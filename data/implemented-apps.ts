@@ -417,6 +417,12 @@ export const implementedAppsUrls = [
   "/selector-canal-venta/",              // Test 10 preguntas: marketplace, plataforma sectorial, tienda propia, RRSS, directa
   "/selector-regimen-fiscal-autonomo/",  // Test 10 preguntas: módulos, directa simplificada, directa normal, SL
   "/selector-movilidad-urbana/",         // Test 10 preguntas: coche, transporte público, moto, bici/patinete, combinación
+  "/selector-gestion-estres/",           // Test 10 preguntas: meditación, ejercicio, terapia, hobbies, desconexión digital
+  "/selector-tipo-alojamiento/",         // Test 10 preguntas: hotel, apartamento, hostel, camping/glamping, casa rural
+  "/selector-tablet/",                   // Test 10 preguntas: Android, iPad, Windows, eReader, sin tablet
+  "/selector-financiacion-empresa/",     // Test 10 preguntas: autofinanciación, préstamo, inversores, crowdfunding, subvenciones
+  "/selector-tipo-gimnasio/",            // Test 10 preguntas: tradicional, CrossFit, yoga/pilates, casa, aire libre
+  "/selector-auriculares/",              // Test 10 preguntas: in-ear TWS, over-ear ANC, deportivos, gaming, cable
 ];
 
 /**

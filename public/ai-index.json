@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 335,
+  "total_tools": 341,
   "updated": "2026-03-28",
   "features": {
     "all_free": true,
@@ -1070,6 +1070,42 @@
           "slug": "selector-regimen-fiscal-autonomo",
           "url": "https://meskeia.com/selector-regimen-fiscal-autonomo/",
           "description": "Orientador de 10 preguntas para autónomos sobre el régimen fiscal: estimación objetiva (módulos), directa simplificada, directa normal o constituir una SL. Orientativo — consultar asesor fiscal"
+        },
+        {
+          "name": "Selector de Gestión del Estrés",
+          "slug": "selector-gestion-estres",
+          "url": "https://meskeia.com/selector-gestion-estres/",
+          "description": "Test de 10 preguntas para elegir el método de gestión del estrés: meditación/mindfulness, ejercicio físico, terapia psicológica, hobbies creativos o desconexión digital"
+        },
+        {
+          "name": "Selector de Tipo de Alojamiento",
+          "slug": "selector-tipo-alojamiento",
+          "url": "https://meskeia.com/selector-tipo-alojamiento/",
+          "description": "Test de 10 preguntas para elegir el tipo de alojamiento en viajes: hotel, apartamento turístico, hostel o B&B, camping o glamping, o casa rural"
+        },
+        {
+          "name": "Selector de Tablet",
+          "slug": "selector-tablet",
+          "url": "https://meskeia.com/selector-tablet/",
+          "description": "Test de 10 preguntas para elegir el tipo de tablet: Android, iPad/iOS, Windows, eReader o prescindir de tablet"
+        },
+        {
+          "name": "Selector de Financiación Empresarial",
+          "slug": "selector-financiacion-empresa",
+          "url": "https://meskeia.com/selector-financiacion-empresa/",
+          "description": "Test de 10 preguntas para elegir la financiación del negocio: autofinanciación, préstamo bancario, inversores/business angels, crowdfunding o subvenciones"
+        },
+        {
+          "name": "Selector de Tipo de Gimnasio",
+          "slug": "selector-tipo-gimnasio",
+          "url": "https://meskeia.com/selector-tipo-gimnasio/",
+          "description": "Test de 10 preguntas para elegir el tipo de entrenamiento: gimnasio tradicional, CrossFit/funcional, yoga/pilates, en casa o al aire libre"
+        },
+        {
+          "name": "Selector de Auriculares",
+          "slug": "selector-auriculares",
+          "url": "https://meskeia.com/selector-auriculares/",
+          "description": "Test de 10 preguntas para elegir el tipo de auriculares: in-ear TWS inalámbricos, over-ear con cancelación de ruido, deportivos, gaming o de cable"
         },
         {
           "name": "Selector de Movilidad Urbana",

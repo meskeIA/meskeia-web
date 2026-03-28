@@ -1,0 +1,362 @@
+/* SelectorTipoGimnasio.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Quiz wrapper */
+.quiz {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Barra de progreso */
+.progreso {
+  margin-bottom: 1.5rem;
+}
+
+.progresoLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.progresoBar {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .progresoBar {
+  background: #444;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Pregunta */
+.pregunta {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .pregunta {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pregunta h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  line-height: 1.4;
+}
+
+/* Opciones */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.opcion {
+  background: var(--bg-primary);
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  line-height: 1.4;
+}
+
+[data-theme='dark'] .opcion {
+  border-color: #555;
+}
+
+.opcion:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.opcion.seleccionada {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .opcion.seleccionada {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+/* Navegación */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btnSecundario {
+  background: transparent;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnSecundario:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.btnSecundario:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  flex: 1;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+
+.btnPrimary:active {
+  transform: scale(0.98);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Resultado */
+.resultado {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.resultadoCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  border-top: 4px solid var(--primary);
+}
+
+[data-theme='dark'] .resultadoCard {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.resultadoIcono {
+  font-size: 3.5rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.resultadoCard h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin: 0 0 1rem;
+}
+
+.resultadoCard p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Marcador de puntuaciones */
+.marcador {
+  margin-top: 1.5rem;
+}
+
+.marcador h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.barraResultado {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.barraLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.barraFondo {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .barraFondo {
+  background: #444;
+}
+
+.barraRelleno {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  transition: width 0.4s ease;
+}
+
+.barraRelleno.ganador {
+  background: linear-gradient(90deg, #2e7d32 0%, #43a047 100%);
+}
+
+.barraPuntos {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  width: 32px;
+  text-align: right;
+}
+
+/* Reiniciar */
+.btnReiniciar {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s;
+  margin-top: 0.5rem;
+}
+
+.btnReiniciar:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* Warning box (indicador v2.0) */
+.warningBox {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  color: #856404;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #3a2e00;
+  border-color: #ffc107;
+  color: #ffd54f;
+}
+
+/* Accesibilidad */
+.opcion:focus-visible,
+.btnPrimary:focus-visible,
+.btnSecundario:focus-visible,
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .pregunta {
+    padding: 1.25rem;
+  }
+
+  .navegacion {
+    flex-direction: column;
+  }
+
+  .btnSecundario {
+    order: 2;
+  }
+
+  .barraLabel {
+    width: 120px;
+    font-size: 0.78rem;
+  }
+}
+
+/* Preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

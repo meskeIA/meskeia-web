@@ -1504,6 +1504,54 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/selector-contrato-trabajo/', icon: '📋', name: 'Selector Contrato de Trabajo', description: '¿Qué tipo de contrato te conviene?' },
   ],
 
+  // Gestión del estrés
+  'selector-gestion-estres': [
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué tipo de ejercicio te conviene?' },
+    { url: '/selector-tipo-gimnasio/', icon: '🏟️', name: 'Selector Tipo de Gimnasio', description: 'Gimnasio, CrossFit, yoga o casa' },
+    { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: '¿Qué dieta se adapta a ti?' },
+    { url: '/selector-herramienta-productividad/', icon: '⚡', name: 'Selector Método Productividad', description: 'GTD, Pomodoro, Kanban...' },
+  ],
+
+  // Tipo de alojamiento
+  'selector-tipo-alojamiento': [
+    { url: '/selector-vacaciones/', icon: '✈️', name: 'Selector de Vacaciones', description: '¿Playa, montaña o ciudad?' },
+    { url: '/presupuesto-viaje/', icon: '💰', name: 'Presupuesto de Viaje', description: 'Planifica los gastos de tu viaje' },
+    { url: '/lista-equipaje/', icon: '🧳', name: 'Lista de Equipaje', description: 'Checklist personalizado de viaje' },
+    { url: '/selector-idioma/', icon: '🌍', name: 'Selector de Idioma', description: '¿Qué idioma aprender?' },
+  ],
+
+  // Tablet
+  'selector-tablet': [
+    { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿iOS o Android?' },
+    { url: '/selector-portatil/', icon: '💻', name: 'Selector de Portátil', description: '¿Qué portátil necesitas?' },
+    { url: '/selector-tipo-television/', icon: '📺', name: 'Selector de Televisión', description: 'OLED, QLED o LED' },
+    { url: '/selector-auriculares/', icon: '🎧', name: 'Selector de Auriculares', description: '¿Qué auriculares necesitas?' },
+  ],
+
+  // Financiación empresarial
+  'selector-financiacion-empresa': [
+    { url: '/selector-modelo-negocio/', icon: '💼', name: 'Selector Modelo de Negocio', description: '¿Tienda, servicios o SaaS?' },
+    { url: '/selector-forma-juridica/', icon: '⚖️', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
+    { url: '/selector-canal-venta/', icon: '🛒', name: 'Selector Canal de Venta', description: '¿Marketplace o tienda propia?' },
+    { url: '/selector-regimen-fiscal-autonomo/', icon: '🧾', name: 'Selector Régimen Fiscal', description: '¿Módulos, directa o SL?' },
+  ],
+
+  // Tipo de gimnasio
+  'selector-tipo-gimnasio': [
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué tipo de actividad física elegir?' },
+    { url: '/selector-gestion-estres/', icon: '🧘', name: 'Selector Gestión del Estrés', description: '¿Cómo manejas el estrés?' },
+    { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: '¿Qué dieta se adapta a ti?' },
+    { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
+  ],
+
+  // Auriculares
+  'selector-auriculares': [
+    { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿iOS o Android?' },
+    { url: '/selector-portatil/', icon: '💻', name: 'Selector de Portátil', description: '¿Qué portátil necesitas?' },
+    { url: '/selector-tablet/', icon: '🖥️', name: 'Selector de Tablet', description: '¿Qué tablet necesitas?' },
+    { url: '/selector-tipo-television/', icon: '📺', name: 'Selector de Televisión', description: 'OLED, QLED o LED' },
+  ],
+
   // Movilidad urbana
   'selector-movilidad-urbana': [
     { url: '/selector-vehiculo-electrico/', icon: '⚡', name: 'Selector Vehículo Eléctrico', description: '¿BEV, PHEV o híbrido?' },
@@ -1686,6 +1734,20 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Movilidad
     'selector-movilidad-urbana': { title: 'Más herramientas sobre movilidad y transporte', icon: '🚲' },
+
+    // Salud y bienestar (nuevas)
+    'selector-gestion-estres': { title: 'Más herramientas de salud y bienestar', icon: '🧘' },
+    'selector-tipo-gimnasio': { title: 'Más herramientas de ejercicio y salud', icon: '🏋️' },
+
+    // Viajes y alojamiento
+    'selector-tipo-alojamiento': { title: 'Más herramientas para viajes', icon: '🏨' },
+
+    // Tecnología
+    'selector-tablet': { title: 'Más herramientas para elegir tecnología', icon: '📱' },
+    'selector-auriculares': { title: 'Más herramientas para elegir tecnología', icon: '🎧' },
+
+    // Financiación y emprendimiento
+    'selector-financiacion-empresa': { title: 'Más herramientas para emprendedores', icon: '💰' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };
