@@ -1,0 +1,515 @@
+/* ============================================
+   Selector de Seguro de Vida — CSS Module
+   Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal)
+   ============================================ */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 auto;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* ---- Sección del test ---- */
+.testSection {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ---- Barra de progreso ---- */
+.progreso {
+  margin-bottom: 2rem;
+}
+
+.progresoBar {
+  background-color: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 9999px;
+  transition: width 0.35s ease;
+}
+
+/* ---- Pregunta ---- */
+.pregunta {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.preguntaTexto {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  line-height: 1.45;
+}
+
+/* ---- Opciones ---- */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.opcionBtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ---- Navegación ---- */
+.navegacion {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado,
+.btnReiniciar {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  border: none;
+}
+
+.btnAnterior:focus-visible,
+.btnSiguiente:focus-visible,
+.btnResultado:focus-visible,
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnAnterior {
+  background-color: var(--bg-card);
+  border: 2px solid #cccccc;
+  color: var(--text-secondary);
+}
+
+.btnAnterior:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnSiguiente,
+.btnResultado {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  flex: 1;
+  min-width: 160px;
+}
+
+.btnSiguiente:disabled,
+.btnResultado:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnSiguiente:not(:disabled):hover,
+.btnResultado:not(:disabled):hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnReiniciar {
+  background-color: var(--bg-card);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  margin-top: 1rem;
+}
+
+.btnReiniciar:hover {
+  background-color: rgba(46, 134, 171, 0.08);
+}
+
+/* ---- Sección de resultado ---- */
+.resultadoSection {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.resultadoCard {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Colores por recomendación ---- */
+.recomendacion_temporal {
+  border-top: 5px solid #2E86AB;
+}
+
+.recomendacion_ahorro {
+  border-top: 5px solid #48A9A6;
+}
+
+.recomendacion_mixto {
+  border-top: 5px solid #e8a020;
+}
+
+.recomendacion_ninguno {
+  border-top: 5px solid #888888;
+}
+
+.recomendacionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem;
+}
+
+.recomendacionSubtitulo {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  font-style: italic;
+}
+
+.recomendacionDesc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.25rem;
+}
+
+/* ---- Grid capital orientativo ---- */
+.capitalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.capitalCard {
+  background-color: var(--bg-primary);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.capitalCard h4 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 0 0 0.3rem;
+}
+
+.capitalCard p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ---- Para quién ---- */
+.paraQuienList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.paraQuienList li {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  padding-left: 1.25rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.paraQuienList li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ---- Consejos ---- */
+.consejosSection {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1.25rem;
+}
+
+.consejosSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.consejosSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.consejosSection li {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  padding-left: 1.3rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.consejosSection li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+/* ---- Warning box ---- */
+.warningBox {
+  background-color: rgba(232, 160, 32, 0.1);
+  border: 1px solid rgba(232, 160, 32, 0.4);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin-top: 1rem;
+}
+
+.warningBox strong {
+  color: #b87200;
+}
+
+/* ---- Etiqueta de resultado ---- */
+.etiquetaResultado {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.etiqueta_temporal {
+  background-color: rgba(46, 134, 171, 0.15);
+  color: #1a6688;
+}
+
+.etiqueta_ahorro {
+  background-color: rgba(72, 169, 166, 0.15);
+  color: #2d7b79;
+}
+
+.etiqueta_mixto {
+  background-color: rgba(232, 160, 32, 0.15);
+  color: #a06a00;
+}
+
+.etiqueta_ninguno {
+  background-color: rgba(136, 136, 136, 0.15);
+  color: #555555;
+}
+
+/* ---- Dark mode ---- */
+[data-theme='dark'] .pregunta,
+[data-theme='dark'] .resultadoCard {
+  background-color: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .progresoBar {
+  border-color: #444444;
+  background-color: #333333;
+}
+
+[data-theme='dark'] .opcionBtn {
+  background-color: var(--bg-card);
+  border-color: #444444;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.18);
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .btnAnterior {
+  border-color: #555555;
+  color: var(--text-secondary);
+  background-color: var(--bg-card);
+}
+
+[data-theme='dark'] .btnAnterior:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .btnReiniciar {
+  background-color: var(--bg-card);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .capitalCard {
+  background-color: #333333;
+  border-color: #555555;
+}
+
+[data-theme='dark'] .consejosSection {
+  border-top-color: #444444;
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(232, 160, 32, 0.07);
+  border-color: rgba(232, 160, 32, 0.3);
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #d4a030;
+}
+
+[data-theme='dark'] .etiqueta_temporal {
+  background-color: rgba(46, 134, 171, 0.2);
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .etiqueta_ahorro {
+  background-color: rgba(72, 169, 166, 0.2);
+  color: #7eccc9;
+}
+
+[data-theme='dark'] .etiqueta_mixto {
+  background-color: rgba(232, 160, 32, 0.15);
+  color: #e8b857;
+}
+
+[data-theme='dark'] .etiqueta_ninguno {
+  background-color: rgba(136, 136, 136, 0.2);
+  color: #aaaaaa;
+}
+
+/* ---- Reducción de movimiento ---- */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 540px) {
+  .hero {
+    padding: 2rem 1rem 2rem;
+  }
+
+  .testSection,
+  .resultadoSection {
+    padding: 1.5rem 1rem;
+  }
+
+  .pregunta {
+    padding: 1.25rem;
+  }
+
+  .navegacion {
+    flex-direction: column;
+  }
+
+  .btnSiguiente,
+  .btnResultado {
+    min-width: unset;
+  }
+
+  .capitalGrid {
+    grid-template-columns: 1fr;
+  }
+}

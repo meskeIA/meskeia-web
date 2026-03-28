@@ -568,10 +568,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro necesitas?' },
   ],
   'selector-zona-residencia': [
+    { url: '/selector-tipo-vivienda/', icon: '🏠', name: 'Selector Tipo de Vivienda', description: '¿Piso, casa, ático o estudio?' },
     { url: '/selector-alquiler-vs-compra/', icon: '🏠', name: 'Selector Alquiler o Compra', description: '¿Te conviene más alquilar o comprar?' },
-    { url: '/calculadora-costes-teletrabajo/', icon: '💻', name: 'Costes del Teletrabajo', description: 'Cuánto ahorras trabajando en casa' },
     { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
     { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro de hogar necesitas?' },
+  ],
+  'selector-tipo-vivienda': [
+    { url: '/selector-zona-residencia/', icon: '🏡', name: 'Selector Zona de Residencia', description: '¿Ciudad, pueblo o costa?' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Orientador Alquiler vs Compra', description: 'Análisis financiero completo' },
+    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Estimador de Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
   'selector-dieta': [
     { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Calcula tu índice de masa corporal' },
@@ -1351,6 +1357,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto necesitas ahorrar' },
     { url: '/selector-plan-pensiones/', icon: '🏦', name: 'Selector Plan de Pensiones', description: 'Test: ¿te conviene contratar uno?' },
   ],
+  'selector-inversiones': [
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Descubre tu tolerancia al riesgo' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Simula el crecimiento de tus ahorros' },
+    { url: '/selector-tipo-ahorro/', icon: '💶', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
+    { url: '/selector-plan-pensiones/', icon: '🏦', name: 'Selector Plan de Pensiones', description: 'Test: ¿te conviene contratar un plan?' },
+  ],
   'selector-tipo-prestamo': [
     { url: '/estimador-prestamos/', icon: '🏦', name: 'Simulador de Préstamos', description: 'Calcula cuota y coste total' },
     { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
@@ -1378,6 +1390,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Gastos del Hogar', description: 'Control de tu presupuesto mensual' },
     { url: '/estimador-reformas-hogar/', icon: '🔨', name: 'Estimador Reformas', description: 'Coste estimado de tu reforma' },
     { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro Hogar', description: '¿Qué cobertura de seguro necesitas?' },
+  ],
+
+  // Educación y orientación vocacional
+  'selector-carrera-universitaria': [
+    { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización de tu empresa' },
+    { url: '/selector-contrato-trabajo/', icon: '📄', name: 'Selector de Contrato', description: '¿Qué modalidad laboral te conviene?' },
+    { url: '/selector-forma-juridica/', icon: '🏢', name: 'Selector Forma Jurídica', description: '¿Autónomo o sociedad limitada?' },
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Descubre tu tolerancia al riesgo' },
+  ],
+
+  // Productividad — métodos de trabajo
+  'selector-herramienta-productividad': [
+    { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Temporizador Pomodoro', description: 'Técnica de concentración 25/5' },
+    { url: '/time-tracker/', icon: '⏱️', name: 'Time Tracker', description: 'Registra tu tiempo por proyecto' },
+    { url: '/test-burnout-laboral/', icon: '🔥', name: 'Test de Burnout Laboral', description: '¿Estás al límite en el trabajo?' },
+    { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento de Hábitos', description: 'Construye rutinas productivas' },
+  ],
+
+  // Seguros de vida
+  'selector-seguro-vida': [
+    { url: '/orientador-seguro-vida/', icon: '🛡️', name: 'Calculadora Seguro de Vida', description: 'Calcula el capital asegurado que necesitas' },
+    { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/selector-tipo-ahorro/', icon: '💰', name: 'Selector Tipo de Ahorro', description: '¿Dónde poner tus ahorros?' },
   ],
 };
 
@@ -1493,8 +1529,10 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'selector-mascota': { title: 'Más herramientas de salud y bienestar', icon: '🐾' },
     'selector-seguro-salud': { title: 'Más herramientas de salud y finanzas', icon: '🏥' },
     'selector-seguro-hogar': { title: 'Más herramientas para el hogar y seguros', icon: '🏠' },
+    'selector-seguro-vida': { title: 'Más herramientas de seguros y finanzas', icon: '🛡️' },
     'selector-alquiler-vs-compra': { title: 'Más herramientas para decidir sobre vivienda', icon: '🏠' },
     'selector-zona-residencia': { title: 'Más herramientas sobre vivienda y estilo de vida', icon: '🏡' },
+    'selector-tipo-vivienda': { title: 'Más herramientas sobre vivienda', icon: '🏠' },
     'selector-dieta': { title: 'Más herramientas de salud y bienestar', icon: '🥗' },
     'selector-ejercicio': { title: 'Más herramientas de salud y bienestar', icon: '🏋️' },
     'selector-modelo-negocio': { title: 'Más herramientas para emprender', icon: '🏢' },
@@ -1509,6 +1547,7 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Jubilación y ahorro
     'selector-plan-pensiones': { title: 'Más herramientas de jubilación y ahorro', icon: '🏦' },
+    'selector-inversiones': { title: 'Más herramientas de inversión y finanzas', icon: '📈' },
 
     // Trabajo y empleo
     'selector-contrato-trabajo': { title: 'Más herramientas para el trabajo', icon: '💼' },
@@ -1521,6 +1560,12 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
 
     // Finanzas — préstamos
     'selector-tipo-prestamo': { title: 'Más herramientas de finanzas', icon: '💳' },
+
+    // Educación y orientación vocacional
+    'selector-carrera-universitaria': { title: 'Más herramientas para estudiantes', icon: '🎓' },
+
+    // Productividad — métodos
+    'selector-herramienta-productividad': { title: 'Más herramientas de productividad', icon: '⚡' },
   };
 
   return familyTitles[appSlug] || { title: 'Apps relacionadas', icon: '🔗' };

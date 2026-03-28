@@ -1,0 +1,525 @@
+/* ============================================
+   Selector de Carrera Universitaria
+   meskeIA — Paleta oficial
+   ============================================ */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin: 0 auto;
+  max-width: 640px;
+  opacity: 0.92;
+  line-height: 1.5;
+}
+
+/* ---- Sección principal del test ---- */
+.testSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* ---- Progreso ---- */
+.progreso {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.progresoLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.progresoBar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-card);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ---- Tarjeta de pregunta ---- */
+.pregunta {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+}
+
+.preguntaTexto {
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin: 0 0 1.25rem;
+}
+
+/* ---- Opciones ---- */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.opcionBtn {
+  display: block;
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+  outline: none;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--accent);
+  background-color: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.12);
+  font-weight: 600;
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+/* ---- Navegación ---- */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado,
+.btnReiniciar {
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.18s ease, transform 0.15s ease, background-color 0.18s ease;
+  outline: none;
+}
+
+.btnAnterior:focus-visible,
+.btnSiguiente:focus-visible,
+.btnResultado:focus-visible,
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnAnterior {
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.btnAnterior:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btnSiguiente {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  margin-left: auto;
+}
+
+.btnSiguiente:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnSiguiente:disabled,
+.btnAnterior:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnResultado {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  margin-left: auto;
+}
+
+.btnResultado:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnResultado:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnReiniciar {
+  background-color: var(--bg-card);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  margin: 1.5rem auto 0;
+  display: block;
+}
+
+.btnReiniciar:hover {
+  background-color: rgba(46, 134, 171, 0.08);
+}
+
+/* ---- Sección de resultado ---- */
+.resultadoSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem 2rem;
+}
+
+.resultadoCard {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.resultadoHeader {
+  padding: 2rem 2rem 1.5rem;
+  color: #fff;
+  text-align: center;
+}
+
+.resultadoEmoji {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  line-height: 1;
+}
+
+.recomendacionTitulo {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.recomendacionSubtitulo {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.resultadoBody {
+  background-color: var(--bg-card);
+  padding: 1.5rem 2rem;
+}
+
+.recomendacionDesc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Carreras grid ---- */
+.carrerasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.carreraCard {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  border-left: 3px solid var(--primary);
+}
+
+/* ---- Salidas laborales ---- */
+.salidasSection {
+  margin-top: 1.25rem;
+}
+
+.salidasTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+}
+
+.salidasLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.salidasLista li {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.salidasLista li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ---- Colores por recomendación ---- */
+.recomendacion_ciencias .resultadoHeader {
+  background: linear-gradient(135deg, #2E86AB 0%, #1a6a8a 100%);
+}
+
+.recomendacion_ciencias .carreraCard {
+  border-left-color: #2E86AB;
+}
+
+.recomendacion_salud .resultadoHeader {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.recomendacion_salud .carreraCard {
+  border-left-color: #e74c3c;
+}
+
+.recomendacion_humanidades .resultadoHeader {
+  background: linear-gradient(135deg, #9b59b6 0%, #7d3c98 100%);
+}
+
+.recomendacion_humanidades .carreraCard {
+  border-left-color: #9b59b6;
+}
+
+.recomendacion_tecnologia .resultadoHeader {
+  background: linear-gradient(135deg, #48A9A6 0%, #2e8a87 100%);
+}
+
+.recomendacion_tecnologia .carreraCard {
+  border-left-color: #48A9A6;
+}
+
+.recomendacion_arte .resultadoHeader {
+  background: linear-gradient(135deg, #e8a020 0%, #c47d10 100%);
+}
+
+.recomendacion_arte .carreraCard {
+  border-left-color: #e8a020;
+}
+
+/* ---- Puntuación detallada ---- */
+.puntuacionDetalle {
+  background-color: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.puntuacionTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.8rem;
+}
+
+.puntuacionFila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.puntuacionEtiqueta {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  min-width: 160px;
+  font-weight: 500;
+}
+
+.puntuacionBarraWrap {
+  flex: 1;
+  background-color: var(--bg-card);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.puntuacionBarra {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.puntuacionValor {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ---- Warning box ---- */
+.warningBox {
+  background-color: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin: 1rem 0;
+}
+
+.warningBox strong {
+  color: var(--primary);
+}
+
+/* ---- Dark mode ---- */
+[data-theme='dark'] .pregunta,
+[data-theme='dark'] .resultadoBody {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .opcionBtn {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  background-color: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  background-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .progresoBar {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .puntuacionDetalle {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .carreraCard {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .btnAnterior {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnAnterior:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .pregunta {
+    padding: 1.25rem;
+  }
+
+  .resultadoBody {
+    padding: 1.25rem;
+  }
+
+  .carrerasGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .puntuacionEtiqueta {
+    min-width: 120px;
+    font-size: 0.82rem;
+  }
+
+  .navegacion {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btnSiguiente,
+  .btnResultado {
+    margin-left: 0;
+  }
+}
+
+/* ---- Accesibilidad: movimiento reducido ---- */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

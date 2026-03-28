@@ -583,10 +583,28 @@
           "description": "Test de 10 preguntas para descubrir qué tecnología de panel de TV conviene: OLED, QLED/Mini-LED, LED LCD IPS o LED LCD VA. Analiza uso, iluminación de la habitación, ángulos de visión, gaming y presupuesto"
         },
         {
+          "name": "Selector de Carrera Universitaria",
+          "slug": "selector-carrera-universitaria",
+          "url": "https://meskeia.com/selector-carrera-universitaria/",
+          "description": "Test de 10 preguntas para saber qué rama universitaria se adapta mejor al perfil: ciencias/ingeniería, salud, humanidades/sociales, tecnología/informática o arte/diseño. Orientación vocacional sin mencionar universidades concretas"
+        },
+        {
+          "name": "Selector de Método de Productividad",
+          "slug": "selector-herramienta-productividad",
+          "url": "https://meskeia.com/selector-herramienta-productividad/",
+          "description": "Test de 10 preguntas para saber qué método de productividad se adapta mejor al estilo de trabajo: GTD, Pomodoro, Kanban, Timeboxing o Inbox Zero. Análisis según tipo de tareas, distracciones, contextos y objetivos"
+        },
+        {
           "name": "Selector de Coche Nuevo o Usado",
           "slug": "selector-coche-nuevo-usado",
           "url": "https://meskeia.com/selector-coche-nuevo-usado/",
           "description": "Test de 10 preguntas para saber si conviene más un coche nuevo, seminuevo (1-3 años) o de segunda mano según presupuesto, km previstos, importancia de la garantía y etiqueta DGT"
+        },
+        {
+          "name": "Selector de Seguro de Vida",
+          "slug": "selector-seguro-vida",
+          "url": "https://meskeia.com/selector-seguro-vida/",
+          "description": "Test de 10 preguntas para saber si se necesita un seguro de vida y qué tipo conviene: temporal (protección pura), ahorro/vida entera, mixto o ninguno por ahora. Análisis según cargas familiares, hipoteca y situación económica"
         },
         {
           "name": "Selector de Mascota",
@@ -629,6 +647,12 @@
           "slug": "selector-zona-residencia",
           "url": "https://meskeia.com/selector-zona-residencia/",
           "description": "Test de 10 preguntas para descubrir qué tipo de zona de residencia se adapta mejor al estilo de vida, trabajo y familia: ciudad grande, ciudad media, zona rural o pueblo, o costa"
+        },
+        {
+          "name": "Selector de Tipo de Vivienda",
+          "slug": "selector-tipo-vivienda",
+          "url": "https://meskeia.com/selector-tipo-vivienda/",
+          "description": "Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a la situación familiar, presupuesto y estilo de vida: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido"
         },
         {
           "name": "Selector de Tipo de Vehículo",
@@ -974,6 +998,12 @@
           "slug": "selector-tipo-ahorro",
           "url": "https://meskeia.com/selector-tipo-ahorro/",
           "description": "Test de 10 preguntas para saber qué vehículo de ahorro conviene: cuenta remunerada, depósito a plazo fijo, fondo indexado o una combinación. Análisis según liquidez, horizonte temporal y perfil de riesgo"
+        },
+        {
+          "name": "Selector de Tipo de Inversión",
+          "slug": "selector-inversiones",
+          "url": "https://meskeia.com/selector-inversiones/",
+          "description": "Test de 10 preguntas para saber qué vehículo de inversión se adapta mejor al perfil: fondos indexados, acciones directas, renta fija, inversión inmobiliaria o plan de pensiones/PPI. Análisis según horizonte temporal, tolerancia al riesgo y conocimiento financiero"
         },
         {
           "name": "Estimador Impuesto de Sucesiones",

@@ -378,6 +378,7 @@ export const implementedAppsUrls = [
   "/selector-ejercicio/",                    // Test 10 preguntas: gimnasio, running, natación, ciclismo, yoga, casa
   "/selector-seguro-hogar/",                 // Test 10 preguntas: cobertura básica, estándar o completa
   "/selector-zona-residencia/",              // Test 10 preguntas: ciudad grande, ciudad media, rural o costa
+  "/selector-tipo-vivienda/",               // Test 10 preguntas: piso, casa unifamiliar, ático, estudio o compartido
 
   "/selector-coche-nuevo-usado/",             // Test 10 preguntas: nuevo, seminuevo o segunda mano
 
@@ -391,6 +392,7 @@ export const implementedAppsUrls = [
   // Herramientas de ahorro y jubilación (2026-03-28)
   "/selector-plan-pensiones/",            // Test 10 preguntas: individual, empleo, EPSV, diversificar o ninguno
   "/selector-tipo-ahorro/",              // Test 10 preguntas: cuenta remunerada, depósito, fondo indexado o combinación
+  "/selector-inversiones/",             // Test 10 preguntas: fondos indexados, acciones, renta fija, inmobiliario o pensiones
 
   // Herramientas de tecnología de hogar (2026-03-28)
   "/selector-tipo-television/",           // Test 10 preguntas: OLED, QLED/Mini-LED, LED IPS o LED VA
@@ -400,6 +402,9 @@ export const implementedAppsUrls = [
   "/selector-contrato-trabajo/",         // Test 10 preguntas: indefinido, temporal, autónomo, prácticas, funcionario
   "/selector-tipo-prestamo/",            // Test 10 preguntas: personal, hipotecario, consumo, línea crédito, microcrédito
   "/selector-energia-hogar/",            // Test 10 preguntas: gas, eléctrico/bomba calor, aerotermia, biomasa, solar
+  "/selector-carrera-universitaria/",    // Test 10 preguntas: ciencias/ingeniería, salud, humanidades, tecnología, arte/diseño
+  "/selector-herramienta-productividad/", // Test 10 preguntas: GTD, Pomodoro, Kanban, Timeboxing, Inbox Zero
+  "/selector-seguro-vida/",              // Test 10 preguntas: temporal, ahorro/vida entera, mixto o ninguno por ahora
 ];
 
 /**

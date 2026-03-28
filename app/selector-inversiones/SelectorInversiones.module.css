@@ -1,0 +1,443 @@
+/* ============================================================
+   SelectorInversiones.module.css — paleta meskeIA
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ── Sección test ─────────────────────────────────────────── */
+.testSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* ── Progreso ─────────────────────────────────────────────── */
+.progreso {
+  margin-bottom: 1.75rem;
+}
+
+.progresoBar {
+  background-color: #e0e0e0;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .progresoBar {
+  background-color: #3a3a3a;
+}
+
+.progresoFill {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.progresoTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+  text-align: right;
+}
+
+/* ── Pregunta ─────────────────────────────────────────────── */
+.pregunta {
+  background-color: var(--bg-card);
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .pregunta {
+  border-color: #3a3a3a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.preguntaNumero {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.preguntaTexto {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  line-height: 1.4;
+}
+
+/* ── Opciones ─────────────────────────────────────────────── */
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.opcionBtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  line-height: 1.4;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .opcionBtn {
+  border-color: #3a3a3a;
+  background-color: var(--bg-card);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn.selected {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+/* ── Navegación ───────────────────────────────────────────── */
+.navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btnAnterior,
+.btnSiguiente,
+.btnResultado,
+.btnReiniciar {
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btnAnterior {
+  background-color: transparent;
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.btnAnterior:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.btnAnterior:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSiguiente,
+.btnResultado {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.btnSiguiente:hover,
+.btnResultado:hover {
+  background-color: #2474a0;
+  border-color: #2474a0;
+}
+
+.btnSiguiente:focus-visible,
+.btnResultado:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSiguiente:disabled,
+.btnResultado:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnReiniciar {
+  background-color: transparent;
+  border-color: var(--secondary);
+  color: var(--secondary);
+  display: block;
+  margin: 1.5rem auto 0;
+}
+
+.btnReiniciar:hover {
+  background-color: var(--secondary);
+  color: #ffffff;
+}
+
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* ── Resultado ─────────────────────────────────────────────── */
+.resultadoSection {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.resultadoCard {
+  background-color: var(--bg-card);
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .resultadoCard {
+  border-color: #3a3a3a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.resultadoBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+/* ── Colores por recomendación ──────────────────────────────── */
+.recomendacion_indexados { border-left: 5px solid #2E86AB; }
+.recomendacion_acciones   { border-left: 5px solid #e8a020; }
+.recomendacion_renta_fija { border-left: 5px solid #48A9A6; }
+.recomendacion_inmobiliario { border-left: 5px solid #6aaa5e; }
+.recomendacion_pensiones  { border-left: 5px solid #9b59b6; }
+
+.badge_indexados    { background-color: #2E86AB; }
+.badge_acciones     { background-color: #e8a020; }
+.badge_renta_fija   { background-color: #48A9A6; }
+.badge_inmobiliario { background-color: #6aaa5e; }
+.badge_pensiones    { background-color: #9b59b6; }
+
+.recomendacionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.recomendacionSubtitulo {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.recomendacionDesc {
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Grid de características ───────────────────────────────── */
+.caracteristicasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 540px) {
+  .caracteristicasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.caracteristicaCard {
+  background-color: var(--bg-primary);
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+[data-theme='dark'] .caracteristicaCard {
+  border-color: #3a3a3a;
+}
+
+.caracteristicaCard h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.caracteristicaCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.caracteristicaCard ul li {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  padding-left: 1.1em;
+  position: relative;
+  line-height: 1.4;
+}
+
+.caracteristicaCard ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+}
+
+.perfilTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Alertas ────────────────────────────────────────────────── */
+.alertasSection {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .alertasSection {
+  background-color: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+.alertasSection p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Warning box (v2.0) ────────────────────────────────────── */
+.warningBox {
+  background-color: #fff8e1;
+  border: 1px solid #f0c040;
+  border-left: 4px solid #f0c040;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  font-size: 0.92rem;
+  color: #5a4500;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: #2e2800;
+  border-color: #b8960c;
+  color: #f5d76e;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .pregunta {
+    padding: 1.25rem;
+  }
+
+  .resultadoCard {
+    padding: 1.25rem;
+  }
+
+  .navegacion {
+    flex-direction: column;
+  }
+
+  .btnAnterior,
+  .btnSiguiente,
+  .btnResultado {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
