@@ -281,7 +281,7 @@
       "post": {
         "operationId": "recomendarTipoInversion",
         "summary": "Recomienda el tipo de inversión más adecuado según el perfil del usuario",
-        "description": "Analiza 10 factores clave del perfil inversor (horizonte temporal, tolerancia al riesgo, conocimiento financiero, capital disponible, necesidad de liquidez, ventaja fiscal, disposición a gestionar, interés inmobiliario, preocupación por inflación y fondo de emergencia) y recomienda el vehículo más adecuado entre: fondos indexados, acciones directas, renta fija, inversión inmobiliaria o plan de pensiones. Incluye puntuaciones detalladas y segunda opción.",
+        "description": "Analiza el perfil inversor en 10 dimensiones (horizonte, riesgo, conocimiento, capital, liquidez, fiscalidad, gestión, inmobiliario, inflación y fondo de emergencia) y recomienda el vehículo más adecuado: fondos indexados, acciones, renta fija, inmobiliario o pensiones. Incluye puntuaciones y segunda opción.",
         "requestBody": {
           "required": true,
           "content": {
