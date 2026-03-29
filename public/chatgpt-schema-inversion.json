@@ -3,7 +3,7 @@
   "info": {
     "title": "meskeIA — Inversión y Ahorro España",
     "description": "Calculadoras financieras para inversores y ahorradores en España: interés compuesto, objetivos de ahorro, plusvalías IRPF 2025, reequilibrio de cartera, planes de pensiones y retención sobre dividendos.",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "servers": [
     {
@@ -273,6 +273,92 @@
         "responses": {
           "200": {
             "description": "Aportación deducible, ahorro fiscal anual, tipo marginal IRPF y capital estimado al jubilarse."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/selector-inversiones": {
+      "post": {
+        "operationId": "recomendarTipoInversion",
+        "summary": "Recomienda el tipo de inversión más adecuado según el perfil del usuario",
+        "description": "Analiza 10 factores clave del perfil inversor (horizonte temporal, tolerancia al riesgo, conocimiento financiero, capital disponible, necesidad de liquidez, ventaja fiscal, disposición a gestionar, interés inmobiliario, preocupación por inflación y fondo de emergencia) y recomienda el vehículo más adecuado entre: fondos indexados, acciones directas, renta fija, inversión inmobiliaria o plan de pensiones. Incluye puntuaciones detalladas y segunda opción.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "horizonte_temporal",
+                  "reaccion_caida",
+                  "conocimiento_financiero",
+                  "capital_disponible",
+                  "importancia_liquidez",
+                  "ventaja_fiscal",
+                  "gestion_activa",
+                  "interes_inmobiliario",
+                  "preocupacion_inflacion",
+                  "fondo_emergencia"
+                ],
+                "properties": {
+                  "horizonte_temporal": {
+                    "type": "string",
+                    "enum": ["menos_2_anos", "2_a_5_anos", "5_a_15_anos", "mas_15_anos"],
+                    "description": "¿Cuándo podría necesitar el dinero? 'menos_2_anos': antes de 2 años, '2_a_5_anos': en 2-5 años, '5_a_15_anos': en 5-15 años, 'mas_15_anos': más de 15 años (incluye jubilación)."
+                  },
+                  "reaccion_caida": {
+                    "type": "string",
+                    "enum": ["vendo_todo", "aguanto_preocupado", "acepto_recuperacion", "compro_mas"],
+                    "description": "Si tu cartera cayera un 40%, ¿qué harías? 'vendo_todo': vendería para no perder más, 'aguanto_preocupado': aguantaría pero con angustia, 'acepto_recuperacion': aceptaría la caída esperando recuperación, 'compro_mas': aprovecharía para comprar más."
+                  },
+                  "conocimiento_financiero": {
+                    "type": "string",
+                    "enum": ["muy_basico", "conceptos_basicos", "sigo_mercados", "avanzado"],
+                    "description": "Nivel de conocimiento financiero. 'muy_basico': no sé cómo funcionan los mercados, 'conceptos_basicos': conozco los conceptos básicos, 'sigo_mercados': sigo los mercados habitualmente, 'avanzado': analizo empresas y gestiono activamente."
+                  },
+                  "capital_disponible": {
+                    "type": "string",
+                    "enum": ["menos_5k", "5k_20k", "20k_100k", "mas_100k"],
+                    "description": "Capital disponible para invertir (excluyendo fondo de emergencia). 'menos_5k': menos de 5.000€, '5k_20k': entre 5.000 y 20.000€, '20k_100k': entre 20.000 y 100.000€, 'mas_100k': más de 100.000€."
+                  },
+                  "importancia_liquidez": {
+                    "type": "string",
+                    "enum": ["muy_alta", "alta", "media", "baja"],
+                    "description": "¿Qué importancia tiene poder acceder rápidamente al dinero? 'muy_alta': necesito poder disponer de él en días, 'alta': prefiero poder vender en semanas, 'media': puedo esperar meses si es necesario, 'baja': no me importa que esté bloqueado años."
+                  },
+                  "ventaja_fiscal": {
+                    "type": "string",
+                    "enum": ["tramo_alto", "autonomo", "situacion_normal", "empresa_sociedad"],
+                    "description": "Situación fiscal. 'tramo_alto': soy asalariado en tramo alto de IRPF (>45%), 'autonomo': soy autónomo y quiero reducir base imponible, 'situacion_normal': situación fiscal estándar, 'empresa_sociedad': invierto a través de una sociedad."
+                  },
+                  "gestion_activa": {
+                    "type": "string",
+                    "enum": ["no_automatizar", "revisar_anual", "seguir_habitualmente", "intensiva"],
+                    "description": "Preferencia de gestión. 'no_automatizar': quiero que todo funcione solo sin intervención, 'revisar_anual': revisaría mi cartera una vez al año, 'seguir_habitualmente': seguiría los mercados cada semana, 'intensiva': dedicaría horas semanales a gestionar mis inversiones."
+                  },
+                  "interes_inmobiliario": {
+                    "type": "string",
+                    "enum": ["objetivo_principal", "si_capital_suficiente", "prefiero_financiero", "no_iliquidez"],
+                    "description": "¿Te interesa invertir en inmuebles? 'objetivo_principal': es mi principal objetivo de inversión, 'si_capital_suficiente': me interesa si tengo capital suficiente, 'prefiero_financiero': prefiero activos financieros más líquidos, 'no_iliquidez': no, no quiero activos ilíquidos."
+                  },
+                  "preocupacion_inflacion": {
+                    "type": "string",
+                    "enum": ["mucho", "bastante", "moderado", "poco"],
+                    "description": "¿Cuánto te preocupa que la inflación erosione tu patrimonio a largo plazo? 'mucho': es mi principal preocupación, 'bastante': me preocupa bastante, 'moderado': moderadamente, 'poco': no es una preocupación relevante para mí."
+                  },
+                  "fondo_emergencia": {
+                    "type": "string",
+                    "enum": ["no_todo_ahorro", "algo_incompleto", "si_separado", "si_y_otros_activos"],
+                    "description": "Situación del fondo de emergencia. 'no_todo_ahorro': no tengo, este dinero es todo mi ahorro, 'algo_incompleto': tengo algo pero no cubre 6 meses de gastos, 'si_separado': sí, tengo 6+ meses de gastos en cuenta separada, 'si_y_otros_activos': sí, y además tengo otros activos ya invertidos."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tipo de inversión recomendado, descripción, ventajas, riesgos, perfil ideal, segunda opción y puntuaciones detalladas."
           }
         }
       }
