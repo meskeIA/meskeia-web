@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "meskeIA — Freelance España",
-    "description": "Calculadoras especializadas para autónomos y freelances españoles: tarifa hora, horas facturables, Modelo 130, gastos deducibles IRPF, IVA y break-even.",
-    "version": "1.0.0"
+    "description": "Calculadoras especializadas para autónomos y freelances españoles: tarifa hora, horas facturables, Modelo 130, gastos deducibles IRPF, IVA, break-even y selector de régimen fiscal.",
+    "version": "1.1.0"
   },
   "servers": [
     {
@@ -452,6 +452,106 @@
                     "aviso_legal": { "type": "string" }
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/selector-regimen-fiscal": {
+      "post": {
+        "operationId": "recomendarRegimenFiscal",
+        "summary": "Recomendar el régimen fiscal más adecuado para un autónomo español",
+        "description": "Analiza el perfil del autónomo (tipo de actividad, facturación, gastos, empleados, crecimiento previsto, etc.) y recomienda el régimen fiscal más adecuado: módulos, estimación directa simplificada, estimación directa normal o constituir una SL. Incluye ventajas, consideraciones y segunda opción.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["actividad_en_modulos", "facturacion_anual", "nivel_gastos", "clientes_con_retencion", "empleados", "crecimiento_previsto", "proteccion_patrimonio", "clientes_internacionales", "complejidad_aceptable", "limite_modulos"],
+                "properties": {
+                  "actividad_en_modulos": {
+                    "type": "string",
+                    "enum": ["si", "no", "no_sabe"],
+                    "description": "¿La actividad está incluida en el listado de epígrafes de módulos (estimación objetiva)? Actividades típicas: transporte, hostelería, comercio minorista, albañilería. Actividades que NO están: consultoría, marketing, diseño, programación."
+                  },
+                  "facturacion_anual": {
+                    "type": "string",
+                    "enum": ["menos_150k", "150k_600k", "mas_600k"],
+                    "description": "Facturación anual estimada (ingresos brutos). 'menos_150k' = menos de 150.000 €, '150k_600k' = entre 150.000 € y 600.000 €, 'mas_600k' = más de 600.000 €."
+                  },
+                  "nivel_gastos": {
+                    "type": "string",
+                    "enum": ["pocos", "moderados", "muchos"],
+                    "description": "Gastos reales respecto a los ingresos. 'pocos' = gastos < 20% de ingresos (márgenes muy altos), 'moderados' = 20-50%, 'muchos' = gastos > 50% (márgenes bajos)."
+                  },
+                  "clientes_con_retencion": {
+                    "type": "string",
+                    "enum": ["empresas", "particulares", "mixto"],
+                    "description": "Tipo de clientes predominante. 'empresas' = casi todos son empresas que aplican retención IRPF (7% o 15%), 'particulares' = clientes sin retención, 'mixto' = combinación."
+                  },
+                  "empleados": {
+                    "type": "string",
+                    "enum": ["ninguno", "uno_a_cinco", "mas_cinco"],
+                    "description": "Empleados actuales o previstos a cargo del autónomo."
+                  },
+                  "crecimiento_previsto": {
+                    "type": "string",
+                    "enum": ["estable", "moderado", "rapido"],
+                    "description": "Crecimiento previsto del negocio en los próximos 3 años. 'estable' = autónomo independiente sin prisa, 'moderado' = puede crecer sin inversión externa, 'rapido' = espera crecer rápido o necesitar socios/inversores."
+                  },
+                  "proteccion_patrimonio": {
+                    "type": "string",
+                    "enum": ["no_importante", "deseable", "muy_importante"],
+                    "description": "Importancia de separar el patrimonio personal del riesgo empresarial."
+                  },
+                  "clientes_internacionales": {
+                    "type": "string",
+                    "enum": ["no", "ocasional", "importante"],
+                    "description": "Actividad con clientes o proveedores fuera de España. 'no' = solo nacionales, 'ocasional' = algún cliente internacional puntual, 'importante' = parte relevante del negocio es internacional."
+                  },
+                  "complejidad_aceptable": {
+                    "type": "string",
+                    "enum": ["minima", "basica", "completa"],
+                    "description": "Nivel de complejidad contable y administrativa que puede asumir. 'minima' = la gestión más sencilla posible, 'basica' = puede llevar libro de ingresos y gastos, 'completa' = no le importa la complejidad si optimiza fiscalidad."
+                  },
+                  "limite_modulos": {
+                    "type": "string",
+                    "enum": ["lejos", "cerca", "superado"],
+                    "description": "Situación respecto a los límites de módulos (150.000 € ingresos o 150.000 € compras). 'lejos' = muy por debajo, 'cerca' = próximo o podría superarlo, 'superado' = ya los supera o fue excluido."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recomendación de régimen fiscal con ventajas y consideraciones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "regimen_recomendado": { "type": "string", "enum": ["modulos", "directa_simplificada", "directa_normal", "sociedad_limitada"], "description": "Régimen fiscal recomendado." },
+                    "titulo": { "type": "string", "description": "Nombre del régimen recomendado." },
+                    "subtitulo": { "type": "string", "description": "Resumen en una línea." },
+                    "descripcion": { "type": "string", "description": "Descripción detallada del régimen recomendado." },
+                    "ventajas": { "type": "array", "items": { "type": "string" }, "description": "Ventajas del régimen recomendado." },
+                    "consideraciones": { "type": "array", "items": { "type": "string" }, "description": "Puntos a tener en cuenta y limitaciones." },
+                    "segunda_opcion": { "type": "string", "nullable": true, "description": "Segunda opción recomendada si la primera no encaja." },
+                    "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
               }
             }
           }

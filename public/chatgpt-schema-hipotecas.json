@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "meskeIA — Hipotecas España",
-    "description": "Calculadoras hipotecarias para España: simulador de hipoteca, capacidad de compra, amortización anticipada y gastos de compraventa por CCAA.",
-    "version": "1.0.0"
+    "description": "Calculadoras hipotecarias para España: simulador de hipoteca, capacidad de compra, amortización anticipada, gastos de compraventa por CCAA y selector de tipo de hipoteca.",
+    "version": "1.1.0"
   },
   "servers": [{ "url": "https://meskeia.com" }],
   "paths": {
@@ -125,6 +125,105 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ResultadoCompraventa" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/selector-hipoteca": {
+      "post": {
+        "operationId": "recomendarTipoHipoteca",
+        "summary": "Recomendar el tipo de hipoteca más adecuado según el perfil del usuario",
+        "description": "Analiza el perfil financiero y personal del usuario (tolerancia al riesgo, situación laboral, plazo, eficiencia energética, etc.) y recomienda el tipo de hipoteca más adecuado: fija, variable, mixta o verde. Incluye características, alertas y segunda opción.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tolerancia_euribor", "plazo_anos", "situacion_laboral", "vivienda_eficiente", "puede_amortizar_regularmente", "vende_antes_10_anos", "preferencia_cuota", "ratio_prestamo_ingresos", "tipo_vivienda", "titulares_con_ingresos"],
+                "properties": {
+                  "tolerancia_euribor": {
+                    "type": "string",
+                    "enum": ["baja", "media", "alta"],
+                    "description": "Cómo reaccionaría el usuario si la cuota sube 150-200 €/mes. 'baja' = le preocupa mucho, 'media' = lo asumiría con esfuerzo, 'alta' = sin problema."
+                  },
+                  "plazo_anos": {
+                    "type": "integer",
+                    "minimum": 5,
+                    "maximum": 40,
+                    "description": "Plazo previsto de la hipoteca en años.",
+                    "example": 25
+                  },
+                  "situacion_laboral": {
+                    "type": "string",
+                    "enum": ["indefinido_estable", "autonomo_variable", "doble_nomina", "temporal"],
+                    "description": "Situación laboral principal del solicitante o del hogar."
+                  },
+                  "vivienda_eficiente": {
+                    "type": "boolean",
+                    "description": "true si la vivienda tiene certificado de eficiencia energética A o B."
+                  },
+                  "puede_amortizar_regularmente": {
+                    "type": "boolean",
+                    "description": "true si el usuario tiene capacidad y disciplina para hacer amortizaciones anticipadas de forma regular."
+                  },
+                  "vende_antes_10_anos": {
+                    "type": ["boolean", "null"],
+                    "description": "true si planea vender o cambiar de vivienda antes de 10 años. false si piensa quedársela a largo plazo. null si no lo sabe."
+                  },
+                  "preferencia_cuota": {
+                    "type": "string",
+                    "enum": ["siempre_fija", "fija_inicio", "acepta_variable"],
+                    "description": "'siempre_fija' = quiere cuota estable siempre, 'fija_inicio' = prefiere cuota fija solo al principio, 'acepta_variable' = acepta variaciones si puede ahorrar."
+                  },
+                  "ratio_prestamo_ingresos": {
+                    "type": "string",
+                    "enum": ["alto", "medio", "bajo"],
+                    "description": "Relación entre el préstamo y los ingresos anuales brutos. 'alto' = más de 5 veces los ingresos, 'medio' = 3-5 veces, 'bajo' = menos de 3 veces."
+                  },
+                  "tipo_vivienda": {
+                    "type": "string",
+                    "enum": ["primera", "segunda_vacacional", "inversion"],
+                    "description": "Uso que se le dará a la vivienda."
+                  },
+                  "titulares_con_ingresos": {
+                    "type": "integer",
+                    "enum": [1, 2],
+                    "description": "Número de titulares del préstamo con ingresos estables (1 o 2)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recomendación del tipo de hipoteca con características y alertas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tipo_recomendado": { "type": "string", "enum": ["fija", "variable", "mixta", "verde"], "description": "Tipo de hipoteca recomendado." },
+                    "titulo": { "type": "string", "description": "Nombre del tipo de hipoteca." },
+                    "subtitulo": { "type": "string", "description": "Resumen en una línea." },
+                    "descripcion": { "type": "string", "description": "Descripción detallada del tipo recomendado." },
+                    "caracteristicas": { "type": "array", "items": { "type": "string" }, "description": "Lista de características clave." },
+                    "alertas": { "type": "array", "items": { "type": "string" }, "description": "Alertas y puntos a tener en cuenta." },
+                    "segunda_opcion": { "type": "string", "nullable": true, "description": "Segunda opción recomendada si la primera no convence." },
+                    "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio." }
+                  }
+                }
               }
             }
           },
