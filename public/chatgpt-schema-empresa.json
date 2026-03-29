@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "meskeIA — Emprender en España",
-    "description": "Calculadoras para emprendedores españoles: comparar autónomo vs SL, Impuesto Sociedades, coste de contratar empleados, ROI de marketing, VAN/TIR de inversiones y punto de equilibrio.",
-    "version": "1.0.0"
+    "description": "Calculadoras para emprendedores españoles: comparar autónomo vs SL, Impuesto Sociedades, coste de contratar empleados, ROI de marketing, VAN/TIR de inversiones, punto de equilibrio y selector de forma jurídica.",
+    "version": "1.1.0"
   },
   "servers": [
     {
@@ -386,6 +386,105 @@
                     "aviso_legal": { "type": "string" }
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/selector-forma-juridica": {
+      "post": {
+        "operationId": "recomendarFormaJuridica",
+        "summary": "Recomendar si conviene operar como autónomo o constituir una SL",
+        "description": "Analiza el perfil del emprendedor (ingresos esperados, socios, riesgo patrimonial, proyección, necesidad de inversores, etc.) y recomienda la forma jurídica más adecuada: autónomo, Sociedad Limitada o valorar con un gestor. Incluye ventajas, inconvenientes y orientación personalizada.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ingresos_esperados", "socios", "riesgo_patrimonial", "tipo_clientes", "separacion_patrimonio", "carga_administrativa", "proyeccion", "necesita_inversores", "capital_inicial", "experiencia"],
+                "properties": {
+                  "ingresos_esperados": {
+                    "type": "string",
+                    "enum": ["menos_30k", "30k_60k", "60k_100k", "mas_100k"],
+                    "description": "Ingresos brutos anuales esperados de la actividad. 'menos_30k' = menos de 30.000 €, '30k_60k' = entre 30.000-60.000 €, '60k_100k' = entre 60.000-100.000 €, 'mas_100k' = más de 100.000 €."
+                  },
+                  "socios": {
+                    "type": "string",
+                    "enum": ["solo", "dos_o_mas", "quizas"],
+                    "description": "¿Trabajará con socios o co-fundadores? 'solo' = será el único, 'dos_o_mas' = tiene 2 o más socios, 'quizas' = quizás en el futuro."
+                  },
+                  "riesgo_patrimonial": {
+                    "type": "string",
+                    "enum": ["muy_bajo", "bajo", "medio", "alto"],
+                    "description": "Riesgo patrimonial de la actividad. 'muy_bajo' = servicios intelectuales, 'bajo' = poco riesgo de reclamaciones, 'medio' = clientes empresas con contratos, 'alto' = productos físicos o responsabilidades grandes."
+                  },
+                  "tipo_clientes": {
+                    "type": "string",
+                    "enum": ["pocos_grandes", "muchos_pequenos", "uno_principal", "no_sabe"],
+                    "description": "Tipo de cartera de clientes esperada."
+                  },
+                  "separacion_patrimonio": {
+                    "type": "string",
+                    "enum": ["no_prioritario", "deseable", "imprescindible"],
+                    "description": "Necesidad de separar el patrimonio personal del empresarial."
+                  },
+                  "carga_administrativa": {
+                    "type": "string",
+                    "enum": ["minima", "algo", "no_importa"],
+                    "description": "Tolerancia a la carga administrativa. 'minima' = quiere lo más simple posible, 'algo' = puede asumir algo de complejidad, 'no_importa' = tiene gestor y no le importa."
+                  },
+                  "proyeccion": {
+                    "type": "string",
+                    "enum": ["complementaria", "principal_estable", "crecimiento"],
+                    "description": "Proyección del negocio a 3-5 años. 'complementaria' = actividad complementaria o temporal, 'principal_estable' = actividad principal pero estable, 'crecimiento' = crecimiento, contrataciones e inversión."
+                  },
+                  "necesita_inversores": {
+                    "type": "string",
+                    "enum": ["no", "posiblemente", "si"],
+                    "description": "¿Necesita captar inversores o financiación externa?"
+                  },
+                  "capital_inicial": {
+                    "type": "string",
+                    "enum": ["no_inmovilizar", "uno_euro", "tengo_capital"],
+                    "description": "Disponibilidad de capital inicial. 'no_inmovilizar' = prefiere no inmovilizar capital, 'uno_euro' = puede aportar 1 € simbólico (desde 2023), 'tengo_capital' = tiene capital para aportar solidez."
+                  },
+                  "experiencia": {
+                    "type": "string",
+                    "enum": ["desde_cero", "autonomo_escalando", "experiencia_empresarial"],
+                    "description": "Experiencia previa. 'desde_cero' = empieza desde cero, 'autonomo_escalando' = lleva tiempo como autónomo y quiere escalar, 'experiencia_empresarial' = ya tiene experiencia empresarial."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recomendación de forma jurídica con ventajas e inconvenientes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "forma_recomendada": { "type": "string", "enum": ["autonomo", "sl", "valorar"], "description": "Forma jurídica recomendada." },
+                    "titulo": { "type": "string", "description": "Nombre de la forma jurídica recomendada." },
+                    "subtitulo": { "type": "string", "description": "Resumen en una línea." },
+                    "descripcion": { "type": "string", "description": "Descripción detallada de la recomendación." },
+                    "ventajas": { "type": "array", "items": { "type": "string" }, "description": "Ventajas de la opción recomendada." },
+                    "inconvenientes": { "type": "array", "items": { "type": "string" }, "description": "Puntos a considerar e inconvenientes." },
+                    "aviso_legal": { "type": "string", "description": "Aviso legal obligatorio." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros incorrectos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "error": { "type": "string" } } }
               }
             }
           }
