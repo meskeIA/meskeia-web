@@ -281,7 +281,7 @@
       "post": {
         "operationId": "recomendarAlquilerVsCompra",
         "summary": "Recomienda si es mejor alquilar o comprar según el perfil vital y financiero",
-        "description": "Analiza 10 factores del perfil del usuario (horizonte en la zona, estabilidad laboral, capital disponible, esfuerzo hipotecario, flexibilidad vital, ratio coste alquiler/hipoteca, tolerancia a la deuda, perspectiva del mercado, situación familiar y prioridades) y recomienda comprar, alquilar o valorar con asesor.",
+        "description": "Analiza 10 factores del perfil (horizonte en la zona, estabilidad laboral, capital, esfuerzo hipotecario, flexibilidad, ratio coste, tolerancia a la deuda, perspectiva del mercado, situación familiar y prioridades) y recomienda comprar, alquilar o consultar con asesor.",
         "requestBody": {
           "required": true,
           "content": {
