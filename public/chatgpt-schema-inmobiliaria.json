@@ -3,7 +3,7 @@
   "info": {
     "title": "meskeIA — Inmobiliaria y Alquiler España",
     "description": "Calculadoras para propietarios e inversores inmobiliarios en España: rentabilidad del alquiler, plusvalía municipal (IIVTNU, métodos objetivo y real), IRPF sobre ingresos de alquiler con reducciones Ley de Vivienda 2023, e imputación de rentas por segunda vivienda vacía.",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "servers": [
     {
@@ -273,6 +273,92 @@
         "responses": {
           "200": {
             "description": "Renta imputada por inmueble, total a integrar en la base imponible general y cuota estimada."
+          }
+        }
+      }
+    },
+    "/api/chatgpt/selector-alquiler-vs-compra": {
+      "post": {
+        "operationId": "recomendarAlquilerVsCompra",
+        "summary": "Recomienda si es mejor alquilar o comprar según el perfil vital y financiero",
+        "description": "Analiza 10 factores del perfil del usuario (horizonte en la zona, estabilidad laboral, capital disponible, esfuerzo hipotecario, flexibilidad vital, ratio coste alquiler/hipoteca, tolerancia a la deuda, perspectiva del mercado, situación familiar y prioridades) y recomienda comprar, alquilar o valorar con asesor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "horizonte_ciudad",
+                  "estabilidad_laboral",
+                  "capital_entrada",
+                  "esfuerzo_hipotecario",
+                  "flexibilidad_vital",
+                  "ratio_coste",
+                  "tolerancia_deuda",
+                  "perspectiva_zona",
+                  "situacion_familiar",
+                  "prioridad_vital"
+                ],
+                "properties": {
+                  "horizonte_ciudad": {
+                    "type": "string",
+                    "enum": ["menos_3_anos", "3_a_7_anos", "mas_7_anos", "indefinido"],
+                    "description": "¿Cuánto tiempo planeas vivir en esta ciudad o zona? 'menos_3_anos': menos de 3 años, '3_a_7_anos': entre 3 y 7 años, 'mas_7_anos': más de 7 años, 'indefinido': no planeo moverme."
+                  },
+                  "estabilidad_laboral": {
+                    "type": "string",
+                    "enum": ["inestable", "estable_privado", "funcionario", "autonomo_variable"],
+                    "description": "Situación laboral actual. 'inestable': contrato temporal o en búsqueda, 'estable_privado': contrato indefinido empresa privada, 'funcionario': funcionario o laboral fijo administración, 'autonomo_variable': autónomo con ingresos variables."
+                  },
+                  "capital_entrada": {
+                    "type": "string",
+                    "enum": ["no_tengo", "tengo_justo", "tengo_suficiente", "tengo_amplio"],
+                    "description": "¿Tienes ahorrado aproximadamente el 20-25% del precio para la entrada más gastos? 'no_tengo': no llego, 'tengo_justo': tengo justo el mínimo, 'tengo_suficiente': tengo suficiente con margen, 'tengo_amplio': tengo capital amplio y fondo de emergencia separado."
+                  },
+                  "esfuerzo_hipotecario": {
+                    "type": "string",
+                    "enum": ["mas_40pct", "entre_30_40pct", "entre_20_30pct", "menos_20pct"],
+                    "description": "Cuota hipotecaria estimada sobre ingresos netos mensuales. 'mas_40pct': más del 40%, 'entre_30_40pct': entre 30 y 40%, 'entre_20_30pct': entre 20 y 30%, 'menos_20pct': menos del 20%."
+                  },
+                  "flexibilidad_vital": {
+                    "type": "string",
+                    "enum": ["muy_importante", "importante", "moderada", "poca"],
+                    "description": "¿Qué importancia tiene poder cambiar de ciudad o país en los próximos años? 'muy_importante': podría necesitarlo en cualquier momento, 'importante': es probable que me mueva, 'moderada': posible pero no probable, 'poca': no tengo planes de moverme."
+                  },
+                  "ratio_coste": {
+                    "type": "string",
+                    "enum": ["alquiler_mucho_mas_barato", "similar", "alquiler_mas_caro", "no_tengo_referencia"],
+                    "description": "Alquiler mensual que pagarías vs cuota hipotecaria por vivienda comparable en tu zona. 'alquiler_mucho_mas_barato': el alquiler es notablemente más barato, 'similar': cuotas parecidas, 'alquiler_mas_caro': la hipoteca saldría más barata que alquilar, 'no_tengo_referencia': no tengo datos para comparar."
+                  },
+                  "tolerancia_deuda": {
+                    "type": "string",
+                    "enum": ["me_agobia", "algo_incomodo", "lo_acepto", "lo_veo_positivo"],
+                    "description": "¿Cómo te sientes ante comprometerte con una hipoteca a 25-30 años? 'me_agobia': me genera mucha ansiedad, 'algo_incomodo': preferiría no tenerla, 'lo_acepto': lo veo como algo normal, 'lo_veo_positivo': lo veo como una inversión y herramienta de ahorro forzoso."
+                  },
+                  "perspectiva_zona": {
+                    "type": "string",
+                    "enum": ["va_a_bajar", "estable", "subira_moderado", "subira_mucho"],
+                    "description": "¿Cómo crees que evolucionará el precio de la vivienda en tu zona? 'va_a_bajar': espero bajadas, 'estable': se mantendrá, 'subira_moderado': subirá moderadamente, 'subira_mucho': subirá bastante y comprar ahora es una ventaja."
+                  },
+                  "situacion_familiar": {
+                    "type": "string",
+                    "enum": ["solo_sin_plan", "pareja_sin_hijos_pronto", "familia_o_planes_claros", "necesito_estabilidad"],
+                    "description": "Situación y planes familiares. 'solo_sin_plan': solo y sin planes definidos, 'pareja_sin_hijos_pronto': en pareja pero sin planes de hijos a corto plazo, 'familia_o_planes_claros': tengo hijos o planes claros de tenerlos pronto, 'necesito_estabilidad': necesito un hogar estable ya (familia, salud, etc.)."
+                  },
+                  "prioridad_vital": {
+                    "type": "string",
+                    "enum": ["libertad_movilidad", "construir_patrimonio", "estabilidad_hogar", "indiferente"],
+                    "description": "¿Qué valoras más en tu vivienda ahora mismo? 'libertad_movilidad': poder moverme sin ataduras, 'construir_patrimonio': que el dinero que pago construya patrimonio, 'estabilidad_hogar': tener un hogar estable y personalizable, 'indiferente': me da igual siempre que el coste sea razonable."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recomendación (comprar/alquilar/valorar), argumentos a favor, aspectos a considerar y perfil ideal."
           }
         }
       }
