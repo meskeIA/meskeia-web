@@ -275,7 +275,7 @@
 
 .recomendacion_consumo {
   background-color: rgba(106, 170, 94, 0.07);
-  border-left: 5px solid #6aaa5e;
+  border-left: 5px solid #5b9e6f;
 }
 
 [data-theme='dark'] .recomendacion_consumo {
@@ -292,12 +292,12 @@
 }
 
 .recomendacion_microcredito {
-  background-color: rgba(155, 89, 182, 0.07);
-  border-left: 5px solid #9b59b6;
+  background-color: rgba(192, 57, 43, 0.07);
+  border-left: 5px solid #c0392b;
 }
 
 [data-theme='dark'] .recomendacion_microcredito {
-  background-color: rgba(155, 89, 182, 0.15);
+  background-color: rgba(192, 57, 43, 0.15);
 }
 
 /* ---- Contenido del resultado ---- */

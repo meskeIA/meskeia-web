@@ -380,7 +380,7 @@
 }
 
 .recomendacion_biomasa .resultadoCabecera {
-  background: linear-gradient(135deg, #6aaa5e 0%, #4d8a42 100%);
+  background: linear-gradient(135deg, #5b9e6f 0%, #3f7a52 100%);
 }
 
 .recomendacion_solar .resultadoCabecera {
@@ -495,7 +495,7 @@
 
 .ventajasPositivo li::before {
   content: '✓';
-  color: #6aaa5e;
+  color: #5b9e6f;
   font-weight: 700;
 }
 

@@ -213,7 +213,7 @@
 }
 
 .recomendacion_rural {
-  border-top-color: #6aaa5e;
+  border-top-color: #5b9e6f;
 }
 
 .recomendacion_costa {
@@ -237,7 +237,7 @@
 
 .recomendacion_ciudad_grande .recomendacionTitulo { color: #2E86AB; }
 .recomendacion_ciudad_media .recomendacionTitulo { color: #48A9A6; }
-.recomendacion_rural .recomendacionTitulo { color: #6aaa5e; }
+.recomendacion_rural .recomendacionTitulo { color: #5b9e6f; }
 .recomendacion_costa .recomendacionTitulo { color: #e8a020; }
 
 .recomendacionSubtitulo {

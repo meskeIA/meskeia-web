@@ -272,14 +272,14 @@
 .recomendacion_indexados { border-left: 5px solid #2E86AB; }
 .recomendacion_acciones   { border-left: 5px solid #e8a020; }
 .recomendacion_renta_fija { border-left: 5px solid #48A9A6; }
-.recomendacion_inmobiliario { border-left: 5px solid #6aaa5e; }
-.recomendacion_pensiones  { border-left: 5px solid #9b59b6; }
+.recomendacion_inmobiliario { border-left: 5px solid #5b9e6f; }
+.recomendacion_pensiones  { border-left: 5px solid #d4860a; }
 
 .badge_indexados    { background-color: #2E86AB; }
 .badge_acciones     { background-color: #e8a020; }
 .badge_renta_fija   { background-color: #48A9A6; }
-.badge_inmobiliario { background-color: #6aaa5e; }
-.badge_pensiones    { background-color: #9b59b6; }
+.badge_inmobiliario { background-color: #5b9e6f; }
+.badge_pensiones    { background-color: #d4860a; }
 
 .recomendacionTitulo {
   font-size: 1.5rem;

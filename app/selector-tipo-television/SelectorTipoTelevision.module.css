@@ -233,7 +233,7 @@
 }
 
 .tecnologia_led_ips {
-  border-top: 5px solid #6aaa5e;
+  border-top: 5px solid #5b9e6f;
   background-color: var(--bg-card);
 }
 
@@ -252,7 +252,7 @@
 
 .tecnologia_oled .tecnologiaEtiqueta { color: #2E86AB; }
 .tecnologia_qled .tecnologiaEtiqueta { color: #48A9A6; }
-.tecnologia_led_ips .tecnologiaEtiqueta { color: #6aaa5e; }
+.tecnologia_led_ips .tecnologiaEtiqueta { color: #5b9e6f; }
 .tecnologia_led_va .tecnologiaEtiqueta { color: #e8a020; }
 
 .tecnologiaTitulo {
@@ -334,7 +334,7 @@
 
 .ventajasSection li::before {
   content: '✓ ';
-  color: #6aaa5e;
+  color: #5b9e6f;
   font-weight: 700;
 }
 

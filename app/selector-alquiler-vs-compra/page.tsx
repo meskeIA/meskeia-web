@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import styles from './SelectorAlquilerVsCompra.module.css';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
@@ -315,6 +315,7 @@ export default function SelectorAlquilerVsCompra() {
       )}
 
       <LegalNotice />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {pantalla === 'inicio' && (
         <div className={styles.introContainer}>

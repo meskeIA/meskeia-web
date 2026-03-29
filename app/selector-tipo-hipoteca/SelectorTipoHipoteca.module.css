@@ -274,12 +274,12 @@
 }
 
 .recomendacion_mixta {
-  background-color: rgba(106, 170, 94, 0.07);
-  border-left: 5px solid #6aaa5e;
+  background-color: rgba(91, 158, 111, 0.07);
+  border-left: 5px solid #5b9e6f;
 }
 
 [data-theme='dark'] .recomendacion_mixta {
-  background-color: rgba(106, 170, 94, 0.15);
+  background-color: rgba(91, 158, 111, 0.15);
 }
 
 .recomendacion_verde {

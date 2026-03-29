@@ -386,7 +386,7 @@ const COLOR_BARRAS: Record<MetodoKey, string> = {
   mapas_mentales: '#48A9A6',
   proyectos_practicos: '#e8a020',
   pomodoro_libros: '#e74c3c',
-  clases_particulares: '#9b59b6',
+  clases_particulares: '#6b7fa8',
 };
 
 // ============================================================
