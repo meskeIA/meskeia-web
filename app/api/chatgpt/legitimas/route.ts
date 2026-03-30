@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calcularLegitimas } from '@/lib/calculadoras/legitimas';
+import { getTursoClient, initializeDatabase } from '@/lib/turso';
 
 const ALLOWED_ORIGINS = ['https://chat.openai.com', 'https://chatgpt.com'];
 
@@ -28,14 +29,7 @@ export async function POST(req: NextRequest) {
       tieneConyuge:   body.tieneConyuge ?? false,
     });
 
-    // Registrar en analytics
-    try {
-      await fetch(`${req.nextUrl.origin}/api/analytics/track`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ aplicacion: 'orientacion-tramitacion-herencias', modo: 'chatgpt' }),
-      });
-    } catch { /* analytics no crítico */ }
+    registrarLlamadaChatGPT().catch(() => {});
 
     return NextResponse.json(
       {
@@ -48,4 +42,17 @@ export async function POST(req: NextRequest) {
     const mensaje = error instanceof Error ? error.message : 'Error en el cálculo';
     return NextResponse.json({ error: mensaje }, { status: 400, headers: corsHeaders(origin) });
   }
+}
+
+async function registrarLlamadaChatGPT(): Promise<void> {
+  await initializeDatabase();
+  const client = getTursoClient();
+  const timestamp = new Date().toLocaleString('es-ES', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  });
+  await client.execute({
+    sql: `INSERT INTO uso_aplicaciones (aplicacion, timestamp, modo) VALUES (?, ?, ?)`,
+    args: ['orientacion-tramitacion-herencias', timestamp, 'chatgpt'],
+  });
 }
