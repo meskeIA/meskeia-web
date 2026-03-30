@@ -64,6 +64,11 @@ const saludMayoresApps: RelatedApp[] = [
   { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Orientación BVD y prestaciones SAAD' },
   { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo? RD 888/2022' },
   { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
+  { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD por grado' },
+  { url: '/planificador-turnos-cuidadores/', icon: '📅', name: 'Turnos de Cuidadores', description: 'Organiza rotaciones de cuidado' },
+  { url: '/test-zarit-cuidador/', icon: '🤝', name: 'Test Zarit Cuidador', description: 'Evalúa sobrecarga del cuidador' },
+  { url: '/estimacion-deduccion-discapacidad/', icon: '♿', name: 'Deducción Discapacidad', description: 'Ahorro IRPF por discapacidad' },
+  { url: '/checklist-tramites-dependencia/', icon: '✅', name: 'Trámites Dependencia', description: 'Checklist paso a paso' },
 ];
 
 const patrimonioPensionApps: RelatedApp[] = [
@@ -1302,6 +1307,21 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'orientador-discapacidad': [
     ...saludMayoresApps.filter(a => a.url !== '/orientador-discapacidad/'),
   ],
+  'estimacion-prestaciones-dependencia': [
+    ...saludMayoresApps.filter(a => a.url !== '/estimacion-prestaciones-dependencia/'),
+  ],
+  'planificador-turnos-cuidadores': [
+    ...saludMayoresApps.filter(a => a.url !== '/planificador-turnos-cuidadores/'),
+  ],
+  'test-zarit-cuidador': [
+    ...saludMayoresApps.filter(a => a.url !== '/test-zarit-cuidador/'),
+  ],
+  'estimacion-deduccion-discapacidad': [
+    ...saludMayoresApps.filter(a => a.url !== '/estimacion-deduccion-discapacidad/'),
+  ],
+  'checklist-tramites-dependencia': [
+    ...saludMayoresApps.filter(a => a.url !== '/checklist-tramites-dependencia/'),
+  ],
   'simulador-bono-joven-alquiler': [
     { url: '/orientador-aval-ico/', icon: '🏡', name: 'Aval ICO Vivienda', description: 'Primera vivienda sin el 20% de entrada' },
     { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo' },
@@ -1597,6 +1617,11 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'calculadora-calorias-ejercicio': { title: 'Herramientas de salud', icon: '❤️' },
     'test-burnout-laboral': { title: 'Más herramientas de bienestar', icon: '🧘' },
     'orientador-discapacidad': { title: 'Más herramientas de salud y bienestar', icon: '♿' },
+    'estimacion-prestaciones-dependencia': { title: 'Herramientas de cuidadores y dependencia', icon: '💶' },
+    'planificador-turnos-cuidadores': { title: 'Herramientas de cuidadores y dependencia', icon: '📅' },
+    'test-zarit-cuidador': { title: 'Herramientas de cuidadores y dependencia', icon: '🤝' },
+    'estimacion-deduccion-discapacidad': { title: 'Herramientas de discapacidad y dependencia', icon: '♿' },
+    'checklist-tramites-dependencia': { title: 'Herramientas de cuidadores y dependencia', icon: '✅' },
     'simulador-bono-joven-alquiler': { title: 'Más herramientas de vivienda y finanzas', icon: '🏠' },
     'orientador-aval-ico': { title: 'Herramientas para comprar tu primera vivienda', icon: '🏡' },
     'calculadora-costes-teletrabajo': { title: 'Más herramientas de productividad', icon: '💻' },

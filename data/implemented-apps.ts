@@ -31,6 +31,11 @@ export const implementedAppsUrls = [
   "/optimizador-rentas-60/",            // Optimizador de Rentas 60+: estrategia IRPF pensión + PP + ahorro + alquiler
   "/test-fragilidad/",                  // Test de Fragilidad (Escala FRAIL): 5 ítems, 3 niveles (robusto/pre-frágil/frágil)
   "/orientador-grado-dependencia/",     // Orientador Grado de Dependencia BVD: Grado I/II/III + prestaciones SAAD
+  "/estimacion-prestaciones-dependencia/", // Estimación prestaciones SAAD por grado: cuantías, servicios, copago
+  "/planificador-turnos-cuidadores/",      // Planificador de turnos de cuidadores: calendario semanal con reparto equitativo
+  "/test-zarit-cuidador/",                 // Test de Zarit: escala 22 ítems sobrecarga del cuidador
+  "/estimacion-deduccion-discapacidad/",   // Estimación deducción IRPF por discapacidad: mínimos personales y familiares
+  "/checklist-tramites-dependencia/",      // Checklist trámites dependencia: 6 fases, documentación, plazos
   "/estimador-jubilacion/",
   "/estimador-inversiones/",
   "/test-perfil-inversor/",

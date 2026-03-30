@@ -1,0 +1,666 @@
+/* ============================================================
+   Checklist Trámites de Dependencia — meskeIA
+   ============================================================ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+  background: var(--bg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #777777;
+  --border: #404040;
+}
+
+/* ── Hero ─────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin: 80px 0 var(--spacing-xl);
+  padding: 2.5rem var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ── Barra de progreso ────────────────────── */
+.progresoWrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  transition: border-color 0.3s ease;
+}
+
+.progresoWrapper.progresoCompleto {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+[data-theme='dark'] .progresoWrapper.progresoCompleto {
+  background: #0f2d1a;
+  border-color: #22c55e;
+}
+
+.progresoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.progresoTexto {
+  color: var(--text-secondary);
+}
+
+.progresoPorcentaje {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.progresoBar {
+  width: 100%;
+  height: 10px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progresoFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── Acciones ─────────────────────────────── */
+.acciones {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-xl);
+}
+
+.btnAccion {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.btnAccion:hover:not(:disabled) {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.btnAccion:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Checklist ────────────────────────────── */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ── Fase (bloque expandible) ─────────────── */
+.faseBloque {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.faseBloque.faseCompleta {
+  border-color: #22c55e;
+}
+
+.faseHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: #f8fafc;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.faseHeader:hover {
+  background: #f0f4f8;
+}
+
+[data-theme='dark'] .faseHeader {
+  background: #1e2228;
+}
+
+[data-theme='dark'] .faseHeader:hover {
+  background: #252a32;
+}
+
+.faseIcono {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.faseInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.faseTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.fasePlazo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.faseProgreso {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--border);
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+.faseChevron {
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.faseChevron.chevronOpen {
+  transform: rotate(90deg);
+}
+
+/* ── Items ────────────────────────────────── */
+.itemsLista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item:hover {
+  background: #f0f8ff;
+}
+
+[data-theme='dark'] .item:hover {
+  background: #1e3040;
+}
+
+.item.itemChecked {
+  background: #f0fdf4;
+}
+
+[data-theme='dark'] .item.itemChecked {
+  background: #0f2d1a;
+}
+
+.item.itemChecked .itemNombre {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.checkbox {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  margin-top: 1px;
+  transition: all 0.15s ease;
+}
+
+.item.itemChecked .checkbox {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemNombre {
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.badgeCritico {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .badgeCritico {
+  background: #2d0a0a;
+  border-color: #7f1d1d;
+  color: #f87171;
+}
+
+.itemNota {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0.3rem 0 0;
+}
+
+/* ── Mensaje completado ──────────────────── */
+.mensajeCompleto {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+[data-theme='dark'] .mensajeCompleto {
+  background: #0f2d1a;
+  border-color: #22c55e;
+}
+
+.mensajeCompleto h2 {
+  font-size: 1.3rem;
+  margin: 0 0 0.5rem;
+  color: #16a34a;
+}
+
+.mensajeCompleto p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Nota de privacidad ──────────────────── */
+.privacidadNota {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-sm);
+}
+
+/* ── Sección educativa ───────────────────── */
+.eduSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduSectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-md);
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.eduParrafo {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 var(--spacing-md);
+}
+
+.eduLista {
+  margin: 0 0 var(--spacing-md);
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.eduLista li {
+  margin-bottom: 0.6rem;
+}
+
+.eduLista strong {
+  color: var(--text-primary);
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable th:first-child {
+  text-align: left;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.comparativaTable td:first-child {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #1e2228;
+}
+
+/* Detalle de fases */
+.fasesDetalle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faseDetalleCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.faseDetalleHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.faseDetalleHeader span {
+  font-size: 1.2rem;
+}
+
+.faseDetalleHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.faseDetalleCard p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* Tips grid */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.faqItem dt {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.faqItem dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* Warning box (v2.0) */
+.warningBox {
+  background: #fff8e1;
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1f00;
+  border-color: #d97706;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+}
+
+.warningHeader strong {
+  font-size: 1rem;
+  color: #b45309;
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #fbbf24;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningList strong {
+  color: var(--text-primary);
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 640px) {
+  .container {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .acciones {
+    flex-direction: column;
+  }
+
+  .faseHeader {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .item {
+    padding: 0.75rem var(--spacing-md);
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Accesibilidad ───────────────────────── */
+.item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.faseHeader:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnAccion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,615 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --danger: #E07A5F;
+  --warning-bg: #FFF3CD;
+  --warning-border: #FFD666;
+  --warning-text: #856404;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+  --hover: #333333;
+  --warning-bg: #3D3520;
+  --warning-border: #A68B00;
+  --warning-text: #FFD666;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.cardTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.cardDesc {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.95rem;
+}
+
+/* Paso 1: Añadir cuidadores */
+.addRow {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .input {
+  background: #333;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btnPrimary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.cuidadorList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.cuidadorItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+}
+
+.cuidadorColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cuidadorNombre {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.btnRemove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.25rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.btnRemove:hover {
+  color: var(--danger);
+}
+
+.btnRemove:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Paso 2: Calendario – Vista escritorio */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: 120px repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.calendarMobile {
+  display: none;
+}
+
+.gridCell {
+  background: var(--bg-card);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.gridHeader {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-height: auto;
+  padding: 0.6rem var(--spacing-sm);
+  text-align: center;
+}
+
+.gridCorner {
+  background: var(--secondary);
+}
+
+.gridRowHeader {
+  background: var(--bg-primary);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.horarioLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.turnoSelect {
+  width: 100%;
+  padding: 0.35rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.turnoSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .turnoSelect {
+  background: #333;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.asignadoTag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Paso 3: Resumen */
+.barsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.barLabel {
+  width: 100px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.barTrack {
+  flex: 1;
+  height: 28px;
+  background: var(--bg-primary);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 14px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.barValue {
+  width: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.summaryItem {
+  background: var(--bg-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.summaryLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.summaryValue {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.uncovered {
+  color: var(--danger);
+}
+
+.alertBox {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--warning-text);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+}
+
+.btnDanger {
+  display: block;
+  margin: 0 auto;
+  padding: 0.65rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--danger);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnDanger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.btnDanger:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 2px;
+}
+
+/* Sección educativa */
+.guideSection {
+  padding: var(--spacing-lg) 0;
+}
+
+.guideSection h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.3rem;
+}
+
+/* Tabla comparativa */
+.comparisonTable {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.comparisonTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.comparisonTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.comparisonTable td {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.comparisonTable tr:nth-child(even) td {
+  background: var(--bg-primary);
+}
+
+/* Tips grid */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.tipCard h3 {
+  font-size: 1.05rem;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Warning box (v2.0) */
+.warningBox {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  color: var(--warning-text);
+  line-height: 1.6;
+}
+
+.warningBox ul {
+  margin: var(--spacing-sm) 0;
+  padding-left: 1.5rem;
+}
+
+.warningBox li {
+  margin-bottom: 4px;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #3D2520;
+  border-color: #A64B3D;
+  color: #FFB3A0;
+}
+
+/* FAQ */
+.faqItem {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-sm);
+  overflow: hidden;
+}
+
+.faqItem summary {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: background 0.2s;
+}
+
+.faqItem summary:hover {
+  background: var(--hover);
+}
+
+.faqItem p {
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+/* ─── Vista móvil ─── */
+.mobileDay {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-md);
+  overflow: hidden;
+}
+
+.mobileDayTitle {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mobileShift {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.mobileShift:last-child {
+  border-bottom: none;
+}
+
+.mobileShiftLabel {
+  width: 90px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.mobileShift .turnoSelect {
+  flex: 1;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .calendarGrid {
+    display: none;
+  }
+
+  .calendarMobile {
+    display: block;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .addRow {
+    flex-direction: column;
+  }
+
+  .barLabel {
+    width: 70px;
+    font-size: 0.8rem;
+  }
+
+  .barValue {
+    width: 40px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Reducir animaciones — aplicado globalmente en globals.css */
