@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-23
-> **Apps totales**: 305 | **Suites**: 13
+> **Última actualización**: 2026-03-30
+> **Apps totales**: 354 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -39,8 +39,12 @@
     - ⏸️ `eslint` 9→10 **suspendido indefinidamente** hasta que `eslint-config-next` soporte oficialmente ESLint 10. No revisar en audits hasta que haya confirmación oficial de compatibilidad. Riesgo: lint se rompe completamente si se actualiza antes.
     - ✅ Next.js/React al día.
     - ✅ `@trpc/*` 11.10.0 → 11.12.0 **completado** (2026-03-09). Build OK.
-    - 🟢 `@trpc/*` 11.12.0 → 11.13.4 disponible (minor, sin breaking changes). Actualizable en próxima sesión de mantenimiento. *(actualizado: 2026-03-16)*
-    - 🟢 `baseline-browser-mapping` advertencia durante build ("datos de hace 2 meses"). Actualizar con `npm i baseline-browser-mapping@latest -D` en próxima sesión de mantenimiento. *(detectado: 2026-03-15)*
+    - ✅ `@trpc/*` 11.14.1 → 11.16.0 **completado** (2026-03-30). Build OK.
+    - ✅ `baseline-browser-mapping` 2.10.10 → 2.10.12 **completado** (2026-03-30).
+    - ✅ `@modelcontextprotocol/sdk` 1.27.1 → 1.28.0 **completado** (2026-03-30).
+    - ✅ `@tanstack/react-query` 5.95.0 → 5.95.2 **completado** (2026-03-30).
+    - ✅ `eslint` 9.39.3 → 9.39.4 **completado** (2026-03-30). No subir a v10.
+    - 🔴 `typescript` 5.9.3 → 6.0.2 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
     - 🟡 `dompurify` CVE moderado (XSS, GHSA-v2wj-7wpq-c8vv): afecta `jspdf` y `html2pdf.js`. `npm audit fix` añadiría 61 paquetes nuevos (riesgo breaking change). Requiere sesión dedicada para revisar si jspdf tiene nueva versión compatible. *(detectado: 2026-03-09)*
@@ -48,8 +52,9 @@
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
-- [ ] **ai-index.json: 48 apps sin indexar** — El JSON tiene 288 slugs reales (`total_tools: 291` incorrecto) vs 305 en `implemented-apps.ts`. Faltan principalmente `estimador-*`, `orientador-*`, `quiz-*` y algunas guías añadidas desde la última actualización del índice. Requiere sesión dedicada para añadir las 48 entradas con nombre, descripción y categoría correctos. *(detectado auditoría: 2026-03-23)*
-  - Apps faltantes: `estimador-*` (26), `orientador-*` (14), `quiz-*` (3), otras: `adaptacion-hogar`, `residencia-vs-cuidado-en-casa`, `test-fragilidad`, `guia-reclamar-seguro-coche`, `optimizador-rentas-60`
+- [ ] **ai-index.json: desincronizado** — 346 apps indexadas vs 354 en `implemented-apps.ts` (`total_tools: 341` incorrecto). Faltan ~8 apps por indexar. Requiere sesión dedicada para añadir entradas faltantes y corregir `total_tools`. *(actualizado auditoría: 2026-03-30)*
+
+- [x] **Disclaimers: 26 apps corregidas** — severity y collapsible ajustados según DISCLAIMER-POLICY.md. 16 apps nivel 1 → critical, 10 apps nivel 2 → high. Re-auditoría: 0 incidencias. *(resuelto: 2026-03-30)*
 
 - [x] **Dark mode (verificado)** — Los 25 CSS modules sin `[data-theme]` son falsos positivos: usan colores de marca o semánticos intencionales (juegos, espejo, hero). Resto de interfaz usa variables CSS de globals.css. Dark mode funciona correctamente en toda la plataforma. *(verificado: 2026-03-01)*
 
