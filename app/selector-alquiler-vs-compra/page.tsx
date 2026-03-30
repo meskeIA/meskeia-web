@@ -315,7 +315,7 @@ export default function SelectorAlquilerVsCompra() {
       )}
 
       <LegalNotice />
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {pantalla === 'inicio' && (
         <div className={styles.introContainer}>

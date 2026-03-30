@@ -644,9 +644,8 @@ export default function EtiquetaDgtPage() {
         {/* ---- Disclaimer ---- */}
         <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 1.5rem' }}>
           <DisclaimerCard
-            variant="general"
-            severity="medium"
-            collapsible
+            variant="financial"
+            severity="critical"
             context="etiqueta-dgt"
           />
         </div>

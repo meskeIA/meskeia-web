@@ -490,7 +490,7 @@ export default function SelectorModeloNegocioPage() {
       )}
 
       {/* ---- DISCLAIMER ---- */}
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="general" severity="high" />
 
       {/* ---- SECCIÓN EDUCATIVA ---- */}
       <EducationalSection

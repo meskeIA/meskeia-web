@@ -471,7 +471,7 @@ export default function SelectorVacaciones() {
       )}
 
       {/* 6. Disclaimer */}
-      <DisclaimerCard variant="general" severity="low" />
+      <DisclaimerCard variant="general" severity="high" />
 
       {/* 7. Sección educativa */}
       <EducationalSection

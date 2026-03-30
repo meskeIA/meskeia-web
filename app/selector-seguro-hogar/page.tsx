@@ -346,7 +346,7 @@ export default function SelectorSeguroHogar() {
       )}
 
       <LegalNotice />
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* ── Pantalla de inicio ── */}
       {pantalla === 'inicio' && (

@@ -537,7 +537,7 @@ export default function SelectorCanalVenta() {
             </div>
           </div>
 
-          <DisclaimerCard variant="general" severity="low" />
+          <DisclaimerCard variant="general" severity="high" />
 
           <EducationalSection
             title="Canales de venta online en España"

@@ -564,7 +564,7 @@ export default function SelectorVehiculoElectrico() {
             </button>
           </div>
 
-          <DisclaimerCard variant="financial" severity="medium" />
+          <DisclaimerCard variant="financial" severity="high" />
 
           <EducationalSection
             title="Guía de vehículos electrificados en España"

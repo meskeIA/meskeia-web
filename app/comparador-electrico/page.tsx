@@ -182,7 +182,7 @@ export default function ComparadorElectrico() {
       <main className={styles.main}>
         <LegalNotice />
 
-        <DisclaimerCard variant="financial" severity="high" />
+        <DisclaimerCard variant="financial" severity="critical" />
 
         {/* ── Formulario ── */}
         <section className={styles.formSection} aria-label="Datos del comparador">

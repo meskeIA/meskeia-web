@@ -566,7 +566,7 @@ export default function SelectorEnergiaHogarPage() {
       )}
 
       {/* Disclaimer — fuera del toggle, siempre visible */}
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* Sección educativa v2.0 */}
       <EducationalSection

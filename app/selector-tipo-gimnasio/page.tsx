@@ -321,7 +321,7 @@ export default function SelectorTipoGimnasio() {
           </button>
         </div>
 
-        <DisclaimerCard variant="medical" severity="medium" />
+        <DisclaimerCard variant="medical" severity="high" />
 
         <EducationalSection
           title="¿Cómo elegir el entrenamiento adecuado?"

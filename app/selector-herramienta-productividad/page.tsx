@@ -460,7 +460,7 @@ export default function SelectorHerramientaProductividad() {
         );
       })()}
 
-      <DisclaimerCard variant="educational" severity="low" />
+      <DisclaimerCard variant="general" severity="high" />
 
       <EducationalSection
         title="Los 5 métodos de productividad más efectivos"

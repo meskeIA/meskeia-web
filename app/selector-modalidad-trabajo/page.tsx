@@ -619,7 +619,7 @@ export default function SelectorModalidadTrabajoPage() {
         </div>
       )}
 
-      <DisclaimerCard variant="general" severity="low" />
+      <DisclaimerCard variant="general" severity="high" />
 
       <EducationalSection
         title="Modalidades de trabajo en España"

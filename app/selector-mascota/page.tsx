@@ -374,7 +374,7 @@ export default function SelectorMascota() {
       )}
 
       <LegalNotice />
-      <DisclaimerCard variant="educational" severity="low" />
+      <DisclaimerCard variant="general" severity="high" />
 
       {pantalla === 'intro' && (
         <div className={styles.introContainer}>

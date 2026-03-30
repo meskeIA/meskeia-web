@@ -497,7 +497,7 @@ export default function SelectorEstiloDecoracion() {
       )}
 
       {/* ── Disclaimer ─────────────────────────────────────────── */}
-      <DisclaimerCard variant="general" severity="low" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* ── Contenido educativo ────────────────────────────────── */}
       <EducationalSection

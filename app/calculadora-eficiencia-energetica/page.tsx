@@ -367,10 +367,9 @@ export default function EficienciaEnergeticaPage() {
         </div>
 
         <DisclaimerCard
-          variant="general"
-          severity="medium"
+          variant="financial"
+          severity="critical"
           context="calculadora-eficiencia-energetica"
-          collapsible={true}
         />
 
         <EducationalSection

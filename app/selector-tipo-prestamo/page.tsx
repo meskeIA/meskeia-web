@@ -557,7 +557,7 @@ export default function SelectorTipoPrestamoPage() {
       )}
 
       {/* ==================== DISCLAIMER (visible, no colapsable) ==================== */}
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* ==================== SECCIÓN EDUCATIVA ==================== */}
       <EducationalSection

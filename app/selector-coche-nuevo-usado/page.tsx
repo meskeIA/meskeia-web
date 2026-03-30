@@ -437,7 +437,7 @@ export default function SelectorCocheNuevoUsado() {
         </section>
       )}
 
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       <EducationalSection title="Nuevo, seminuevo o segunda mano: lo que debes saber" subtitle="Claves para tomar la mejor decisión de compra">
         <h3>Depreciación: el coste oculto del coche nuevo</h3>

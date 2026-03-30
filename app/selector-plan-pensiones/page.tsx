@@ -611,7 +611,7 @@ export default function SelectorPlanPensiones() {
 
       {/* ---- DISCLAIMER (Nivel 2 ALTO — financiero general, visible siempre) ---- */}
       <div className={styles.disclaimerWrapper}>
-        <DisclaimerCard variant="financial" severity="high" />
+        <DisclaimerCard variant="financial" severity="critical" />
       </div>
 
       {/* ---- SECCIÓN EDUCATIVA (Patrón v2.0) ---- */}

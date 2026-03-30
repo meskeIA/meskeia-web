@@ -464,7 +464,7 @@ export default function SelectorTipoVivienda() {
       )}
 
       {/* ── Disclaimer ── */}
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* ── Sección educativa ── */}
       <EducationalSection

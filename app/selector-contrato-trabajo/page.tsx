@@ -487,7 +487,7 @@ export default function SelectorContratoTrabajo() {
       )}
 
       {/* ---- Disclaimer ---- */}
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="general" severity="high" />
 
       {/* ---- Sección educativa ---- */}
       <EducationalSection

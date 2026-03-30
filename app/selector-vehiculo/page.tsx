@@ -1032,9 +1032,8 @@ export default function SelectorVehiculo() {
           </div>
 
           <DisclaimerCard
-            variant="educational"
-            severity="medium"
-            collapsible
+            variant="financial"
+            severity="critical"
             context="selector-vehiculo"
           />
 

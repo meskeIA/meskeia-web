@@ -401,7 +401,7 @@ export default function SelectorCalefaccion() {
       )}
 
       <LegalNotice />
-      <DisclaimerCard variant="technical" severity="low" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* ── INTRO ── */}
       {pantalla === 'intro' && (

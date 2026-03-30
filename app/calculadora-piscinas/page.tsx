@@ -301,10 +301,9 @@ export default function CalculadoraPiscinasPage() {
         )}
 
         <DisclaimerCard
-          variant="general"
-          severity="medium"
+          variant="financial"
+          severity="critical"
           context="calculadora-piscinas"
-          collapsible={true}
         />
 
         <EducationalSection

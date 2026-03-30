@@ -615,7 +615,7 @@ export default function SelectorZonaResidencia() {
       )}
 
       {/* DISCLAIMER */}
-      <DisclaimerCard variant="general" severity="medium" />
+      <DisclaimerCard variant="financial" severity="critical" />
 
       {/* SECCIÓN EDUCATIVA */}
       <EducationalSection title="Factores clave para elegir dónde vivir" subtitle="Ciudad, pueblo o costa: ventajas e inconvenientes de cada entorno">

@@ -424,10 +424,9 @@ export default function CalculadoraMaterialesPage() {
         </div>
 
         <DisclaimerCard
-          variant="general"
-          severity="medium"
+          variant="financial"
+          severity="critical"
           context="calculadora-materiales-construccion"
-          collapsible={true}
         />
 
         {/* Sección educativa */}

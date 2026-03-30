@@ -449,7 +449,7 @@ export default function SelectorCuentaBancariaPage() {
       )}
 
       {/* Disclaimer */}
-      <DisclaimerCard variant="financial" severity="medium" />
+      <DisclaimerCard variant="financial" severity="high" />
 
       {/* Sección educativa */}
       <EducationalSection
