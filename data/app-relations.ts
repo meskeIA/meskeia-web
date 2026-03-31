@@ -1389,6 +1389,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'estimador-pension-viudedad': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
   ],
+  'estimador-complemento-minimos': [
+    ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 4),
+    { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
+  ],
+  'selector-actividades-movilidad': [
+    { url: '/test-fragilidad/', icon: '🧓', name: 'Test de Fragilidad', description: 'Escala FRAIL: ¿eres frágil o pre-frágil?' },
+    { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo Osteoporosis', description: 'Test FRAX/IOF de riesgo óseo' },
+    { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Baremo BVD orientativo' },
+    { url: '/adaptacion-hogar/', icon: '🏠', name: 'Adaptación del Hogar', description: 'Accesibilidad y seguridad en casa' },
+  ],
   'estimador-legitimas': [
     ...patrimonioPensionApps.filter(a => a.url !== '/estimador-legitimas/'),
   ],

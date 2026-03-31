@@ -195,3 +195,51 @@ export const PENSION_VIUDEDAD_2026 = {
   // Base reguladora para causante en activo: BR = (24 bases × media) / 28
   divisorBaseReguladora:    28,
 };
+
+// ─── Pensiones mínimas completas 2026 (complemento a mínimos) ───────────────
+// Fuente: LPGE 2026 + Resolución INSS pensiones mínimas 2026
+// Revalorización +2,8% IPC respecto a 2025
+// Importes mensuales en €, 14 pagas/año
+// Verificado: 2026-03-16
+
+export interface PensionMinimaEntry {
+  tipo: 'jubilacion' | 'incapacidad' | 'viudedad';
+  subtipo: string;
+  label: string;
+  /** Con cónyuge a cargo (€/mes). 0 si no aplica (viudedad) */
+  conConyuge: number;
+  /** Con cónyuge NO a cargo (€/mes). 0 si no aplica */
+  sinConyuge: number;
+  /** Unipersonal — sin cónyuge (€/mes) */
+  unipersonal: number;
+}
+
+export const PENSIONES_MINIMAS_2026: PensionMinimaEntry[] = [
+  // ── Jubilación ──
+  { tipo: 'jubilacion', subtipo: '65_o_mas',  label: 'Jubilación ≥ 65 años',  conConyuge: 1256.60, sinConyuge: 888.70, unipersonal: 936.20 },
+  { tipo: 'jubilacion', subtipo: 'menos_65',  label: 'Jubilación < 65 años',   conConyuge: 1031.00, sinConyuge: 832.00, unipersonal: 879.00 },
+
+  // ── Incapacidad permanente ──
+  { tipo: 'incapacidad', subtipo: 'gran_invalidez',   label: 'Gran Invalidez',                     conConyuge: 1885.00, sinConyuge: 1333.10, unipersonal: 1404.30 },
+  { tipo: 'incapacidad', subtipo: 'absoluta',          label: 'Incapacidad Permanente Absoluta',    conConyuge: 1256.60, sinConyuge: 888.70,  unipersonal: 936.20 },
+  { tipo: 'incapacidad', subtipo: 'total_65_o_mas',    label: 'Total ≥ 65 años',                   conConyuge: 1256.60, sinConyuge: 888.70,  unipersonal: 936.20 },
+  { tipo: 'incapacidad', subtipo: 'total_60_64',       label: 'Total 60-64 años',                  conConyuge: 1031.00, sinConyuge: 832.00,  unipersonal: 879.00 },
+  { tipo: 'incapacidad', subtipo: 'total_menos_60',    label: 'Total < 60 años (enf. común)',       conConyuge: 786.00,  sinConyuge: 635.00,  unipersonal: 671.00 },
+
+  // ── Viudedad (no tiene "con/sin cónyuge" — se usa solo unipersonal) ──
+  { tipo: 'viudedad', subtipo: '65_o_mas',             label: 'Viudedad ≥ 65 años',                conConyuge: 0, sinConyuge: 0, unipersonal: 853.00 },
+  { tipo: 'viudedad', subtipo: '60_a_64',              label: 'Viudedad 60-64 años',               conConyuge: 0, sinConyuge: 0, unipersonal: 769.00 },
+  { tipo: 'viudedad', subtipo: 'menos_60_con_cargas',  label: 'Viudedad < 60 con cargas familiares', conConyuge: 0, sinConyuge: 0, unipersonal: 785.00 },
+  { tipo: 'viudedad', subtipo: 'menos_60_sin_cargas',  label: 'Viudedad < 60 sin cargas familiares', conConyuge: 0, sinConyuge: 0, unipersonal: 583.00 },
+];
+
+// ── Límites de ingresos para acceder al complemento a mínimos 2026 ──
+// Rentas anuales NO derivadas del trabajo (excluida la propia pensión)
+// Fuente: LPGE 2026
+
+export const COMPLEMENTO_MINIMOS_LIMITES_2026 = {
+  /** Sin cónyuge a cargo: ingresos anuales máximos */
+  sinConyuge: 8614,
+  /** Con cónyuge a cargo: ingresos anuales máximos (pensionista + cónyuge) */
+  conConyuge: 10047,
+};

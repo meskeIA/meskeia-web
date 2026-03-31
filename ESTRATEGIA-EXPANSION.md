@@ -1,7 +1,7 @@
 # ESTRATEGIA-EXPANSION.md - meskeIA Web
 
 > **Creado**: 2026-03-30
-> **Última actualización**: 2026-03-30
+> **Última actualización**: 2026-03-31
 > **Estado**: Activo — documento vivo de planificación estratégica
 
 ---
@@ -75,7 +75,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2 | ~~Migración y Extranjería~~ | ~~Alta~~ | ~~Cero~~ | ~~Muy alto~~ | ❌ **DESCARTADO** |
 | 3 | Salud Mental | Muy alta | Baja | Muy alto | 🔴 Alta |
 | 4 | Crianza y Familia | Alta | Baja | Alto | ✅ **COMPLETADO** |
-| 5 | Tercera Edad | Alta | **Cero** | Alto | 🟡 Media |
+| 5 | Tercera Edad | Alta | **Cero** | Alto | ✅ **COMPLETADO** |
 | 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 7 | Derecho Cotidiano | Alta | Baja | Alto | 🟡 Media |
 | 8 | Comunidades de Vecinos | Media | **Cero** | Medio | 🟢 Normal |
@@ -177,12 +177,12 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Calculadora de complemento a mínimos | Pensión mínima según situación | Media | ⬜ Por decidir |
-| Simulador de pensión de viudedad | Requisitos + cuantía estimada | Media | ⬜ Por decidir |
-| Test de fragilidad ampliado | FRAIL + Barthel + orientación | Media | ⬜ Por decidir |
-| Planificador de testamento orientativo | Guía interactiva, no asesoramiento | Alta | ⬜ Por decidir |
-| Selector de actividades según movilidad | Recomendaciones personalizadas | Baja | ⬜ Por decidir |
-| Calculadora de ayudas al alquiler mayores 65 | Por CCAA | Media | ⬜ Por decidir |
+| Estimador de Complemento a Mínimos | Pensión mínima según situación | Media | ✅ Implementada 2026-03-31 |
+| ~~Simulador de pensión de viudedad~~ | ~~Requisitos + cuantía estimada~~ | ~~Media~~ | ✅ Ya existía (estimador-pension-viudedad) |
+| ~~Test de fragilidad~~ | ~~FRAIL + orientación~~ | ~~Media~~ | ✅ Ya existía (test-fragilidad) |
+| ~~Planificador de testamento orientativo~~ | ~~Guía interactiva~~ | ~~Alta~~ | ✅ Ya existía (orientacion-tramitacion-herencias) |
+| Selector de Actividades según Movilidad | Recomendaciones personalizadas | Baja | ✅ Implementada 2026-03-31 |
+| ~~Ayudas al alquiler mayores 65~~ | ~~Por CCAA~~ | ~~Media~~ | ❌ Descartada (alta variabilidad, difícil mantenimiento) |
 
 ---
 
@@ -300,6 +300,8 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Sostenibilidad | Estimación de Ahorro Hídrico | ✅ Build OK |
 | 2026-03-31 | Sostenibilidad | Simulador de Subvenciones Rehabilitación | ✅ Build OK |
 | 2026-03-31 | Sostenibilidad | Estimación de Certificación Energética | ✅ Build OK |
+| 2026-03-31 | Tercera Edad | Estimador de Complemento a Mínimos | ✅ Build OK |
+| 2026-03-31 | Tercera Edad | Selector de Actividades según Movilidad | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -312,6 +314,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Nicho 4 (Crianza) completado: 5 apps nuevas + 2 existentes = 7 apps totales. Módulo data/fiscal/maternidad.ts creado. Selector escolarización descartado (sesgo ideológico). |
 | 2026-03-31 | Nicho 3 (Salud Mental) aplazado al final por decisión del usuario. |
 | 2026-03-31 | Nicho 6 (Sostenibilidad) completado: 5 apps nuevas + 4 existentes = 9 apps totales. |
+| 2026-03-31 | Nicho 5 (Tercera Edad) completado: 2 apps nuevas + 3 existentes (viudedad, fragilidad, herencias) + 1 descartada (ayudas alquiler). Datos pensiones mínimas añadidos a data/fiscal/pensiones.ts. |
 
 ---
 
@@ -323,6 +326,6 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 ---
 
-**Última actualización**: 2026-03-30
+**Última actualización**: 2026-03-31
 **Autor**: Claude Code + Jace
 **Proyecto**: meskeIA Web
