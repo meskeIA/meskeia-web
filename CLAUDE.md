@@ -210,11 +210,21 @@ Cuando se crean **3 o más apps** en una misma sesión, usar agentes en paralelo
 ```
 
 **Fase paralela (agentes crean apps):**
+
+Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
+
 ```
-- Cada agente crea SOLO los archivos de su app (metadata.ts, page.tsx, .module.css)
-- ❌ PROHIBIDO: npm run build (conflicto de .next/build.lock entre agentes)
+## REGLAS CRÍTICAS PARA ESTE AGENTE
+- ✅ Crea SOLO los 3 archivos de tu app (metadata.ts, page.tsx, .module.css)
+- ✅ Puedes ejecutar `npx tsc --noEmit` UNA SOLA VEZ para verificar
+- ❌ PROHIBIDO: ejecutar `npm run build` (conflicto de lock entre agentes)
 - ❌ PROHIBIDO: modificar archivos compartidos (applications.ts, implemented-apps.ts, app-relations.ts, ai-index.json)
-- ✅ PERMITIDO: npx tsc --noEmit (verificación TS sin lock)
+- ❌ PROHIBIDO: ejecutar `npx tsc --noEmit` más de una vez
+- ❌ PROHIBIDO: reintentar comandos fallidos en bucle (sleep + retry)
+- ❌ PROHIBIDO: ejecutar comandos en background (run_in_background)
+- ⚠️ TERMINAR INMEDIATAMENTE después de crear los archivos y verificar TS una vez
+- ⚠️ Si tsc falla, reportar el error y TERMINAR — no reintentar
+- ⚠️ No usar JSX.Element ni React.JSX.Element como tipo de retorno (causa error TS)
 ```
 
 **Fase secuencial DESPUÉS (registros + build):**
@@ -224,10 +234,11 @@ Cuando se crean **3 o más apps** en una misma sesión, usar agentes en paralelo
 3. Actualizar data/app-relations.ts (añadir relaciones)
 4. Actualizar public/ai-index.json (incrementar total, añadir entradas)
 5. npm run build (una sola vez, verificar 0 errores)
-6. Commit + push
+6. Corregir errores si los hay (CSS: no usar `*` puro, TS: no usar JSX.Element)
+7. Commit + push
 ```
 
-**Razón**: Los agentes que ejecutan `npm run build` simultáneamente producen conflictos de lock, builds fallidos en cadena y reintentos interminables. La verificación con `tsc --noEmit` es suficiente para cada agente individual.
+**Razón**: Los agentes que no terminan limpiamente producen procesos zombie, locks de build, reintentos en cadena y docenas de notificaciones residuales. La clave es que cada agente cree sus archivos, verifique UNA vez, y termine inmediatamente.
 
 ---
 
