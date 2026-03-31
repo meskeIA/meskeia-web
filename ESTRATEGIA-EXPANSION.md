@@ -77,7 +77,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 4 | Crianza y Familia | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 5 | Tercera Edad | Alta | **Cero** | Alto | ✅ **COMPLETADO** |
 | 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | ✅ **COMPLETADO** |
-| 7 | Derecho Cotidiano | Alta | Baja | Alto | 🟡 Media |
+| 7 | Derecho Cotidiano | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 8 | Comunidades de Vecinos | Media | **Cero** | Medio | 🟢 Normal |
 | 9 | Oposiciones y Empleo Público | Media | Baja | Medio | 🟢 Normal |
 | 10 | Educación Financiera Juvenil | Media | Baja | Alto | 🟢 Normal |
@@ -219,12 +219,14 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Calculadora de plazos de prescripción | Por tipo de acción legal | Media | ⬜ Por decidir |
-| Selector de tipo de reclamación | Guía según situación | Baja | ⬜ Por decidir |
-| Simulador de costas judiciales | Estimación por cuantía y tipo | Media | ⬜ Por decidir |
-| Calculadora de indemnización accidente | Baremo de tráfico vigente | Alta | ⬜ Por decidir |
-| Checklist de derechos del consumidor | Por tipo de compra/servicio | Baja | ⬜ Por decidir |
-| Calculadora de pensión compensatoria | Divorcio: estimación orientativa | Alta | ⬜ Por decidir |
+| ~~Plazos de prescripción~~ | ~~Por tipo de acción legal~~ | ~~Media~~ | ✅ Ya existía (plazos-legales) |
+| ~~Selector de reclamación~~ | ~~Guía según situación~~ | ~~Baja~~ | ✅ Ya existía (asistente-reclamaciones) |
+| Estimador de Costas Judiciales | Estimación por cuantía y tipo | Media | ✅ Implementada 2026-03-31 |
+| ~~Indemnización accidente~~ | ~~Baremo de tráfico vigente~~ | ~~Alta~~ | ❌ Descartada (baremo complejo, difícil mantenimiento) |
+| ~~Derechos del consumidor~~ | ~~Por tipo de compra/servicio~~ | ~~Baja~~ | ✅ Cubierto por asistente-reclamaciones |
+| ~~Pensión compensatoria~~ | ~~Divorcio: estimación~~ | ~~Alta~~ | ❌ Descartada (baremo complejo, difícil mantenimiento) |
+| Estimador de Costes de Divorcio | Mutuo acuerdo vs contencioso | Media | ✅ Implementada 2026-03-31 |
+| Orientador de Justicia Gratuita | Test requisitos IPREM | Baja | ✅ Implementada 2026-03-31 |
 
 ---
 
@@ -302,6 +304,9 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Sostenibilidad | Estimación de Certificación Energética | ✅ Build OK |
 | 2026-03-31 | Tercera Edad | Estimador de Complemento a Mínimos | ✅ Build OK |
 | 2026-03-31 | Tercera Edad | Selector de Actividades según Movilidad | ✅ Build OK |
+| 2026-03-31 | Derecho Cotidiano | Estimador de Costas Judiciales | ✅ Build OK |
+| 2026-03-31 | Derecho Cotidiano | Estimador de Costes de Divorcio | ✅ Build OK |
+| 2026-03-31 | Derecho Cotidiano | Orientador de Justicia Gratuita | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -315,6 +320,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Nicho 3 (Salud Mental) aplazado al final por decisión del usuario. |
 | 2026-03-31 | Nicho 6 (Sostenibilidad) completado: 5 apps nuevas + 4 existentes = 9 apps totales. |
 | 2026-03-31 | Nicho 5 (Tercera Edad) completado: 2 apps nuevas + 3 existentes (viudedad, fragilidad, herencias) + 1 descartada (ayudas alquiler). Datos pensiones mínimas añadidos a data/fiscal/pensiones.ts. |
+| 2026-03-31 | Nicho 7 (Derecho Cotidiano) completado: 3 apps nuevas + 2 existentes (plazos-legales, asistente-reclamaciones) + 2 descartadas (baremos complejos). 2 ideas nuevas añadidas (divorcio, justicia gratuita). |
 
 ---
 

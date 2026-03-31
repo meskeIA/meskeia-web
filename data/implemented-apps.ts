@@ -38,6 +38,9 @@ export const implementedAppsUrls = [
   "/checklist-tramites-dependencia/",      // Checklist trámites dependencia: 6 fases, documentación, plazos
   "/selector-actividades-movilidad/",      // Selector actividades según movilidad: test 8 preguntas, 20 actividades, 4 niveles
   "/estimador-complemento-minimos/",      // Estimador complemento a mínimos: pensiones mínimas SS por tipo, edad, situación
+  "/estimador-costas-judiciales/",        // Estimador costas judiciales: abogado, procurador, tasas, peritos
+  "/estimador-costes-divorcio/",          // Estimador costes divorcio: mutuo acuerdo vs contencioso
+  "/orientador-justicia-gratuita/",       // Orientador justicia gratuita: requisitos IPREM, prestaciones
   "/estimador-jubilacion/",
   "/estimador-inversiones/",
   "/test-perfil-inversor/",

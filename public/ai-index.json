@@ -1180,6 +1180,24 @@
           "description": "Plazos de prescripción y caducidad en España: garantías, deudas, laboral, fiscal y tráfico"
         },
         {
+          "name": "Estimador de Costas Judiciales",
+          "slug": "estimador-costas-judiciales",
+          "url": "https://meskeia.com/estimador-costas-judiciales/",
+          "description": "Coste orientativo de un juicio en España: abogado, procurador, tasas y peritos"
+        },
+        {
+          "name": "Estimador de Costes de Divorcio",
+          "slug": "estimador-costes-divorcio",
+          "url": "https://meskeia.com/estimador-costes-divorcio/",
+          "description": "Cuánto cuesta divorciarse en España: mutuo acuerdo judicial, notarial o contencioso"
+        },
+        {
+          "name": "Orientador de Justicia Gratuita",
+          "slug": "orientador-justicia-gratuita",
+          "url": "https://meskeia.com/orientador-justicia-gratuita/",
+          "description": "Test de requisitos para abogado y procurador de oficio según IPREM 2026"
+        },
+        {
           "name": "Estimador IRPF Pensionista",
           "slug": "estimador-irpf-pensionista",
           "url": "https://meskeia.com/estimador-irpf-pensionista/",

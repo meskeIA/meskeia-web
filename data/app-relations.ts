@@ -1393,6 +1393,23 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 4),
     { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
   ],
+  'estimador-costas-judiciales': [
+    { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },
+    { url: '/orientador-justicia-gratuita/', icon: '🏛️', name: 'Justicia Gratuita', description: '¿Tienes derecho a abogado gratis?' },
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad en España' },
+    { url: '/asistente-reclamaciones/', icon: '⚖️', name: 'Reclamaciones', description: 'Guía para reclamar tus derechos' },
+  ],
+  'estimador-costes-divorcio': [
+    { url: '/estimador-costas-judiciales/', icon: '⚖️', name: 'Costas Judiciales', description: 'Cuánto cuesta un juicio' },
+    { url: '/orientador-justicia-gratuita/', icon: '🏛️', name: 'Justicia Gratuita', description: '¿Tienes derecho a abogado gratis?' },
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad en España' },
+  ],
+  'orientador-justicia-gratuita': [
+    { url: '/estimador-costas-judiciales/', icon: '⚖️', name: 'Costas Judiciales', description: 'Cuánto cuesta un juicio' },
+    { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },
+    { url: '/asistente-reclamaciones/', icon: '⚖️', name: 'Reclamaciones', description: 'Guía para reclamar tus derechos' },
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad en España' },
+  ],
   'selector-actividades-movilidad': [
     { url: '/test-fragilidad/', icon: '🧓', name: 'Test de Fragilidad', description: 'Escala FRAIL: ¿eres frágil o pre-frágil?' },
     { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo Osteoporosis', description: 'Test FRAX/IOF de riesgo óseo' },
