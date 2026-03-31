@@ -72,9 +72,9 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | # | Nicho | Audiencia | Competencia | Impacto Social | Prioridad |
 |---|-------|-----------|-------------|----------------|-----------|
 | 1 | Cuidadores y Dependencia | Alta | **Cero** | Muy alto | 🔴 Alta |
-| 2 | Migración y Extranjería | Alta | **Cero** | Muy alto | 🔴 Alta |
+| 2 | ~~Migración y Extranjería~~ | ~~Alta~~ | ~~Cero~~ | ~~Muy alto~~ | ❌ **DESCARTADO** |
 | 3 | Salud Mental | Muy alta | Baja | Muy alto | 🔴 Alta |
-| 4 | Crianza y Familia | Alta | Baja | Alto | 🟡 Media |
+| 4 | Crianza y Familia | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 5 | Tercera Edad | Alta | **Cero** | Alto | 🟡 Media |
 | 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | 🟡 Media |
 | 7 | Derecho Cotidiano | Alta | Baja | Alto | 🟡 Media |
@@ -156,12 +156,14 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Simulador de prestaciones por nacimiento | Ayudas estatales y CCAA | Media | ⬜ Por decidir |
-| Calculadora de baja maternal/paternal | Días + retribución según situación | Media | ⬜ Por decidir |
-| Planificador de gastos primer año bebé | Estimación realista categorizada | Baja | ⬜ Por decidir |
-| Selector de tipo de escolarización | Público/concertado/privado según criterios | Baja | ⬜ Por decidir |
-| Calculadora de deducción por maternidad | IRPF: 1.200€/año + guardería | Baja | ⬜ Por decidir |
-| Test de estilo parental | Autoconocimiento con orientación | Baja | ⬜ Por decidir |
+| Planificador Embarazo y Bebé | FPP, checklist trimestral, lista compras, vacunas | Media | ✅ Ya existía |
+| Orientador Percentiles Infantiles | Peso y talla OMS bebés/niños | Media | ✅ Ya existía |
+| Estimación de Prestación por Nacimiento | Cuantía SS, 16 semanas, requisitos por edad | Media | ✅ Implementada 2026-03-31 |
+| Estimación de Baja Maternal y Paternal | Duración, distribución, extras (múltiple/prematuro) | Media | ✅ Implementada 2026-03-31 |
+| Planificador de Gastos del Primer Año | 10 categorías, 3 niveles (ajustado/medio/confortable) | Baja | ✅ Implementada 2026-03-31 |
+| ~~Selector de tipo de escolarización~~ | ~~Público/concertado/privado~~ | ~~Baja~~ | ❌ Descartado (sesgo ideológico) |
+| Estimación de Deducción por Maternidad IRPF | 1.200€/año + 1.000€ guardería, Modelo 140 | Baja | ✅ Implementada 2026-03-31 |
+| Test de Estilo Parental | Baumrind, 16 preguntas, 4 estilos, autoconocimiento | Baja | ✅ Implementada 2026-03-31 |
 
 ---
 
@@ -285,6 +287,11 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-30 | Cuidadores | Test de Zarit — Sobrecarga del Cuidador | ✅ Build OK |
 | 2026-03-30 | Cuidadores | Estimación de Deducción IRPF por Discapacidad | ✅ Build OK |
 | 2026-03-30 | Cuidadores | Checklist de Trámites de Dependencia | ✅ Build OK |
+| 2026-03-31 | Crianza | Estimación de Prestación por Nacimiento | ✅ Build OK |
+| 2026-03-31 | Crianza | Estimación de Baja Maternal y Paternal | ✅ Build OK |
+| 2026-03-31 | Crianza | Planificador de Gastos del Primer Año del Bebé | ✅ Build OK |
+| 2026-03-31 | Crianza | Estimación de Deducción por Maternidad IRPF | ✅ Build OK |
+| 2026-03-31 | Crianza | Test de Estilo Parental | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -293,6 +300,9 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-30 | Documento estratégico creado. Se revisará nicho por nicho antes de implementar. |
 | 2026-03-30 | Nicho 1 (Cuidadores) completado: 5 apps nuevas + 3 existentes = 8 apps totales. Módulo data/fiscal/dependencia.ts creado. |
 | 2026-03-30 | Nomenclatura: usar "Estimación" en lugar de "Calculadora" para reducir riesgo legal. |
+| 2026-03-31 | Nicho 2 (Migración) **DESCARTADO**: riesgo legal inaceptable (consecuencias irreversibles, colectivo vulnerable, complejidad normativa inmanejable). |
+| 2026-03-31 | Nicho 4 (Crianza) completado: 5 apps nuevas + 2 existentes = 7 apps totales. Módulo data/fiscal/maternidad.ts creado. Selector escolarización descartado (sesgo ideológico). |
+| 2026-03-31 | Nicho 3 (Salud Mental) aplazado al final por decisión del usuario. |
 
 ---
 

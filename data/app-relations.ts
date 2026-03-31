@@ -472,6 +472,11 @@ const familiaApps: RelatedApp[] = [
   { url: '/planificador-embarazo/', icon: '🤰', name: 'Planificador Embarazo', description: 'Semanas y checklist' },
   { url: '/orientador-percentiles/', icon: '📏', name: 'Percentiles Infantiles', description: 'Peso y talla OMS' },
   { url: '/calculadora-fechas/', icon: '📅', name: 'Calculadora Fechas', description: 'Días entre fechas' },
+  { url: '/estimacion-prestacion-nacimiento/', icon: '👶', name: 'Prestación Nacimiento', description: 'Cuantía SS por nacimiento/adopción' },
+  { url: '/estimacion-baja-maternal/', icon: '📅', name: 'Baja Maternal/Paternal', description: '16 semanas: distribución y extras' },
+  { url: '/planificador-gastos-bebe/', icon: '🍼', name: 'Gastos Primer Año Bebé', description: 'Presupuesto categorizado' },
+  { url: '/estimacion-deduccion-maternidad/', icon: '👩‍👧', name: 'Deducción Maternidad', description: '1.200 €/año + guardería IRPF' },
+  { url: '/test-estilo-parental/', icon: '👨‍👩‍👧‍👦', name: 'Test Estilo Parental', description: 'Autoconocimiento educativo' },
 ];
 
 // ==========================================
@@ -928,8 +933,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // FAMILIA
-  'planificador-embarazo': saludFemeninaApps.filter(a => a.url !== '/planificador-embarazo/'),
+  'planificador-embarazo': [
+    ...saludFemeninaApps.filter(a => a.url !== '/planificador-embarazo/'),
+    ...familiaApps.filter(a => a.url !== '/planificador-embarazo/' && !saludFemeninaApps.some(s => s.url === a.url)),
+  ],
   'calculadora-percentiles': familiaApps.filter(a => a.url !== '/orientador-percentiles/'),
+  'estimacion-prestacion-nacimiento': familiaApps.filter(a => a.url !== '/estimacion-prestacion-nacimiento/'),
+  'estimacion-baja-maternal': familiaApps.filter(a => a.url !== '/estimacion-baja-maternal/'),
+  'planificador-gastos-bebe': familiaApps.filter(a => a.url !== '/planificador-gastos-bebe/'),
+  'estimacion-deduccion-maternidad': familiaApps.filter(a => a.url !== '/estimacion-deduccion-maternidad/'),
+  'test-estilo-parental': familiaApps.filter(a => a.url !== '/test-estilo-parental/'),
 
   // SALUD FEMENINA
   'seguimiento-ciclo-menstrual': saludFemeninaApps.filter(a => a.url !== '/seguimiento-ciclo-menstrual/'),
@@ -1622,6 +1635,11 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'test-zarit-cuidador': { title: 'Herramientas de cuidadores y dependencia', icon: '🤝' },
     'estimacion-deduccion-discapacidad': { title: 'Herramientas de discapacidad y dependencia', icon: '♿' },
     'checklist-tramites-dependencia': { title: 'Herramientas de cuidadores y dependencia', icon: '✅' },
+    'estimacion-prestacion-nacimiento': { title: 'Herramientas de crianza y familia', icon: '👶' },
+    'estimacion-baja-maternal': { title: 'Herramientas de crianza y familia', icon: '📅' },
+    'planificador-gastos-bebe': { title: 'Herramientas de crianza y familia', icon: '🍼' },
+    'estimacion-deduccion-maternidad': { title: 'Herramientas de crianza y familia', icon: '👩‍👧' },
+    'test-estilo-parental': { title: 'Herramientas de crianza y familia', icon: '👨‍👩‍👧‍👦' },
     'simulador-bono-joven-alquiler': { title: 'Más herramientas de vivienda y finanzas', icon: '🏠' },
     'orientador-aval-ico': { title: 'Herramientas para comprar tu primera vivienda', icon: '🏡' },
     'calculadora-costes-teletrabajo': { title: 'Más herramientas de productividad', icon: '💻' },

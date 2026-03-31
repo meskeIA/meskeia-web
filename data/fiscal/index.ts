@@ -22,3 +22,4 @@ export * from './pensiones';
 export * from './alquiler';
 export * from './nomada-digital';
 export * from './dependencia';
+export * from './maternidad';

@@ -41,7 +41,9 @@
       "Bash(copy:*)",
       "Bash(copy \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\ahorrar-dinero\\\\GuiaAhorrarDinero.module.css\" \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\comprar-coche\\\\GuiaComprarCoche.module.css\")",
       "Bash(copy \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\ahorrar-dinero\\\\GuiaAhorrarDinero.module.css\" \"C:\\\\Users\\\\jaceb\\\\meskeia-web\\\\app\\\\guia\\\\montar-negocio\\\\GuiaMontarNegocio.module.css\")",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Read(//tmp/**)",
+      "Bash(python3 -c \"open\\(''/c/Users/jaceb/meskeia-web/.next/lock'', ''w''\\).close\\(\\); print\\(''cleared''\\)\")"
     ],
     "deny": [],
     "ask": []

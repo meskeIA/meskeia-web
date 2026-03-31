@@ -71,6 +71,8 @@ Repositorio centralizado de datos normativos para la Suite Legal-Fiscal. Cada m�
 | `data/fiscal/donaciones.ts` | Tarifas impuesto donaciones por CCAA |
 | `data/fiscal/sociedades.ts` | Tipos IS, regímenes especiales |
 | `data/fiscal/pensiones.ts` | Datos SS jubilación: porcentajes por años, pensión máx/mín, coeficientes anticipada 2025 |
+| `data/fiscal/dependencia.ts` | Prestaciones SAAD, copago, cotización SS cuidadores, deducciones IRPF discapacidad, escala Zarit |
+| `data/fiscal/maternidad.ts` | Permiso nacimiento (16 sem), prestación SS, deducción maternidad IRPF, gastos bebé, estilos parentales |
 
 ### ⚠️ Regla obligatoria para apps Legal-Fiscal y Jubilación
 
@@ -195,6 +197,37 @@ Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no op
 **Excepción**: Cursos (`/curso-*`) y Guías (`/guia/*`) están excluidos del patrón v2.0 por tener estructura propia. Juegos y ocio → patrón lite (ver `PROFESIONALIZACION.md`).
 
 **Instrucciones técnicas completas del patrón v2.0**: `PROFESIONALIZACION.md`
+
+### 3. Creación de múltiples apps en paralelo (agentes)
+
+Cuando se crean **3 o más apps** en una misma sesión, usar agentes en paralelo para maximizar velocidad. Reglas OBLIGATORIAS:
+
+**Fase secuencial ANTES (archivos compartidos):**
+```
+1. Crear/actualizar data/fiscal/*.ts si se necesitan datos normativos
+2. Actualizar data/fiscal/index.ts con el nuevo export
+3. Verificar que compila: npx tsc --noEmit data/fiscal/index.ts
+```
+
+**Fase paralela (agentes crean apps):**
+```
+- Cada agente crea SOLO los archivos de su app (metadata.ts, page.tsx, .module.css)
+- ❌ PROHIBIDO: npm run build (conflicto de .next/build.lock entre agentes)
+- ❌ PROHIBIDO: modificar archivos compartidos (applications.ts, implemented-apps.ts, app-relations.ts, ai-index.json)
+- ✅ PERMITIDO: npx tsc --noEmit (verificación TS sin lock)
+```
+
+**Fase secuencial DESPUÉS (registros + build):**
+```
+1. Actualizar data/applications.ts (añadir todas las apps nuevas)
+2. Actualizar data/implemented-apps.ts (añadir URLs)
+3. Actualizar data/app-relations.ts (añadir relaciones)
+4. Actualizar public/ai-index.json (incrementar total, añadir entradas)
+5. npm run build (una sola vez, verificar 0 errores)
+6. Commit + push
+```
+
+**Razón**: Los agentes que ejecutan `npm run build` simultáneamente producen conflictos de lock, builds fallidos en cadena y reintentos interminables. La verificación con `tsc --noEmit` es suficiente para cada agente individual.
 
 ---
 

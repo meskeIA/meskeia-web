@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 346,
-  "updated": "2026-03-30",
+  "total_tools": 351,
+  "updated": "2026-03-31",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -1883,6 +1883,36 @@
           "slug": "planificador-embarazo",
           "url": "https://meskeia.com/planificador-embarazo/",
           "description": "Planificador completo: calculadora FPP, checklist por trimestre, lista compras bebé y vacunas España 2024"
+        },
+        {
+          "name": "Estimación de Prestación por Nacimiento",
+          "slug": "estimacion-prestacion-nacimiento",
+          "url": "https://meskeia.com/estimacion-prestacion-nacimiento/",
+          "description": "Estima la prestación SS por nacimiento: 100% base reguladora, 16 semanas, requisitos por edad"
+        },
+        {
+          "name": "Estimación de Baja Maternal y Paternal",
+          "slug": "estimacion-baja-maternal",
+          "url": "https://meskeia.com/estimacion-baja-maternal/",
+          "description": "Duración del permiso por nacimiento: 16 semanas, distribución obligatoria/voluntaria, extras"
+        },
+        {
+          "name": "Planificador de Gastos del Primer Año del Bebé",
+          "slug": "planificador-gastos-bebe",
+          "url": "https://meskeia.com/planificador-gastos-bebe/",
+          "description": "Presupuesto primer año bebé: 10 categorías de gasto con 3 niveles (ajustado/medio/confortable)"
+        },
+        {
+          "name": "Estimación de Deducción por Maternidad IRPF",
+          "slug": "estimacion-deduccion-maternidad",
+          "url": "https://meskeia.com/estimacion-deduccion-maternidad/",
+          "description": "Deducción IRPF maternidad: 1.200€/año por hijo menor 3 años + hasta 1.000€ guardería"
+        },
+        {
+          "name": "Test de Estilo Parental",
+          "slug": "test-estilo-parental",
+          "url": "https://meskeia.com/test-estilo-parental/",
+          "description": "Test de autoconocimiento parental: 16 preguntas, modelo Baumrind, 4 estilos educativos"
         },
         {
           "name": "Planificador de Mascota",
