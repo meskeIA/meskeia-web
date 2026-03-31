@@ -1393,6 +1393,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 4),
     { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
   ],
+  'simulador-paga-ahorro': [
+    { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Calcula cuándo alcanzarás tu objetivo' },
+    { url: '/juego-presupuesto-mensual/', icon: '🎮', name: 'Juego de Presupuesto', description: '¿Llegas a fin de mes?' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de dinero?' },
+    { url: '/orientador-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tus ingresos' },
+  ],
+  'juego-presupuesto-mensual': [
+    { url: '/simulador-paga-ahorro/', icon: '🐷', name: 'Simulador de Paga', description: 'Gestiona tu paga y ahorra' },
+    { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Plazo para tu objetivo' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de dinero?' },
+    { url: '/control-gastos/', icon: '📋', name: 'Control de Gastos', description: 'Registra tus gastos reales' },
+  ],
+  'estimador-tiempo-ahorro': [
+    { url: '/simulador-paga-ahorro/', icon: '🐷', name: 'Simulador de Paga', description: 'Gestiona tu paga y ahorra' },
+    { url: '/juego-presupuesto-mensual/', icon: '🎮', name: 'Juego de Presupuesto', description: '¿Llegas a fin de mes?' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Haz crecer tu ahorro' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de dinero?' },
+  ],
+  'quiz-conceptos-financieros': [
+    { url: '/simulador-paga-ahorro/', icon: '🐷', name: 'Simulador de Paga', description: 'Gestiona tu paga y ahorra' },
+    { url: '/juego-presupuesto-mensual/', icon: '🎮', name: 'Juego de Presupuesto', description: '¿Llegas a fin de mes?' },
+    { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Plazo para tu objetivo' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Haz crecer tu ahorro' },
+  ],
   'estimador-costas-judiciales': [
     { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },
     { url: '/orientador-justicia-gratuita/', icon: '🏛️', name: 'Justicia Gratuita', description: '¿Tienes derecho a abogado gratis?' },

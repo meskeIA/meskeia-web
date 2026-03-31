@@ -36,6 +36,10 @@ export const implementedAppsUrls = [
   "/test-zarit-cuidador/",                 // Test de Zarit: escala 22 ítems sobrecarga del cuidador
   "/estimacion-deduccion-discapacidad/",   // Estimación deducción IRPF por discapacidad: mínimos personales y familiares
   "/checklist-tramites-dependencia/",      // Checklist trámites dependencia: 6 fases, documentación, plazos
+  "/simulador-paga-ahorro/",               // Simulador paga y ahorro: gestión paga semanal/mensual, objetivos visuales
+  "/juego-presupuesto-mensual/",           // Juego presupuesto mensual: 3 perfiles, 6 escenarios, lecciones financieras
+  "/estimador-tiempo-ahorro/",             // ¿Cuánto tardo en ahorrar?: objetivo + ahorro mensual = plazo
+  "/quiz-conceptos-financieros/",          // Quiz 15 preguntas: ahorro, inflación, inversión, deuda, presupuesto
   "/selector-actividades-movilidad/",      // Selector actividades según movilidad: test 8 preguntas, 20 actividades, 4 niveles
   "/estimador-complemento-minimos/",      // Estimador complemento a mínimos: pensiones mínimas SS por tipo, edad, situación
   "/estimador-costas-judiciales/",        // Estimador costas judiciales: abogado, procurador, tasas, peritos

@@ -847,6 +847,30 @@
           "description": "Calcula la pensión de viudedad estimada según la Seguridad Social española 2025"
         },
         {
+          "name": "Simulador de Paga y Ahorro",
+          "slug": "simulador-paga-ahorro",
+          "url": "https://meskeia.com/simulador-paga-ahorro/",
+          "description": "Gestiona tu paga semanal o mensual, distribuye gastos y ahorra con objetivos visuales"
+        },
+        {
+          "name": "Juego de Presupuesto Mensual",
+          "slug": "juego-presupuesto-mensual",
+          "url": "https://meskeia.com/juego-presupuesto-mensual/",
+          "description": "Juego educativo: elige perfil, toma decisiones financieras y descubre si llegas a fin de mes"
+        },
+        {
+          "name": "¿Cuánto tardo en ahorrar?",
+          "slug": "estimador-tiempo-ahorro",
+          "url": "https://meskeia.com/estimador-tiempo-ahorro/",
+          "description": "Calcula cuánto tiempo necesitas para alcanzar tu objetivo de ahorro"
+        },
+        {
+          "name": "Quiz de Conceptos Financieros",
+          "slug": "quiz-conceptos-financieros",
+          "url": "https://meskeia.com/quiz-conceptos-financieros/",
+          "description": "Test de 15 preguntas sobre ahorro, inflación, inversión, deuda y presupuesto"
+        },
+        {
           "name": "Selector de Actividades según Movilidad",
           "slug": "selector-actividades-movilidad",
           "url": "https://meskeia.com/selector-actividades-movilidad/",

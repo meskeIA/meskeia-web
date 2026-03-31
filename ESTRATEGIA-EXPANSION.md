@@ -78,9 +78,9 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 5 | Tercera Edad | Alta | **Cero** | Alto | ✅ **COMPLETADO** |
 | 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 7 | Derecho Cotidiano | Alta | Baja | Alto | ✅ **COMPLETADO** |
-| 8 | Comunidades de Vecinos | Media | **Cero** | Medio | 🟢 Normal |
+| 8 | Comunidades de Vecinos | Media | **Cero** | Medio | ✅ **CUBIERTO** |
 | 9 | Oposiciones y Empleo Público | Media | Baja | Medio | 🟢 Normal |
-| 10 | Educación Financiera Juvenil | Media | Baja | Alto | 🟢 Normal |
+| 10 | Educación Financiera Juvenil | Media | Baja | Alto | ✅ **COMPLETADO** |
 
 ---
 
@@ -240,10 +240,10 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Calculadora de derramas | Reparto por coeficiente de participación | Baja | ⬜ Por decidir |
-| Simulador de quórums LPH | Votos necesarios según tipo de acuerdo | Media | ⬜ Por decidir |
-| Presupuesto anual de comunidad | Plantilla interactiva por partidas | Media | ⬜ Por decidir |
-| Calculadora de cuota comunitaria | Distribución justa según coeficientes | Baja | ⬜ Por decidir |
+| ~~Derramas~~ | ~~Reparto por coeficiente~~ | ~~Baja~~ | ✅ Ya existía (estimador-gastos-comunidad) |
+| ~~Simulador de quórums LPH~~ | ~~Votos según tipo de acuerdo~~ | ~~Media~~ | ❌ Descartada (LPH estatal ≠ Código Civil catalán, doble régimen) |
+| ~~Presupuesto anual comunidad~~ | ~~Plantilla interactiva~~ | ~~Media~~ | ✅ Cubierto por estimador-gastos-comunidad |
+| ~~Cuota comunitaria~~ | ~~Distribución por coeficientes~~ | ~~Baja~~ | ✅ Cubierto por estimador-gastos-comunidad |
 
 ---
 
@@ -274,10 +274,10 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Simulador de paga + ahorro | Gestionar dinero semanal/mensual | Baja | ⬜ Por decidir |
-| Juego de presupuesto mensual | Gamificado con escenarios reales | Media | ⬜ Por decidir |
-| Calculadora "¿cuánto tardo en ahorrar?" | Objetivo + ahorro mensual = plazo | Baja | ⬜ Por decidir |
-| Quiz de conceptos financieros | Interés, inflación, ahorro, inversión | Baja | ⬜ Por decidir |
+| Simulador de Paga y Ahorro | Gestionar dinero semanal/mensual | Baja | ✅ Implementada 2026-03-31 |
+| Juego de Presupuesto Mensual | Gamificado con escenarios reales | Media | ✅ Implementada 2026-03-31 |
+| ¿Cuánto tardo en ahorrar? | Objetivo + ahorro mensual = plazo | Baja | ✅ Implementada 2026-03-31 |
+| Quiz de Conceptos Financieros | Interés, inflación, ahorro, inversión | Baja | ✅ Implementada 2026-03-31 |
 
 ---
 
@@ -307,6 +307,10 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Derecho Cotidiano | Estimador de Costas Judiciales | ✅ Build OK |
 | 2026-03-31 | Derecho Cotidiano | Estimador de Costes de Divorcio | ✅ Build OK |
 | 2026-03-31 | Derecho Cotidiano | Orientador de Justicia Gratuita | ✅ Build OK |
+| 2026-03-31 | Educación Financiera | Simulador de Paga y Ahorro | ✅ Build OK |
+| 2026-03-31 | Educación Financiera | Juego de Presupuesto Mensual | ✅ Build OK |
+| 2026-03-31 | Educación Financiera | ¿Cuánto tardo en ahorrar? | ✅ Build OK |
+| 2026-03-31 | Educación Financiera | Quiz de Conceptos Financieros | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -321,6 +325,8 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Nicho 6 (Sostenibilidad) completado: 5 apps nuevas + 4 existentes = 9 apps totales. |
 | 2026-03-31 | Nicho 5 (Tercera Edad) completado: 2 apps nuevas + 3 existentes (viudedad, fragilidad, herencias) + 1 descartada (ayudas alquiler). Datos pensiones mínimas añadidos a data/fiscal/pensiones.ts. |
 | 2026-03-31 | Nicho 7 (Derecho Cotidiano) completado: 3 apps nuevas + 2 existentes (plazos-legales, asistente-reclamaciones) + 2 descartadas (baremos complejos). 2 ideas nuevas añadidas (divorcio, justicia gratuita). |
+| 2026-03-31 | Nicho 8 (Comunidades de Vecinos) **CUBIERTO** por estimador-gastos-comunidad existente. Simulador quórums LPH descartado (doble régimen: LPH estatal ≠ Código Civil catalán). |
+| 2026-03-31 | Nicho 10 (Educación Financiera Juvenil) completado: 4 apps nuevas. Mini-ecosistema educativo: paga, presupuesto gamificado, objetivos y quiz. |
 
 ---
 
