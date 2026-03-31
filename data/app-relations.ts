@@ -455,6 +455,21 @@ const hogarApps: RelatedApp[] = [
 ];
 
 // ==========================================
+// FAMILIA: SOSTENIBILIDAD Y HOGAR EFICIENTE
+// ==========================================
+const sostenibilidadApps: RelatedApp[] = [
+  { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental' },
+  { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro con mejoras energéticas' },
+  { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
+  { url: '/selector-energia-hogar/', icon: '🔥', name: 'Selector Energía Hogar', description: 'Calefacción ideal para ti' },
+  { url: '/simulador-placas-solares/', icon: '☀️', name: 'Placas Solares', description: 'Ahorro con autoconsumo fotovoltaico' },
+  { url: '/selector-tarifa-electrica/', icon: '⚡', name: 'Tarifa Eléctrica', description: 'PVPC o mercado libre' },
+  { url: '/estimacion-ahorro-hidrico/', icon: '💧', name: 'Ahorro Hídrico', description: 'Litros y euros ahorrados' },
+  { url: '/simulador-subvenciones-rehabilitacion/', icon: '🏠', name: 'Subvenciones Rehabilitación', description: 'Ayudas Next Generation' },
+  { url: '/estimacion-certificacion-energetica/', icon: '🏷️', name: 'Certificación Energética', description: 'Estima tu letra (A-G)' },
+];
+
+// ==========================================
 // FAMILIA: BRICOLAJE Y REFORMAS
 // ==========================================
 const bricolajeApps: RelatedApp[] = [
@@ -1419,10 +1434,22 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   'selector-energia-hogar': [
-    { url: '/selector-calefaccion/', icon: '🌡️', name: 'Selector de Calefacción', description: '¿Qué sistema de calefacción te conviene?' },
-    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Gastos del Hogar', description: 'Control de tu presupuesto mensual' },
-    { url: '/estimador-reformas-hogar/', icon: '🔨', name: 'Estimador Reformas', description: 'Coste estimado de tu reforma' },
-    { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro Hogar', description: '¿Qué cobertura de seguro necesitas?' },
+    ...sostenibilidadApps.filter(a => a.url !== '/selector-energia-hogar/'),
+  ],
+  'simulador-placas-solares': [
+    ...sostenibilidadApps.filter(a => a.url !== '/simulador-placas-solares/'),
+  ],
+  'selector-tarifa-electrica': [
+    ...sostenibilidadApps.filter(a => a.url !== '/selector-tarifa-electrica/'),
+  ],
+  'estimacion-ahorro-hidrico': [
+    ...sostenibilidadApps.filter(a => a.url !== '/estimacion-ahorro-hidrico/'),
+  ],
+  'simulador-subvenciones-rehabilitacion': [
+    ...sostenibilidadApps.filter(a => a.url !== '/simulador-subvenciones-rehabilitacion/'),
+  ],
+  'estimacion-certificacion-energetica': [
+    ...sostenibilidadApps.filter(a => a.url !== '/estimacion-certificacion-energetica/'),
   ],
 
   // Educación y orientación vocacional
@@ -1743,7 +1770,12 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'selector-vacaciones': { title: 'Más herramientas para viajar', icon: '✈️' },
 
     // Hogar y energía
-    'selector-energia-hogar': { title: 'Más herramientas para el hogar', icon: '🏠' },
+    'selector-energia-hogar': { title: 'Herramientas de sostenibilidad y hogar eficiente', icon: '🏠' },
+    'simulador-placas-solares': { title: 'Herramientas de sostenibilidad y hogar eficiente', icon: '☀️' },
+    'selector-tarifa-electrica': { title: 'Herramientas de sostenibilidad y hogar eficiente', icon: '⚡' },
+    'estimacion-ahorro-hidrico': { title: 'Herramientas de sostenibilidad y hogar eficiente', icon: '💧' },
+    'simulador-subvenciones-rehabilitacion': { title: 'Herramientas de sostenibilidad y hogar eficiente', icon: '🏠' },
+    'estimacion-certificacion-energetica': { title: 'Herramientas de sostenibilidad y hogar eficiente', icon: '🏷️' },
 
     // Finanzas — préstamos
     'selector-tipo-prestamo': { title: 'Más herramientas de finanzas', icon: '💳' },

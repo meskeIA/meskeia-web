@@ -412,6 +412,11 @@ export const implementedAppsUrls = [
   "/selector-contrato-trabajo/",         // Test 10 preguntas: indefinido, temporal, autónomo, prácticas, funcionario
   "/selector-tipo-prestamo/",            // Test 10 preguntas: personal, hipotecario, consumo, línea crédito, microcrédito
   "/selector-energia-hogar/",            // Test 10 preguntas: gas, eléctrico/bomba calor, aerotermia, biomasa, solar
+  "/simulador-placas-solares/",          // Simulador ahorro placas solares: producción, autoconsumo, amortización
+  "/selector-tarifa-electrica/",         // Selector PVPC o mercado libre: test 10 preguntas + estimación coste
+  "/estimacion-ahorro-hidrico/",         // Estimación ahorro hídrico: 10 hábitos, litros y euros ahorrados
+  "/simulador-subvenciones-rehabilitacion/", // Subvenciones rehabilitación energética: Next Generation + IRPF
+  "/estimacion-certificacion-energetica/",   // Estimación letra energética (A-G): 8 factores orientativos
   "/selector-carrera-universitaria/",    // Test 10 preguntas: ciencias/ingeniería, salud, humanidades, tecnología, arte/diseño
   "/selector-herramienta-productividad/", // Test 10 preguntas: GTD, Pomodoro, Kanban, Timeboxing, Inbox Zero
   "/selector-seguro-vida/",              // Test 10 preguntas: temporal, ahorro/vida entera, mixto o ninguno por ahora

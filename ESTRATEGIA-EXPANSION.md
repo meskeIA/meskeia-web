@@ -76,7 +76,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 3 | Salud Mental | Muy alta | Baja | Muy alto | 🔴 Alta |
 | 4 | Crianza y Familia | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 5 | Tercera Edad | Alta | **Cero** | Alto | 🟡 Media |
-| 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | 🟡 Media |
+| 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 7 | Derecho Cotidiano | Alta | Baja | Alto | 🟡 Media |
 | 8 | Comunidades de Vecinos | Media | **Cero** | Medio | 🟢 Normal |
 | 9 | Oposiciones y Empleo Público | Media | Baja | Medio | 🟢 Normal |
@@ -196,12 +196,15 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Calculadora de huella de carbono personal | Estimación anual por categorías | Media | ⬜ Por decidir |
-| Simulador de ahorro con placas solares | Por provincia, consumo, orientación | Alta | ⬜ Por decidir |
-| Selector de tarifa eléctrica | PVPC vs. mercado libre según consumo | Media | ⬜ Por decidir |
-| Calculadora de ahorro hídrico | Litros/año con cambios de hábitos | Baja | ⬜ Por decidir |
-| Simulador de subvenciones rehabilitación | NextGen + CCAA según reforma | Alta | ⬜ Por decidir |
-| Calculadora de certificación energética | Estimación orientativa de letra | Media | ⬜ Por decidir |
+| Calculadora Huella de Carbono | Estimación anual por categorías | Media | ✅ Ya existía |
+| Calculadora Gasto Energético | Consumo eléctrico electrodomésticos | Baja | ✅ Ya existía |
+| Calculadora Eficiencia Energética | Ahorro aislamiento/ventanas/bomba calor | Media | ✅ Ya existía |
+| Selector de Energía para el Hogar | Test calefacción: gas/aerotermia/biomasa/solar | Media | ✅ Ya existía |
+| Simulador de Ahorro con Placas Solares | Producción, autoconsumo, amortización por zona | Alta | ✅ Implementada 2026-03-31 |
+| Selector de Tarifa Eléctrica | PVPC vs. mercado libre: test 10 preguntas | Media | ✅ Implementada 2026-03-31 |
+| Estimación de Ahorro Hídrico | 10 hábitos, litros y euros ahorrados | Baja | ✅ Implementada 2026-03-31 |
+| Simulador de Subvenciones Rehabilitación | NextGen EU + deducciones IRPF | Alta | ✅ Implementada 2026-03-31 |
+| Estimación de Certificación Energética | Letra orientativa (A-G), 8 factores | Media | ✅ Implementada 2026-03-31 |
 
 ---
 
@@ -292,6 +295,11 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Crianza | Planificador de Gastos del Primer Año del Bebé | ✅ Build OK |
 | 2026-03-31 | Crianza | Estimación de Deducción por Maternidad IRPF | ✅ Build OK |
 | 2026-03-31 | Crianza | Test de Estilo Parental | ✅ Build OK |
+| 2026-03-31 | Sostenibilidad | Simulador de Ahorro con Placas Solares | ✅ Build OK |
+| 2026-03-31 | Sostenibilidad | Selector de Tarifa Eléctrica | ✅ Build OK |
+| 2026-03-31 | Sostenibilidad | Estimación de Ahorro Hídrico | ✅ Build OK |
+| 2026-03-31 | Sostenibilidad | Simulador de Subvenciones Rehabilitación | ✅ Build OK |
+| 2026-03-31 | Sostenibilidad | Estimación de Certificación Energética | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -303,6 +311,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Nicho 2 (Migración) **DESCARTADO**: riesgo legal inaceptable (consecuencias irreversibles, colectivo vulnerable, complejidad normativa inmanejable). |
 | 2026-03-31 | Nicho 4 (Crianza) completado: 5 apps nuevas + 2 existentes = 7 apps totales. Módulo data/fiscal/maternidad.ts creado. Selector escolarización descartado (sesgo ideológico). |
 | 2026-03-31 | Nicho 3 (Salud Mental) aplazado al final por decisión del usuario. |
+| 2026-03-31 | Nicho 6 (Sostenibilidad) completado: 5 apps nuevas + 4 existentes = 9 apps totales. |
 
 ---
 

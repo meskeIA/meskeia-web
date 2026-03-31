@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 351,
+  "total_tools": 356,
   "updated": "2026-03-31",
   "features": {
     "all_free": true,
@@ -478,6 +478,36 @@
           "slug": "selector-energia-hogar",
           "url": "https://meskeia.com/selector-energia-hogar/",
           "description": "Test de 10 preguntas para saber qué sistema de calefacción y agua caliente conviene: gas natural, bomba de calor, aerotermia, biomasa o solar térmica"
+        },
+        {
+          "name": "Simulador de Ahorro con Placas Solares",
+          "slug": "simulador-placas-solares",
+          "url": "https://meskeia.com/simulador-placas-solares/",
+          "description": "Estima ahorro anual con paneles solares: producción, autoconsumo, excedentes, amortización y CO2 evitado"
+        },
+        {
+          "name": "Selector de Tarifa Eléctrica",
+          "slug": "selector-tarifa-electrica",
+          "url": "https://meskeia.com/selector-tarifa-electrica/",
+          "description": "PVPC o mercado libre: test de 10 preguntas según tu patrón de consumo eléctrico"
+        },
+        {
+          "name": "Estimación de Ahorro Hídrico",
+          "slug": "estimacion-ahorro-hidrico",
+          "url": "https://meskeia.com/estimacion-ahorro-hidrico/",
+          "description": "Estima litros y euros ahorrados al año con 10 hábitos de ahorro de agua"
+        },
+        {
+          "name": "Simulador de Subvenciones Rehabilitación Energética",
+          "slug": "simulador-subvenciones-rehabilitacion",
+          "url": "https://meskeia.com/simulador-subvenciones-rehabilitacion/",
+          "description": "Subvenciones Next Generation EU para rehabilitación energética + deducciones IRPF"
+        },
+        {
+          "name": "Estimación de Certificación Energética",
+          "slug": "estimacion-certificacion-energetica",
+          "url": "https://meskeia.com/estimacion-certificacion-energetica/",
+          "description": "Estima la letra energética orientativa (A-G) de tu vivienda según 8 factores"
         },
         {
           "name": "Analizador GEO/AEO",
