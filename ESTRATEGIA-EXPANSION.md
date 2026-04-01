@@ -2,7 +2,7 @@
 
 > **Creado**: 2026-03-30
 > **Última actualización**: 2026-03-31
-> **Estado**: Activo — documento vivo de planificación estratégica
+> **Estado**: COMPLETADO — todos los nichos resueltos (2026-04-01)
 
 ---
 
@@ -338,12 +338,33 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 ## 4. Métricas de Éxito
 
-- **Objetivo**: Cubrir al menos 5 nichos nuevos con 3+ apps cada uno
-- **Medición**: Apps implementadas + analytics de uso (Turso)
-- **Revisión**: Actualizar este documento tras cada sesión de desarrollo
+- **Objetivo**: Cubrir al menos 5 nichos nuevos con 3+ apps cada uno → ✅ **SUPERADO** (9 nichos cubiertos)
+- **Apps nuevas implementadas**: **28**
+- **Apps descartadas con criterio**: 13 (riesgo legal, mantenibilidad, variabilidad normativa)
+- **Nichos descartados**: 1 (Migración — riesgo legal inaceptable)
+- **Sesiones de desarrollo**: 3 (2026-03-30, 2026-03-31, 2026-04-01)
+
+### Resultado final por tipo
+
+| Categoría | Cantidad |
+|-----------|:--------:|
+| Apps nuevas implementadas | 28 |
+| Apps que ya existían (descubiertas) | 12 |
+| Apps descartadas por riesgo | 13 |
+| Nichos completados | 9 de 10 |
+| Módulos de datos creados | 2 (dependencia.ts, maternidad.ts) + ampliación pensiones.ts |
+
+### Criterios de descarte aplicados
+
+1. **Riesgo legal alto**: PHQ-9, GAD-7, baremos de oposiciones, indemnización accidente, pensión compensatoria
+2. **Variabilidad normativa**: Ayudas alquiler por CCAA, quórums LPH (doble régimen civil)
+3. **Colectivo vulnerable**: Migración completa (consecuencias irreversibles)
+4. **Sesgo ideológico**: Selector de escolarización
+5. **Difícil mantenimiento**: Nota de corte oposiciones, baremos por convocatoria
 
 ---
 
-**Última actualización**: 2026-03-31
+**Estado**: COMPLETADO
+**Última actualización**: 2026-04-01
 **Autor**: Claude Code + Jace
 **Proyecto**: meskeIA Web
