@@ -142,3 +142,47 @@ export function tipoMarginalDesdeRNT(rnt: number): number {
   }
   return 47;
 }
+
+// ─── Obligación de declarar IRPF 2025 (ejercicio fiscal 2025, campaña 2026) ──
+
+/**
+ * Umbrales de obligación de declarar la Renta 2025
+ * Art. 96 Ley 35/2006 del IRPF + modificaciones LPGE 2025
+ *
+ * Fuente: https://sede.agenciatributaria.gob.es
+ * Verificado: 2026-04-01
+ */
+export const OBLIGACION_DECLARAR_2025 = {
+  // Rendimientos del trabajo
+  trabajo: {
+    unPagador: 22000,          // 1 pagador o varios si 2º+3º ≤ 1.500 €
+    variosPagadores: 15876,    // 2+ pagadores si 2º+3º > 1.500 €
+    limiteSegundoPagador: 1500, // Umbral para considerar "varios pagadores"
+  },
+  // Rendimientos del capital mobiliario y ganancias patrimoniales
+  capitalMobiliario: {
+    limite: 1600,              // Sujetos a retención
+  },
+  // Rentas inmobiliarias imputadas, letras del tesoro, subvenciones vivienda
+  rentasImputadas: {
+    limite: 1000,
+  },
+  // Rendimientos del trabajo no sujetos a retención (pensiones extranjeras, etc.)
+  trabajoSinRetencion: {
+    limite: 15876,
+  },
+  // Obligación de declarar SIEMPRE (independientemente del importe)
+  siempreObligados: [
+    'Deducciones por inversión en vivienda habitual (régimen transitorio)',
+    'Deducciones por aportaciones a patrimonio protegido de personas con discapacidad',
+    'Deducciones por doble imposición internacional',
+    'Reducciones en la base imponible por aportaciones a planes de pensiones',
+    'Solicitar devolución derivada de la normativa del tributo',
+  ],
+  // Exenciones destacadas
+  exenciones: {
+    imv: true,                 // Perceptores de IMV: obligados a declarar siempre
+    desempleo: false,          // Desempleo tributa como rendimiento del trabajo (no exento)
+    indemnizacionDespido: true, // Exenta hasta el límite legal (art. 7.e LIRPF)
+  },
+};

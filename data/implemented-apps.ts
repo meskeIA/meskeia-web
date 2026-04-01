@@ -371,6 +371,7 @@ export const implementedAppsUrls = [
   "/guia/herencias/",                   // Guía landing page: journey hereditario con 4 herramientas
   "/estimador-plusvalia-municipal/",    // Estimador IIVTNU método objetivo y real — RDL 26/2021
   "/orientador-intereses-demora/",      // Orientador interés comercial (Ley 3/2004) e interés legal (CC)
+  "/test-obligado-declarar-renta/",         // Test obligación declarar Renta 2025: 7 preguntas, umbrales IRPF, varios pagadores, IMV
   "/checklist-declaracion-renta/",          // Checklist documentos declaración renta 2026 por perfil (asalariado/autónomo/pensionista/inversor/arrendador)
   "/estimador-actualizacion-alquiler/",   // Calculadora IRAV/IPC para actualización de renta de alquiler según Ley de Vivienda 2023
   "/requisitos-nomada-digital/",            // Orientador elegibilidad Visa Nómada Digital (Ley 28/2022 de Startups)

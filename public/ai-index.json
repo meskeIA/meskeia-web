@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 356,
-  "updated": "2026-03-31",
+  "total_tools": 357,
+  "updated": "2026-04-01",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -743,6 +743,12 @@
           "slug": "orientador-intereses-demora",
           "url": "https://meskeia.com/orientador-intereses-demora/",
           "description": "Estima los intereses por facturas impagadas o deudas vencidas. Interés comercial (Ley 3/2004, BCE+8pp) e interés legal del dinero (Código Civil) para España 2025."
+        },
+        {
+          "name": "Test Obligación Declarar Renta 2025",
+          "slug": "test-obligado-declarar-renta",
+          "url": "https://meskeia.com/test-obligado-declarar-renta/",
+          "description": "Test interactivo de 7 preguntas para saber si estás obligado a presentar la declaración de la Renta 2025. Umbrales 22.000 €, 15.876 €, varios pagadores, desempleo, IMV."
         },
         {
           "name": "Checklist Declaración de la Renta 2026",

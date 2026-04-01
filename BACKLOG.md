@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-03-30
-> **Apps totales**: 354 | **Suites**: 13
+> **Última actualización**: 2026-04-01
+> **Apps totales**: 355 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -209,16 +209,30 @@
 
 ---
 
-## ✨ NUEVAS APPS — Tendencias España 2026 (propuestas 2026-03-19)
+## ✨ NUEVAS APPS — Tendencias España 2026
 
 > Ideas detectadas en análisis de tendencias con WebSearch. Selección aprobada por usuario.
+
+### Tendencias abril 2026 (campaña renta, vivienda, SMI, pensiones, energía)
+
+- [x] **test-obligado-declarar-renta** — `finanzas`+`freelance` · Test interactivo: ¿estoy obligado a declarar la Renta 2025? Umbrales 22.000 €/15.876 €, parados, IMV, deducciones rentas bajas. DisclaimerCard `financial` severity `high`. *(2026-04-01)*
+- [ ] **calculadora-actualizacion-alquiler-ine** — `inmobiliaria` · Actualización de renta con nuevo índice INE 2026 (reemplaza IPC). Introduce renta actual y fecha contrato → importe máximo legal. DisclaimerCard `financial`. Complejidad media.
+- [ ] **calculadora-smi-neto** — `finanzas`+`freelance` · SMI 2026 (1.221 € brutos × 14 pagas) → sueldo neto con IRPF y SS. Incluye cálculo de atrasos retroactivos. Complejidad baja.
+- [ ] **simulador-pension-sistema-dual** — `finanzas` · Compara pensión con fórmula clásica (25 años) vs nueva (29 años excluyendo 2 peores). Sistema dual vigente desde enero 2026. DisclaimerCard `financial` severity `critical`. Complejidad media.
+- [ ] **calculadora-edad-jubilacion** — `finanzas` · ¿Cuándo me jubilo? Tabla actualizada por año de nacimiento. 66 años y 10 meses en 2026, 67 en 2027. Complejidad baja.
+- [ ] **calculadora-deduccion-irpf-obras-energeticas** — `inmobiliaria`+`finanzas` · Deducción 20-40-60% por obras de mejora energética en vivienda. Reglas complejas por tipo de obra y plazos. DisclaimerCard `financial` severity `critical`. Complejidad media.
+- [ ] **estimador-certificado-energetico** — `inmobiliaria` · ¿Qué letra energética necesito para alquilar/vender? Estimador coste de pasar de F/G a D/E. Obligatorio desde marzo 2026. DisclaimerCard `financial`. Complejidad baja.
+- [ ] **calculadora-habitaciones-zona-tensionada** — `inmobiliaria` · ¿Cuánto puedo cobrar por habitación en zona tensionada? Nueva regulación 2026. DisclaimerCard `financial`. Complejidad baja.
+- [ ] **comparador-smi-sueldo-provincia** — `finanzas`+`cultura` · Comparador SMI vs sueldo medio por provincia. Potencial viral — SMI supera 60% sueldo medio en 46 provincias. Complejidad baja (datos embebidos).
+
+### Tendencias marzo 2026 (propuestas 2026-03-19)
 
 - [ ] **simulador-bono-joven-alquiler** — `inmobiliaria`+`finanzas` · Comprueba elegibilidad del Bono Joven Alquiler (18-35 años, ingresos ≤ 2× IPREM). Calcula ahorro mensual/total (€250/mes × 24 meses = €6.000). DisclaimerCard `financial` obligatoria. Datos normativos estables. Complejidad baja.
 - [ ] **orientador-aval-ico** — `inmobiliaria`+`finanzas` · Orienta sobre el aval ICO para jóvenes (<35 años) y familias con menores sin el 20% de entrada. Requisitos, proceso, checklist documentación. Sin listar bancos específicos (remite a ico.es para lista actualizada — datos cambian con frecuencia). DisclaimerCard `financial` obligatoria. Complejidad baja.
 - [ ] **calculadora-costes-teletrabajo** — `productividad`+`finanzas` · Ahorro real del teletrabajo vs. oficina: transporte, comidas, ropa, electricidad, internet. Resultado neto mensual y anual. Sin datos normativos. Complejidad baja.
 - [ ] **quiz-historia-espana** — `juegos`+`cultura` · Quiz de historia española: ~80 preguntas verificables desde época íbera/romana hasta la Constitución de 1978. Universo cerrado y sin ambigüedad. Complejidad baja.
 
-### ✨ Tendencias anteriores (2026-03-18) — completadas
+### Tendencias anteriores (2026-03-18) — completadas
 
 > Las 5 propuestas de la sesión anterior ya están implementadas (ver sección ✅).
 
