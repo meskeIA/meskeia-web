@@ -1185,10 +1185,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
   ],
+  'estimador-smi': [
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Bruto a neto con IRPF y SS' },
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota orientativa de tu renta' },
+    { url: '/test-obligado-declarar-renta/', icon: '📋', name: '¿Obligado a declarar?', description: 'Test rápido para la Renta 2025' },
+    { url: '/checklist-declaracion-renta/', icon: '📋', name: 'Checklist Renta', description: 'Documentos para tu declaración' },
+  ],
   'estimador-sueldo-neto': [
+    { url: '/estimador-smi/', icon: '💶', name: 'Estimador SMI 2026', description: 'Neto, atrasos y comparativa provincial' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Optimiza tus deducciones' },
-    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
   'orientador-gastos-deducibles': [

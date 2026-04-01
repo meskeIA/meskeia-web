@@ -357,6 +357,7 @@ export const implementedAppsUrls = [
   "/comparador-formas-juridicas/",      // Comparador orientativo: autónomo, SL, cooperativa, asociación, CB
   "/asistente-constitucion-asociacion/", // Asistente para generar documentos orientativos de constitución de asociación
   "/estimador-cuota-autonomo/",         // Estimador cuota RETA por ingresos reales 2025
+  "/estimador-smi/",                     // Estimador SMI 2026: neto, atrasos retroactivos y comparativa por provincia
   "/estimador-sueldo-neto/",            // Estimador sueldo neto ↔ bruto con IRPF y SS 2025
   "/orientador-gastos-deducibles/",     // Orientador gastos deducibles autónomo IRPF+IVA
   "/calendario-fiscal-emprendedor/",    // Calendario fiscal obligaciones autónomos y sociedades 2025

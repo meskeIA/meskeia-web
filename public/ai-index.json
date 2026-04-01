@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 357,
+  "total_tools": 358,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -743,6 +743,12 @@
           "slug": "orientador-intereses-demora",
           "url": "https://meskeia.com/orientador-intereses-demora/",
           "description": "Estima los intereses por facturas impagadas o deudas vencidas. Interés comercial (Ley 3/2004, BCE+8pp) e interés legal del dinero (Código Civil) para España 2025."
+        },
+        {
+          "name": "Estimador SMI 2026",
+          "slug": "estimador-smi",
+          "url": "https://meskeia.com/estimador-smi/",
+          "description": "Herramienta completa del SMI 2026: sueldo neto mensual (1.221 € × 14 pagas), atrasos retroactivos desde enero y comparativa con el salario medio de las 52 provincias españolas."
         },
         {
           "name": "Test Obligación Declarar Renta 2025",
