@@ -52,7 +52,7 @@
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
-- [ ] **ai-index.json: desincronizado** — 346 apps indexadas vs 354 en `implemented-apps.ts` (`total_tools: 341` incorrecto). Faltan ~8 apps por indexar. Requiere sesión dedicada para añadir entradas faltantes y corregir `total_tools`. *(actualizado auditoría: 2026-03-30)*
+- [x] **ai-index.json: sincronizado** — Añadidas 13 entradas faltantes (8 guías, 4 quizzes, 1 orientador). Total: 392 entradas, `total_tools` corregido. *(resuelto: 2026-04-01)*
 
 - [x] **Disclaimers: 26 apps corregidas** — severity y collapsible ajustados según DISCLAIMER-POLICY.md. 16 apps nivel 1 → critical, 10 apps nivel 2 → high. Re-auditoría: 0 incidencias. *(resuelto: 2026-03-30)*
 
@@ -161,7 +161,7 @@
 - [x] **conversor-imagenes** — ✅ Profesionalizada: tabla 5 formatos imagen (JPEG/PNG/WebP/GIF/SVG), 4 casos uso, 8 FAQs, guía elección 6 pasos, 6 tips, warning. *(2026-03-16)*
 - [x] **test-habitos-saludables** — ✅ Profesionalizada: tabla 5 áreas hábitos, 4 perfiles beneficiarios, 8 FAQs (evidencia científica), guía plan 6 semanas, 6 claves, warning. *(2026-03-16)*
 - [x] **planificador-mudanzas** — ✅ Ya profesionalizada (verificado auditoría 2026-03-23).
-- [ ] **calculadora-percentiles** — ⚠️ App aún no creada (propuesta futura, no pendiente de profesionalización).
+- [x] ~~**calculadora-percentiles**~~ — Descartada: funcionalidad cubierta por `orientador-percentiles` (infantil OMS), `calculadora-estadistica` (percentiles genéricos) y `estadistica-avanzada`. Sin valor diferencial. *(descartada: 2026-04-01)*
 
 **Potencial educativo específico**:
 - [x] **conversor-binario** — Tabla comparativa sistemas numéricos, EducationalSection añadida. *(2026-03-09 — verificado commit 336e1be)*
@@ -199,15 +199,15 @@
 
 > Apps ya publicadas que pueden mejorar en calidad, contenido educativo o experiencia.
 
-- [ ] **lista-equipaje**: Añadir modo "por días de viaje" (vista alternativa agrupada por día). *(categorías personalizables ya implementadas — 2026-02-24)*
+- [x] ~~**lista-equipaje**: modo "por días de viaje"~~ — Descartada: la app ya tiene categorías personalizables, filtro por tipo/clima/duración y persistencia. El modo por días solo reorganiza la misma información sin valor añadido significativo. *(descartada: 2026-04-01)*
 
-- [ ] **calculadora-jubilacion**: Revisar si los cálculos reflejan la reforma del sistema de pensiones 2024. Añadir DisclaimerCard `financial` si no la tiene.
+- [x] **calculadora-jubilacion**: Resuelto con `orientador-edad-jubilacion` (nueva app) + sistema dual 2026 integrado en `estimador-pension-publica`. Datos de pensiones actualizados en `data/fiscal/pensiones.ts`. *(2026-04-01)*
 
 - [x] **simulador-hipoteca**: Comparativa fija vs variable vs mixta en un mismo visualizador. Añadido tipo 'mixta' al simulador (2 fases) + panel comparador en tiempo real con los 3 tipos simultáneos + tabla educativa actualizada a 4 columnas. *(2026-03-09)*
 
 - [x] **estimador-irpf + estimador-sueldo-neto**: Integrar deducción por rentas bajas del trabajo (art. 80 bis LIRPF, hasta 340 €/año para rendimientos del trabajo < 18.276 €). Datos centralizados en `data/fiscal/irpf.ts`. *(2026-04-01)*
 
-- [ ] **DisclaimerCard medical (Grupo B)**: Revisar las 8 apps con children custom de baja prioridad (`test-habitos-saludables`, `curso-nutrisalud`, `calculadora-porciones`, `calculadora-edad-mascotas`, `calculadora-tamano-adulto-perro`, `planificador-mascota`, `guia-cuidado-mascota`, `guia/vivir-sano`) para añadir cláusula de exoneración si se considera necesario.
+- [x] ~~**DisclaimerCard medical (Grupo B)**~~ — Descartada: las 8 apps son de bajo riesgo (hábitos, porciones, edad mascotas) y ya tienen disclaimers custom adecuados ("orientativa", "consulta profesional"). Añadir exoneración formal es desproporcionado. *(descartada: 2026-04-01)*
 
 ---
 
@@ -234,10 +234,10 @@
 
 ### Tendencias marzo 2026 (propuestas 2026-03-19)
 
-- [ ] **simulador-bono-joven-alquiler** — `inmobiliaria`+`finanzas` · Comprueba elegibilidad del Bono Joven Alquiler (18-35 años, ingresos ≤ 2× IPREM). Calcula ahorro mensual/total (€250/mes × 24 meses = €6.000). DisclaimerCard `financial` obligatoria. Datos normativos estables. Complejidad baja.
-- [ ] **orientador-aval-ico** — `inmobiliaria`+`finanzas` · Orienta sobre el aval ICO para jóvenes (<35 años) y familias con menores sin el 20% de entrada. Requisitos, proceso, checklist documentación. Sin listar bancos específicos (remite a ico.es para lista actualizada — datos cambian con frecuencia). DisclaimerCard `financial` obligatoria. Complejidad baja.
-- [ ] **calculadora-costes-teletrabajo** — `productividad`+`finanzas` · Ahorro real del teletrabajo vs. oficina: transporte, comidas, ropa, electricidad, internet. Resultado neto mensual y anual. Sin datos normativos. Complejidad baja.
-- [ ] **quiz-historia-espana** — `juegos`+`cultura` · Quiz de historia española: ~80 preguntas verificables desde época íbera/romana hasta la Constitución de 1978. Universo cerrado y sin ambigüedad. Complejidad baja.
+- [x] **simulador-bono-joven-alquiler** — Ya implementada en sesión anterior. *(verificado: 2026-04-01)*
+- [x] **orientador-aval-ico** — Ya implementada en sesión anterior. *(verificado: 2026-04-01)*
+- [x] **calculadora-costes-teletrabajo** — Ya implementada en sesión anterior. *(verificado: 2026-04-01)*
+- [x] **quiz-historia-espana** — Ya implementada en sesión anterior. *(verificado: 2026-04-01)*
 
 ### Tendencias anteriores (2026-03-18) — completadas
 

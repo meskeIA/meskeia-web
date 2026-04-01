@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 361,
+  "total_tools": 392,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -995,6 +995,36 @@
           "slug": "estimador-tir-van",
           "url": "https://meskeia.com/estimador-tir-van/",
           "description": "Calcula la Tasa Interna de Retorno y el Valor Actual Neto de tus proyectos de inversión"
+        },
+        {
+          "name": "Guía para Ahorrar Dinero en España",
+          "slug": "guia/ahorrar-dinero",
+          "url": "https://meskeia.com/guia/ahorrar-dinero/",
+          "description": "Guía completa para ahorrar dinero: control de gastos, regla 50/30/20, fondo de emergencia, eliminar suscripciones y herramientas meskeIA integradas."
+        },
+        {
+          "name": "Guía para Comprar Casa en España",
+          "slug": "guia/comprar-casa",
+          "url": "https://meskeia.com/guia/comprar-casa/",
+          "description": "Guía completa para comprar vivienda en España: simulador de hipoteca, gastos de compraventa (ITP, notaría, registro), presupuesto total y checklist."
+        },
+        {
+          "name": "Guía para Comprar un Coche en España",
+          "slug": "guia/comprar-coche",
+          "url": "https://meskeia.com/guia/comprar-coche/",
+          "description": "Guía completa para comprar coche: compara contado vs financiación vs renting, calcula el consumo real, seguros y presupuesto total."
+        },
+        {
+          "name": "Guía para Invertir",
+          "slug": "guia/invertir",
+          "url": "https://meskeia.com/guia/invertir/",
+          "description": "Guía para empezar a invertir: interés compuesto, perfil de riesgo, simulador de cartera, plusvalías y planificación financiera."
+        },
+        {
+          "name": "Guía para Montar un Negocio en España",
+          "slug": "guia/montar-negocio",
+          "url": "https://meskeia.com/guia/montar-negocio/",
+          "description": "Guía completa para emprender: genera el nombre de tu empresa, calcula el punto de equilibrio, planifica el cashflow y elige forma jurídica."
         }
       ]
     },
@@ -1014,6 +1044,12 @@
           "slug": "orientador-tarifa-freelance",
           "url": "https://meskeia.com/orientador-tarifa-freelance/",
           "description": "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio"
+        },
+        {
+          "name": "Guía Freelance en España",
+          "slug": "guia/freelance",
+          "url": "https://meskeia.com/guia/freelance/",
+          "description": "Guía completa para freelances y autónomos en España: cuota de autónomo, IRPF, IVA, facturación, tarifa hora y gastos deducibles."
         }
       ]
     },
@@ -1286,6 +1322,12 @@
           "slug": "estimador-legitimas",
           "url": "https://meskeia.com/estimador-legitimas/",
           "description": "Calcula la legítima hereditaria según el derecho civil de tu comunidad autónoma"
+        },
+        {
+          "name": "Guía para Gestionar una Herencia en España",
+          "slug": "guia/herencias",
+          "url": "https://meskeia.com/guia/herencias/",
+          "description": "Guía completa para tramitar una herencia en España: documentos, impuestos por CCAA, legítimas, estimador de sucesiones y plazos legales."
         }
       ]
     },
@@ -1425,6 +1467,30 @@
           "slug": "guia-reclamar-seguro-coche",
           "url": "https://meskeia.com/guia-reclamar-seguro-coche/",
           "description": "Guía completa para decidir cuándo reclamar al seguro del coche: siniestros, asistencia, peritaje"
+        },
+        {
+          "name": "Quiz Países y Capitales del Mundo",
+          "slug": "quiz-paises-capitales",
+          "url": "https://meskeia.com/quiz-paises-capitales/",
+          "description": "Pon a prueba tus conocimientos de geografía: adivina las capitales del mundo, identifica países por su bandera. 195 países, 5 dificultades."
+        },
+        {
+          "name": "Quiz Figuras Retóricas",
+          "slug": "quiz-figuras-retoricas",
+          "url": "https://meskeia.com/quiz-figuras-retoricas/",
+          "description": "Aprende a identificar las figuras retóricas con este quiz interactivo. 27 figuras, 3 niveles de dificultad (básico, bachillerato, avanzado)."
+        },
+        {
+          "name": "Quiz Reinos de la Naturaleza",
+          "slug": "quiz-reinos-naturaleza",
+          "url": "https://meskeia.com/quiz-reinos-naturaleza/",
+          "description": "Descubre a qué grupo pertenecen 43 organismos sorprendentes: murciélagos, coral, líquenes y más. Clasificación biológica interactiva."
+        },
+        {
+          "name": "Quiz Verbos Irregulares en Inglés",
+          "slug": "quiz-verbos-irregulares",
+          "url": "https://meskeia.com/quiz-verbos-irregulares/",
+          "description": "Aprende los verbos irregulares en inglés con este quiz interactivo. 75 verbos clasificados por nivel MCER (A2, B1, B2, C1)."
         }
       ]
     },
@@ -2243,6 +2309,18 @@
           "slug": "residencia-vs-cuidado-en-casa",
           "url": "https://meskeia.com/residencia-vs-cuidado-en-casa/",
           "description": "Compara los costes de residencia privada, ayuda a domicilio y cuidador contratado"
+        },
+        {
+          "name": "Guía para Vivir Más Sano",
+          "slug": "guia/vivir-sano",
+          "url": "https://meskeia.com/guia/vivir-sano/",
+          "description": "Guía completa de salud: calcula tu IMC, planifica macros y calorías, optimiza el sueño, controla tensión arterial y hábitos saludables."
+        },
+        {
+          "name": "Orientador de Jet Lag",
+          "slug": "orientador-jet-lag",
+          "url": "https://meskeia.com/orientador-jet-lag/",
+          "description": "Calcula el jet lag de tu próximo viaje internacional. Conoce los días de adaptación y recibe recomendaciones según la dirección del vuelo."
         }
       ]
     },
