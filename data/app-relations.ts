@@ -1315,9 +1315,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // JUBILACIÓN Y PATRIMONIO
+  'orientador-edad-jubilacion': [
+    { url: '/estimador-pension-publica/', icon: '🌅', name: 'Estimador Pensión Pública', description: 'Cuánto cobrarás con sistema dual 2026' },
+    { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
+    { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: '¿Puedes jubilarte antes?' },
+    { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagarás de renta' },
+  ],
   'estimador-pension-publica': [
-    ...jubilacionApps.filter(a => a.url !== '/estimador-pension-publica/'),
-    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
+    { url: '/orientador-edad-jubilacion/', icon: '📅', name: '¿Cuándo me jubilo?', description: 'Edad por año de nacimiento' },
+    ...jubilacionApps.filter(a => a.url !== '/estimador-pension-publica/' && a.url !== '/orientador-edad-jubilacion/').slice(0, 3),
   ],
   'estimador-brecha-jubilacion': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-brecha-jubilacion/'),

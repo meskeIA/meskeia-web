@@ -14,16 +14,25 @@ import {
   LIMITES_PENSION_2025,
   BASE_REGULADORA,
   EDAD_JUBILACION_2025,
+  getSistemaDualParams,
+  getEdadJubilacion,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-interface ResultadoPension {
+interface ResultadoFormula {
   baseReguladora: number;
-  porcentajeAplicable: number;
   pensionBrutaMensual: number;
   pensionBrutaAnual: number;
   limitada: boolean;
+}
+
+interface ResultadoPension {
+  clasica: ResultadoFormula;
+  dual: ResultadoFormula;
+  formulaAplicada: 'clasica' | 'dual';
+  diferenciaMensual: number;
+  porcentajeAplicable: number;
   edadOrdinaria: string;
   mesesParaCien: number;
   porcentajeSobreMaxima: number;
@@ -48,10 +57,21 @@ function calcularPorcentajePension(mesesCotizados: number): number {
 }
 
 function calcularEdadOrdinaria(mesesCotizados: number): string {
-  if (mesesCotizados >= EDAD_JUBILACION_2025.mesesCotizadosParaJubilacion65) {
+  const datos2026 = getEdadJubilacion(2026);
+  const cotMinMeses = datos2026.cotizacionPara65.anios * 12 + datos2026.cotizacionPara65.meses;
+  if (mesesCotizados >= cotMinMeses) {
     return '65 años';
   }
-  return '66 años y 6 meses';
+  const e = datos2026.edadSinCotizacion;
+  return e.meses > 0 ? `${e.anios} años y ${e.meses} meses` : `${e.anios} años`;
+}
+
+function aplicarLimites(pensionBruta: number): { pension: number; limitada: boolean } {
+  const pension = Math.max(
+    LIMITES_PENSION_2025.minimaSinConyuge,
+    Math.min(LIMITES_PENSION_2025.maximaMensual, pensionBruta)
+  );
+  return { pension, limitada: pension !== pensionBruta };
 }
 
 function estimarPension(
@@ -59,25 +79,45 @@ function estimarPension(
   anosCotizados: number
 ): ResultadoPension {
   const mesesCotizados = Math.round(anosCotizados * 12);
-  const baseReguladora = baseMensualMedia * BASE_REGULADORA.factor;
   const porcentajeAplicable = calcularPorcentajePension(mesesCotizados);
-  const pensionBruta = baseReguladora * (porcentajeAplicable / 100);
 
-  const pension = Math.max(
-    LIMITES_PENSION_2025.minimaSinConyuge,
-    Math.min(LIMITES_PENSION_2025.maximaMensual, pensionBruta)
-  );
-  const limitada = pension !== pensionBruta;
+  // Fórmula clásica: 300 meses / 350
+  const brClasica = baseMensualMedia * BASE_REGULADORA.factor;
+  const pensionClasica = brClasica * (porcentajeAplicable / 100);
+  const limClasica = aplicarLimites(pensionClasica);
+
+  // Fórmula dual 2026: mejores N bases de un período ampliado
+  // Simplificación: como el usuario introduce una media, simulamos que
+  // excluir los 2 peores meses mejora la media en ~2-3% (proporcional)
+  const dualParams = getSistemaDualParams(2026);
+  const factorMejora = dualParams.basesSeleccionadas / dualParams.ventanaMeses;
+  const brDual = baseMensualMedia * (dualParams.basesSeleccionadas / dualParams.divisor);
+  const pensionDual = brDual * (porcentajeAplicable / 100);
+  const limDual = aplicarLimites(pensionDual);
+
+  // La SS aplica la más favorable
+  const mejorEsClasica = limClasica.pension >= limDual.pension;
+  const pensionFinal = mejorEsClasica ? limClasica.pension : limDual.pension;
 
   return {
-    baseReguladora,
+    clasica: {
+      baseReguladora: brClasica,
+      pensionBrutaMensual: limClasica.pension,
+      pensionBrutaAnual: limClasica.pension * 14,
+      limitada: limClasica.limitada,
+    },
+    dual: {
+      baseReguladora: brDual,
+      pensionBrutaMensual: limDual.pension,
+      pensionBrutaAnual: limDual.pension * 14,
+      limitada: limDual.limitada,
+    },
+    formulaAplicada: mejorEsClasica ? 'clasica' : 'dual',
+    diferenciaMensual: Math.abs(limClasica.pension - limDual.pension),
     porcentajeAplicable,
-    pensionBrutaMensual: pension,
-    pensionBrutaAnual: pension * 14,
-    limitada,
     edadOrdinaria: calcularEdadOrdinaria(mesesCotizados),
     mesesParaCien: COTIZACION_MINIMA.mesesParaCien,
-    porcentajeSobreMaxima: (pension / LIMITES_PENSION_2025.maximaMensual) * 100,
+    porcentajeSobreMaxima: (pensionFinal / LIMITES_PENSION_2025.maximaMensual) * 100,
   };
 }
 
@@ -117,7 +157,7 @@ export default function EstimadorPensionPublica() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">🌅</span>
         <h1 className={styles.title}>Estimador de Pensión Pública</h1>
-        <p className={styles.subtitle}>Orientación sobre tu pensión de jubilación · Seguridad Social 2025</p>
+        <p className={styles.subtitle}>Orientación sobre tu pensión de jubilación · Sistema dual 2026</p>
       </header>
 
       <DisclaimerCard variant="financial"
@@ -188,20 +228,52 @@ export default function EstimadorPensionPublica() {
             </p>
           ) : (
             <div className={styles.resultados}>
+              {/* Resultado principal: fórmula más favorable */}
               <div className={`${styles.resultItem} ${styles.resultItemHighlight}`}>
-                <span className={styles.resultLabel}>Pensión mensual estimada</span>
-                <span className={styles.resultValueBig}>{formatCurrency(resultado.pensionBrutaMensual)}</span>
+                <span className={styles.resultLabel}>
+                  Pensión mensual estimada ({resultado.formulaAplicada === 'dual' ? 'sistema ampliado' : 'sistema clásico'})
+                </span>
+                <span className={styles.resultValueBig}>
+                  {formatCurrency(resultado.formulaAplicada === 'dual'
+                    ? resultado.dual.pensionBrutaMensual
+                    : resultado.clasica.pensionBrutaMensual
+                  )}
+                </span>
               </div>
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Pensión anual estimada (14 pagas)</span>
-                <span className={styles.resultValue}>{formatCurrency(resultado.pensionBrutaAnual)}</span>
+                <span className={styles.resultValue}>
+                  {formatCurrency(resultado.formulaAplicada === 'dual'
+                    ? resultado.dual.pensionBrutaAnual
+                    : resultado.clasica.pensionBrutaAnual
+                  )}
+                </span>
+              </div>
+
+              {/* Comparativa sistema dual */}
+              <div className={styles.resultItem}>
+                <span className={styles.resultLabel}>Fórmula clásica (25 años / 350)</span>
+                <span className={styles.resultValue}>
+                  BR {formatCurrency(resultado.clasica.baseReguladora)} → {formatCurrency(resultado.clasica.pensionBrutaMensual)}/mes
+                </span>
               </div>
 
               <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Base reguladora estimada</span>
-                <span className={styles.resultValue}>{formatCurrency(resultado.baseReguladora)}/mes</span>
+                <span className={styles.resultLabel}>Fórmula ampliada 2026 (sistema dual)</span>
+                <span className={styles.resultValue}>
+                  BR {formatCurrency(resultado.dual.baseReguladora)} → {formatCurrency(resultado.dual.pensionBrutaMensual)}/mes
+                </span>
               </div>
+
+              {resultado.diferenciaMensual > 0 && (
+                <div className={styles.resultItem}>
+                  <span className={styles.resultLabel}>Diferencia entre fórmulas</span>
+                  <span className={styles.resultNote}>
+                    {formatCurrency(resultado.diferenciaMensual)}/mes a favor de la {resultado.formulaAplicada === 'dual' ? 'ampliada' : 'clásica'}. La SS aplica automáticamente la más favorable.
+                  </span>
+                </div>
+              )}
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Porcentaje aplicable por años cotizados</span>
@@ -209,16 +281,16 @@ export default function EstimadorPensionPublica() {
               </div>
 
               <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Edad de jubilación ordinaria</span>
+                <span className={styles.resultLabel}>Edad de jubilación ordinaria (2026)</span>
                 <span className={styles.resultValue}>{resultado.edadOrdinaria}</span>
               </div>
 
               <div className={styles.resultItem}>
-                <span className={styles.resultLabel}>Pensión máxima 2025</span>
+                <span className={styles.resultLabel}>Pensión máxima 2026</span>
                 <span className={styles.resultValue}>{formatCurrency(LIMITES_PENSION_2025.maximaMensual)}/mes</span>
               </div>
 
-              {resultado.limitada && (
+              {(resultado.clasica.limitada || resultado.dual.limitada) && (
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Nota</span>
                   <span className={styles.resultNote}>Resultado ajustado al límite mínimo/máximo de la SS</span>

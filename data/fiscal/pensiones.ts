@@ -19,15 +19,40 @@ export const FISCAL_PENSIONES_META = {
   nota: 'Las cifras son orientativas. La SS calcula la pensión real a partir de tu historial completo de cotización. Consulta tu vida laboral en la Sede Electrónica de la SS.',
 };
 
-// ─── Edad de jubilación ordinaria 2025 ───────────────────────────────────────
+// ─── Edad de jubilación ordinaria (tabla progresiva 2024-2027+) ──────────────
 
+/**
+ * Tabla de edad de jubilación por año en que se produce la jubilación.
+ * Con cotización suficiente: jubilación a los 65 años.
+ * Sin cotización suficiente: edad progresiva hasta 67 años (definitivo en 2027).
+ *
+ * Fuente: Ley 27/2011 + Ley 21/2021 (calendario transitorio)
+ */
+export interface EdadJubilacionAnio {
+  anio: number;
+  edadSinCotizacion: { anios: number; meses: number };
+  cotizacionPara65: { anios: number; meses: number };
+}
+
+export const TABLA_EDAD_JUBILACION: EdadJubilacionAnio[] = [
+  { anio: 2024, edadSinCotizacion: { anios: 66, meses: 6 },  cotizacionPara65: { anios: 38, meses: 0 } },
+  { anio: 2025, edadSinCotizacion: { anios: 66, meses: 8 },  cotizacionPara65: { anios: 38, meses: 3 } },
+  { anio: 2026, edadSinCotizacion: { anios: 66, meses: 10 }, cotizacionPara65: { anios: 38, meses: 3 } },
+  { anio: 2027, edadSinCotizacion: { anios: 67, meses: 0 },  cotizacionPara65: { anios: 38, meses: 6 } },
+];
+
+/** Obtiene la edad de jubilación para un año dado */
+export function getEdadJubilacion(anio: number): EdadJubilacionAnio {
+  if (anio >= 2027) return TABLA_EDAD_JUBILACION[3]; // 67 años definitivo
+  const entry = TABLA_EDAD_JUBILACION.find(e => e.anio === anio);
+  return entry ?? TABLA_EDAD_JUBILACION[3];
+}
+
+// Mantener compatibilidad con apps existentes
 export const EDAD_JUBILACION_2025 = {
-  // Con menos de 37 años y 3 meses cotizados
-  edadOrdinariaMesesShort: 66 * 12 + 6, // 66 años y 6 meses
-  // Con 37 años y 3 meses o más cotizados
+  edadOrdinariaMesesShort: 66 * 12 + 8, // 66 años y 8 meses (2025)
   edadOrdinariaMesesLong: 65 * 12,       // 65 años
-  // Años cotizados que dan acceso a jubilación a los 65
-  mesesCotizadosParaJubilacion65: 37 * 12 + 3, // 447 meses
+  mesesCotizadosParaJubilacion65: 38 * 12 + 3, // 459 meses (corregido: 38a 3m)
 };
 
 // ─── Años mínimos de cotización ───────────────────────────────────────────────
@@ -87,6 +112,47 @@ export const BASE_REGULADORA = {
   divisor: 350,            // Incluye compensación de lagunas
   factor: 300 / 350,       // ≈ 0.8571
 };
+
+// ─── Sistema Dual: base reguladora ampliada (DT 40.a LGSS, RDL 2/2023) ──────
+
+/**
+ * Sistema dual de cálculo de pensión (vigente desde 1 enero 2026).
+ * La SS aplica DE OFICIO la fórmula más favorable al trabajador.
+ *
+ * Opción 1 (clásica): BASE_REGULADORA (300 meses / 350)
+ * Opción 2 (ampliada): Selecciona las N mejores bases de un período más amplio,
+ *   descartando las peores. Transición gradual 2026→2037 (29 años en 2037).
+ *
+ * Fuente: DT 40.a LGSS (RDL 2/2023, de 16 de marzo)
+ */
+export interface SistemaDualParams {
+  anio: number;
+  ventanaMeses: number;       // Período de bases consideradas
+  basesSeleccionadas: number; // Mejores bases que se suman
+  divisor: number;            // Divisor para calcular la BR
+}
+
+export const SISTEMA_DUAL_TRANSICION: SistemaDualParams[] = [
+  { anio: 2026, ventanaMeses: 304, basesSeleccionadas: 302, divisor: 352.33 },
+  { anio: 2027, ventanaMeses: 308, basesSeleccionadas: 304, divisor: 354.67 },
+  { anio: 2028, ventanaMeses: 312, basesSeleccionadas: 306, divisor: 357.00 },
+  { anio: 2029, ventanaMeses: 316, basesSeleccionadas: 308, divisor: 359.33 },
+  { anio: 2030, ventanaMeses: 320, basesSeleccionadas: 310, divisor: 361.67 },
+  { anio: 2031, ventanaMeses: 324, basesSeleccionadas: 312, divisor: 364.00 },
+  { anio: 2032, ventanaMeses: 328, basesSeleccionadas: 314, divisor: 366.33 },
+  { anio: 2033, ventanaMeses: 332, basesSeleccionadas: 316, divisor: 368.67 },
+  { anio: 2034, ventanaMeses: 336, basesSeleccionadas: 318, divisor: 371.00 },
+  { anio: 2035, ventanaMeses: 340, basesSeleccionadas: 320, divisor: 373.33 },
+  { anio: 2036, ventanaMeses: 344, basesSeleccionadas: 322, divisor: 375.67 },
+  { anio: 2037, ventanaMeses: 348, basesSeleccionadas: 324, divisor: 378.00 },
+];
+
+/** Obtiene los parámetros del sistema dual para un año dado */
+export function getSistemaDualParams(anio: number): SistemaDualParams {
+  if (anio < 2026) return SISTEMA_DUAL_TRANSICION[0];
+  if (anio >= 2037) return SISTEMA_DUAL_TRANSICION[11];
+  return SISTEMA_DUAL_TRANSICION.find(s => s.anio === anio) ?? SISTEMA_DUAL_TRANSICION[0];
+}
 
 // ─── Jubilación anticipada: coeficientes reductores 2025 ─────────────────────
 
