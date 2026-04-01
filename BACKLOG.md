@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-04-01
-> **Apps totales**: 358 | **Suites**: 13
+> **Apps totales**: 359 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -222,7 +222,7 @@
 - [x] **estimador-smi** — `finanzas`+`legal-fiscal` · App unificada: SMI 2026 neto (IRPF+SS+deducción rentas bajas), atrasos retroactivos y comparativa SMI vs salario medio en 52 provincias. Fusiona 3 propuestas (neto + atrasos + comparador provincial). *(2026-04-01)*
 - [x] ~~**simulador-pension-sistema-dual**~~ — Integrado en `estimador-pension-publica`: comparativa automática fórmula clásica (300/350) vs ampliada 2026 (302/352,33). La SS aplica la más favorable. *(2026-04-01)*
 - [x] **orientador-edad-jubilacion** — `jubilacion`+`finanzas` · ¿Cuándo me jubilo? Tabla progresiva 2024-2027 por año de nacimiento y años cotizados. 66a 10m en 2026, 67 en 2027. *(2026-04-01)*
-- [ ] **calculadora-deduccion-irpf-obras-energeticas** — `inmobiliaria`+`finanzas` · Deducción 20-40-60% por obras de mejora energética en vivienda. Reglas complejas por tipo de obra y plazos. DisclaimerCard `financial` severity `critical`. Complejidad media.
+- [x] **orientador-deduccion-obras-energeticas** — `inmobiliaria`+`finanzas`+`legal-fiscal` · Orientador 3 deducciones IRPF (20/40/60%) por obras energéticas (DA 50.ª LIRPF). Requisitos, plazos, bases máximas, estimación ahorro fiscal. DisclaimerCard severity `critical`. *(2026-04-01)*
 - [x] ~~**estimador-certificado-energetico**~~ — Ya existía `estimacion-certificacion-energetica`. Actualizada con aviso: NO existe prohibición F/G (mito). Obligatorio tener certificado (RD 390/2021). *(2026-04-01)*
 - [x] **orientador-alquiler-habitaciones** — `inmobiliaria`+`legal-fiscal` · Orientador sobre reglas del alquiler por habitaciones en zona tensionada (Ley 12/2023 + Prop. Ley 2025 + RDL 8/2026). Techo de renta, +300 municipios declarados, SERPAVI, sanciones. *(2026-04-01)*
 - [x] ~~**comparador-smi-sueldo-provincia**~~ — Fusionada en `estimador-smi` (pestaña "Por provincia"). *(2026-04-01)*

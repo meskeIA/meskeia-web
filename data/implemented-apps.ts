@@ -17,6 +17,7 @@ export const implementedAppsUrls = [
   "/estimador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
   "/estimador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
+  "/orientador-deduccion-obras-energeticas/", // Orientador deducciones IRPF 20/40/60% por obras mejora energética vivienda
   "/orientador-edad-jubilacion/",       // Orientador edad jubilación: tabla por año nacimiento 2024-2027, cotización para 65
   "/estimador-pension-publica/",        // Estimador pensión SS: sistema dual 2026, base reguladora, % por años
   "/estimador-brecha-jubilacion/",      // Brecha pensión-sueldo: cuánto perderás y ahorro mensual necesario

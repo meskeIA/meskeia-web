@@ -467,6 +467,7 @@ const sostenibilidadApps: RelatedApp[] = [
   { url: '/estimacion-ahorro-hidrico/', icon: '💧', name: 'Ahorro Hídrico', description: 'Litros y euros ahorrados' },
   { url: '/simulador-subvenciones-rehabilitacion/', icon: '🏠', name: 'Subvenciones Rehabilitación', description: 'Ayudas Next Generation' },
   { url: '/estimacion-certificacion-energetica/', icon: '🏷️', name: 'Certificación Energética', description: 'Estima tu letra (A-G)' },
+  { url: '/orientador-deduccion-obras-energeticas/', icon: '🏗️', name: 'Deducción IRPF Obras', description: 'Deduce 20-60% en tu renta' },
 ];
 
 // ==========================================
@@ -1294,6 +1295,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota orientativa de tu declaración' },
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
+  ],
+  'orientador-deduccion-obras-energeticas': [
+    { url: '/estimacion-certificacion-energetica/', icon: '🏷️', name: 'Certificación Energética', description: 'Estima tu letra A-G' },
+    { url: '/simulador-subvenciones-rehabilitacion/', icon: '🏠', name: 'Subvenciones Rehabilitación', description: 'Ayudas Next Generation EU' },
+    { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'ROI de reformas energéticas' },
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota orientativa de tu renta' },
   ],
   'orientador-alquiler-habitaciones': [
     { url: '/estimador-actualizacion-alquiler/', icon: '🏠', name: 'Actualización Alquiler', description: 'IRAV e IPC para actualizar la renta' },
