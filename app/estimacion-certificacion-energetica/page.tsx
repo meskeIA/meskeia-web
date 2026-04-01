@@ -235,6 +235,19 @@ export default function EstimacionCertificacionEnergeticaPage() {
           sustituye al certificado oficial.
         </DisclaimerCard>
 
+        {/* Aviso normativa vigente 2026 */}
+        <div className={styles.infoBox}>
+          <p>
+            <strong>Normativa vigente (RD 390/2021):</strong> Es <strong>obligatorio</strong> tener
+            un certificado energetico en vigor para anunciar, vender o alquilar cualquier vivienda en
+            Espana. Sin embargo, <strong>no existe ninguna prohibicion</strong> de alquilar viviendas
+            con calificacion F o G — esto es un mito extendido. La Directiva UE 2024/1275 establece
+            objetivos futuros de rehabilitacion, pero no impone restricciones por letra energetica a
+            dia de hoy. Lo que si puede acarrear sanciones (desde 300 &#8364;) es <strong>no tener el
+            certificado</strong> al firmar el contrato.
+          </p>
+        </div>
+
         {/* Formulario */}
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>

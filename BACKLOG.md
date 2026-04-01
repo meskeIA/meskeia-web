@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-04-01
-> **Apps totales**: 356 | **Suites**: 13
+> **Apps totales**: 357 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -218,13 +218,13 @@
 ### Tendencias abril 2026 (campaña renta, vivienda, SMI, pensiones, energía)
 
 - [x] **test-obligado-declarar-renta** — `finanzas`+`freelance` · Test interactivo: ¿estoy obligado a declarar la Renta 2025? Umbrales 22.000 €/15.876 €, parados, IMV, deducciones rentas bajas. DisclaimerCard `financial` severity `high`. *(2026-04-01)*
-- [ ] **calculadora-actualizacion-alquiler-ine** — `inmobiliaria` · Actualización de renta con nuevo índice INE 2026 (reemplaza IPC). Introduce renta actual y fecha contrato → importe máximo legal. DisclaimerCard `financial`. Complejidad media.
+- [x] ~~**calculadora-actualizacion-alquiler-ine**~~ — Ya existía `estimador-actualizacion-alquiler`. Actualizado IRAV con datos INE 2025 completo + Q1 2026 + IPC ene-feb 2026. *(2026-04-01)*
 - [x] **estimador-smi** — `finanzas`+`legal-fiscal` · App unificada: SMI 2026 neto (IRPF+SS+deducción rentas bajas), atrasos retroactivos y comparativa SMI vs salario medio en 52 provincias. Fusiona 3 propuestas (neto + atrasos + comparador provincial). *(2026-04-01)*
 - [ ] **simulador-pension-sistema-dual** — `finanzas` · Compara pensión con fórmula clásica (25 años) vs nueva (29 años excluyendo 2 peores). Sistema dual vigente desde enero 2026. DisclaimerCard `financial` severity `critical`. Complejidad media.
 - [ ] **calculadora-edad-jubilacion** — `finanzas` · ¿Cuándo me jubilo? Tabla actualizada por año de nacimiento. 66 años y 10 meses en 2026, 67 en 2027. Complejidad baja.
 - [ ] **calculadora-deduccion-irpf-obras-energeticas** — `inmobiliaria`+`finanzas` · Deducción 20-40-60% por obras de mejora energética en vivienda. Reglas complejas por tipo de obra y plazos. DisclaimerCard `financial` severity `critical`. Complejidad media.
-- [ ] **estimador-certificado-energetico** — `inmobiliaria` · ¿Qué letra energética necesito para alquilar/vender? Estimador coste de pasar de F/G a D/E. Obligatorio desde marzo 2026. DisclaimerCard `financial`. Complejidad baja.
-- [ ] **calculadora-habitaciones-zona-tensionada** — `inmobiliaria` · ¿Cuánto puedo cobrar por habitación en zona tensionada? Nueva regulación 2026. DisclaimerCard `financial`. Complejidad baja.
+- [x] ~~**estimador-certificado-energetico**~~ — Ya existía `estimacion-certificacion-energetica`. Actualizada con aviso: NO existe prohibición F/G (mito). Obligatorio tener certificado (RD 390/2021). *(2026-04-01)*
+- [x] **orientador-alquiler-habitaciones** — `inmobiliaria`+`legal-fiscal` · Orientador sobre reglas del alquiler por habitaciones en zona tensionada (Ley 12/2023 + Prop. Ley 2025 + RDL 8/2026). Techo de renta, +300 municipios declarados, SERPAVI, sanciones. *(2026-04-01)*
 - [x] ~~**comparador-smi-sueldo-provincia**~~ — Fusionada en `estimador-smi` (pestaña "Por provincia"). *(2026-04-01)*
 
 ### Propuestas descartadas (abril 2026)

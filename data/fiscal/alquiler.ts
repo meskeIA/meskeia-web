@@ -14,13 +14,13 @@
  * - Aplica a contratos firmados ANTES del 26 de mayo de 2023
  *
  * Versión: 1.0.0
- * Última verificación: 2026-03-18
+ * Última verificación: 2026-04-01
  * ⚠️ Verificar valores con el INE antes de aplicar en un contrato real.
  */
 
 export const ALQUILER_META = {
   fuente: 'INE — Índice de Referencia de Actualización de Vivienda (IRAV) + IPC Interanual · Ley 12/2023 de Vivienda',
-  verificado: '2026-03-18',
+  verificado: '2026-04-01',
   vigencia: '2026',
   urlOficial: 'https://www.ine.es/jaxiT3/Tabla.htm?t=25171',
   nota: 'El IRAV se publica trimestralmente. Contratos anteriores al 26/05/2023 usan IPC interanual. Verificar índice vigente en el INE.',
@@ -42,10 +42,11 @@ export const IRAV_POR_TRIMESTRE: Record<string, number> = {
   '2024-Q2': 3.3,  // abr-jun 2024
   '2024-Q3': 2.5,  // jul-sep 2024
   '2024-Q4': 1.9,  // oct-dic 2024
-  '2025-Q1': 2.2,  // ene-mar 2025
-  '2025-Q2': 2.1,  // abr-jun 2025
-  '2025-Q3': 1.8,  // jul-sep 2025
-  '2025-Q4': 1.8,  // oct-dic 2025
+  '2025-Q1': 2.08, // ene-mar 2025 (media mensual INE: 2.19, 2.08, 1.98)
+  '2025-Q2': 2.06, // abr-jun 2025 (media mensual INE: 2.09, 1.99, 2.10)
+  '2025-Q3': 2.19, // jul-sep 2025 (media mensual INE: 2.15, 2.19, 2.22)
+  '2025-Q4': 2.29, // oct-dic 2025 (media mensual INE: 2.25, 2.29, 2.32)
+  '2026-Q1': 2.15, // ene-feb 2026 (media INE: 2.14, 2.16 — mar pendiente ~14 abr)
 };
 
 /**
@@ -95,6 +96,9 @@ export const IPC_INTERANUAL_POR_MES: Record<string, number> = {
   '2025-10': 1.6,
   '2025-11': 1.8,
   '2025-12': 2.0,
+  // 2026
+  '2026-01': 2.9,
+  '2026-02': 2.8,
 };
 
 /** Devuelve la clave del trimestre IRAV para un mes dado (1-12) */

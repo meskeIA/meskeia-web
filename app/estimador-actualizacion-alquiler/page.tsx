@@ -47,10 +47,11 @@ const TABLA_IRAV = [
   { periodo: 'Q2 2024 (abr-jun)', valor: 3.3 },
   { periodo: 'Q3 2024 (jul-sep)', valor: 2.5 },
   { periodo: 'Q4 2024 (oct-dic)', valor: 1.9 },
-  { periodo: 'Q1 2025 (ene-mar)', valor: 2.2 },
-  { periodo: 'Q2 2025 (abr-jun)', valor: 2.1 },
-  { periodo: 'Q3 2025 (jul-sep)', valor: 1.8 },
-  { periodo: 'Q4 2025 (oct-dic)', valor: 1.8 },
+  { periodo: 'Q1 2025 (ene-mar)', valor: 2.08 },
+  { periodo: 'Q2 2025 (abr-jun)', valor: 2.06 },
+  { periodo: 'Q3 2025 (jul-sep)', valor: 2.19 },
+  { periodo: 'Q4 2025 (oct-dic)', valor: 2.29 },
+  { periodo: 'Q1 2026 (ene-mar)', valor: 2.15 },
 ];
 
 // ──────────────────────────────────────────

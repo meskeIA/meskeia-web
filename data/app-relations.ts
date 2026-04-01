@@ -1295,10 +1295,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
   ],
+  'orientador-alquiler-habitaciones': [
+    { url: '/estimador-actualizacion-alquiler/', icon: '🏠', name: 'Actualización Alquiler', description: 'IRAV e IPC para actualizar la renta' },
+    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
+    { url: '/simulador-bono-joven-alquiler/', icon: '🏠', name: 'Bono Joven Alquiler', description: 'Comprueba si eres elegible' },
+    { url: '/estimacion-certificacion-energetica/', icon: '⚡', name: 'Certificado Energético', description: 'Estima tu letra energética' },
+  ],
   'estimador-actualizacion-alquiler': [
+    { url: '/orientador-alquiler-habitaciones/', icon: '🏠', name: 'Alquiler por Habitaciones', description: 'Reglas en zona tensionada' },
     { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI, cash flow y payback' },
     { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero' },
-    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Gastos de Compraventa', description: 'ITP, notaría y registro' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
   'requisitos-nomada-digital': [

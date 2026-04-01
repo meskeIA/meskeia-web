@@ -374,6 +374,7 @@ export const implementedAppsUrls = [
   "/orientador-intereses-demora/",      // Orientador interés comercial (Ley 3/2004) e interés legal (CC)
   "/test-obligado-declarar-renta/",         // Test obligación declarar Renta 2025: 7 preguntas, umbrales IRPF, varios pagadores, IMV
   "/checklist-declaracion-renta/",          // Checklist documentos declaración renta 2026 por perfil (asalariado/autónomo/pensionista/inversor/arrendador)
+  "/orientador-alquiler-habitaciones/",   // Orientador alquiler por habitaciones zona tensionada: techo renta, SERPAVI, municipios
   "/estimador-actualizacion-alquiler/",   // Calculadora IRAV/IPC para actualización de renta de alquiler según Ley de Vivienda 2023
   "/requisitos-nomada-digital/",            // Orientador elegibilidad Visa Nómada Digital (Ley 28/2022 de Startups)
   "/quiz-simbolos-quimicos/",               // Quiz símbolos químicos — 85 elementos, 3 dificultades, 2 modos
