@@ -101,6 +101,47 @@ export const REDUCCION_RENDIMIENTOS_TRABAJO_2025 = {
   factorInterpolacion:    1.14,   // Factor interpolación entre límite1 y límite2
 };
 
+// ─── Deducción por rendimientos del trabajo para rentas bajas (art. 80 bis) ──
+
+/**
+ * Deducción en cuota por obtención de rendimientos del trabajo (art. 80 bis LIRPF)
+ * Introducida por RDL 4/2024, aplicable desde ejercicio 2025.
+ *
+ * Requisitos:
+ * - Rendimientos netos del trabajo ≤ limiteMaximo (18.276 €)
+ * - Otras rentas (no del trabajo) ≤ limiteOtrasRentas (6.500 €)
+ *
+ * Cuantía:
+ * - RNT ≤ limiteCompleto (14.852 €): deducción completa (340 €)
+ * - limiteCompleto < RNT ≤ limiteMaximo: deducción proporcional decreciente
+ * - RNT > limiteMaximo: sin deducción
+ *
+ * Fuente: art. 80 bis Ley 35/2006 del IRPF
+ * Verificado: 2026-04-01
+ */
+export const DEDUCCION_RENTAS_BAJAS_2025 = {
+  deduccionMaxima:     340,     // € anuales
+  limiteCompleto:    14852,     // RNT hasta aquí: deducción máxima
+  limiteMaximo:      18276,     // RNT por encima: sin deducción
+  limiteOtrasRentas:  6500,     // Máximo de rentas no laborales permitido
+};
+
+/**
+ * Calcula la deducción por rentas bajas del trabajo (art. 80 bis LIRPF).
+ * @param rnt Rendimiento Neto del Trabajo (después de gastos deducibles art.19, antes de reducción art.20)
+ * @param otrasRentas Suma de rentas no laborales (capital, imputadas, etc.). 0 si no se conocen.
+ * @returns Importe de la deducción (0 a 340 €)
+ */
+export function calcularDeduccionRentasBajas(rnt: number, otrasRentas: number = 0): number {
+  const d = DEDUCCION_RENTAS_BAJAS_2025;
+  if (otrasRentas > d.limiteOtrasRentas) return 0;
+  if (rnt <= 0) return 0;
+  if (rnt <= d.limiteCompleto) return d.deduccionMaxima;
+  if (rnt > d.limiteMaximo) return 0;
+  // Interpolación lineal entre limiteCompleto y limiteMaximo
+  return d.deduccionMaxima * (1 - (rnt - d.limiteCompleto) / (d.limiteMaximo - d.limiteCompleto));
+}
+
 // ─── Helpers: estimación tipo marginal ────────────────────────────────────────
 
 /**

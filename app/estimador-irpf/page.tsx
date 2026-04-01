@@ -15,6 +15,7 @@ import {
   BASES_SS_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
+  calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -110,6 +111,8 @@ export default function EstimadorIRPFPage() {
     baseLiquidable: number;
     cuotaIntegra: number;
     desgloseTramos: DesgloseTramo[];
+    deduccionRentasBajas: number;
+    cuotaTrasDeducciones: number;
     retenciones: number;
     cuotaDiferencial: number;
     tipoEfectivo: number;
@@ -148,11 +151,19 @@ export default function EstimadorIRPFPage() {
     // Cuota íntegra
     const { cuota: cuotaIntegra, desglose: desgloseTramos } = calcularCuotaIRPF(baseLiquidable);
 
+    // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
+    const deduccionRentasBajas = esTrabajador && bruto > 0
+      ? calcularDeduccionRentasBajas(rnt, capital)
+      : 0;
+
+    // Cuota tras deducciones (no puede ser negativa)
+    const cuotaTrasDeducciones = Math.max(0, cuotaIntegra - deduccionRentasBajas);
+
     // Cuota diferencial
-    const cuotaDiferencial = cuotaIntegra - retenciones;
+    const cuotaDiferencial = cuotaTrasDeducciones - retenciones;
 
     // Tipo efectivo sobre base imponible
-    const tipoEfectivo = baseImponibleGeneral > 0 ? (cuotaIntegra / baseImponibleGeneral) * 100 : 0;
+    const tipoEfectivo = baseImponibleGeneral > 0 ? (cuotaTrasDeducciones / baseImponibleGeneral) * 100 : 0;
 
     setResultado({
       brutoAnual: bruto,
@@ -163,6 +174,8 @@ export default function EstimadorIRPFPage() {
       baseLiquidable,
       cuotaIntegra,
       desgloseTramos,
+      deduccionRentasBajas,
+      cuotaTrasDeducciones,
       retenciones,
       cuotaDiferencial,
       tipoEfectivo,
@@ -318,8 +331,18 @@ export default function EstimadorIRPFPage() {
                   unit="€"
                   variant="highlight"
                   icon="📊"
-                  description="IRPF calculado antes de retenciones"
+                  description="IRPF antes de deducciones y retenciones"
                 />
+                {resultado.deduccionRentasBajas > 0 && (
+                  <ResultCard
+                    title="Deducción rentas bajas"
+                    value={`-${formatNumber(resultado.deduccionRentasBajas, 2)}`}
+                    unit="€"
+                    variant="success"
+                    icon="🟢"
+                    description="Art. 80 bis LIRPF (trabajo < 18.276 €)"
+                  />
+                )}
                 <ResultCard
                   title="Tipo efectivo"
                   value={formatNumber(resultado.tipoEfectivo, 2)}

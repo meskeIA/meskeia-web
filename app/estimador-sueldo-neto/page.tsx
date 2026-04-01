@@ -7,7 +7,7 @@ import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, Relat
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025, calcularDeduccionRentasBajas } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -104,11 +104,15 @@ function calcularBrutoANeto(
   ssAnual: number;
   ssDesglose: Record<string, number>;
   tipoRetencion: number;
+  deduccionRentasBajas: number;
 } {
   const ss = calcularSeguridadSocial(brutoAnual);
   const baseImponible = brutoAnual - ss.anual;
   const minimos = calcularMinimosPersonales(situacion, numHijos, hijosMenores3);
-  const irpfAnual = calcularIRPF(baseImponible, minimos);
+  const cuotaIRPF = calcularIRPF(baseImponible, minimos);
+  // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
+  const deduccion = calcularDeduccionRentasBajas(baseImponible, 0);
+  const irpfAnual = Math.max(0, cuotaIRPF - deduccion);
   const tipoRetencion = brutoAnual > 0 ? (irpfAnual / brutoAnual) * 100 : 0;
   const netoAnual = brutoAnual - ss.anual - irpfAnual;
 
@@ -116,10 +120,11 @@ function calcularBrutoANeto(
     netoAnual,
     netoMensual: netoAnual / pagas,
     irpfAnual,
-    irpfPorcentaje: (irpfAnual / brutoAnual) * 100,
+    irpfPorcentaje: brutoAnual > 0 ? (irpfAnual / brutoAnual) * 100 : 0,
     ssAnual: ss.anual,
     ssDesglose: ss.desglose,
     tipoRetencion,
+    deduccionRentasBajas: deduccion,
   };
 }
 
@@ -138,6 +143,7 @@ function calcularNetoABruto(
   ssAnual: number;
   ssDesglose: Record<string, number>;
   tipoRetencion: number;
+  deduccionRentasBajas: number;
 } {
   // Estimación inicial: neto / 0.7 (asumiendo ~30% de deducciones)
   let brutoEstimado = netoAnualObjetivo / 0.7;
@@ -157,6 +163,7 @@ function calcularNetoABruto(
         ssAnual: resultado.ssAnual,
         ssDesglose: resultado.ssDesglose,
         tipoRetencion: resultado.tipoRetencion,
+        deduccionRentasBajas: resultado.deduccionRentasBajas,
       };
     }
 
@@ -174,6 +181,7 @@ function calcularNetoABruto(
     ssAnual: resultadoFinal.ssAnual,
     ssDesglose: resultadoFinal.ssDesglose,
     tipoRetencion: resultadoFinal.tipoRetencion,
+    deduccionRentasBajas: resultadoFinal.deduccionRentasBajas,
   };
 }
 
@@ -195,6 +203,7 @@ export default function EstimadorSueldoNetoPage() {
     ssAnual: number;
     ssDesglose: Record<string, number>;
     tipoRetencion: number;
+    deduccionRentasBajas: number;
   } | null>(null);
 
   const calcular = useCallback(() => {
@@ -221,6 +230,7 @@ export default function EstimadorSueldoNetoPage() {
         ssAnual: calc.ssAnual,
         ssDesglose: calc.ssDesglose,
         tipoRetencion: calc.tipoRetencion,
+        deduccionRentasBajas: calc.deduccionRentasBajas,
       };
     } else {
       const calc = calcularNetoABruto(salarioNum, situacion, hijosNum, hijosMenores3Num, pagasNum);
@@ -234,6 +244,7 @@ export default function EstimadorSueldoNetoPage() {
         ssAnual: calc.ssAnual,
         ssDesglose: calc.ssDesglose,
         tipoRetencion: calc.tipoRetencion,
+        deduccionRentasBajas: calc.deduccionRentasBajas,
       };
     }
 
@@ -399,6 +410,12 @@ export default function EstimadorSueldoNetoPage() {
                     <span>Retención IRPF anual</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.irpfAnual)}</span>
                   </div>
+                  {resultado.deduccionRentasBajas > 0 && (
+                    <div className={styles.desgloseRow}>
+                      <span>Deducción rentas bajas (art. 80 bis)</span>
+                      <span className={styles.desgloseValue} style={{ color: '#27ae60' }}>-{formatCurrency(resultado.deduccionRentasBajas)}</span>
+                    </div>
+                  )}
                   <div className={styles.desgloseRow}>
                     <span>Tipo de retención efectivo</span>
                     <span className={styles.desgloseValue}>{formatNumber(resultado.tipoRetencion, 2)}%</span>

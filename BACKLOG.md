@@ -205,6 +205,8 @@
 
 - [x] **simulador-hipoteca**: Comparativa fija vs variable vs mixta en un mismo visualizador. Añadido tipo 'mixta' al simulador (2 fases) + panel comparador en tiempo real con los 3 tipos simultáneos + tabla educativa actualizada a 4 columnas. *(2026-03-09)*
 
+- [x] **estimador-irpf + estimador-sueldo-neto**: Integrar deducción por rentas bajas del trabajo (art. 80 bis LIRPF, hasta 340 €/año para rendimientos del trabajo < 18.276 €). Datos centralizados en `data/fiscal/irpf.ts`. *(2026-04-01)*
+
 - [ ] **DisclaimerCard medical (Grupo B)**: Revisar las 8 apps con children custom de baja prioridad (`test-habitos-saludables`, `curso-nutrisalud`, `calculadora-porciones`, `calculadora-edad-mascotas`, `calculadora-tamano-adulto-perro`, `planificador-mascota`, `guia-cuidado-mascota`, `guia/vivir-sano`) para añadir cláusula de exoneración si se considera necesario.
 
 ---
@@ -224,6 +226,11 @@
 - [ ] **estimador-certificado-energetico** — `inmobiliaria` · ¿Qué letra energética necesito para alquilar/vender? Estimador coste de pasar de F/G a D/E. Obligatorio desde marzo 2026. DisclaimerCard `financial`. Complejidad baja.
 - [ ] **calculadora-habitaciones-zona-tensionada** — `inmobiliaria` · ¿Cuánto puedo cobrar por habitación en zona tensionada? Nueva regulación 2026. DisclaimerCard `financial`. Complejidad baja.
 - [ ] **comparador-smi-sueldo-provincia** — `finanzas`+`cultura` · Comparador SMI vs sueldo medio por provincia. Potencial viral — SMI supera 60% sueldo medio en 46 provincias. Complejidad baja (datos embebidos).
+
+### Propuestas descartadas (abril 2026)
+
+> - ~~**calculadora-deduccion-rentas-bajas**~~ — Integrada como mejora en `estimador-irpf` y `estimador-sueldo-neto`. No requiere app nueva. *(2026-04-01)*
+> - ~~**calculadora-retenciones-ahorro-30**~~ — El tramo 30% para >300.000 € ya está implementado en `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (`data/fiscal/inmuebles.ts`) y usado por `estimador-plusvalias-irpf`. *(2026-04-01)*
 
 ### Tendencias marzo 2026 (propuestas 2026-03-19)
 
