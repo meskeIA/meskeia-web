@@ -1393,6 +1393,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 4),
     { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
   ],
+  'planificador-estudio-oposiciones': [
+    { url: '/orientador-tipo-oposicion/', icon: '🎯', name: 'Orientador de Oposición', description: '¿Qué oposición encaja contigo?' },
+    { url: '/temporizador-pomodoro/', icon: '⏰', name: 'Pomodoro', description: 'Técnica de estudio 25+5 min' },
+    { url: '/planificador-habitos/', icon: '📋', name: 'Planificador de Hábitos', description: 'Crea rutinas de estudio' },
+  ],
+  'orientador-tipo-oposicion': [
+    { url: '/planificador-estudio-oposiciones/', icon: '📅', name: 'Planificador de Estudio', description: 'Organiza tu temario en semanas' },
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Calcula tu sueldo neto como funcionario' },
+    { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: 'Planifica tu carrera pública' },
+  ],
   'simulador-paga-ahorro': [
     { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Calcula cuándo alcanzarás tu objetivo' },
     { url: '/juego-presupuesto-mensual/', icon: '🎮', name: 'Juego de Presupuesto', description: '¿Llegas a fin de mes?' },

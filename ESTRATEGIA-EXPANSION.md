@@ -79,7 +79,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 7 | Derecho Cotidiano | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 8 | Comunidades de Vecinos | Media | **Cero** | Medio | ✅ **CUBIERTO** |
-| 9 | Oposiciones y Empleo Público | Media | Baja | Medio | 🟢 Normal |
+| 9 | Oposiciones y Empleo Público | Media | Baja | Medio | ✅ **COMPLETADO** |
 | 10 | Educación Financiera Juvenil | Media | Baja | Alto | ✅ **COMPLETADO** |
 
 ---
@@ -257,10 +257,10 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Simulador de baremos | Puntuación por experiencia + formación + examen | Media | ⬜ Por decidir |
-| Planificador de estudio por temario | Distribuir temas en semanas | Baja | ⬜ Por decidir |
-| Calculadora de nota de corte estimada | Histórico + previsión | Media | ⬜ Por decidir |
-| Selector de oposición por perfil | Test según estudios, preferencias, edad | Baja | ⬜ Por decidir |
+| ~~Simulador de baremos~~ | ~~Puntuación por experiencia + formación~~ | ~~Media~~ | ❌ Descartada (cada convocatoria tiene baremo distinto, riesgo alto) |
+| Planificador de Estudio para Oposiciones | Distribuir temas en semanas + repasos | Baja | ✅ Implementada 2026-04-01 |
+| ~~Nota de corte estimada~~ | ~~Histórico + previsión~~ | ~~Media~~ | ❌ Descartada (predicción no fiable, falsas expectativas) |
+| Orientador de Tipo de Oposición | Test 8 preguntas, 16 oposiciones | Baja | ✅ Implementada 2026-04-01 |
 
 ---
 
@@ -311,6 +311,8 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Educación Financiera | Juego de Presupuesto Mensual | ✅ Build OK |
 | 2026-03-31 | Educación Financiera | ¿Cuánto tardo en ahorrar? | ✅ Build OK |
 | 2026-03-31 | Educación Financiera | Quiz de Conceptos Financieros | ✅ Build OK |
+| 2026-04-01 | Oposiciones | Planificador de Estudio para Oposiciones | ✅ Build OK |
+| 2026-04-01 | Oposiciones | Orientador de Tipo de Oposición | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -327,6 +329,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Nicho 7 (Derecho Cotidiano) completado: 3 apps nuevas + 2 existentes (plazos-legales, asistente-reclamaciones) + 2 descartadas (baremos complejos). 2 ideas nuevas añadidas (divorcio, justicia gratuita). |
 | 2026-03-31 | Nicho 8 (Comunidades de Vecinos) **CUBIERTO** por estimador-gastos-comunidad existente. Simulador quórums LPH descartado (doble régimen: LPH estatal ≠ Código Civil catalán). |
 | 2026-03-31 | Nicho 10 (Educación Financiera Juvenil) completado: 4 apps nuevas. Mini-ecosistema educativo: paga, presupuesto gamificado, objetivos y quiz. |
+| 2026-04-01 | Nicho 9 (Oposiciones) completado: 2 apps nuevas (planificador + orientador). Baremos y nota de corte descartados (alto riesgo por variabilidad entre convocatorias). |
 
 ---
 
