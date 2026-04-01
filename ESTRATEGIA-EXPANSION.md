@@ -73,7 +73,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 |---|-------|-----------|-------------|----------------|-----------|
 | 1 | Cuidadores y Dependencia | Alta | **Cero** | Muy alto | 🔴 Alta |
 | 2 | ~~Migración y Extranjería~~ | ~~Alta~~ | ~~Cero~~ | ~~Muy alto~~ | ❌ **DESCARTADO** |
-| 3 | Salud Mental | Muy alta | Baja | Muy alto | 🔴 Alta |
+| 3 | Salud Mental | Muy alta | Baja | Muy alto | ✅ **COMPLETADO** |
 | 4 | Crianza y Familia | Alta | Baja | Alto | ✅ **COMPLETADO** |
 | 5 | Tercera Edad | Alta | **Cero** | Alto | ✅ **COMPLETADO** |
 | 6 | Sostenibilidad y Hogar Eficiente | Alta | Baja | Alto | ✅ **COMPLETADO** |
@@ -136,13 +136,13 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 
 | App | Descripción | Complejidad | Estado |
 |-----|-------------|-------------|--------|
-| Test PHQ-9 (depresión) | Escala validada + orientación y recursos | Baja | ⬜ Por decidir |
-| Test GAD-7 (ansiedad) | Escala validada + recursos | Baja | ⬜ Por decidir |
-| Test de calidad del sueño (Pittsburgh) | PSQI completo con puntuación | Media | ⬜ Por decidir |
-| Test de estrés laboral (Maslach) | Burnout + agotamiento + despersonalización | Media | ⬜ Por decidir |
-| Diario emocional visual | Registro diario con patrones visuales | Media | ⬜ Por decidir |
-| Planificador de hábitos saludables | Seguimiento visual con racha | Media | ⬜ Por decidir |
-| Test de bienestar general (WHO-5) | Escala OMS de bienestar subjetivo | Baja | ⬜ Por decidir |
+| ~~Test PHQ-9 (depresión)~~ | ~~Escala validada~~ | ~~Baja~~ | ❌ Descartada (pregunta 9 sobre ideación suicida, autodiagnóstico clínico, riesgo muy alto) |
+| ~~Test GAD-7 (ansiedad)~~ | ~~Escala validada~~ | ~~Baja~~ | ❌ Descartada (autodiagnóstico clínico, falsa tranquilidad, riesgo alto) |
+| ~~Test Pittsburgh (sueño)~~ | ~~PSQI completo~~ | ~~Media~~ | ❌ Descartada (ya cubierto parcialmente por calculadora-sueno) |
+| ~~Test Maslach (burnout)~~ | ~~Burnout + agotamiento~~ | ~~Media~~ | ✅ Ya existía (test-burnout-laboral) |
+| Diario Emocional Visual | Registro diario con patrones | Media | ✅ Implementada 2026-04-01 |
+| ~~Planificador de hábitos~~ | ~~Seguimiento visual~~ | ~~Media~~ | ✅ Ya existía (seguimiento-habitos) |
+| Test de Bienestar WHO-5 | Escala OMS bienestar positivo | Baja | ✅ Implementada 2026-04-01 |
 
 ---
 
@@ -313,6 +313,8 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Educación Financiera | Quiz de Conceptos Financieros | ✅ Build OK |
 | 2026-04-01 | Oposiciones | Planificador de Estudio para Oposiciones | ✅ Build OK |
 | 2026-04-01 | Oposiciones | Orientador de Tipo de Oposición | ✅ Build OK |
+| 2026-04-01 | Salud Mental | Diario Emocional Visual | ✅ Build OK |
+| 2026-04-01 | Salud Mental | Test de Bienestar WHO-5 | ✅ Build OK |
 
 ### Decisiones tomadas
 
@@ -330,6 +332,7 @@ CalcularIRPF.es, CalculadoraIRPF.es, CalculaFinanzas.es — una sola herramienta
 | 2026-03-31 | Nicho 8 (Comunidades de Vecinos) **CUBIERTO** por estimador-gastos-comunidad existente. Simulador quórums LPH descartado (doble régimen: LPH estatal ≠ Código Civil catalán). |
 | 2026-03-31 | Nicho 10 (Educación Financiera Juvenil) completado: 4 apps nuevas. Mini-ecosistema educativo: paga, presupuesto gamificado, objetivos y quiz. |
 | 2026-04-01 | Nicho 9 (Oposiciones) completado: 2 apps nuevas (planificador + orientador). Baremos y nota de corte descartados (alto riesgo por variabilidad entre convocatorias). |
+| 2026-04-01 | Nicho 3 (Salud Mental) completado: 2 apps nuevas (diario emocional + WHO-5). PHQ-9 y GAD-7 descartados (escalas clínicas, riesgo autodiagnóstico, pregunta suicida). Ambas apps incluyen recurso 024 siempre visible. |
 
 ---
 

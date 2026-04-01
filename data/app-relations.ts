@@ -1393,6 +1393,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 4),
     { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
   ],
+  'diario-emocional': [
+    { url: '/test-bienestar-who5/', icon: '🌱', name: 'Test Bienestar WHO-5', description: 'Evalúa tu bienestar en 5 preguntas' },
+    { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Regulación emocional visual' },
+    { url: '/selector-gestion-estres/', icon: '🧘', name: 'Gestión del Estrés', description: 'Encuentra tu método anti-estrés' },
+    { url: '/guia-respiracion/', icon: '🫁', name: 'Guía de Respiración', description: 'Técnicas para la calma' },
+  ],
+  'test-bienestar-who5': [
+    { url: '/diario-emocional/', icon: '📔', name: 'Diario Emocional', description: 'Registra cómo te sientes cada día' },
+    { url: '/test-burnout-laboral/', icon: '🔥', name: 'Test de Burnout', description: 'Evalúa tu agotamiento laboral' },
+    { url: '/selector-gestion-estres/', icon: '🧘', name: 'Gestión del Estrés', description: 'Encuentra tu método anti-estrés' },
+    { url: '/test-habitos-saludables/', icon: '🌟', name: 'Hábitos Saludables', description: 'Evalúa tu estilo de vida' },
+  ],
   'planificador-estudio-oposiciones': [
     { url: '/orientador-tipo-oposicion/', icon: '🎯', name: 'Orientador de Oposición', description: '¿Qué oposición encaja contigo?' },
     { url: '/temporizador-pomodoro/', icon: '⏰', name: 'Pomodoro', description: 'Técnica de estudio 25+5 min' },

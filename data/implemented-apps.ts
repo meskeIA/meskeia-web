@@ -36,6 +36,8 @@ export const implementedAppsUrls = [
   "/test-zarit-cuidador/",                 // Test de Zarit: escala 22 ítems sobrecarga del cuidador
   "/estimacion-deduccion-discapacidad/",   // Estimación deducción IRPF por discapacidad: mínimos personales y familiares
   "/checklist-tramites-dependencia/",      // Checklist trámites dependencia: 6 fases, documentación, plazos
+  "/diario-emocional/",                     // Diario emocional visual: registro ánimo diario, patrones, localStorage
+  "/test-bienestar-who5/",                 // Test bienestar WHO-5: escala OMS 5 preguntas, 4 niveles, recursos ayuda
   "/planificador-estudio-oposiciones/",     // Planificador estudio oposiciones: distribuir temas, repasos espaciados
   "/orientador-tipo-oposicion/",           // Orientador tipo oposición: test 8 preguntas, 16 oposiciones, filtrado por perfil
   "/simulador-paga-ahorro/",               // Simulador paga y ahorro: gestión paga semanal/mensual, objetivos visuales
