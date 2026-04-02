@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Planificador de Ahorro para la Jubilaci\u00f3n — CSS Module (meskeIA)
+   Planificador de Ahorro para la Jubilación — CSS Module (meskeIA)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .container {
@@ -251,7 +251,7 @@
 .escenarioCapital { font-weight: 700; color: var(--primary); font-size: 1.1rem; display: block; }
 .escenarioPension { font-size: 0.85rem; color: var(--success); margin-top: 0.25rem; }
 
-/* Tabla proyecci\u00f3n */
+/* Tabla proyección */
 .tabla {
   width: 100%;
   border-collapse: collapse;
@@ -277,7 +277,7 @@
 .tabla td:first-child { text-align: left; }
 .tabla tr:nth-child(even) td { background: var(--hover); }
 
-/* Profesionalizaci\u00f3n v2.0 */
+/* Profesionalización v2.0 */
 .tableWrapper {
   overflow-x: auto;
   margin: 1.5rem 0;

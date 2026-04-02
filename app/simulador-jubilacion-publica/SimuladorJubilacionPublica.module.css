@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Simulador de Jubilaci\u00f3n P\u00fablica — CSS Module (meskeIA)
+   Simulador de Jubilación Pública — CSS Module (meskeIA)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .container {
@@ -130,7 +130,7 @@
 }
 [data-theme='dark'] .infoSS { background: #1a3a4a; color: #90CAF9; }
 
-/* ─── Secci\u00f3n de resultado (edad) ──────────────────────────────────────── */
+/* ─── Sección de resultado (edad) ──────────────────────────────────────── */
 
 .resultAge {
   text-align: center;
@@ -169,7 +169,7 @@
   color: var(--text-primary);
 }
 
-/* ─── Resultados (pensi\u00f3n) ─────────────────────────────────────────────── */
+/* ─── Resultados (pensión) ─────────────────────────────────────────────── */
 
 .resultados { display: flex; flex-direction: column; gap: var(--spacing-md); }
 
@@ -358,7 +358,7 @@
   font-size: 1.1rem;
 }
 
-/* ─── Tabla edad jubilaci\u00f3n ──────────────────────────────────────────────── */
+/* ─── Tabla edad jubilación ──────────────────────────────────────────────── */
 
 .tabla {
   width: 100%;
@@ -402,7 +402,7 @@
 .tipBox p { color: var(--text-primary); font-size: 0.95rem; line-height: 1.6; margin: 0; }
 .tipBox strong { color: var(--primary); }
 
-/* ─── Profesionalizaci\u00f3n v2.0 ──────────────────────────────────────────── */
+/* ─── Profesionalización v2.0 ──────────────────────────────────────────── */
 
 .tableWrapper {
   overflow-x: auto;
