@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 392,
+  "total_tools": 393,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1857,6 +1857,12 @@
           "slug": "diagnostico-comunicacion-interna",
           "url": "https://meskeia.com/diagnostico-comunicacion-interna/",
           "description": "¿Tu equipo comunica rápido pero sin profundidad? Test de 10 preguntas sobre velocidad y profundidad de la comunicación organizacional"
+        },
+        {
+          "name": "Checklist Pre-Mortem",
+          "slug": "checklist-pre-mortem",
+          "url": "https://meskeia.com/checklist-pre-mortem/",
+          "description": "Antes de lanzar algo: ¿por qué podría fallar? Test de 10 preguntas basado en Gary Klein. Evalúa anticipación de riesgos y acción preventiva"
         },
         {
           "name": "Planificador de Turnos",
