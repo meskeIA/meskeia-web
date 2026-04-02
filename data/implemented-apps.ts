@@ -457,6 +457,7 @@ export const implementedAppsUrls = [
   "/auditoria-reuniones/",               // Reflexión: auditoría de reuniones — eficiencia + cultura, 10 preguntas, perfil + acciones
   "/mapa-decisiones-urgentes-importantes/", // Reflexión: urgente vs importante (Eisenhower) — visión + filtro, 10 preguntas, perfil + acciones
   "/test-delegacion-efectiva/",            // Reflexión: delegación efectiva (Hersey-Blanchard) — acompañamiento + autonomía, 10 preguntas, perfil + acciones
+  "/diagnostico-comunicacion-interna/",    // Reflexión: comunicación interna — velocidad + profundidad, 10 preguntas, perfil + acciones
 ];
 
 /**
