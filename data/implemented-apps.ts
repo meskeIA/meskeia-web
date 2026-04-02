@@ -461,6 +461,7 @@ export const implementedAppsUrls = [
   "/checklist-pre-mortem/",                // Reflexión: pre-mortem (Gary Klein) — anticipación + acción, 10 preguntas, perfil + acciones
   "/diagnostico-brecha-ia/",               // Reflexión: brecha IA — criterio propio + aprovechamiento IA, 10 preguntas, perfil + acciones
   "/evaluador-prompts/",                   // Reflexión: prompt engineering — calidad instrucciones + procesamiento salida, 10 preguntas, perfil + acciones
+  "/test-dependencia-tecnologica/",        // Reflexión: dependencia tecnológica — autonomía real + adaptabilidad, 10 preguntas, perfil + acciones
 ];
 
 /**

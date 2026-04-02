@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 395,
+  "total_tools": 396,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1875,6 +1875,12 @@
           "slug": "evaluador-prompts",
           "url": "https://meskeia.com/evaluador-prompts/",
           "description": "¿Tus instrucciones a la IA son específicas o vagas? Test de 10 preguntas sobre prompt engineering y procesamiento crítico de respuestas"
+        },
+        {
+          "name": "Test de Dependencia Tecnológica",
+          "slug": "test-dependencia-tecnologica",
+          "url": "https://meskeia.com/test-dependencia-tecnologica/",
+          "description": "¿Podrías hacer tu trabajo si mañana no tuvieras IA? Test de 10 preguntas sobre autonomía real y adaptabilidad tecnológica"
         },
         {
           "name": "Planificador de Turnos",
