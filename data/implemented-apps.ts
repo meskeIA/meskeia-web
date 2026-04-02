@@ -451,6 +451,9 @@ export const implementedAppsUrls = [
   "/selector-financiacion-empresa/",     // Test 10 preguntas: autofinanciación, préstamo, inversores, crowdfunding, subvenciones
   "/selector-tipo-gimnasio/",            // Test 10 preguntas: tradicional, CrossFit, yoga/pilates, casa, aire libre
   "/selector-auriculares/",              // Test 10 preguntas: in-ear TWS, over-ear ANC, deportivos, gaming, cable
+
+  // Apps de reflexión (2026-04-02)
+  "/diagnostico-explotacion-exploracion/", // Reflexión: explotación vs exploración (March, 1991) — 10 preguntas, perfil + acciones
 ];
 
 /**

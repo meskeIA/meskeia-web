@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 387,
+  "total_tools": 388,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1827,6 +1827,12 @@
           "slug": "matriz-eisenhower",
           "url": "https://meskeia.com/matriz-eisenhower/",
           "description": "Prioriza tareas con la matriz urgente/importante. Decide qué hacer, planificar, delegar o eliminar"
+        },
+        {
+          "name": "Diagnóstico Explotación vs Exploración",
+          "slug": "diagnostico-explotacion-exploracion",
+          "url": "https://meskeia.com/diagnostico-explotacion-exploracion/",
+          "description": "Test de reflexión basado en James G. March (1991). Descubre si tu organización equilibra eficiencia operativa e innovación. 10 preguntas con perfil visual y acciones sugeridas"
         },
         {
           "name": "Planificador de Turnos",
