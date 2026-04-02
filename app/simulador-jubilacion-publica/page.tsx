@@ -677,6 +677,11 @@ export default function SimuladorJubilacionPublicaPage() {
                       <div className={`${styles.requisitoItem} ${resultadoAnticipada.mesesAnticipacion <= resultadoAnticipada.maxMesesPermitidos ? styles.requisitoOk : styles.requisitoNok}`}>
                         {resultadoAnticipada.mesesAnticipacion <= resultadoAnticipada.maxMesesPermitidos ? '\u2713' : '\u2717'} Antelaci\u00f3n (m\u00e1x. {resultadoAnticipada.maxMesesPermitidos} meses)
                       </div>
+                      {tipoAnticipada === 'involuntaria' && (
+                        <div className={`${styles.requisitoItem} ${styles.requisitoInfo}`}>
+                          \u24d8 Adem\u00e1s: al menos {REQUISITOS_ANTICIPADA_INVOLUNTARIA.anosCotizadosEnUltimos15} a\u00f1os cotizados en los \u00faltimos 15 a\u00f1os de vida laboral
+                        </div>
+                      )}
                     </div>
 
                     {resultadoAnticipada.posible && (

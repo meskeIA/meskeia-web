@@ -182,6 +182,7 @@ export const COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025: CoeficienteReductor[] = 
 export const REQUISITOS_ANTICIPADA_INVOLUNTARIA = {
   anosMinimoCotizados: 33,
   maxMesesAnticipacion: 48, // hasta 4 años antes
+  anosCotizadosEnUltimos15: 2, // Al menos 2 años cotizados en los últimos 15 (LGSS art. 207.1.d)
 };
 
 // Jubilación VOLUNTARIA (a iniciativa del propio trabajador)

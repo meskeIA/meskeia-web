@@ -274,8 +274,10 @@
 
 .requisitoOk { background: #f0faf0; color: #27AE60; border: 1px solid #27AE60; }
 .requisitoNok { background: #fdf2f2; color: #E74C3C; border: 1px solid #E74C3C; }
+.requisitoInfo { background: #f0f4fa; color: var(--text-secondary); border: 1px solid var(--accent); opacity: 0.85; }
 [data-theme='dark'] .requisitoOk { background: #1a3a1a; }
 [data-theme='dark'] .requisitoNok { background: #3a1a1a; }
+[data-theme='dark'] .requisitoInfo { background: #1a2a3a; }
 
 /* ─── Toggle sections ──────────────────────────────────────────────────── */
 
