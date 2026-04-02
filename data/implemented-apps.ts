@@ -454,6 +454,7 @@ export const implementedAppsUrls = [
 
   // Apps de reflexión (2026-04-02)
   "/diagnostico-explotacion-exploracion/", // Reflexión: explotación vs exploración (March, 1991) — 10 preguntas, perfil + acciones
+  "/auditoria-reuniones/",               // Reflexión: auditoría de reuniones — eficiencia + cultura, 10 preguntas, perfil + acciones
 ];
 
 /**
