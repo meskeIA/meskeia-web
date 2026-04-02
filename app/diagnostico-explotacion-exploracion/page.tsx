@@ -33,17 +33,16 @@ interface Perfil {
 /* ─── Datos ─── */
 
 const PREGUNTAS: Pregunta[] = [
-  // Explotación (5 preguntas)
+  // Intercaladas: explotación (A) y exploración (B) en patrón ABABABABAB
   { id: 1, texto: 'Priorizamos mejorar lo que ya funciona antes que probar cosas nuevas', dimension: 'explotacion' },
-  { id: 2, texto: 'Nuestros procesos están bien definidos y los seguimos con disciplina', dimension: 'explotacion' },
-  { id: 3, texto: 'La mayoría de nuestras reuniones se centran en resultados a corto plazo', dimension: 'explotacion' },
-  { id: 4, texto: 'Medimos el éxito principalmente por la eficiencia y el cumplimiento de objetivos inmediatos', dimension: 'explotacion' },
-  { id: 5, texto: 'Cuando algo funciona, preferimos no tocarlo', dimension: 'explotacion' },
-  // Exploración (5 preguntas)
   { id: 6, texto: 'Dedicamos tiempo regularmente a experimentar con nuevas ideas o enfoques', dimension: 'exploracion' },
+  { id: 2, texto: 'Nuestros procesos están bien definidos y los seguimos con disciplina', dimension: 'explotacion' },
   { id: 7, texto: 'Se permite (y se valora) el error como parte del aprendizaje', dimension: 'exploracion' },
+  { id: 3, texto: 'La mayoría de nuestras reuniones se centran en resultados a corto plazo', dimension: 'explotacion' },
   { id: 8, texto: 'Invertimos recursos en proyectos sin retorno garantizado a corto plazo', dimension: 'exploracion' },
+  { id: 4, texto: 'Medimos el éxito principalmente por la eficiencia y el cumplimiento de objetivos inmediatos', dimension: 'explotacion' },
   { id: 9, texto: 'Buscamos activamente perspectivas externas y nuevas formas de hacer las cosas', dimension: 'exploracion' },
+  { id: 5, texto: 'Cuando algo funciona, preferimos no tocarlo', dimension: 'explotacion' },
   { id: 10, texto: 'Reservamos tiempo específico para pensar en el futuro, no solo en el día a día', dimension: 'exploracion' },
 ];
 
@@ -291,9 +290,6 @@ export default function DiagnosticoExplotacionExploracionPage() {
             <div key={pregunta.id} className={styles.questionCard}>
               <div className={styles.questionHeader}>
                 <span className={styles.questionNumber}>{index + 1}</span>
-                <span className={`${styles.dimensionTag} ${styles[pregunta.dimension]}`}>
-                  {pregunta.dimension === 'explotacion' ? '⚙️ Explotación' : '🔬 Exploración'}
-                </span>
               </div>
               <p className={styles.questionText}>{pregunta.texto}</p>
               <div className={styles.scaleContainer} role="radiogroup" aria-label={`Pregunta ${index + 1}: ${pregunta.texto}`}>
@@ -355,6 +351,11 @@ export default function DiagnosticoExplotacionExploracionPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span>⚙️ Máquina de Eficiencia</span>
                 </div>
+                {/* Líneas de umbral */}
+                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
                 {/* Punto de posición */}
                 <div
                   className={styles.mapDot}

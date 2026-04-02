@@ -33,17 +33,16 @@ interface Perfil {
 /* ─── Datos ─── */
 
 const PREGUNTAS: Pregunta[] = [
-  // Eficiencia (5 preguntas)
+  // Intercaladas: eficiencia (A) y cultura (B) en patrón ABABABABAB
   { id: 1, texto: 'La mayoría de nuestras reuniones tiene un objetivo claro definido de antemano', dimension: 'eficiencia' },
-  { id: 2, texto: 'Salimos de las reuniones con decisiones concretas y próximos pasos asignados', dimension: 'eficiencia' },
-  { id: 3, texto: 'Las reuniones empiezan y terminan puntualmente', dimension: 'eficiencia' },
-  { id: 4, texto: 'Solo asisten las personas imprescindibles para el tema tratado', dimension: 'eficiencia' },
-  { id: 5, texto: 'Antes de convocar una reunión, nos preguntamos si podría resolverse por email o chat', dimension: 'eficiencia' },
-  // Cultura (5 preguntas)
   { id: 6, texto: 'Se puede declinar una reunión sin que sea mal visto', dimension: 'cultura' },
+  { id: 2, texto: 'Salimos de las reuniones con decisiones concretas y próximos pasos asignados', dimension: 'eficiencia' },
   { id: 7, texto: 'Tenemos bloques de tiempo protegidos sin reuniones para trabajo profundo', dimension: 'cultura' },
+  { id: 3, texto: 'Las reuniones empiezan y terminan puntualmente', dimension: 'eficiencia' },
   { id: 8, texto: 'Se revisan periódicamente las reuniones recurrentes para eliminar las innecesarias', dimension: 'cultura' },
+  { id: 4, texto: 'Solo asisten las personas imprescindibles para el tema tratado', dimension: 'eficiencia' },
   { id: 9, texto: 'La información importante se comparte por escrito, no solo en reuniones', dimension: 'cultura' },
+  { id: 5, texto: 'Antes de convocar una reunión, nos preguntamos si podría resolverse por email o chat', dimension: 'eficiencia' },
   { id: 10, texto: 'Los participantes preparan los temas antes de la reunión (no se improvisa)', dimension: 'cultura' },
 ];
 
@@ -292,9 +291,6 @@ export default function AuditoriaReunionesPage() {
             <div key={pregunta.id} className={styles.questionCard}>
               <div className={styles.questionHeader}>
                 <span className={styles.questionNumber}>{index + 1}</span>
-                <span className={`${styles.dimensionTag} ${styles[pregunta.dimension]}`}>
-                  {pregunta.dimension === 'eficiencia' ? '⚙️ Eficiencia' : '🌱 Cultura'}
-                </span>
               </div>
               <p className={styles.questionText}>{pregunta.texto}</p>
               <div className={styles.scaleContainer} role="radiogroup" aria-label={`Pregunta ${index + 1}: ${pregunta.texto}`}>
@@ -356,6 +352,11 @@ export default function AuditoriaReunionesPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span>⏰ Eficientes pero Obligatorias</span>
                 </div>
+                {/* Líneas de umbral */}
+                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
                 {/* Punto de posición */}
                 <div
                   className={styles.mapDot}
