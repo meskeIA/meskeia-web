@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 394,
+  "total_tools": 395,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1869,6 +1869,12 @@
           "slug": "diagnostico-brecha-ia",
           "url": "https://meskeia.com/diagnostico-brecha-ia/",
           "description": "¿Usas la IA para pensar mejor o para dejar de pensar? Test de 10 preguntas sobre criterio propio y aprovechamiento de la inteligencia artificial"
+        },
+        {
+          "name": "Evaluador de Prompts",
+          "slug": "evaluador-prompts",
+          "url": "https://meskeia.com/evaluador-prompts/",
+          "description": "¿Tus instrucciones a la IA son específicas o vagas? Test de 10 preguntas sobre prompt engineering y procesamiento crítico de respuestas"
         },
         {
           "name": "Planificador de Turnos",
