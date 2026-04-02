@@ -456,6 +456,7 @@ export const implementedAppsUrls = [
   "/diagnostico-explotacion-exploracion/", // Reflexión: explotación vs exploración (March, 1991) — 10 preguntas, perfil + acciones
   "/auditoria-reuniones/",               // Reflexión: auditoría de reuniones — eficiencia + cultura, 10 preguntas, perfil + acciones
   "/mapa-decisiones-urgentes-importantes/", // Reflexión: urgente vs importante (Eisenhower) — visión + filtro, 10 preguntas, perfil + acciones
+  "/test-delegacion-efectiva/",            // Reflexión: delegación efectiva (Hersey-Blanchard) — acompañamiento + autonomía, 10 preguntas, perfil + acciones
 ];
 
 /**
