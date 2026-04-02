@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 389,
+  "total_tools": 387,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -787,10 +787,10 @@
           "description": "Calcula el nuevo índice IRAV (contratos desde 26/05/2023) o IPC interanual (contratos anteriores) para actualizar la renta de alquiler según la Ley de Vivienda 12/2023."
         },
         {
-          "name": "Estimador Brecha de Jubilación",
-          "slug": "estimador-brecha-jubilacion",
-          "url": "https://meskeia.com/estimador-brecha-jubilacion/",
-          "description": "Calcula cuánto dinero perderás mensualmente al jubilarte respecto a tu sueldo actual"
+          "name": "Planificador de Ahorro para la Jubilación",
+          "slug": "planificador-ahorro-jubilacion",
+          "url": "https://meskeia.com/planificador-ahorro-jubilacion/",
+          "description": "Brecha entre sueldo y pensión, ahorro mensual necesario, ventaja fiscal del plan de pensiones y proyección de capital por escenarios."
         },
         {
           "name": "Estimador Cartera de Inversión",
@@ -857,12 +857,6 @@
           "slug": "estimador-inversiones",
           "url": "https://meskeia.com/estimador-inversiones/",
           "description": "Calcula y optimiza tu cartera de inversión según tu perfil de riesgo"
-        },
-        {
-          "name": "Estimador de Jubilación",
-          "slug": "estimador-jubilacion",
-          "url": "https://meskeia.com/estimador-jubilacion/",
-          "description": "Calcula cuánto necesitas ahorrar para tu jubilación con diferentes escenarios"
         },
         {
           "name": "Estimador Pensión de Viudedad",
@@ -947,12 +941,6 @@
           "slug": "orientador-alquiler-vs-compra",
           "url": "https://meskeia.com/orientador-alquiler-vs-compra/",
           "description": "Compara alquilar vs comprar vivienda en España. Análisis a 10, 20 y 30 años"
-        },
-        {
-          "name": "Orientador Plan de Pensiones",
-          "slug": "orientador-plan-pensiones",
-          "url": "https://meskeia.com/orientador-plan-pensiones/",
-          "description": "Descubre cuánto desgravas aportando a un plan de pensiones y el capital que acumularás"
         },
         {
           "name": "Orientador Seguro de Vida",

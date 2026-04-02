@@ -46,8 +46,7 @@ const estudiantesApps: RelatedApp[] = [
 const jubilacionApps: RelatedApp[] = [
   { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
   { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2025' },
-  { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
-  { url: '/orientador-plan-pensiones/', icon: '💼', name: 'Plan de Pensiones', description: 'Ahorro fiscal y pensión complementaria' },
+  { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro y plan de pensiones' },
   { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
 ];
 
@@ -83,8 +82,7 @@ const patrimonioPensionApps: RelatedApp[] = [
 const jubilacionFiscalApps: RelatedApp[] = [
   { url: '/optimizador-rentas-60/', icon: '📊', name: 'Optimizador de Rentas 60+', description: 'Estrategia IRPF: pensión + PP + ahorro' },
   { url: '/estimador-irpf-pensionista/', icon: '🧮', name: 'IRPF Pensionista', description: 'Cuota y retención sobre la pensión' },
-  { url: '/orientador-plan-pensiones/', icon: '📈', name: 'Plan de Pensiones', description: 'Desgravación y capital acumulado' },
-  { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Cuánto perderás respecto al sueldo' },
+  { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro, plan de pensiones' },
   { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
 ];
 
@@ -132,7 +130,7 @@ const finanzasPersonalesApps: RelatedApp[] = [
   { url: '/control-gastos/', icon: '💳', name: 'Control de Gastos', description: 'Gestiona tu presupuesto' },
   { url: '/calculadora-suscripciones/', icon: '📱', name: 'Control Suscripciones', description: 'Gastos recurrentes' },
   { url: '/calculadora-roommates/', icon: '🏘️', name: 'Gastos Compartidos', description: 'División justa' },
-  { url: '/estimador-jubilacion/', icon: '👴', name: 'Calculadora Jubilación', description: 'Planifica tu retiro' },
+  { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador Ahorro Jubilación', description: 'Brecha, ahorro y plan' },
   { url: '/estimador-fondo-emergencia/', icon: '🛡️', name: 'Fondo de Emergencia', description: 'Cuánto ahorrar' },
   { url: '/orientador-regla-50-30-20/', icon: '📊', name: 'Regla 50/30/20', description: 'Distribuye tu presupuesto' },
   { url: '/estimador-fire/', icon: '🔥', name: 'Estimador FIRE', description: 'Independencia financiera' },
@@ -536,7 +534,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'control-gastos': finanzasPersonalesApps.filter(a => a.url !== '/control-gastos/'),
   'calculadora-suscripciones': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-suscripciones/'),
   'calculadora-roommates': finanzasPersonalesApps.filter(a => a.url !== '/calculadora-roommates/'),
-  'calculadora-jubilacion': finanzasPersonalesApps.filter(a => a.url !== '/estimador-jubilacion/'),
+  'calculadora-jubilacion': finanzasPersonalesApps.filter(a => a.url !== '/planificador-ahorro-jubilacion/'),
   'calculadora-fondo-emergencia': finanzasPersonalesApps.filter(a => a.url !== '/estimador-fondo-emergencia/'),
   'calculadora-regla-50-30-20': finanzasPersonalesApps.filter(a => a.url !== '/orientador-regla-50-30-20/'),
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
@@ -1324,12 +1322,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/simulador-jubilacion-publica/'),
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
   ],
-  'estimador-brecha-jubilacion': [
-    ...jubilacionApps.filter(a => a.url !== '/estimador-brecha-jubilacion/'),
+  'planificador-ahorro-jubilacion': [
+    ...jubilacionApps.filter(a => a.url !== '/planificador-ahorro-jubilacion/'),
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
-  ],
-  'orientador-plan-pensiones': [
-    ...jubilacionApps.filter(a => a.url !== '/orientador-plan-pensiones/').slice(0, 4),
   ],
   'estimador-irpf-pensionista': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-irpf-pensionista/').slice(0, 4),

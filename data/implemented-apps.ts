@@ -19,8 +19,7 @@ export const implementedAppsUrls = [
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
   "/orientador-deduccion-obras-energeticas/", // Orientador deducciones IRPF 20/40/60% por obras mejora energética vivienda
   "/simulador-jubilacion-publica/",     // Simulador completo: edad, pensión, anticipada y parcial (unifica 4 apps)
-  "/estimador-brecha-jubilacion/",      // Brecha pensión-sueldo: cuánto perderás y ahorro mensual necesario
-  "/orientador-plan-pensiones/",        // Plan de pensiones: desgravación IRPF, capital acumulado, pensión complementaria
+  "/planificador-ahorro-jubilacion/",    // Planificador completo: brecha, ahorro, plan pensiones y proyección (unifica 3 apps)
   "/estimador-irpf-pensionista/",       // IRPF pensionista: reducción RRT, mínimo personal edad, pensión neta mensual
   "/adaptacion-hogar/",                 // Checklist adaptaciones del hogar: costes, prioridades y ayudas públicas
   "/residencia-vs-cuidado-en-casa/",    // Comparativa costes residencia / SAD / cuidador en casa
@@ -48,7 +47,6 @@ export const implementedAppsUrls = [
   "/estimador-costas-judiciales/",        // Estimador costas judiciales: abogado, procurador, tasas, peritos
   "/estimador-costes-divorcio/",          // Estimador costes divorcio: mutuo acuerdo vs contencioso
   "/orientador-justicia-gratuita/",       // Orientador justicia gratuita: requisitos IPREM, prestaciones
-  "/estimador-jubilacion/",
   "/estimador-inversiones/",
   "/test-perfil-inversor/",
   "/estimador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
