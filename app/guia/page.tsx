@@ -22,6 +22,14 @@ const guias = [
     tools: 4,
   },
   {
+    slug: 'jubilacion',
+    icon: '🏤',
+    title: 'Planificar la Jubilación',
+    description:
+      'Pensión pública, brecha de ingresos, ahorro complementario, plan de pensiones, IRPF como pensionista y protección familiar. El journey completo.',
+    tools: 6,
+  },
+  {
     slug: 'freelance',
     icon: '💼',
     title: 'Freelance en España',

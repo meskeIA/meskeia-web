@@ -22,16 +22,14 @@ const APP_META = {
   'estimador-impuesto-sucesiones':    'FISCAL_SUCESIONES_META',
   'estimador-irpf':                   'FISCAL_IRPF_META',
   'estimador-irpf-pensionista':       'FISCAL_IRPF_META',
-  'estimador-pension-publica':        'FISCAL_PENSIONES_META',
   'estimador-pension-viudedad':       'FISCAL_PENSIONES_META',
   'estimador-plusvalia-municipal':    'PLUSVALIA_MUNICIPAL_META',
   'estimador-plusvalias-irpf':        'FISCAL_INMUEBLES_META',
   'estimador-sueldo-neto':            'FISCAL_IRPF_META',
   'optimizador-rentas-60':            'FISCAL_IRPF_META',
   'orientador-intereses-demora':      'FISCAL_INTERESES_META',
-  'orientador-jubilacion-anticipada': 'FISCAL_PENSIONES_META',
-  'orientador-jubilacion-parcial':    'JUBILACION_PARCIAL_META',
-  'orientador-plan-pensiones':        'FISCAL_PLAN_PENSIONES_META',
+  'simulador-jubilacion-publica':     'FISCAL_PENSIONES_META',
+  'planificador-ahorro-jubilacion':   'FISCAL_PLAN_PENSIONES_META',
   'requisitos-nomada-digital':        'NOMADA_DIGITAL_META',
 };
 
