@@ -62,6 +62,76 @@ Cada app de reflexión sigue esta estructura:
 
 **Tiempo estimado de uso**: 3-5 minutos (deliberadamente breve — la reflexión sigue después)
 
+### Decisiones de diseño validadas (2026-04-02)
+
+Tras revisión de las dos primeras apps implementadas, se fijaron estas reglas para todas las apps de reflexión:
+
+#### 1. Preguntas intercaladas (OBLIGATORIO)
+
+Las preguntas de cada dimensión se intercalan en patrón ABABABABAB, **nunca agrupadas** (AAAAABBBBB).
+
+```typescript
+// ✅ CORRECTO — intercaladas
+const PREGUNTAS = [
+  { id: 1, dimension: 'A' },
+  { id: 6, dimension: 'B' },
+  { id: 2, dimension: 'A' },
+  { id: 7, dimension: 'B' },
+  // ...
+];
+
+// ❌ INCORRECTO — agrupadas por dimensión
+const PREGUNTAS = [
+  { id: 1, dimension: 'A' },
+  { id: 2, dimension: 'A' },
+  // ... todas las A, luego todas las B
+];
+```
+
+**Razón**: Agrupar por dimensión permite al usuario detectar el patrón y ajustar inconscientemente sus respuestas (sesgo por agrupación).
+
+#### 2. Sin etiquetas de dimensión durante las preguntas (OBLIGATORIO)
+
+Las etiquetas de dimensión (ej. "⚙️ Eficiencia", "🌱 Cultura") **NO se muestran** junto a cada pregunta. Solo aparecen en la sección de resultado (barras de puntuación y mapa 2D).
+
+```tsx
+// ✅ CORRECTO — solo número de pregunta
+<div className={styles.questionHeader}>
+  <span className={styles.questionNumber}>{index + 1}</span>
+</div>
+
+// ❌ INCORRECTO — etiqueta de dimensión visible
+<div className={styles.questionHeader}>
+  <span className={styles.questionNumber}>{index + 1}</span>
+  <span className={styles.dimensionTag}>⚙️ Eficiencia</span>
+</div>
+```
+
+**Razón**: Ciertas dimensiones tienen connotaciones más positivas que otras (ej. "Exploración" suena más moderno que "Explotación", "Cultura" suena más deseable que "Eficiencia"). Mostrarlas sesga las respuestas.
+
+#### 3. Líneas de umbral en el mapa 2D (OBLIGATORIO)
+
+El mapa bidimensional incluye **líneas discontinuas** en las posiciones de los umbrales de scoring, para que el usuario vea las fronteras entre perfiles.
+
+```
+Umbral bajo (14/25) → posición 45% del eje
+Umbral alto (18/25) → posición 65% del eje
+```
+
+Se añaden 4 líneas: 2 verticales (eje X) + 2 horizontales (eje Y), con estilo `dashed`, opacidad sutil (15%), y soporte dark mode.
+
+**Razón**: Sin las líneas, el usuario ve su punto en el mapa pero no sabe a qué distancia está de cambiar de perfil. Las líneas convierten los 4 cuadrantes visuales en las 9 zonas reales del scoring.
+
+### Patrón técnico de referencia
+
+Las dos apps implementadas sirven como plantilla exacta:
+
+- **Estructura TSX**: `diagnostico-explotacion-exploracion/page.tsx`
+- **Estructura CSS**: `diagnostico-explotacion-exploracion/DiagnosticoExplotacionExploracion.module.css`
+- **Scoring**: 2 dimensiones × 5 preguntas × escala 1-5 = 0-25 por dimensión
+- **Perfiles**: 6 (4 extremos + 2 intermedios), cada uno con fortalezas/riesgos/acciones
+- **Umbrales**: 18 (alto) y 14 (bajo) sobre 25
+
 ---
 
 ## Catálogo de ideas
@@ -158,24 +228,27 @@ Nivel **4 INFORMATIVO** para la mayoría. Nivel **3 MEDIO** si tocan salud menta
 
 ### Diferenciación técnica
 
-Estas apps usan `'use client'` como todas, pero tienen una estructura de datos particular:
+Estas apps usan `'use client'` como todas, con esta estructura de datos:
 
 ```typescript
-interface PreguntaReflexion {
-  id: string;
+interface Pregunta {
+  id: number;
   texto: string;
-  tipo: 'escala' | 'si-no' | 'multiple';
-  opciones?: string[];
-  categoria: string;  // Para agrupar en el resultado
+  dimension: 'dimensionA' | 'dimensionB';  // Nombre específico por app
 }
 
-interface ResultadoReflexion {
-  perfil: string;           // Nombre del perfil resultante
-  descripcion: string;      // Interpretación personalizada
-  puntuacion: number[];     // Para gráfico radar
-  acciones: string[];       // Sugerencias concretas
+interface Perfil {
+  nombre: string;
+  emoji: string;
+  descripcion: string;
+  fortalezas: string[];
+  riesgos: string[];
+  acciones: string[];
 }
 ```
+
+**Estado**: `respuestas` (Record<number, number>) + `mostrarResultado` (boolean).
+**Componentes obligatorios**: MeskeiaLogo, LegalNotice, EducationalSection, RelatedApps, ShareCard, Footer.
 
 ---
 
@@ -212,10 +285,11 @@ interface ResultadoReflexion {
 ## Próximos pasos
 
 1. ✅ Documento de criterios creado (este archivo)
-2. [ ] Revisar y priorizar con el usuario
-3. [ ] Diseñar la primera app como prototipo de formato
-4. [ ] Validar que el formato funciona (build + revisión visual)
-5. [ ] Si funciona, producir Ola 1 completa
+2. ✅ Primera app implementada: Diagnóstico Explotación vs Exploración (commit 41199eb)
+3. ✅ Segunda app implementada: Auditoría de Reuniones (commit 6ac308e)
+4. ✅ Revisión de calidad + decisiones de diseño fijadas (commit e80f6ff)
+5. [ ] Continuar Ola 1: Diagnóstico de brecha IA, Detector de sesgos cognitivos
+6. [ ] Si funciona, producir Ola 2
 
 ---
 

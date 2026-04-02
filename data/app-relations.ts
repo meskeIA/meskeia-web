@@ -813,6 +813,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'planificador-turnos': productividadApps.filter(a => a.url !== '/planificador-turnos/'),
   'diagnostico-explotacion-exploracion': [...productividadApps.slice(0, 3), ...freelanceApps.slice(0, 1)],
   'auditoria-reuniones': [...productividadApps.slice(0, 3), ...freelanceApps.slice(0, 1)],
+  'mapa-decisiones-urgentes-importantes': [...productividadApps.slice(0, 3), ...freelanceApps.slice(0, 1)],
   'cronometro': productividadApps,
   'guia-seguro-viaje': viajesApps.filter(a => a.url !== '/guia-seguro-viaje/').slice(0, 4),
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/').slice(0, 4),
