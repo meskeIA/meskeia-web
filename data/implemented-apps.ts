@@ -18,13 +18,10 @@ export const implementedAppsUrls = [
   "/estimador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
   "/orientador-deduccion-obras-energeticas/", // Orientador deducciones IRPF 20/40/60% por obras mejora energética vivienda
-  "/orientador-edad-jubilacion/",       // Orientador edad jubilación: tabla por año nacimiento 2024-2027, cotización para 65
-  "/estimador-pension-publica/",        // Estimador pensión SS: sistema dual 2026, base reguladora, % por años
+  "/simulador-jubilacion-publica/",     // Simulador completo: edad, pensión, anticipada y parcial (unifica 4 apps)
   "/estimador-brecha-jubilacion/",      // Brecha pensión-sueldo: cuánto perderás y ahorro mensual necesario
-  "/orientador-jubilacion-anticipada/", // Jubilación anticipada: requisitos, coeficientes reductores SS 2025
   "/orientador-plan-pensiones/",        // Plan de pensiones: desgravación IRPF, capital acumulado, pensión complementaria
   "/estimador-irpf-pensionista/",       // IRPF pensionista: reducción RRT, mínimo personal edad, pensión neta mensual
-  "/orientador-jubilacion-parcial/",    // Jubilación parcial: contrato relevo, pensión parcial + salario combinados
   "/adaptacion-hogar/",                 // Checklist adaptaciones del hogar: costes, prioridades y ayudas públicas
   "/residencia-vs-cuidado-en-casa/",    // Comparativa costes residencia / SAD / cuidador en casa
   "/estimador-riesgo-osteoporosis/",    // Test validado (FRAX/IOF) de riesgo de osteoporosis

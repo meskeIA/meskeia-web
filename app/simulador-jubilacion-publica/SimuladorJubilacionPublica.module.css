@@ -1,0 +1,577 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Simulador de Jubilaci\u00f3n P\u00fablica — CSS Module (meskeIA)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --warning: #E67E22;
+  --success: #27AE60;
+  --danger: #E74C3C;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  text-align: center;
+  margin: 80px 0 var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.title { font-size: 2rem; font-weight: 700; margin: 0 0 0.5rem; }
+.subtitle { font-size: 1.1rem; opacity: 0.9; margin: 0; }
+
+/* ─── Cards ────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border);
+}
+
+/* ─── Formulario ───────────────────────────────────────────────────────── */
+
+.formGroup { margin-bottom: var(--spacing-lg); }
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  appearance: none;
+}
+.select:focus { outline: none; border-color: var(--primary); }
+
+.hint { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+.btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: var(--spacing-md);
+  transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.9; }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.errorMsg {
+  color: #c0392b;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.infoSS {
+  margin-top: var(--spacing-md);
+  padding: 0.75rem 1rem;
+  background: #e8f4f8;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: #1A5276;
+}
+[data-theme='dark'] .infoSS { background: #1a3a4a; color: #90CAF9; }
+
+/* ─── Secci\u00f3n de resultado (edad) ──────────────────────────────────────── */
+
+.resultAge {
+  text-align: center;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary)15, var(--secondary)15);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-large);
+  margin-bottom: var(--spacing-lg);
+}
+
+.resultAgeNumber {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.resultAgeYear {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.resultAgeDetail {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.resultAgeAlt {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+/* ─── Resultados (pensi\u00f3n) ─────────────────────────────────────────────── */
+
+.resultados { display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+.resultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resultItemHighlight {
+  background: linear-gradient(135deg, var(--primary)15, var(--secondary)15);
+  border-color: var(--primary);
+  padding: 1rem;
+}
+
+.resultLabel { color: var(--text-secondary); font-size: 0.9rem; }
+.resultValue { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+.resultValueBig { font-weight: 700; color: var(--primary); font-size: 1.4rem; }
+.resultValueDanger { font-weight: 700; color: var(--danger); font-size: 1.1rem; }
+.resultValueWarning { font-weight: 700; color: var(--warning); font-size: 1.1rem; }
+.resultValuePositive { font-weight: 700; color: var(--success); font-size: 1.1rem; }
+.resultNote { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* ─── Barra de progreso ────────────────────────────────────────────────── */
+
+.barraProgreso {
+  margin-top: var(--spacing-md);
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.barraLabel {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.barra {
+  height: 12px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.barraFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+/* ─── Status (anticipada/parcial) ──────────────────────────────────────── */
+
+.statusOk {
+  padding: 1rem;
+  background: #f0faf0;
+  border: 2px solid var(--success);
+  border-radius: var(--radius);
+  color: var(--success);
+  font-weight: 700;
+  text-align: center;
+}
+.statusNok {
+  padding: 1rem;
+  background: #fdf2f2;
+  border: 2px solid var(--danger);
+  border-radius: var(--radius);
+  color: var(--danger);
+  font-weight: 700;
+  text-align: center;
+}
+[data-theme='dark'] .statusOk { background: #1a3a1a; }
+[data-theme='dark'] .statusNok { background: #3a1a1a; }
+
+.smallNormal { font-weight: normal; }
+
+.requisitosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: var(--spacing-md);
+}
+
+.requisitoItem {
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.requisitoOk { background: #f0faf0; color: #27AE60; border: 1px solid #27AE60; }
+.requisitoNok { background: #fdf2f2; color: #E74C3C; border: 1px solid #E74C3C; }
+[data-theme='dark'] .requisitoOk { background: #1a3a1a; }
+[data-theme='dark'] .requisitoNok { background: #3a1a1a; }
+
+/* ─── Toggle sections ──────────────────────────────────────────────────── */
+
+.toggleSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.toggleHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+.toggleHeader:hover { border-color: var(--primary); }
+.toggleHeader:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.toggleHeaderActive {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary)08, var(--secondary)08);
+}
+
+.toggleIcon { font-size: 1.5rem; flex-shrink: 0; }
+.toggleInfo { flex: 1; }
+.toggleTitle { font-weight: 700; font-size: 1rem; display: block; }
+.toggleSubtitle { font-size: 0.85rem; color: var(--text-secondary); display: block; margin-top: 0.15rem; }
+.toggleArrow { font-size: 1.2rem; color: var(--text-secondary); transition: transform 0.2s; }
+.toggleArrowOpen { transform: rotate(180deg); }
+
+.toggleContent {
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-large) var(--radius-large);
+  background: var(--bg-card);
+  margin-top: -8px;
+}
+
+/* ─── Comparativa parcial ──────────────────────────────────────────────── */
+
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: var(--spacing-md);
+}
+
+.comparativaItem {
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.comparativaHighlight {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary)10, var(--secondary)10);
+}
+
+.comparativaLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.comparativaValue {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+/* ─── Tabla edad jubilaci\u00f3n ──────────────────────────────────────────────── */
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.tabla th {
+  background: var(--primary);
+  color: white;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.tabla tr:nth-child(even) td { background: var(--hover); }
+
+.tablaHighlight td {
+  background: rgba(46, 134, 171, 0.1) !important;
+  font-weight: 600;
+}
+
+/* ─── Tip box ──────────────────────────────────────────────────────────── */
+
+.tipBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+[data-theme='dark'] .tipBox { background: rgba(46, 134, 171, 0.15); }
+.tipBox p { color: var(--text-primary); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+.tipBox strong { color: var(--primary); }
+
+/* ─── Profesionalizaci\u00f3n v2.0 ──────────────────────────────────────────── */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+[data-theme='dark'] .tableWrapper { border-color: #374151; }
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-primary);
+}
+.comparativaTable tr:last-child td { border-bottom: none; }
+.comparativaTable tr:nth-child(even) td { background: #f9fafb; }
+[data-theme='dark'] .comparativaTable td { border-color: #374151; }
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: #1f2937; }
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.25rem;
+  border-left: 4px solid var(--primary);
+}
+[data-theme='dark'] .escenarioCard { border-color: #374151; border-left-color: var(--primary); }
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.escenarioHeader strong { color: var(--text-primary); font-size: 0.95rem; }
+.escenarioIcon { font-size: 1.5rem; }
+.escenarioExample { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-style: italic; }
+.escenarioTip { font-size: 0.875rem; color: var(--text-primary); margin: 0; }
+
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+[data-theme='dark'] .faqItem { border-color: #374151; }
+.faqItem strong { display: block; color: var(--primary); font-size: 0.95rem; margin-bottom: 0.5rem; }
+.faqItem p { font-size: 0.875rem; color: var(--text-primary); margin: 0.25rem 0 0; }
+
+.faqTip {
+  font-size: 0.8rem !important;
+  color: var(--secondary) !important;
+  font-style: italic;
+  margin-top: 0.5rem !important;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.step { display: flex; gap: 1rem; align-items: flex-start; }
+.stepNumber {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.stepContent { flex: 1; }
+.stepContent strong { display: block; color: var(--text-primary); font-size: 0.95rem; margin-bottom: 0.25rem; }
+.stepContent p { font-size: 0.875rem; color: var(--text-secondary); margin: 0; }
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+}
+[data-theme='dark'] .tipCard { border-color: #374151; }
+.tipCard strong { display: block; color: var(--text-primary); font-size: 0.9rem; margin: 0.5rem 0 0.25rem; }
+.tipCard p { font-size: 0.8rem; color: var(--text-secondary); margin: 0; }
+.tipCardIcon { font-size: 1.75rem; }
+
+.warningBox {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+[data-theme='dark'] .warningBox { background: #1c1007; border-color: #92400e; }
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.warningHeader strong { color: #92400e; font-size: 1rem; }
+[data-theme='dark'] .warningHeader strong { color: #fb923c; }
+.warningIcon { font-size: 1.5rem; }
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.warningList li {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  border-left: 3px solid #f97316;
+  padding-left: 0.75rem;
+}
+.warningList li strong { color: #c2410c; }
+[data-theme='dark'] .warningList li strong { color: #fb923c; }
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.5rem; }
+  .resultAgeNumber { font-size: 2rem; }
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: 1fr; }
+  .requisitosGrid { grid-template-columns: 1fr; }
+  .comparativaGrid { grid-template-columns: 1fr; }
+}

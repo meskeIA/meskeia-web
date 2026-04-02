@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 392,
+  "total_tools": 389,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -751,10 +751,10 @@
           "description": "Oriéntate sobre las 3 deducciones IRPF por obras de mejora energética: 20% (demanda), 40% (consumo) y 60% (edificio). Requisitos, plazos y estimación del ahorro fiscal."
         },
         {
-          "name": "Orientador Edad de Jubilación",
-          "slug": "orientador-edad-jubilacion",
-          "url": "https://meskeia.com/orientador-edad-jubilacion/",
-          "description": "Descubre a qué edad puedes jubilarte según tu año de nacimiento y años cotizados. Tabla progresiva 2024-2027 con efecto de cotización larga para jubilarse a los 65."
+          "name": "Simulador de Jubilación Pública",
+          "slug": "simulador-jubilacion-publica",
+          "url": "https://meskeia.com/simulador-jubilacion-publica/",
+          "description": "Simulador completo de jubilación pública: edad de jubilación, pensión estimada (sistema dual 2026), jubilación anticipada con coeficientes reductores y jubilación parcial."
         },
         {
           "name": "Orientador Alquiler por Habitaciones",
@@ -865,12 +865,6 @@
           "description": "Calcula cuánto necesitas ahorrar para tu jubilación con diferentes escenarios"
         },
         {
-          "name": "Estimador Pensión Pública",
-          "slug": "estimador-pension-publica",
-          "url": "https://meskeia.com/estimador-pension-publica/",
-          "description": "Estima orientativamente tu pensión pública de jubilación según años cotizados y base reguladora"
-        },
-        {
           "name": "Estimador Pensión de Viudedad",
           "slug": "estimador-pension-viudedad",
           "url": "https://meskeia.com/estimador-pension-viudedad/",
@@ -977,18 +971,6 @@
           "slug": "optimizador-rentas-60",
           "url": "https://meskeia.com/optimizador-rentas-60/",
           "description": "Planifica el orden óptimo de retirada de fondos para pensionistas: IRPF, plan de pensiones"
-        },
-        {
-          "name": "Orientador Jubilación Anticipada",
-          "slug": "orientador-jubilacion-anticipada",
-          "url": "https://meskeia.com/orientador-jubilacion-anticipada/",
-          "description": "Descubre si puedes jubilarte antes, cuánto se reduciría tu pensión y los requisitos SS"
-        },
-        {
-          "name": "Orientador Jubilación Parcial",
-          "slug": "orientador-jubilacion-parcial",
-          "url": "https://meskeia.com/orientador-jubilacion-parcial/",
-          "description": "Descubre si cumples los requisitos para jubilación parcial y cuánto cobrarás de pensión"
         },
         {
           "name": "Estimador TIR y VAN",

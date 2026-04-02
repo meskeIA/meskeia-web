@@ -44,13 +44,11 @@ const estudiantesApps: RelatedApp[] = [
 // FAMILIA: JUBILACIÓN Y PATRIMONIO
 // ==========================================
 const jubilacionApps: RelatedApp[] = [
-  { url: '/estimador-pension-publica/', icon: '🌅', name: 'Estimador de Pensión Pública', description: 'Cuánto cobrarás al jubilarte' },
+  { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
   { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2025' },
   { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
-  { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: '¿Puedes jubilarte antes?' },
   { url: '/orientador-plan-pensiones/', icon: '💼', name: 'Plan de Pensiones', description: 'Ahorro fiscal y pensión complementaria' },
   { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
-  { url: '/orientador-jubilacion-parcial/', icon: '⚖️', name: 'Jubilación Parcial', description: 'Trabaja y cobra pensión a la vez' },
 ];
 
 // ==========================================
@@ -87,7 +85,7 @@ const jubilacionFiscalApps: RelatedApp[] = [
   { url: '/estimador-irpf-pensionista/', icon: '🧮', name: 'IRPF Pensionista', description: 'Cuota y retención sobre la pensión' },
   { url: '/orientador-plan-pensiones/', icon: '📈', name: 'Plan de Pensiones', description: 'Desgravación y capital acumulado' },
   { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Cuánto perderás respecto al sueldo' },
-  { url: '/estimador-pension-publica/', icon: '🏛️', name: 'Pensión Pública', description: 'Base reguladora y % por años cotizados' },
+  { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
 ];
 
 // ==========================================
@@ -1322,31 +1320,19 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // JUBILACIÓN Y PATRIMONIO
-  'orientador-edad-jubilacion': [
-    { url: '/estimador-pension-publica/', icon: '🌅', name: 'Estimador Pensión Pública', description: 'Cuánto cobrarás con sistema dual 2026' },
-    { url: '/estimador-brecha-jubilacion/', icon: '📉', name: 'Brecha de Jubilación', description: 'Lo que perderás al jubilarte' },
-    { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: '¿Puedes jubilarte antes?' },
-    { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagarás de renta' },
-  ],
-  'estimador-pension-publica': [
-    { url: '/orientador-edad-jubilacion/', icon: '📅', name: '¿Cuándo me jubilo?', description: 'Edad por año de nacimiento' },
-    ...jubilacionApps.filter(a => a.url !== '/estimador-pension-publica/' && a.url !== '/orientador-edad-jubilacion/').slice(0, 3),
+  'simulador-jubilacion-publica': [
+    ...jubilacionApps.filter(a => a.url !== '/simulador-jubilacion-publica/'),
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
   ],
   'estimador-brecha-jubilacion': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-brecha-jubilacion/'),
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Qué pagarás de renta' },
-  ],
-  'orientador-jubilacion-anticipada': [
-    ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-anticipada/').slice(0, 4),
   ],
   'orientador-plan-pensiones': [
     ...jubilacionApps.filter(a => a.url !== '/orientador-plan-pensiones/').slice(0, 4),
   ],
   'estimador-irpf-pensionista': [
     ...jubilacionApps.filter(a => a.url !== '/estimador-irpf-pensionista/').slice(0, 4),
-  ],
-  'orientador-jubilacion-parcial': [
-    ...jubilacionApps.filter(a => a.url !== '/orientador-jubilacion-parcial/').slice(0, 4),
   ],
   'adaptacion-hogar': [
     ...saludMayoresApps.filter(a => a.url !== '/adaptacion-hogar/'),
@@ -1444,7 +1430,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'orientador-tipo-oposicion': [
     { url: '/planificador-estudio-oposiciones/', icon: '📅', name: 'Planificador de Estudio', description: 'Organiza tu temario en semanas' },
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Calcula tu sueldo neto como funcionario' },
-    { url: '/orientador-jubilacion-anticipada/', icon: '⏩', name: 'Jubilación Anticipada', description: 'Planifica tu carrera pública' },
+    { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación', description: 'Planifica tu carrera pública' },
   ],
   'simulador-paga-ahorro': [
     { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Calcula cuándo alcanzarás tu objetivo' },
