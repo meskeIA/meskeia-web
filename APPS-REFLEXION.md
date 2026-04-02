@@ -254,20 +254,37 @@ interface Perfil {
 
 ## Prioridad sugerida (por impacto + viabilidad)
 
-### Ola 1 — Prueba de concepto (3 apps)
-1. **Diagnóstico explotación vs exploración** — directamente del artículo, muy tangible
-2. **Diagnóstico de brecha IA** — tema actual, diferenciador fuerte
-3. **Detector de sesgos cognitivos** — universal, alta demanda potencial
+### Implementado — Categoría 1: Empresa y Management (6/6 ✅)
 
-### Ola 2 — Si funciona (5 apps)
-4. Test de ritmo vital
-5. Mapa de decisiones urgentes vs importantes
-6. Diagnóstico de estancamiento profesional
-7. Test de validación de idea
-8. Checklist pre-mortem
+| # | App | Dimensiones | Commit |
+|---|-----|-------------|--------|
+| 1 | Diagnóstico Explotación vs Exploración | explotacion / exploracion | 41199eb |
+| 2 | Auditoría de Reuniones | eficiencia / cultura | 6ac308e |
+| 3 | Mapa Decisiones Urgentes vs Importantes | vision / filtro | 6e73ea4 |
+| 4 | Test de Delegación Efectiva | acompanamiento / autonomia | 2b69845 |
+| 5 | Diagnóstico de Comunicación Interna | velocidad / profundidad | d2afa04 |
+| 6 | Checklist Pre-Mortem | anticipacion / accion | 2bd5659 |
 
-### Ola 3 — Expansión
-9-26. Resto del catálogo según datos de uso
+### Implementado — Categoría 2: Uso Inteligente de IA (4/4 ✅)
+
+| # | App | Dimensiones | Commit |
+|---|-----|-------------|--------|
+| 7 | Diagnóstico de Brecha IA | criterio / aprovechamiento | 0741282 |
+| 8 | Evaluador de Prompts | entrada / salida | eeae92a |
+| 9 | Test de Dependencia Tecnológica | autonomia / adaptabilidad | d7113eb |
+| 10 | Mapa de Automatización Personal | automatizacion / proteccion | b4c1fa1 |
+
+### Pendiente — Categoría 3: Carrera Profesional (0/4)
+11-14. Estancamiento profesional, Dependencia clientes, Habilidades vs mercado, Síndrome impostor
+
+### Pendiente — Categoría 4: Productividad y Ritmo Vital (0/4)
+15-18. Ritmo vital, Energía semanal, Multitarea, Compromisos vs capacidad
+
+### Pendiente — Categoría 5: Pensamiento Crítico y Decisiones (0/4)
+19-22. Sesgos cognitivos, Decisión reversible/irreversible, Pensamiento de grupo, Segunda opinión
+
+### Pendiente — Categoría 6: Emprendimiento y Negocio (0/4)
+23-26. Modelo de negocio, Validación de idea, Riesgo emprendedor, Propuesta de valor
 
 ---
 
@@ -285,12 +302,16 @@ interface Perfil {
 ## Próximos pasos
 
 1. ✅ Documento de criterios creado (este archivo)
-2. ✅ Primera app implementada: Diagnóstico Explotación vs Exploración (commit 41199eb)
-3. ✅ Segunda app implementada: Auditoría de Reuniones (commit 6ac308e)
-4. ✅ Revisión de calidad + decisiones de diseño fijadas (commit e80f6ff)
-5. [ ] Continuar Ola 1: Diagnóstico de brecha IA, Detector de sesgos cognitivos
-6. [ ] Si funciona, producir Ola 2
+2. ✅ Patrón validado con 2 apps + revisión de diseño (preguntas intercaladas, sin etiquetas, líneas umbral)
+3. ✅ Categoría 1 completa: 6/6 apps de Empresa y Management
+4. ✅ Categoría 2 completa: 4/4 apps de Uso Inteligente de IA
+5. [ ] Categoría 3: Carrera Profesional (4 apps)
+6. [ ] Categoría 4: Productividad y Ritmo Vital (4 apps)
+7. [ ] Categoría 5: Pensamiento Crítico y Decisiones (4 apps)
+8. [ ] Categoría 6: Emprendimiento y Negocio (4 apps)
 
 ---
 
 **Última actualización**: 2026-04-02
+**Apps implementadas**: 10/26
+**Categorías completas**: 2/6
