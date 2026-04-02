@@ -459,6 +459,7 @@ export const implementedAppsUrls = [
   "/test-delegacion-efectiva/",            // Reflexión: delegación efectiva (Hersey-Blanchard) — acompañamiento + autonomía, 10 preguntas, perfil + acciones
   "/diagnostico-comunicacion-interna/",    // Reflexión: comunicación interna — velocidad + profundidad, 10 preguntas, perfil + acciones
   "/checklist-pre-mortem/",                // Reflexión: pre-mortem (Gary Klein) — anticipación + acción, 10 preguntas, perfil + acciones
+  "/diagnostico-brecha-ia/",               // Reflexión: brecha IA — criterio propio + aprovechamiento IA, 10 preguntas, perfil + acciones
 ];
 
 /**
