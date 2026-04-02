@@ -98,6 +98,15 @@ const guidesData = [
     toolsCount: 4,
     available: true,
   },
+  {
+    id: 'jubilacion',
+    name: 'Guía para Planificar la Jubilación',
+    icon: '🏤',
+    description: 'Pensión pública, brecha de ingresos, ahorro complementario, plan de pensiones e IRPF como pensionista',
+    url: '/guia/jubilacion/',
+    toolsCount: 6,
+    available: true,
+  },
 ];
 
 function HomeContent() {
