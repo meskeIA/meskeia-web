@@ -836,6 +836,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'diagnostico-modelo-negocio': [...freelanceApps.slice(0, 3), ...productividadApps.slice(0, 1)],
   'test-validacion-idea': [...freelanceApps.slice(0, 3), ...productividadApps.slice(0, 1)],
   'mapa-riesgo-emprendedor': [...freelanceApps.slice(0, 3), ...productividadApps.slice(0, 1)],
+  'auditoria-propuesta-valor': [...freelanceApps.slice(0, 3), ...productividadApps.slice(0, 1)],
   'cronometro': productividadApps,
   'guia-seguro-viaje': viajesApps.filter(a => a.url !== '/guia-seguro-viaje/').slice(0, 4),
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/').slice(0, 4),

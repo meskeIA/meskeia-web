@@ -478,6 +478,7 @@ export const implementedAppsUrls = [
   "/diagnostico-modelo-negocio/",          // Reflexión: modelo negocio — propuesta + sostenibilidad (BMC), 10 preguntas, perfil + acciones
   "/test-validacion-idea/",                // Reflexión: validación idea — asunción + validación (Lean Startup), 10 preguntas, perfil + acciones
   "/mapa-riesgo-emprendedor/",             // Reflexión: riesgo emprendedor — exposición + preparación, 10 preguntas, perfil + acciones
+  "/auditoria-propuesta-valor/",           // Reflexión: propuesta de valor — encaje + comunicación (Osterwalder), 10 preguntas, perfil + acciones
 ];
 
 /**
