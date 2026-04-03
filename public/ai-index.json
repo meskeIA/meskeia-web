@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 401,
+  "total_tools": 402,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1911,6 +1911,12 @@
           "slug": "test-sindrome-impostor",
           "url": "https://meskeia.com/test-sindrome-impostor/",
           "description": "¿Subestimas tu competencia real? Test de 10 preguntas basado en la Escala de Clance adaptada"
+        },
+        {
+          "name": "Test de Ritmo Vital",
+          "slug": "test-ritmo-vital",
+          "url": "https://meskeia.com/test-ritmo-vital/",
+          "description": "¿Vives en modo urgencia permanente? Test de 10 preguntas sobre urgencia y presencia vital"
         },
         {
           "name": "Planificador de Turnos",

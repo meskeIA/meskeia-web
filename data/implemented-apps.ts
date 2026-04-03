@@ -467,6 +467,7 @@ export const implementedAppsUrls = [
   "/mapa-dependencia-clientes/",            // Reflexión: dependencia clientes — concentración + diversificación, 10 preguntas, perfil + acciones
   "/auditoria-habilidades-mercado/",       // Reflexión: habilidades vs mercado — relevancia + actualización, 10 preguntas, perfil + acciones
   "/test-sindrome-impostor/",              // Reflexión: síndrome del impostor — autoexigencia + reconocimiento (Clance), 10 preguntas, perfil + acciones
+  "/test-ritmo-vital/",                    // Reflexión: ritmo vital — urgencia + presencia (kletskassa), 10 preguntas, perfil + acciones
 ];
 
 /**
