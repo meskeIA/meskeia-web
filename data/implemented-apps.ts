@@ -476,6 +476,7 @@ export const implementedAppsUrls = [
   "/test-pensamiento-grupo/",              // Reflexión: pensamiento de grupo — conformidad + disidencia (Janis), 10 preguntas, perfil + acciones
   "/checklist-segunda-opinion/",           // Reflexión: segunda opinión — certeza + cuestionamiento (red team), 10 preguntas, perfil + acciones
   "/diagnostico-modelo-negocio/",          // Reflexión: modelo negocio — propuesta + sostenibilidad (BMC), 10 preguntas, perfil + acciones
+  "/test-validacion-idea/",                // Reflexión: validación idea — asunción + validación (Lean Startup), 10 preguntas, perfil + acciones
 ];
 
 /**

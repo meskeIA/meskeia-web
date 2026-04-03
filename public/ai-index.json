@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 410,
+  "total_tools": 411,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1965,6 +1965,12 @@
           "slug": "diagnostico-modelo-negocio",
           "url": "https://meskeia.com/diagnostico-modelo-negocio/",
           "description": "¿Los pilares de tu negocio están equilibrados? Test basado en el Business Model Canvas"
+        },
+        {
+          "name": "Test de Validación de Idea",
+          "slug": "test-validacion-idea",
+          "url": "https://meskeia.com/test-validacion-idea/",
+          "description": "¿Tu idea resuelve un problema real? Test basado en Lean Startup (Eric Ries)"
         },
         {
           "name": "Planificador de Turnos",
