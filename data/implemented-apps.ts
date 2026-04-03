@@ -474,6 +474,7 @@ export const implementedAppsUrls = [
   "/detector-sesgos-cognitivos/",          // Reflexión: sesgos cognitivos — automatismo + deliberación (Kahneman), 10 preguntas, perfil + acciones
   "/analisis-decision-reversible/",        // Reflexión: decisión reversible/irreversible — parálisis + prudencia (Bezos), 10 preguntas, perfil + acciones
   "/test-pensamiento-grupo/",              // Reflexión: pensamiento de grupo — conformidad + disidencia (Janis), 10 preguntas, perfil + acciones
+  "/checklist-segunda-opinion/",           // Reflexión: segunda opinión — certeza + cuestionamiento (red team), 10 preguntas, perfil + acciones
 ];
 
 /**
