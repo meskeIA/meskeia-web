@@ -471,6 +471,7 @@ export const implementedAppsUrls = [
   "/auditoria-energia-semanal/",           // Reflexión: energía semanal — desgaste + recarga (Loehr/Schwartz), 10 preguntas, perfil + acciones
   "/diagnostico-multitarea/",              // Reflexión: multitarea — fragmentación + foco (context-switching), 10 preguntas, perfil + acciones
   "/mapa-compromisos-capacidad/",          // Reflexión: compromisos vs capacidad — carga + capacidad, 10 preguntas, perfil + acciones
+  "/detector-sesgos-cognitivos/",          // Reflexión: sesgos cognitivos — automatismo + deliberación (Kahneman), 10 preguntas, perfil + acciones
 ];
 
 /**
