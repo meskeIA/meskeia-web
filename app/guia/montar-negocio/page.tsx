@@ -277,6 +277,59 @@ export default function GuiaMontarNegocioPage() {
         </div>
       </section>
 
+      {/* Reflexión: piensa antes de actuar */}
+      <section className={styles.toolsSection}>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionIcon}>🧠</span>
+          Piensa antes de actuar
+        </h2>
+        <p className={styles.toolsSubtitle}>
+          Los números te dicen si es viable. Estas herramientas te ayudan a pensar si es el momento, si tu idea tiene mercado y si estás preparado.
+        </p>
+        <div className={styles.toolsGrid}>
+          <Link href="/test-validacion-idea/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>🧪</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Validación de Idea</h3>
+            <p className={styles.toolQuestion}>¿Tu idea resuelve un problema real o solo te gusta a ti?</p>
+            <p className={styles.toolDescription}>Evalúa cuánto estás asumiendo sin validar y cuánto has comprobado con el mercado real.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+          <Link href="/diagnostico-modelo-negocio/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>🏛️</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Modelo de Negocio</h3>
+            <p className={styles.toolQuestion}>¿Los pilares de tu negocio están equilibrados?</p>
+            <p className={styles.toolDescription}>Evalúa si tu propuesta de valor es clara y si tu modelo genera ingresos de forma consistente.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+          <Link href="/auditoria-propuesta-valor/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>💎</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Propuesta de Valor</h3>
+            <p className={styles.toolQuestion}>¿Lo que ofreces encaja con lo que tu cliente necesita?</p>
+            <p className={styles.toolDescription}>Evalúa el encaje entre tu oferta y la necesidad real del cliente.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+          <Link href="/mapa-riesgo-emprendedor/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>🎲</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Riesgo del Emprendedor</h3>
+            <p className={styles.toolQuestion}>¿Qué pasa si esto no funciona? ¿Lo has pensado?</p>
+            <p className={styles.toolDescription}>Evalúa tu exposición al riesgo y tu nivel de preparación ante el fracaso.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className={styles.ctaSection}>
         <h2 className={styles.ctaTitle}>¿Listo para validar tu idea?</h2>
@@ -296,18 +349,18 @@ export default function GuiaMontarNegocioPage() {
           Otras guías que te pueden interesar
         </h2>
         <div className={styles.otherGuidesGrid}>
+          <Link href="/guia/pensar-mejor/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>🧠</span>
+            <div>
+              <h3 className={styles.otherGuideTitle}>Guía Pensar Mejor</h3>
+              <p className={styles.otherGuideDescription}>14 herramientas de reflexión profesional</p>
+            </div>
+          </Link>
           <Link href="/guia/freelance/" className={styles.otherGuideCard}>
             <span className={styles.otherGuideIcon}>💼</span>
             <div>
               <h3 className={styles.otherGuideTitle}>Guía Freelance</h3>
               <p className={styles.otherGuideDescription}>Empieza a trabajar por tu cuenta</p>
-            </div>
-          </Link>
-          <Link href="/guia/ahorrar-dinero/" className={styles.otherGuideCard}>
-            <span className={styles.otherGuideIcon}>💰</span>
-            <div>
-              <h3 className={styles.otherGuideTitle}>Guía Ahorrar Dinero</h3>
-              <p className={styles.otherGuideDescription}>Gestiona tus finanzas personales</p>
             </div>
           </Link>
           <Link href="/guia/invertir/" className={styles.otherGuideCard}>

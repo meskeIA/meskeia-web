@@ -277,6 +277,49 @@ export default function GuiaFreelancePage() {
         </div>
       </section>
 
+      {/* Reflexión: antes de dar el paso */}
+      <section className={styles.toolsSection}>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.sectionIcon}>🧠</span>
+          Antes de dar el paso, reflexiona
+        </h2>
+        <p className={styles.toolsSubtitle}>
+          Los números son importantes, pero las preguntas correctas también. Estos tests te ayudan a pensar mejor sobre tu situación.
+        </p>
+        <div className={styles.toolsGrid}>
+          <Link href="/mapa-dependencia-clientes/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>📊</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Dependencia de Clientes</h3>
+            <p className={styles.toolQuestion}>¿Tu negocio depende demasiado de pocos clientes?</p>
+            <p className={styles.toolDescription}>Evalúa la concentración de riesgo en tu cartera y qué estás haciendo para diversificar.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+          <Link href="/mapa-compromisos-capacidad/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>📋</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Compromisos vs Capacidad</h3>
+            <p className={styles.toolQuestion}>¿Has dicho sí a más de lo que puedes hacer bien?</p>
+            <p className={styles.toolDescription}>Evalúa si tu carga de compromisos es realista. Como freelance, decir &quot;no&quot; es una habilidad clave.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+          <Link href="/mapa-riesgo-emprendedor/" className={styles.toolCard}>
+            <div className={styles.toolHeader}>
+              <span className={styles.toolIcon}>🎲</span>
+              <span className={styles.toolStep}>Reflexión</span>
+            </div>
+            <h3 className={styles.toolName}>Riesgo del Emprendedor</h3>
+            <p className={styles.toolQuestion}>¿Qué pasa si esto no funciona? ¿Lo has pensado?</p>
+            <p className={styles.toolDescription}>Evalúa tu exposición al riesgo y tu nivel de preparación ante el fracaso.</p>
+            <span className={styles.toolCta}>Hacer el test →</span>
+          </Link>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className={styles.ctaSection}>
         <h2 className={styles.ctaTitle}>¿Listo para dar el salto?</h2>
@@ -296,6 +339,13 @@ export default function GuiaFreelancePage() {
           Otras guías que te pueden interesar
         </h2>
         <div className={styles.otherGuidesGrid}>
+          <Link href="/guia/pensar-mejor/" className={styles.otherGuideCard}>
+            <span className={styles.otherGuideIcon}>🧠</span>
+            <div>
+              <h3 className={styles.otherGuideTitle}>Guía Pensar Mejor</h3>
+              <p className={styles.otherGuideDescription}>14 herramientas de reflexión profesional</p>
+            </div>
+          </Link>
           <Link href="/guia/montar-negocio/" className={styles.otherGuideCard}>
             <span className={styles.otherGuideIcon}>🚀</span>
             <div>
@@ -308,13 +358,6 @@ export default function GuiaFreelancePage() {
             <div>
               <h3 className={styles.otherGuideTitle}>Guía para Invertir</h3>
               <p className={styles.otherGuideDescription}>Haz crecer tus ahorros</p>
-            </div>
-          </Link>
-          <Link href="/guia/comprar-casa/" className={styles.otherGuideCard}>
-            <span className={styles.otherGuideIcon}>🏠</span>
-            <div>
-              <h3 className={styles.otherGuideTitle}>Guía Comprar Casa</h3>
-              <p className={styles.otherGuideDescription}>Hipoteca siendo autónomo</p>
             </div>
           </Link>
         </div>
