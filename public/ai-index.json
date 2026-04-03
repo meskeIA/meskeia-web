@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 411,
+  "total_tools": 412,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1971,6 +1971,12 @@
           "slug": "test-validacion-idea",
           "url": "https://meskeia.com/test-validacion-idea/",
           "description": "¿Tu idea resuelve un problema real? Test basado en Lean Startup (Eric Ries)"
+        },
+        {
+          "name": "Mapa de Riesgo del Emprendedor",
+          "slug": "mapa-riesgo-emprendedor",
+          "url": "https://meskeia.com/mapa-riesgo-emprendedor/",
+          "description": "¿Qué pasa si no funciona? Test de 10 preguntas sobre exposición al riesgo y preparación"
         },
         {
           "name": "Planificador de Turnos",
