@@ -469,6 +469,7 @@ export const implementedAppsUrls = [
   "/test-sindrome-impostor/",              // Reflexión: síndrome del impostor — autoexigencia + reconocimiento (Clance), 10 preguntas, perfil + acciones
   "/test-ritmo-vital/",                    // Reflexión: ritmo vital — urgencia + presencia (kletskassa), 10 preguntas, perfil + acciones
   "/auditoria-energia-semanal/",           // Reflexión: energía semanal — desgaste + recarga (Loehr/Schwartz), 10 preguntas, perfil + acciones
+  "/diagnostico-multitarea/",              // Reflexión: multitarea — fragmentación + foco (context-switching), 10 preguntas, perfil + acciones
 ];
 
 /**
