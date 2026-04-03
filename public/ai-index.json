@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 406,
+  "total_tools": 407,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1941,6 +1941,12 @@
           "slug": "detector-sesgos-cognitivos",
           "url": "https://meskeia.com/detector-sesgos-cognitivos/",
           "description": "¿Qué sesgos afectan tus decisiones? Test basado en Kahneman (Sistema 1 y 2)"
+        },
+        {
+          "name": "Análisis Decisión Reversible vs Irreversible",
+          "slug": "analisis-decision-reversible",
+          "url": "https://meskeia.com/analisis-decision-reversible/",
+          "description": "¿Das vueltas a decisiones que podrías probar? Framework de Jeff Bezos: puertas tipo 1 y 2"
         },
         {
           "name": "Planificador de Turnos",

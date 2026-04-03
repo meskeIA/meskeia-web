@@ -472,6 +472,7 @@ export const implementedAppsUrls = [
   "/diagnostico-multitarea/",              // Reflexión: multitarea — fragmentación + foco (context-switching), 10 preguntas, perfil + acciones
   "/mapa-compromisos-capacidad/",          // Reflexión: compromisos vs capacidad — carga + capacidad, 10 preguntas, perfil + acciones
   "/detector-sesgos-cognitivos/",          // Reflexión: sesgos cognitivos — automatismo + deliberación (Kahneman), 10 preguntas, perfil + acciones
+  "/analisis-decision-reversible/",        // Reflexión: decisión reversible/irreversible — parálisis + prudencia (Bezos), 10 preguntas, perfil + acciones
 ];
 
 /**
