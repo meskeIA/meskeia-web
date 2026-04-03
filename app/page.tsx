@@ -107,6 +107,15 @@ const guidesData = [
     toolsCount: 6,
     available: true,
   },
+  {
+    id: 'pensar-mejor',
+    name: 'Guía Pensar Mejor',
+    icon: '🧠',
+    description: 'Herramientas de reflexión profesional: conócete, decide mejor y emprende con criterio',
+    url: '/guia/pensar-mejor/',
+    toolsCount: 14,
+    available: true,
+  },
 ];
 
 function HomeContent() {
