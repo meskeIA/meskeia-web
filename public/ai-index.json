@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 413,
+  "total_tools": 414,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -995,6 +995,12 @@
           "slug": "guia/montar-negocio",
           "url": "https://meskeia.com/guia/montar-negocio/",
           "description": "Guía completa para emprender: genera el nombre de tu empresa, calcula el punto de equilibrio, planifica el cashflow y elige forma jurídica."
+        },
+        {
+          "name": "Guía Pensar Mejor — Reflexión Profesional",
+          "slug": "guia/pensar-mejor",
+          "url": "https://meskeia.com/guia/pensar-mejor/",
+          "description": "14 herramientas de reflexión en 3 capítulos: conócete profesionalmente, decide mejor y emprende con criterio. Basadas en Kahneman, Csikszentmihalyi, Bezos, Osterwalder."
         }
       ]
     },

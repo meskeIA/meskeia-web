@@ -317,6 +317,7 @@ export const implementedAppsUrls = [
   "/guia/vivir-sano/",              // Guía para vivir más sano: nutrición, sueño, hábitos
   "/guia/comprar-coche/",           // Guía para comprar un coche en España
   "/guia/montar-negocio/",          // Guía para montar un negocio o emprender
+  "/guia/pensar-mejor/",            // Guía de reflexión profesional: 14 herramientas en 3 capítulos
 
   // Nuevas apps (2026-02-19)
   "/calculadora-rentabilidad-alquiler/", // ROI inversión inmobiliaria: rentabilidad bruta/neta, cash flow, payback

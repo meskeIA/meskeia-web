@@ -69,6 +69,14 @@ const guias = [
       'IMC, macros y calorías, optimización del sueño, control de hidratación y seguimiento de hábitos saludables duraderos.',
     tools: 5,
   },
+  {
+    slug: 'pensar-mejor',
+    icon: '🧠',
+    title: 'Pensar Mejor',
+    description:
+      'Herramientas de reflexión profesional: conócete, decide mejor y emprende con criterio. Tests basados en Kahneman, Csikszentmihalyi, Bezos y Osterwalder.',
+    tools: 14,
+  },
 ];
 
 export default function GuiasIndexPage() {

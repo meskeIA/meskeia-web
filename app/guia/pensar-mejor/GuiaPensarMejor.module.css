@@ -1,0 +1,503 @@
+/* Guía Pensar Mejor - meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  margin-top: 80px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--spacing-lg);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  opacity: 0.95;
+  max-width: 650px;
+  margin: 0 auto var(--spacing-xl);
+  line-height: 1.6;
+}
+
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.heroStatNumber {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.heroStatLabel {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Intro Section */
+.introSection {
+  margin-bottom: var(--spacing-2xl);
+  text-align: center;
+}
+
+.introText {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto var(--spacing-xl);
+}
+
+.chapterNav {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.chapterNavItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.chapterNavItem:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+  transform: translateY(-2px);
+}
+
+.chapterNavEmoji {
+  font-size: 1.2rem;
+}
+
+.chapterNavTitle {
+  color: var(--text-primary);
+}
+
+/* Section Titles */
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.sectionIcon {
+  font-size: 1.5rem;
+}
+
+/* Chapter Section */
+.chapterSection {
+  margin-bottom: var(--spacing-2xl);
+  scroll-margin-top: 100px;
+}
+
+.chapterHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.chapterNumber {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.chapterTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.chapterIntro {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Insight box */
+.chapterInsight {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06) 0%, rgba(72, 169, 166, 0.06) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: var(--radius-large);
+  margin-bottom: var(--spacing-xl);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[data-theme='dark'] .chapterInsight {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+.chapterInsight p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.insightIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Tools Grid */
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.toolCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.toolCard:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.toolHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.toolIcon {
+  font-size: 2.5rem;
+}
+
+.toolFramework {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--focus);
+  border-radius: var(--radius);
+  white-space: nowrap;
+}
+
+.toolName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.toolQuestion {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+  font-style: italic;
+}
+
+.toolDescription {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex-grow: 1;
+  margin-bottom: var(--spacing-md);
+}
+
+.toolCta {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.toolCard:hover .toolCta {
+  transform: translateX(4px);
+}
+
+/* CTA Section */
+.ctaSection {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.ctaTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.ctaText {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.ctaButtons {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(46, 134, 171, 0.3);
+}
+
+.ctaButtonSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ctaButtonSecondary:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Other Guides Section */
+.otherGuidesSection {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.otherGuidesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.otherGuideCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.otherGuideCard:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.otherGuideIcon {
+  font-size: 2.5rem;
+}
+
+.otherGuideTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.otherGuideDescription {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .heroIcon {
+    font-size: 3rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .heroStats {
+    gap: var(--spacing-md);
+  }
+
+  .heroStat {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .heroStatNumber {
+    font-size: 1.25rem;
+  }
+
+  .chapterNav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chapterNavItem {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .chapterTitle {
+    font-size: 1.4rem;
+  }
+
+  .toolsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitle {
+    font-size: 1.4rem;
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ctaButton,
+  .ctaButtonSecondary {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .otherGuidesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolCard,
+  .ctaButton,
+  .ctaButtonSecondary,
+  .chapterNavItem,
+  .otherGuideCard {
+    transition: none;
+  }
+
+  .toolCard:hover,
+  .ctaButton:hover,
+  .ctaButtonSecondary:hover,
+  .chapterNavItem:hover {
+    transform: none;
+  }
+}

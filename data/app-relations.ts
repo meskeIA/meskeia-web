@@ -1239,6 +1239,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-tarifa-freelance/', icon: '💰', name: 'Tarifa Freelance', description: 'Cuánto cobrar por hora' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Facturas con IVA e IRPF' },
   ],
+  'guia-pensar-mejor': [
+    { url: '/diagnostico-estancamiento-profesional/', icon: '🌊', name: 'Estancamiento Profesional', description: '¿Confort, estrés o flujo?' },
+    { url: '/detector-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: '¿Decides bien o decides rápido?' },
+    { url: '/test-validacion-idea/', icon: '🧪', name: 'Validación de Idea', description: '¿Tu idea resuelve un problema real?' },
+    { url: '/diagnostico-modelo-negocio/', icon: '🏛️', name: 'Modelo de Negocio', description: '¿Tus pilares están equilibrados?' },
+  ],
 
   // ACCESIBILIDAD
   'adaptador-dislexia': [
