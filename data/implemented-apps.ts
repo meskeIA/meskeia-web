@@ -473,6 +473,7 @@ export const implementedAppsUrls = [
   "/mapa-compromisos-capacidad/",          // Reflexión: compromisos vs capacidad — carga + capacidad, 10 preguntas, perfil + acciones
   "/detector-sesgos-cognitivos/",          // Reflexión: sesgos cognitivos — automatismo + deliberación (Kahneman), 10 preguntas, perfil + acciones
   "/analisis-decision-reversible/",        // Reflexión: decisión reversible/irreversible — parálisis + prudencia (Bezos), 10 preguntas, perfil + acciones
+  "/test-pensamiento-grupo/",              // Reflexión: pensamiento de grupo — conformidad + disidencia (Janis), 10 preguntas, perfil + acciones
 ];
 
 /**
