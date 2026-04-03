@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 400,
+  "total_tools": 401,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1905,6 +1905,12 @@
           "slug": "auditoria-habilidades-mercado",
           "url": "https://meskeia.com/auditoria-habilidades-mercado/",
           "description": "¿Lo que sabes hacer es lo que el mercado necesita? Gap analysis profesional con 10 preguntas"
+        },
+        {
+          "name": "Test de Síndrome del Impostor",
+          "slug": "test-sindrome-impostor",
+          "url": "https://meskeia.com/test-sindrome-impostor/",
+          "description": "¿Subestimas tu competencia real? Test de 10 preguntas basado en la Escala de Clance adaptada"
         },
         {
           "name": "Planificador de Turnos",
