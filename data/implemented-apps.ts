@@ -475,6 +475,7 @@ export const implementedAppsUrls = [
   "/analisis-decision-reversible/",        // Reflexión: decisión reversible/irreversible — parálisis + prudencia (Bezos), 10 preguntas, perfil + acciones
   "/test-pensamiento-grupo/",              // Reflexión: pensamiento de grupo — conformidad + disidencia (Janis), 10 preguntas, perfil + acciones
   "/checklist-segunda-opinion/",           // Reflexión: segunda opinión — certeza + cuestionamiento (red team), 10 preguntas, perfil + acciones
+  "/diagnostico-modelo-negocio/",          // Reflexión: modelo negocio — propuesta + sostenibilidad (BMC), 10 preguntas, perfil + acciones
 ];
 
 /**

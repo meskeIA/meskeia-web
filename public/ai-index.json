@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 409,
+  "total_tools": 410,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1959,6 +1959,12 @@
           "slug": "checklist-segunda-opinion",
           "url": "https://meskeia.com/checklist-segunda-opinion/",
           "description": "¿Has buscado razones para NO hacerlo? Test basado en el principio de red team"
+        },
+        {
+          "name": "Diagnóstico de Modelo de Negocio",
+          "slug": "diagnostico-modelo-negocio",
+          "url": "https://meskeia.com/diagnostico-modelo-negocio/",
+          "description": "¿Los pilares de tu negocio están equilibrados? Test basado en el Business Model Canvas"
         },
         {
           "name": "Planificador de Turnos",
