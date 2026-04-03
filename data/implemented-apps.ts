@@ -470,6 +470,7 @@ export const implementedAppsUrls = [
   "/test-ritmo-vital/",                    // Reflexión: ritmo vital — urgencia + presencia (kletskassa), 10 preguntas, perfil + acciones
   "/auditoria-energia-semanal/",           // Reflexión: energía semanal — desgaste + recarga (Loehr/Schwartz), 10 preguntas, perfil + acciones
   "/diagnostico-multitarea/",              // Reflexión: multitarea — fragmentación + foco (context-switching), 10 preguntas, perfil + acciones
+  "/mapa-compromisos-capacidad/",          // Reflexión: compromisos vs capacidad — carga + capacidad, 10 preguntas, perfil + acciones
 ];
 
 /**

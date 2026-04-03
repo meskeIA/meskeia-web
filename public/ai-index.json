@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 404,
+  "total_tools": 405,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1929,6 +1929,12 @@
           "slug": "diagnostico-multitarea",
           "url": "https://meskeia.com/diagnostico-multitarea/",
           "description": "¿Tu multitarea es productiva o destructiva? Test de 10 preguntas sobre fragmentación y foco"
+        },
+        {
+          "name": "Mapa de Compromisos vs Capacidad",
+          "slug": "mapa-compromisos-capacidad",
+          "url": "https://meskeia.com/mapa-compromisos-capacidad/",
+          "description": "¿Has dicho sí a más de lo que puedes? Test de 10 preguntas sobre carga y capacidad de gestión"
         },
         {
           "name": "Planificador de Turnos",
