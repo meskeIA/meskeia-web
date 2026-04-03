@@ -463,6 +463,7 @@ export const implementedAppsUrls = [
   "/evaluador-prompts/",                   // Reflexión: prompt engineering — calidad instrucciones + procesamiento salida, 10 preguntas, perfil + acciones
   "/test-dependencia-tecnologica/",        // Reflexión: dependencia tecnológica — autonomía real + adaptabilidad, 10 preguntas, perfil + acciones
   "/mapa-automatizacion-personal/",        // Reflexión: automatización personal — automatización rutinario + protección creativo, 10 preguntas, perfil + acciones
+  "/diagnostico-estancamiento-profesional/", // Reflexión: estancamiento profesional — desafío + habilidad (Csikszentmihalyi), 10 preguntas, perfil + acciones
 ];
 
 /**

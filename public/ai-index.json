@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 397,
+  "total_tools": 398,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1887,6 +1887,12 @@
           "slug": "mapa-automatizacion-personal",
           "url": "https://meskeia.com/mapa-automatizacion-personal/",
           "description": "¿Qué tareas deberías automatizar y cuáles proteger? Test de 10 preguntas sobre automatización de lo rutinario y protección de lo creativo"
+        },
+        {
+          "name": "Diagnóstico de Estancamiento Profesional",
+          "slug": "diagnostico-estancamiento-profesional",
+          "url": "https://meskeia.com/diagnostico-estancamiento-profesional/",
+          "description": "¿Estás en zona de confort, estrés o flujo? Test de 10 preguntas basado en el modelo de flujo de Csikszentmihalyi"
         },
         {
           "name": "Planificador de Turnos",
