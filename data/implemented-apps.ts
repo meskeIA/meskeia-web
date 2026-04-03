@@ -464,6 +464,7 @@ export const implementedAppsUrls = [
   "/test-dependencia-tecnologica/",        // Reflexión: dependencia tecnológica — autonomía real + adaptabilidad, 10 preguntas, perfil + acciones
   "/mapa-automatizacion-personal/",        // Reflexión: automatización personal — automatización rutinario + protección creativo, 10 preguntas, perfil + acciones
   "/diagnostico-estancamiento-profesional/", // Reflexión: estancamiento profesional — desafío + habilidad (Csikszentmihalyi), 10 preguntas, perfil + acciones
+  "/mapa-dependencia-clientes/",            // Reflexión: dependencia clientes — concentración + diversificación, 10 preguntas, perfil + acciones
 ];
 
 /**
