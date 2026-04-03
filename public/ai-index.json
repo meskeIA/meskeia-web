@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 414,
+  "total_tools": 415,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -779,6 +779,12 @@
           "slug": "checklist-declaracion-renta",
           "url": "https://meskeia.com/checklist-declaracion-renta/",
           "description": "Lista de documentos para la declaración de la renta 2026 (ejercicio 2025) personalizada por perfil: asalariado, autónomo, pensionista, inversor o arrendador. Incluye fechas clave y guía paso a paso."
+        },
+        {
+          "name": "Declaración Renta Persona Fallecida",
+          "slug": "declaracion-renta-fallecidos",
+          "url": "https://meskeia.com/declaracion-renta-fallecidos/",
+          "description": "Guía interactiva para herederos: obligación de declarar del fallecido, acceso al borrador, documentación según importe de devolución (Modelo H-100), casos especiales y normativa de referencia."
         },
         {
           "name": "Estimador Actualización de Alquiler 2026",

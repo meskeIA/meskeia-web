@@ -1423,7 +1423,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'orientacion-tramitacion-herencias': [
     { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Cuánto pagas de IS según tu CCAA' },
-    { url: '/estimador-impuesto-donaciones/', icon: '🎁', name: 'Estimador Donaciones', description: 'Impuesto por recibir una donación' },
+    { url: '/declaracion-renta-fallecidos/', icon: '📋', name: 'Renta Persona Fallecida', description: 'Guía IRPF herederos paso a paso' },
     { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Estimador Compraventa', description: 'Gastos al vender inmuebles heredados' },
     { url: '/guia/herencias/', icon: '📜', name: 'Guía Herencias', description: 'Journey completo para gestionar la herencia' },
   ],
@@ -1467,8 +1467,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'checklist-declaracion-renta': [
     { url: '/test-obligado-declarar-renta/', icon: '📋', name: '¿Obligado a declarar?', description: 'Test: ¿debes presentar la Renta 2025?' },
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuota orientativa de tu declaración' },
-    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
+    { url: '/declaracion-renta-fallecidos/', icon: '📋', name: 'Renta Persona Fallecida', description: 'Guía IRPF herederos paso a paso' },
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Plazos y obligaciones fiscales' },
+  ],
+  'declaracion-renta-fallecidos': [
+    { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Tramitar una Herencia', description: 'Checklist y orden de gestiones' },
+    { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Estimador Sucesiones', description: 'Impuesto de herencias por CCAA' },
+    { url: '/test-obligado-declarar-renta/', icon: '📋', name: '¿Obligado a declarar?', description: 'Test rápido para la Renta 2025' },
+    { url: '/checklist-declaracion-renta/', icon: '📋', name: 'Checklist Renta', description: 'Documentos para tu declaración' },
   ],
   'orientador-deduccion-obras-energeticas': [
     { url: '/estimacion-certificacion-energetica/', icon: '🏷️', name: 'Certificación Energética', description: 'Estima tu letra A-G' },
