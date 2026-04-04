@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 422,
+  "total_tools": 423,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -848,6 +848,11 @@
         },
         {
           "name": "El Dinero y el Tiempo",
+          "slug": "visualizador-mapa-tiempo",
+          "url": "https://meskeia.com/visualizador-mapa-tiempo/",
+          "description": "En qué gastas las 700.000 horas de tu vida: dormir, trabajar, pantallas, comer y más"
+        },
+        {
           "slug": "visualizador-jubilacion-perspectiva",
           "url": "https://meskeia.com/visualizador-jubilacion-perspectiva/",
           "description": "Timeline visual de tu vida laboral: años cotizados, porcentaje de pensión y hitos clave"
