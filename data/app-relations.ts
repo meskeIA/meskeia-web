@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-viaje-impuestos': [
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagas de renta' },
+    { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'Cascada bruto a neto' },
+    { url: '/visualizador-anatomia-nomina/', icon: '📄', name: 'Anatomía de una Nómina', description: 'Cada línea explicada' },
+    { url: '/visualizador-dinero-y-tiempo/', icon: '⏳', name: 'El Dinero y el Tiempo', description: 'Hipoteca, inflación, interés compuesto' },
+  ],
   'visualizador-anatomia-nomina': [
     { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'Cascada bruto a neto' },
     { url: '/estimador-sueldo-neto/', icon: '🧮', name: 'Calculadora Sueldo Neto', description: 'Calcula tu neto exacto' },

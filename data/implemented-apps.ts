@@ -13,6 +13,7 @@ export const implementedAppsUrls = [
   "/visualizador-dinero-y-tiempo/",
   "/visualizador-sueldo-neto/",
   "/visualizador-anatomia-nomina/",
+  "/visualizador-viaje-impuestos/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",

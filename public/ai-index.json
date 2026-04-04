@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 418,
+  "total_tools": 419,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -848,6 +848,11 @@
         },
         {
           "name": "El Dinero y el Tiempo",
+          "slug": "visualizador-viaje-impuestos",
+          "url": "https://meskeia.com/visualizador-viaje-impuestos/",
+          "description": "Gráfico interactivo del gasto público español: pensiones, sanidad, educación, defensa y más"
+        },
+        {
           "slug": "visualizador-anatomia-nomina",
           "url": "https://meskeia.com/visualizador-anatomia-nomina/",
           "description": "Nómina ficticia interactiva: haz clic en cada concepto para ver qué significa"
