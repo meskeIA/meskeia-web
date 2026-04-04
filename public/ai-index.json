@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 426,
+  "total_tools": 427,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -848,6 +848,11 @@
         },
         {
           "name": "El Dinero y el Tiempo",
+          "slug": "visualizador-escalas-tiempo",
+          "url": "https://meskeia.com/visualizador-escalas-tiempo/",
+          "description": "De un parpadeo a la edad del universo: escalas temporales que desafían la intuición"
+        },
+        {
           "slug": "visualizador-factura-electrica",
           "url": "https://meskeia.com/visualizador-factura-electrica/",
           "description": "Anatomía de la factura de la luz: cada concepto clickable con explicación"

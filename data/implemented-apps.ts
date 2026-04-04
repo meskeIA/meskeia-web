@@ -21,6 +21,7 @@ export const implementedAppsUrls = [
   "/visualizador-sesgos-cognitivos/",
   "/visualizador-huella-alimentos/",
   "/visualizador-factura-electrica/",
+  "/visualizador-escalas-tiempo/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",
