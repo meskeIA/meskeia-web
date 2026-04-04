@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-factura-electrica': [
+    { url: '/visualizador-anatomia-nomina/', icon: '📄', name: 'Anatomía de una Nómina', description: 'Cada línea de tu nómina explicada' },
+    { url: '/calculadora-suscripciones/', icon: '📱', name: 'Control Suscripciones', description: 'Gastos recurrentes' },
+    { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'De bruto a neto visual' },
+    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
+  ],
   'visualizador-huella-alimentos': [
     { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos' },
     { url: '/calculadora-huella-carbono/', icon: '🌱', name: 'Huella de Carbono', description: 'Tu huella personal completa' },
