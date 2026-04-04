@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-envejecimiento-cuerpo': [
+    { url: '/orientador-imc/', icon: '⚖️', name: 'Calculadora IMC', description: 'Índice de masa corporal' },
+    { url: '/test-fragilidad/', icon: '🩺', name: 'Test de Fragilidad', description: 'Escala FRAIL validada' },
+    { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos' },
+    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tu estilo de vida' },
+  ],
   'visualizador-viaje-impuestos': [
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagas de renta' },
     { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'Cascada bruto a neto' },
