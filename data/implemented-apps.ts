@@ -25,6 +25,7 @@ export const implementedAppsUrls = [
   "/visualizador-peso-numeros/",
   "/visualizador-mundo-100-personas/",
   "/visualizador-mapa-dinero-mensual/",
+  "/visualizador-peso-decisiones/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",
