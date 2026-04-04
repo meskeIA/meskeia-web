@@ -15,6 +15,7 @@ export const implementedAppsUrls = [
   "/visualizador-anatomia-nomina/",
   "/visualizador-viaje-impuestos/",
   "/visualizador-envejecimiento-cuerpo/",
+  "/visualizador-precio-real-cosas/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",
