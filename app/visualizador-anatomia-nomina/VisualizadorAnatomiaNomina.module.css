@@ -1,0 +1,345 @@
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --rojo: #e74c3c;
+  --verde: #27ae60;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+  --hover: #333333;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+.instruccion {
+  text-align: center;
+  background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* ─── Nómina ─── */
+.nomina {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  margin-bottom: var(--spacing-xl);
+}
+
+.nominaCabecera {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-bottom: 2px solid var(--border);
+  background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%);
+}
+
+.cabeceraBloque { }
+.cabeceraLabel { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+.cabeceraValor { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.1rem; }
+.cabeceraDetalle { font-size: 0.78rem; color: var(--text-secondary); }
+
+.cabeceraMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-bottom: 2px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--hover);
+}
+
+/* ─── Secciones ─── */
+.seccion {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.seccionTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.seccionNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.seccionHint {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+/* ─── Líneas clickables ─── */
+.lineaWrapper {
+  margin-bottom: 2px;
+}
+
+.lineaBtn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  gap: var(--spacing-sm);
+}
+
+.lineaBtn:hover {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+.lineaActiva {
+  background: rgba(46, 134, 171, 0.06);
+  border-color: var(--primary);
+}
+
+.linea_devengo .lineaImporte { color: var(--verde); }
+.linea_deduccion .lineaImporte { color: var(--rojo); }
+.linea_base .lineaImporte { color: var(--text-secondary); }
+
+.lineaConcepto {
+  flex: 1;
+}
+
+.lineaImporte {
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.lineaChevron {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevronAbierto {
+  transform: rotate(180deg);
+}
+
+/* ─── Explicación ─── */
+.explicacion {
+  background: linear-gradient(135deg, rgba(46,134,171,0.05) 0%, rgba(72,169,166,0.05) 100%);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: 0.3rem 0 0.5rem 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.explicacionTexto {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+}
+
+.explicacionDetalle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Totales ─── */
+.totalLinea {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem 0.8rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  border-top: 1px dashed var(--border);
+  margin-top: var(--spacing-sm);
+}
+
+/* ─── Líquido ─── */
+.liquidoSeccion {
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%);
+}
+
+.liquidoCalculo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding: 0.3rem 0;
+}
+
+.liquidoResultado {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 0.7rem 0 0;
+  border-top: 3px double var(--primary);
+  margin-top: var(--spacing-sm);
+}
+
+/* ─── Resumen visual ─── */
+.resumenVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.resumenItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.resumenDestacado {
+  border-color: var(--primary);
+  border-width: 2px;
+}
+
+.resumenLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.resumenValor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.resumenFlecha {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+}
+
+.rojo { color: var(--rojo); }
+.azul { color: var(--primary); }
+
+/* ─── Enlace ─── */
+.enlaceApp {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a:hover { text-decoration: underline; }
+
+.warningBox {
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #422006;
+  border-color: #B45309;
+  color: #FDE68A;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .subtitle { font-size: 0.95rem; }
+  .nominaCabecera { grid-template-columns: 1fr; }
+  .cabeceraMeta { flex-direction: column; gap: 0.3rem; }
+  .resumenVisual { flex-direction: column; }
+  .resumenFlecha { transform: rotate(90deg); }
+  .liquidoResultado { font-size: 1rem; }
+  .explicacion { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explicacion { animation: none; }
+  .lineaChevron { transition-duration: 0.01ms; }
+}
