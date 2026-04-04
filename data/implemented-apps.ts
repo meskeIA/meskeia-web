@@ -18,6 +18,7 @@ export const implementedAppsUrls = [
   "/visualizador-precio-real-cosas/",
   "/visualizador-jubilacion-perspectiva/",
   "/visualizador-mapa-tiempo/",
+  "/visualizador-sesgos-cognitivos/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",

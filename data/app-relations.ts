@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-sesgos-cognitivos': [
+    { url: '/diagnostico-pensamiento-critico/', icon: '🎯', name: 'Pensamiento Crítico', description: 'Evalúa tu capacidad analítica' },
+    { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Precios en horas de trabajo' },
+    { url: '/visualizador-mapa-tiempo/', icon: '🗺️', name: 'El Mapa de tu Tiempo', description: 'En qué gastas tu vida' },
+    { url: '/test-sindrome-impostor/', icon: '🎭', name: 'Test Síndrome Impostor', description: 'Detecta si lo padeces' },
+  ],
   'visualizador-mapa-tiempo': [
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Precios en horas de trabajo' },
     { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica de productividad' },
