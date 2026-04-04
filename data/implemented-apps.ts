@@ -23,6 +23,7 @@ export const implementedAppsUrls = [
   "/visualizador-factura-electrica/",
   "/visualizador-escalas-tiempo/",
   "/visualizador-peso-numeros/",
+  "/visualizador-mundo-100-personas/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",

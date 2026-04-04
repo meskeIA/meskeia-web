@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-mundo-100-personas': [
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas visuales' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'La Huella de lo que Comes', description: 'Impacto ambiental alimentos' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Cómo tu cerebro te engaña' },
+  ],
   'visualizador-peso-numeros': [
     { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales fascinantes' },
     { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
