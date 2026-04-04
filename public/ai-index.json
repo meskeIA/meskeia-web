@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 424,
+  "total_tools": 425,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -848,6 +848,11 @@
         },
         {
           "name": "El Dinero y el Tiempo",
+          "slug": "visualizador-huella-alimentos",
+          "url": "https://meskeia.com/visualizador-huella-alimentos/",
+          "description": "Compara la huella de carbono, agua y suelo de 16 alimentos comunes"
+        },
+        {
           "slug": "visualizador-sesgos-cognitivos",
           "url": "https://meskeia.com/visualizador-sesgos-cognitivos/",
           "description": "8 sesgos cognitivos con mini-tests interactivos: anclaje, aversión a la pérdida, coste hundido y más"
