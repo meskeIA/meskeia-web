@@ -11,6 +11,7 @@ export const implementedAppsUrls = [
   // Finanzas (apps universales, sin normativa española)
   "/estimador-inflacion/",
   "/visualizador-dinero-y-tiempo/",
+  "/visualizador-sueldo-neto/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",

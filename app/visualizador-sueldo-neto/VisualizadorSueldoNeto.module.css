@@ -1,0 +1,456 @@
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --rojo: #e74c3c;
+  --naranja: #e67e22;
+  --verde: #27ae60;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* ─── Hero ─── */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ─── Slider ─── */
+.sliderZona {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.sliderLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.sliderValor {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderExtremos {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+/* ─── Cascada ─── */
+.cascada {
+  margin-bottom: var(--spacing-xl);
+}
+
+.cascadaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: border-color 0.2s;
+}
+
+.cascadaResta {
+  border-color: var(--rojo);
+  border-style: dashed;
+}
+
+.cascadaResultado {
+  border-color: var(--primary);
+  border-width: 3px;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.04) 0%, rgba(72, 169, 166, 0.04) 100%);
+}
+
+.cascadaIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.cascadaInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cascadaLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.cascadaValorPrincipal {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cascadaValor {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--rojo);
+}
+
+.cascadaPct {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cascadaFlecha {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  padding: 0.3rem 0;
+}
+
+/* ─── Desglose SS ─── */
+.desgloseSS {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: 0.3rem 0 0 2.5rem;
+}
+
+.desgloseItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border-bottom: 1px dotted var(--border);
+}
+
+.desgloseItem:last-child {
+  border-bottom: none;
+}
+
+.desgloseItem span:last-child {
+  color: var(--rojo);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─── Desglose tramos IRPF ─── */
+.desgloseTramos {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: 0.3rem 0 0 2.5rem;
+}
+
+.desgloseTramTitulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tramoItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.4rem 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.tramoItem:last-child {
+  border-bottom: none;
+}
+
+.tramoColor {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.tramoInfo {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.tramoRango {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.tramoPct {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.tramoValores {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.tramoBase {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.tramoCuota {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--rojo);
+  white-space: nowrap;
+}
+
+/* ─── Barra de reparto ─── */
+.barraReparto {
+  display: flex;
+  height: 48px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--spacing-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.barraNeto {
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s ease;
+}
+
+.barraIRPF {
+  background: var(--rojo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s ease;
+}
+
+.barraSS {
+  background: var(--naranja);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s ease;
+}
+
+.barraTexto {
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Insight ─── */
+.insight {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06) 0%, rgba(72, 169, 166, 0.06) 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.insight p {
+  margin: 0;
+}
+
+/* ─── Gráfico ─── */
+.chartContainer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.chartTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.chartWrap {
+  position: relative;
+  height: 320px;
+}
+
+/* ─── Enlace ─── */
+.enlaceApp {
+  text-align: center;
+  padding: var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+.enlaceApp a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.enlaceApp a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Warning box (v2.0) ─── */
+.warningBox {
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #422006;
+  border-color: #B45309;
+  color: #FDE68A;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title { font-size: 1.8rem; }
+  .subtitle { font-size: 0.95rem; }
+
+  .cascadaItem { padding: var(--spacing-md); }
+  .cascadaIcono { font-size: 1.5rem; }
+  .cascadaValorPrincipal { font-size: 1.3rem; }
+  .cascadaValor { font-size: 1.1rem; }
+
+  .desgloseSS,
+  .desgloseTramos { margin-left: 0; }
+
+  .tramoInfo { flex-direction: column; gap: 0; }
+  .tramoValores { flex-direction: column; gap: 0; }
+
+  .barraReparto { height: 40px; }
+  .barraTexto { font-size: 0.7rem; }
+  .chartWrap { height: 260px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraNeto, .barraIRPF, .barraSS {
+    transition-duration: 0.01ms;
+  }
+}
