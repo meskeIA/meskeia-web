@@ -540,6 +540,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-fire': [...finanzasPersonalesApps.filter(a => a.url !== '/estimador-fire/').slice(0, 2), ...finanzasInversionApps.slice(0, 2)],
   'calculadora-coste-plazos': finanzasPersonalesApps.filter(a => a.url !== '/estimador-coste-plazos/').slice(0, 4),
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
+
+  // VISUALIZADORES
+  'visualizador-dinero-y-tiempo': [
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Calcula con tus datos reales' },
+    { url: '/estimador-inflacion/', icon: '💸', name: 'Estimador Inflación', description: 'Datos históricos del INE' },
+    { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Hipoteca', description: 'Reducir cuota vs plazo' },
+  ],
+
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
