@@ -344,6 +344,12 @@
   margin: 0 0 var(--spacing-xs) 0;
 }
 
+.cardCode {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
 .cardContinent {
   font-size: 1rem;
   color: var(--text-secondary);
@@ -497,6 +503,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.gridCode {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
 }
 
 /* Responsive */

@@ -215,7 +215,7 @@ export default function PaisesDelMundoPage() {
             <div className={styles.cardHeader}>
               <Flag code={selectedCountry.code} size="xl" className={styles.cardFlag} />
               <div className={styles.cardTitleGroup}>
-                <h2 className={styles.cardTitle}>{selectedCountry.name}</h2>
+                <h2 className={styles.cardTitle}>{selectedCountry.name} <span className={styles.cardCode}>({selectedCountry.code.toUpperCase()})</span></h2>
                 <span className={styles.cardContinent}>{selectedCountry.continent}</span>
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function PaisesDelMundoPage() {
                   className={styles.gridItem}
                 >
                   <Flag code={country.code} size="md" className={styles.gridFlag} />
-                  <span className={styles.gridName}>{country.name}</span>
+                  <span className={styles.gridName}>{country.name} <span className={styles.gridCode}>({country.code.toUpperCase()})</span></span>
                 </button>
               ))}
             </div>

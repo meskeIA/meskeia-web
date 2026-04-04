@@ -248,7 +248,8 @@ export const searchCountries = (query: string, continent?: string): Country[] =>
     results = results.filter(c => {
       const normalizedName = c.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       const normalizedCapital = c.capital.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return normalizedName.includes(normalizedQuery) || normalizedCapital.includes(normalizedQuery);
+      const normalizedCode = c.code.toLowerCase();
+      return normalizedName.includes(normalizedQuery) || normalizedCapital.includes(normalizedQuery) || normalizedCode === normalizedQuery;
     });
   }
 
