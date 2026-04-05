@@ -27,6 +27,7 @@ export const implementedAppsUrls = [
   "/visualizador-mapa-dinero-mensual/",
   "/visualizador-peso-decisiones/",
   "/visualizador-internet-60-segundos/",
+  "/visualizador-como-funciona-banco/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",
