@@ -1,0 +1,91 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+/* Timeline horizontal */
+.timeline { display: flex; gap: 0.3rem; justify-content: center; margin-bottom: var(--spacing-sm); overflow-x: auto; padding-bottom: 0.3rem; }
+.timelineStep { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.4rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; min-width: 52px; color: var(--text-primary); }
+.timelineStep:hover { background: var(--hover); }
+.timelineActivo { background: rgba(46,134,171,0.06); }
+.stepNum { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--border); color: var(--text-secondary); border-radius: 50%; font-size: 0.7rem; font-weight: 700; }
+.stepIcono { font-size: 1.1rem; }
+.stepTiempo { font-size: 0.58rem; color: var(--text-muted); white-space: nowrap; }
+
+/* Barra de progreso */
+.progressBar { display: flex; gap: 2px; margin-bottom: var(--spacing-lg); }
+.progressSegment { flex: 1; height: 4px; background: var(--border); border-radius: 2px; transition: background-color 0.2s; }
+.progressFilled { }
+
+/* Toggle vista */
+.vistaToggle { display: flex; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.vistaBtn { padding: 0.4rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); transition: all 0.15s; }
+.vistaBtn:hover { border-color: var(--primary); }
+.vistaActiva { background: var(--primary); border-color: var(--primary); color: white; }
+
+/* Detalle del paso */
+.pasoDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid; border-radius: var(--radius); padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
+.pasoHeader { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.pasoIcono { font-size: 2.5rem; flex-shrink: 0; }
+.pasoNum { font-size: 0.82rem; font-weight: 600; }
+.pasoTitulo { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0.2rem 0 0; }
+.pasoTexto { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
+
+.pasoSorpresa { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sorpresaLabel { display: block; font-size: 0.78rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.pasoSorpresa p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+
+/* Navegación entre pasos */
+.pasoNav { display: flex; align-items: center; justify-content: space-between; }
+.pasoNavBtn { padding: 0.5rem 1rem; background: var(--hover); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; color: var(--text-primary); transition: all 0.15s; }
+.pasoNavBtn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+.pasoNavBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+.pasoNavInfo { font-size: 0.82rem; color: var(--text-muted); }
+
+/* Resumen tiempo */
+.resumenTiempo { margin-bottom: var(--spacing-xl); }
+.resumenTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.resumenGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
+.resumenCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.resumenValor { display: block; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.2rem; }
+.resumenLabel { font-size: 0.82rem; color: var(--text-secondary); }
+
+/* Datos globales */
+.globalesSection { margin-bottom: var(--spacing-xl); }
+.globalesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.globalesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
+.globalCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: var(--spacing-md); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+.globalIcono { font-size: 1.3rem; }
+.globalCifra { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.globalDesc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.2; }
+
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.enlaceApp { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); }
+.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a:hover { text-decoration: underline; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.7rem; }
+  .timeline { justify-content: flex-start; }
+  .timelineStep { min-width: 46px; padding: 0.3rem; }
+  .stepIcono { font-size: 0.9rem; }
+  .globalesGrid { grid-template-columns: repeat(2, 1fr); }
+  .resumenGrid { grid-template-columns: 1fr; }
+  .pasoHeader { flex-direction: column; text-align: center; }
+  .pasoIcono { font-size: 2rem; }
+}
+@media (prefers-reduced-motion: reduce) { .progressSegment { transition-duration: 0.01ms; } }
