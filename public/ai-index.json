@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 435,
+  "total_tools": 442,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -848,6 +848,41 @@
         },
         {
           "name": "El Dinero y el Tiempo",
+          "slug": "visualizador-fuerzas-invisibles",
+          "url": "https://meskeia.com/visualizador-fuerzas-invisibles/",
+          "description": "5 fuerzas cotidianas: gravedad, fricción, inercia, presión y tensión superficial"
+        },
+        {
+          "slug": "visualizador-escala-universo",
+          "url": "https://meskeia.com/visualizador-escala-universo/",
+          "description": "Zoom del quark a la galaxia: 14 niveles de escala del universo"
+        },
+        {
+          "slug": "visualizador-oferta-demanda",
+          "url": "https://meskeia.com/visualizador-oferta-demanda/",
+          "description": "Oferta y demanda con 5 escenarios reales: petróleo, sequía, iPhone, BCE"
+        },
+        {
+          "slug": "visualizador-viaje-comida",
+          "url": "https://meskeia.com/visualizador-viaje-comida/",
+          "description": "6 etapas del sistema digestivo: de la boca al intestino con tiempos reales"
+        },
+        {
+          "slug": "visualizador-adn-numeros",
+          "url": "https://meskeia.com/visualizador-adn-numeros/",
+          "description": "Tu ADN en cifras: 3.200 millones de bases, 99,9% idéntico, 60% plátano"
+        },
+        {
+          "slug": "visualizador-historia-reloj",
+          "url": "https://meskeia.com/visualizador-historia-reloj/",
+          "description": "300.000 años de humanidad en 24 horas: agricultura a las 23:52, internet a las 23:59:57"
+        },
+        {
+          "slug": "visualizador-origen-camiseta",
+          "url": "https://meskeia.com/visualizador-origen-camiseta/",
+          "description": "Cadena global de una camiseta de 15 €: del algodón a la tienda en 6 etapas"
+        },
+        {
           "slug": "visualizador-funciones-mundo",
           "url": "https://meskeia.com/visualizador-funciones-mundo/",
           "description": "Lineal, exponencial, logarítmica y cuadrática con ejemplos reales y gráficos interactivos"

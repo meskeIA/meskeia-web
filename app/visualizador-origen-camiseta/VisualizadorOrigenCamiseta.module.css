@@ -1,0 +1,184 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+/* ── HERO ── */
+.hero {
+  text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large); color: white;
+}
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+/* ── RESUMEN PRECIO ── */
+.resumenPrecio {
+  display: flex; align-items: center; justify-content: center; gap: var(--spacing-lg);
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large);
+  padding: var(--spacing-lg) var(--spacing-xl); margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+.resumenItem { display: flex; align-items: center; gap: var(--spacing-md); }
+.resumenIcono { font-size: 2rem; }
+.resumenLabel { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 0.2rem 0; }
+.resumenValor { font-size: 1.6rem; font-weight: 800; margin: 0; }
+.resumenSeparador { font-size: 1.5rem; color: var(--text-muted); }
+
+/* ── BARRA COMPOSICIÓN ── */
+.barraSeccion { margin-bottom: var(--spacing-xl); }
+.barraTitulo { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.barraSubtitulo { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: var(--spacing-md); }
+
+.barraPrecio {
+  display: flex; height: 48px; border-radius: var(--radius); overflow: hidden;
+  margin-bottom: var(--spacing-md); box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.barraSegmento {
+  border: none; cursor: pointer; transition: filter 0.15s, transform 0.15s;
+  outline: none; padding: 0;
+}
+.barraSegmento:hover { filter: brightness(1.15); }
+.barraSegmento:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.barraSegmentoActivo { transform: scaleY(1.12); filter: brightness(1.2); z-index: 1; position: relative; }
+
+.barraLeyenda { display: flex; flex-direction: column; gap: 0.4rem; }
+.barraLeyendaItem {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  font-size: 0.85rem;
+}
+.barraLeyendaDot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.barraLeyendaTexto { flex: 1; color: var(--text-primary); }
+.barraLeyendaCoste { font-weight: 700; color: var(--text-secondary); white-space: nowrap; }
+
+/* ── TIMELINE ── */
+.timelineSeccion { margin-bottom: var(--spacing-xl); }
+
+.timeline {
+  display: flex; align-items: flex-start; gap: 0;
+  overflow-x: auto; padding-bottom: var(--spacing-md);
+}
+.timelineEtapa {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; min-width: 90px; position: relative;
+}
+.timelineNodo {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 3px solid var(--border); background: var(--bg-card);
+  cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0;
+  transition: all 0.2s; position: relative; z-index: 2;
+  flex-shrink: 0;
+}
+.timelineNodo:hover { transform: scale(1.1); }
+.timelineNodo:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.timelineNodoActivo { color: white; transform: scale(1.12); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.timelineIcono { font-size: 1.2rem; line-height: 1; }
+.timelineNum {
+  font-size: 0.62rem; font-weight: 800; line-height: 1;
+  color: inherit; opacity: 0.75;
+}
+.timelineNodoActivo .timelineNum { color: white; }
+.timelineLinea {
+  position: absolute; top: 26px; left: calc(50% + 26px);
+  width: calc(100% - 52px); height: 3px;
+  background: var(--border); z-index: 1;
+}
+.timelineLabel {
+  font-size: 0.72rem; color: var(--text-secondary); text-align: center;
+  margin-top: 0.4rem; max-width: 80px; line-height: 1.3;
+  padding: 0 0.25rem;
+}
+
+/* ── PANEL DETALLE ── */
+.detallePanel {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-left: 5px solid var(--primary); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-xl);
+  animation: slideIn 0.2s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.detalleCabecera { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.detalleIconoGrande { font-size: 2.8rem; }
+.detalleTitulos {}
+.detalleNombre { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.2rem 0; }
+.detallePais { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
+
+.detalleMeta { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.detalleMetaItem { display: flex; align-items: flex-start; gap: var(--spacing-sm); }
+.detalleMetaIcono { font-size: 1.3rem; margin-top: 0.1rem; }
+.detalleMetaLabel { font-size: 0.78rem; color: var(--text-muted); margin: 0 0 0.2rem 0; }
+.detalleMetaValor { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.detalleMetaPct { font-size: 0.82rem; color: var(--text-muted); font-weight: 400; }
+
+.detalleDescripcion { font-size: 0.92rem; color: var(--text-primary); line-height: 1.65; margin-bottom: var(--spacing-md); }
+
+.detalleImpacto {
+  display: flex; gap: var(--spacing-sm); align-items: flex-start;
+  background: rgba(255,193,7,0.08); border: 1px solid #F59E0B;
+  border-radius: 8px; padding: var(--spacing-md); margin-bottom: var(--spacing-md);
+}
+.detalleImpactoIcono { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+.detalleImpactoTexto { font-size: 0.87rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
+[data-theme='dark'] .detalleImpacto { background: rgba(255,193,7,0.05); border-color: #B45309; }
+
+.detalleCerrar {
+  background: var(--hover); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.4rem 1rem; font-size: 0.82rem; color: var(--text-secondary);
+  cursor: pointer; transition: all 0.15s;
+}
+.detalleCerrar:hover { background: var(--border); color: var(--text-primary); }
+.detalleCerrar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ── INSIGHT ── */
+.insight {
+  background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%);
+  border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl);
+  color: var(--text-primary); line-height: 1.65;
+}
+.insight p { margin: 0; font-size: 0.95rem; }
+
+/* ── EDUCATIONAL WARNING BOX ── */
+.warningBox {
+  background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg);
+  font-size: 0.9rem; line-height: 1.5; color: #92400E;
+}
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .subtitle { font-size: 0.98rem; }
+  .resumenPrecio { gap: var(--spacing-md); padding: var(--spacing-md); }
+  .resumenSeparador { display: none; }
+  .resumenValor { font-size: 1.3rem; }
+  .detalleMeta { grid-template-columns: 1fr; }
+  .timeline { gap: 0; }
+  .timelineNodo { width: 44px; height: 44px; }
+  .timelineIcono { font-size: 1rem; }
+  .timelineLabel { font-size: 0.65rem; max-width: 70px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraSegmento, .timelineNodo, .detallePanel {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
