@@ -1,0 +1,69 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+.funcionesNav { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.funcionBtn { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; color: var(--text-secondary); }
+.funcionBtn:hover { background: var(--hover); }
+.funcionActiva { background: rgba(46,134,171,0.06); color: var(--text-primary); }
+.funcionIcono { font-size: 1.5rem; }
+.funcionNombre { font-size: 0.82rem; font-weight: 600; }
+
+.funcionInfo { border-left: 4px solid; background: var(--bg-card); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.formulaCard { display: inline-block; background: var(--hover); border-radius: 8px; padding: 0.4rem 1rem; margin-bottom: var(--spacing-sm); }
+.formulaTexto { font-family: 'Courier New', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.funcionExplicacion { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+
+.sliderZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sliderHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
+.sliderLabel { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+.sliderValor { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+.slider { width: 100%; height: 8px; border-radius: 4px; background: var(--border); outline: none; appearance: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+
+.chartContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.chartWrap { position: relative; height: 320px; }
+
+.ejemploReal { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md); }
+.ejemploTitulo { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.ejemploTexto { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+
+.datoSorprendente { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.datoLabel { display: block; font-size: 0.78rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.datoSorprendente p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+
+.comparativaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
+.comparativaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.comparativaTexto { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: var(--spacing-lg); }
+.comparativaGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); }
+.comparativaItem { background: var(--hover); border-top: 3px solid; border-radius: var(--radius); padding: var(--spacing-sm); text-align: center; }
+.comparativaIcono { font-size: 1.3rem; display: block; }
+.comparativaNombre { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); display: block; }
+.comparativaCrece { font-size: 0.7rem; color: var(--text-muted); }
+
+.enlaceApp { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); }
+.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a:hover { text-decoration: underline; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); } .title { font-size: 1.7rem; }
+  .funcionesNav { grid-template-columns: repeat(2, 1fr); }
+  .comparativaGrid { grid-template-columns: repeat(2, 1fr); }
+  .chartWrap { height: 260px; }
+}
+@media (prefers-reduced-motion: reduce) { }

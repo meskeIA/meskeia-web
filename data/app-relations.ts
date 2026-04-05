@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-funciones-mundo': [
+    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad', description: 'Simulaciones interactivas' },
+    { url: '/algebra-ecuaciones/', icon: '🧮', name: 'Álgebra y Ecuaciones', description: 'Resuelve ecuaciones' },
+    { url: '/visualizador-dinero-y-tiempo/', icon: '⏳', name: 'El Dinero y el Tiempo', description: 'Interés compuesto visual' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+  ],
   'visualizador-probabilidad': [
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas visuales' },
     { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Cómo tu cerebro te engaña' },
