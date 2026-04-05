@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 442,
+  "total_tools": 452,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -981,6 +981,56 @@
           "slug": "visualizador-dinero-y-tiempo",
           "url": "https://meskeia.com/visualizador-dinero-y-tiempo/",
           "description": "Explicador visual interactivo: hipoteca, interés compuesto, inflación y amortización con gráficos animados"
+        },
+        {
+          "slug": "visualizador-coste-sanidad",
+          "url": "https://meskeia.com/visualizador-coste-sanidad/",
+          "description": "Coste real de consultas, operaciones y urgencias: España vs otros países, sanidad pública vs privada"
+        },
+        {
+          "slug": "visualizador-agua-virtual",
+          "url": "https://meskeia.com/visualizador-agua-virtual/",
+          "description": "El agua oculta en tu café, camiseta y filete: huella hídrica invisible de productos cotidianos"
+        },
+        {
+          "slug": "visualizador-historia-dinero",
+          "url": "https://meskeia.com/visualizador-historia-dinero/",
+          "description": "Del trueque al bitcoin: timeline interactiva del dinero a través de la historia"
+        },
+        {
+          "slug": "visualizador-sistema-electoral",
+          "url": "https://meskeia.com/visualizador-sistema-electoral/",
+          "description": "Sistemas electorales: ley D'Hondt paso a paso, proporcional vs mayoritario, circunscripciones"
+        },
+        {
+          "slug": "visualizador-idiomas-mundo",
+          "url": "https://meskeia.com/visualizador-idiomas-mundo/",
+          "description": "7.000 idiomas del mundo: familias lingüísticas, los más hablados y lenguas en peligro de extinción"
+        },
+        {
+          "slug": "visualizador-ciclos-sueno",
+          "url": "https://meskeia.com/visualizador-ciclos-sueno/",
+          "description": "Fases del sueño, hipnograma, horas por edad y enemigos del descanso explicados visualmente"
+        },
+        {
+          "slug": "visualizador-ciudad",
+          "url": "https://meskeia.com/visualizador-ciudad/",
+          "description": "Infraestructura urbana en capas: tuberías, metro, fibra óptica, transporte y presupuesto municipal"
+        },
+        {
+          "slug": "visualizador-desarrollo-farmaco",
+          "url": "https://meskeia.com/visualizador-desarrollo-farmaco/",
+          "description": "Del laboratorio a la farmacia: 10.000 compuestos → 1 medicamento, ensayos clínicos y costes"
+        },
+        {
+          "slug": "visualizador-proceso-legislativo",
+          "url": "https://meskeia.com/visualizador-proceso-legislativo/",
+          "description": "Cómo se hace una ley en España: propuesta, Congreso, Senado, BOE. Flujo con tiempos reales"
+        },
+        {
+          "slug": "visualizador-vida-estrella",
+          "url": "https://meskeia.com/visualizador-vida-estrella/",
+          "description": "Del nacimiento al agujero negro: evolución estelar con slider de masa y diagrama de destinos"
         },
         {
           "name": "Estimador de Infraseguro",

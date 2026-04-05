@@ -704,6 +704,66 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-inflacion/', icon: '💸', name: 'Estimador Inflación', description: 'Datos históricos del INE' },
     { url: '/amortizacion-hipoteca/', icon: '💰', name: 'Amortización Hipoteca', description: 'Reducir cuota vs plazo' },
   ],
+  'visualizador-coste-sanidad': [
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Qué Pasa Cuando Duermes', description: 'Ciencia del sueño' },
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
+    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
+  ],
+  'visualizador-agua-virtual': [
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental alimentos' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global de producción' },
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+  ],
+  'visualizador-historia-dinero': [
+    { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Sistema bancario visual' },
+    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'A dónde va tu dinero' },
+    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'Por qué suben los precios' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+  ],
+  'visualizador-sistema-electoral': [
+    { url: '/visualizador-proceso-legislativo/', icon: '📜', name: 'El Viaje de una Ley', description: 'Cómo se hace una ley en España' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Cómo tu cerebro te engaña' },
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
+    { url: '/visualizador-peso-decisiones/', icon: '⚖️', name: 'Cuánto Pesa una Decisión', description: 'Impacto acumulado' },
+  ],
+  'visualizador-idiomas-mundo': [
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+    { url: '/visualizador-historia-reloj/', icon: '🕐', name: 'Historia en un Reloj', description: '300.000 años en 24 horas' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global' },
+  ],
+  'visualizador-ciclos-sueno': [
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+    { url: '/visualizador-coste-sanidad/', icon: '🏥', name: 'Lo que Cuesta Enfermarse', description: 'Sanidad pública vs privada' },
+    { url: '/visualizador-mapa-tiempo/', icon: '🗺️', name: 'El Mapa de tu Tiempo', description: 'Las 700.000 horas de tu vida' },
+    { url: '/visualizador-peso-decisiones/', icon: '⚖️', name: 'Cuánto Pesa una Decisión', description: 'Impacto acumulado' },
+  ],
+  'visualizador-ciudad': [
+    { url: '/visualizador-factura-electrica/', icon: '💡', name: 'Tu Electricidad al Desnudo', description: 'Anatomía de la factura' },
+    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'Presupuestos del Estado' },
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Agua que No Ves', description: 'Huella hídrica invisible' },
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
+  ],
+  'visualizador-desarrollo-farmaco': [
+    { url: '/visualizador-coste-sanidad/', icon: '🏥', name: 'Lo que Cuesta Enfermarse', description: 'Sanidad pública vs privada' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+    { url: '/visualizador-viaje-comida/', icon: '🍽️', name: 'El Viaje de tu Comida', description: 'Sistema digestivo' },
+  ],
+  'visualizador-proceso-legislativo': [
+    { url: '/visualizador-sistema-electoral/', icon: '🗳️', name: 'Cómo Funciona una Elección', description: 'Sistemas electorales' },
+    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'Presupuestos del Estado' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Cómo tu cerebro te engaña' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+  ],
+  'visualizador-vida-estrella': [
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma humano' },
+  ],
 
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },

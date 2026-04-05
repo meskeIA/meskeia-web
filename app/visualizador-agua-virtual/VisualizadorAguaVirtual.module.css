@@ -1,0 +1,147 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --agua: #3498db; --agua-claro: #85c1e9;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegacion */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionSubtituloH3 { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* Productos - desayuno */
+.productosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.productoCard { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; text-align: center; }
+.productoCard:hover { border-color: var(--agua); }
+.productoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.productoActivo { border-color: var(--agua); background: rgba(52,152,219,0.04); }
+.productoIcono { font-size: 2rem; }
+.productoNombre { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.productoLitros { font-size: 1.1rem; font-weight: 700; color: var(--agua); }
+
+/* Barra de agua (reutilizable) */
+.barraContainer { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.barraAgua { height: 100%; background: linear-gradient(90deg, var(--primary), var(--agua-claro)); border-radius: 4px; transition: width 0.3s; }
+.barraAlimento { height: 100%; border-radius: 4px; transition: width 0.3s; }
+
+/* Detalle card */
+.detalleCard { display: flex; gap: var(--spacing-md); align-items: flex-start; background: rgba(52,152,219,0.06); border: 1px solid rgba(52,152,219,0.2); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.detalleIcono { font-size: 1.5rem; flex-shrink: 0; }
+.detalleCard p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0.3rem 0 0; }
+
+/* Total card */
+.totalCard { display: flex; align-items: center; gap: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--agua); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.totalIcono { font-size: 2rem; flex-shrink: 0; }
+.totalLabel { display: block; font-size: 0.82rem; color: var(--text-secondary); }
+.totalValor { display: block; font-size: 1.4rem; font-weight: 700; color: var(--agua); }
+.totalComparacion { margin-left: auto; font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
+
+/* Ropa - armario */
+.ropaLista { display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.ropaItem { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; text-align: left; }
+.ropaItem:hover { border-color: var(--agua); }
+.ropaItem:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ropaActivo { border-color: var(--agua); background: rgba(52,152,219,0.04); }
+.ropaInfo { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.ropaIcono { font-size: 1.5rem; }
+.ropaNombre { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+.ropaLitros { font-size: 1.1rem; font-weight: 700; color: var(--agua); }
+
+/* Comparacion card */
+.comparacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.comparacionTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+.comparacionGrid { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); flex-wrap: wrap; }
+.comparacionItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); text-align: center; }
+.comparacionIcono { font-size: 1.5rem; }
+.comparacionTexto { font-size: 0.82rem; color: var(--text-secondary); }
+.comparacionValor { font-size: 1.1rem; font-weight: 700; color: var(--agua); }
+.comparacionVs { font-size: 1.5rem; color: var(--text-muted); }
+
+/* Alimentos - plato */
+.ordenControl { text-align: right; margin-bottom: var(--spacing-md); }
+.ordenBtn { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem var(--spacing-md); font-size: 0.82rem; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
+.ordenBtn:hover { border-color: var(--primary); color: var(--primary); }
+.ordenBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.alimentosLista { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: var(--spacing-lg); }
+.alimentoItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.alimentoInfo { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.alimentoIcono { font-size: 1.3rem; }
+.alimentoNombre { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+.alimentoLitros { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+
+/* Slider */
+.sliderZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sliderHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
+.sliderLabel { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+.sliderValor { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+.slider { width: 100%; height: 8px; border-radius: 4px; background: var(--border); outline: none; appearance: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.sliderExtremos { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+/* Paises comparacion */
+.paisesComparacion { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: var(--spacing-lg); }
+.paisItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); transition: all 0.2s; }
+.paisActivo { border-color: var(--primary); background: rgba(46,134,171,0.04); }
+.paisInfo { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.paisNombre { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+.paisLitros { font-size: 0.95rem; font-weight: 700; color: var(--agua); }
+
+.paisDetalle { display: flex; gap: var(--spacing-md); align-items: flex-start; background: rgba(52,152,219,0.06); border: 1px solid rgba(52,152,219,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.paisDetalleFlag { font-size: 2.5rem; flex-shrink: 0; }
+.paisDetalle p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0.3rem 0 0; }
+.paisAnual { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+/* Consejos */
+.consejosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.consejoCard { display: flex; gap: var(--spacing-md); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.consejoIcono { font-size: 1.5rem; flex-shrink: 0; }
+.consejoTexto { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.2rem; }
+.consejoAhorro { display: block; font-size: 0.78rem; color: var(--secondary); font-weight: 600; }
+
+/* Insight, enlace, warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.enlaceApp { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); }
+.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a:hover { text-decoration: underline; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .productosGrid { grid-template-columns: 1fr; }
+  .totalCard { flex-direction: column; text-align: center; }
+  .totalComparacion { margin-left: 0; }
+  .comparacionGrid { flex-direction: column; }
+  .comparacionVs { transform: rotate(90deg); }
+  .consejosGrid { grid-template-columns: 1fr; }
+  .paisDetalle { flex-direction: column; align-items: center; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { .barraAgua, .barraAlimento { transition-duration: 0.01ms; } }
