@@ -28,6 +28,7 @@ export const implementedAppsUrls = [
   "/visualizador-peso-decisiones/",
   "/visualizador-internet-60-segundos/",
   "/visualizador-como-funciona-banco/",
+  "/visualizador-probabilidad/",
   "/estimador-tir-van/",
   "/control-gastos/",
   "/estimador-interes-compuesto/",

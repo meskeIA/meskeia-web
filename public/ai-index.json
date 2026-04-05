@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 433,
+  "total_tools": 434,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -848,6 +848,11 @@
         },
         {
           "name": "El Dinero y el Tiempo",
+          "slug": "visualizador-probabilidad",
+          "url": "https://meskeia.com/visualizador-probabilidad/",
+          "description": "Simulaciones de probabilidad: monedas, dados, paradoja del cumpleaños y falacia del jugador"
+        },
+        {
           "slug": "visualizador-como-funciona-banco",
           "url": "https://meskeia.com/visualizador-como-funciona-banco/",
           "description": "Cómo funciona un banco: depósitos, reserva fraccionaria, multiplicador, BCE y pánico bancario"

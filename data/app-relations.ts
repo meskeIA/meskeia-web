@@ -542,6 +542,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-deuda': finanzasPersonalesApps.filter(a => a.url !== '/estimador-deuda/').slice(0, 4),
 
   // VISUALIZADORES
+  'visualizador-probabilidad': [
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas visuales' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Cómo tu cerebro te engaña' },
+    { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Sistema bancario visual' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+  ],
   'visualizador-como-funciona-banco': [
     { url: '/visualizador-dinero-y-tiempo/', icon: '⏳', name: 'El Dinero y el Tiempo', description: 'Interés compuesto e inflación' },
     { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'De bruto a neto visual' },
