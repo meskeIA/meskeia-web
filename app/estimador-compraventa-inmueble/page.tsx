@@ -170,9 +170,9 @@ export default function SimuladorCompraventaPage() {
       porcentaje = tipoAplicable;
     }
 
-    // AJD: En primera mano se paga sobre la compraventa. En segunda mano, solo si hay hipoteca (sobre el préstamo)
-    // Aquí calculamos el AJD de la compraventa (primera mano) o de la escritura (segunda mano)
-    const ajd = calcularAJD(precio, ccaa);
+    // AJD: Solo aplica en primera mano (junto con IVA). En segunda mano se paga ITP, no AJD
+    // El AJD en segunda mano solo aplicaría sobre la escritura de hipoteca (no sobre la compraventa)
+    const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
 
     const notario = calcularNotario(precio);
     const registro = calcularRegistro(precio);
