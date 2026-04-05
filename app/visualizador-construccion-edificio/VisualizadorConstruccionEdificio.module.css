@@ -1,0 +1,171 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección Fases: Timeline vertical ─── */
+.timeline { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-lg); }
+.timelineItem { display: flex; align-items: stretch; background: var(--bg-card); border: 1px solid var(--border); border-bottom: none; cursor: pointer; transition: background 0.2s; text-align: left; padding: 0; }
+.timelineItem:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+.timelineItem:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); }
+.timelineItem:hover { background: var(--hover); }
+.timelineItem:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; z-index: 1; }
+.timelineActivo { background: var(--hover); border-color: var(--fase-color, var(--primary)); }
+
+.timelineLinea { display: flex; flex-direction: column; align-items: center; width: 48px; flex-shrink: 0; padding: var(--spacing-md) 0; position: relative; }
+.timelineLinea::before { content: ''; position: absolute; top: 0; bottom: 0; width: 3px; background: var(--border); left: 50%; transform: translateX(-50%); }
+.timelineItem:first-child .timelineLinea::before { top: 50%; }
+.timelineItem:last-child .timelineLinea::before { bottom: 50%; }
+
+.timelineNodo { width: 28px; height: 28px; border-radius: 50%; background: var(--fase-color, var(--primary)); display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; flex-shrink: 0; }
+.timelineNumero { font-size: 0.75rem; font-weight: 700; color: white; }
+
+.timelineContenido { flex: 1; padding: var(--spacing-md); }
+.timelineHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.4rem; flex-wrap: wrap; }
+.timelineIcono { font-size: 1.2rem; }
+.timelineNombre { font-size: 0.92rem; color: var(--text-primary); }
+.timelineDuracion { font-size: 0.78rem; color: var(--primary); font-weight: 600; margin-left: auto; }
+
+.duracionBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.3rem; }
+.duracionRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 4px; }
+
+.timelineDetalle { padding-top: 0.4rem; border-top: 1px solid var(--border); margin-top: 0.4rem; }
+.timelineDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.4rem 0; }
+.timelineDato { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+
+/* ─── Sección Oficios ─── */
+.filtroGrid { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); justify-content: center; }
+.filtroBtn { padding: 0.5rem 1rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; }
+.filtroBtn:hover { border-color: var(--filtro-color, var(--primary)); color: var(--filtro-color, var(--primary)); }
+.filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.filtroActivo { border-color: var(--filtro-color, var(--primary)); background: var(--filtro-color, var(--primary)); color: white; }
+.filtroActivo:hover { color: white; }
+
+.oficiosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.oficioCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--oficio-color, var(--primary)); border-radius: var(--radius); padding: var(--spacing-md); }
+.oficioHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.oficioIcono { font-size: 1.3rem; flex-shrink: 0; }
+.oficioNombre { display: block; font-size: 0.9rem; color: var(--text-primary); }
+.oficioFase { display: block; font-size: 0.72rem; color: var(--oficio-color, var(--primary)); font-weight: 600; }
+.oficioNum { margin-left: auto; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); background: var(--hover); padding: 0.2rem 0.5rem; border-radius: 10px; white-space: nowrap; }
+.oficioDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* ─── Sección Materiales ─── */
+.materialesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.materialCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.materialHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.materialIcono { font-size: 1.4rem; flex-shrink: 0; }
+.materialNombre { display: block; font-size: 0.92rem; color: var(--text-primary); }
+.materialCantidad { display: block; font-size: 0.82rem; color: var(--primary); font-weight: 600; }
+.materialBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: var(--spacing-sm); }
+.materialRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 4px; }
+.materialDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+.subSeccionTitulo { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+
+.costesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.costeCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.costeHeader { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; }
+.costeNombre { font-size: 0.85rem; color: var(--text-primary); }
+.costeRango { display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem; }
+.costeSeparador { color: var(--text-muted); }
+.costeUnidad { font-size: 0.72rem; color: var(--text-muted); font-weight: 400; }
+.costeBarra { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.costeRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 3px; }
+
+/* ─── Sección Tiempos ─── */
+.tiempoBarraTotal { display: flex; height: 40px; border-radius: var(--radius); overflow: hidden; margin-bottom: var(--spacing-sm); border: 1px solid var(--border); }
+.tiempoSegmento { cursor: pointer; transition: opacity 0.2s, transform 0.2s; }
+.tiempoSegmento:focus-visible { outline: 2px solid white; outline-offset: -2px; }
+.tiempoSegmentoActivo { opacity: 1; transform: scaleY(1.15); z-index: 1; }
+
+.leyendaTiempo { display: flex; justify-content: center; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.leyendaItem { display: flex; align-items: center; gap: 0.3rem; font-size: 0.82rem; color: var(--text-secondary); }
+.leyendaDot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+.etapasLista { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.etapaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); transition: all 0.2s; cursor: default; }
+.etapaDestacada { border-color: var(--etapa-color, var(--primary)); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.etapaHeader { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+.etapaIndicador { width: 10px; height: 10px; border-radius: 50%; background: var(--etapa-color, var(--primary)); flex-shrink: 0; }
+.etapaIcono { font-size: 1.1rem; }
+.etapaNombre { font-size: 0.85rem; color: var(--text-primary); flex: 1; }
+.etapaTipo { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+.etapaMeses { display: flex; align-items: center; gap: var(--spacing-sm); }
+.etapaMesesValor { font-size: 0.82rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 80px; }
+.etapaBarra { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.etapaRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 3px; }
+.etapaDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0.4rem 0 0 0; padding-top: 0.4rem; border-top: 1px solid var(--border); }
+
+/* ─── Compartidos ─── */
+.totalCard { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; margin-bottom: var(--spacing-lg); }
+.totalHeader { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.totalIcono { font-size: 1.5rem; }
+.totalLabel { font-size: 0.95rem; color: var(--text-secondary); font-weight: 600; }
+.totalValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; }
+.totalDetalle { display: block; font-size: 0.85rem; color: var(--text-muted); }
+
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .oficiosGrid { grid-template-columns: 1fr; }
+  .materialesGrid { grid-template-columns: 1fr; }
+  .costesGrid { grid-template-columns: 1fr; }
+  .timelineHeader { flex-wrap: wrap; }
+  .timelineDuracion { margin-left: 0; }
+  .etapaNombre { flex: auto; }
+}
+
+@media (max-width: 480px) {
+  .tiempoBarraTotal { height: 32px; }
+  .filtroGrid { gap: 0.3rem; }
+  .filtroBtn { padding: 0.4rem 0.7rem; font-size: 0.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .duracionRelleno,
+  .materialRelleno,
+  .costeRelleno,
+  .etapaRelleno,
+  .timelineItem,
+  .navBtn,
+  .filtroBtn,
+  .etapaCard,
+  .tiempoSegmento {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,244 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección 1: Sonido ─── */
+
+.propiedadesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.propiedadCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.propiedadHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.propiedadIcono { font-size: 1.3rem; }
+.propiedadTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.propiedadDesc { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.propiedadEjemplo { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+
+/* Ondas */
+.ondasCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.ondasTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.ondasSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.ondasGrid { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.ondaRow { display: flex; align-items: center; gap: var(--spacing-md); }
+.ondaLabel { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); width: 100px; flex-shrink: 0; }
+.ondaVisual { display: flex; align-items: center; gap: 3px; height: 40px; flex: 1; }
+.ondaBarra { width: 8px; border-radius: 4px; transition: height 0.3s; min-height: 4px; }
+.ondaFreq { font-size: 0.82rem; font-weight: 700; color: var(--primary); width: 65px; text-align: right; flex-shrink: 0; }
+
+/* Rango auditivo */
+.rangoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.rangoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-md) 0; }
+.rangoBar { display: flex; border-radius: var(--radius); overflow: hidden; height: 60px; margin-bottom: var(--spacing-sm); }
+.rangoInfra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; }
+[data-theme='dark'] .rangoInfra { background: #3a3a3a; }
+.rangoAudible { flex: 4; background: linear-gradient(90deg, var(--primary), var(--secondary)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; color: white; }
+.rangoUltra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; }
+[data-theme='dark'] .rangoUltra { background: #3a3a3a; }
+.rangoLabel { font-size: 0.75rem; font-weight: 700; }
+.rangoFreq { font-size: 0.7rem; }
+.rangoNotas { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap; gap: var(--spacing-sm); }
+
+/* Dato destacado */
+.datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.datoUnidad { font-size: 1.1rem; font-weight: 600; color: var(--secondary); margin-right: var(--spacing-sm); }
+.datoTexto { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
+
+/* ─── Sección 2: Escala ─── */
+
+/* Ratios pitagóricos */
+.ratiosCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.ratiosTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.ratiosSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.ratiosGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.intervaloRow { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm); background: var(--hover); border-radius: 8px; }
+.intervaloInfo { display: flex; flex-direction: column; gap: 0.1rem; }
+.intervaloNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.intervaloEjemplo { font-size: 0.72rem; color: var(--text-muted); }
+.intervaloRatio { font-size: 0.95rem; font-weight: 700; color: var(--primary); font-family: monospace; text-align: center; min-width: 50px; }
+.intervaloBarContainer { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.intervaloBar { height: 100%; border-radius: 5px; transition: width 0.3s; }
+.consonanciaTag { font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 10px; white-space: nowrap; text-align: center; }
+.consonancia_perfecta { background: rgba(46,134,171,0.12); color: #2E86AB; }
+.consonancia_alta { background: rgba(72,169,166,0.12); color: #48A9A6; }
+.consonancia_media { background: rgba(230,126,34,0.12); color: #e67e22; }
+.consonancia_baja { background: rgba(231,76,60,0.12); color: #e74c3c; }
+
+/* 12 notas */
+.doceNotasCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.doceNotasTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.doceNotasExplicacion { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.doceNotasPaso { display: flex; gap: var(--spacing-md); align-items: flex-start; }
+.pasoNumero { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+.doceNotasPaso p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0.3rem 0 0 0; }
+.doceNotasPaso strong { color: var(--text-primary); font-size: 0.95rem; }
+
+/* Notas y frecuencias */
+.notasFreqCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.notasFreqTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.notasBarras { display: flex; justify-content: center; align-items: flex-end; gap: var(--spacing-sm); height: 200px; padding-bottom: 60px; position: relative; }
+.notaBarra { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; flex: 1; max-width: 60px; height: 100%; position: relative; justify-content: flex-end; }
+.notaBarraFill { width: 100%; border-radius: 6px 6px 0 0; min-height: 10px; transition: height 0.3s; }
+.notaBarraNombre { font-size: 0.68rem; font-weight: 700; color: var(--text-primary); position: absolute; bottom: -22px; white-space: nowrap; }
+.notaBarraFreq { font-size: 0.62rem; color: var(--text-muted); position: absolute; bottom: -36px; white-space: nowrap; }
+.notaBarraRatio { font-size: 0.6rem; color: var(--text-secondary); position: absolute; bottom: -48px; font-family: monospace; }
+
+/* ─── Sección 3: Acordes ─── */
+
+.acordesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.acordeCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); transition: transform 0.2s; }
+.acordeCard:hover { transform: translateY(-2px); }
+.acordeMayor { border-left: 4px solid #2E86AB; }
+.acordeMenor { border-left: 4px solid #9b59b6; }
+.acordeHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); flex-wrap: wrap; gap: 0.3rem; }
+.acordeNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.acordeTipo { font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 10px; }
+.tipoMayor { background: rgba(46,134,171,0.12); color: #2E86AB; }
+.tipoMenor { background: rgba(155,89,182,0.12); color: #9b59b6; }
+.acordeNotas { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); font-weight: 500; }
+.acordeRatioVisual { margin-bottom: var(--spacing-sm); }
+.acordeRatioLabel { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; display: block; margin-bottom: 0.3rem; }
+.acordeBarras { display: flex; align-items: flex-end; gap: 6px; height: 50px; }
+.acordeBarraItem { width: 20px; border-radius: 4px 4px 0 0; min-height: 8px; }
+.acordeEmocion { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 var(--spacing-sm) 0; font-style: italic; }
+.acordeEjemplos { display: flex; flex-direction: column; gap: 0.2rem; }
+.acordeEjemplo { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Explicación mayor/menor */
+.explicacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.explicacionTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.explicacionGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
+.explicacionItem { text-align: center; }
+.explicacionIcono { font-size: 1.5rem; display: block; margin-bottom: var(--spacing-sm); }
+.explicacionItem strong { font-size: 0.88rem; color: var(--text-primary); display: block; margin-bottom: 0.3rem; }
+.explicacionItem p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* Progresiones */
+.progresionesCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.progresionesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.progresionesSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.progresionItem { border-bottom: 1px solid var(--border); padding: var(--spacing-md) 0; }
+.progresionItem:last-child { border-bottom: none; padding-bottom: 0; }
+.progresionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; flex-wrap: wrap; gap: 0.3rem; }
+.progresionNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.progresionGrados { font-size: 0.82rem; font-weight: 600; color: var(--primary); font-family: monospace; }
+.progresionAcordes { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); font-weight: 500; }
+.progresionCanciones { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+.progresionCancion { font-size: 0.75rem; color: var(--text-muted); background: var(--hover); padding: 0.15rem 0.5rem; border-radius: 8px; }
+
+/* ─── Sección 4: Ritmo ─── */
+
+/* Compases */
+.compasesCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.compasesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.compasesSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.compasesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.compasItem { display: grid; grid-template-columns: 50px 1fr auto; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.compasNumero { font-size: 1.3rem; font-weight: 800; color: var(--primary); font-family: monospace; text-align: center; }
+.compasNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.compasPatron { display: flex; gap: 4px; align-items: center; }
+.compassPulso { width: 14px; height: 14px; border-radius: 50%; transition: all 0.2s; }
+.pulsoFuerte { background: var(--primary); box-shadow: 0 0 6px rgba(46,134,171,0.4); }
+.pulsoDebil { background: var(--border); }
+.compasGenero { font-size: 0.75rem; color: var(--text-secondary); grid-column: 2; }
+.compasEjemplo { font-size: 0.72rem; color: var(--text-muted); font-style: italic; grid-column: 2; }
+
+/* BPM */
+.bpmCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.bpmTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.bpmSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.bpmGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.bpmRow { display: grid; grid-template-columns: 100px 1fr 60px; gap: var(--spacing-sm); align-items: center; }
+.bpmGenero { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+.bpmBarContainer { height: 18px; background: var(--hover); border-radius: 9px; position: relative; overflow: hidden; }
+.bpmBar { position: absolute; top: 0; height: 100%; border-radius: 9px; opacity: 0.8; }
+.bpmRango { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-align: right; font-family: monospace; }
+.bpmEscala { display: flex; justify-content: space-between; padding-top: var(--spacing-sm); border-top: 1px solid var(--border); margin-top: var(--spacing-sm); }
+.bpmEscala span { font-size: 0.68rem; color: var(--text-muted); }
+
+/* Polirritmias */
+.polirritmiaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.polirritmiaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.polirritmiaSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.polirritmiaVisual { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.polirritmiaRow { display: flex; align-items: center; gap: var(--spacing-md); }
+.polirritmiaLabel { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); width: 70px; flex-shrink: 0; }
+.polirritmiaGrid12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; flex: 1; }
+.polirritmiaCelda { height: 24px; background: var(--hover); border-radius: 4px; }
+.pulsoPoli3 { background: var(--primary); box-shadow: 0 0 6px rgba(46,134,171,0.4); }
+.pulsoPoli4 { background: var(--secondary); box-shadow: 0 0 6px rgba(72,169,166,0.4); }
+.polirritmiaEjemplo { font-size: 0.78rem; color: var(--text-muted); text-align: center; font-style: italic; }
+
+/* Fibonacci */
+.fibonacciCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.fibonacciTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.fibonacciSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+.fibonacciGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.fibonacciItem { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.fibonacciHeader { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); align-items: baseline; margin-bottom: 0.3rem; }
+.fibonacciCompositor { font-size: 0.95rem; color: var(--text-primary); }
+.fibonacciObra { font-size: 0.82rem; color: var(--primary); }
+.fibonacciDetalle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.3rem 0; }
+.fibonacciDato { font-size: 0.75rem; font-weight: 600; color: var(--primary); font-family: monospace; }
+.fibonacciSecuencia { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); }
+.fibonacciSecLabel { font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; }
+.fibonacciNumeros { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); justify-content: center; }
+.fibonacciNum { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-weight: 700; font-size: 0.82rem; }
+.fibonacciEllipsis { display: flex; align-items: center; font-size: 1.2rem; color: var(--text-muted); font-weight: 700; }
+
+/* ─── Compartidos ─── */
+
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Responsive ─── */
+
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .acordesGrid { grid-template-columns: 1fr; }
+  .explicacionGrid { grid-template-columns: 1fr; }
+  .intervaloRow { grid-template-columns: 1fr auto; gap: 0.3rem; }
+  .intervaloBarContainer { display: none; }
+  .consonanciaTag { grid-column: 1 / -1; text-align: left; }
+  .bpmRow { grid-template-columns: 80px 1fr 50px; }
+  .datoDestacado { flex-direction: column; text-align: center; }
+  .ondaLabel { width: 80px; font-size: 0.72rem; }
+  .compasItem { grid-template-columns: 40px 1fr; }
+  .compasPatron { grid-column: 1 / -1; }
+  .notasBarras { gap: 0.25rem; }
+  .polirritmiaRow { flex-direction: column; align-items: stretch; }
+  .polirritmiaLabel { width: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acordeCard, .intervaloBar, .ondaBarra, .compassPulso { transition-duration: 0.01ms !important; }
+}

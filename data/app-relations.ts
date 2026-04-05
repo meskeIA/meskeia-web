@@ -764,6 +764,66 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma humano' },
   ],
+  'visualizador-vacunas': [
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes del cuerpo' },
+    { url: '/visualizador-desarrollo-farmaco/', icon: '💊', name: 'Cómo se Descubre un Medicamento', description: 'Del laboratorio a la farmacia' },
+    { url: '/visualizador-coste-sanidad/', icon: '🏥', name: 'Lo que Cuesta Enfermarse', description: 'Sanidad pública vs privada' },
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
+  ],
+  'visualizador-viaje-basura': [
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica invisible' },
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Efecto invernadero y calentamiento' },
+    { url: '/visualizador-ciudad/', icon: '🏙️', name: 'Anatomía de una Ciudad', description: 'Infraestructura urbana' },
+  ],
+  'visualizador-anatomia-smartphone': [
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global de producción' },
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
+    { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
+    { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'El Viaje de tu Basura', description: 'Reciclaje y degradación' },
+  ],
+  'visualizador-cuerpo-numeros': [
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma humano' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Qué Pasa Cuando Duermes', description: 'Ciencia del sueño' },
+    { url: '/visualizador-vacunas/', icon: '💉', name: 'Cómo Funciona una Vacuna', description: 'Sistema inmune visual' },
+  ],
+  'visualizador-matematicas-musica': [
+    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad', description: 'Simulaciones interactivas' },
+    { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones del Mundo', description: '4 funciones fundamentales' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+  ],
+  'visualizador-construccion-edificio': [
+    { url: '/visualizador-ciudad/', icon: '🏙️', name: 'Anatomía de una Ciudad', description: 'Infraestructura urbana' },
+    { url: '/visualizador-factura-electrica/', icon: '💡', name: 'Tu Electricidad al Desnudo', description: 'Anatomía de la factura' },
+    { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Estimador Hipoteca', description: 'Calcula tu cuota mensual' },
+  ],
+  'visualizador-historia-escritura': [
+    { url: '/visualizador-historia-dinero/', icon: '🪙', name: 'La Evolución del Dinero', description: 'Del trueque al bitcoin' },
+    { url: '/visualizador-historia-reloj/', icon: '🕐', name: 'Historia en un Reloj', description: '300.000 años en 24 horas' },
+    { url: '/visualizador-idiomas-mundo/', icon: '🗣️', name: 'El Mapa de los Idiomas', description: 'Familias lingüísticas' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+  ],
+  'visualizador-anatomia-vuelo': [
+    { url: '/visualizador-fuerzas-invisibles/', icon: '🌍', name: 'Fuerzas Invisibles', description: 'Física del día a día' },
+    { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Lo que hay dentro' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Corrientes y calentamiento' },
+    { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas' },
+  ],
+  'visualizador-mapa-especias': [
+    { url: '/visualizador-historia-dinero/', icon: '🪙', name: 'La Evolución del Dinero', description: 'Del trueque al bitcoin' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global' },
+    { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'Evolución de la Escritura', description: '5.000 años de escritura' },
+    { url: '/visualizador-idiomas-mundo/', icon: '🗣️', name: 'El Mapa de los Idiomas', description: 'Familias lingüísticas' },
+  ],
+  'visualizador-clima': [
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental' },
+    { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'El Viaje de tu Basura', description: 'Reciclaje y degradación' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'La Vida de una Estrella', description: 'Evolución estelar' },
+  ],
 
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },

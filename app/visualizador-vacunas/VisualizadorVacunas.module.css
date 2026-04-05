@@ -1,0 +1,157 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.subSeccionTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* Slider */
+.sliderZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sliderHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
+.sliderLabel { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+.sliderValor { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+.slider { width: 100%; height: 8px; border-radius: 4px; background: var(--border); outline: none; appearance: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.sliderExtremos { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+/* Timeline vertical */
+.timelineVertical { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-xl); position: relative; padding-left: 40px; }
+.timelineVertical::before { content: ''; position: absolute; left: 18px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(180deg, var(--primary), var(--secondary)); }
+.timelineItem { display: flex; gap: var(--spacing-md); position: relative; padding-bottom: var(--spacing-lg); }
+.timelineDot { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; position: absolute; left: -40px; z-index: 1; }
+.timelineCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); flex: 1; }
+.timelineHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); flex-wrap: wrap; gap: 0.3rem; }
+.timelineTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.timelineDuracion { font-size: 0.78rem; color: var(--primary); font-weight: 600; }
+.timelineDesc { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin-bottom: var(--spacing-sm); }
+.timelineDetalle { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin: 0; font-style: italic; }
+
+/* Células inmunes */
+.celulasGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.celulaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.celulaHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.celulaIcono { font-size: 1.5rem; }
+.celulaNombre { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.celulaTipo { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 20px; margin-top: 0.15rem; }
+.tipoInnata { background: rgba(231,76,60,0.1); color: #c0392b; }
+[data-theme='dark'] .tipoInnata { background: rgba(231,76,60,0.2); color: #e74c3c; }
+.tipoAdaptativa { background: rgba(46,134,171,0.1); color: #2E86AB; }
+[data-theme='dark'] .tipoAdaptativa { background: rgba(46,134,171,0.2); color: #7FB3D3; }
+.celulaRol { font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; margin: 0 0 var(--spacing-sm) 0; }
+.celulaPorcentaje { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
+
+/* Vacunas cards */
+.vacunasGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.vacunaCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; }
+.vacunaCard:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.vacunaCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.vacunaActiva { border-left-width: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.vacunaHeaderRow { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.vacunaIcono { font-size: 1.3rem; }
+.vacunaNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.vacunaMecanismo { font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.vacunaEjemplos { font-size: 0.82rem; color: var(--text-secondary); margin: 0; }
+.vacunaDetalle { margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border); }
+.prosContras { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
+.prosCol, .contrasCol { font-size: 0.82rem; }
+.prosLabel, .contrasLabel { display: block; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.prosList, .contrasList { list-style: none; padding: 0; margin: 0; }
+.prosList li, .contrasList li { padding: 0.2rem 0; color: var(--text-primary); line-height: 1.4; }
+.prosList li::before { content: '+ '; color: var(--verde); font-weight: 700; }
+.contrasList li::before { content: '- '; color: var(--rojo); font-weight: 700; }
+
+/* Grid de personas (inmunidad de rebaño) */
+.gridPersonas { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-bottom: var(--spacing-lg); padding: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.persona { width: 100%; aspect-ratio: 1; border-radius: 50%; transition: background 0.3s; }
+.personaVacunada { background: var(--verde); }
+.personaInfectada { background: var(--rojo); }
+.personaSusceptible { background: var(--border); }
+
+/* Leyenda rebaño */
+.leyendaRebano { display: flex; flex-wrap: wrap; gap: var(--spacing-md); justify-content: center; margin-bottom: var(--spacing-lg); }
+.leyendaItem { display: flex; align-items: center; gap: 0.3rem; }
+.leyendaColor { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.leyendaVerde { background: var(--verde); }
+.leyendaRojo { background: var(--rojo); }
+.leyendaGris { background: var(--border); }
+.leyendaTexto { font-size: 0.78rem; color: var(--text-secondary); }
+
+/* Stats grid */
+.statsGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.statCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.statLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
+.statValor { display: block; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+
+/* Umbral cards */
+.umbralGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.umbralCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.umbralEnfermedad { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.umbralBarra { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 0.3rem; }
+.umbralProgreso { height: 100%; border-radius: 4px; transition: width 0.4s, background 0.3s; }
+.umbralDatos { display: flex; justify-content: space-between; align-items: center; }
+.umbralPorcentaje { font-size: 0.78rem; color: var(--text-secondary); }
+.umbralR0 { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
+.umbralLogrado { display: block; font-size: 0.78rem; color: var(--verde); font-weight: 600; margin-top: 0.3rem; }
+
+/* Impacto grid */
+.impactoGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.impactoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg) var(--spacing-md); text-align: center; }
+.impactoIcono { display: block; font-size: 1.8rem; margin-bottom: var(--spacing-sm); }
+.impactoNumero { display: block; font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 0.2rem; }
+.impactoLabel { display: block; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3; }
+
+/* Cita */
+.citaCard { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg) var(--spacing-xl); margin-bottom: var(--spacing-xl); text-align: center; }
+.citaTexto { font-size: 1rem; color: var(--text-primary); line-height: 1.6; font-style: italic; margin: 0 0 var(--spacing-sm) 0; }
+.citaAutor { font-size: 0.88rem; color: var(--primary); font-weight: 600; }
+
+/* Insight, warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .celulasGrid { grid-template-columns: 1fr; }
+  .statsGrid { grid-template-columns: 1fr; }
+  .impactoGrid { grid-template-columns: 1fr; }
+  .prosContras { grid-template-columns: 1fr; }
+  .timelineVertical { padding-left: 30px; }
+  .timelineDot { left: -30px; width: 28px; height: 28px; font-size: 0.9rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .persona, .vacunaCard, .umbralProgreso, .navBtn { transition-duration: 0.01ms !important; }
+}

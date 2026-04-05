@@ -1,0 +1,349 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegacion */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─────────────────────────────────────────
+   Seccion 1: Diagrama de fuerzas
+   ───────────────────────────────────────── */
+.diagramaFuerzas {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avionCentral {
+  position: absolute;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border-radius: 50%;
+  border: 2px solid var(--border);
+}
+.avionEmoji { font-size: 2rem; }
+
+.fuerzaFlecha {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.flechaArriba { top: 16px; left: 50%; transform: translateX(-50%); }
+.flechaAbajo { bottom: 16px; left: 50%; transform: translateX(-50%); }
+.flechaDerecha { right: 24px; top: 50%; transform: translateY(-50%); flex-direction: row; }
+.flechaIzquierda { left: 24px; top: 50%; transform: translateY(-50%); flex-direction: row; }
+.flechaLinea { width: 4px; height: 60px; border-radius: 2px; }
+.flechaLineaH { width: 60px; height: 4px; border-radius: 2px; }
+.flechaLabel { font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+
+/* Perfil del ala */
+.perfilAla {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.perfilTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.alaVisual {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+.alaForma {
+  position: relative;
+  width: 260px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.flujoSuperior, .flujoInferior {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.flujoFlecha { font-size: 1.1rem; color: var(--primary); letter-spacing: 4px; }
+.flujoTexto { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
+.flujoSuperior .flujoTexto { color: var(--verde); }
+.flujoInferior .flujoTexto { color: var(--rojo); }
+.perfilExplicacion { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; text-align: center; margin: 0; }
+
+/* Tarjetas de fuerzas */
+.fuerzasGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.fuerzaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+.fuerzaHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }
+.fuerzaNombre { font-size: 0.9rem; font-weight: 700; margin: 0; }
+.fuerzaDireccion { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: var(--spacing-sm); }
+.fuerzaDesc { font-size: 0.82rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+
+/* ─────────────────────────────────────────
+   Seccion 2: Perfil de altitud
+   ───────────────────────────────────────── */
+.perfilAltitud {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.perfilAltTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.altitudGrafico { position: relative; }
+.altitudLinea {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+.altitudSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.altitudPunto {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, 50%);
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s;
+}
+.altitudPunto:hover, .altitudPuntoActivo {
+  background: var(--primary);
+  transform: translate(-50%, 50%) scale(1.15);
+}
+.altitudIcono { font-size: 0.9rem; }
+.altitudEtiquetas {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-sm);
+}
+
+/* Fases timeline */
+.fasesTimeline { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.faseCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.faseCard:hover { border-color: var(--primary); }
+.faseCardActiva { border-color: var(--primary); border-width: 2px; background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.faseHeader { display: flex; align-items: center; gap: var(--spacing-md); }
+.faseNumero {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.faseIcono { font-size: 1.3rem; flex-shrink: 0; }
+.faseInfo { flex: 1; }
+.faseNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; }
+.faseMetas { display: flex; gap: var(--spacing-md); flex-wrap: wrap; }
+.faseMeta { font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.2rem; }
+.faseDetalle { margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border); }
+.faseDesc { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.faseDato { font-size: 0.82rem; color: var(--primary); margin: 0; line-height: 1.4; }
+
+/* ─────────────────────────────────────────
+   Seccion 3: Ruta visual
+   ───────────────────────────────────────── */
+.rutaVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.rutaCiudad { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.rutaCode { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+.rutaNombre { font-size: 0.75rem; color: var(--text-secondary); }
+.rutaLinea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  position: relative;
+  border-top: 2px dashed var(--primary);
+  padding-top: var(--spacing-sm);
+  max-width: 300px;
+}
+.rutaAvion { font-size: 1.2rem; }
+.rutaDistancia { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+
+/* Tarjetas de datos */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.datoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+.datoIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+.datoLabel { display: block; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.2rem; }
+.datoValor { display: block; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.datoComp { display: block; font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+/* Comparativa CO2 */
+.comparativaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.comparativaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-lg); }
+.barrasContainer { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.barraRow { display: flex; align-items: center; gap: var(--spacing-md); }
+.barraMedio { display: flex; align-items: center; gap: 0.3rem; width: 90px; flex-shrink: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.barraTrack { flex: 1; height: 24px; background: var(--hover); border-radius: 12px; overflow: hidden; }
+.barraFill { height: 100%; border-radius: 12px; transition: width 0.5s ease; min-width: 20px; }
+.barraValores { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; width: 90px; }
+.barraCo2 { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.barraTiempo { font-size: 0.72rem; color: var(--text-muted); }
+
+/* ─────────────────────────────────────────
+   Seccion 4: Instrumentos y curiosidades
+   ───────────────────────────────────────── */
+.instrumentosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.instrumentoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.instrumentoCard:hover { border-color: var(--primary); }
+.instrumentoActivo { border-color: var(--primary); border-width: 2px; }
+.instrumentoHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }
+.instrumentoIcono { font-size: 1.3rem; }
+.instrumentoNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.instrumentoFuncion { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 var(--spacing-sm) 0; }
+.instrumentoDetalle {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+}
+.instrumentoToggle {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Curiosidades */
+.curiosidadesTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-lg); }
+.curiosidadesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.curiosidadCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+.curiosidadIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+.curiosidadTitulo { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
+.curiosidadTexto { font-size: 0.82rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+
+/* Insight, warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .fuerzasGrid { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .instrumentosGrid { grid-template-columns: 1fr; }
+  .curiosidadesGrid { grid-template-columns: 1fr; }
+  .diagramaFuerzas { height: 220px; }
+  .flechaLinea { height: 40px; }
+  .flechaLineaH { width: 40px; }
+  .rutaVisual { flex-direction: column; gap: var(--spacing-md); }
+  .rutaLinea { border-top: none; border-left: 2px dashed var(--primary); padding-top: 0; padding-left: var(--spacing-sm); max-width: none; }
+  .barraRow { flex-wrap: wrap; }
+  .barraMedio { width: 80px; }
+  .barraValores { width: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .altitudPunto, .faseCard, .instrumentoCard, .barraFill { transition-duration: 0.01ms !important; }
+}

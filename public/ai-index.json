@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 452,
+  "total_tools": 462,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1031,6 +1031,56 @@
           "slug": "visualizador-vida-estrella",
           "url": "https://meskeia.com/visualizador-vida-estrella/",
           "description": "Del nacimiento al agujero negro: evolución estelar con slider de masa y diagrama de destinos"
+        },
+        {
+          "slug": "visualizador-vacunas",
+          "url": "https://meskeia.com/visualizador-vacunas/",
+          "description": "Sistema inmune, tipos de vacunas (ARNm, vector, atenuada), inmunidad de rebaño y historia"
+        },
+        {
+          "slug": "visualizador-viaje-basura",
+          "url": "https://meskeia.com/visualizador-viaje-basura/",
+          "description": "Reciclaje explicado: qué va en cada cubo, tiempos de degradación y tasas España vs Europa"
+        },
+        {
+          "slug": "visualizador-anatomia-smartphone",
+          "url": "https://meskeia.com/visualizador-anatomia-smartphone/",
+          "description": "30+ minerales de 15 países dentro de tu móvil: componentes, coste real y obsolescencia"
+        },
+        {
+          "slug": "visualizador-cuerpo-numeros",
+          "url": "https://meskeia.com/visualizador-cuerpo-numeros/",
+          "description": "206 huesos, 100.000 km de vasos, 86.000M neuronas: datos fascinantes del cuerpo humano"
+        },
+        {
+          "slug": "visualizador-matematicas-musica",
+          "url": "https://meskeia.com/visualizador-matematicas-musica/",
+          "description": "Frecuencias, ratios pitagóricos, escalas y armonía: las matemáticas detrás de la música"
+        },
+        {
+          "slug": "visualizador-construccion-edificio",
+          "url": "https://meskeia.com/visualizador-construccion-edificio/",
+          "description": "7 fases de construcción, 15+ oficios, materiales y tiempos: del terreno a las llaves"
+        },
+        {
+          "slug": "visualizador-historia-escritura",
+          "url": "https://meskeia.com/visualizador-historia-escritura/",
+          "description": "De pictogramas a emojis: cuneiforme, jeroglíficos, alfabeto, imprenta y la era digital"
+        },
+        {
+          "slug": "visualizador-anatomia-vuelo",
+          "url": "https://meskeia.com/visualizador-anatomia-vuelo/",
+          "description": "Por qué vuela un avión: aerodinámica, 7 fases del vuelo, Madrid-Londres en datos"
+        },
+        {
+          "slug": "visualizador-mapa-especias",
+          "url": "https://meskeia.com/visualizador-mapa-especias/",
+          "description": "Rutas comerciales históricas, especias más valiosas que el oro y origen de 12 especias"
+        },
+        {
+          "slug": "visualizador-clima",
+          "url": "https://meskeia.com/visualizador-clima/",
+          "description": "Efecto invernadero, corrientes oceánicas y qué pasa con +1°C, +2°C y +4°C de calentamiento"
         },
         {
           "name": "Estimador de Infraseguro",

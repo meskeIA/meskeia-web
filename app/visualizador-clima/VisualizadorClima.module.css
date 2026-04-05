@@ -1,0 +1,201 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.subtituloSeccion { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* Slider */
+.sliderZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sliderHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
+.sliderLabel { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+.sliderValor { font-weight: 700; font-size: 1.4rem; }
+.slider { width: 100%; height: 8px; border-radius: 4px; outline: none; appearance: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { appearance: none; width: 28px; height: 28px; border-radius: 50%; background: white; cursor: pointer; border: 3px solid #EF4444; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: white; cursor: pointer; border: 3px solid #EF4444; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.sliderExtremos { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+/* Sección 1: Comparación tiempo vs clima */
+.comparacionGrid { display: flex; gap: var(--spacing-md); align-items: stretch; margin-bottom: var(--spacing-xl); }
+.comparacionCard { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.comparacionIcono { font-size: 2.5rem; margin-bottom: var(--spacing-sm); }
+.comparacionTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.comparacionLista { text-align: left; padding-left: var(--spacing-lg); margin: 0 0 var(--spacing-md) 0; font-size: 0.88rem; color: var(--text-primary); line-height: 1.8; }
+.comparacionEjemplo { font-size: 0.82rem; color: var(--text-muted); font-style: italic; padding-top: var(--spacing-sm); border-top: 1px solid var(--border); }
+.comparacionVs { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; color: var(--text-muted); flex-shrink: 0; }
+
+/* Balance energético */
+.balanceCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.balanceTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
+.balanceSubtitulo { font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin-bottom: var(--spacing-lg); }
+.balanceDiagrama { text-align: center; }
+.balanceFlujo { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); flex-wrap: wrap; }
+.balanceFlecha { display: flex; flex-direction: column; align-items: center; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius); color: white; min-width: 160px; }
+.balanceFlechaTexto { font-size: 0.78rem; font-weight: 600; }
+.balanceFlechaValor { font-size: 1.1rem; font-weight: 800; }
+.balanceTierra { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; font-size: 2.5rem; }
+.balanceTierraTexto { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; }
+.balanceNota { font-size: 0.82rem; color: var(--text-muted); margin-top: var(--spacing-md); font-style: italic; }
+
+/* Factores */
+.factoresGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.factorCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.factorIcono { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+.factorNombre { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.factorDesc { display: block; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Sección 2: Pasos efecto invernadero */
+.pasosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.pasoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; position: relative; }
+.pasoNumero { position: absolute; top: -10px; left: -10px; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.pasoIcono { font-size: 2rem; display: block; margin-bottom: var(--spacing-sm); }
+.pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.pasoDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* Comparación temperatura */
+.tempComparacion { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.tempCard { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.tempIcono { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+.tempValor { display: block; font-size: 2rem; font-weight: 800; margin-bottom: 0.2rem; }
+.tempLabel { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.2rem; }
+.tempDetalle { display: block; font-size: 0.75rem; color: var(--text-muted); }
+.tempFlecha { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+.tempFlechaIcono { font-size: 1.5rem; color: var(--primary); }
+
+/* Barras CO2 */
+.co2Card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.co2Titulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
+.co2Subtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-lg); }
+.co2Barras { display: flex; justify-content: center; gap: var(--spacing-md); align-items: flex-end; height: 200px; }
+.co2BarraItem { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; flex: 1; max-width: 70px; height: 100%; }
+.co2BarraValor { font-size: 0.72rem; font-weight: 700; color: var(--text-primary); }
+.co2BarraContainer { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.co2Barra { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 4px; }
+.co2BarraAnio { font-size: 0.72rem; font-weight: 700; color: var(--text-primary); }
+.co2BarraContexto { font-size: 0.62rem; color: var(--text-muted); text-align: center; line-height: 1.2; min-height: 2.4em; }
+.co2Nota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-top: var(--spacing-md); font-style: italic; border-top: 1px solid var(--border); padding-top: var(--spacing-md); }
+
+/* Sección 3: Cinta transportadora */
+.cintaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.cintaTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
+.cintaDesc { font-size: 0.88rem; color: var(--text-secondary); text-align: center; line-height: 1.5; margin-bottom: var(--spacing-lg); }
+.cintaDiagrama { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
+.cintaPaso { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; background: var(--hover); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); min-width: 120px; max-width: 160px; text-align: center; }
+.cintaPasoNum { font-size: 0.72rem; font-weight: 800; color: white; background: var(--primary); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.cintaPasoIcono { font-size: 1.3rem; }
+.cintaPasoTexto { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; }
+.cintaFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 800; }
+
+/* Corrientes */
+.corrientesGrid { display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.corrienteCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.corrienteHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); font-size: 1.3rem; }
+.corrienteNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.corrienteTipo { font-size: 0.78rem; font-weight: 600; }
+.corrienteEfecto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 0.3rem 0; }
+.corrienteDato { font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin: 0; }
+
+/* Comparación ciudades */
+.comparacionCiudades { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); text-align: center; }
+.comparacionCiudadesTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.comparacionCiudadesSubtitulo { font-size: 0.82rem; color: var(--text-muted); margin-bottom: var(--spacing-lg); }
+.ciudadesGrid { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); }
+.ciudadCard { flex: 1; max-width: 200px; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.ciudadIcono { font-size: 2rem; }
+.ciudadNombre { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.ciudadTemp { font-size: 1.3rem; font-weight: 800; }
+.ciudadDetalle { font-size: 0.78rem; color: var(--text-muted); }
+.ciudadVs { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--text-muted); flex-shrink: 0; }
+.ciudadDelta { font-weight: 700; color: var(--primary); font-size: 0.85rem; }
+
+/* El Niño / La Niña */
+.ninoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.ninoTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
+.ninoDesc { font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin-bottom: var(--spacing-lg); }
+.ninoGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
+.ninoItem { text-align: center; }
+.ninoItemIcono { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+.ninoItemTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.ninoItemDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* Sección 4: Nivel de calentamiento */
+.nivelHeader { border-left: 4px solid; border-radius: 0 var(--radius) var(--radius) 0; background: var(--bg-card); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.nivelTitulo { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.2rem 0; }
+.nivelEstado { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* Termómetro */
+.termometroContainer { display: flex; align-items: stretch; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); justify-content: center; }
+.termometro { width: 40px; height: 180px; background: var(--hover); border-radius: 20px; border: 2px solid var(--border); position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+.termometroRelleno { width: 100%; border-radius: 0 0 18px 18px; transition: height 0.5s ease; }
+.termometroEscala { display: flex; flex-direction: column; justify-content: space-between; font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0; }
+
+/* Impactos */
+.impactosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.impactoCard { background: var(--bg-card); border: 1px solid var(--border); border-top: 3px solid; border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.impactoIcono { font-size: 1.8rem; display: block; margin-bottom: var(--spacing-sm); }
+.impactoTitulo { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.impactoDesc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* Referencia era glacial */
+.referenciaCard { display: flex; align-items: flex-start; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.referenciaIcono { font-size: 2rem; flex-shrink: 0; }
+.referenciaTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; }
+
+/* Insight, warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .comparacionGrid { flex-direction: column; }
+  .comparacionVs { display: none; }
+  .tempComparacion { flex-direction: column; }
+  .tempFlecha { flex-direction: row; }
+  .tempFlechaIcono { transform: rotate(90deg); }
+  .pasosGrid { grid-template-columns: 1fr; }
+  .co2Barras { gap: var(--spacing-sm); }
+  .co2BarraItem { max-width: 50px; }
+  .cintaDiagrama { flex-direction: column; }
+  .cintaFlecha { transform: rotate(90deg); }
+  .ciudadesGrid { flex-direction: column; }
+  .ninoGrid { grid-template-columns: 1fr; }
+  .impactosGrid { grid-template-columns: 1fr; }
+  .factoresGrid { grid-template-columns: 1fr; }
+  .balanceFlujo { flex-direction: column; }
+  .termometroContainer { flex-direction: row; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .co2Barra, .termometroRelleno, .navBtn, .corrienteCard { transition-duration: 0.01ms !important; }
+}
