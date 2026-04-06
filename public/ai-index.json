@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 295+ aplicaciones web educativas organizadas en 12 Suites Temáticas: Calculadoras Prácticas, Criptografía y Seguridad, Diseño y Desarrollo, Finanzas e Inversión, Freelance y Autónomo, Herramientas Técnicas, Inmobiliaria y Hogar, Juegos y Ocio, Marketing y Contenido, Productividad, Salud y Bienestar, y Estudiantes. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 462,
+  "total_tools": 472,
   "updated": "2026-04-01",
   "features": {
     "all_free": true,
@@ -1081,6 +1081,56 @@
           "slug": "visualizador-clima",
           "url": "https://meskeia.com/visualizador-clima/",
           "description": "Efecto invernadero, corrientes oceánicas y qué pasa con +1°C, +2°C y +4°C de calentamiento"
+        },
+        {
+          "slug": "visualizador-produccion-energia",
+          "url": "https://meskeia.com/visualizador-produccion-energia/",
+          "description": "Nuclear, solar, eólica, gas, hidráulica: mix español, coste y CO2 por kWh"
+        },
+        {
+          "slug": "visualizador-oceano",
+          "url": "https://meskeia.com/visualizador-oceano/",
+          "description": "71% de la Tierra, Fosa de las Marianas, vida por profundidad y 8M toneladas de plástico"
+        },
+        {
+          "slug": "visualizador-cerebro",
+          "url": "https://meskeia.com/visualizador-cerebro/",
+          "description": "86.000M neuronas, formación de recuerdos, neuroplasticidad e ilusiones cognitivas"
+        },
+        {
+          "slug": "visualizador-fibonacci-naturaleza",
+          "url": "https://meskeia.com/visualizador-fibonacci-naturaleza/",
+          "description": "Fibonacci y proporción áurea en girasoles, galaxias, conchas, arte y música"
+        },
+        {
+          "slug": "visualizador-sistema-solar",
+          "url": "https://meskeia.com/visualizador-sistema-solar/",
+          "description": "8 planetas a escala, velocidad de la luz, distancias y curiosidades del sistema solar"
+        },
+        {
+          "slug": "visualizador-cadena-alimentaria",
+          "url": "https://meskeia.com/visualizador-cadena-alimentaria/",
+          "description": "De la granja a tu mesa: quién se lleva qué del precio y alternativas km0"
+        },
+        {
+          "slug": "visualizador-pantallas",
+          "url": "https://meskeia.com/visualizador-pantallas/",
+          "description": "CRT a MicroLED: píxeles RGB, resoluciones HD-8K, luz azul y salud visual"
+        },
+        {
+          "slug": "visualizador-viaje-paquete",
+          "url": "https://meskeia.com/visualizador-viaje-paquete/",
+          "description": "Del click al timbre: almacén, transporte, última milla, 700M+ paquetes/año en España"
+        },
+        {
+          "slug": "visualizador-tabla-periodica",
+          "url": "https://meskeia.com/visualizador-tabla-periodica/",
+          "description": "Elementos en tu cuerpo, bolsillo y casa: la tabla periódica de tu vida cotidiana"
+        },
+        {
+          "slug": "visualizador-gps",
+          "url": "https://meskeia.com/visualizador-gps/",
+          "description": "31 satélites, trilateración, relatividad de Einstein y por qué el GPS tiene 3m de error"
         },
         {
           "name": "Estimador de Infraseguro",

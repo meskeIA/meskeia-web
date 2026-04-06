@@ -822,7 +822,67 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
     { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental' },
     { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'El Viaje de tu Basura', description: 'Reciclaje y degradación' },
+    { url: '/visualizador-oceano/', icon: '🌊', name: 'Los Números del Océano', description: 'Regulador del clima' },
+  ],
+  'visualizador-produccion-energia': [
+    { url: '/visualizador-factura-electrica/', icon: '💡', name: 'Tu Electricidad al Desnudo', description: 'Anatomía de la factura' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Efecto invernadero' },
+    { url: '/visualizador-ciudad/', icon: '🏙️', name: 'Anatomía de una Ciudad', description: 'Infraestructura urbana' },
+    { url: '/visualizador-viaje-impuestos/', icon: '🏛️', name: 'El Viaje de tus Impuestos', description: 'Presupuestos del Estado' },
+  ],
+  'visualizador-oceano': [
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Corrientes y calentamiento' },
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'El Viaje de tu Basura', description: 'Plástico y reciclaje' },
+  ],
+  'visualizador-cerebro': [
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Cómo tu cerebro te engaña' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Qué Pasa Cuando Duermes', description: 'Ciencia del sueño' },
+    { url: '/visualizador-peso-decisiones/', icon: '⚖️', name: 'Cuánto Pesa una Decisión', description: 'Impacto acumulado' },
+  ],
+  'visualizador-fibonacci-naturaleza': [
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Los Números de la Música', description: 'Matemáticas y arte' },
+    { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones del Mundo', description: '4 funciones fundamentales' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+  ],
+  'visualizador-sistema-solar': [
     { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'La Vida de una Estrella', description: 'Evolución estelar' },
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+  ],
+  'visualizador-cadena-alimentaria': [
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental' },
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global' },
+    { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo' },
+  ],
+  'visualizador-pantallas': [
+    { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Lo que hay dentro' },
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
+    { url: '/visualizador-gps/', icon: '📡', name: 'Cómo Funciona el GPS', description: 'Satélites y trilateración' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Qué Pasa Cuando Duermes', description: 'Luz azul y sueño' },
+  ],
+  'visualizador-viaje-paquete': [
+    { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Lo que hay dentro' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global' },
+    { url: '/visualizador-ciudad/', icon: '🏙️', name: 'Anatomía de una Ciudad', description: 'Infraestructura urbana' },
+    { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'El Viaje de tu Basura', description: 'Reciclaje y degradación' },
+  ],
+  'visualizador-tabla-periodica': [
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Minerales en tu móvil' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'La Vida de una Estrella', description: 'Somos polvo de estrellas' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+  ],
+  'visualizador-gps': [
+    { url: '/visualizador-anatomia-vuelo/', icon: '✈️', name: 'Anatomía de un Vuelo', description: 'Cómo vuela un avión' },
+    { url: '/visualizador-sistema-solar/', icon: '🪐', name: 'El Sistema Solar', description: '8 planetas en números' },
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
+    { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
   ],
 
   'selector-calefaccion': [

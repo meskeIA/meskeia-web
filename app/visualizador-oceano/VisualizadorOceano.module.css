@@ -1,0 +1,162 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección 1: Cifras ─── */
+.cifrasGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.cifraCard { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.cifraCard:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.cifraCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.cifraActiva { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.cifraIcono { font-size: 1.8rem; }
+.cifraNumero { display: flex; align-items: baseline; gap: 0.3rem; justify-content: center; }
+.cifraValor { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+.cifraUnidad { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+.cifraDesc { font-size: 0.82rem; color: var(--text-secondary); }
+.cifraBarraContainer { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 0.3rem; }
+.cifraBarra { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.5s ease; }
+.cifraComparacion { margin-top: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: rgba(46,134,171,0.08); border-radius: 8px; font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; text-align: left; }
+
+/* ─── Sección 2: Profundidad ─── */
+.profundidadContainer { display: grid; grid-template-columns: 140px 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); align-items: stretch; }
+.profundidadColumna { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius); overflow: hidden; min-height: 400px; }
+.profundidadBanda { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; padding: var(--spacing-sm) 0.3rem; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; color: white; text-align: center; }
+.profundidadBanda:hover { opacity: 0.9; }
+.profundidadBanda:focus-visible { outline: 2px solid white; outline-offset: -2px; }
+.profundidadBandaActiva { border-color: white; }
+.profundidadRango { font-size: 0.65rem; font-weight: 700; opacity: 0.9; }
+.profundidadNombreCorto { font-size: 0.6rem; opacity: 0.8; line-height: 1.2; }
+
+.zonaDetalle { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
+.zonaNombre { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; }
+.zonaRango { font-size: 0.85rem; color: var(--text-muted); margin-bottom: var(--spacing-md); }
+.zonaStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.zonaStat { background: var(--hover); border-radius: 8px; padding: var(--spacing-sm); text-align: center; display: flex; flex-direction: column; gap: 0.2rem; }
+.zonaStatIcono { font-size: 1.2rem; }
+.zonaStatLabel { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.zonaStatValor { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+
+.zonaCriaturas { margin-bottom: var(--spacing-md); }
+.zonaCriaturasLabel { display: block; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; margin-bottom: var(--spacing-sm); }
+.zonaCriaturasLista { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.zonaCriaturaBadge { background: var(--hover); border: 1px solid var(--border); border-radius: 20px; padding: 0.2rem 0.6rem; font-size: 0.75rem; color: var(--text-primary); font-weight: 500; }
+
+.zonaDato { background: rgba(46,134,171,0.08); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md); font-size: 0.85rem; color: var(--text-primary); line-height: 1.4; }
+
+/* ─── Sección 3: Plástico ─── */
+.impactoGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.impactoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; display: flex; flex-direction: column; gap: 0.3rem; }
+.impactoValor { font-size: 1.5rem; font-weight: 800; color: var(--rojo); }
+.impactoDesc { font-size: 0.88rem; color: var(--text-primary); font-weight: 600; }
+.impactoComparacion { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+.degradacionContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.degradacionTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-lg); }
+.degradacionLista { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.degradacionItem { display: grid; grid-template-columns: 160px 1fr 80px; align-items: center; gap: var(--spacing-sm); }
+.degradacionInfo { display: flex; align-items: center; gap: 0.4rem; }
+.degradacionObjeto { font-size: 0.82rem; color: var(--text-primary); font-weight: 500; }
+.degradacionBarraContainer { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.degradacionBarra { height: 100%; background: linear-gradient(90deg, #F59E0B, #EF4444); border-radius: 5px; transition: width 0.5s ease; }
+.degradacionAnios { font-size: 0.82rem; font-weight: 700; color: var(--rojo); text-align: right; }
+
+.paisesContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.paisesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.2rem; }
+.paisesSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-lg); }
+.paisesLista { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.paisItem { display: grid; grid-template-columns: 140px 1fr 100px; align-items: center; gap: var(--spacing-sm); }
+.paisInfo { display: flex; align-items: center; gap: 0.4rem; }
+.paisPosicion { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); width: 24px; }
+.paisNombre { font-size: 0.88rem; color: var(--text-primary); font-weight: 500; }
+.paisBarraContainer { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.paisBarra { height: 100%; background: linear-gradient(90deg, var(--primary), #EF4444); border-radius: 5px; transition: width 0.5s ease; }
+.paisToneladas { font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-align: right; }
+
+/* ─── Sección 4: Regulador del clima ─── */
+.climaGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.climaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.4rem; }
+.climaIcono { font-size: 1.8rem; }
+.climaValor { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.climaEtiqueta { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.climaDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+.circulacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.circulacionTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.2rem; }
+.circulacionSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-lg); }
+.circulacionDiagrama { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.circulacionPaso { background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; display: flex; flex-direction: column; gap: 0.3rem; }
+.circulacionNum { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+.circulacionTexto { font-size: 0.78rem; color: var(--text-primary); line-height: 1.3; }
+.circulacionFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 700; }
+.circulacionNota { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; text-align: center; margin: 0; }
+
+.proyeccionesContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.proyeccionesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-lg); }
+.proyeccionesLista { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.proyeccionItem { border-left: 4px solid var(--border); padding-left: var(--spacing-md); }
+.proyeccionHeader { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; margin-bottom: 0.3rem; }
+.proyeccionDot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.proyeccionEscenario { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.proyeccionSubida { font-size: 0.95rem; font-weight: 800; margin-left: auto; }
+.proyeccionDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* ─── Comunes ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .cifrasGrid { grid-template-columns: 1fr; }
+  .profundidadContainer { grid-template-columns: 1fr; }
+  .profundidadColumna { min-height: 250px; flex-direction: row; }
+  .profundidadBanda { min-width: 0; flex: 1; height: auto !important; min-height: 60px; }
+  .profundidadRango { font-size: 0.55rem; }
+  .profundidadNombreCorto { display: none; }
+  .zonaStats { grid-template-columns: 1fr; }
+  .impactoGrid { grid-template-columns: 1fr; }
+  .degradacionItem { grid-template-columns: 1fr; gap: 0.3rem; }
+  .degradacionInfo { margin-bottom: 0.2rem; }
+  .degradacionAnios { text-align: left; }
+  .paisItem { grid-template-columns: 1fr; gap: 0.3rem; }
+  .paisToneladas { text-align: left; }
+  .climaGrid { grid-template-columns: 1fr; }
+  .circulacionDiagrama { grid-template-columns: 1fr; }
+  .circulacionFlecha { transform: rotate(90deg); justify-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cifraCard, .cifraBarra, .degradacionBarra, .paisBarra { transition-duration: 0.01ms !important; }
+}
