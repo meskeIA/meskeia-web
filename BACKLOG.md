@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-04-01
-> **Apps totales**: 359 | **Suites**: 13
+> **Última actualización**: 2026-04-06
+> **Apps totales**: 472 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
