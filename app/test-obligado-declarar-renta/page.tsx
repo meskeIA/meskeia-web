@@ -351,7 +351,7 @@ export default function TestObligadoDeclararRentaPage() {
 
         <DisclaimerCard
           variant="financial"
-          severity="high"
+          severity="critical"
           context="test-obligado-declarar-renta"
         />
         <DataReference

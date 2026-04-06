@@ -70,11 +70,38 @@ const APPS_SIN_DISCLAIMER = new Set([
   'temporizador-pomodoro',    // temporizador — sin consejo profesional
   'temporizador-visual',      // temporizador visual — herramienta accesibilidad
   'privacidad',               // página legal de privacidad — ES la info legal
+  // Tests de reflexión/autoconocimiento — sin consejos de riesgo (revisado 2026-04-06)
+  'test-delegacion-efectiva',     // estilo de delegación — reflexión profesional
+  'test-dependencia-tecnologica', // autonomía vs herramientas — reflexión
+  'test-estilo-parental',         // dimensiones parentales — reflexión, no diagnóstico
+  'test-ritmo-vital',             // urgencia vs presencia — reflexión personal
+  'test-sindrome-impostor',       // autoexigencia — reflexión, no diagnóstico psicológico
+  'test-validacion-idea',         // asunciones de negocio — reflexión emprendedora
+  'checklist-pre-mortem',         // anticipar riesgos de proyectos — checklist reflexivo
+  // Educativos/informativos sin consejos personalizados (revisado 2026-04-06)
+  'estimacion-ahorro-hidrico',        // cálculo informativo de ahorro de agua
+  'estimacion-certificacion-energetica', // estimador informativo de certificación energética
+  'estimador-tiempo-ahorro',          // calculadora simple de tiempo para ahorrar
+  'juego-presupuesto-mensual',        // juego educativo de gestión presupuestaria
+  'quiz-conceptos-financieros',       // quiz de conocimiento financiero
+  'simulador-paga-ahorro',            // simulador educativo de metas de ahorro
 ]);
+
+// Prefijos de apps educativas puras (datos de ejemplo, sin datos del usuario ni consejos personalizados)
+// Estas apps se tratan como nivel 4 (informativo) salvo que estén en NIVEL_MANUAL
+const PREFIJOS_EDUCATIVOS = [
+  'visualizador-',   // Explicadores visuales: gráficos interactivos con datos de ejemplo
+  'auditoria-',      // Auditorías de reflexión personal/profesional (energía, reuniones, propuesta valor)
+  'diagnostico-',    // Diagnósticos reflexivos orientativos (comunicación, modelo negocio, explotación)
+  'mapa-',           // Mapas de reflexión (compromisos, decisiones, dependencia clientes, riesgo)
+];
 
 // Apps con nivel aprobado manualmente (distinto del cálculo automático por suites)
 // Formato: slug → nivel aprobado (1-4)
 const NIVEL_MANUAL = {
+  // Visualizadores que importan data/fiscal/ → nivel 1 (cálculos fiscales reales)
+  'visualizador-sueldo-neto':              1,  // importa data/fiscal, cálculo IRPF
+  'visualizador-jubilacion-perspectiva':   1,  // importa data/fiscal/pensiones
   // Herramientas hogar sin implicación financiera real (suite: inmobiliaria)
   'calculadora-combustible':    3,  // calculadora de coste de combustible
   'calculadora-gasto-energetico': 3, // estimador gasto energético doméstico
@@ -101,6 +128,11 @@ const NIVEL_MANUAL = {
   'vitaminas-minerales':        3,
   // Fiscal con datos de data/fiscal/ → Level 1 CRÍTICO (override por contenido)
   'orientador-intereses-demora': 1, // calcula intereses de demora fiscales
+  'estimador-complemento-minimos': 1, // cálculo fiscal de complementos a pensiones mínimas
+  // Inmobiliaria/hogar sin implicación fiscal directa (revisado 2026-04-06)
+  'selector-tarifa-electrica':    2,  // comparador tarifas eléctricas — financiero, no fiscal
+  'simulador-placas-solares':     2,  // ROI inversión solar — financiero, no fiscal
+  'simulador-subvenciones-rehabilitacion': 2, // elegibilidad subvenciones — financiero, no fiscal
 };
 
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO
@@ -207,6 +239,10 @@ function escanearApp(slug) {
 function calcularNivelEsperado(slug, suites) {
   // Nivel revisado manualmente → tiene prioridad absoluta
   if (NIVEL_MANUAL[slug] !== undefined) return NIVEL_MANUAL[slug];
+
+  // Prefijos educativos → nivel 4 (informativo) por defecto
+  // Son apps que muestran datos de ejemplo con gráficos, sin recoger datos del usuario
+  if (PREFIJOS_EDUCATIVOS.some(p => slug.startsWith(p))) return 4;
 
   // Nivel base: máximo de todas las suites
   let nivel = 4;

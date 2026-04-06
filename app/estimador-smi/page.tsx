@@ -221,7 +221,7 @@ export default function EstimadorSMIPage() {
 
         <LegalNotice />
 
-        <DisclaimerCard variant="financial" severity="high" context="estimador-smi" />
+        <DisclaimerCard variant="financial" severity="critical" context="estimador-smi" />
         <DataReference
           normativa="SMI 2026 + Salarios provinciales AEAT 2023"
           fuente={FISCAL_SMI_META.fuente}

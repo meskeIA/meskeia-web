@@ -118,7 +118,7 @@ export default function TestZaritCuidadorPage() {
         </header>
 
         {/* Disclaimer CRÍTICO — salud mental */}
-        <DisclaimerCard variant="medical" severity="critical">
+        <DisclaimerCard variant="medical" severity="high">
           <p>
             Este test es una herramienta de <strong>ORIENTACIÓN</strong> basada en la Escala de Zarit
             (Caregiver Burden Interview), validada en español por Martín et al. (1996).{' '}

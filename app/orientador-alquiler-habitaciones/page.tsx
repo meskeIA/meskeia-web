@@ -89,7 +89,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
 
         <LegalNotice />
 
-        <DisclaimerCard variant="financial" severity="high" context="orientador-alquiler-habitaciones" />
+        <DisclaimerCard variant="financial" severity="critical" context="orientador-alquiler-habitaciones" />
 
         {/* Regla principal */}
         <div className={styles.tipBox}>

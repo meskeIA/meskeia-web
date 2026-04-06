@@ -102,10 +102,9 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
 
         {/* Disclaimer */}
         <DisclaimerCard
-          variant="general"
-          severity="medium"
+          variant="financial"
+          severity="high"
           context="planificador-gastos-bebe"
-          collapsible={true}
         >
           Los importes mostrados son estimaciones medias para España 2025. Los gastos reales
           varían según la zona, estilo de vida y opciones personales. Esta herramienta es una

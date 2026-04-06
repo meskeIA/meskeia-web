@@ -365,10 +365,9 @@ export default function SelectorTarifaElectricaPage() {
         <LegalNotice />
 
         <DisclaimerCard
-          variant="general"
-          severity="medium"
+          variant="financial"
+          severity="high"
           context="selector-tarifa-electrica"
-          collapsible={true}
         >
           Esta herramienta ofrece una orientacion basada en patrones de consumo tipicos.
           Los precios PVPC varian diariamente y los del mercado libre dependen de cada

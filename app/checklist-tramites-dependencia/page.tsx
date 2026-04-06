@@ -225,7 +225,7 @@ export default function ChecklistTramitesDependenciaPage() {
         <LegalNotice />
 
         {/* Disclaimer */}
-        <DisclaimerCard variant="general" severity="high">
+        <DisclaimerCard variant="general" severity="critical">
           Esta guía es <strong>orientativa</strong> y refleja el proceso general en España.
           Los requisitos, plazos y formularios específicos varían según la Comunidad Autónoma.
           Consulta siempre con los <strong>Servicios Sociales de tu municipio</strong> para

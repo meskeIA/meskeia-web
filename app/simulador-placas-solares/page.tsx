@@ -161,11 +161,12 @@ export default function SimuladorPlacasSolaresPage() {
         <LegalNotice />
 
         <DisclaimerCard
-          variant="general"
-          severity="medium"
-          collapsible={true}
-          context="Los resultados son estimaciones orientativas basadas en datos medios de irradiación solar. La producción real depende de la orientación exacta, inclinación, sombras, calidad de los paneles y condiciones climáticas locales. Solicita siempre un estudio técnico personalizado a un instalador acreditado."
-        />
+          variant="financial"
+          severity="high"
+          context="simulador-placas-solares"
+        >
+          Los resultados son estimaciones orientativas basadas en datos medios de irradiación solar. La producción real depende de la orientación exacta, inclinación, sombras, calidad de los paneles y condiciones climáticas locales. Solicita siempre un estudio técnico personalizado a un instalador acreditado.
+        </DisclaimerCard>
 
         {/* Formulario */}
         <section className={styles.section}>
