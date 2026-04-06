@@ -501,7 +501,7 @@ export default function SelectorTipoTelevision() {
 
       <DisclaimerCard
         variant="technical"
-        severity="low"
+        severity="medium"
         collapsible
         context="selector-tipo-television"
       />

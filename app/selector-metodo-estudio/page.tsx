@@ -640,7 +640,7 @@ export default function SelectorMetodoEstudioPage() {
 
       {mostrarResultado ? renderResultado() : renderTest()}
 
-      <DisclaimerCard variant="educational" severity="low" />
+      <DisclaimerCard variant="educational" severity="medium" />
 
       <EducationalSection
         title="Métodos de estudio: guía práctica para aprender mejor"

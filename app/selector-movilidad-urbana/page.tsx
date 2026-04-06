@@ -527,7 +527,7 @@ export default function SelectorMovilidadUrbana() {
         </main>
       )}
 
-      <DisclaimerCard variant="general" severity="low" />
+      <DisclaimerCard variant="general" severity="medium" />
 
       <EducationalSection
         title="Movilidad urbana en España"

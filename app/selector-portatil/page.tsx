@@ -523,7 +523,7 @@ export default function SelectorPortatil() {
       )}
 
       <LegalNotice />
-      <DisclaimerCard variant="technical" severity="low" />
+      <DisclaimerCard variant="technical" severity="medium" />
 
       {/* ── INTRO ── */}
       {pantalla === 'intro' && (

@@ -483,7 +483,7 @@ export default function SelectorTipoAlojamientoPage() {
       )}
 
       {/* 6. Disclaimer */}
-      <DisclaimerCard variant="general" severity="low" />
+      <DisclaimerCard variant="general" severity="medium" />
 
       {/* 7. Sección educativa */}
       <EducationalSection

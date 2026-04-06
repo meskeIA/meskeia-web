@@ -426,7 +426,7 @@ export default function SelectorSmartphone() {
       )}
 
       <LegalNotice />
-      <DisclaimerCard variant="technical" severity="low" />
+      <DisclaimerCard variant="technical" severity="medium" />
 
       {/* ── PANTALLA INTRO ── */}
       {pantalla === 'intro' && (

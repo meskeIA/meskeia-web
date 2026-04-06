@@ -122,7 +122,7 @@ export default function PlanificadorEstudioOposicionesPage() {
         </header>
 
         <LegalNotice />
-        <DisclaimerCard variant="educational" severity="low" context="planificador-estudio-oposiciones" />
+        <DisclaimerCard variant="educational" severity="medium" context="planificador-estudio-oposiciones" />
 
         {/* ── Configuración ── */}
         <div className={styles.configSection}>

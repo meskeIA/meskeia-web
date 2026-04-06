@@ -573,7 +573,7 @@ export default function SelectorAuriculares() {
         </section>
       )}
 
-      <DisclaimerCard variant="general" severity="low" />
+      <DisclaimerCard variant="general" severity="medium" />
 
       <EducationalSection
         title="Guía de auriculares: tipos, tecnologías y claves de compra"

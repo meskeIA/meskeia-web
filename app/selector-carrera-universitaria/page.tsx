@@ -539,7 +539,7 @@ export default function SelectorCarreraUniversitaria() {
 
       {mostrarResultado ? renderResultado() : renderTest()}
 
-      <DisclaimerCard variant="educational" severity="low" />
+      <DisclaimerCard variant="educational" severity="medium" />
 
       <EducationalSection
         title="Ramas universitarias en España: guía orientativa"
