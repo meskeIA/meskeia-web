@@ -1,4 +1,7 @@
 'use client';
+// Si la app NO necesita DisclaimerCard (educativa, juego, reflexión):
+// Reemplazar esta línea por: // @disclaimer: exempt
+// y eliminar DisclaimerCard del import y del JSX.
 
 import { useState } from 'react';
 import styles from './[NombreApp].module.css';

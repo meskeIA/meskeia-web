@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import styles from './VisualizadorDineroYTiempo.module.css';

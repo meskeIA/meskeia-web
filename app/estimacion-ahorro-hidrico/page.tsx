@@ -225,8 +225,7 @@ export default function EstimacionAhorroHidricoPage() {
         {/* Disclaimer */}
         <DisclaimerCard
           variant="general"
-          severity="low"
-          collapsible={true}
+          severity="medium"
           context="estimacion-ahorro-hidrico"
         >
           Los ahorros son estimaciones basadas en consumos medios en España (INE 2023). El ahorro real

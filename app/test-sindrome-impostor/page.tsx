@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './TestSindromeImpostor.module.css';
@@ -9,7 +10,6 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
-  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
@@ -260,7 +260,6 @@ export default function TestSindromeImpostorPage() {
 
         <LegalNotice />
 
-        <DisclaimerCard variant="medical" severity="medium" />
 
         <section className={styles.contextCard}>
           <p>

@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect } from 'react';
 import MeskeiaLogo from '@/components/MeskeiaLogo';

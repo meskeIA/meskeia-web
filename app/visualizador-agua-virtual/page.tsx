@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './VisualizadorAguaVirtual.module.css';

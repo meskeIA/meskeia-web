@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorAvatares.module.css';

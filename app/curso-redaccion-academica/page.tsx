@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import Link from 'next/link';
 import styles from './CursoRedaccionAcademica.module.css';

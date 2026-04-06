@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './DashboardAnalytics.module.css';

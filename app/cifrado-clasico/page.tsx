@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback } from 'react';
 import styles from './CifradoClasico.module.css';

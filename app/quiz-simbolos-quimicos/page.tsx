@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo, useCallback } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';

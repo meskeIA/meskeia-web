@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './JuegoAhorcado.module.css';

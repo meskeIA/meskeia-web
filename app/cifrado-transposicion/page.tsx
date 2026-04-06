@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback, useMemo } from 'react';
 import styles from './CifradoTransposicion.module.css';

@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './NivelBurbuja.module.css';

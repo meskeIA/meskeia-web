@@ -1,10 +1,11 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback } from 'react';
 import styles from './QuizConceptosFinancieros.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
@@ -95,7 +96,6 @@ export default function QuizConceptosFinancierosPage() {
         </header>
 
         <LegalNotice />
-        <DisclaimerCard variant="educational" severity="low" context="quiz-conceptos-financieros" />
 
         {!quizTerminado ? (
           <div className={styles.quizSection}>

@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo, useCallback } from 'react';
 import 'flag-icons/css/flag-icons.min.css';

@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaMicrofono.module.css';

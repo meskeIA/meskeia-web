@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useRef, useEffect } from 'react';
 import styles from './VisualizadorHistoriaReloj.module.css';

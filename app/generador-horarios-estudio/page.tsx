@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './GeneradorHorarios.module.css';

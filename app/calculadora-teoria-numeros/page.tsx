@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraTeoriaNumeros.module.css';

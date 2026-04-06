@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './TestEstiloParental.module.css';
@@ -7,7 +8,6 @@ import {
   Footer,
   EducationalSection,
   RelatedApps,
-  DisclaimerCard,
   LegalNotice,
   ShareCard,
 } from '@/components';
@@ -134,17 +134,6 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
 
         <LegalNotice />
 
-        <DisclaimerCard
-          variant="educational"
-          severity="low"
-          context="test-estilo-parental"
-          collapsible={true}
-        >
-          Este test es una herramienta de <strong>autoconocimiento</strong> basada en el modelo de
-          Diana Baumrind (1966). No es un diagnóstico ni una evaluación profesional. Ningún estilo
-          es completamente bueno o malo — todos tenemos aspectos de varios estilos. El objetivo es
-          reflexionar, no juzgar.
-        </DisclaimerCard>
 
         {/* ─── RESULTADO ─── */}
         {mostrarResultado && estiloData && (

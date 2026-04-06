@@ -1,10 +1,11 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback } from 'react';
 import styles from './JuegoPresupuestoMensual.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -184,7 +185,6 @@ export default function JuegoPresupuestoMensualPage() {
         </header>
 
         <LegalNotice />
-        <DisclaimerCard variant="educational" severity="low" context="juego-presupuesto-mensual" />
 
         {/* ── Selección de perfil ── */}
         {!perfil && (

@@ -1,10 +1,11 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
 import styles from './SimuladorPagaAhorro.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -82,7 +83,6 @@ export default function SimuladorPagaAhorroPage() {
         </header>
 
         <LegalNotice />
-        <DisclaimerCard variant="educational" severity="low" context="simulador-paga-ahorro" />
 
         <div className={styles.mainContent}>
           {/* ── Panel izquierdo ── */}

@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './RuletaAleatoria.module.css';

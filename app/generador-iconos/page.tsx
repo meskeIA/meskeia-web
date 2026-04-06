@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useRef, useCallback } from 'react';
 import styles from './GeneradorIconos.module.css';

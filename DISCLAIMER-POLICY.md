@@ -320,7 +320,13 @@ Normativa aplicada: IRPF 2025 — Ley 35/2006 + LPGE 2025
 Antes de hacer commit de cualquier nueva app, verificar:
 
 ```
-DISCLAIMER
+DISCLAIMER — Paso 1: ¿Necesita DisclaimerCard?
+[ ] ¿La app da consejos personalizados sobre temas fiscales, legales, médicos o financieros?
+[ ] ¿El usuario podría tomar decisiones de impacto basándose en el resultado?
+  → SÍ a cualquiera: necesita DisclaimerCard (ir a Paso 2)
+  → NO a ambas: añadir `// @disclaimer: exempt` en línea 2 del page.tsx (después de 'use client')
+
+DISCLAIMER — Paso 2: Configurar DisclaimerCard
 [ ] ¿He identificado el nivel de riesgo correcto? (1-4)
 [ ] ¿La app pertenece a varias suites? → aplicar el nivel más alto
 [ ] ¿Hay componente fiscal? → Nivel 1 CRÍTICO obligatorio
@@ -339,6 +345,19 @@ LEGAL
 [ ] ¿LegalNotice presente bajo el hero?
 [ ] ¿DisclaimerCard NO está dentro de EducationalSection?
 ```
+
+### Directiva `@disclaimer: exempt`
+
+Apps que **no necesitan DisclaimerCard** deben declararlo explícitamente en su `page.tsx`:
+
+```tsx
+'use client';
+// @disclaimer: exempt
+```
+
+Esto aplica a: apps educativas puras, juegos, tests de reflexión/autoconocimiento, visualizadores con datos de ejemplo, quizzes de conocimiento, herramientas técnicas sin consejo profesional.
+
+El script `audit-disclaimers.mjs` lee esta directiva. Apps sin `DisclaimerCard` ni `@disclaimer: exempt` se flagean como pendientes de revisión.
 
 ---
 

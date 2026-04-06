@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './GeneradorOndas.module.css';

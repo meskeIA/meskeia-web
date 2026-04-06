@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './VisualizadorComoFuncionaBanco.module.css';

@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './VisualizadorCosteSanidad.module.css';

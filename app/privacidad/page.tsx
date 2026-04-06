@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { LegalNotice, ShareCard } from '@/components';
 import { useState } from 'react';

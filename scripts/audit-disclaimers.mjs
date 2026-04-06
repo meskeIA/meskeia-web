@@ -48,53 +48,7 @@ const SUITE_LEVEL = {
 
 // ============================================================
 // EXCEPCIONES REVISADAS MANUALMENTE (DISCLAIMER-POLICY.md)
-// Apps auditadas individualmente — nivel aprobado por revisión
 // ============================================================
-
-// Apps sin disclaimer (contenido informativo puro, sin riesgo)
-const APPS_SIN_DISCLAIMER = new Set([
-  // Cursos (/curso-*) — excluidos del patrón v2.0 (estructura propia, ver CLAUDE.md)
-  'curso-emprendimiento',
-  'curso-empresa-familiar',
-  'curso-estrategia-empresarial',
-  'curso-marketing-digital',
-  'curso-negociacion',
-  'curso-optimizacion-ia',
-  'calculadora-cocina',       // recetas — sin implicación financiera/legal
-  'calculadora-pintura',      // m² de pintura — sin consejo profesional
-  'golden-hour',              // hora dorada fotográfica — herramienta creativa
-  'informacion-tiempo',       // info meteorológica — sin implicaciones
-  'lista-compras',            // lista de compras — sin consejo profesional
-  'mi-ip',                    // muestra dirección IP — técnico puro
-  'conversor-horarios',       // conversor de zonas horarias — sin consejo
-  'temporizador-pomodoro',    // temporizador — sin consejo profesional
-  'temporizador-visual',      // temporizador visual — herramienta accesibilidad
-  'privacidad',               // página legal de privacidad — ES la info legal
-  // Tests de reflexión/autoconocimiento — sin consejos de riesgo (revisado 2026-04-06)
-  'test-delegacion-efectiva',     // estilo de delegación — reflexión profesional
-  'test-dependencia-tecnologica', // autonomía vs herramientas — reflexión
-  'test-estilo-parental',         // dimensiones parentales — reflexión, no diagnóstico
-  'test-ritmo-vital',             // urgencia vs presencia — reflexión personal
-  'test-sindrome-impostor',       // autoexigencia — reflexión, no diagnóstico psicológico
-  'test-validacion-idea',         // asunciones de negocio — reflexión emprendedora
-  'checklist-pre-mortem',         // anticipar riesgos de proyectos — checklist reflexivo
-  // Educativos/informativos sin consejos personalizados (revisado 2026-04-06)
-  'estimacion-ahorro-hidrico',        // cálculo informativo de ahorro de agua
-  'estimacion-certificacion-energetica', // estimador informativo de certificación energética
-  'estimador-tiempo-ahorro',          // calculadora simple de tiempo para ahorrar
-  'juego-presupuesto-mensual',        // juego educativo de gestión presupuestaria
-  'quiz-conceptos-financieros',       // quiz de conocimiento financiero
-  'simulador-paga-ahorro',            // simulador educativo de metas de ahorro
-]);
-
-// Prefijos de apps educativas puras (datos de ejemplo, sin datos del usuario ni consejos personalizados)
-// Estas apps se tratan como nivel 4 (informativo) salvo que estén en NIVEL_MANUAL
-const PREFIJOS_EDUCATIVOS = [
-  'visualizador-',   // Explicadores visuales: gráficos interactivos con datos de ejemplo
-  'auditoria-',      // Auditorías de reflexión personal/profesional (energía, reuniones, propuesta valor)
-  'diagnostico-',    // Diagnósticos reflexivos orientativos (comunicación, modelo negocio, explotación)
-  'mapa-',           // Mapas de reflexión (compromisos, decisiones, dependencia clientes, riesgo)
-];
 
 // Apps con nivel aprobado manualmente (distinto del cálculo automático por suites)
 // Formato: slug → nivel aprobado (1-4)
@@ -133,6 +87,8 @@ const NIVEL_MANUAL = {
   'selector-tarifa-electrica':    2,  // comparador tarifas eléctricas — financiero, no fiscal
   'simulador-placas-solares':     2,  // ROI inversión solar — financiero, no fiscal
   'simulador-subvenciones-rehabilitacion': 2, // elegibilidad subvenciones — financiero, no fiscal
+  'estimacion-ahorro-hidrico':    3,  // cálculo informativo de ahorro de agua — sin consejo profesional
+  'estimacion-certificacion-energetica': 3,  // estimador orientativo de certificación energética
 };
 
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO
@@ -194,6 +150,9 @@ function escanearApp(slug) {
 
   const contenido = fs.readFileSync(pagePath, 'utf8');
 
+  // ¿Tiene directiva @disclaimer: exempt? (apps educativas/reflexión sin riesgo)
+  const esExempt = /@disclaimer:\s*exempt/.test(contenido);
+
   // ¿Tiene DisclaimerCard?
   const tieneDisclaimer = /DisclaimerCard/.test(contenido);
 
@@ -222,6 +181,7 @@ function escanearApp(slug) {
     : false;
 
   return {
+    esExempt,
     tieneDisclaimer,
     variant,
     severity,
@@ -239,10 +199,6 @@ function escanearApp(slug) {
 function calcularNivelEsperado(slug, suites) {
   // Nivel revisado manualmente → tiene prioridad absoluta
   if (NIVEL_MANUAL[slug] !== undefined) return NIVEL_MANUAL[slug];
-
-  // Prefijos educativos → nivel 4 (informativo) por defecto
-  // Son apps que muestran datos de ejemplo con gráficos, sin recoger datos del usuario
-  if (PREFIJOS_EDUCATIVOS.some(p => slug.startsWith(p))) return 4;
 
   // Nivel base: máximo de todas las suites
   let nivel = 4;
@@ -273,27 +229,34 @@ function calcularNivelEsperado(slug, suites) {
 function analizarApp(slug, appData, scan) {
   const incidencias = [];
 
-  // App revisada manualmente sin disclaimer → sin incidencias
-  if (APPS_SIN_DISCLAIMER.has(slug)) {
+  // App con directiva @disclaimer: exempt en page.tsx → sin incidencias
+  // La propia app declara que no necesita disclaimer (contenido educativo/reflexión)
+  if (scan.esExempt) {
     return { nivel: null, incidencias };
   }
 
   const nivel = calcularNivelEsperado(slug, appData.suites);
   const severidadEsperada = SEVERITY_ESPERADA[nivel];
 
-  // Sin DisclaimerCard pero debería tenerlo
+  // Sin DisclaimerCard y sin directiva exempt → incidencia
   if (!scan.tieneDisclaimer) {
     if (nivel <= 2) {
       incidencias.push({
         prioridad: '🔴',
         codigo: 'SIN_DISCLAIMER_CRITICO',
-        mensaje: `Sin DisclaimerCard — nivel esperado ${nivel} (${severidadEsperada})`,
+        mensaje: `Sin DisclaimerCard ni @disclaimer: exempt — nivel esperado ${nivel} (${severidadEsperada})`,
       });
     } else if (nivel === 3) {
       incidencias.push({
         prioridad: '🟡',
         codigo: 'SIN_DISCLAIMER_MEDIO',
-        mensaje: 'Sin DisclaimerCard — recomendado para nivel 3',
+        mensaje: 'Sin DisclaimerCard ni @disclaimer: exempt — recomendado para nivel 3',
+      });
+    } else {
+      incidencias.push({
+        prioridad: '🟢',
+        codigo: 'SIN_DIRECTIVA',
+        mensaje: 'Sin DisclaimerCard ni @disclaimer: exempt — añadir directiva para documentar',
       });
     }
     return { nivel, incidencias };

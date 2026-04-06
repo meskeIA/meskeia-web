@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorBase64.module.css';

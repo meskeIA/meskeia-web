@@ -226,8 +226,8 @@ export default function EstimacionCertificacionEnergeticaPage() {
 
         <LegalNotice />
 
-        {/* Disclaimer obligatorio - severity high */}
-        <DisclaimerCard variant="general" severity="high">
+        {/* Disclaimer — nivel 3 (orientativo, sin validez legal) */}
+        <DisclaimerCard variant="general" severity="medium">
           Esta herramienta ofrece una estimacion <strong>MUY APROXIMADA</strong> de la letra
           energetica de tu vivienda. El certificado energetico oficial solo puede ser emitido por
           un tecnico competente (arquitecto, ingeniero) mediante visita presencial y software

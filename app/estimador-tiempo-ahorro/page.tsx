@@ -1,10 +1,11 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorTiempoAhorro.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -87,7 +88,6 @@ export default function EstimadorTiempoAhorroPage() {
         </header>
 
         <LegalNotice />
-        <DisclaimerCard variant="educational" severity="low" context="estimador-tiempo-ahorro" />
 
         {/* ── Objetivos rápidos ── */}
         <div className={styles.objetivosSection}>

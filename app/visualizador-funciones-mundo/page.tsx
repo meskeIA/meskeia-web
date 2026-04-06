@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import styles from './VisualizadorFuncionesMundo.module.css';

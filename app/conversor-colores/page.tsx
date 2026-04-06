@@ -1,4 +1,5 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useCallback, useEffect } from 'react';
 import styles from './ConversorColores.module.css';
