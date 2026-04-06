@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import styles from './VisualizadorMatematicasMusica.module.css';
 import {
   MeskeiaLogo,
@@ -13,6 +13,110 @@ import {
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
+
+// ─────────────────────────────────────────────
+// Web Audio API — generador de sonido
+// ─────────────────────────────────────────────
+
+type WaveType = 'sine' | 'triangle' | 'square' | 'sawtooth';
+
+function useAudio() {
+  const ctxRef = useRef<AudioContext | null>(null);
+  const activeRef = useRef<OscillatorNode[]>([]);
+
+  const getCtx = useCallback(() => {
+    if (!ctxRef.current || ctxRef.current.state === 'closed') {
+      ctxRef.current = new AudioContext();
+    }
+    if (ctxRef.current.state === 'suspended') {
+      ctxRef.current.resume();
+    }
+    return ctxRef.current;
+  }, []);
+
+  const stopAll = useCallback(() => {
+    activeRef.current.forEach(osc => {
+      try { osc.stop(); } catch { /* ya parado */ }
+    });
+    activeRef.current = [];
+  }, []);
+
+  const playTone = useCallback((freq: number, duration = 0.6, wave: WaveType = 'sine', volume = 0.3) => {
+    stopAll();
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = wave;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+    activeRef.current.push(osc);
+  }, [getCtx, stopAll]);
+
+  const playChord = useCallback((freqs: number[], duration = 1.2, wave: WaveType = 'sine') => {
+    stopAll();
+    const ctx = getCtx();
+    const vol = 0.2 / Math.max(freqs.length, 1);
+    freqs.forEach(freq => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = wave;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+      activeRef.current.push(osc);
+    });
+  }, [getCtx, stopAll]);
+
+  const playInterval = useCallback((baseFreq: number, ratio: number, duration = 1.0) => {
+    playChord([baseFreq, baseFreq * ratio], duration);
+  }, [playChord]);
+
+  const playBeat = useCallback((bpm: number, beats = 8) => {
+    stopAll();
+    const ctx = getCtx();
+    const interval = 60 / bpm;
+    for (let i = 0; i < beats; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const isStrong = i % 4 === 0;
+      osc.type = 'sine';
+      osc.frequency.value = isStrong ? 880 : 660;
+      const t = ctx.currentTime + i * interval;
+      gain.gain.setValueAtTime(isStrong ? 0.4 : 0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.1);
+      activeRef.current.push(osc);
+    }
+  }, [getCtx, stopAll]);
+
+  return { playTone, playChord, playInterval, playBeat, stopAll };
+}
+
+function PlayButton({ onClick, label, small }: { onClick: () => void; label?: string; small?: boolean }) {
+  return (
+    <button
+      type="button"
+      className={`${styles.playBtn} ${small ? styles.playBtnSmall : ''}`}
+      onClick={onClick}
+      aria-label={label || 'Escuchar'}
+      title={label || 'Escuchar'}
+    >
+      <span aria-hidden="true">▶</span>{!small && <span className={styles.playBtnText}> Escuchar</span>}
+    </button>
+  );
+}
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -152,7 +256,7 @@ const FIBONACCI_MUSICA: FibonacciMusica[] = [
 // Sección 1: Qué es el sonido
 // ─────────────────────────────────────────────
 
-function SeccionSonido() {
+function SeccionSonido({ audio }: { audio: ReturnType<typeof useAudio> }) {
   const propiedades = [
     { icono: '〰️', titulo: 'Frecuencia (Hz)', desc: 'Cuántas veces vibra por segundo. Más frecuencia = sonido más agudo.', ejemplo: 'La4 = 440 Hz (440 vibraciones/segundo)', color: '#2E86AB' },
     { icono: '📶', titulo: 'Amplitud', desc: 'Cuánto se desplaza la onda. Mayor amplitud = más volumen.', ejemplo: 'Un susurro ≈ 30 dB, un concierto ≈ 110 dB', color: '#48A9A6' },
@@ -207,6 +311,7 @@ function SeccionSonido() {
                 ))}
               </div>
               <span className={styles.ondaFreq}>{formatNumber(o.freq, 0)} Hz</span>
+              <PlayButton onClick={() => audio.playTone(o.freq, 0.8)} label={`Escuchar ${o.nombre}`} small />
             </div>
           ))}
         </div>
@@ -239,6 +344,7 @@ function SeccionSonido() {
         <span className={styles.datoNumero}>440</span>
         <span className={styles.datoUnidad}>Hz</span>
         <span className={styles.datoTexto}>La nota La4 (A4) — el estándar de afinación universal desde 1955. Todos los instrumentos del mundo se afinan a partir de esta frecuencia.</span>
+        <PlayButton onClick={() => audio.playTone(440, 1.0)} label="Escuchar La4 a 440 Hz" />
       </div>
 
       <div className={styles.insight}>
@@ -254,7 +360,7 @@ function SeccionSonido() {
 // Sección 2: La escala musical
 // ─────────────────────────────────────────────
 
-function SeccionEscala() {
+function SeccionEscala({ audio }: { audio: ReturnType<typeof useAudio> }) {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
@@ -290,6 +396,7 @@ function SeccionEscala() {
                  intv.consonancia === 'alta' ? 'Consonante' :
                  intv.consonancia === 'media' ? 'Medio' : 'Disonante'}
               </span>
+              <PlayButton onClick={() => audio.playInterval(261.63, intv.ratioDecimal)} label={`Escuchar ${intv.nombre}`} small />
             </div>
           ))}
         </div>
@@ -339,6 +446,7 @@ function SeccionEscala() {
               <span className={styles.notaBarraNombre}>{n.nota}</span>
               <span className={styles.notaBarraFreq}>{formatNumber(n.freq, 0)} Hz</span>
               <span className={styles.notaBarraRatio}>{n.ratio}</span>
+              <PlayButton onClick={() => audio.playTone(n.freq, 0.6)} label={`Escuchar ${n.nota}`} small />
             </div>
           ))}
         </div>
@@ -357,7 +465,7 @@ function SeccionEscala() {
 // Sección 3: Acordes y armonía
 // ─────────────────────────────────────────────
 
-function SeccionAcordes() {
+function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
@@ -391,6 +499,7 @@ function SeccionAcordes() {
                 ))}
               </div>
             </div>
+            <PlayButton onClick={() => audio.playChord(ac.frecuencias, 1.5)} label={`Escuchar ${ac.nombre}`} />
             <p className={styles.acordeEmocion}>{ac.emocion}</p>
             <div className={styles.acordeEjemplos}>
               {ac.ejemplos.map((ej, j) => (
@@ -456,7 +565,7 @@ function SeccionAcordes() {
 // Sección 4: Ritmo y matemáticas
 // ─────────────────────────────────────────────
 
-function SeccionRitmo() {
+function SeccionRitmo({ audio }: { audio: ReturnType<typeof useAudio> }) {
   const maxBpm = 190;
 
   return (
@@ -508,6 +617,7 @@ function SeccionRitmo() {
                 />
               </div>
               <span className={styles.bpmRango}>{g.min}-{g.max}</span>
+              <PlayButton onClick={() => audio.playBeat(Math.round((g.min + g.max) / 2))} label={`Escuchar ritmo ${g.genero}`} small />
             </div>
           ))}
           <div className={styles.bpmEscala}>
@@ -587,13 +697,14 @@ function SeccionRitmo() {
 
 export default function VisualizadorMatematicasMusicaPage() {
   const [seccionActiva, setSeccionActiva] = useState<Seccion>('sonido');
+  const audio = useAudio();
 
   const renderSeccion = () => {
     switch (seccionActiva) {
-      case 'sonido': return <SeccionSonido />;
-      case 'escala': return <SeccionEscala />;
-      case 'acordes': return <SeccionAcordes />;
-      case 'ritmo': return <SeccionRitmo />;
+      case 'sonido': return <SeccionSonido audio={audio} />;
+      case 'escala': return <SeccionEscala audio={audio} />;
+      case 'acordes': return <SeccionAcordes audio={audio} />;
+      case 'ritmo': return <SeccionRitmo audio={audio} />;
     }
   };
 

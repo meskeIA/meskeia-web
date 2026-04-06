@@ -39,6 +39,14 @@
 .propiedadDesc { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
 .propiedadEjemplo { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
 
+/* Botones de sonido */
+.playBtn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: var(--primary); color: white; border: none; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
+.playBtn:hover { background: var(--secondary); transform: scale(1.05); }
+.playBtn:active { transform: scale(0.95); }
+.playBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.playBtnSmall { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
+.playBtnText { }
+
 /* Ondas */
 .ondasCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
 .ondasTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
