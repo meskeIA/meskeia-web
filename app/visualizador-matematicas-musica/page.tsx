@@ -80,6 +80,28 @@ function useAudio() {
     playChord([baseFreq, baseFreq * ratio], duration);
   }, [playChord]);
 
+  const playProgression = useCallback((chords: number[][], tempo = 0.7) => {
+    stopAll();
+    const ctx = getCtx();
+    chords.forEach((freqs, idx) => {
+      const vol = 0.15 / Math.max(freqs.length, 1);
+      const t = ctx.currentTime + idx * tempo;
+      freqs.forEach(freq => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + tempo * 0.95);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + tempo);
+        activeRef.current.push(osc);
+      });
+    });
+  }, [getCtx, stopAll]);
+
   const playBeat = useCallback((bpm: number, beats = 8) => {
     stopAll();
     const ctx = getCtx();
@@ -101,7 +123,7 @@ function useAudio() {
     }
   }, [getCtx, stopAll]);
 
-  return { playTone, playChord, playInterval, playBeat, stopAll };
+  return { playTone, playChord, playInterval, playProgression, playBeat, stopAll };
 }
 
 function PlayButton({ onClick, label, small }: { onClick: () => void; label?: string; small?: boolean }) {
@@ -195,6 +217,22 @@ interface Progresion {
   grados: string;
   acordes: string;
   canciones: string[];
+}
+
+// Frecuencias de acordes para reproducir progresiones
+const ACORDE_FREQS: Record<string, number[]> = {
+  'Do': [261.63, 329.63, 392.00],     // C major
+  'Re': [293.66, 369.99, 440.00],     // D major
+  'Mim': [329.63, 392.00, 493.88],    // E minor
+  'Mi': [329.63, 415.30, 493.88],     // E major
+  'Fa': [349.23, 440.00, 523.25],     // F major
+  'Sol': [392.00, 493.88, 587.33],    // G major
+  'Lam': [220.00, 261.63, 329.63],    // A minor
+  'La': [220.00, 277.18, 329.63],     // A major (not used but available)
+};
+
+function getProgFreqs(acordesStr: string): number[][] {
+  return acordesStr.split(' - ').map(name => ACORDE_FREQS[name.trim()] || [261.63, 329.63, 392.00]);
 }
 
 const PROGRESIONES: Progresion[] = [
@@ -548,6 +586,7 @@ function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
                 <span key={j} className={styles.progresionCancion}>♪ {c}</span>
               ))}
             </div>
+            <PlayButton onClick={() => audio.playProgression(getProgFreqs(prog.acordes))} label={`Escuchar ${prog.nombre}`} />
           </div>
         ))}
       </div>
