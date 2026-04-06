@@ -129,9 +129,8 @@ a:hover {
   color: var(--primary-hover);
 }
 
-/* Tipografía base */
+/* Tipografía base — sin color explícito: heredan del padre (body o .hero) */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--text-primary);
   font-weight: 600;
   line-height: 1.3;
 }
