@@ -915,6 +915,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
   ],
 
+  'visualizador-leyes-newton': [
+    { url: '/visualizador-fuerzas-invisibles/', icon: '🌍', name: 'Fuerzas Invisibles', description: 'Física del día a día' },
+    { url: '/visualizador-optica/', icon: '💡', name: 'Óptica', description: 'El viaje de la luz' },
+    { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
+    { url: '/visualizador-matrices/', icon: '🔢', name: 'Matrices', description: 'Transformaciones 2D' },
+  ],
+  'visualizador-tabla-periodica-interactiva': [
+    { url: '/visualizador-tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Visual', description: 'Elementos interactivos' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
+    { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+  ],
+  'visualizador-optica': [
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes de la física' },
+    { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-como-funciona-wifi/', icon: '📶', name: 'Cómo Funciona el WiFi', description: 'Ondas y frecuencias' },
+  ],
+  'visualizador-estados-materia': [
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tendencias Tabla Periódica', description: 'Mapas de calor' },
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes de la física' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+  ],
+  'visualizador-tectonica-placas': [
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Calentamiento global' },
+    { url: '/visualizador-oceano/', icon: '🌊', name: 'Los Secretos del Océano', description: '71% de la Tierra' },
+    { url: '/visualizador-sistema-solar/', icon: '🪐', name: 'El Sistema Solar', description: '8 planetas en números' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 475+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 480+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 477,
+  "total_tools": 482,
   "updated": "2026-04-07",
   "features": {
     "all_free": true,
@@ -1361,6 +1361,36 @@
           "slug": "visualizador-fotosintesis",
           "url": "https://meskeia.com/visualizador-fotosintesis/",
           "description": "Fotosíntesis paso a paso: fase luminosa, ciclo de Calvin, cloroplastos y datos de escala planetaria"
+        },
+        {
+          "name": "Las 3 Leyes de Newton",
+          "slug": "visualizador-leyes-newton",
+          "url": "https://meskeia.com/visualizador-leyes-newton/",
+          "description": "Inercia, F=ma y acción-reacción con simulaciones interactivas, sliders y ejemplos cotidianos"
+        },
+        {
+          "name": "Tendencias de la Tabla Periódica",
+          "slug": "visualizador-tabla-periodica-interactiva",
+          "url": "https://meskeia.com/visualizador-tabla-periodica-interactiva/",
+          "description": "Electronegatividad, radio atómico y energía de ionización como mapas de calor interactivos"
+        },
+        {
+          "name": "Óptica - El Viaje de la Luz",
+          "slug": "visualizador-optica",
+          "url": "https://meskeia.com/visualizador-optica/",
+          "description": "Reflexión, refracción (ley de Snell), lentes convergentes/divergentes y descomposición en colores"
+        },
+        {
+          "name": "Estados de la Materia",
+          "slug": "visualizador-estados-materia",
+          "url": "https://meskeia.com/visualizador-estados-materia/",
+          "description": "Sólido, líquido, gas y plasma con partículas animadas, transiciones y diagrama de fases"
+        },
+        {
+          "name": "Tectónica de Placas",
+          "slug": "visualizador-tectonica-placas",
+          "url": "https://meskeia.com/visualizador-tectonica-placas/",
+          "description": "15 placas tectónicas, 3 tipos de bordes, escala Richter y datos geológicos fascinantes"
         }
       ]
     },

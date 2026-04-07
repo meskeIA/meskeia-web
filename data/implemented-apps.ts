@@ -543,6 +543,11 @@ export const implementedAppsUrls = [
   "/visualizador-reacciones-quimicas/",    // Explicador visual: tipos reacciones, balanceo ecuaciones, átomos
   "/visualizador-celula/",                 // Explicador visual: célula animal vs vegetal, orgánulos clickables
   "/visualizador-fotosintesis/",           // Explicador visual: fotosíntesis paso a paso, Calvin, datos escala
+  "/visualizador-leyes-newton/",           // Explicador visual: 3 leyes de Newton, F=ma, simulaciones
+  "/visualizador-tabla-periodica-interactiva/", // Explicador visual: tendencias tabla periódica, mapas de calor
+  "/visualizador-optica/",                 // Explicador visual: reflexión, refracción, lentes, prisma
+  "/visualizador-estados-materia/",        // Explicador visual: sólido, líquido, gas, plasma, partículas animadas
+  "/visualizador-tectonica-placas/",       // Explicador visual: placas tectónicas, bordes, Richter, volcanes
 ];
 
 /**

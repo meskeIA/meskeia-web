@@ -1,0 +1,201 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+/* ─── Hero ─── */
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* ─── Navegación ─── */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+/* ─── Secciones comunes ─── */
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.subtituloSeccion { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-xl) 0 var(--spacing-md); text-align: center; }
+
+/* ─── Sección 1: Selector de estados ─── */
+.estadoSelector { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.estadoBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 0.85rem; }
+.estadoBtn:hover { transform: translateY(-2px); }
+.estadoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.estadoBtnActivo { color: white; }
+.estadoBtnNombre { font-weight: 700; font-size: 0.82rem; }
+
+.estadoDescripcion { text-align: center; color: var(--text-secondary); font-size: 0.95rem; margin-bottom: var(--spacing-lg); line-height: 1.6; }
+
+/* ─── Contenedor de partículas ─── */
+.contenedorParticulas {
+  position: relative;
+  width: 300px; height: 300px;
+  margin: 0 auto var(--spacing-lg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+.particula {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  transition: left 0.15s linear, top 0.15s linear;
+  pointer-events: none;
+}
+
+/* Estados de partículas */
+.solido { opacity: 0.95; }
+.liquido { opacity: 0.85; }
+.gas { opacity: 0.7; }
+.plasma {
+  opacity: 0.9;
+  box-shadow: 0 0 8px 3px currentColor;
+  animation: plasmaGlow 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes plasmaGlow {
+  0% { box-shadow: 0 0 6px 2px currentColor; }
+  100% { box-shadow: 0 0 14px 6px currentColor; }
+}
+
+.estadoLabel {
+  position: absolute; bottom: 8px; right: 12px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ─── Tabla comparativa ─── */
+.tablaContainer { overflow-x: auto; margin-bottom: var(--spacing-lg); }
+.tabla {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.85rem; color: var(--text-primary);
+}
+.tabla th, .tabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+.tabla th { font-weight: 700; font-size: 0.8rem; white-space: nowrap; }
+.tabla td { font-size: 0.82rem; color: var(--text-secondary); }
+.tabla tr:last-child td { border-bottom: none; }
+
+/* ─── Insight box ─── */
+.insightBox { display: flex; align-items: flex-start; gap: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border: 1px solid rgba(46,134,171,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-top: var(--spacing-lg); }
+.insightBox p { margin: 0; font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; }
+
+/* ─── Sección 2: Transiciones ─── */
+.transicionesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.transicionCard {
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm);
+  padding: var(--spacing-lg); background: var(--bg-card);
+  border: 2px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; transition: all 0.2s; text-align: center; color: var(--text-primary);
+}
+.transicionCard:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.transicionCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.transicionActiva { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.transicionIcono { font-size: 1.6rem; }
+.transicionNombre { font-size: 1rem; font-weight: 700; }
+.transicionDir { font-size: 0.78rem; color: var(--text-muted); }
+.transicionDetalle { margin-top: var(--spacing-sm); text-align: left; animation: fadeIn 0.2s ease; }
+.transicionDetalle p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0.3rem 0; }
+.transicionEjemplo { color: var(--text-primary) !important; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── Slider de temperatura ─── */
+.sliderContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sliderLabel { display: block; font-size: 0.95rem; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+.slider { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: linear-gradient(90deg, #2196F3 0%, #48A9A6 40%, #FF9800 100%); border-radius: 3px; outline: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: white; border: 2px solid var(--primary); border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.slider::-moz-range-thumb { width: 20px; height: 20px; background: white; border: 2px solid var(--primary); border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.sliderMarks { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; }
+.sliderResultado { margin-top: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); border-left: 4px solid var(--primary); background: var(--hover); border-radius: 0 var(--radius) var(--radius) 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.sliderEstado { font-size: 1.05rem; font-weight: 700; }
+.sliderDetalle { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* ─── Sección 3: Diagrama de fases ─── */
+.diagramaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.diagramaSvg { width: 100%; height: auto; color: var(--text-primary); }
+.diagramaZona { cursor: pointer; transition: opacity 0.2s; }
+.diagramaZona:hover { opacity: 0.7; }
+.diagramaPunto { cursor: pointer; transition: transform 0.2s; }
+.diagramaPunto:hover { transform: scale(1.3); }
+.diagramaPunto:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.diagramaExplicacion { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.diagramaExplicacion h3 { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin: 0 0 var(--spacing-sm); }
+.diagramaExplicacion p { font-size: 0.92rem; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+.diagramaHint { text-align: center; color: var(--text-muted); font-size: 0.88rem; font-style: italic; }
+
+/* ─── Sección 4: Curiosidades ─── */
+.curiosidadesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.curiosidadCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); transition: transform 0.2s; }
+.curiosidadCard:hover { transform: translateY(-2px); }
+.curiosidadIcono { font-size: 1.8rem; display: block; margin-bottom: var(--spacing-sm); }
+.curiosidadTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm); }
+.curiosidadTexto { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+/* ─── Escala de temperaturas ─── */
+.escalaContainer { display: flex; flex-direction: column; gap: 2px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); overflow: hidden; }
+.escalaPunto { display: grid; grid-template-columns: 120px 24px 1fr; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) 0; }
+.escalaTemp { font-size: 0.82rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.escalaBarra { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.escalaLabel { font-size: 0.85rem; color: var(--text-secondary); }
+
+/* ─── Contenido educativo ─── */
+.guideSection h2 { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-lg) 0 var(--spacing-sm); }
+.guideSection p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--spacing-md); }
+.warningBox { background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin: var(--spacing-md) 0; font-size: 0.9rem; line-height: 1.6; color: var(--text-primary); }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .subtitle { font-size: 0.95rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .estadoSelector { grid-template-columns: repeat(2, 1fr); }
+  .transicionesGrid { grid-template-columns: 1fr 1fr; }
+  .curiosidadesGrid { grid-template-columns: 1fr; }
+  .contenedorParticulas { width: 260px; height: 260px; }
+  .escalaPunto { grid-template-columns: 100px 20px 1fr; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: var(--spacing-md); }
+  .transicionesGrid { grid-template-columns: 1fr; }
+  .contenedorParticulas { width: 220px; height: 220px; }
+  .escalaTemp { font-size: 0.75rem; }
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .container .particula,
+  .container .navBtn,
+  .container .estadoBtn,
+  .container .transicionCard,
+  .container .curiosidadCard,
+  .container .diagramaZona,
+  .container .diagramaPunto {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
