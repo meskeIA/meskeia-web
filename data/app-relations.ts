@@ -884,6 +884,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
     { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
   ],
+  'visualizador-como-funciona-wifi': [
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
+    { url: '/visualizador-gps/', icon: '📡', name: 'Cómo Funciona el GPS', description: 'Satélites y trilateración' },
+    { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
+    { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Lo que hay dentro' },
+  ],
+  'visualizador-matrices': [
+    { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones del Mundo', description: '4 funciones fundamentales' },
+    { url: '/visualizador-fibonacci-naturaleza/', icon: '🌻', name: 'Fibonacci en la Naturaleza', description: 'La secuencia áurea' },
+    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad en la Vida', description: 'Azar y decisiones' },
+    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
+  ],
+  'visualizador-reacciones-quimicas': [
+    { url: '/visualizador-tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Visual', description: 'Elementos interactivos' },
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+  ],
+  'visualizador-celula': [
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Cómo Piensa tu Cerebro', description: '86.000 millones de neuronas' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+  ],
+  'visualizador-fotosintesis': [
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
+    { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
+  ],
 
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },

@@ -1,11 +1,11 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 470+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 475+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 472,
-  "updated": "2026-04-06",
+  "total_tools": 477,
+  "updated": "2026-04-07",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -1331,6 +1331,36 @@
           "slug": "quiz-simbolos-quimicos",
           "url": "https://meskeia.com/quiz-simbolos-quimicos/",
           "description": "Aprende la tabla periódica jugando: adivina el nombre del elemento por su símbolo o viceversa. 85 elementos, 3 dificultades, 2 modos de juego."
+        },
+        {
+          "name": "Cómo Funciona el WiFi",
+          "slug": "visualizador-como-funciona-wifi",
+          "url": "https://meskeia.com/visualizador-como-funciona-wifi/",
+          "description": "Ondas electromagnéticas, frecuencias 2.4 vs 5 GHz, propagación en el hogar, obstáculos, canales y evolución WiFi"
+        },
+        {
+          "name": "Matrices - Transformaciones 2D",
+          "slug": "visualizador-matrices",
+          "url": "https://meskeia.com/visualizador-matrices/",
+          "description": "Qué son las matrices, operaciones básicas y transformaciones geométricas 2D animadas en plano cartesiano"
+        },
+        {
+          "name": "Reacciones Químicas",
+          "slug": "visualizador-reacciones-quimicas",
+          "url": "https://meskeia.com/visualizador-reacciones-quimicas/",
+          "description": "Tipos de reacciones, balanceo interactivo de ecuaciones con conteo atómico visual y reacciones cotidianas"
+        },
+        {
+          "name": "La Célula por Dentro",
+          "slug": "visualizador-celula",
+          "url": "https://meskeia.com/visualizador-celula/",
+          "description": "Anatomía de célula animal y vegetal con orgánulos clickables, comparativa visual y datos fascinantes"
+        },
+        {
+          "name": "La Fotosíntesis",
+          "slug": "visualizador-fotosintesis",
+          "url": "https://meskeia.com/visualizador-fotosintesis/",
+          "description": "Fotosíntesis paso a paso: fase luminosa, ciclo de Calvin, cloroplastos y datos de escala planetaria"
         }
       ]
     },

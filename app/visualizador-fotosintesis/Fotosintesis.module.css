@@ -1,0 +1,256 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+.instruccion { text-align: center; color: var(--text-muted); font-size: 0.88rem; font-style: italic; margin-bottom: var(--spacing-lg); }
+
+/* ─── Sección 1: Ecuación general ─── */
+.ecuacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); text-align: center; }
+.ecuacionTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); }
+.ecuacion { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--spacing-sm); }
+.ecuacionMol { padding: 0.4rem 0.7rem; border-radius: 8px; font-weight: 700; font-size: 1.1rem; }
+.ecuacionOp { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
+.ecuacionFlecha { font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+
+/* Colores de moléculas */
+.molLuz { background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
+[data-theme='dark'] .molLuz { background: #422006; color: #FDE68A; border-color: #B45309; }
+.molCO2 { background: #F3F4F6; color: #4B5563; border: 1px solid #9CA3AF; }
+[data-theme='dark'] .molCO2 { background: #374151; color: #D1D5DB; border-color: #6B7280; }
+.molAgua { background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA; }
+[data-theme='dark'] .molAgua { background: #1E3A5F; color: #93C5FD; border-color: #3B82F6; }
+.molGlucosa { background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
+[data-theme='dark'] .molGlucosa { background: #422006; color: #FDE68A; border-color: #B45309; }
+.molO2 { background: #D1FAE5; color: #065F46; border: 1px solid #34D399; }
+[data-theme='dark'] .molO2 { background: #064E3B; color: #6EE7B7; border-color: #10B981; }
+.molATP { background: #EDE9FE; color: #5B21B6; border: 1px solid #A78BFA; }
+[data-theme='dark'] .molATP { background: #2E1065; color: #C4B5FD; border-color: #7C3AED; }
+.molNADPH { background: #FCE7F3; color: #9D174D; border: 1px solid #F472B6; }
+[data-theme='dark'] .molNADPH { background: #500724; color: #F9A8D4; border-color: #EC4899; }
+
+/* ─── Sección 1: Diagrama de hoja ─── */
+.hojaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.hojaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.hojaDiagrama { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--spacing-md); align-items: center; }
+.hojaEntradas, .hojaSalidas { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.hojaGrupoLabel { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; text-align: center; }
+.hojaMolecula { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; background: var(--bg-card); text-align: center; color: var(--text-primary); }
+.hojaMolecula:hover { transform: translateY(-2px); }
+.hojaMolActiva { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.2); }
+.hojaMolIcono { font-size: 1.5rem; }
+.hojaMolNombre { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+.hojaMolFormula { font-size: 0.7rem; color: var(--text-muted); }
+
+.hojaCentral { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); position: relative; }
+.hojaFlechaEntrada, .hojaFlechaSalida { font-size: 1.5rem; color: var(--primary); animation: flujo 1.5s ease-in-out infinite; }
+.hojaIcono { font-size: 3rem; }
+.hojaLabel { font-size: 0.82rem; font-weight: 700; color: var(--primary); }
+
+.componenteDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.componenteHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.componenteDetalleIcono { font-size: 2rem; }
+.componenteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.componenteDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.componenteDato { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; }
+
+/* ─── Sección 2: Cloroplasto ─── */
+.cloroplastoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.cloroplastoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.cloroplastoDiagrama { display: flex; justify-content: center; }
+.cloroplastoOuter { border: 3px solid var(--verde); border-radius: 50% / 40%; padding: var(--spacing-md); position: relative; min-width: 280px; }
+.cloroplastoLabel { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 var(--spacing-sm); font-size: 0.72rem; color: var(--verde); font-weight: 600; }
+.cloroplastoInner { border: 2px dashed var(--secondary); border-radius: 40% / 30%; padding: var(--spacing-lg) var(--spacing-md); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); }
+.estromaLabel { font-size: 0.72rem; color: var(--secondary); font-weight: 600; }
+.tilacoidesStack { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.tilacoide { background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 20px; padding: 6px var(--spacing-md); text-align: center; }
+.tilacoideTxt { font-size: 0.68rem; color: white; font-weight: 600; }
+.tilacoidesInfo, .estromaInfo { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--text-secondary); }
+.tilacoidesInfoIcono, .estromaInfoIcono { font-size: 1rem; }
+
+/* ─── Sección 2: Pasos luminosa ─── */
+.subSeccionTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.pasosContainer { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-xl); }
+.pasoWrapper { display: flex; flex-direction: column; align-items: center; }
+.pasoCard { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; text-align: left; color: var(--text-primary); width: 100%; }
+.pasoCard:hover { border-color: var(--primary); }
+.pasoActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.pasoHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }
+.pasoIcono { font-size: 1.3rem; }
+.pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.pasoDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+.pasoDetalle { margin-top: var(--spacing-md); border-top: 1px solid var(--border); padding-top: var(--spacing-md); font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+.pasoFlecha { color: var(--primary); font-size: 1.2rem; padding: 0.3rem 0; }
+.flechaAnimada { animation: flujo 1.5s ease-in-out infinite; }
+
+/* Colores de pasos (bordes sutiles) */
+.pasoLuz { border-left: 4px solid #F59E0B; }
+.pasoElectron { border-left: 4px solid #8B5CF6; }
+.pasoAgua { border-left: 4px solid #3B82F6; }
+.pasoCadena { border-left: 4px solid #EC4899; }
+.pasoATP { border-left: 4px solid #10B981; }
+.pasoNADPH { border-left: 4px solid #F472B6; }
+
+/* Productos fase luminosa */
+.productosCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.productosTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.productosGrid { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); flex-wrap: wrap; }
+.productoItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); min-width: 100px; }
+.productoItemIcono { font-size: 1.5rem; }
+.productoItemNombre { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.productoItemDesc { font-size: 0.75rem; color: var(--text-muted); }
+.productoItemFlecha { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
+
+/* ─── Sección 3: Ciclo de Calvin ─── */
+.cicloCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.cicloTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.cicloContainer { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-lg); }
+.cicloCirculo { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+.cicloFase { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-primary); z-index: 1; min-width: 100px; text-align: center; }
+.cicloFase:hover { transform: scale(1.05); }
+.cicloFaseActiva { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.25); }
+.cicloFaseIcono { font-size: 1.3rem; }
+.cicloFaseNombre { font-size: 0.78rem; font-weight: 700; }
+
+/* Posiciones de las 3 fases en triángulo */
+.cicloFase:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+.cicloFaseActiva:nth-child(1) { transform: translateX(-50%) scale(1.05); }
+.cicloFase:nth-child(2) { bottom: 15px; left: 0; }
+.cicloFaseActiva:nth-child(2) { transform: scale(1.05); }
+.cicloFase:nth-child(3) { bottom: 15px; right: 0; }
+.cicloFaseActiva:nth-child(3) { transform: scale(1.05); }
+
+.cicloCentro { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.cicloCentroIcono { font-size: 2rem; animation: giro 4s linear infinite; }
+.cicloCentroTexto { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-align: center; }
+.cicloFlechas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+.cicloFlechaArc { font-size: 5rem; color: var(--border); opacity: 0.3; animation: giro 8s linear infinite; }
+
+/* Colores de fases */
+.faseFijacion { border-left: 4px solid #EF4444; }
+.faseReduccion { border-left: 4px solid #3B82F6; }
+.faseRegeneracion { border-left: 4px solid #10B981; }
+
+.cicloIO { display: flex; gap: var(--spacing-lg); justify-content: center; flex-wrap: wrap; }
+.cicloEntrada, .cicloSalida { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; }
+.cicloIOLabel { font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); }
+.cicloIOItem { padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+
+.faseDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.faseDetalleHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.faseDetalleIcono { font-size: 2rem; }
+.faseDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.faseDetalleSubtitulo { font-size: 0.82rem; color: var(--text-muted); }
+.faseDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.faseDetalleDato { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; }
+
+/* Conteo de vueltas */
+.vueltasCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.vueltasTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.vueltasVisual { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.vueltaItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); }
+.vueltaIcono { font-size: 1.3rem; }
+.vueltaNum { font-size: 0.68rem; font-weight: 700; color: var(--text-primary); }
+.vueltaCO2 { font-size: 0.65rem; color: var(--text-muted); }
+.vueltasResultado { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.vueltasIgual { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+.vueltasGlucosa { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.vueltasNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; }
+
+/* ─── Sección 4: Datos de escala ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.datoCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; color: var(--text-primary); }
+.datoCard:hover { border-color: var(--primary); transform: translateY(-2px); }
+.datoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
+.datoIcono { font-size: 1.8rem; }
+.datoCifra { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.datoEtiqueta { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.3; }
+.datoDetalle { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: var(--spacing-sm); border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
+
+/* Árboles por persona */
+.arbolesCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.arbolesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.arbolesVisual { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.arbolesIconos { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; justify-content: center; }
+.arbolIcono { font-size: 2.5rem; }
+.arbolesTexto { text-align: center; }
+.arbolesCifra { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.3rem; }
+.arbolesDesc { font-size: 0.88rem; color: var(--text-secondary); }
+.arbolesNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; }
+
+/* Comparativa */
+.comparativaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.comparativaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.comparativaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.comparativaCol { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); }
+.comparativaColTitulo { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+.comparativaFila { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.comparativaFila:last-child { border-bottom: none; }
+.comparativaLabel { font-size: 0.82rem; color: var(--text-secondary); }
+.comparativaValor { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); text-align: right; }
+.comparativaNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; line-height: 1.5; }
+
+/* ─── Comunes ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes flujo { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(4px); } }
+@keyframes giro { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .hojaDiagrama { grid-template-columns: 1fr; gap: var(--spacing-sm); }
+  .hojaCentral { flex-direction: row; }
+  .hojaFlechaEntrada { transform: rotate(90deg); }
+  .hojaFlechaSalida { transform: rotate(90deg); }
+  .ecuacion { gap: 0.3rem; }
+  .ecuacionMol { font-size: 0.95rem; padding: 0.3rem 0.5rem; }
+  .datosGrid { grid-template-columns: repeat(2, 1fr); }
+  .comparativaGrid { grid-template-columns: 1fr; }
+  .vueltasVisual { grid-template-columns: repeat(3, 1fr); }
+  .cicloCirculo { width: 240px; height: 240px; }
+  .cicloFase { min-width: 80px; padding: 0.3rem var(--spacing-sm); }
+  .cicloFaseNombre { font-size: 0.7rem; }
+  .productosGrid { gap: var(--spacing-sm); }
+  .productoItem { min-width: 80px; padding: var(--spacing-sm); }
+  .cloroplastoOuter { min-width: 240px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hojaMolecula, .datoCard, .pasoCard, .cicloFase { transition-duration: 0.01ms !important; }
+  .componenteDetalle, .faseDetalle { animation-duration: 0.01ms !important; }
+  .hojaFlechaEntrada, .hojaFlechaSalida, .flechaAnimada { animation: none !important; }
+  .cicloCentroIcono, .cicloFlechaArc { animation: none !important; }
+}

@@ -538,6 +538,11 @@ export const implementedAppsUrls = [
   "/mapa-riesgo-emprendedor/",             // Reflexión: riesgo emprendedor — exposición + preparación, 10 preguntas, perfil + acciones
   "/auditoria-propuesta-valor/",           // Reflexión: propuesta de valor — encaje + comunicación (Osterwalder), 10 preguntas, perfil + acciones
   "/declaracion-renta-fallecidos/",        // Guía interactiva IRPF fallecidos: obligación, borrador, documentación, devolución herederos
+  "/visualizador-como-funciona-wifi/",     // Explicador visual: ondas, 2.4/5 GHz, propagación, canales WiFi
+  "/visualizador-matrices/",               // Explicador visual: matrices, operaciones, transformaciones 2D
+  "/visualizador-reacciones-quimicas/",    // Explicador visual: tipos reacciones, balanceo ecuaciones, átomos
+  "/visualizador-celula/",                 // Explicador visual: célula animal vs vegetal, orgánulos clickables
+  "/visualizador-fotosintesis/",           // Explicador visual: fotosíntesis paso a paso, Calvin, datos escala
 ];
 
 /**

@@ -1,0 +1,166 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+/* Hero */
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto; }
+
+/* Navegación secciones */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+/* Cabecera de sección */
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSub { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); line-height: 1.5; }
+.subSeccionTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+
+/* Insight */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+
+/* Warning box */
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Sección 1: Definición ─── */
+.matrizEjemplo { display: flex; gap: var(--spacing-xl); justify-content: center; margin-bottom: var(--spacing-xl); flex-wrap: wrap; }
+.matrizDemo { text-align: center; }
+.matrizLabel { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: var(--spacing-sm); }
+.matrizGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; background: var(--border); border-radius: 8px; overflow: hidden; padding: 3px; }
+.matrizGrid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; background: var(--border); border-radius: 8px; overflow: hidden; padding: 3px; }
+.celda { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; background: var(--bg-card); font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+.matrizAnotacion { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; padding: 0 0.3rem; }
+
+/* Tipos */
+.tiposGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.tipoBtn { padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.tipoBtn:hover { border-color: var(--tipo-color, var(--primary)); color: var(--tipo-color, var(--primary)); }
+.tipoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tipoBtnActivo { border-color: var(--tipo-color, var(--primary)); background: var(--tipo-color, var(--primary)); color: white; }
+.tipoBtnActivo:hover { color: white; }
+.tipoNombre { font-size: 0.85rem; font-weight: 600; }
+.tipoDetalle { display: flex; align-items: center; gap: var(--spacing-lg); justify-content: center; margin-bottom: var(--spacing-lg); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
+.tipoDesc { font-size: 0.92rem; color: var(--text-primary); margin: 0; max-width: 300px; }
+
+/* Grids pequeños de matrices */
+.matrizGridPeq { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+.celdaPeq { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: var(--hover); border-radius: 4px; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+
+/* ─── Sección 2: Operaciones ─── */
+.opNav { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
+.opBtn { padding: 0.5rem 1rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
+.opBtn:hover { border-color: var(--primary); color: var(--primary); }
+.opBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.opBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.opBtnActivo:hover { color: white; }
+
+.operacionContenido { margin-bottom: var(--spacing-md); }
+.operacionVisual { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
+.matrizOp { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+.celdaOp { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 4px; font-size: 1rem; color: var(--text-primary); transition: background 0.2s; }
+.operador { font-size: 1.5rem; font-weight: 700; color: var(--text-muted); }
+
+.pasoAPaso { display: flex; gap: var(--spacing-md); justify-content: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
+.paso { font-size: 0.88rem; color: var(--text-primary); background: var(--hover); padding: 0.3rem 0.6rem; border-radius: 6px; }
+
+/* Multiplicación pasos */
+.pasoMulti { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.pasoCalc { margin-bottom: var(--spacing-sm); }
+.pasoLabel { font-size: 0.82rem; font-weight: 700; color: var(--primary); margin-right: var(--spacing-sm); }
+.pasoFormula { font-size: 0.9rem; color: var(--text-primary); }
+.botonesSimulacion { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+.btnPaso { padding: 0.4rem 0.8rem; background: var(--hover); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: var(--text-secondary); transition: all 0.15s; }
+.btnPaso:hover { border-color: var(--primary); color: var(--primary); }
+.btnPasoActivo { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Determinante */
+.determinanteVisual { display: flex; align-items: center; justify-content: center; gap: var(--spacing-xl); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
+.detMatriz { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; background: var(--border); border-radius: 8px; overflow: hidden; padding: 3px; }
+.celdaDet { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: var(--bg-card); font-size: 1.4rem; font-weight: 700; }
+.detFormula { text-align: center; }
+.detLinea { font-size: 1.1rem; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.detExplicacion { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
+.detRegla { flex: 1; min-width: 150px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: var(--spacing-md); text-align: center; }
+.detReglaTitulo { display: block; font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; }
+.detReglaTexto { font-size: 0.82rem; color: var(--text-secondary); }
+
+/* Transpuesta */
+.transVisual { display: flex; align-items: center; justify-content: center; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
+.matrizTrans2x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.matrizTrans3x2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+.celdaTrans { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: var(--hover); border-radius: 4px; font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+.flechaTrans { font-size: 2rem; color: var(--primary); }
+.transDestaque { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); font-size: 0.88rem; color: var(--text-primary); line-height: 1.8; }
+.transDestaque p { margin: 0; }
+
+/* ─── Sección 3: Transformaciones ─── */
+.transLayout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); align-items: start; }
+.planoWrapper { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.planoCartesiano { width: 100%; height: auto; display: block; }
+[data-theme='dark'] .planoCartesiano line[stroke="#e0e0e0"] { stroke: #333; }
+[data-theme='dark'] .planoCartesiano line[stroke="#666"] { stroke: #888; }
+[data-theme='dark'] .planoCartesiano text { fill: #888; }
+.figuraAnimada { transition: all 0.4s ease; }
+
+.transControles { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.matrizActiva { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.transBotones { display: flex; flex-direction: column; gap: 0.4rem; }
+.transBtn { display: flex; align-items: center; gap: var(--spacing-sm); padding: 0.5rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); transition: all 0.15s; text-align: left; }
+.transBtn:hover { border-color: var(--primary); color: var(--primary); }
+.transBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.transBtnActivo { border-color: var(--secondary); background: var(--secondary); color: white; }
+.transBtnActivo:hover { color: white; }
+.transDesc { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); font-size: 0.9rem; color: var(--text-primary); text-align: center; }
+
+/* ─── Sección 4: Vida real ─── */
+.appsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.appCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; transition: border-color 0.2s; }
+.appCard:hover { border-color: var(--primary); }
+.appIcono { font-size: 2rem; display: block; margin-bottom: var(--spacing-sm); }
+.appTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.appDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+.datoCurioso { background: linear-gradient(135deg, rgba(46,134,171,0.05) 0%, rgba(72,169,166,0.05) 100%); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.datoCurioso h4 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.datoCurioso ul { margin: 0; padding-left: 1.2rem; }
+.datoCurioso li { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; margin-bottom: 0.4rem; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.7rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .matrizEjemplo { flex-direction: column; align-items: center; }
+  .tiposGrid { grid-template-columns: repeat(2, 1fr); }
+  .operacionVisual { gap: var(--spacing-sm); }
+  .celdaOp { width: 36px; height: 36px; font-size: 0.88rem; }
+  .transLayout { grid-template-columns: 1fr; }
+  .appsGrid { grid-template-columns: 1fr; }
+  .determinanteVisual { flex-direction: column; }
+  .detExplicacion { flex-direction: column; }
+  .opNav { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figuraAnimada { transition-duration: 0.01ms !important; }
+  .navBtn, .tipoBtn, .opBtn, .transBtn, .appCard, .celdaOp { transition-duration: 0.01ms !important; }
+}
