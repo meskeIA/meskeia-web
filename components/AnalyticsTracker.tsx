@@ -52,10 +52,11 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     // Detectar si la visita viene referida desde una plataforma de IA
     const referrer = document.referrer;
     const esReferralIA = /chatgpt\.com|perplexity\.ai|claude\.ai|gemini\.google|copilot\.microsoft\.com|you\.com|phind\.com|poe\.com/i.test(referrer);
+    const esReferralSocial = /t\.co|x\.com|twitter\.com|instagram\.com|facebook\.com|linkedin\.com/i.test(referrer);
 
     // Extraer solo el hostname del referrer (RGPD: solo dominio, nunca la URL completa)
     let referrerHostname: string | null = null;
-    if (esReferralIA && referrer) {
+    if ((esReferralIA || esReferralSocial) && referrer) {
       try {
         referrerHostname = new URL(referrer).hostname;
       } catch {
@@ -87,7 +88,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     // Datos de entrada (registro inicial)
     const entryData = {
       aplicacion: finalAppName,
-      modo: isPWA ? 'pwa' : esReferralIA ? 'referral-ia' : 'web',
+      modo: isPWA ? 'pwa' : esReferralIA ? 'referral-ia' : esReferralSocial ? 'referral-social' : 'web',
       navegador: navigator.userAgent,
       sistema_operativo: navigator.platform,
       resolucion: `${window.screen.width}x${window.screen.height}`,
@@ -127,7 +128,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
           aplicacion: finalAppName,
           duracion_segundos: durationSeconds,
           tipo_dispositivo: deviceType,
-          modo: isPWA ? 'pwa' : esReferralIA ? 'referral-ia' : 'web',
+          modo: isPWA ? 'pwa' : esReferralIA ? 'referral-ia' : esReferralSocial ? 'referral-social' : 'web',
           sesion_id: sessionId,
         });
 

@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
     // Preparar datos con límites de longitud (H5/L1: prevenir abuso con payloads grandes)
     const aplicacion = datos.aplicacion.slice(0, 100);
     const timestamp = new Date().toLocaleString('es-ES', {
+      timeZone: 'Europe/Madrid',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
