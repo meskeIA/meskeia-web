@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 480+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 485+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 482,
+  "total_tools": 487,
   "updated": "2026-04-07",
   "features": {
     "all_free": true,
@@ -1391,6 +1391,36 @@
           "slug": "visualizador-tectonica-placas",
           "url": "https://meskeia.com/visualizador-tectonica-placas/",
           "description": "15 placas tectónicas, 3 tipos de bordes, escala Richter y datos geológicos fascinantes"
+        },
+        {
+          "name": "Mitosis y Meiosis",
+          "slug": "visualizador-mitosis-meiosis",
+          "url": "https://meskeia.com/visualizador-mitosis-meiosis/",
+          "description": "División celular paso a paso: mitosis (5 fases) y meiosis (crossing-over), cromosomas animados"
+        },
+        {
+          "name": "Capas de la Tierra",
+          "slug": "visualizador-capas-tierra",
+          "url": "https://meskeia.com/visualizador-capas-tierra/",
+          "description": "Corteza, manto, núcleo externo e interno. Ondas sísmicas, campo magnético y datos del interior"
+        },
+        {
+          "name": "Tipos de Rocas",
+          "slug": "visualizador-tipos-rocas",
+          "url": "https://meskeia.com/visualizador-tipos-rocas/",
+          "description": "Ígneas, sedimentarias y metamórficas: ciclo de las rocas animado y escala de Mohs"
+        },
+        {
+          "name": "El Árbol de la Vida Animal",
+          "slug": "visualizador-arbol-vida",
+          "url": "https://meskeia.com/visualizador-arbol-vida/",
+          "description": "Árbol filogenético interactivo: de las esponjas a los mamíferos, 8,7 millones de especies"
+        },
+        {
+          "name": "Anatomía de una Flor",
+          "slug": "visualizador-anatomia-flor",
+          "url": "https://meskeia.com/visualizador-anatomia-flor/",
+          "description": "Partes de la flor clickables, polinización, tipos de frutos y dispersión de semillas"
         }
       ]
     },

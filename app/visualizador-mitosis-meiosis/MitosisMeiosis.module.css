@@ -1,0 +1,437 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+.heroIcono { font-size: 3rem; margin-bottom: var(--spacing-sm); }
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto var(--spacing-sm); line-height: 1.5; }
+.heroNota { font-size: 0.88rem; opacity: 0.78; margin: 0; }
+
+/* Navegación de secciones */
+.nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+}
+.navBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Secciones */
+.seccion { margin-bottom: var(--spacing-xl); }
+.seccionTitulo {
+  font-size: 1.3rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.seccionSubtitulo {
+  font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-lg);
+}
+
+/* ─── Visor de fases (mitosis/meiosis) ─── */
+.visorFases {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.visorVisual {
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm);
+}
+
+/* Célula container */
+.celulaContainer {
+  position: relative;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 3px solid var(--border);
+  overflow: hidden;
+}
+[data-theme='dark'] .celulaContainer {
+  background: #333;
+  border-color: #555;
+}
+
+/* Membrana nuclear */
+.membranaNuclear {
+  position: absolute;
+  top: 15%; left: 15%;
+  width: 70%; height: 70%;
+  border-radius: 50%;
+  border: 2px dashed var(--text-muted);
+  transition: opacity 0.5s;
+}
+
+/* Surco de división */
+.surcoDiv {
+  position: absolute;
+  top: 0; left: 50%;
+  width: 2px; height: 100%;
+  background: var(--text-muted);
+  transform: translateX(-50%);
+  transition: opacity 0.5s;
+}
+.surcoDivHorizontal {
+  position: absolute;
+  top: 50%; left: 0;
+  width: 100%; height: 2px;
+  background: var(--text-muted);
+  transform: translateY(-50%);
+}
+
+/* Cromosomas */
+.cromosoma {
+  position: absolute;
+  transition: all 0.6s ease;
+}
+.cromosomaMaterno { background: #2E86AB; }
+.cromosomaPaterno { background: #E74C3C; }
+
+/* Leyenda dot */
+.leyendaDot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.leyendaDot.cromosomaMaterno { background: #2E86AB; }
+.leyendaDot.cromosomaPaterno { background: #E74C3C; }
+
+/* Huso mitótico */
+.husoMitotico {
+  position: absolute;
+  top: 50%; width: 40%; height: 1px;
+  background: var(--text-muted);
+  opacity: 0.5;
+  transform: translateY(-50%);
+}
+.husoIzq { left: 2%; }
+.husoDer { right: 2%; }
+
+/* Crossing-over label */
+.crossingOverLabel {
+  position: absolute;
+  bottom: 8%; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(46, 134, 171, 0.85);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Leyenda cromosomas */
+.leyendaCromosomas {
+  display: flex; gap: var(--spacing-md);
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+.leyendaItem {
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* Panel de información de fase */
+.visorInfo {
+  display: flex; flex-direction: column; gap: var(--spacing-sm);
+}
+.faseTag {
+  font-size: 0.75rem; color: var(--primary); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.faseNombre {
+  font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;
+}
+.faseDesc {
+  font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; margin: 0;
+}
+.faseCromosomas {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--hover); padding: 4px 10px;
+  border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+  color: var(--primary); width: fit-content;
+}
+.faseDetalle {
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;
+}
+
+/* Navegación de fases */
+.fasesNav {
+  display: flex; align-items: center; justify-content: center; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.faseNavBtn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+.faseNavBtn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.faseNavBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.faseNavBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.faseDots { display: flex; gap: 6px; }
+.faseDot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.faseDot:hover { border-color: var(--primary); }
+.faseDotActivo { background: var(--primary); border-color: var(--primary); }
+
+/* Insight */
+.insight {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.insight p { margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--text-primary); }
+
+/* ─── Comparativa ─── */
+.comparativaTabla {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+.comparativaRow {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 0;
+}
+.comparativaHeader {
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.comparativaRow:not(.comparativaHeader) {
+  border-top: 1px solid var(--border);
+}
+.comparativaRow:not(.comparativaHeader):nth-child(even) {
+  background: var(--hover);
+}
+.comparativaAspecto,
+.comparativaMitosis,
+.comparativaMeiosis {
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+.comparativaAspecto { font-weight: 600; }
+.comparativaMitosis { border-left: 1px solid var(--border); }
+.comparativaMeiosis { border-left: 1px solid var(--border); }
+.comparativaHeader .comparativaMitosis,
+.comparativaHeader .comparativaMeiosis { border-left-color: rgba(255,255,255,0.3); }
+
+/* Diagrama de flujo */
+.flujoContainer {
+  margin-bottom: var(--spacing-lg);
+}
+.flujoTitulo {
+  font-size: 1.1rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: var(--spacing-md); text-align: center;
+}
+.flujoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+.flujoColumna {
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm);
+}
+.flujoLabel {
+  font-weight: 700; font-size: 0.95rem; color: var(--primary);
+}
+.flujoCelula {
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.flujoFlecha {
+  font-size: 1.5rem; color: var(--text-muted);
+}
+.flujoResultado {
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+}
+.flujoCelulaSmall {
+  padding: 6px 14px;
+  background: var(--secondary);
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.flujoNota {
+  font-size: 0.8rem; color: var(--text-muted); text-align: center;
+}
+
+/* ─── Datos fascinantes ─── */
+.datosGrid {
+  display: flex; flex-direction: column; gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+.datoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.datoHeader {
+  width: 100%;
+  display: flex; align-items: center; gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+}
+.datoHeader:hover { background: var(--hover); }
+.datoHeaderActivo { background: var(--hover); }
+.datoIcono { font-size: 1.4rem; flex-shrink: 0; }
+.datoTitulo { flex: 1; font-weight: 600; }
+.datoChevron {
+  font-size: 0.7rem; color: var(--text-muted);
+  transition: transform 0.2s;
+}
+.datoChevronAbierto { transform: rotate(180deg); }
+.datoDetalle {
+  padding: 0 var(--spacing-lg) var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+.datoDetalle p {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* Timeline */
+.timeline {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.timelineTitulo {
+  font-size: 1rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+.timelineItem {
+  display: flex; gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-left: 2px solid var(--primary);
+  padding-left: var(--spacing-md);
+  margin-left: 4px;
+}
+.timelineItem:not(:last-child) { margin-bottom: var(--spacing-sm); }
+.timelineAnio {
+  font-weight: 700; color: var(--primary);
+  font-size: 0.9rem; min-width: 3rem;
+}
+.timelineEvento {
+  font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;
+}
+
+/* Warning box */
+.warningBox {
+  background: #FEF3CD;
+  border: 1px solid #F0D68A;
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  font-size: 0.88rem;
+  color: #856404;
+  line-height: 1.5;
+}
+[data-theme='dark'] .warningBox {
+  background: #3D3520;
+  border-color: #5A4E2D;
+  color: #F0D68A;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .nav { grid-template-columns: repeat(2, 1fr); }
+  .visorFases { grid-template-columns: 1fr; }
+  .celulaContainer { width: 180px; height: 180px; margin: 0 auto; }
+  .comparativaRow { grid-template-columns: 1fr; }
+  .comparativaHeader { display: none; }
+  .comparativaAspecto {
+    font-weight: 700; background: var(--hover);
+    border-bottom: 1px solid var(--border);
+  }
+  .comparativaMitosis,
+  .comparativaMeiosis { border-left: none; padding-left: 16px; }
+  .comparativaMitosis::before { content: 'Mitosis: '; font-weight: 600; color: var(--primary); }
+  .comparativaMeiosis::before { content: 'Meiosis: '; font-weight: 600; color: var(--secondary); }
+  .flujoGrid { grid-template-columns: 1fr; gap: var(--spacing-xl); }
+  .title { font-size: 1.8rem; }
+}
+
+/* ─── Prefers reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .cromosoma,
+  .membranaNuclear,
+  .surcoDiv,
+  .datoChevron,
+  .navBtn,
+  .faseNavBtn,
+  .faseDot,
+  .datoHeader {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -548,6 +548,11 @@ export const implementedAppsUrls = [
   "/visualizador-optica/",                 // Explicador visual: reflexión, refracción, lentes, prisma
   "/visualizador-estados-materia/",        // Explicador visual: sólido, líquido, gas, plasma, partículas animadas
   "/visualizador-tectonica-placas/",       // Explicador visual: placas tectónicas, bordes, Richter, volcanes
+  "/visualizador-mitosis-meiosis/",        // Explicador visual: división celular, cromosomas animados, crossing-over
+  "/visualizador-capas-tierra/",           // Explicador visual: corteza, manto, núcleo, ondas sísmicas
+  "/visualizador-tipos-rocas/",            // Explicador visual: ígneas, sedimentarias, metamórficas, ciclo rocas
+  "/visualizador-arbol-vida/",             // Explicador visual: árbol filogenético, 11 grupos animales
+  "/visualizador-anatomia-flor/",          // Explicador visual: partes flor, polinización, frutos, semillas
 ];
 
 /**

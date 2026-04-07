@@ -1,0 +1,146 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+/* ─── Diagrama de flor ─── */
+.florContainer { position: relative; width: 100%; max-width: 480px; aspect-ratio: 1; margin: 0 auto var(--spacing-lg); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); overflow: hidden; }
+.florSvg { width: 100%; height: 100%; }
+
+.parteBtn { cursor: pointer; transition: opacity 0.2s, filter 0.2s; }
+.parteBtn:hover { opacity: 0.85; filter: brightness(1.1); }
+.parteBtnSelected { filter: brightness(1.2); stroke-width: 2; }
+
+/* Panel info de parte */
+.parteInfo { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.25s ease; }
+.parteInfoHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.parteColorDot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; }
+.parteNombre { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.parteFuncion { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+.parteExtra { font-size: 0.85rem; color: var(--text-muted); margin: var(--spacing-sm) 0 0 0; font-style: italic; }
+
+/* Grid de partes (lista alternativa) */
+.partesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.parteCard { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; }
+.parteCard:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.parteCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.parteCardActiva { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.parteCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.parteCardNombre { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); }
+.parteCardDesc { font-size: 0.82rem; color: var(--text-secondary); margin: 0.3rem 0 0 0; line-height: 1.4; }
+
+/* ─── Polinización ─── */
+.polinizacionPasos { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.paso { display: flex; align-items: flex-start; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.pasoNumero { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+.pasoTexto { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; }
+
+.tiposGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.tipoCard { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; }
+.tipoCard:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.tipoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tipoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.tipoCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.tipoIcono { font-size: 1.5rem; }
+.tipoNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.tipoDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+.tipoDetalle { font-size: 0.82rem; color: var(--text-primary); line-height: 1.5; margin: var(--spacing-sm) 0 0 0; border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
+
+/* ─── Frutos ─── */
+.transformacionPasos { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+
+.frutosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.frutoCard { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; }
+.frutoCard:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.frutoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.frutoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.frutoCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.frutoIcono { font-size: 1.3rem; }
+.frutoNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.frutoDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+.frutoDetalle { font-size: 0.82rem; color: var(--text-primary); line-height: 1.5; margin: var(--spacing-sm) 0 0 0; border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
+
+.dispersionGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.dispersionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.dispersionIcono { font-size: 1.3rem; margin-bottom: 0.3rem; }
+.dispersionNombre { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.dispersionEjemplo { font-size: 0.78rem; color: var(--text-secondary); }
+
+/* ─── Datos fascinantes ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.datoCard { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; }
+.datoCard:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.datoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.datoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
+.datoCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.datoIcono { font-size: 1.5rem; flex-shrink: 0; }
+.datoTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.datoDesc { font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+.datoExtra { font-size: 0.82rem; color: var(--primary); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
+
+/* Timeline */
+.timeline { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.timelineTitle { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.timelineBar { position: relative; height: 6px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; margin: var(--spacing-xl) 0; }
+.timelineDot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: var(--primary); border: 3px solid var(--bg-card); box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+.timelineLabel { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; text-align: center; }
+.timelineLabelWide { width: 90px; white-space: normal; }
+
+/* Etiqueta de sección */
+.seccionLabel { font-size: 0.85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--spacing-sm); }
+
+/* Insight, warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-lg) 0 var(--spacing-sm) 0; }
+.guideSection p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
+.guideSection ul { padding-left: 1.2rem; margin: 0 0 var(--spacing-md) 0; }
+.guideSection li { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.3rem; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .partesGrid { grid-template-columns: 1fr; }
+  .tiposGrid { grid-template-columns: 1fr; }
+  .frutosGrid { grid-template-columns: 1fr; }
+  .dispersionGrid { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .florContainer { max-width: 320px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parteCard, .tipoCard, .frutoCard, .datoCard, .navBtn, .parteBtn { transition-duration: 0.01ms !important; }
+  .parteInfo { animation-duration: 0.01ms !important; }
+}

@@ -1,0 +1,156 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección 1: Tipos ─── */
+.tipoSelector { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.tipoBtn { display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+.tipoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tipoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tipoBtnActivo { background: var(--bg-card); font-weight: 700; }
+.tipoBtnIcono { font-size: 1.3rem; }
+.tipoBtnNombre { font-size: 0.9rem; }
+
+.tipoCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.tipoCardTitulo { font-size: 1.1rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.tipoCardDesc { font-size: 0.95rem; color: var(--text-primary); margin-bottom: var(--spacing-md); line-height: 1.5; }
+.tipoCardMeta { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+.tipoCardTag { font-size: 0.82rem; padding: 0.3rem 0.6rem; background: var(--hover); border-radius: 8px; color: var(--text-secondary); line-height: 1.3; }
+
+.subtipoBloque { margin-bottom: var(--spacing-lg); }
+.subtipoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.subtipoDesc { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: var(--spacing-md); }
+
+.ejemplosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
+.ejemploCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; color: var(--text-primary); }
+.ejemploCard:hover { border-color: var(--primary); }
+.ejemploCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ejemploCardActivo { background: rgba(46,134,171,0.04); }
+.ejemploNombre { font-size: 0.95rem; font-weight: 700; display: block; margin-bottom: 0.3rem; }
+.ejemploDetalle { margin-top: var(--spacing-sm); }
+.ejemploDescText { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.4rem; }
+.ejemploUbicacion { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.2rem; }
+.ejemploUso { font-size: 0.78rem; color: var(--text-muted); }
+
+/* Tabla comparativa */
+.tablaComparativa { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); overflow-x: auto; }
+.tablaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.tablaHeader { display: grid; grid-template-columns: 1fr 1fr 1fr 0.7fr; gap: var(--spacing-sm); padding-bottom: var(--spacing-sm); border-bottom: 2px solid var(--border); margin-bottom: var(--spacing-sm); }
+.tablaHCell { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.tablaRow { display: grid; grid-template-columns: 1fr 1fr 1fr 0.7fr; gap: var(--spacing-sm); padding: var(--spacing-sm) 0; border-bottom: 1px solid var(--border); }
+.tablaRow:last-child { border-bottom: none; }
+.tablaCell { font-size: 0.82rem; color: var(--text-primary); }
+
+/* ─── Sección 2: Ciclo ─── */
+.cicloContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }
+.cicloSvg { width: 100%; max-width: 420px; height: auto; margin: 0 auto; display: block; }
+.cicloLeyenda { font-size: 0.82rem; color: var(--text-muted); margin-top: var(--spacing-sm); }
+
+.flechaCiclo { transition: stroke-width 0.2s, opacity 0.2s; }
+.flechaActiva { stroke-width: 4 !important; opacity: 1; }
+.flechaLabel { cursor: pointer; }
+.flechaLabel:hover rect { fill: rgba(46,134,171,0.08); }
+
+.procesoDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.procesoDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.procesoDetalleNombre { font-size: 0.95rem; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.procesoDetalleDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: var(--spacing-sm); }
+.procesoDetalleDuracion { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
+
+.procesosLista { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.procesosListaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.procesoItem { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md); border: 1px solid var(--border); border-radius: 8px; background: transparent; cursor: pointer; width: 100%; text-align: left; color: var(--text-primary); transition: all 0.2s; margin-bottom: 0.4rem; }
+.procesoItem:hover { border-color: var(--primary); }
+.procesoItem:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.procesoItemActivo { border-color: var(--primary); background: rgba(46,134,171,0.04); }
+.procesoItemFlecha { font-size: 0.82rem; font-weight: 700; color: var(--primary); min-width: 160px; }
+.procesoItemNombre { font-size: 0.82rem; color: var(--text-secondary); }
+
+/* ─── Sección 3: Vida cotidiana ─── */
+.vidaGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.vidaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; color: var(--text-primary); }
+.vidaCard:hover { border-color: var(--primary); }
+.vidaCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.vidaCardActivo { border-color: var(--primary); background: rgba(46,134,171,0.04); }
+.vidaCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }
+.vidaIcono { font-size: 1.4rem; }
+.vidaCardInfo { display: flex; flex-direction: column; }
+.vidaNombre { font-size: 0.92rem; font-weight: 700; }
+.vidaTipo { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+.vidaUso { font-size: 0.82rem; color: var(--text-secondary); margin: 0; }
+.vidaDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid var(--border); }
+
+.datoDestacado { text-align: center; background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid rgba(46,134,171,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.datoDestacadoValor { display: block; font-size: 2.4rem; font-weight: 800; color: var(--primary); margin-bottom: 0.3rem; }
+.datoDestacadoTexto { font-size: 0.95rem; color: var(--text-secondary); }
+
+/* ─── Sección 4: Datos Fascinantes ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.datoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); display: flex; flex-direction: column; gap: 0.4rem; }
+.datoIcono { font-size: 1.8rem; }
+.datoTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.datoDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* Escala de Mohs */
+.mohsContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.mohsTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
+.mohsSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-lg); }
+.mohsGrid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.3rem; align-items: flex-end; min-height: 200px; }
+.mohsItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; text-align: center; }
+.mohsBarra { width: 100%; border-radius: 6px 6px 0 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.3rem; min-width: 20px; transition: height 0.5s ease; }
+.mohsDureza { color: white; font-weight: 800; font-size: 0.85rem; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.mohsMineral { font-size: 0.62rem; font-weight: 600; color: var(--text-primary); line-height: 1.1; }
+.mohsRef { font-size: 0.55rem; color: var(--text-muted); line-height: 1.1; }
+
+/* ─── Comunes ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .tipoSelector { grid-template-columns: 1fr; }
+  .ejemplosGrid { grid-template-columns: 1fr; }
+  .tablaHeader, .tablaRow { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+  .vidaGrid { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .mohsGrid { grid-template-columns: repeat(5, 1fr); min-height: 140px; }
+  .procesoItemFlecha { min-width: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flechaCiclo,
+  .mohsBarra { transition-duration: 0.01ms !important; }
+}

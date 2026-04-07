@@ -76,7 +76,7 @@
 - Cómo se forma cada una: enfriamiento magma, compactación sedimentos, presión+calor
 - Texturas y usos cotidianos (encimeras de granito, pizarras, mármol en esculturas)
 **Valor visual**: El ciclo de las rocas es un proceso circular que se entiende mucho mejor animado
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-07)
 
 #### G2. `visualizador-capas-tierra`
 **Lecciones**: 18 (actividad interna del globo), 15 (geodinámica)
@@ -87,7 +87,7 @@
 - Comparativa: si la Tierra fuera un melocotón, la corteza es la piel
 - Convección del manto → motor de las placas tectónicas
 **Valor visual**: Las capas a escala con temperaturas son imposibles de imaginar sin visualización
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-07)
 
 #### G3. `visualizador-ciclo-agua`
 **Lecciones**: 14 (hidrosfera), 16 (acción geológica aguas continentales)
@@ -134,7 +134,7 @@
 - Por qué importa: crecimiento vs reproducción sexual → diversidad genética
 - Datos: tu cuerpo hace ~3,8 millones de mitosis por segundo
 **Valor visual**: Las fases son abstractas en texto pero muy claras con animación de cromosomas
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-07)
 
 #### B3. `visualizador-respiracion-celular`
 **Lección**: 27 (génesis de la energía vital)
@@ -160,7 +160,7 @@
 - Datos: ~8,7 millones de especies estimadas, solo ~1,5 millones descritas
 - Timeline de aparición de cada grupo
 **Valor visual**: El árbol ramificado muestra relaciones evolutivas mejor que cualquier lista
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-07)
 **Nota**: `quiz-reinos-naturaleza` ya existe pero es un quiz, no un visualizador explicativo
 
 #### Z2. `visualizador-metamorfosis`
@@ -198,7 +198,7 @@
 - Tipos de frutos clickables: carnosos (manzana, tomate) vs secos (nuez, legumbre)
 - Dato: el 75% de los cultivos dependen de polinizadores
 **Valor visual**: La flor es un mecanismo complejo que se entiende pieza a pieza al hacerlo clickable
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-07)
 
 #### P2. `visualizador-germinacion`
 **Lecciones**: 59 (aparato vegetativo), 64 (el fruto)
