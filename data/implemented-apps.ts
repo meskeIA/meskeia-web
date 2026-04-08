@@ -567,6 +567,10 @@ export const implementedAppsUrls = [
   "/visualizador-seleccion-natural/",      // Explicador visual: evolución, Darwin vs Lamarck, poblaciones
   "/visualizador-sistema-inmune/",         // Explicador visual: 3 defensas, anticuerpos, vacunas
   "/visualizador-termodinamica/",          // Explicador visual: conducción, convección, radiación
+  "/visualizador-electricidad-domestica/", // Explicador visual: cuadro eléctrico, diferencial, REBT, circuitos
+  "/visualizador-ph-acidos-bases/",        // Explicador visual: escala pH, ácidos, bases, neutralización
+  "/visualizador-estaciones-ano/",         // Explicador visual: inclinación 23,5°, solsticios, horas de luz
+  "/visualizador-maquinas-simples/",       // Explicador visual: palanca, polea, plano inclinado, ventaja mecánica
 ];
 
 /**

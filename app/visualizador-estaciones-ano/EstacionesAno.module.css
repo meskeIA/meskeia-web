@@ -1,0 +1,850 @@
+/* ─────────────────────────────────────────────
+   Visualizador: Estaciones del Año
+   Paleta meskeIA + Dark mode
+   ───────────────────────────────────────────── */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* ── Hero ── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ── Navegación de tabs ── */
+
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0;
+  margin-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--text-muted);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.navBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.navBtnActive {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.navBtnText {
+  display: inline;
+}
+
+.seccionSubtitulo {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Contenido principal ── */
+
+.mainContent {
+  margin-bottom: 2rem;
+}
+
+/* ── Sección Órbita ── */
+
+.orbitaContainer {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.orbitaSvg {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.orbitaPosicion {
+  cursor: pointer;
+  transition: r 0.2s, fill 0.2s;
+}
+
+.orbitaPosicion:hover {
+  filter: brightness(1.1);
+}
+
+.orbitaIcono {
+  pointer-events: none;
+}
+
+.orbitaLabel {
+  pointer-events: none;
+}
+
+.instruccion {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Tarjeta de posición orbital */
+
+.posicionCard {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.posicionTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text-primary);
+}
+
+.posicionFecha {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.hemisferiosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.hemisferioCard {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hemisferioLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hemisferioEstacion {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.posicionExplicacion {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Card de concepto ── */
+
+.conceptoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+}
+
+.conceptoCard h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--primary);
+}
+
+.conceptoCard p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.conceptoCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Sección Horas de Luz ── */
+
+.sliderContainer {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  appearance: none;
+  background: color-mix(in srgb, var(--text-muted) 30%, transparent);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderMarks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Barras de horas de luz */
+
+.barrasContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.barraItem {
+  display: grid;
+  grid-template-columns: 120px 1fr 60px;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.barraLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.barraTrack {
+  height: 28px;
+  background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.barraFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.barraValor {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Dato contextual */
+
+.datoContextual {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.datoContextual p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Tabla de datos */
+
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.6rem 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla th:first-child {
+  text-align: left;
+}
+
+.tabla td {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-muted) 15%, transparent);
+  color: var(--text-secondary);
+}
+
+.tablaCelda {
+  text-align: left !important;
+}
+
+.tablaRowActiva {
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+}
+
+.tablaRowActiva td {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ── Sección Solsticios ── */
+
+.eventosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.eventoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+}
+
+.eventoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.eventoIcono {
+  font-size: 2rem;
+}
+
+.eventoNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.eventoFecha {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.eventoDescripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+.eventoFenomeno {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-primary));
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.eventoDatos {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.eventoDatos li {
+  margin-bottom: 0.25rem;
+}
+
+.lineasLista {
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.lineasLista li {
+  margin-bottom: 0.5rem;
+}
+
+/* ── Sección Mitos ── */
+
+.mitosGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mitoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border-left: 4px solid var(--text-muted);
+}
+
+.mitoFalso {
+  border-left-color: #E05555;
+}
+
+.mitoVerdadero {
+  border-left-color: var(--secondary);
+}
+
+.mitoHeader {
+  margin-bottom: 0.5rem;
+}
+
+.mitoBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.mitoBadgeFalso {
+  background: color-mix(in srgb, #E05555 15%, var(--bg-card));
+  color: #E05555;
+}
+
+.mitoBadgeVerdadero {
+  background: color-mix(in srgb, var(--secondary) 15%, var(--bg-card));
+  color: var(--secondary);
+}
+
+.mitoAfirmacion {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-style: italic;
+  margin: 0 0 0.5rem;
+}
+
+.mitoExplicacion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.mitoDato {
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-primary));
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Distancias Sol */
+
+.distanciasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.distanciaCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.distanciaIcono {
+  font-size: 1.5rem;
+}
+
+.distanciaCard strong {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.distanciaCard span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.distanciaValor {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: var(--primary) !important;
+}
+
+.distanciaDetalle {
+  font-size: 0.78rem !important;
+  color: var(--text-secondary) !important;
+}
+
+.distanciaExplicacion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Planetas */
+
+.planetasGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.planetaCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 0.5rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.planetaCardTierra {
+  border: 2px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-primary));
+}
+
+.planetaIcono {
+  font-size: 1.3rem;
+}
+
+.planetaCard strong {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.planetaInclinacion {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.planetaEstaciones {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.planetaExplicacion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Warning Box ── */
+
+.warningBox {
+  background: color-mix(in srgb, #F59E0B 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #F59E0B 40%, transparent);
+  border-left: 4px solid #F59E0B;
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.warningBox p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── Educativo ── */
+
+.guideSection {
+  margin-bottom: 1.5rem;
+}
+
+.guideSection h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.guideSection p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 0.75rem;
+}
+
+.guideSection p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Dark mode ── */
+
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+[data-theme='dark'] .navBtn {
+  background: var(--bg-card);
+  border-color: color-mix(in srgb, var(--text-muted) 40%, transparent);
+}
+
+[data-theme='dark'] .navBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .posicionCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .hemisferioCard {
+  background: color-mix(in srgb, var(--bg-primary) 80%, var(--bg-card));
+}
+
+[data-theme='dark'] .conceptoCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .sliderContainer {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .slider::-webkit-slider-thumb {
+  border-color: var(--bg-card);
+}
+
+[data-theme='dark'] .slider::-moz-range-thumb {
+  border-color: var(--bg-card);
+}
+
+[data-theme='dark'] .tabla th {
+  background: color-mix(in srgb, var(--primary) 80%, #000);
+}
+
+[data-theme='dark'] .eventoCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .mitoCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .distanciaCard {
+  background: color-mix(in srgb, var(--bg-primary) 80%, var(--bg-card));
+}
+
+[data-theme='dark'] .planetaCard {
+  background: color-mix(in srgb, var(--bg-primary) 80%, var(--bg-card));
+}
+
+[data-theme='dark'] .warningBox {
+  background: color-mix(in srgb, #F59E0B 8%, var(--bg-card));
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .eventosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .planetasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .barraItem {
+    grid-template-columns: 100px 1fr 50px;
+  }
+
+  .sliderMarks {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .hero {
+    padding: 1.75rem 1rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .navBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .navBtnText {
+    display: none;
+  }
+
+  .barraItem {
+    grid-template-columns: 40px 1fr 45px;
+  }
+
+  .barraLabel span:last-child {
+    display: none;
+  }
+
+  .distanciasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hemisferiosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .planetasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tabla {
+    font-size: 0.75rem;
+  }
+}
+
+/* ── Accesibilidad ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .barraFill {
+    transition: none;
+  }
+
+  .navBtn {
+    transition: none;
+  }
+
+  .orbitaPosicion {
+    transition: none;
+  }
+}

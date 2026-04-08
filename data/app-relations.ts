@@ -1059,6 +1059,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
     { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'Convección del manto' },
   ],
+  'visualizador-electricidad-domestica': [
+    { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
+    { url: '/visualizador-factura-electrica/', icon: '💡', name: 'Tu Factura Eléctrica', description: 'Cada concepto explicado' },
+    { url: '/visualizador-como-funciona-wifi/', icon: '📡', name: 'Cómo Funciona el WiFi', description: 'Ondas y propagación' },
+    { url: '/visualizador-maquinas-simples/', icon: '⚙️', name: 'Máquinas Simples', description: 'Palanca, polea y más' },
+  ],
+  'visualizador-ph-acidos-bases': [
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos y balanceo' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Los 4 ingredientes de la vida' },
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
+    { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Iónico, covalente, metálico' },
+  ],
+  'visualizador-estaciones-ano': [
+    { url: '/visualizador-fases-luna-eclipses/', icon: '🌙', name: 'Fases de la Luna', description: 'Fases, eclipses y mareas' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'La Vida de una Estrella', description: 'Del nacimiento al final' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Evaporación y precipitación' },
+  ],
+  'visualizador-maquinas-simples': [
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes del movimiento' },
+    { url: '/visualizador-electricidad-domestica/', icon: '⚡', name: 'Electricidad Doméstica', description: 'Tu cuadro eléctrico' },
+    { url: '/visualizador-construccion-edificio/', icon: '🏗️', name: 'Construcción de un Edificio', description: 'De los cimientos al tejado' },
+    { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
