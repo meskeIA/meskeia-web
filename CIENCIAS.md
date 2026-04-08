@@ -109,7 +109,7 @@
 - 5 grandes extinciones marcadas con datos de impacto
 - Cómo se datan los fósiles (carbono-14, potasio-argón)
 **Valor visual**: La escala temporal es tan inmensa que sin visualización no se comprende
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 ---
 
@@ -123,7 +123,7 @@
 - Ejemplos cotidianos: pan=carbohidratos, aceite=lípidos, músculo=proteínas, ADN=ácidos nucleicos
 - Proporción en el cuerpo humano (agua 60%, proteínas 20%, lípidos 15%, etc.)
 **Valor visual**: Las estructuras moleculares simplificadas ayudan a entender la diversidad
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 #### B2. `visualizador-mitosis-meiosis`
 **Lección**: 28 (funciones de reproducción)
@@ -183,7 +183,7 @@
 - Por qué importa: sangre oxigenada separada = más eficiencia = sangre caliente
 - Dato: el corazón humano late ~100.000 veces/día, bombea ~7.500 litros
 **Valor visual**: Los circuitos sanguíneos con flujo animado hacen visible lo invisible
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 ---
 
@@ -210,7 +210,7 @@
 - Timeline de crecimiento: desde semilla hasta planta adulta
 - Dato: la semilla más antigua que germinó tenía 2.000 años (palmera datilera de Masada)
 **Valor visual**: El proceso subterráneo de germinación es invisible a simple vista
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 #### P3. `visualizador-transporte-plantas`
 **Lecciones**: 53 (nutrición vegetales), 61 (transpiración)

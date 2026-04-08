@@ -1005,6 +1005,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
     { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
   ],
+  'visualizador-fosiles-tiempo-geologico': [
+    { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'Del suelo al núcleo' },
+    { url: '/visualizador-tectonica-placas/', icon: '🌍', name: 'Tectónica de Placas', description: 'Terremotos y volcanes' },
+    { url: '/visualizador-tipos-rocas/', icon: '🪨', name: 'Tipos de Rocas', description: 'Ciclo de las rocas' },
+    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
+  ],
+  'visualizador-biomoleculas': [
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+    { url: '/visualizador-respiracion-celular/', icon: '⚡', name: 'Respiración Celular', description: 'De glucosa a ATP' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+  ],
+  'visualizador-germinacion': [
+    { url: '/visualizador-anatomia-flor/', icon: '🌸', name: 'Anatomía de una Flor', description: 'Polinización y frutos' },
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
+    { url: '/visualizador-transporte-plantas/', icon: '🌱', name: 'Transporte en Plantas', description: 'Xilema y floema' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Célula vegetal' },
+  ],
+  'visualizador-sistemas-circulatorios': [
+    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Cómo Piensa tu Cerebro', description: '86.000 millones de neuronas' },
+    { url: '/visualizador-metamorfosis/', icon: '🦋', name: 'Metamorfosis', description: 'Transformación radical' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

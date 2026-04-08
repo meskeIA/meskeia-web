@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 490+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 495+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 492,
+  "total_tools": 496,
   "updated": "2026-04-07",
   "features": {
     "all_free": true,
@@ -1451,6 +1451,30 @@
           "slug": "visualizador-ecosistema",
           "url": "https://meskeia.com/visualizador-ecosistema/",
           "description": "Pirámide trófica, regla del 10%, ciclos del carbono y nitrógeno, redes tróficas"
+        },
+        {
+          "name": "Fósiles y Tiempo Geológico",
+          "slug": "visualizador-fosiles-tiempo-geologico",
+          "url": "https://meskeia.com/visualizador-fosiles-tiempo-geologico/",
+          "description": "4.500 Ma en una barra navegable, reloj de 24h, 5 grandes extinciones y datación"
+        },
+        {
+          "name": "Biomoléculas",
+          "slug": "visualizador-biomoleculas",
+          "url": "https://meskeia.com/visualizador-biomoleculas/",
+          "description": "Carbohidratos, lípidos, proteínas y ácidos nucleicos: estructuras y funciones"
+        },
+        {
+          "name": "Germinación",
+          "slug": "visualizador-germinacion",
+          "url": "https://meskeia.com/visualizador-germinacion/",
+          "description": "De la semilla a la planta: anatomía, 6 fases, factores y datos de botánica"
+        },
+        {
+          "name": "Sistemas Circulatorios",
+          "slug": "visualizador-sistemas-circulatorios",
+          "url": "https://meskeia.com/visualizador-sistemas-circulatorios/",
+          "description": "Evolución del corazón: 2 a 4 cámaras, sangre fría vs caliente, 3 corazones del pulpo"
         }
       ]
     },

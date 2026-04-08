@@ -1,0 +1,207 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.instruccion { text-align: center; color: var(--text-muted); font-size: 0.88rem; font-style: italic; margin-bottom: var(--spacing-lg); }
+
+/* ─── Sección 1: Anatomía de la semilla ─── */
+.semillaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.semillaDiagrama { display: flex; justify-content: center; }
+.semillaVisual { width: 100%; max-width: 500px; }
+.semillaForma { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
+
+.parteSemilla { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-primary); text-align: center; }
+.parteSemilla:hover { transform: translateY(-2px); border-color: var(--primary); }
+.parteActiva { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.25); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
+.parteIcono { font-size: 1.5rem; }
+.parteNombre { font-size: 0.78rem; font-weight: 700; }
+
+/* Colores distintivos por parte */
+.parte_testa { border-left: 4px solid #92400E; }
+.parte_cotiledones { border-left: 4px solid #065F46; }
+.parte_radicula { border-left: 4px solid #7C2D12; }
+.parte_plumula { border-left: 4px solid #166534; }
+.parte_hipocotilo { border-left: 4px solid #4338CA; }
+.parte_micropilo { border-left: 4px solid #1E40AF; }
+
+[data-theme='dark'] .parte_testa { border-left-color: #FDE68A; }
+[data-theme='dark'] .parte_cotiledones { border-left-color: #6EE7B7; }
+[data-theme='dark'] .parte_radicula { border-left-color: #FDBA74; }
+[data-theme='dark'] .parte_plumula { border-left-color: #86EFAC; }
+[data-theme='dark'] .parte_hipocotilo { border-left-color: #A5B4FC; }
+[data-theme='dark'] .parte_micropilo { border-left-color: #93C5FD; }
+
+.parteDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.parteDetalleHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.parteDetalleIcono { font-size: 2rem; }
+.parteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.parteDetalleFuncion { font-size: 0.85rem; color: var(--text-muted); margin: 0.2rem 0 0; }
+.parteDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+
+/* ─── Sección 2: Proceso de germinación ─── */
+.faseControles { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.faseBtn { padding: var(--spacing-sm) var(--spacing-lg); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; color: var(--text-primary); font-weight: 600; font-size: 0.88rem; transition: all 0.2s; }
+.faseBtn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.faseBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.faseIndicador { font-size: 0.95rem; font-weight: 700; color: var(--primary); min-width: 100px; text-align: center; }
+
+.faseVisual { margin-bottom: var(--spacing-lg); }
+
+.germinacionDiagrama { position: relative; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.lineaSuelo { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #92400E; opacity: 0.5; }
+.semillaGerminando { position: absolute; top: 55%; left: 50%; transform: translateX(-50%); transition: all 0.5s ease; z-index: 1; }
+.semillaOculta { opacity: 0.3; top: 65%; }
+.semillaEmoji { font-size: 2.5rem; }
+.raiz { position: absolute; top: 60%; left: 50%; transform: translateX(-50%); transition: all 0.5s ease; font-size: 1.5rem; }
+.raizFase2 { top: 62%; }
+.raizFase3 { top: 68%; }
+.raizFase4 { top: 72%; }
+.raizFase5 { top: 75%; }
+.tallo { position: absolute; top: 30%; left: 50%; transform: translateX(-50%); transition: all 0.5s ease; font-size: 2rem; }
+.talloFase3 { top: 35%; }
+.talloFase4 { top: 25%; }
+.talloFase5 { top: 15%; font-size: 2.5rem; }
+
+.faseCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.faseCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.faseCardIcono { font-size: 2rem; }
+.faseCardTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.faseCardDesc { font-size: 0.88rem; color: var(--text-muted); margin: 0.2rem 0 0; }
+.faseCardDetalle { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0 0 var(--spacing-md); }
+.faseCardDuracion { font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.3rem; }
+
+.timelineContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.timelineTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.timeline { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--spacing-sm); }
+.timelinePunto { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); text-align: center; }
+.timelinePunto:hover { border-color: var(--primary); }
+.timelinePuntoActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); color: var(--text-primary); }
+.timelinePuntoPasado { opacity: 0.6; }
+.timelinePuntoIcono { font-size: 1.2rem; }
+.timelinePuntoNombre { font-size: 0.65rem; font-weight: 600; }
+.timelinePuntoDuracion { font-size: 0.6rem; color: var(--text-muted); }
+
+/* ─── Sección 3: Factores ─── */
+.factoresGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.factorCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.factorHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.factorIcono { font-size: 1.5rem; }
+.factorTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.factorDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; flex: 1; }
+.factorNota { font-size: 0.78rem; color: var(--text-muted); margin: 0; font-style: italic; }
+
+.factorToggle { padding: var(--spacing-sm) var(--spacing-md); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 0.88rem; transition: all 0.2s; }
+.factorToggleOn { background: #D1FAE5; border-color: #10B981; color: #065F46; }
+[data-theme='dark'] .factorToggleOn { background: #064E3B; border-color: #10B981; color: #6EE7B7; }
+.factorToggleOff { background: #FEE2E2; border-color: #EF4444; color: #991B1B; }
+[data-theme='dark'] .factorToggleOff { background: #450A0A; border-color: #EF4444; color: #FCA5A5; }
+
+.sliderContainer { display: flex; align-items: center; gap: var(--spacing-md); }
+.slider { flex: 1; accent-color: var(--primary); }
+.sliderValor { font-size: 1rem; font-weight: 700; min-width: 70px; text-align: center; }
+.sliderOptimo { color: var(--verde); }
+.sliderFuera { color: var(--rojo); }
+
+.factorEstado { display: flex; align-items: center; gap: 0.3rem; font-size: 0.88rem; color: var(--text-secondary); padding: var(--spacing-sm) 0; }
+.factorEstadoIcono { font-size: 1rem; }
+
+.resultadoGerminacion { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-lg); border-radius: var(--radius); margin-bottom: var(--spacing-lg); }
+.resultadoOK { background: #D1FAE5; border: 2px solid #10B981; color: #065F46; }
+[data-theme='dark'] .resultadoOK { background: #064E3B; border-color: #10B981; color: #6EE7B7; }
+.resultadoKO { background: #FEE2E2; border: 2px solid #EF4444; color: #991B1B; }
+[data-theme='dark'] .resultadoKO { background: #450A0A; border-color: #EF4444; color: #FCA5A5; }
+.resultadoIcono { font-size: 2.5rem; }
+.resultadoDetalle { font-size: 0.88rem; margin: 0.3rem 0 0; line-height: 1.5; }
+
+.factorLuz { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.factorLuzTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm); }
+.factorLuzDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+/* Tabla de condiciones */
+.tablaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.tablaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-md); text-align: center; }
+.tablaScroll { overflow-x: auto; }
+.tabla { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.tabla th { background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); padding: var(--spacing-sm) var(--spacing-md); text-align: left; font-weight: 700; color: var(--text-primary); border-bottom: 2px solid var(--border); }
+.tabla td { padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border); color: var(--text-primary); }
+.tabla tr:last-child td { border-bottom: none; }
+
+/* ─── Sección 4: Datos fascinantes ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.datoCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; color: var(--text-primary); }
+.datoCard:hover { border-color: var(--primary); transform: translateY(-2px); }
+.datoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
+.datoIcono { font-size: 1.8rem; }
+.datoCifra { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.datoEtiqueta { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.3; }
+.datoDetalle { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: var(--spacing-sm); border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
+
+/* ─── Comparativa ─── */
+.comparativaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.comparativaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.comparativaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.comparativaCol { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); }
+.comparativaColTitulo { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+.comparativaFila { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.comparativaFila:last-child { border-bottom: none; }
+.comparativaLabel { font-size: 0.82rem; color: var(--text-secondary); }
+.comparativaValor { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); text-align: right; }
+.comparativaNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; line-height: 1.5; }
+
+/* ─── Comunes ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-lg) 0 var(--spacing-sm); }
+.guideSection p { font-size: 0.92rem; color: var(--text-primary); line-height: 1.7; margin: 0 0 var(--spacing-md); }
+
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .semillaForma { grid-template-columns: repeat(2, 1fr); }
+  .factoresGrid { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: repeat(2, 1fr); }
+  .comparativaGrid { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: repeat(3, 1fr); }
+  .faseControles { flex-wrap: wrap; }
+  .germinacionDiagrama { height: 160px; }
+  .sliderContainer { flex-direction: column; align-items: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parteSemilla, .datoCard, .navBtn, .faseBtn, .factorToggle, .timelinePunto { transition-duration: 0.01ms !important; }
+  .parteDetalle, .faseCard { animation-duration: 0.01ms !important; }
+  .semillaGerminando, .raiz, .tallo { transition-duration: 0.01ms !important; }
+}

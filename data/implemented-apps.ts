@@ -558,6 +558,10 @@ export const implementedAppsUrls = [
   "/visualizador-metamorfosis/",           // Explicador visual: completa, incompleta, anfibio, fases animadas
   "/visualizador-transporte-plantas/",     // Explicador visual: xilema, floema, estomas, capilaridad
   "/visualizador-ecosistema/",             // Explicador visual: pirámide trófica, regla 10%, ciclos biogeoquímicos
+  "/visualizador-fosiles-tiempo-geologico/", // Explicador visual: eras geológicas, extinciones, datación fósiles
+  "/visualizador-biomoleculas/",           // Explicador visual: carbohidratos, lípidos, proteínas, ácidos nucleicos
+  "/visualizador-germinacion/",            // Explicador visual: semilla, 6 fases germinación, factores
+  "/visualizador-sistemas-circulatorios/", // Explicador visual: corazones 2-4 cámaras, sangre fría/caliente
 ];
 
 /**
