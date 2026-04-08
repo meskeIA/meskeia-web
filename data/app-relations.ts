@@ -975,6 +975,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
     { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
   ],
+  'visualizador-ciclo-agua': [
+    { url: '/visualizador-oceano/', icon: '🌊', name: 'Los Secretos del Océano', description: '71% de la Tierra' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
+    { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'Del suelo al núcleo' },
+  ],
+  'visualizador-respiracion-celular': [
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'El proceso inverso' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+    { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'División celular' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
+  ],
+  'visualizador-metamorfosis': [
+    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+    { url: '/visualizador-ecosistema/', icon: '🌿', name: 'Ecosistemas', description: 'Flujo de energía' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+  ],
+  'visualizador-transporte-plantas': [
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
+    { url: '/visualizador-anatomia-flor/', icon: '🌸', name: 'Anatomía de una Flor', description: 'Polinización y frutos' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Viaje infinito de cada gota' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Célula vegetal' },
+  ],
+  'visualizador-ecosistema': [
+    { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Ciclo hidrológico' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

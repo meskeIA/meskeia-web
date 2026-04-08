@@ -97,7 +97,7 @@
 - Slider de tiempo: cuánto tarda una gota en completar el ciclo (días en atmósfera vs miles de años en glaciar)
 - Solo el 2,5% del agua es dulce, y solo el 0,3% es accesible
 **Valor visual**: El ciclo es circular y la escala de volúmenes es contraintuitiva
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 **Nota**: Complementa `visualizador-agua-virtual` (que es sobre huella hídrica, no sobre el ciclo)
 
 #### G4. `visualizador-fosiles-tiempo-geologico`
@@ -145,7 +145,7 @@
 - Comparativa con fotosíntesis (procesos inversos, mismos actores)
 - Dato: produces ~65 kg de ATP al día (pero lo reciclas constantemente)
 **Valor visual**: Complementa perfectamente `visualizador-fotosintesis` como su "espejo"
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 ---
 
@@ -172,7 +172,7 @@
 - Comparativa: qué cambia en cada fase (alimentación, respiración, locomoción)
 - Datos curiosos: una oruga aumenta su peso 3.000 veces antes de convertirse en crisálida
 **Valor visual**: La transformación paso a paso es el caso perfecto para animación
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 #### Z3. `visualizador-sistemas-circulatorios`
 **Lecciones**: 48 (organografía animal comparada)
@@ -222,7 +222,7 @@
 - Un roble adulto puede transpirar 400 litros de agua al día
 - Capilaridad: el agua sube contra la gravedad hasta 100+ metros (secuoyas)
 **Valor visual**: El flujo de savia es invisible y contraintuitivo (sube sin bomba)
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 
 ---
 
@@ -237,7 +237,7 @@
 - Red trófica vs cadena trófica (más realista)
 - Dato: se necesitan ~10.000 kg de fitoplancton para producir 1 kg de atún
 **Valor visual**: La pirámide energética y los ciclos son conceptos circulares/jerárquicos perfectos para visualización
-**Estado**: Pendiente
+**Estado**: ✅ Implementado (2026-04-08)
 **Nota**: `visualizador-cadena-alimentaria` cubre la cadena campo→mesa (producción alimentaria), NO la ecología trófica
 
 ---

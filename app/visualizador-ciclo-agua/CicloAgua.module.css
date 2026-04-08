@@ -1,0 +1,143 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --agua: #3498db; --agua-claro: #85c1e9;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegacion */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* Diagrama del ciclo */
+.diagramaContainer { position: relative; width: 100%; aspect-ratio: 16 / 10; background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 40%, #228B22 40%, #228B22 50%, #8B7355 50%, #8B7355 55%, #5a3e2b 55%); border-radius: var(--radius-large); overflow: hidden; margin-bottom: var(--spacing-lg); border: 2px solid var(--border); }
+[data-theme='dark'] .diagramaContainer { background: linear-gradient(180deg, #1a3a5c 0%, #1a3a5c 40%, #0d3d0d 40%, #0d3d0d 50%, #3e2a1a 50%, #3e2a1a 55%, #2a1a0d 55%); }
+
+.diagramaSvg { width: 100%; height: 100%; }
+
+.etapaLabel { cursor: pointer; transition: opacity 0.2s; }
+.etapaLabel:hover { opacity: 0.8; }
+.etapaLabelText { font-size: 12px; font-weight: 700; fill: white; text-anchor: middle; paint-order: stroke; stroke: rgba(0,0,0,0.5); stroke-width: 3px; }
+.etapaLabelBg { fill: rgba(0,0,0,0.4); rx: 6; }
+
+.etapaDetalle { display: flex; gap: var(--spacing-md); align-items: flex-start; background: rgba(52,152,219,0.06); border: 1px solid rgba(52,152,219,0.2); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.etapaDetalleIcono { font-size: 1.5rem; flex-shrink: 0; }
+.etapaDetalle p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0.3rem 0 0; }
+
+/* Animacion flechas */
+@keyframes flujoArriba {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+@keyframes flujoAbajo {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(30px); opacity: 0; }
+}
+@keyframes flujoDerechaAbajo {
+  0% { transform: translate(0, 0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(15px, 15px); opacity: 0; }
+}
+
+.flechaArriba { animation: flujoArriba 2s ease-in-out infinite; fill: #85c1e9; }
+.flechaAbajo { animation: flujoAbajo 2s ease-in-out infinite; fill: #3498db; }
+.flechaEscorrentia { animation: flujoDerechaAbajo 2s ease-in-out infinite; fill: #2980b9; }
+
+/* Etapas clickables grid */
+.etapasGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.etapaCard { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; text-align: center; }
+.etapaCard:hover { border-color: var(--agua); }
+.etapaCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.etapaActiva { border-color: var(--agua); background: rgba(52,152,219,0.04); }
+.etapaCardIcono { font-size: 1.8rem; }
+.etapaCardNombre { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+
+/* Distribucion del agua */
+.distribucionVisual { margin-bottom: var(--spacing-lg); }
+.distribucionFila { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.distribucionIcono { font-size: 1.5rem; flex-shrink: 0; }
+.distribucionInfo { flex: 1; min-width: 0; }
+.distribucionNombre { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.distribucionPorcentaje { display: block; font-size: 1.1rem; font-weight: 700; color: var(--agua); }
+.barraContainer { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 0.3rem; }
+.barraAgua { height: 100%; background: linear-gradient(90deg, var(--primary), var(--agua-claro)); border-radius: 4px; transition: width 0.3s; }
+
+.subDistribucion { margin-left: 2rem; padding-left: var(--spacing-md); border-left: 3px solid var(--agua-claro); }
+.subDistribucion .distribucionFila { border: 1px solid rgba(52,152,219,0.2); background: rgba(52,152,219,0.02); }
+
+.analogiaCard { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }
+.analogiaIcono { font-size: 2.5rem; display: block; margin-bottom: var(--spacing-sm); }
+.analogiaTexto { font-size: 1rem; color: var(--text-primary); line-height: 1.5; }
+.analogiaDestacado { display: block; font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-top: var(--spacing-sm); }
+
+/* Tiempos de residencia */
+.residenciaLista { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: var(--spacing-lg); }
+.residenciaItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.residenciaInfo { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.residenciaIcono { font-size: 1.3rem; flex-shrink: 0; }
+.residenciaNombre { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+.residenciaTiempo { font-size: 0.9rem; font-weight: 700; color: var(--agua); white-space: nowrap; }
+.barraResidencia { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px; transition: width 0.3s; min-width: 2px; }
+.residenciaEscala { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: var(--spacing-md); padding: 0 var(--spacing-sm); }
+
+/* Datos fascinantes */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.datoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); display: flex; gap: var(--spacing-sm); align-items: flex-start; }
+.datoIcono { font-size: 1.5rem; flex-shrink: 0; }
+.datoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; }
+
+.climaCard { background: rgba(231,76,60,0.06); border: 1px solid rgba(231,76,60,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.climaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); display: flex; align-items: center; gap: var(--spacing-sm); }
+.climaTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; }
+[data-theme='dark'] .climaCard { background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.3); }
+
+/* Insight, enlace, warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.enlaceApp { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); }
+.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a:hover { text-decoration: underline; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .etapasGrid { grid-template-columns: repeat(2, 1fr); }
+  .datosGrid { grid-template-columns: 1fr; }
+  .distribucionFila { flex-direction: column; text-align: center; }
+  .subDistribucion { margin-left: var(--spacing-md); }
+  .analogiaCard { padding: var(--spacing-md); }
+  .etapaDetalle { flex-direction: column; align-items: center; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flechaArriba, .flechaAbajo, .flechaEscorrentia { animation-duration: 0.01ms; }
+  .barraAgua, .barraResidencia { transition-duration: 0.01ms; }
+}

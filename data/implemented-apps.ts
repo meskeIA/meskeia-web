@@ -553,6 +553,11 @@ export const implementedAppsUrls = [
   "/visualizador-tipos-rocas/",            // Explicador visual: ígneas, sedimentarias, metamórficas, ciclo rocas
   "/visualizador-arbol-vida/",             // Explicador visual: árbol filogenético, 11 grupos animales
   "/visualizador-anatomia-flor/",          // Explicador visual: partes flor, polinización, frutos, semillas
+  "/visualizador-ciclo-agua/",             // Explicador visual: ciclo hidrológico, distribución agua, tiempos residencia
+  "/visualizador-respiracion-celular/",    // Explicador visual: glucólisis, Krebs, cadena transporte, ATP
+  "/visualizador-metamorfosis/",           // Explicador visual: completa, incompleta, anfibio, fases animadas
+  "/visualizador-transporte-plantas/",     // Explicador visual: xilema, floema, estomas, capilaridad
+  "/visualizador-ecosistema/",             // Explicador visual: pirámide trófica, regla 10%, ciclos biogeoquímicos
 ];
 
 /**

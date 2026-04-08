@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 485+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 490+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 487,
+  "total_tools": 492,
   "updated": "2026-04-07",
   "features": {
     "all_free": true,
@@ -1421,6 +1421,36 @@
           "slug": "visualizador-anatomia-flor",
           "url": "https://meskeia.com/visualizador-anatomia-flor/",
           "description": "Partes de la flor clickables, polinización, tipos de frutos y dispersión de semillas"
+        },
+        {
+          "name": "El Ciclo del Agua",
+          "slug": "visualizador-ciclo-agua",
+          "url": "https://meskeia.com/visualizador-ciclo-agua/",
+          "description": "Ciclo hidrológico animado: evaporación, condensación, precipitación, distribución y tiempos de residencia"
+        },
+        {
+          "name": "Respiración Celular",
+          "slug": "visualizador-respiracion-celular",
+          "url": "https://meskeia.com/visualizador-respiracion-celular/",
+          "description": "De la glucosa al ATP: glucólisis, ciclo de Krebs, cadena de transporte y mitocondria"
+        },
+        {
+          "name": "Metamorfosis",
+          "slug": "visualizador-metamorfosis",
+          "url": "https://meskeia.com/visualizador-metamorfosis/",
+          "description": "Metamorfosis completa (mariposa), incompleta (saltamontes) y anfibio (rana) paso a paso"
+        },
+        {
+          "name": "Transporte en las Plantas",
+          "slug": "visualizador-transporte-plantas",
+          "url": "https://meskeia.com/visualizador-transporte-plantas/",
+          "description": "Xilema, floema, estomas y capilaridad: cómo las plantas transportan agua sin corazón"
+        },
+        {
+          "name": "Ecosistemas",
+          "slug": "visualizador-ecosistema",
+          "url": "https://meskeia.com/visualizador-ecosistema/",
+          "description": "Pirámide trófica, regla del 10%, ciclos del carbono y nitrógeno, redes tróficas"
         }
       ]
     },

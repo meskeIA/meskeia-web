@@ -1,0 +1,253 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+.instruccion { text-align: center; color: var(--text-muted); font-size: 0.88rem; font-style: italic; margin-bottom: var(--spacing-lg); }
+
+/* ─── Sección 1: Ecuación general ─── */
+.ecuacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); text-align: center; }
+.ecuacionTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); }
+.ecuacion { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--spacing-sm); }
+.ecuacionMol { padding: 0.4rem 0.7rem; border-radius: 8px; font-weight: 700; font-size: 1.1rem; }
+.ecuacionOp { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
+.ecuacionFlecha { font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+
+/* Colores de moléculas */
+.molGlucosa { background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
+[data-theme='dark'] .molGlucosa { background: #422006; color: #FDE68A; border-color: #B45309; }
+.molO2 { background: #D1FAE5; color: #065F46; border: 1px solid #34D399; }
+[data-theme='dark'] .molO2 { background: #064E3B; color: #6EE7B7; border-color: #10B981; }
+.molCO2 { background: #F3F4F6; color: #4B5563; border: 1px solid #9CA3AF; }
+[data-theme='dark'] .molCO2 { background: #374151; color: #D1D5DB; border-color: #6B7280; }
+.molAgua { background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA; }
+[data-theme='dark'] .molAgua { background: #1E3A5F; color: #93C5FD; border-color: #3B82F6; }
+.molATP { background: #FEF3C7; color: #92400E; border: 1px solid #D97706; }
+[data-theme='dark'] .molATP { background: #451A03; color: #FDE68A; border-color: #B45309; }
+.molNADH { background: #EDE9FE; color: #5B21B6; border: 1px solid #A78BFA; }
+[data-theme='dark'] .molNADH { background: #2E1065; color: #C4B5FD; border-color: #7C3AED; }
+.molFADH2 { background: #FCE7F3; color: #9D174D; border: 1px solid #F472B6; }
+[data-theme='dark'] .molFADH2 { background: #500724; color: #F9A8D4; border-color: #EC4899; }
+.molPiruvato { background: #FFEDD5; color: #9A3412; border: 1px solid #FB923C; }
+[data-theme='dark'] .molPiruvato { background: #431407; color: #FDBA74; border-color: #EA580C; }
+.molAcetilCoA { background: #FEF9C3; color: #854D0E; border: 1px solid #FACC15; }
+[data-theme='dark'] .molAcetilCoA { background: #422006; color: #FDE047; border-color: #CA8A04; }
+
+/* ─── Sección 1: Diagrama general ─── */
+.diagramaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.diagramaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.diagramaFlujo { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: var(--spacing-md); align-items: center; }
+.diagramaEntradas, .diagramaSalidas { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.diagramaGrupoLabel { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; text-align: center; }
+.diagramaMolecula { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; background: var(--bg-card); text-align: center; color: var(--text-primary); }
+.diagramaMolecula:hover { transform: translateY(-2px); }
+.diagramaMolActiva { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.2); }
+.diagramaMolIcono { font-size: 1.5rem; }
+.diagramaMolNombre { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+.diagramaMolFormula { font-size: 0.7rem; color: var(--text-muted); }
+
+.diagramaCentral { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); position: relative; }
+.diagramaFlecha { font-size: 1.5rem; color: var(--primary); animation: flujo 1.5s ease-in-out infinite; }
+.diagramaIcono { font-size: 3rem; }
+.diagramaLabel { font-size: 0.82rem; font-weight: 700; color: var(--primary); text-align: center; }
+
+.componenteDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.componenteHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.componenteDetalleIcono { font-size: 2rem; }
+.componenteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.componenteDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.componenteDato { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; }
+
+/* Comparativa fotosíntesis vs respiración */
+.comparativaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.comparativaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.comparativaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.comparativaCol { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); }
+.comparativaColTitulo { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+.comparativaFila { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.comparativaFila:last-child { border-bottom: none; }
+.comparativaLabel { font-size: 0.82rem; color: var(--text-secondary); }
+.comparativaValor { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); text-align: right; }
+.comparativaNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; line-height: 1.5; }
+
+/* ─── Sección 2: Fases ─── */
+.fasesNav { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.faseBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); text-align: center; }
+.faseBtn:hover { border-color: var(--primary); color: var(--primary); }
+.faseBtnActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); color: var(--primary); }
+.faseBtnIcono { font-size: 1.4rem; }
+.faseBtnNombre { font-size: 0.82rem; font-weight: 700; }
+.faseBtnLugar { font-size: 0.7rem; color: var(--text-muted); }
+
+.faseDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.faseDetalleHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.faseDetalleIcono { font-size: 2rem; }
+.faseDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.faseDetalleLugar { font-size: 0.82rem; color: var(--text-muted); }
+.faseDetalleReaccion { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md); margin-bottom: var(--spacing-md); text-align: center; font-weight: 700; color: var(--primary); font-size: 0.95rem; }
+.faseDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.faseDetalleDato { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; }
+
+/* Diagrama visual de fases */
+.faseDiagrama { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.faseDiagramaTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+.faseDiagramaVisual { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); flex-wrap: wrap; }
+.faseDiagramaItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius); text-align: center; }
+.faseDiagramaItemIcono { font-size: 1.3rem; }
+.faseDiagramaItemLabel { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+.faseDiagramaItemSub { font-size: 0.68rem; color: var(--text-muted); }
+.faseDiagramaFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 700; }
+
+/* Conteo ATP */
+.conteoATP { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.conteoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.conteoGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.conteoItem { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); text-align: center; }
+.conteoItemIcono { font-size: 1.3rem; }
+.conteoItemFase { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.conteoItemATP { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.conteoItemLabel { font-size: 0.72rem; color: var(--text-muted); }
+.conteoTotal { text-align: center; padding: var(--spacing-md); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius); color: white; }
+.conteoTotalCifra { font-size: 1.8rem; font-weight: 800; display: block; }
+.conteoTotalLabel { font-size: 0.88rem; opacity: 0.92; }
+
+/* Ciclo de Krebs circular */
+.cicloCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.cicloTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.cicloCirculo { position: relative; width: 280px; height: 280px; margin: 0 auto var(--spacing-lg); }
+.cicloPaso { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-primary); z-index: 1; min-width: 90px; text-align: center; }
+.cicloPaso:hover { transform: scale(1.05); }
+.cicloPasoActivo { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.25); }
+.cicloPasoIcono { font-size: 1.2rem; }
+.cicloPasoNombre { font-size: 0.72rem; font-weight: 700; }
+.cicloCentro { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.cicloCentroIcono { font-size: 2rem; animation: giro 4s linear infinite; }
+.cicloCentroTexto { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-align: center; }
+.cicloFlechas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+.cicloFlechaArc { font-size: 5rem; color: var(--border); opacity: 0.3; animation: giro 8s linear infinite; }
+
+/* Cadena de transporte */
+.cadenaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.cadenaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.cadenaMembrana { position: relative; background: linear-gradient(180deg, rgba(46,134,171,0.08) 0%, rgba(46,134,171,0.02) 100%); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg) var(--spacing-md); min-height: 200px; }
+.cadenaMembranaLabel { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 var(--spacing-sm); font-size: 0.72rem; color: var(--primary); font-weight: 600; white-space: nowrap; }
+.cadenaFlujo { display: flex; align-items: center; justify-content: space-around; gap: var(--spacing-sm); flex-wrap: wrap; }
+.cadenaProteina { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-sm); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); min-width: 80px; text-align: center; }
+.cadenaProteinaIcono { font-size: 1.5rem; }
+.cadenaProteinaNombre { font-size: 0.72rem; font-weight: 700; color: var(--text-primary); }
+.cadenaProteinaDesc { font-size: 0.65rem; color: var(--text-muted); }
+.cadenaFlechaHorizontal { font-size: 1rem; color: var(--primary); animation: flujo 1.5s ease-in-out infinite; }
+.cadenaEspacioLabel { text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: var(--spacing-md); font-style: italic; }
+
+/* ─── Sección 3: Mitocondria ─── */
+.mitocondriaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.mitocondriaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.mitocondriaDiagrama { display: flex; justify-content: center; margin-bottom: var(--spacing-lg); }
+.mitocondriaOuter { border: 3px solid var(--primary); border-radius: 50% / 40%; padding: var(--spacing-md); position: relative; min-width: 300px; }
+.mitocondriaOuterLabel { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 var(--spacing-sm); font-size: 0.72rem; color: var(--primary); font-weight: 600; white-space: nowrap; }
+.mitocondriaInner { border: 2px dashed var(--secondary); border-radius: 40% / 30%; padding: var(--spacing-lg) var(--spacing-md); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); }
+.mitocondriaInnerLabel { font-size: 0.72rem; color: var(--secondary); font-weight: 600; }
+.mitocondriaCrestas { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.mitocondriaCresta { background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 20px; padding: 6px var(--spacing-md); text-align: center; }
+.mitocondriaCrestaTxt { font-size: 0.68rem; color: white; font-weight: 600; }
+.mitocondriaMatrizInfo { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--text-secondary); }
+.mitocondriaMatrizInfoIcono { font-size: 1rem; }
+.mitocondriaEspacioInfo { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--text-secondary); margin-top: var(--spacing-sm); }
+
+.mitocondriaPartes { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
+.mitocondriaParte { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; color: var(--text-primary); }
+.mitocondriaParte:hover { border-color: var(--primary); transform: translateY(-2px); }
+.mitocondriaParteActiva { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.2); }
+.mitocondriaParteIcono { font-size: 1.5rem; }
+.mitocondriaParteNombre { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+
+.mitocondriaDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-top: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.mitocondriaDetalleHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+.mitocondriaDetalleIcono { font-size: 2rem; }
+.mitocondriaDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.mitocondriaDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.mitocondriaDetalleDato { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; }
+
+/* ─── Sección 4: Datos fascinantes ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.datoCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; color: var(--text-primary); }
+.datoCard:hover { border-color: var(--primary); transform: translateY(-2px); }
+.datoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
+.datoIcono { font-size: 1.8rem; }
+.datoCifra { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.datoEtiqueta { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.3; }
+.datoDetalle { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: var(--spacing-sm); border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
+
+/* Tabla comparativa final */
+.tablaComparativa { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.tablaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+.tablaGrid { display: grid; grid-template-columns: auto 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.tablaHeader { background: linear-gradient(135deg, rgba(46,134,171,0.1) 0%, rgba(72,169,166,0.1) 100%); padding: var(--spacing-sm) var(--spacing-md); font-weight: 700; font-size: 0.82rem; color: var(--text-primary); border-bottom: 1px solid var(--border); }
+.tablaCelda { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.82rem; color: var(--text-primary); border-bottom: 1px solid var(--border); }
+.tablaCeldaLabel { font-weight: 600; color: var(--text-secondary); }
+
+/* ─── Comunes ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes flujo { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(4px); } }
+@keyframes giro { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .diagramaFlujo { grid-template-columns: 1fr; gap: var(--spacing-sm); }
+  .diagramaCentral { flex-direction: row; }
+  .ecuacion { gap: 0.3rem; }
+  .ecuacionMol { font-size: 0.95rem; padding: 0.3rem 0.5rem; }
+  .datosGrid { grid-template-columns: repeat(2, 1fr); }
+  .comparativaGrid { grid-template-columns: 1fr; }
+  .conteoGrid { grid-template-columns: 1fr; }
+  .fasesNav { grid-template-columns: 1fr; }
+  .mitocondriaPartes { grid-template-columns: 1fr; }
+  .mitocondriaOuter { min-width: 240px; }
+  .cicloCirculo { width: 240px; height: 240px; }
+  .cicloPaso { min-width: 75px; padding: 0.3rem var(--spacing-sm); }
+  .cicloPasoNombre { font-size: 0.65rem; }
+  .cadenaFlujo { flex-direction: column; }
+  .tablaGrid { font-size: 0.75rem; }
+  .tablaCelda, .tablaHeader { padding: 0.3rem var(--spacing-sm); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagramaMolecula, .datoCard, .faseBtn, .cicloPaso, .mitocondriaParte, .navBtn { transition-duration: 0.01ms !important; }
+  .componenteDetalle, .faseDetalle, .mitocondriaDetalle { animation-duration: 0.01ms !important; }
+  .diagramaFlecha, .cadenaFlechaHorizontal { animation: none !important; }
+  .cicloCentroIcono, .cicloFlechaArc { animation: none !important; }
+}
