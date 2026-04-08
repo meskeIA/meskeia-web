@@ -1,10 +1,10 @@
 {
   "site": "meskeIA",
   "url": "https://meskeia.com",
-  "description": "Biblioteca gratuita de 495+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
+  "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 496,
+  "total_tools": 501,
   "updated": "2026-04-07",
   "features": {
     "all_free": true,
@@ -1475,6 +1475,36 @@
           "slug": "visualizador-sistemas-circulatorios",
           "url": "https://meskeia.com/visualizador-sistemas-circulatorios/",
           "description": "Evolución del corazón: 2 a 4 cámaras, sangre fría vs caliente, 3 corazones del pulpo"
+        },
+        {
+          "name": "Enlaces Químicos",
+          "slug": "visualizador-enlaces-quimicos",
+          "url": "https://meskeia.com/visualizador-enlaces-quimicos/",
+          "description": "Iónico, covalente y metálico: electrones animados, electronegatividad y propiedades"
+        },
+        {
+          "name": "Fases de la Luna y Eclipses",
+          "slug": "visualizador-fases-luna-eclipses",
+          "url": "https://meskeia.com/visualizador-fases-luna-eclipses/",
+          "description": "8 fases lunares con slider, eclipses solar/lunar, mareas vivas y muertas"
+        },
+        {
+          "name": "Selección Natural",
+          "slug": "visualizador-seleccion-natural",
+          "url": "https://meskeia.com/visualizador-seleccion-natural/",
+          "description": "Motor de la evolución: simulación de poblaciones, Darwin vs Lamarck, resistencia antibióticos"
+        },
+        {
+          "name": "El Sistema Inmune",
+          "slug": "visualizador-sistema-inmune",
+          "url": "https://meskeia.com/visualizador-sistema-inmune/",
+          "description": "3 líneas de defensa, anticuerpos, memoria inmunológica, vacunas e inmunidad de grupo"
+        },
+        {
+          "name": "Transferencia de Calor",
+          "slug": "visualizador-termodinamica",
+          "url": "https://meskeia.com/visualizador-termodinamica/",
+          "description": "Conducción, convección y radiación: partículas, corrientes y ondas animadas"
         }
       ]
     },

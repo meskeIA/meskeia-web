@@ -562,6 +562,11 @@ export const implementedAppsUrls = [
   "/visualizador-biomoleculas/",           // Explicador visual: carbohidratos, lípidos, proteínas, ácidos nucleicos
   "/visualizador-germinacion/",            // Explicador visual: semilla, 6 fases germinación, factores
   "/visualizador-sistemas-circulatorios/", // Explicador visual: corazones 2-4 cámaras, sangre fría/caliente
+  "/visualizador-enlaces-quimicos/",       // Explicador visual: iónico, covalente, metálico, electrones animados
+  "/visualizador-fases-luna-eclipses/",    // Explicador visual: fases lunares, eclipses, mareas
+  "/visualizador-seleccion-natural/",      // Explicador visual: evolución, Darwin vs Lamarck, poblaciones
+  "/visualizador-sistema-inmune/",         // Explicador visual: 3 defensas, anticuerpos, vacunas
+  "/visualizador-termodinamica/",          // Explicador visual: conducción, convección, radiación
 ];
 
 /**

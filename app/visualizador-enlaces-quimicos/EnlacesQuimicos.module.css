@@ -1,0 +1,963 @@
+/* ─────────────────────────────────────────────
+   Enlaces Químicos - Visualizador meskeIA
+   ───────────────────────────────────────────── */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ── Hero ── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0;
+}
+
+/* ── Navegación ── */
+
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.navBtn {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.7rem 0.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.navBtnActivo {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.navBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Contenido principal ── */
+
+.mainContent {
+  margin-bottom: 2rem;
+}
+
+.seccionContenido {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.seccionTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--primary);
+}
+
+.seccionDesc {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── Sección 1: Cards de enlace ── */
+
+.enlaceCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.enlaceCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 0.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-primary);
+}
+
+.enlaceCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
+}
+
+.enlaceCardActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.enlaceCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.enlaceIcono {
+  font-size: 2rem;
+}
+
+.enlaceNombre {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.enlaceEjemplo {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ── Animaciones de enlace ── */
+
+.animacionContainer {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.animacionEnlace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 100px;
+  margin-bottom: 0.75rem;
+}
+
+.animacionDetalle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.carga {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.atraccion {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* ── Átomos ── */
+
+.atomo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-weight: 700;
+}
+
+.atomoLabel {
+  font-size: 0.85rem;
+  z-index: 1;
+  color: #fff;
+}
+
+.atomoNa {
+  background: #FF6B35;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.4);
+}
+
+.atomoCl {
+  background: #4ECDC4;
+  box-shadow: 0 0 12px rgba(78, 205, 196, 0.4);
+}
+
+.atomoH {
+  background: #E63946;
+  box-shadow: 0 0 12px rgba(230, 57, 70, 0.4);
+  width: 45px;
+  height: 45px;
+}
+
+.atomoO {
+  background: #457B9D;
+  box-shadow: 0 0 12px rgba(69, 123, 157, 0.4);
+}
+
+.atomoMetal {
+  background: #6C757D;
+  box-shadow: 0 0 8px rgba(108, 117, 125, 0.4);
+  width: 45px;
+  height: 45px;
+}
+
+/* ── Electrones ── */
+
+.electron {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FFD700;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+}
+
+.electronTransferir {
+  top: -4px;
+  right: -4px;
+  animation: transferir 2s ease-in-out infinite;
+}
+
+@keyframes transferir {
+  0%, 10% { transform: translate(0, 0); opacity: 1; }
+  50% { transform: translate(80px, 0); opacity: 0.6; }
+  60%, 100% { transform: translate(80px, 0); opacity: 0; }
+}
+
+.electronRecibido {
+  top: -4px;
+  left: -4px;
+  opacity: 0;
+  animation: recibir 2s ease-in-out infinite;
+}
+
+@keyframes recibir {
+  0%, 55% { opacity: 0; }
+  65%, 100% { opacity: 1; }
+}
+
+.flechaTransferencia {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  margin: 0 0.5rem;
+}
+
+/* Covalente: electrones compartidos */
+
+.zonaCompartida {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.electronCompartido1 {
+  animation: orbitar1 1.8s linear infinite;
+}
+
+.electronCompartido2 {
+  animation: orbitar2 1.8s linear infinite;
+}
+
+@keyframes orbitar1 {
+  0% { top: 0; left: 50%; }
+  25% { top: 50%; left: 100%; }
+  50% { top: 100%; left: 50%; }
+  75% { top: 50%; left: 0; }
+  100% { top: 0; left: 50%; }
+}
+
+@keyframes orbitar2 {
+  0% { top: 100%; left: 50%; }
+  25% { top: 50%; left: 0; }
+  50% { top: 0; left: 50%; }
+  75% { top: 50%; left: 100%; }
+  100% { top: 100%; left: 50%; }
+}
+
+/* Metálico: electrones libres */
+
+.redMetalica {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  position: relative;
+  padding: 1rem;
+}
+
+.electronLibre {
+  position: absolute;
+  z-index: 2;
+}
+
+.electronLibre1 {
+  animation: libre1 3s ease-in-out infinite;
+}
+
+.electronLibre2 {
+  animation: libre2 2.5s ease-in-out infinite;
+}
+
+.electronLibre3 {
+  animation: libre3 3.5s ease-in-out infinite;
+}
+
+@keyframes libre1 {
+  0% { top: 20%; left: 30%; }
+  33% { top: 70%; left: 60%; }
+  66% { top: 40%; left: 80%; }
+  100% { top: 20%; left: 30%; }
+}
+
+@keyframes libre2 {
+  0% { top: 60%; left: 70%; }
+  33% { top: 30%; left: 20%; }
+  66% { top: 80%; left: 50%; }
+  100% { top: 60%; left: 70%; }
+}
+
+@keyframes libre3 {
+  0% { top: 40%; left: 50%; }
+  33% { top: 10%; left: 40%; }
+  66% { top: 60%; left: 20%; }
+  100% { top: 40%; left: 50%; }
+}
+
+/* ── Panel detalle ── */
+
+.panelDetalle {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.panelTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.panelFormula {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.panelResumen {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+.panelInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panelInfoBloque {
+  padding: 0.75rem;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 8px;
+}
+
+.panelInfoBloque p {
+  margin: 0.25rem 0 0;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.panelInfoLabel {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Insight ── */
+
+.insight {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* ── Sección 2: Electronegatividad ── */
+
+.escalaEN {
+  margin-bottom: 1.5rem;
+}
+
+.escalaBarraContainer {
+  padding: 0.5rem 0;
+}
+
+.escalaBarra {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 60px;
+}
+
+.escalaZona {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.escalaValor {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.escalaApolar {
+  background: #48A9A6;
+}
+
+.escalaPolar {
+  background: #2E86AB;
+}
+
+.escalaIonico {
+  background: #1B5E7B;
+}
+
+.ejemplosEN {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.ejemploEN {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.ejemploENHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.3rem;
+}
+
+.ejemploENAtomo {
+  font-weight: 700;
+  font-size: 0.95rem;
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.ejemploENVs {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.ejemploENDiff {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.ejemploENTipo {
+  font-weight: 700;
+  color: var(--secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.ejemploENDesc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.polarVsApolar {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.polarVsApolar h4 {
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.polarGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.polarCard {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.polarCard p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.polarIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+/* ── Sección 3: Tabla de propiedades ── */
+
+.tablaContainer {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tablaPropiedades {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tablaPropiedades th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablaPropiedades th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.tablaPropiedades th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.tablaPropiedades td {
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: top;
+}
+
+.filaPropiedad {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.filaPropiedad:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.filaPropiedadActiva {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.explicacionPropiedad {
+  display: flex;
+  gap: 0.75rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.explicacionIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.explicacionPropiedad p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Sección 4: Vida cotidiana ── */
+
+.vidaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.vidaCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.vidaCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.vidaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.vidaIcono {
+  font-size: 1.8rem;
+}
+
+.vidaHeader strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.vidaFormula {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.vidaTipo {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.vidaDesc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.curiosidades {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.curiosidades h4 {
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.curiosidades ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.curiosidades li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ── Educativo ── */
+
+.guideSection h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.guideSection h2:first-child {
+  margin-top: 0;
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.warningBox {
+  background: #FFF3CD;
+  border: 1px solid #FFECB5;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.warningBox strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #664D03;
+}
+
+.warningBox p {
+  margin: 0;
+  color: #664D03;
+  font-size: 0.9rem;
+}
+
+/* ── Dark Mode ── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .navBtn {
+  background: var(--bg-card);
+  border-color: #444;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .navBtn:hover {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .navBtnActivo {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .enlaceCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .enlaceCardActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .animacionContainer {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .panelDetalle {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .panelInfoBloque {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .ejemploEN {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .polarVsApolar {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .polarCard {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .tablaPropiedades td {
+  border-bottom-color: #444;
+}
+
+[data-theme='dark'] .filaPropiedadActiva {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .explicacionPropiedad {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .vidaCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .curiosidades {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #3D3A1A;
+  border-color: #5A5320;
+}
+
+[data-theme='dark'] .warningBox strong,
+[data-theme='dark'] .warningBox p {
+  color: #FFE082;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .nav {
+    gap: 0.35rem;
+  }
+
+  .navBtn {
+    min-width: 0;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.3rem;
+  }
+
+  .enlaceCards {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .enlaceCard {
+    flex-direction: row;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .enlaceIcono {
+    font-size: 1.5rem;
+  }
+
+  .animacionEnlace {
+    gap: 0.5rem;
+    min-height: 80px;
+  }
+
+  .atomo {
+    width: 45px;
+    height: 45px;
+  }
+
+  .atomoH,
+  .atomoMetal {
+    width: 35px;
+    height: 35px;
+  }
+
+  .atomoLabel {
+    font-size: 0.7rem;
+  }
+
+  .polarGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tablaPropiedades {
+    font-size: 0.78rem;
+  }
+
+  .tablaPropiedades th,
+  .tablaPropiedades td {
+    padding: 0.5rem 0.35rem;
+  }
+
+  .vidaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Movimiento reducido ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .seccionContenido,
+  .electronTransferir,
+  .electronRecibido,
+  .electronCompartido1,
+  .electronCompartido2,
+  .electronLibre1,
+  .electronLibre2,
+  .electronLibre3,
+  .enlaceCard,
+  .vidaCard,
+  .explicacionPropiedad {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1029,6 +1029,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cerebro/', icon: '🧠', name: 'Cómo Piensa tu Cerebro', description: '86.000 millones de neuronas' },
     { url: '/visualizador-metamorfosis/', icon: '🦋', name: 'Metamorfosis', description: 'Transformación radical' },
   ],
+  'visualizador-enlaces-quimicos': [
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tendencias Tabla Periódica', description: 'Mapas de calor' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
+    { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Los 4 ingredientes de la vida' },
+  ],
+  'visualizador-fases-luna-eclipses': [
+    { url: '/visualizador-sistema-solar/', icon: '🪐', name: 'El Sistema Solar', description: '8 planetas en números' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'La Vida de una Estrella', description: 'Evolución estelar' },
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Mareas y ciclo hidrológico' },
+  ],
+  'visualizador-seleccion-natural': [
+    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
+    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
+    { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'División celular' },
+    { url: '/visualizador-fosiles-tiempo-geologico/', icon: '🦕', name: 'Fósiles y Tiempo Geológico', description: '4.500 Ma de historia' },
+  ],
+  'visualizador-sistema-inmune': [
+    { url: '/visualizador-vacunas/', icon: '💉', name: 'Vacunas', description: 'Historia y calendario' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Proteínas y anticuerpos' },
+  ],
+  'visualizador-termodinamica': [
+    { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
+    { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'Convección del manto' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
