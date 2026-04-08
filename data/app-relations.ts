@@ -1083,6 +1083,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-construccion-edificio/', icon: '🏗️', name: 'Construcción de un Edificio', description: 'De los cimientos al tejado' },
     { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
   ],
+  'visualizador-sonido-ondas': [
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Matemáticas y Música', description: 'Armonía, escalas y Web Audio' },
+    { url: '/visualizador-optica/', icon: '🔍', name: 'Óptica', description: 'Reflexión, refracción, lentes' },
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Mecánica y movimiento' },
+    { url: '/visualizador-electricidad-domestica/', icon: '⚡', name: 'Electricidad Doméstica', description: 'Otra forma de energía en casa' },
+  ],
+  'visualizador-efecto-invernadero': [
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-estaciones-ano/', icon: '🌍', name: 'Las Estaciones del Año', description: 'Inclinación y órbita' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Evaporación y precipitación' },
+    { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Fuentes y mix español' },
+  ],
+  'visualizador-geometria-fractales': [
+    { url: '/visualizador-numeros-primos/', icon: '🔢', name: 'Números Primos', description: 'Criba, patrones y criptografía' },
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Matemáticas y Música', description: 'Patrones matemáticos en la armonía' },
+    { url: '/visualizador-matrices/', icon: '📐', name: 'Matrices', description: 'Operaciones y transformaciones' },
+    { url: '/visualizador-optica/', icon: '🔍', name: 'Óptica', description: 'Geometría de la luz' },
+  ],
+  'visualizador-numeros-primos': [
+    { url: '/visualizador-geometria-fractales/', icon: '🔷', name: 'Geometría Fractal', description: 'Sierpinski, Koch, Mandelbrot' },
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Matemáticas y Música', description: 'Patrones numéricos en armonía' },
+    { url: '/visualizador-matrices/', icon: '📐', name: 'Matrices', description: 'Operaciones y transformaciones' },
+    { url: '/visualizador-como-funciona-wifi/', icon: '📡', name: 'Cómo Funciona el WiFi', description: 'Criptografía en acción' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

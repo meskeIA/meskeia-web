@@ -1,0 +1,199 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+
+.seccionContent { color: var(--text-primary); }
+.subtituloSeccion { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-xl) 0 var(--spacing-md) 0; }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección 1: El mecanismo ─── */
+.diagramaContainer { margin-bottom: var(--spacing-lg); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); }
+.diagramaSvg { display: block; width: 100%; height: auto; }
+
+.pasosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.pasoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); cursor: pointer; transition: all 0.2s; position: relative; }
+.pasoCard:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.pasoActivo { border-color: var(--primary); box-shadow: 0 4px 12px rgba(46,134,171,0.15); }
+.pasoNumero { width: 28px; height: 28px; border-radius: 50%; color: white; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-sm); }
+.pasoIcono { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+.pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.pasoDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+.pasoHint { font-size: 0.75rem; color: var(--text-muted); margin: var(--spacing-sm) 0 0 0; font-style: italic; }
+
+.tempComparacion { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); flex-wrap: wrap; }
+.tempCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); text-align: center; display: flex; flex-direction: column; gap: 0.3rem; min-width: 140px; }
+.tempIcono { font-size: 1.8rem; }
+.tempValor { font-size: 1.4rem; font-weight: 800; font-family: monospace; }
+.tempLabel { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+.tempDetalle { font-size: 0.75rem; color: var(--text-muted); }
+.tempFlecha { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.tempFlechaIcono { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.08), rgba(72,169,166,0.08)); border: 1px solid rgba(46,134,171,0.2); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; }
+[data-theme='dark'] .insight { background: linear-gradient(135deg, rgba(46,134,171,0.15), rgba(72,169,166,0.15)); border-color: rgba(46,134,171,0.3); }
+
+/* ─── Sección 2: Los gases ─── */
+.gasesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.gasCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); cursor: pointer; transition: all 0.2s; }
+.gasCard:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.gasActivo { border-color: var(--primary); box-shadow: 0 4px 12px rgba(46,134,171,0.15); }
+.gasHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.gasIcono { font-size: 1.6rem; }
+.gasNombre { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.gasFormula { font-size: 0.82rem; font-weight: 700; font-family: monospace; }
+.gasDetalle { margin-top: var(--spacing-sm); display: flex; flex-direction: column; gap: 0.4rem; }
+.gasInfo { display: flex; gap: 0.4rem; font-size: 0.82rem; }
+.gasInfoLabel { color: var(--text-muted); white-space: nowrap; }
+.gasInfoValor { color: var(--text-primary); font-weight: 600; }
+
+/* GWP */
+.gwpCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.gwpTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.gwpSubtitulo { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 var(--spacing-md) 0; }
+.gwpBarras { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.gwpBarraItem { display: grid; grid-template-columns: 50px 1fr 60px; gap: var(--spacing-sm); align-items: center; }
+.gwpBarraLabel { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); font-family: monospace; }
+.gwpBarraContainer { height: 18px; background: var(--hover); border-radius: 9px; overflow: hidden; }
+.gwpBarra { height: 100%; border-radius: 9px; transition: width 0.5s ease; }
+.gwpBarraValor { font-size: 0.82rem; font-weight: 700; text-align: right; }
+.gwpNota { font-size: 0.78rem; color: var(--text-muted); margin-top: var(--spacing-md); font-style: italic; }
+
+/* Contribución */
+.contribucionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.contribucionTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.contribucionSubtitulo { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 var(--spacing-md) 0; }
+.contribucionBarras { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.contribucionItem { display: flex; flex-direction: column; gap: 0.3rem; }
+.contribucionHeader { display: flex; justify-content: space-between; align-items: center; }
+.contribucionPct { font-size: 0.88rem; font-weight: 700; color: var(--primary); }
+.contribucionBarraContainer { height: 14px; background: var(--hover); border-radius: 7px; overflow: hidden; }
+.contribucionBarra { height: 100%; border-radius: 7px; transition: width 0.5s ease; }
+.contribucionNota { font-size: 0.78rem; color: var(--text-muted); margin-top: var(--spacing-md); line-height: 1.5; }
+
+/* ─── Sección 3: Natural vs exceso ─── */
+.co2Card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.co2Titulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.co2Subtitulo { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 var(--spacing-lg) 0; line-height: 1.4; }
+.co2Barras { display: flex; gap: var(--spacing-md); align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+.co2BarraItem { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 60px; }
+.co2BarraValor { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); font-family: monospace; }
+.co2BarraContainer { width: 40px; background: var(--hover); border-radius: 6px 6px 0 0; overflow: hidden; }
+.co2Barra { width: 100%; border-radius: 6px 6px 0 0; transition: height 0.5s ease; }
+.co2BarraAnio { font-size: 0.72rem; font-weight: 600; color: var(--text-primary); }
+.co2BarraContexto { font-size: 0.65rem; color: var(--text-muted); text-align: center; max-width: 80px; }
+
+/* Fuentes */
+.fuentesCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.fuentesTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.fuentesSubtitulo { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 var(--spacing-md) 0; }
+.fuentesBarras { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.fuenteItem { display: flex; flex-direction: column; gap: 0.3rem; }
+.fuenteHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.fuenteNombre { font-size: 0.88rem; color: var(--text-primary); flex: 1; }
+.fuentePct { font-size: 0.88rem; font-weight: 700; }
+.fuenteBarraContainer { height: 14px; background: var(--hover); border-radius: 7px; overflow: hidden; }
+.fuenteBarra { height: 100%; border-radius: 7px; transition: width 0.5s ease; }
+
+/* Escenarios */
+.escenariosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.escenarioCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.escenarioGrados { font-size: 1.8rem; font-weight: 800; font-family: monospace; display: block; margin-bottom: 0.3rem; }
+.escenarioTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
+.escenarioLista { text-align: left; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; padding-left: 1.2em; margin: 0; }
+
+/* ─── Sección 4: Datos y soluciones ─── */
+.huellaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.huellaTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.huellaSubtitulo { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 var(--spacing-md) 0; }
+.huellaBarras { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.huellaItem { display: flex; flex-direction: column; gap: 0.3rem; }
+.huellaDestacado { background: linear-gradient(135deg, rgba(46,134,171,0.06), rgba(72,169,166,0.06)); border-color: var(--primary); }
+.huellaItemHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.huellaItemPais { font-size: 0.88rem; color: var(--text-primary); flex: 1; }
+.huellaItemValor { font-size: 0.88rem; font-weight: 700; color: var(--primary); }
+.huellaBarraContainer { height: 14px; background: var(--hover); border-radius: 7px; overflow: hidden; }
+.huellaBarra { height: 100%; border-radius: 7px; transition: width 0.5s ease; }
+.huellaNota { font-size: 0.78rem; color: var(--text-muted); margin-top: var(--spacing-md); font-style: italic; }
+
+/* Keeling */
+.keelingCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+.keelingTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.keelingDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--spacing-md) 0; }
+.keelingDatos { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); flex-wrap: wrap; }
+.keelingDato { text-align: center; display: flex; flex-direction: column; gap: 0.2rem; }
+.keelingDatoValor { font-size: 1.3rem; font-weight: 800; color: var(--text-primary); font-family: monospace; }
+.keelingDatoLabel { font-size: 0.75rem; color: var(--text-muted); }
+.keelingFlecha { font-size: 1.4rem; color: var(--primary); font-weight: 700; }
+
+/* Feedback loops */
+.feedbackIntro { font-size: 0.88rem; color: var(--text-secondary); margin: 0 0 var(--spacing-md) 0; }
+.feedbackGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.feedbackCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
+.feedbackIcono { font-size: 1.6rem; display: block; margin-bottom: var(--spacing-sm); }
+.feedbackTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.feedbackDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* Soluciones */
+.solucionesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.solucionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.solucionIcono { font-size: 1.8rem; display: block; margin-bottom: var(--spacing-sm); }
+.solucionTitulo { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.solucionDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* ─── Warning Box ─── */
+.warningBox { background: #FEF9E7; border: 1px solid #F0E68C; border-left: 4px solid #F4D03F; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-md); font-size: 0.85rem; color: #5D4E37; line-height: 1.5; }
+[data-theme='dark'] .warningBox { background: #3A3520; border-color: #5D4E37; color: #E5E5E5; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .pasosGrid { grid-template-columns: 1fr; }
+  .gasesGrid { grid-template-columns: 1fr; }
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .feedbackGrid { grid-template-columns: 1fr; }
+  .solucionesGrid { grid-template-columns: repeat(2, 1fr); }
+  .tempComparacion { flex-direction: column; }
+  .co2Barras { gap: var(--spacing-sm); }
+}
+
+@media (max-width: 480px) {
+  .container { padding: var(--spacing-md) var(--spacing-sm); }
+  .hero { padding: var(--spacing-lg) var(--spacing-md); }
+  .title { font-size: 1.8rem; }
+  .solucionesGrid { grid-template-columns: 1fr; }
+  .gwpBarraItem { grid-template-columns: 40px 1fr 50px; }
+  .keelingDatos { flex-direction: column; }
+  .keelingFlecha { transform: rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pasoCard, .gasCard, .gwpBarra, .contribucionBarra, .co2Barra, .fuenteBarra, .huellaBarra { transition: none; }
+  .pasoCard:hover, .gasCard:hover { transform: none; }
+}

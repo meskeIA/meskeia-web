@@ -1,0 +1,176 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+
+/* ─── Cards genéricas ─── */
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.cardTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.3rem 0; }
+.cardSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección 1: Anatomía de onda ─── */
+.svgContainer { width: 100%; overflow: hidden; border-radius: var(--radius); background: var(--bg-card); border: 1px solid var(--border); margin-bottom: var(--spacing-md); }
+.svgContainer svg { display: block; width: 100%; height: auto; }
+
+.slidersGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sliderGroup { display: flex; flex-direction: column; gap: 0.3rem; }
+.sliderLabel { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); display: flex; justify-content: space-between; }
+.sliderValue { font-weight: 700; color: var(--primary); font-family: monospace; }
+.sliderInput { width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px; }
+.sliderRange { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); }
+
+.etiquetasGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.etiquetaCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.etiquetaHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }
+.etiquetaIcono { font-size: 1.2rem; }
+.etiquetaNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.etiquetaDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+.velocidadGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.velocidadRow { display: grid; grid-template-columns: 100px 1fr 80px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.velocidadMedio { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.velocidadBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
+.velocidadBar { height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+.velocidadValor { font-size: 0.82rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+
+/* ─── Sección 2: Frecuencia y tono ─── */
+.rangoBar { display: flex; border-radius: var(--radius); overflow: hidden; height: 56px; margin-bottom: var(--spacing-sm); }
+.rangoInfra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; }
+[data-theme='dark'] .rangoInfra { background: #3a3a3a; }
+.rangoAudible { flex: 4; background: linear-gradient(90deg, var(--primary), var(--secondary)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; color: white; }
+.rangoUltra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; }
+[data-theme='dark'] .rangoUltra { background: #3a3a3a; }
+.rangoLabel { font-size: 0.75rem; font-weight: 700; }
+.rangoFreq { font-size: 0.68rem; }
+.rangoNotas { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-bottom: var(--spacing-lg); }
+
+.notasGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.notaRow { display: grid; grid-template-columns: 90px 1fr 70px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.notaNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.notaBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
+.notaBar { height: 100%; border-radius: 7px; }
+.notaFreq { font-size: 0.82rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+
+.vocalesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.vocalRow { display: grid; grid-template-columns: 110px 1fr 90px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.vocalNombre { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.vocalBarContainer { height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; position: relative; }
+.vocalBar { position: absolute; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+.vocalRango { font-size: 0.78rem; color: var(--text-secondary); text-align: right; font-family: monospace; }
+
+.animalesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.animalRow { display: grid; grid-template-columns: 36px 1fr 90px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.animalIcono { font-size: 1.3rem; text-align: center; }
+.animalNombre { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.animalFreq { font-size: 0.78rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+
+/* ─── Sección 3: Decibelios ─── */
+.dbScale { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-lg); }
+.dbRow { display: grid; grid-template-columns: 50px 36px 1fr auto; gap: var(--spacing-sm); align-items: center; padding: 0.6rem var(--spacing-md); border-bottom: 1px solid var(--border); }
+.dbRow:last-child { border-bottom: none; }
+.dbValor { font-size: 0.95rem; font-weight: 800; font-family: monospace; text-align: right; }
+.dbIcono { font-size: 1.2rem; text-align: center; }
+.dbInfo { display: flex; flex-direction: column; gap: 0.1rem; }
+.dbNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.dbDesc { font-size: 0.75rem; color: var(--text-muted); }
+.dbTag { font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; white-space: nowrap; }
+.dbSeguro { background: rgba(39,174,96,0.12); color: #27ae60; }
+.dbPrecaucion { background: rgba(241,196,15,0.15); color: #b7950b; }
+[data-theme='dark'] .dbPrecaucion { background: rgba(241,196,15,0.1); color: #f1c40f; }
+.dbPeligro { background: rgba(231,76,60,0.12); color: #e74c3c; }
+.dbDolor { background: rgba(142,68,173,0.12); color: #8e44ad; }
+
+.dbBarVertical { width: 100%; height: 20px; border-radius: 10px; background: linear-gradient(90deg, #27ae60 0%, #27ae60 30%, #f1c40f 50%, #e74c3c 75%, #8e44ad 100%); margin-bottom: var(--spacing-sm); }
+.dbBarLabels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-bottom: var(--spacing-lg); }
+
+.exposicionGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.exposicionRow { display: grid; grid-template-columns: 50px 1fr auto; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.exposicionDb { font-size: 0.88rem; font-weight: 700; font-family: monospace; color: var(--text-primary); text-align: right; }
+.exposicionBarContainer { height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; }
+.exposicionBar { height: 100%; border-radius: 6px; }
+.exposicionTiempo { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-align: right; white-space: nowrap; }
+
+/* ─── Sección 4: Timbre y armónicos ─── */
+.armonicosVisual { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.armonicoRow { display: grid; grid-template-columns: 80px 1fr 50px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
+.armonicoNombre { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+.armonicoBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
+.armonicoBar { height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+.armonicoPct { font-size: 0.78rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+
+.formasGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.formaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.formaSvg { width: 100%; height: 60px; margin-bottom: 0.3rem; }
+.formaNombre { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; }
+.formaDesc { font-size: 0.78rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+
+.fenomenoCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-md); }
+.fenomenoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; display: flex; align-items: center; gap: var(--spacing-sm); }
+.fenomenoDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* ─── Dato destacado ─── */
+.datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.datoUnidad { font-size: 1.1rem; font-weight: 600; color: var(--secondary); }
+.datoTexto { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
+
+/* ─── Insight ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+
+/* ─── Warning box (v2.0) ─── */
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .slidersGrid { grid-template-columns: 1fr; }
+  .formasGrid { grid-template-columns: 1fr; }
+  .notaRow { grid-template-columns: 80px 1fr 60px; }
+  .vocalRow { grid-template-columns: 90px 1fr 80px; }
+  .dbRow { grid-template-columns: 45px 30px 1fr auto; }
+  .datoDestacado { flex-direction: column; text-align: center; }
+  .velocidadRow { grid-template-columns: 80px 1fr 70px; }
+  .armonicoRow { grid-template-columns: 70px 1fr 40px; }
+}
+
+@media (max-width: 480px) {
+  .dbRow { grid-template-columns: 40px 1fr; gap: 0.3rem; }
+  .dbIcono { display: none; }
+  .dbTag { display: none; }
+  .animalRow { grid-template-columns: 28px 1fr 70px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navBtn, .velocidadBar, .notaBar, .vocalBar, .armonicoBar, .exposicionBar { transition-duration: 0.01ms !important; }
+}

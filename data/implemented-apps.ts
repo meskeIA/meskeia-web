@@ -571,6 +571,10 @@ export const implementedAppsUrls = [
   "/visualizador-ph-acidos-bases/",        // Explicador visual: escala pH, ácidos, bases, neutralización
   "/visualizador-estaciones-ano/",         // Explicador visual: inclinación 23,5°, solsticios, horas de luz
   "/visualizador-maquinas-simples/",       // Explicador visual: palanca, polea, plano inclinado, ventaja mecánica
+  "/visualizador-sonido-ondas/",           // Explicador visual: frecuencia, amplitud, decibelios, armónicos
+  "/visualizador-efecto-invernadero/",     // Explicador visual: mecanismo invernadero, CO₂, escenarios, soluciones
+  "/visualizador-geometria-fractales/",    // Explicador visual: Sierpinski, Koch, Mandelbrot, naturaleza
+  "/visualizador-numeros-primos/",         // Explicador visual: criba Eratóstenes, Ulam, RSA, criptografía
 ];
 
 /**

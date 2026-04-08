@@ -1,0 +1,167 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+/* Hero */
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+/* Secciones */
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.subtituloSeccion { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* Demo fractal (Sección 1) */
+.fractalDemo { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.demoTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+
+/* SVG containers */
+.svgContainer { display: flex; justify-content: center; margin-bottom: var(--spacing-md); }
+.svgContainerSmall { display: flex; justify-content: center; margin-bottom: var(--spacing-sm); }
+.fractalSvg { width: 100%; max-width: 300px; aspect-ratio: 1; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius); }
+
+/* SVG fractal paths */
+.fractalPath { fill: rgba(72, 169, 166, 0.25); stroke: var(--primary); stroke-width: 0.8; }
+.fractalFill { fill: rgba(72, 169, 166, 0.3); stroke: none; }
+.fractalHueco { fill: var(--bg-primary); stroke: none; }
+.fractalStroke { stroke: var(--primary); stroke-width: 1.5; opacity: 0.85; }
+[data-theme='dark'] .fractalPath { fill: rgba(72, 169, 166, 0.15); }
+[data-theme='dark'] .fractalFill { fill: rgba(72, 169, 166, 0.2); }
+[data-theme='dark'] .fractalHueco { fill: var(--bg-primary); }
+
+/* Slider */
+.sliderGroup { margin-bottom: var(--spacing-md); }
+.sliderLabel { display: block; font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.3rem; text-align: center; }
+.slider { width: 100%; height: 6px; appearance: none; background: var(--border); border-radius: 3px; outline: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; cursor: pointer; }
+.slider::-moz-range-thumb { width: 20px; height: 20px; background: var(--primary); border: none; border-radius: 50%; cursor: pointer; }
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.sliderMarks { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); padding: 0 2px; margin-top: 0.2rem; }
+
+/* Datos iteración (Sección 1) */
+.datosGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-top: var(--spacing-md); }
+.datoItem { text-align: center; background: var(--bg-primary); border-radius: var(--radius); padding: var(--spacing-sm); }
+.datoValor { display: block; font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+.datoLabel { display: block; font-size: 0.75rem; color: var(--text-muted); }
+
+/* Propiedades grid */
+.propiedadesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.propiedadCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.propiedadIcono { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+.propiedadTitulo { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.propiedadDesc { display: block; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Fractales clásicos grid (Sección 2) */
+.fractalesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.fractalCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-md); transition: transform 0.2s; }
+.fractalCard:hover { transform: translateY(-2px); }
+.fractalNombre { display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.fractalDim { font-size: 0.72rem; font-weight: 600; color: white; background: var(--secondary); padding: 0.15rem 0.5rem; border-radius: 20px; }
+.fractalDesc { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); }
+.fractalMetricas { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); padding-top: var(--spacing-sm); border-top: 1px solid var(--border); }
+
+/* Naturaleza grid (Sección 3) */
+.naturalezaGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.naturalezaCard { display: flex; gap: var(--spacing-md); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); transition: transform 0.2s; }
+.naturalezaCard:hover { transform: translateY(-2px); }
+.naturalezaIcono { font-size: 2.2rem; flex-shrink: 0; line-height: 1; }
+.naturalezaInfo { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+.naturalezaNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.naturalezaDim { font-size: 0.72rem; font-weight: 600; color: var(--secondary); }
+.naturalezaDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Paradoja de la costa */
+.paradojaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.paradojaCard h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.paradojaCard p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.paradojaEjemplo { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
+.paradojaItem { text-align: center; background: var(--bg-primary); border-radius: var(--radius); padding: var(--spacing-sm); }
+.paradojaRegla { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem; }
+.paradojaLong { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+/* Mandelbrot card (Sección 4) */
+.mandelbrotCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.mandelbrotCard h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.mandelbrotCard p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.formulaBox { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; background: var(--bg-primary); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.formula { font-size: 1.4rem; font-weight: 700; color: var(--primary); font-family: 'Georgia', serif; }
+.formulaDesc { font-size: 0.8rem; color: var(--text-muted); }
+
+/* Hausdorff card */
+.hausdorffCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.hausdorffCard h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.hausdorffCard p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.dimensionesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
+.dimItem { text-align: center; background: var(--bg-primary); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); }
+.dimNombre { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
+.dimValor { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+/* Timeline */
+.timeline { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.timelineItem { display: flex; gap: var(--spacing-md); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); }
+.timelineAnio { font-size: 0.85rem; font-weight: 700; color: var(--primary); flex-shrink: 0; min-width: 3rem; }
+.timelineContent { flex: 1; }
+.timelineQuien { display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
+.timelineQue { display: block; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Aplicaciones grid */
+.aplicacionesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.aplicacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; transition: transform 0.2s; }
+.aplicacionCard:hover { transform: translateY(-2px); }
+.aplicacionIcono { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+.aplicacionNombre { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.aplicacionDesc { display: block; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Insight y warning */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .fractalesGrid { grid-template-columns: 1fr; }
+  .naturalezaGrid { grid-template-columns: 1fr; }
+  .propiedadesGrid { grid-template-columns: 1fr; }
+  .aplicacionesGrid { grid-template-columns: 1fr; }
+  .dimensionesGrid { grid-template-columns: repeat(2, 1fr); }
+  .paradojaEjemplo { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .title { font-size: 1.5rem; }
+  .subtitle { font-size: 0.95rem; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .dimensionesGrid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fractalCard, .naturalezaCard, .aplicacionCard { transition-duration: 0.01ms !important; }
+}

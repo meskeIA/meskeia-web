@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 505,
+  "total_tools": 509,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1529,6 +1529,30 @@
           "slug": "visualizador-maquinas-simples",
           "url": "https://meskeia.com/visualizador-maquinas-simples/",
           "description": "Palanca, polea, plano inclinado, rueda, cuña y tornillo con ventaja mecánica interactiva"
+        },
+        {
+          "name": "Sonido y Ondas",
+          "slug": "visualizador-sonido-ondas",
+          "url": "https://meskeia.com/visualizador-sonido-ondas/",
+          "description": "Frecuencia, amplitud, decibelios y armónicos: por qué guitarra y piano suenan diferente"
+        },
+        {
+          "name": "El Efecto Invernadero",
+          "slug": "visualizador-efecto-invernadero",
+          "url": "https://meskeia.com/visualizador-efecto-invernadero/",
+          "description": "Mecanismo paso a paso, gases CO₂/metano, escenarios de calentamiento y soluciones"
+        },
+        {
+          "name": "Geometría Fractal",
+          "slug": "visualizador-geometria-fractales",
+          "url": "https://meskeia.com/visualizador-geometria-fractales/",
+          "description": "Sierpinski, Koch y Mandelbrot con sliders de iteración. Fractales en la naturaleza"
+        },
+        {
+          "name": "Números Primos",
+          "slug": "visualizador-numeros-primos",
+          "url": "https://meskeia.com/visualizador-numeros-primos/",
+          "description": "Criba de Eratóstenes animada, espiral de Ulam y criptografía RSA"
         }
       ]
     },
