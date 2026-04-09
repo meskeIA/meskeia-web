@@ -104,7 +104,7 @@ const SECCIONES: SeccionInfo[] = [
 
 // ─── Helpers para generar geometría ───
 
-const S = 80; // escala: 1 unidad = 80px
+const S = 90; // escala: 1 unidad = 90px
 
 function cuboAristas(sx: number, sy: number, sz: number): Arista3D[] {
   const hx = sx / 2, hy = sy / 2, hz = sz / 2;
@@ -773,9 +773,11 @@ function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Esc
               style={{
                 width: c.w,
                 height: c.h,
-                transform: `translate3d(${c.cx - c.w / 2}px, ${c.cy - c.h / 2}px, ${c.cz}px) rotateX(${c.rotX}deg) rotateY(${c.rotY}deg) rotateZ(${c.rotZ}deg)`,
+                marginLeft: -c.w / 2,
+                marginTop: -c.h / 2,
+                transform: `translate3d(${c.cx}px, ${c.cy}px, ${c.cz}px) rotateX(${c.rotX}deg) rotateY(${c.rotY}deg) rotateZ(${c.rotZ}deg)`,
                 borderColor: c.color,
-                background: `${c.color}18`,
+                background: `${c.color}20`,
               }}
             />
           ))}
