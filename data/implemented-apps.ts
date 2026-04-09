@@ -583,6 +583,10 @@ export const implementedAppsUrls = [
   "/visualizador-espectro-electromagnetico/", // Explicador visual: 7 bandas EM, radio a gamma, energía y peligro
   "/visualizador-estructura-atomo/",       // Explicador visual: protones, neutrones, Bohr vs orbitales, isótopos
   "/visualizador-cartografia-proyecciones/", // Explicador visual: Mercator vs Peters, distorsiones, coordenadas
+  "/visualizador-enzimas-cuerpo-humano/",  // Explicador visual: 13 enzimas, llave-cerradura, pH/temperatura, cofactores
+  "/visualizador-sangre-componentes/",     // Explicador visual: tubo centrifugado, ABO/Rh, coagulación, análisis
+  "/visualizador-adn-codigo-genetico/",    // Explicador visual: doble hélice, transcripción, codones, CRISPR
+  "/visualizador-fenomenos-meteorologicos/", // Explicador visual: nubes, precipitaciones, rayos, huracanes, DANA
 ];
 
 /**

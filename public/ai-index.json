@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 517,
+  "total_tools": 521,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1601,6 +1601,30 @@
           "slug": "visualizador-cartografia-proyecciones",
           "url": "https://meskeia.com/visualizador-cartografia-proyecciones/",
           "description": "Mercator, Peters, Robinson comparadas. Groenlandia vs África. Coordenadas y husos horarios"
+        },
+        {
+          "name": "Enzimas del Cuerpo Humano",
+          "slug": "visualizador-enzimas-cuerpo-humano",
+          "url": "https://meskeia.com/visualizador-enzimas-cuerpo-humano/",
+          "description": "13 enzimas principales, modelo llave-cerradura, sliders pH/temperatura, cofactores y coenzimas"
+        },
+        {
+          "name": "La Sangre - Componentes",
+          "slug": "visualizador-sangre-componentes",
+          "url": "https://meskeia.com/visualizador-sangre-componentes/",
+          "description": "Tubo centrifugado, glóbulos rojos/blancos, plaquetas, grupos ABO/Rh y coagulación"
+        },
+        {
+          "name": "ADN y Código Genético",
+          "slug": "visualizador-adn-codigo-genetico",
+          "url": "https://meskeia.com/visualizador-adn-codigo-genetico/",
+          "description": "Doble hélice, transcripción, tabla de 64 codones, mutaciones y CRISPR"
+        },
+        {
+          "name": "Fenómenos Meteorológicos",
+          "slug": "visualizador-fenomenos-meteorologicos",
+          "url": "https://meskeia.com/visualizador-fenomenos-meteorologicos/",
+          "description": "10 tipos de nubes, lluvia/nieve/granizo, rayos, huracanes, tornados y DANA"
         }
       ]
     },

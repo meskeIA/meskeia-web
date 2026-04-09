@@ -1,0 +1,184 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* ─── Navegación ─── */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.subSeccionTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-xl) 0 var(--spacing-md); text-align: center; }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Sección 1: Doble Hélice ─── */
+.heliceContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }
+.heliceSvg { max-width: 300px; width: 100%; height: auto; }
+[data-theme='dark'] .heliceSvg text { fill: var(--text-primary); }
+
+/* Componentes del ADN */
+.componentesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.componenteCard { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: var(--spacing-lg) var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); text-align: center; }
+.componenteIcono { font-size: 1.8rem; }
+.componenteNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.componenteDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Bases nitrogenadas */
+.basesGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.baseCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; }
+.baseCard:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.baseCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.baseActiva { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.baseLetra { font-size: 2rem; font-weight: 800; font-family: 'Courier New', monospace; }
+.baseNombre { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+.baseTipo { font-size: 0.72rem; color: var(--text-muted); }
+.baseComplementaria { font-size: 0.78rem; color: var(--text-secondary); }
+.baseInfo { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: slideIn 0.25s ease-out; }
+.baseInfo p { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Tabla ADN vs ARN */
+.tablaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: var(--spacing-xl); }
+.tablaHeader3 { display: grid; grid-template-columns: 1fr 1.5fr 1.5fr; gap: 0; padding: var(--spacing-sm) var(--spacing-md); background: var(--primary); color: white; font-weight: 700; font-size: 0.82rem; }
+.tablaHeaderCell { padding: 0.2rem; }
+.tablaRow3 { display: grid; grid-template-columns: 1fr 1.5fr 1.5fr; gap: 0; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border); align-items: center; font-size: 0.85rem; transition: background 0.15s; }
+.tablaRow3:hover { background: var(--hover); }
+.tablaRow3:last-child { border-bottom: none; }
+.tablaCellNombre { font-weight: 600; color: var(--text-primary); }
+.tablaCell { color: var(--text-secondary); }
+
+/* ─── Sección 2: Transcripción ─── */
+.procesoSvg { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; overflow-x: auto; }
+.transcripcionSvg { max-width: 420px; width: 100%; height: auto; }
+.traduccionSvg { max-width: 420px; width: 100%; height: auto; }
+[data-theme='dark'] .transcripcionSvg text,
+[data-theme='dark'] .traduccionSvg text { fill: var(--text-primary); }
+
+/* Pasos */
+.pasosContainer { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.pasoCard { display: flex; align-items: flex-start; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.pasoNumero { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.82rem; font-weight: 800; flex-shrink: 0; }
+.pasoContenido { display: flex; flex-direction: column; gap: 0.2rem; }
+.pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.pasoDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+/* Reglas de complementariedad */
+.reglasGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.reglaCard { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); padding: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.reglaBase { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; color: white; font-size: 1.1rem; font-weight: 800; font-family: 'Courier New', monospace; }
+.reglaFlecha { font-size: 1.2rem; color: var(--text-muted); font-weight: 700; }
+
+/* Splicing */
+.splicingContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.splicingVisual { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); }
+.splicingPre, .splicingPost { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
+.exonBloque { padding: 0.4rem 0.8rem; background: rgba(46,134,171,0.15); border: 2px solid #2E86AB; border-radius: 6px; font-size: 0.82rem; font-weight: 700; color: #2E86AB; }
+.intronBloque { padding: 0.4rem 0.8rem; background: rgba(231,76,60,0.1); border: 2px dashed #E74C3C; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: #E74C3C; opacity: 0.7; }
+.splicingFlecha { font-size: 0.88rem; color: var(--text-secondary); font-weight: 600; }
+.splicingNota { font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin: var(--spacing-md) 0 0 0; line-height: 1.5; }
+
+/* ─── Sección 3: Traducción y Codones ─── */
+.filtroContainer { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; margin-bottom: var(--spacing-lg); }
+.filtroBtn { padding: 0.3rem 0.6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); transition: all 0.15s; white-space: nowrap; }
+.filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
+.filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.filtroBtnActivo { background: var(--primary); border-color: var(--primary); color: white; }
+
+.codonesGrid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; margin-bottom: var(--spacing-lg); }
+.codonCard { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.4rem 0.2rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 6px; text-align: center; transition: transform 0.15s; }
+.codonCard:hover { transform: scale(1.05); }
+.codonStop { background: rgba(127,140,141,0.08); }
+.codonInicio { background: rgba(46,204,113,0.08); }
+.codonTriplete { font-size: 0.78rem; font-weight: 800; font-family: 'Courier New', monospace; }
+.codonAa { font-size: 0.62rem; color: var(--text-primary); font-weight: 600; line-height: 1.2; }
+.codonAbrev { font-size: 0.58rem; color: var(--text-muted); }
+
+/* ─── Sección 4: Datos y Mutaciones ─── */
+.dogmaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.dogmaFlujo { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); flex-wrap: wrap; margin-bottom: var(--spacing-lg); }
+.dogmaBloque { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-lg); border: 2px solid; border-radius: var(--radius); min-width: 90px; }
+.dogmaIcono { font-size: 1.6rem; }
+.dogmaNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+.dogmaFlecha { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; color: var(--text-muted); font-size: 1.4rem; font-weight: 700; }
+.dogmaFlechaLabel { font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); }
+.dogmaExcepcion { background: rgba(155,89,182,0.08); border: 1px dashed #9B59B6; border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+[data-theme='dark'] .dogmaExcepcion { background: rgba(155,89,182,0.15); }
+.dogmaExcepcionLabel { display: block; font-size: 0.82rem; font-weight: 700; color: #9B59B6; margin-bottom: var(--spacing-sm); }
+.dogmaRetro { font-size: 0.9rem; color: var(--text-primary); }
+
+/* Mutaciones */
+.mutacionesGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.mutacionCard { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: var(--spacing-lg) var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); text-align: center; }
+.mutacionIcono { font-size: 1.6rem; }
+.mutacionTipo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.mutacionDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
+.mutacionEjemplo { font-size: 0.85rem; font-weight: 700; color: var(--primary); background: rgba(46,134,171,0.08); padding: 0.2rem 0.6rem; border-radius: 4px; font-family: 'Courier New', monospace; }
+.mutacionEfecto { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+
+/* Datos fascinantes */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.datoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); transition: transform 0.2s; }
+.datoCard:hover { transform: translateY(-2px); }
+.datoIcono { font-size: 1.8rem; display: block; margin-bottom: var(--spacing-sm); }
+.datoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin: 0 0 var(--spacing-sm) 0; }
+.datoDetalle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* ─── Insight y Warning ─── */
+.insight { background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); }
+.insight p { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0; text-align: center; }
+[data-theme='dark'] .insight { background: linear-gradient(135deg, rgba(46, 134, 171, 0.15) 0%, rgba(72, 169, 166, 0.15) 100%); border-color: rgba(46, 134, 171, 0.3); }
+
+.warningBox { background: rgba(243, 156, 18, 0.08); border: 1px solid rgba(243, 156, 18, 0.3); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+[data-theme='dark'] .warningBox { background: rgba(243, 156, 18, 0.12); border-color: rgba(243, 156, 18, 0.4); }
+
+/* ─── Educativo ─── */
+.guideSection h2 { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-md) 0; }
+.guideSection h3 { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin: var(--spacing-lg) 0 var(--spacing-sm) 0; }
+.guideSection p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 var(--spacing-md) 0; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .container { padding: var(--spacing-md); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .componentesGrid { grid-template-columns: 1fr; }
+  .basesGrid { grid-template-columns: repeat(2, 1fr); }
+  .reglasGrid { grid-template-columns: repeat(2, 1fr); }
+  .codonesGrid { grid-template-columns: repeat(4, 1fr); }
+  .mutacionesGrid { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .dogmaFlujo { flex-direction: column; }
+  .dogmaFlecha { transform: rotate(90deg); }
+}
+
+@media (max-width: 480px) {
+  .title { font-size: 1.5rem; }
+  .codonesGrid { grid-template-columns: repeat(3, 1fr); }
+  .basesGrid { grid-template-columns: repeat(2, 1fr); }
+  .reglasGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── Reducir movimiento ─── */
+@media (prefers-reduced-motion: reduce) {
+  .baseCard, .datoCard, .navBtn, .baseInfo, .codonCard, .mutacionCard { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

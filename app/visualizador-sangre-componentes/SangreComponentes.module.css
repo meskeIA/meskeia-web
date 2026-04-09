@@ -1,0 +1,207 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+.subSeccionTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); margin-top: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Tubo de ensayo ─── */
+.tuboZona { display: flex; align-items: flex-start; justify-content: center; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl); flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
+.tuboSvg { width: 180px; height: auto; flex-shrink: 0; }
+.tuboCapaClick { cursor: pointer; transition: opacity 0.2s; }
+.tuboCapaClick:hover { opacity: 0.65; }
+.tuboCapaClick:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.hematocritoBox { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: var(--spacing-md); max-width: 260px; color: var(--text-primary); font-size: 0.9rem; line-height: 1.5; }
+.hematocritoBox strong { display: block; margin-bottom: 0.3rem; font-size: 0.95rem; }
+.hematocritoBox p { margin: 0 0 var(--spacing-sm) 0; color: var(--text-secondary); font-size: 0.85rem; }
+.hematocritoValores { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.85rem; color: var(--text-primary); }
+
+/* ─── Cards de componentes ─── */
+.componentesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.componenteCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; color: var(--text-primary); }
+.componenteCard:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.componenteCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.componenteActivo { border-left-width: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+
+.componenteHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.componenteIcono { font-size: 1.5rem; }
+.componenteNombre { font-size: 1rem; font-weight: 700; display: block; }
+.componenteCientifico { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+.componentePct { margin-left: auto; font-size: 1.1rem; font-weight: 800; }
+
+.componenteDetalle { margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border); }
+.componenteMeta { display: flex; gap: var(--spacing-lg); font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); flex-wrap: wrap; }
+.componenteFuncion { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.componenteDetalles { margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
+.componenteDetalles li { margin-bottom: 0.25rem; }
+
+/* ─── Barras leucocitos ─── */
+.leucocitosBarras { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.barraGrupo { display: flex; flex-direction: column; gap: 0.2rem; }
+.barraLabelZona { display: flex; justify-content: space-between; align-items: center; }
+.barraLabel { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
+.barraPct { font-size: 0.82rem; font-weight: 600; color: var(--primary); }
+.barraTrack { width: 100%; height: 22px; background: var(--border); border-radius: 6px; overflow: hidden; }
+.barraFill { height: 100%; border-radius: 6px; transition: width 0.4s; }
+.barraDesc { font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.3; }
+
+/* ─── Tabla ABO ─── */
+.tablaABOWrapper { overflow-x: auto; margin-bottom: var(--spacing-xl); }
+.tablaABO { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.88rem; }
+.tablaABO th { background: var(--primary); color: white; padding: var(--spacing-sm) var(--spacing-md); text-align: left; font-weight: 600; }
+.tablaABO td { padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border); color: var(--text-primary); }
+.tablaABO tr:last-child td { border-bottom: none; }
+.filaActiva td { background: rgba(46, 134, 171, 0.08); }
+
+.grupoBtn { background: var(--bg-primary); border: 2px solid var(--border); border-radius: 8px; padding: 0.3rem 0.6rem; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; color: var(--text-primary); }
+.grupoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.grupoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.grupoBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+
+/* ─── Grid de compatibilidad ─── */
+.compatGrid { display: flex; flex-direction: column; margin-bottom: var(--spacing-xl); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); font-size: 0.78rem; }
+.compatHeader { display: grid; grid-template-columns: 60px repeat(8, 1fr); background: var(--primary); color: white; font-weight: 700; }
+.compatCorner { display: flex; align-items: center; justify-content: center; padding: 0.4rem; font-size: 0.7rem; }
+.compatColHeader { display: flex; align-items: center; justify-content: center; padding: 0.4rem; text-align: center; }
+.compatRow { display: grid; grid-template-columns: 60px repeat(8, 1fr); border-top: 1px solid var(--border); }
+.compatRowHeader { display: flex; align-items: center; justify-content: center; padding: 0.4rem; font-weight: 800; color: var(--text-primary); background: rgba(46, 134, 171, 0.05); }
+.compatCell { display: flex; align-items: center; justify-content: center; padding: 0.4rem; font-size: 0.85rem; }
+.compatSi { background: rgba(39, 174, 96, 0.1); }
+.compatNo { background: rgba(231, 76, 60, 0.05); }
+
+/* ─── Destacados donante/receptor universal ─── */
+.destacados { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.destacadoCard { display: flex; align-items: flex-start; gap: var(--spacing-sm); background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid; border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.88rem; color: var(--text-primary); }
+.destacadoCard span { font-size: 1.4rem; flex-shrink: 0; }
+.destacadoCard strong { display: block; margin-bottom: 0.2rem; }
+.destacadoCard p { margin: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* ─── Distribución en España ─── */
+.distribucionBarras { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.distGrupo { display: flex; flex-direction: column; gap: 0.15rem; }
+.distLabel { display: flex; justify-content: space-between; align-items: center; }
+.distGrupoNombre { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.distPct { font-size: 0.82rem; font-weight: 600; color: var(--primary); }
+
+/* ─── Cascada de coagulación SVG ─── */
+.cascadaZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg) var(--spacing-sm); margin-bottom: var(--spacing-lg); overflow-x: auto; }
+.cascadaSvg { width: 100%; min-width: 600px; height: auto; }
+.cascadaCircle { cursor: pointer; transition: all 0.2s; }
+.cascadaCircle:hover { opacity: 0.8; }
+.cascadaCircle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ─── Detalle paso coagulación ─── */
+.pasoDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid; border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md); }
+.pasoHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); flex-wrap: wrap; }
+.pasoNumero { background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; white-space: nowrap; }
+.pasoTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.pasoDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+.pasoNav { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.pasoIndicador { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+
+.btnSecondary { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text-primary); }
+.btnSecondary:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.btnSecondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btnSecondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── Anticoagulantes ─── */
+.anticoagGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.anticoagCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.anticoagNombre { font-size: 0.9rem; color: var(--primary); display: block; margin-bottom: 0.3rem; }
+.anticoagMecanismo { font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; margin: 0 0 0.3rem 0; }
+.anticoagUso { font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.3; }
+
+/* ─── Tabla de valores ─── */
+.tablaValoresWrapper { overflow-x: auto; margin-bottom: var(--spacing-xl); }
+.tablaValores { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; }
+.tablaValores th { background: var(--primary); color: white; padding: var(--spacing-sm) var(--spacing-md); text-align: left; font-weight: 600; white-space: nowrap; }
+.tablaValores td { padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border); color: var(--text-primary); }
+.tablaValores tr:last-child td { border-bottom: none; }
+.valorRango { font-weight: 700; color: var(--primary); white-space: nowrap; }
+.valorAlerta { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* ─── Condiciones comunes ─── */
+.condicionesGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.condicionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); color: var(--text-primary); }
+.condicionIcono { font-size: 1.3rem; display: block; margin-bottom: 0.3rem; }
+.condicionCard strong { font-size: 0.92rem; display: block; margin-bottom: 0.3rem; }
+.condicionCard p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* ─── Datos fascinantes ─── */
+.datosGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.datoCard { display: flex; align-items: flex-start; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.datoIcono { font-size: 1.4rem; flex-shrink: 0; }
+.datoCard strong { font-size: 0.9rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem; }
+.datoCard p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
+
+/* ─── Insight y warning ─── */
+.insight { background: rgba(46, 134, 171, 0.06); border: 1px solid rgba(46, 134, 171, 0.2); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl); text-align: center; color: var(--text-primary); font-size: 0.92rem; line-height: 1.5; }
+.insight p { margin: 0; }
+
+.warningBox { background: rgba(231, 76, 60, 0.06); border: 1px solid rgba(231, 76, 60, 0.2); border-left: 4px solid var(--rojo); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl); color: var(--text-primary); font-size: 0.88rem; line-height: 1.5; }
+.warningBox strong { display: block; color: var(--rojo); margin-bottom: 0.3rem; }
+.warningBox p { margin: 0; }
+
+/* ─── Educativo ─── */
+.guideSection { color: var(--text-primary); line-height: 1.6; }
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; margin: 0 0 var(--spacing-md) 0; color: var(--text-primary); }
+.guideSection h3 { font-size: 1.05rem; font-weight: 700; margin: var(--spacing-lg) 0 var(--spacing-sm) 0; color: var(--text-primary); }
+.guideSection p { font-size: 0.92rem; margin: 0 0 var(--spacing-md) 0; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .title { font-size: 1.8rem; }
+  .compatGrid { font-size: 0.7rem; }
+  .compatCorner, .compatColHeader, .compatRowHeader, .compatCell { padding: 0.25rem; }
+  .destacados { grid-template-columns: 1fr; }
+  .anticoagGrid { grid-template-columns: 1fr; }
+  .condicionesGrid { grid-template-columns: 1fr; }
+  .tuboZona { flex-direction: column; align-items: center; }
+  .hematocritoBox { max-width: 100%; }
+}
+@media (max-width: 480px) {
+  .container { padding: var(--spacing-md); }
+  .title { font-size: 1.5rem; }
+  .subtitle { font-size: 0.95rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+  .navBtn { padding: var(--spacing-sm); }
+  .navIcono { font-size: 1.2rem; }
+  .navTexto { font-size: 0.7rem; }
+  .tablaValores { font-size: 0.75rem; }
+  .tablaABO { font-size: 0.78rem; }
+}
+
+/* ─── Accesibilidad ─── */
+@media (prefers-reduced-motion: reduce) {
+  .barraFill, .cascadaCircle, .componenteCard, .navBtn, .grupoBtn, .btnSecondary, .tuboCapaClick {
+    transition: none;
+  }
+}

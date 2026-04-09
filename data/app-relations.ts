@@ -1155,6 +1155,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-mundo-100-personas/', icon: '👥', name: 'El Mundo en 100 Personas', description: 'Geografía humana' },
     { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
   ],
+  'visualizador-enzimas-cuerpo-humano': [
+    { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'Macronutrientes paso a paso' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Proteínas, lípidos, carbohidratos' },
+    { url: '/visualizador-ph-acidos-bases/', icon: '🧪', name: 'pH: Ácidos y Bases', description: 'La escala que afecta a las enzimas' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Hormonas y regulación' },
+  ],
+  'visualizador-sangre-componentes': [
+    { url: '/visualizador-sistemas-circulatorios/', icon: '❤️', name: 'Sistemas Circulatorios', description: 'Del corazón de 2 al de 4 cámaras' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Glóbulos blancos en acción' },
+    { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'Nutrientes que viajan en sangre' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+  ],
+  'visualizador-adn-codigo-genetico': [
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Donde vive el ADN' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Ácidos nucleicos y proteínas' },
+    { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'Cómo se copia el ADN' },
+    { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'La evolución depende del ADN' },
+  ],
+  'visualizador-fenomenos-meteorologicos': [
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Evaporación y precipitación' },
+    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Gases y calentamiento' },
+    { url: '/visualizador-estaciones-ano/', icon: '🌍', name: 'Estaciones del Año', description: 'Inclinación y clima' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
