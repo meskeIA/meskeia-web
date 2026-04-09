@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import styles from './SonidoOndas.module.css';
 import {
   MeskeiaLogo,
@@ -216,6 +216,78 @@ function generarPathOnda(
 }
 
 // ─────────────────────────────────────────────
+// Web Audio API — reproducción de tonos
+// ─────────────────────────────────────────────
+
+let audioCtx: AudioContext | null = null;
+let currentOscillator: OscillatorNode | null = null;
+let currentGain: GainNode | null = null;
+
+function getAudioContext(): AudioContext {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+  }
+  return audioCtx;
+}
+
+function playTone(frequency: number, duration: number = 1.5, type: OscillatorType = 'sine', volume: number = 0.3) {
+  const ctx = getAudioContext();
+  stopTone();
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  // Fade out suave para evitar click
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
+
+  currentOscillator = osc;
+  currentGain = gain;
+}
+
+function playToneWithHarmonics(frequency: number, harmonics: number[], duration: number = 1.5, volume: number = 0.3) {
+  const ctx = getAudioContext();
+  stopTone();
+
+  const masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(volume, ctx.currentTime);
+  masterGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  masterGain.connect(ctx.destination);
+
+  const maxAmp = harmonics.reduce((s, v) => s + v / 100, 0);
+
+  harmonics.forEach((amp, i) => {
+    if (amp === 0) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(frequency * (i + 1), ctx.currentTime);
+    gain.gain.setValueAtTime((amp / 100) / maxAmp, ctx.currentTime);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  });
+
+  currentGain = masterGain;
+}
+
+function stopTone() {
+  try {
+    currentOscillator?.stop();
+  } catch { /* already stopped */ }
+  currentOscillator = null;
+  currentGain = null;
+}
+
+// ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
 
@@ -224,6 +296,11 @@ export default function SonidoOndasPage() {
   const [frecuencia, setFrecuencia] = useState(200);
   const [amplitud, setAmplitud] = useState(70);
   const [instrumentoIdx, setInstrumentoIdx] = useState(0);
+
+  // Cleanup audio al desmontar o cambiar de sección
+  useEffect(() => {
+    return () => { stopTone(); };
+  }, [seccion]);
 
   // Cálculos derivados
   const longitudOnda = 343 / frecuencia;
@@ -320,6 +397,15 @@ export default function SonidoOndasPage() {
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          className={styles.btnEscuchar}
+          onClick={() => playTone(frecuencia, 1.5, 'sine', amplitud / 100 * 0.5)}
+          aria-label={`Escuchar tono a ${frecuencia} hercios`}
+        >
+          <span aria-hidden="true">🔊</span> Escuchar {formatNumber(frecuencia, 0)} Hz
+        </button>
 
         {/* Propiedades */}
         <div className={styles.etiquetasGrid}>
@@ -429,7 +515,16 @@ export default function SonidoOndasPage() {
           <p className={styles.cardSubtitulo}>El estándar: La4 = 440 Hz</p>
           <div className={styles.notasGrid}>
             {NOTAS.map(n => (
-              <div key={n.nota} className={styles.notaRow}>
+              <div
+                key={n.nota}
+                className={styles.notaRow}
+                onClick={() => playTone(n.freq, 1.0)}
+                style={{ cursor: 'pointer' }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && playTone(n.freq, 1.0)}
+                aria-label={`Escuchar ${n.nota} a ${formatNumber(n.freq, 2)} hercios`}
+              >
                 <span className={styles.notaNombre}>{n.nota}</span>
                 <div className={styles.notaBarContainer}>
                   <div
@@ -646,6 +741,14 @@ export default function SonidoOndasPage() {
               />
             </div>
           </div>
+          <button
+            type="button"
+            className={styles.btnEscuchar}
+            onClick={() => playToneWithHarmonics(440, instrActual.armonicos, 2.0, 0.3)}
+            aria-label={`Escuchar La4 con timbre de ${instrActual.nombre}`}
+          >
+            <span aria-hidden="true">🎵</span> Escuchar {instrActual.nombre}
+          </button>
           <div className={styles.armonicosVisual}>
             {instrActual.armonicos.map((pct, idx) => (
               <div key={idx} className={styles.armonicoRow}>

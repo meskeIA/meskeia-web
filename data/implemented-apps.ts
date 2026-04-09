@@ -575,6 +575,10 @@ export const implementedAppsUrls = [
   "/visualizador-efecto-invernadero/",     // Explicador visual: mecanismo invernadero, CO₂, escenarios, soluciones
   "/visualizador-geometria-fractales/",    // Explicador visual: Sierpinski, Koch, Mandelbrot, naturaleza
   "/visualizador-numeros-primos/",         // Explicador visual: criba Eratóstenes, Ulam, RSA, criptografía
+  "/visualizador-sistema-nervioso/",       // Explicador visual: neurona, sinapsis, SNC/SNP, neurotransmisores
+  "/visualizador-sistema-endocrino/",      // Explicador visual: glándulas, hormonas, feedback, eje HPA
+  "/visualizador-digestion-nutrientes/",   // Explicador visual: macronutrientes, digestión bioquímica, vitaminas
+  "/visualizador-minerales-gemas/",        // Explicador visual: escala Mohs, gemas preciosas, formación
 ];
 
 /**

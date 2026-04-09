@@ -1107,6 +1107,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-matrices/', icon: '📐', name: 'Matrices', description: 'Operaciones y transformaciones' },
     { url: '/visualizador-como-funciona-wifi/', icon: '📡', name: 'Cómo Funciona el WiFi', description: 'Criptografía en acción' },
   ],
+  'visualizador-sistema-nervioso': [
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Hormonas y feedback' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Orgánulos y funciones' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Defensas del cuerpo' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Proteínas y neurotransmisores' },
+  ],
+  'visualizador-sistema-endocrino': [
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Neuronas y sinapsis' },
+    { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'Insulina y glucosa en contexto' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Hormonas son proteínas' },
+  ],
+  'visualizador-digestion-nutrientes': [
+    { url: '/visualizador-viaje-comida/', icon: '🍽️', name: 'El Viaje de tu Comida', description: 'Recorrido anatómico' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Insulina y metabolismo' },
+    { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Carbohidratos, lípidos, proteínas' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos del sistema digestivo' },
+  ],
+  'visualizador-minerales-gemas': [
+    { url: '/visualizador-tipos-rocas/', icon: '🪨', name: 'Tipos de Rocas', description: 'Ígneas, sedimentarias, metamórficas' },
+    { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'De la corteza al núcleo' },
+    { url: '/visualizador-tectonica-placas/', icon: '🌋', name: 'Tectónica de Placas', description: 'Volcanes y terremotos' },
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Elementos que forman minerales' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

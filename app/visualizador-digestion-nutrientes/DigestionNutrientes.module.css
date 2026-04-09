@@ -1,0 +1,355 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large); color: white;
+}
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+/* Tab navigation */
+.tabNav {
+  display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);
+  overflow-x: auto; padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.tabBtn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1rem; background: var(--bg-card);
+  border: 2px solid var(--border); border-radius: 999px;
+  cursor: pointer; font-size: 0.85rem; font-weight: 600;
+  color: var(--text-secondary); transition: all 0.15s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tabActivo { background: var(--primary); border-color: var(--primary); color: white; }
+
+/* Sección genérica */
+.seccion { margin-bottom: var(--spacing-xl); }
+.seccionTitulo {
+  font-size: 1.3rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+.seccionIntro {
+  font-size: 0.93rem; color: var(--text-secondary); line-height: 1.5;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ─── Sección 1: Macronutrientes ─── */
+
+.macroGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+.macroCard {
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+  cursor: pointer; transition: all 0.15s; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm);
+  color: var(--text-primary); width: 100%;
+}
+.macroCard:hover { border-color: var(--primary); background: var(--hover); }
+.macroCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.macroCardActivo { border-width: 2px; }
+.macroIcono { font-size: 2.4rem; }
+.macroNombre { font-size: 1rem; font-weight: 700; }
+.macroKcal {
+  font-size: 0.82rem; font-weight: 600; color: var(--text-muted);
+  background: var(--hover); padding: 0.2rem 0.6rem; border-radius: 999px;
+}
+
+.macroDetalle {
+  text-align: left; width: 100%; margin-top: var(--spacing-sm);
+  border-top: 1px solid var(--border); padding-top: var(--spacing-sm);
+  display: flex; flex-direction: column; gap: var(--spacing-sm);
+}
+.macroFila { font-size: 0.85rem; line-height: 1.5; color: var(--text-primary); }
+.macroEtiqueta {
+  display: block; font-size: 0.72rem; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem;
+}
+
+/* Comparativa kcal/g */
+.comparativaBloque {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.comparativaTitulo {
+  font-size: 0.95rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+.comparativaFila {
+  display: flex; align-items: center; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+.comparativaLabel {
+  font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+  min-width: 110px;
+}
+.comparativaBarra {
+  flex: 1; height: 20px; background: var(--hover);
+  border-radius: 10px; overflow: hidden;
+}
+.comparativaRelleno {
+  height: 100%; border-radius: 10px;
+  transition: width 0.3s ease;
+}
+.comparativaValor {
+  font-size: 0.82rem; font-weight: 700; color: var(--text-primary);
+  min-width: 55px; text-align: right;
+}
+.comparativaNota {
+  font-size: 0.82rem; color: var(--text-muted); margin-top: var(--spacing-sm);
+  text-align: center;
+}
+
+/* Proporción recomendada */
+.proporcionBloque {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.proporcionTitulo {
+  font-size: 0.95rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+.proporcionBarra {
+  display: flex; height: 32px; border-radius: 8px; overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+.proporcionSegmento {
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.72rem; font-weight: 700;
+}
+.proporcionLeyenda {
+  display: flex; justify-content: center; gap: var(--spacing-lg);
+}
+.leyendaItem {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.78rem; color: var(--text-secondary);
+}
+.leyendaColor {
+  display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+}
+
+/* ─── Sección 2: Digestión paso a paso ─── */
+
+.selectorMacro {
+  display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+.selectorBtn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1.1rem; background: var(--bg-card);
+  border: 2px solid var(--border); border-radius: 999px;
+  cursor: pointer; font-size: 0.85rem; font-weight: 600;
+  color: var(--text-secondary); transition: all 0.15s;
+}
+.selectorBtn:hover { border-color: var(--primary); }
+.selectorBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.selectorActivo { border-width: 2px; }
+
+.pasosWrap {
+  display: flex; flex-direction: column; gap: 0;
+}
+.pasoRow {
+  display: flex; flex-direction: column; align-items: stretch;
+}
+.pasoCard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+}
+.pasoHeader {
+  display: flex; align-items: center; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+.pasoNum {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; min-width: 26px;
+  background: var(--primary); color: white;
+  border-radius: 50%; font-size: 0.75rem; font-weight: 700;
+}
+.pasoIcono { font-size: 1.5rem; flex-shrink: 0; }
+.pasoInfo { display: flex; flex-direction: column; gap: 0.1rem; }
+.pasoLugar { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.pasoEnzima { font-size: 0.78rem; color: var(--secondary); font-weight: 600; }
+
+.pasoResultado {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  background: linear-gradient(135deg, rgba(46,134,171,0.07) 0%, rgba(72,169,166,0.07) 100%);
+  border-radius: 8px; padding: 0.5rem var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.88rem; font-weight: 600; color: var(--text-primary);
+}
+.pasoFlecha { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+
+.pasoDetalle {
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;
+}
+
+.pasoConector {
+  display: flex; justify-content: center; padding: 6px 0;
+}
+.pasoFlechaAbajo {
+  color: var(--primary); font-size: 0.9rem;
+}
+
+/* ─── Sección 3: Micronutrientes ─── */
+
+.tipoBanner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.tipoCard {
+  display: flex; align-items: flex-start; gap: var(--spacing-sm);
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-md);
+  font-size: 0.85rem; color: var(--text-primary); line-height: 1.4;
+}
+.tipoIcono { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
+.tipoDesc {
+  display: block; font-size: 0.78rem; color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.microGrid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.microCard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-md);
+  display: flex; flex-direction: column; gap: var(--spacing-sm);
+}
+.microHeader {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+}
+.microIcono { font-size: 1.4rem; flex-shrink: 0; }
+.microNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: block; }
+.microBadge {
+  display: inline-block; font-size: 0.65rem; font-weight: 600;
+  padding: 0.1rem 0.45rem; border-radius: 999px; margin-top: 0.15rem;
+}
+.badgeHidro { background: #DBEAFE; color: #1E40AF; }
+[data-theme='dark'] .badgeHidro { background: #1E3A5F; color: #93C5FD; }
+.badgeLipo { background: #FEF3C7; color: #92400E; }
+[data-theme='dark'] .badgeLipo { background: #422006; color: #FDE68A; }
+.badgeMineral { background: #E5E7EB; color: #374151; }
+[data-theme='dark'] .badgeMineral { background: #374151; color: #D1D5DB; }
+
+.microFila { font-size: 0.82rem; line-height: 1.4; color: var(--text-primary); }
+.microEtiqueta {
+  display: block; font-size: 0.68rem; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.1rem;
+}
+.microDeficit { color: #DC2626; font-weight: 500; }
+[data-theme='dark'] .microDeficit { color: #FCA5A5; }
+
+.absorcionTip {
+  display: flex; align-items: flex-start; gap: var(--spacing-md);
+  background: linear-gradient(135deg, rgba(46,134,171,0.07) 0%, rgba(72,169,166,0.07) 100%);
+  border-left: 4px solid var(--secondary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.absorcionTip p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+
+/* ─── Sección 4: Datos y metabolismo ─── */
+
+.datosGrid {
+  display: flex; flex-direction: column; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.datoCard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+}
+.datoHeader {
+  display: flex; align-items: center; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+.datoIcono { font-size: 1.6rem; flex-shrink: 0; }
+.datoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); display: block; }
+.datoCifra {
+  font-size: 0.82rem; font-weight: 700; color: var(--primary);
+  display: block; margin-top: 0.1rem;
+}
+.datoContenido {
+  font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0;
+}
+
+/* Insight y enlace */
+.insight {
+  background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-primary); line-height: 1.6;
+}
+.insight p { margin: 0; font-size: 0.93rem; }
+
+.enlaceApp {
+  text-align: center; padding: var(--spacing-md);
+  background: var(--hover); border-radius: var(--radius);
+  font-size: 0.9rem; color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a:hover { text-decoration: underline; }
+
+/* Warning box (indicador v2.0) */
+.warningBox {
+  background: #FEF3C7; border: 1px solid #F59E0B;
+  border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E;
+}
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.7rem; }
+  .subtitle { font-size: 1rem; }
+  .macroGrid { grid-template-columns: 1fr; }
+  .microGrid { grid-template-columns: 1fr; }
+  .tipoBanner { grid-template-columns: 1fr; }
+  .tabNav { gap: 0.3rem; }
+  .tabBtn { font-size: 0.78rem; padding: 0.45rem 0.7rem; }
+  .comparativaLabel { min-width: 80px; font-size: 0.75rem; }
+  .proporcionSegmento span { font-size: 0.6rem; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: var(--spacing-md); }
+  .title { font-size: 1.4rem; }
+  .selectorMacro { flex-direction: column; }
+  .selectorBtn { justify-content: center; }
+  .proporcionSegmento span { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabBtn,
+  .macroCard,
+  .selectorBtn,
+  .comparativaRelleno { transition-duration: 0.01ms !important; }
+}
