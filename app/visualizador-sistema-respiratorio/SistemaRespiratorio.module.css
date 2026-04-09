@@ -1,0 +1,236 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+.instruccion { text-align: center; color: var(--text-muted); font-size: 0.88rem; font-style: italic; margin-bottom: var(--spacing-lg); }
+.subSeccionTitulo { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-xl) 0 var(--spacing-md); text-align: center; }
+
+/* ─── Sección 1: Anatomía SVG ─── */
+.anatomiaContainer { display: flex; justify-content: center; margin-bottom: var(--spacing-lg); }
+.anatomiasSvg { width: 100%; max-width: 400px; }
+
+.svgParte { cursor: pointer; transition: opacity 0.2s; }
+.svgParte:hover { opacity: 0.8; }
+.svgParte:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.svgParteActiva { opacity: 1; }
+
+.svgNariz { fill: #F9A8D4; stroke: #EC4899; stroke-width: 2; }
+[data-theme='dark'] .svgNariz { fill: #831843; stroke: #EC4899; }
+.svgFaringe { fill: #C4B5FD; stroke: #8B5CF6; stroke-width: 2; }
+[data-theme='dark'] .svgFaringe { fill: #4C1D95; stroke: #8B5CF6; }
+.svgLaringe { fill: #93C5FD; stroke: #3B82F6; stroke-width: 2; }
+[data-theme='dark'] .svgLaringe { fill: #1E3A5F; stroke: #3B82F6; }
+.svgTraquea { fill: #6EE7B7; stroke: #10B981; stroke-width: 2; }
+[data-theme='dark'] .svgTraquea { fill: #064E3B; stroke: #10B981; }
+.svgAnillo { stroke: #059669; stroke-width: 1.5; opacity: 0.6; }
+[data-theme='dark'] .svgAnillo { stroke: #34D399; }
+.svgBronquio { stroke: #34D399; }
+[data-theme='dark'] .svgBronquio { stroke: #6EE7B7; }
+.svgBronquiolo { stroke: #A7F3D0; }
+[data-theme='dark'] .svgBronquiolo { stroke: #34D399; }
+.svgAlveolo { fill: #DBEAFE; stroke: #60A5FA; stroke-width: 1.5; opacity: 0.8; }
+[data-theme='dark'] .svgAlveolo { fill: #1E3A5F; stroke: #60A5FA; }
+.svgPulmon { fill: none; stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 6 4; opacity: 0.4; }
+.svgDiafragma { stroke: #F59E0B; stroke-dasharray: 8 4; }
+[data-theme='dark'] .svgDiafragma { stroke: #FBBF24; }
+.svgLabel { font-size: 11px; fill: var(--text-secondary); font-weight: 600; }
+.svgLabelDiafragma { font-size: 12px; fill: #F59E0B; font-weight: 700; text-anchor: middle; }
+[data-theme='dark'] .svgLabelDiafragma { fill: #FBBF24; }
+
+/* Detalle de parte anatómica */
+.parteDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; border-left: 4px solid var(--primary); }
+.parteDetalleHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.parteDetalleIcono { font-size: 1.6rem; }
+.parteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.parteDetalleDesc { color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-sm); }
+.parteDetalleDato { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md); font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+.parteViaAlta { border-left-color: #8B5CF6; }
+.parteViaBaja { border-left-color: #10B981; }
+.parteAlveolo { border-left-color: #3B82F6; }
+
+/* Mecánica respiratoria */
+.mecanicaNav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.mecanicaBtn { padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); transition: all 0.2s; }
+.mecanicaBtn:hover { border-color: var(--primary); color: var(--primary); }
+.mecanicaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.mecanicaBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.mecanicaDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.mecanicaDesc { color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.mecanicaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); }
+.mecanicaItem { background: var(--hover); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md); }
+.mecanicaItemLabel { display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.2rem; }
+.mecanicaItemValor { font-size: 0.85rem; color: var(--text-primary); line-height: 1.4; }
+
+/* ─── Sección 2: Intercambio gaseoso ─── */
+.alveoloContainer { display: flex; justify-content: center; margin-bottom: var(--spacing-lg); }
+.alveoloSvg { width: 100%; max-width: 400px; }
+
+.svgAlveoloGrande { fill: #EFF6FF; stroke: #93C5FD; stroke-width: 2; }
+[data-theme='dark'] .svgAlveoloGrande { fill: #1E3A5F; stroke: #60A5FA; }
+.svgAlveoloLabel { font-size: 14px; fill: var(--text-primary); font-weight: 700; }
+.svgAlveoloAire { font-size: 10px; fill: var(--text-secondary); }
+.svgCapilar { stroke: #FCA5A5; opacity: 0.6; }
+[data-theme='dark'] .svgCapilar { stroke: #7F1D1D; }
+.svgCapilarLabel { font-size: 11px; fill: var(--text-secondary); font-weight: 600; }
+.svgFlechaO2 line { stroke: #3B82F6; }
+.svgFlechaCO2 line { stroke: #EF4444; }
+.svgGasLabel { font-size: 12px; font-weight: 700; }
+.svgFlechaO2 .svgGasLabel { fill: #3B82F6; }
+.svgFlechaCO2 .svgGasLabel { fill: #EF4444; }
+.svgGlobuloRojo { fill: #EF4444; opacity: 0.7; }
+[data-theme='dark'] .svgGlobuloRojo { fill: #DC2626; }
+.svgMembrana { stroke: var(--text-muted); }
+.svgMembranaLabel { fill: var(--text-muted); }
+
+/* Tabla comparativa */
+.tablaComparativa { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.tablaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
+
+.composicionGrid { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.composicionRow { display: flex; flex-direction: column; gap: 0.3rem; }
+.composicionGas { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+.composicionBarras { display: flex; flex-direction: column; gap: 0.2rem; }
+.composicionBarra { position: relative; height: 22px; background: var(--hover); border-radius: 4px; overflow: hidden; }
+.composicionBarraFill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 4px; transition: width 0.4s ease; min-width: 2px; }
+.composicionValor { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 0.72rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+
+/* Procesos de intercambio */
+.procesosGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.procesoCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; }
+.procesoCard:hover { border-color: var(--primary); }
+.procesoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.procesoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
+.procesoIcono { font-size: 1.5rem; }
+.procesoTitulo { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+.procesoDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+.procesoDetalle { display: flex; gap: var(--spacing-md); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; color: var(--text-primary); line-height: 1.6; }
+.procesoDetalleIcono { font-size: 1.5rem; flex-shrink: 0; }
+.procesoDetalle p { margin: 0.3rem 0 0; font-size: 0.9rem; }
+
+/* ─── Sección 3: Volúmenes pulmonares ─── */
+.espirometriaContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.espirometriaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-lg); }
+
+.espirometriaBarraTotal { display: flex; height: 60px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+.espirometriaSegmento { display: flex; flex-direction: column; align-items: center; justify-content: center; border: none; cursor: pointer; transition: all 0.2s; color: white; min-width: 40px; }
+.espirometriaSegmento:hover { filter: brightness(1.1); }
+.espirometriaSegmento:focus-visible { outline: 2px solid var(--text-primary); outline-offset: -2px; }
+.espirometriaSegmentoActivo { filter: brightness(1.2); box-shadow: inset 0 0 0 2px white; }
+.espirometriaSegLabel { font-size: 0.72rem; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.espirometriaSegValor { font-size: 0.65rem; opacity: 0.9; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+.espirometriaLeyenda { display: flex; flex-wrap: wrap; gap: var(--spacing-sm) var(--spacing-md); margin-top: var(--spacing-md); justify-content: center; }
+.leyendaItem { display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--text-secondary); }
+.leyendaColor { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+.volumenDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); border-left: 4px solid var(--primary); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.volumenDetalleTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.volumenDetalleValor { font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: var(--spacing-sm); }
+.volumenDetalle p { color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+.capacidadesGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.capacidadCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.capacidadNombre { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.capacidadAbr { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: var(--spacing-sm); }
+.capacidadValor { display: block; font-size: 1.6rem; font-weight: 800; margin-bottom: var(--spacing-sm); }
+.capacidadDesc { display: block; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+.frecuenciaGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.frecuenciaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
+.frecuenciaIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+.frecuenciaNombre { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.3rem; }
+.frecuenciaValor { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.frecuenciaBarra { height: 6px; background: var(--hover); border-radius: 3px; overflow: hidden; }
+.frecuenciaBarraFill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.4s ease; }
+
+/* ─── Sección 4: Datos y enfermedades ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.datoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; transition: border-color 0.2s; }
+.datoCard:hover { border-color: var(--primary); }
+.datoIcono { font-size: 1.8rem; display: block; margin-bottom: var(--spacing-sm); }
+.datoCifra { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: block; }
+.datoEtiqueta { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: var(--spacing-sm); }
+.datoDetalle { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
+
+.enfermedadesGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.enfermedadCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center; }
+.enfermedadCard:hover { border-color: var(--rojo); }
+.enfermedadCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.enfermedadCardActiva { border-color: var(--rojo); background: rgba(231,76,60,0.04); }
+.enfermedadIcono { font-size: 1.5rem; }
+.enfermedadNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.enfermedadDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+.enfermedadDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--rojo); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
+.enfermedadDetalle h4 { color: var(--text-primary); margin: 0 0 var(--spacing-sm); }
+.enfermedadDetalle p { color: var(--text-primary); line-height: 1.6; margin: 0.3rem 0; }
+.enfermedadDato { font-size: 0.9rem; color: var(--text-secondary); font-style: italic; }
+
+.curiosidadesGrid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.curiosidadCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); display: flex; gap: var(--spacing-md); align-items: flex-start; }
+.curiosidadIcono { font-size: 1.5rem; flex-shrink: 0; }
+.curiosidadTitulo { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); display: block; margin-bottom: 0.2rem; }
+.curiosidadDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* ─── Comunes ─── */
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .mecanicaGrid { grid-template-columns: 1fr; }
+  .procesosGrid { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .capacidadesGrid { grid-template-columns: 1fr; }
+  .enfermedadesGrid { grid-template-columns: 1fr; }
+  .frecuenciaGrid { grid-template-columns: 1fr 1fr; }
+  .espirometriaBarraTotal { height: 50px; }
+  .espirometriaSegLabel { font-size: 0.65rem; }
+}
+
+@media (max-width: 480px) {
+  .container { padding: var(--spacing-md); }
+  .title { font-size: 1.5rem; }
+  .frecuenciaGrid { grid-template-columns: 1fr; }
+  .espirometriaBarraTotal { height: 44px; }
+  .composicionValor { font-size: 0.65rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parteDetalle, .mecanicaDetalle, .procesoDetalle, .volumenDetalle, .enfermedadDetalle { animation-duration: 0.01ms !important; }
+  .navBtn, .mecanicaBtn, .procesoCard, .enfermedadCard, .datoCard, .espirometriaSegmento { transition-duration: 0.01ms !important; }
+  .composicionBarraFill, .frecuenciaBarraFill { transition-duration: 0.01ms !important; }
+}

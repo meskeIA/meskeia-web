@@ -587,6 +587,10 @@ export const implementedAppsUrls = [
   "/visualizador-sangre-componentes/",     // Explicador visual: tubo centrifugado, ABO/Rh, coagulación, análisis
   "/visualizador-adn-codigo-genetico/",    // Explicador visual: doble hélice, transcripción, codones, CRISPR
   "/visualizador-fenomenos-meteorologicos/", // Explicador visual: nubes, precipitaciones, rayos, huracanes, DANA
+  "/visualizador-ojo-humano-vision/",      // Explicador visual: anatomía ojo, conos/bastones, defectos visuales
+  "/visualizador-sistema-respiratorio/",   // Explicador visual: pulmones, alvéolos, intercambio O₂/CO₂, espirometría
+  "/visualizador-musculos-movimiento/",    // Explicador visual: sarcómero, actina/miosina, articulaciones
+  "/visualizador-oido-equilibrio/",        // Explicador visual: cóclea, canales semicirculares, equilibrio
 ];
 
 /**

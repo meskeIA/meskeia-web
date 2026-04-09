@@ -1179,6 +1179,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Gases y calentamiento' },
     { url: '/visualizador-estaciones-ano/', icon: '🌍', name: 'Estaciones del Año', description: 'Inclinación y clima' },
   ],
+  'visualizador-ojo-humano-vision': [
+    { url: '/visualizador-optica/', icon: '🔍', name: 'Óptica', description: 'Reflexión, refracción, lentes' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Del ojo al cerebro' },
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro EM', description: 'La luz visible' },
+    { url: '/visualizador-oido-equilibrio/', icon: '👂', name: 'Oído y Equilibrio', description: 'Otro sentido complejo' },
+  ],
+  'visualizador-sistema-respiratorio': [
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'Hemoglobina transporta O₂' },
+    { url: '/visualizador-respiracion-celular/', icon: '⚡', name: 'Respiración Celular', description: 'El O₂ llega a la mitocondria' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas', description: 'ATP sintasa usa el O₂' },
+    { url: '/visualizador-musculos-movimiento/', icon: '💪', name: 'Músculos', description: 'El diafragma es un músculo' },
+  ],
+  'visualizador-musculos-movimiento': [
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La orden que mueve el músculo' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Hormonas y crecimiento muscular' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas', description: 'ATP sintasa como combustible' },
+    { url: '/visualizador-maquinas-simples/', icon: '⚙️', name: 'Máquinas Simples', description: 'El cuerpo como palanca' },
+  ],
+  'visualizador-oido-equilibrio': [
+    { url: '/visualizador-sonido-ondas/', icon: '🔊', name: 'Sonido y Ondas', description: 'La física de lo que oyes' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Del oído al cerebro' },
+    { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Ojo y Visión', description: 'Otro sentido complejo' },
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'Irrigación del oído interno' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

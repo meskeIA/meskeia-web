@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 521,
+  "total_tools": 525,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1625,6 +1625,30 @@
           "slug": "visualizador-fenomenos-meteorologicos",
           "url": "https://meskeia.com/visualizador-fenomenos-meteorologicos/",
           "description": "10 tipos de nubes, lluvia/nieve/granizo, rayos, huracanes, tornados y DANA"
+        },
+        {
+          "name": "El Ojo Humano y la Visión",
+          "slug": "visualizador-ojo-humano-vision",
+          "url": "https://meskeia.com/visualizador-ojo-humano-vision/",
+          "description": "Anatomía del ojo SVG, conos y bastones, 6 defectos visuales con diagramas ópticos"
+        },
+        {
+          "name": "El Sistema Respiratorio",
+          "slug": "visualizador-sistema-respiratorio",
+          "url": "https://meskeia.com/visualizador-sistema-respiratorio/",
+          "description": "Pulmones, alvéolos, intercambio O₂/CO₂, espirometría visual y enfermedades"
+        },
+        {
+          "name": "Músculos y Movimiento",
+          "slug": "visualizador-musculos-movimiento",
+          "url": "https://meskeia.com/visualizador-musculos-movimiento/",
+          "description": "Sarcómero, actina/miosina, 3 tipos de músculo, 5 articulaciones y palancas"
+        },
+        {
+          "name": "El Oído y el Equilibrio",
+          "slug": "visualizador-oido-equilibrio",
+          "url": "https://meskeia.com/visualizador-oido-equilibrio/",
+          "description": "Cóclea, 15.000 células ciliadas, canales semicirculares, pérdida auditiva y tinnitus"
         }
       ]
     },

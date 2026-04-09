@@ -72,6 +72,7 @@ interface EnzimaInfo {
 const ENZIMAS: EnzimaInfo[] = [
   // Digestivas
   { nombre: 'Amilasa salival', icono: '👅', categoria: 'digestiva', dondeActua: 'Boca (glándulas salivales)', sustrato: 'Almidón', producto: 'Maltosa', phOptimo: '6,8 – 7,0', datoCurioso: 'Por eso el pan masticado mucho tiempo sabe dulce: la amilasa convierte almidón en azúcar.' },
+  { nombre: 'Amilasa pancreática', icono: '🫗', categoria: 'digestiva', dondeActua: 'Intestino delgado (secretada por páncreas)', sustrato: 'Almidón y glucógeno', producto: 'Maltosa y dextrinas', phOptimo: '7,0 – 7,5', datoCurioso: 'Continúa el trabajo que empezó la amilasa salival. Es mucho más potente y digiere el 90% del almidón total.' },
   { nombre: 'Pepsina', icono: '🫁', categoria: 'digestiva', dondeActua: 'Estómago', sustrato: 'Proteínas', producto: 'Péptidos cortos', phOptimo: '1,5 – 2,5', datoCurioso: 'Se secreta como pepsinógeno inactivo. El ácido clorhídrico la activa para que no digiera el propio estómago.' },
   { nombre: 'Tripsina', icono: '🔪', categoria: 'digestiva', dondeActua: 'Intestino delgado', sustrato: 'Proteínas', producto: 'Aminoácidos', phOptimo: '7,5 – 8,5', datoCurioso: 'Viene del páncreas como tripsinógeno. Trabaja en equipo con la quimotripsina.' },
   { nombre: 'Lipasa pancreática', icono: '🧈', categoria: 'digestiva', dondeActua: 'Intestino delgado', sustrato: 'Triglicéridos (grasas)', producto: 'Ácidos grasos + glicerol', phOptimo: '7,0 – 8,0', datoCurioso: 'La bilis emulsiona las grasas para que la lipasa pueda actuar: sin bilis, las grasas no se digieren.' },
