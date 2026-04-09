@@ -37,8 +37,8 @@
 .siluetaSvg { max-width: 360px; width: 100%; height: auto; }
 
 /* Glándula indicador SVG */
-.glandulaDot { cursor: pointer; transition: transform 0.2s; }
-.glandulaDot:hover { transform: scale(1.25); }
+.glandulaDot { cursor: pointer; transition: opacity 0.2s; }
+.glandulaDot:hover { opacity: 1; filter: brightness(1.2); }
 .glandulaDot:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* Card de glándula seleccionada */
