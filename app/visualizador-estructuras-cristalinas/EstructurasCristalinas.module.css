@@ -1,0 +1,203 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
+
+/* ─── Escena 3D ─── */
+.escenaWrapper { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin: var(--spacing-lg) 0; }
+
+.scene3d {
+  margin: 0 auto;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(46,134,171,0.04) 0%, transparent 70%);
+  border-radius: var(--radius);
+}
+.scene3d:active { cursor: grabbing; }
+
+.estructura3d {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.05s linear;
+}
+
+.atomo {
+  position: absolute;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  top: 50%; left: 50%;
+  box-shadow: inset -3px -3px 8px rgba(0,0,0,0.3), 0 0 10px rgba(0,0,0,0.1);
+}
+[data-theme='dark'] .atomo { box-shadow: inset -3px -3px 8px rgba(0,0,0,0.5), 0 0 12px rgba(255,255,255,0.05); }
+
+.arista {
+  position: absolute;
+  background: rgba(46,134,171,0.3);
+  transform-style: preserve-3d;
+  height: 2px;
+  transform-origin: 0 50%;
+  top: 50%; left: 50%;
+}
+[data-theme='dark'] .arista { background: rgba(127,179,211,0.35); }
+
+.botonesRotacion { display: flex; gap: 0.3rem; justify-content: center; }
+.btnRotar { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.75rem; color: var(--text-secondary); transition: all 0.2s; }
+.btnRotar:hover { border-color: var(--primary); color: var(--primary); }
+.btnRotar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.instruccionArrastre { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 0; }
+
+/* ─── Sección 1: 7 Sistemas ─── */
+.sistemasGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.sistemaCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.sistemaCard:hover { transform: translateY(-2px); }
+.sistemaCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.sistemaCardActivo { background: rgba(46,134,171,0.04); box-shadow: 0 4px 12px rgba(46,134,171,0.15); }
+.sistemaIcono { font-size: 1.4rem; }
+.sistemaNombre { font-size: 0.78rem; font-weight: 700; text-align: center; color: var(--text-primary); }
+
+.sistemaDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.sistemaDetalleNombre { font-size: 1.2rem; font-weight: 700; margin-bottom: var(--spacing-md); text-align: center; }
+.sistemaDetalleInfo { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: var(--spacing-md); }
+.sistemaParam { font-size: 0.9rem; color: var(--text-secondary); text-align: center; }
+.sistemaParamLabel { font-weight: 700; color: var(--text-primary); }
+
+/* ─── Sección 2: Metálicas ─── */
+.metalicasTabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.metalicaTab { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.metalicaTab:hover { border-color: var(--primary); }
+.metalicaTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.metalicaTabActiva { background: rgba(46,134,171,0.04); box-shadow: 0 4px 12px rgba(46,134,171,0.15); }
+.metalicaSiglas { font-size: 1.3rem; font-weight: 800; color: var(--text-primary); }
+.metalicaNombreTab { font-size: 0.7rem; font-weight: 600; text-align: center; }
+
+.metalicaDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.metalicaDetalleNombre { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: var(--spacing-sm); }
+.metalicaDesc { font-size: 0.9rem; color: var(--text-secondary); text-align: center; line-height: 1.5; margin-bottom: var(--spacing-md); }
+
+.metalicaStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin: var(--spacing-lg) 0; }
+.metalicaStat { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); }
+.metalicaStatValor { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.metalicaStatLabel { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); margin-top: 0.2rem; }
+
+.metalicaEjemplos { font-size: 0.88rem; color: var(--text-secondary); text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); line-height: 1.5; }
+.metalicaEjemplosLabel { font-weight: 700; color: var(--text-primary); }
+
+.comparativaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
+.comparativaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
+.comparativaBarras { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.comparativaBarra { display: flex; align-items: center; gap: var(--spacing-sm); }
+.comparativaLabel { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); min-width: 36px; }
+.comparativaTrack { flex: 1; height: 20px; background: var(--hover); border-radius: 10px; overflow: hidden; }
+.comparativaFill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+.comparativaValor { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); min-width: 36px; text-align: right; }
+.comparativaNota { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: var(--spacing-md); margin-bottom: 0; }
+
+/* ─── Sección 3: Cristales Famosos ─── */
+.cristalesGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.cristalCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
+.cristalCard:hover { border-color: var(--primary); transform: translateY(-2px); }
+.cristalCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.cristalCardActivo { border-color: var(--primary); background: rgba(46,134,171,0.04); box-shadow: 0 4px 12px rgba(46,134,171,0.15); }
+.cristalIcono { font-size: 1.4rem; }
+.cristalNombre { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); text-align: center; }
+.cristalFormula { font-size: 0.68rem; color: var(--text-muted); }
+
+.cristalDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.cristalDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-sm); }
+.cristalDetalleDesc { font-size: 0.9rem; color: var(--text-secondary); text-align: center; line-height: 1.5; margin-bottom: var(--spacing-md); }
+
+.cristalDato { font-size: 0.88rem; color: var(--text-secondary); padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); line-height: 1.5; text-align: center; }
+.cristalDatoLabel { font-weight: 700; color: var(--primary); }
+
+/* Diamante vs Grafito */
+.vsCard { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); }
+.vsTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
+.vsSubtitulo { font-size: 0.88rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-lg); }
+.vsGrid { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--spacing-md); align-items: start; }
+.vsColumna { padding: 0; }
+.vsColumnaTitulo { font-size: 0.92rem; font-weight: 700; color: var(--primary); text-align: center; margin-bottom: var(--spacing-sm); }
+.vsLista { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-secondary); }
+.vsLista li { padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.vsLista li:last-child { border-bottom: none; }
+.vsSeparador { display: flex; align-items: center; justify-content: center; align-self: center; }
+.vsVersus { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; font-weight: 800; font-size: 0.75rem; }
+
+/* ─── Sección 4: Datos ─── */
+.datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.datoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
+.datoHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.datoIcono { font-size: 1.2rem; }
+.datoTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.datoContenido { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* Warning Box */
+.warningBox { background: rgba(243,156,18,0.08); border: 1px solid rgba(243,156,18,0.3); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }
+[data-theme='dark'] .warningBox { background: rgba(243,156,18,0.12); border-color: rgba(243,156,18,0.25); }
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .title { font-size: 1.6rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .navTexto { font-size: 0.7rem; }
+  .sistemasGrid { grid-template-columns: repeat(4, 1fr); }
+  .cristalesGrid { grid-template-columns: repeat(2, 1fr); }
+  .metalicasTabs { grid-template-columns: 1fr; }
+  .metalicaStats { grid-template-columns: 1fr; }
+  .datosGrid { grid-template-columns: 1fr; }
+  .vsGrid { grid-template-columns: 1fr; }
+  .vsSeparador { padding: var(--spacing-sm) 0; }
+  .scene3d { max-width: 220px; max-height: 220px; }
+}
+
+@media (max-width: 480px) {
+  .sistemasGrid { grid-template-columns: repeat(3, 1fr); }
+  .hero { padding: var(--spacing-lg) var(--spacing-md); }
+}
+
+/* Accesibilidad: movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .estructura3d { transition: none; }
+  .scene3d { cursor: default; }
+  .scene3d:active { cursor: default; }
+  .sistemaCard,
+  .cristalCard,
+  .navBtn,
+  .metalicaTab,
+  .btnRotar,
+  .comparativaFill { transition: none; }
+}

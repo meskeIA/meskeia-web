@@ -1126,10 +1126,34 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos del sistema digestivo' },
   ],
   'visualizador-minerales-gemas': [
+    { url: '/visualizador-estructuras-cristalinas/', icon: '🔮', name: 'Estructuras Cristalinas 3D', description: 'Celdas unitarias rotables' },
     { url: '/visualizador-tipos-rocas/', icon: '🪨', name: 'Tipos de Rocas', description: 'Ígneas, sedimentarias, metamórficas' },
     { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'De la corteza al núcleo' },
-    { url: '/visualizador-tectonica-placas/', icon: '🌋', name: 'Tectónica de Placas', description: 'Volcanes y terremotos' },
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Elementos que forman minerales' },
+  ],
+  'visualizador-estructuras-cristalinas': [
+    { url: '/visualizador-minerales-gemas/', icon: '💎', name: 'Minerales y Gemas', description: 'Escala de Mohs y piedras preciosas' },
+    { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Iónico, covalente, metálico' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Partículas y orbitales' },
+    { url: '/visualizador-tipos-rocas/', icon: '🪨', name: 'Tipos de Rocas', description: 'Ígneas, sedimentarias, metamórficas' },
+  ],
+  'visualizador-espectro-electromagnetico': [
+    { url: '/visualizador-sonido-ondas/', icon: '🔊', name: 'Sonido y Ondas', description: 'Ondas mecánicas vs electromagnéticas' },
+    { url: '/visualizador-optica/', icon: '🔍', name: 'Óptica', description: 'La parte visible del espectro' },
+    { url: '/visualizador-como-funciona-wifi/', icon: '📡', name: 'Cómo Funciona el WiFi', description: 'Microondas en acción' },
+    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Infrarrojo atrapado' },
+  ],
+  'visualizador-estructura-atomo': [
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
+    { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Cómo se unen los átomos' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos y balanceo' },
+    { url: '/visualizador-estructuras-cristalinas/', icon: '🔮', name: 'Estructuras Cristalinas', description: 'Cómo se organizan en sólidos' },
+  ],
+  'visualizador-cartografia-proyecciones': [
+    { url: '/visualizador-estaciones-ano/', icon: '🌍', name: 'Estaciones del Año', description: 'Latitudes e inclinación' },
+    { url: '/visualizador-gps/', icon: '📍', name: 'Cómo Funciona el GPS', description: 'Coordenadas en acción' },
+    { url: '/visualizador-mundo-100-personas/', icon: '👥', name: 'El Mundo en 100 Personas', description: 'Geografía humana' },
+    { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
   ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },

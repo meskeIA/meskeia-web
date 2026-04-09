@@ -1,0 +1,917 @@
+/* ─── Layout ─── */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.92;
+  margin: 0;
+}
+
+/* ─── Tab Navigation ─── */
+
+.tabNav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0 0.75rem;
+  margin-bottom: 1rem;
+  scrollbar-width: thin;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.65rem 1rem;
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  min-width: fit-content;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabActive {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  font-weight: 600;
+}
+
+.tabLabel {
+  font-size: 0.78rem;
+}
+
+/* ─── Main Content ─── */
+
+.mainContent {
+  margin-bottom: 2rem;
+}
+
+.seccionSubtitulo {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem;
+}
+
+.seccionContenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.textoSecundario {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0.25rem 0;
+}
+
+/* ─── Selector de elemento ─── */
+
+.selectorElemento {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.selectorLabel {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.selectInput {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.selectInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Átomo SVG ─── */
+
+.atomoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.atomoSvg {
+  width: 300px;
+  height: 300px;
+  max-width: 100%;
+}
+
+.electronOrbit {
+  animation: orbitar 3s linear infinite;
+}
+
+@keyframes orbitar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .electronOrbit {
+    animation: none;
+  }
+}
+
+.atomoLeyenda {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.circuloProton,
+.circuloNeutron,
+.circuloElectron {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.circuloProton { background: #E53935; }
+.circuloNeutron { background: #78909C; }
+.circuloElectron { background: #2E86AB; }
+
+.configElectronica {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+/* ─── Cards de partículas ─── */
+
+.particulasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.particulaCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.particulaCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.particulaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.particulaCardActive {
+  box-shadow: 0 2px 12px rgba(46, 134, 171, 0.15);
+}
+
+.particulaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.particulaCirculo {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.particulaNombre {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.particulaSimbolo {
+  margin-left: auto;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.particulaDatos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.particulaDetalle {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 0.5rem;
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.particulaDetalle p {
+  margin: 0 0 0.3rem;
+}
+
+/* ─── Comparación modelos ─── */
+
+.comparacionModelos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.modeloCard {
+  padding: 1.25rem;
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.modeloTitulo {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+  color: var(--primary);
+}
+
+.atomoMini {
+  max-width: 180px;
+  margin: 0 auto 0.75rem;
+}
+
+.modeloLista {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.modeloLista li::before {
+  content: '• ';
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.warningBox {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(255, 152, 0, 0.08);
+  border-left: 3px solid #FF9800;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 152, 0, 0.12);
+}
+
+/* ─── Orbitales ─── */
+
+.orbitalesGrid {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.orbitalSvg {
+  width: 100px;
+  height: 100px;
+}
+
+/* ─── Configuración electrónica ─── */
+
+.configSection {
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.configSection h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.configEjemplos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.configEjemplo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.configSimbolo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--primary);
+  min-width: 2rem;
+  text-align: center;
+}
+
+.configTexto {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.configElectrones {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ─── Isótopos ─── */
+
+.bloqueIsotopos,
+.bloqueIones {
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.bloqueIsotopos h3,
+.bloqueIones h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.isotoposGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.isotopoCard {
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+
+.isotopoEstable {
+  background: rgba(76, 175, 80, 0.08);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.isotopoRadiactivo {
+  background: rgba(255, 152, 0, 0.08);
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.isotopoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.isotopoSimbolo {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.isotopoEstado {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.radiactivo {
+  color: #FF9800;
+}
+
+.isotopoComposicion {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.isotopoNota {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ─── Iones ─── */
+
+.ionesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.ionCard {
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+
+.ionCation {
+  background: rgba(229, 57, 53, 0.06);
+  border-color: rgba(229, 57, 53, 0.25);
+}
+
+.ionAnion {
+  background: rgba(46, 134, 171, 0.06);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+.ionTransformacion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.ionOriginal {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.ionFlecha {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.ionResultado {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.ionTipo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.ionEjemplo {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.ionEjemploFinal {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.ionEjemploFinal p {
+  margin: 0;
+}
+
+/* ─── Escala y datos ─── */
+
+.bloqueEscala,
+.bloqueModeloEstandar,
+.bloqueHistoria {
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.bloqueEscala h3,
+.bloqueModeloEstandar h3,
+.bloqueHistoria h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.analogiaEstadio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.estadioSvg {
+  max-width: 320px;
+  width: 100%;
+}
+
+.estadioSvg svg {
+  width: 100%;
+  height: auto;
+}
+
+.analogiaTexto {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.datosImpactantes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.datoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.datoNumero {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.datoTexto {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 0.3rem;
+}
+
+/* ─── Modelo estándar ─── */
+
+.modeloEstandarGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.meCard {
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.meCard h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
+.meItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.meItems span {
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(46, 134, 171, 0.08);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.meNota {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0;
+  line-height: 1.4;
+}
+
+/* ─── Línea temporal ─── */
+
+.lineaTiempo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.lineaTiempo::before {
+  content: '';
+  position: absolute;
+  left: 0.45rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--primary);
+  opacity: 0.3;
+}
+
+.hitoCard {
+  display: flex;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  position: relative;
+}
+
+.hitoCard::before {
+  content: '';
+  position: absolute;
+  left: -1.15rem;
+  top: 1rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.hitoAnio {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--primary);
+  min-width: 5.5rem;
+  white-space: nowrap;
+}
+
+.hitoContenido {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.hitoContenido p {
+  margin: 0.15rem 0 0;
+  color: var(--text-secondary);
+}
+
+.hitoModelo {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(46, 134, 171, 0.08);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ─── Educational ─── */
+
+.guideSection {
+  padding: 0.5rem 0;
+}
+
+.guideSection h2 {
+  font-size: 1.05rem;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--primary);
+}
+
+.guideSection h2:first-child {
+  margin-top: 0;
+}
+
+.guideSection p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+/* ─── Dark mode ─── */
+
+[data-theme='dark'] .tab {
+  border-color: var(--bg-card);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabActive {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .particulaCard {
+  border-color: #333;
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .particulaDetalle {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .modeloCard {
+  border-color: #333;
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .configSection {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .configEjemplo {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .bloqueIsotopos,
+[data-theme='dark'] .bloqueIones {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .isotopoEstable {
+  background: rgba(76, 175, 80, 0.12);
+}
+
+[data-theme='dark'] .isotopoRadiactivo {
+  background: rgba(255, 152, 0, 0.12);
+}
+
+[data-theme='dark'] .ionCation {
+  background: rgba(229, 57, 53, 0.1);
+}
+
+[data-theme='dark'] .ionAnion {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .ionEjemploFinal {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .bloqueEscala,
+[data-theme='dark'] .bloqueModeloEstandar,
+[data-theme='dark'] .bloqueHistoria {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .datoCard {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .meCard {
+  background: rgba(46, 134, 171, 0.06);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .meItems span {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .particulasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparacionModelos {
+    grid-template-columns: 1fr;
+  }
+
+  .ionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .datosImpactantes {
+    grid-template-columns: 1fr;
+  }
+
+  .modeloEstandarGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .atomoSvg {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .hero {
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+  }
+
+  .tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .tabLabel {
+    font-size: 0.72rem;
+  }
+
+  .orbitalSvg {
+    width: 80px;
+    height: 80px;
+  }
+
+  .atomoSvg {
+    width: 220px;
+    height: 220px;
+  }
+
+  .selectInput {
+    min-width: 160px;
+  }
+}

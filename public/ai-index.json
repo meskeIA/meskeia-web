@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 513,
+  "total_tools": 517,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1577,6 +1577,30 @@
           "slug": "visualizador-minerales-gemas",
           "url": "https://meskeia.com/visualizador-minerales-gemas/",
           "description": "Escala de Mohs interactiva, 7 gemas preciosas, formación geológica y usos industriales"
+        },
+        {
+          "name": "Estructuras Cristalinas 3D",
+          "slug": "visualizador-estructuras-cristalinas",
+          "url": "https://meskeia.com/visualizador-estructuras-cristalinas/",
+          "description": "Celdas unitarias rotables en 3D: 7 sistemas cristalinos, BCC/FCC/HCP, sal, diamante y grafito"
+        },
+        {
+          "name": "Espectro Electromagnético",
+          "slug": "visualizador-espectro-electromagnetico",
+          "url": "https://meskeia.com/visualizador-espectro-electromagnetico/",
+          "description": "7 bandas de radio a gamma, zoom en luz visible, energía vs peligro, ionizante vs no ionizante"
+        },
+        {
+          "name": "Estructura del Átomo",
+          "slug": "visualizador-estructura-atomo",
+          "url": "https://meskeia.com/visualizador-estructura-atomo/",
+          "description": "Protones, neutrones, electrones, modelo de Bohr vs orbitales, isótopos e iones"
+        },
+        {
+          "name": "Cartografía y Proyecciones",
+          "slug": "visualizador-cartografia-proyecciones",
+          "url": "https://meskeia.com/visualizador-cartografia-proyecciones/",
+          "description": "Mercator, Peters, Robinson comparadas. Groenlandia vs África. Coordenadas y husos horarios"
         }
       ]
     },

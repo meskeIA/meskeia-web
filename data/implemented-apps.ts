@@ -579,6 +579,10 @@ export const implementedAppsUrls = [
   "/visualizador-sistema-endocrino/",      // Explicador visual: glándulas, hormonas, feedback, eje HPA
   "/visualizador-digestion-nutrientes/",   // Explicador visual: macronutrientes, digestión bioquímica, vitaminas
   "/visualizador-minerales-gemas/",        // Explicador visual: escala Mohs, gemas preciosas, formación
+  "/visualizador-estructuras-cristalinas/", // Explicador visual 3D: celdas unitarias rotables, BCC/FCC/HCP, CSS 3D
+  "/visualizador-espectro-electromagnetico/", // Explicador visual: 7 bandas EM, radio a gamma, energía y peligro
+  "/visualizador-estructura-atomo/",       // Explicador visual: protones, neutrones, Bohr vs orbitales, isótopos
+  "/visualizador-cartografia-proyecciones/", // Explicador visual: Mercator vs Peters, distorsiones, coordenadas
 ];
 
 /**
