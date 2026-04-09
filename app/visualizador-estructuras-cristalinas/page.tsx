@@ -41,6 +41,14 @@ interface Arista3D {
   x2: number; y2: number; z2: number;
 }
 
+interface Cara3D {
+  // 4 vértices en orden (esquina superior-izq, sup-der, inf-der, inf-izq del plano)
+  cx: number; cy: number; cz: number; // centro de la cara
+  rotX: number; rotY: number; rotZ: number; // rotación para orientar la cara
+  w: number; h: number; // ancho y alto de la cara
+  color: string;
+}
+
 interface Rotation {
   x: number;
   y: number;
@@ -55,6 +63,7 @@ interface SistemaCristalino {
   color: string;
   atomos: Atomo3D[];
   aristas: Arista3D[];
+  caras?: Cara3D[];
 }
 
 interface EstructuraMetalica {
@@ -68,6 +77,7 @@ interface EstructuraMetalica {
   color: string;
   atomos: Atomo3D[];
   aristas: Arista3D[];
+  caras?: Cara3D[];
 }
 
 interface CristalFamoso {
@@ -78,6 +88,7 @@ interface CristalFamoso {
   dato: string;
   atomos: Atomo3D[];
   aristas: Arista3D[];
+  caras?: Cara3D[];
 }
 
 // ─────────────────────────────────────────────
@@ -93,7 +104,7 @@ const SECCIONES: SeccionInfo[] = [
 
 // ─── Helpers para generar geometría ───
 
-const S = 60; // escala: 1 unidad = 60px
+const S = 80; // escala: 1 unidad = 80px
 
 function cuboAristas(sx: number, sy: number, sz: number): Arista3D[] {
   const hx = sx / 2, hy = sy / 2, hz = sz / 2;
@@ -116,6 +127,40 @@ function cuboAtomos(sx: number, sy: number, sz: number, color: string, size: num
   ].map(([x, y, z]) => ({ x, y, z, color, size }));
 }
 
+function cuboCaras(sx: number, sy: number, sz: number, color: string): Cara3D[] {
+  const hx = sx / 2, hy = sy / 2, hz = sz / 2;
+  return [
+    // Frente (z = hz)
+    { cx: 0, cy: 0, cz: hz, rotX: 0, rotY: 0, rotZ: 0, w: sx, h: sy, color },
+    // Atrás (z = -hz)
+    { cx: 0, cy: 0, cz: -hz, rotX: 0, rotY: 180, rotZ: 0, w: sx, h: sy, color },
+    // Arriba (y = -hy)
+    { cx: 0, cy: -hy, cz: 0, rotX: 90, rotY: 0, rotZ: 0, w: sx, h: sz, color },
+    // Abajo (y = hy)
+    { cx: 0, cy: hy, cz: 0, rotX: -90, rotY: 0, rotZ: 0, w: sx, h: sz, color },
+    // Izquierda (x = -hx)
+    { cx: -hx, cy: 0, cz: 0, rotX: 0, rotY: -90, rotZ: 0, w: sz, h: sy, color },
+    // Derecha (x = hx)
+    { cx: hx, cy: 0, cz: 0, rotX: 0, rotY: 90, rotZ: 0, w: sz, h: sy, color },
+  ];
+}
+
+function hexCaras(radio: number, altura: number, color: string): Cara3D[] {
+  const caras: Cara3D[] = [];
+  const h = altura / 2;
+  // 6 caras laterales del prisma hexagonal
+  for (let i = 0; i < 6; i++) {
+    const ang = (i * 60 + 30) * Math.PI / 180;
+    const nextAng = ((i + 1) * 60 + 30) * Math.PI / 180;
+    const midX = (Math.cos(ang) + Math.cos(nextAng)) * radio / 2;
+    const midZ = (Math.sin(ang) + Math.sin(nextAng)) * radio / 2;
+    const faceWidth = radio; // aproximación del ancho de la cara
+    const rotY = -(i * 60 + 30);
+    caras.push({ cx: midX, cy: 0, cz: midZ, rotX: 0, rotY, rotZ: 0, w: faceWidth, h: altura, color });
+  }
+  return caras;
+}
+
 // ─── 7 Sistemas cristalinos ───
 
 const SISTEMAS: SistemaCristalino[] = [
@@ -124,22 +169,26 @@ const SISTEMAS: SistemaCristalino[] = [
     ejemplo: 'Sal (NaCl), Diamante', icono: '🧊', color: '#2E86AB',
     atomos: cuboAtomos(S, S, S, '#2E86AB', 18),
     aristas: cuboAristas(S, S, S),
+    caras: cuboCaras(S, S, S, '#2E86AB'),
   },
   {
     nombre: 'Tetragonal', params: 'a = b ≠ c', angulos: 'α = β = γ = 90°',
     ejemplo: 'Circón, Rutilo (TiO₂)', icono: '📦', color: '#48A9A6',
     atomos: cuboAtomos(S, S, S * 1.4, '#48A9A6', 18),
     aristas: cuboAristas(S, S, S * 1.4),
+    caras: cuboCaras(S, S, S * 1.4, '#48A9A6'),
   },
   {
     nombre: 'Ortorrómbico', params: 'a ≠ b ≠ c', angulos: 'α = β = γ = 90°',
     ejemplo: 'Topacio, Olivino', icono: '🧱', color: '#E8A87C',
     atomos: cuboAtomos(S, S * 0.7, S * 1.3, '#E8A87C', 18),
     aristas: cuboAristas(S, S * 0.7, S * 1.3),
+    caras: cuboCaras(S, S * 0.7, S * 1.3, '#E8A87C'),
   },
   {
     nombre: 'Hexagonal', params: 'a = b ≠ c', angulos: 'α = β = 90°, γ = 120°',
     ejemplo: 'Cuarzo, Grafito, Hielo', icono: '⬡', color: '#9B59B6',
+    caras: hexCaras(S * 0.5, S * 0.8 * 2, '#9B59B6'),
     atomos: (() => {
       const atoms: Atomo3D[] = [];
       const h = S * 0.8;
@@ -361,6 +410,7 @@ const ESTRUCTURAS_METALICAS: EstructuraMetalica[] = [
     color: '#2E86AB',
     atomos: bccAtomos(),
     aristas: cuboAristas(S, S, S),
+    caras: cuboCaras(S, S, S, '#2E86AB'),
   },
   {
     nombre: 'Cúbica Centrada en las Caras',
@@ -373,6 +423,7 @@ const ESTRUCTURAS_METALICAS: EstructuraMetalica[] = [
     color: '#F39C12',
     atomos: fccAtomos(),
     aristas: cuboAristas(S, S, S),
+    caras: cuboCaras(S, S, S, '#F39C12'),
   },
   {
     nombre: 'Hexagonal Compacta',
@@ -385,6 +436,7 @@ const ESTRUCTURAS_METALICAS: EstructuraMetalica[] = [
     color: '#48A9A6',
     atomos: hcpAtomos(),
     aristas: hcpAristas(),
+    caras: hexCaras(S * 0.45, S, '#48A9A6'),
   },
 ];
 
@@ -552,6 +604,7 @@ const CRISTALES_FAMOSOS: CristalFamoso[] = [
     dato: 'Punto de fusión: 801 °C. Los cristales de sal siempre se rompen en cubos perfectos (fractura cúbica).',
     atomos: naclAtomos(),
     aristas: naclAristas(),
+    caras: cuboCaras(S * 0.4 * 2, S * 0.4 * 2, S * 0.4 * 2, '#2E86AB'),
   },
   {
     nombre: 'Diamante',
@@ -561,6 +614,7 @@ const CRISTALES_FAMOSOS: CristalFamoso[] = [
     dato: 'Dureza 10 (máxima Mohs). Conductividad térmica 5× mayor que el cobre pero aislante eléctrico.',
     atomos: diamanteAtomos(),
     aristas: diamanteAristas(),
+    caras: cuboCaras(S, S, S, '#555555'),
   },
   {
     nombre: 'Grafito',
@@ -579,6 +633,7 @@ const CRISTALES_FAMOSOS: CristalFamoso[] = [
     dato: 'Efecto piezoeléctrico: vibra a frecuencia exacta con electricidad. Base de todos los relojes de cuarzo y osciladores electrónicos.',
     atomos: cuarzoAtomos(),
     aristas: cuarzoAristas(),
+    caras: hexCaras(S * 0.45, S, '#F39C12'),
   },
 ];
 
@@ -642,6 +697,7 @@ const DATOS_PROPIEDADES: DatoPropiedad[] = [
 interface Escena3DProps {
   atomos: Atomo3D[];
   aristas: Arista3D[];
+  caras?: Cara3D[];
   tamano?: number;
   rotacionInicial?: Rotation;
 }
@@ -660,7 +716,7 @@ function calcularAristaCSS(ar: Arista3D) {
   };
 }
 
-function Escena3D({ atomos, aristas, tamano = 280, rotacionInicial }: Escena3DProps) {
+function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Escena3DProps) {
   const [rotation, setRotation] = useState<Rotation>(rotacionInicial ?? { x: -20, y: 30 });
   const [isDragging, setIsDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
@@ -709,6 +765,20 @@ function Escena3D({ atomos, aristas, tamano = 280, rotacionInicial }: Escena3DPr
           className={styles.estructura3d}
           style={{ transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` }}
         >
+          {/* Caras semitransparentes */}
+          {caras?.map((c, i) => (
+            <div
+              key={`c-${i}`}
+              className={styles.cara}
+              style={{
+                width: c.w,
+                height: c.h,
+                transform: `translate3d(${c.cx - c.w / 2}px, ${c.cy - c.h / 2}px, ${c.cz}px) rotateX(${c.rotX}deg) rotateY(${c.rotY}deg) rotateZ(${c.rotZ}deg)`,
+                borderColor: c.color,
+                background: `${c.color}18`,
+              }}
+            />
+          ))}
           {aristas.map((ar, i) => {
             const aristaStyle = calcularAristaCSS(ar);
             return (
@@ -831,7 +901,8 @@ export default function VisualizadorEstructurasCristalinas() {
             <Escena3D
               atomos={SISTEMAS[sistemaActivo].atomos}
               aristas={SISTEMAS[sistemaActivo].aristas}
-              tamano={260}
+              caras={SISTEMAS[sistemaActivo].caras}
+              tamano={300}
               rotacionInicial={{ x: -20, y: 30 }}
             />
             <p className={styles.instruccionArrastre}>
@@ -874,7 +945,8 @@ export default function VisualizadorEstructurasCristalinas() {
                 <Escena3D
                   atomos={em.atomos}
                   aristas={em.aristas}
-                  tamano={280}
+                  caras={em.caras}
+                  tamano={320}
                   rotacionInicial={{ x: -25, y: 35 }}
                 />
                 <p className={styles.instruccionArrastre}>
@@ -958,7 +1030,8 @@ export default function VisualizadorEstructurasCristalinas() {
                 <Escena3D
                   atomos={cr.atomos}
                   aristas={cr.aristas}
-                  tamano={280}
+                  caras={cr.caras}
+                  tamano={320}
                   rotacionInicial={{ x: -15, y: 25 }}
                 />
                 <p className={styles.instruccionArrastre}>

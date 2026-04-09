@@ -74,6 +74,18 @@
 }
 [data-theme='dark'] .arista { background: rgba(127,179,211,0.35); }
 
+.cara {
+  position: absolute;
+  transform-style: preserve-3d;
+  top: 50%; left: 50%;
+  border: 1px solid;
+  border-radius: 2px;
+  opacity: 0.5;
+  backface-visibility: visible;
+  pointer-events: none;
+}
+[data-theme='dark'] .cara { opacity: 0.35; }
+
 .botonesRotacion { display: flex; gap: 0.3rem; justify-content: center; }
 .btnRotar { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.75rem; color: var(--text-secondary); transition: all 0.2s; }
 .btnRotar:hover { border-color: var(--primary); color: var(--primary); }
