@@ -1251,6 +1251,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'De lo que facturas a lo que queda' },
     { url: '/calculadora-fondo-emergencia/', icon: '🏦', name: 'Fondo de Emergencia', description: 'Versión general del cálculo' },
   ],
+  'planificador-trimestres-freelance': [
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Todas las fechas clave' },
+    { url: '/planificador-cashflow/', icon: '💰', name: 'Cash Flow', description: 'Flujo de caja mensual' },
+    { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'Estructura financiera completa' },
+    { url: '/checklist-preparar-verifactu/', icon: '📋', name: 'Checklist VeriFactu', description: 'Facturación electrónica 2027' },
+  ],
+  'orientador-diversificacion-clientes': [
+    { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Mapa Dependencia', description: 'Análisis detallado de cartera' },
+    { url: '/visualizador-tipos-cliente-freelance/', icon: '🤝', name: 'Tipos de Cliente', description: '6 relaciones comerciales' },
+    { url: '/test-salud-negocio-freelance/', icon: '🩺', name: 'Salud del Negocio', description: 'Evalúa 5 dimensiones' },
+    { url: '/calculadora-precio-por-proyecto/', icon: '🧮', name: 'Precio por Proyecto', description: 'Cuánto cobrar' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

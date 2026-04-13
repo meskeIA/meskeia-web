@@ -599,6 +599,8 @@ export const implementedAppsUrls = [
   "/checklist-preparar-verifactu/",        // Checklist VeriFactu facturación electrónica 2027
   "/planificador-vacaciones-autonomo/",    // Impacto económico vacaciones autónomo
   "/simulador-colchon-emergencia-freelance/", // Meses de supervivencia sin ingresos
+  "/planificador-trimestres-freelance/",    // Planificador 4 trimestres fiscales autónomo
+  "/orientador-diversificacion-clientes/",  // Índice HHI concentración cartera clientes
 ];
 
 /**

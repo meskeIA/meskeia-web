@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 533,
+  "total_tools": 535,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1689,6 +1689,16 @@
           "slug": "simulador-colchon-emergencia-freelance",
           "url": "https://meskeia.com/simulador-colchon-emergencia-freelance/",
           "description": "Cuántos meses sobrevives sin ingresos. Semáforo de riesgo y objetivos de ahorro 3-6 meses"
+        },
+        {
+          "slug": "planificador-trimestres-freelance",
+          "url": "https://meskeia.com/planificador-trimestres-freelance/",
+          "description": "Vista anual de 4 trimestres: ingresos, gastos, modelos fiscales (303, 130, 390) y meses críticos"
+        },
+        {
+          "slug": "orientador-diversificacion-clientes",
+          "url": "https://meskeia.com/orientador-diversificacion-clientes/",
+          "description": "Índice Herfindahl de concentración de cartera, riesgo de falso autónomo (TRADE) y estrategias"
         }
       ]
     },

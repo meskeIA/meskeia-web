@@ -1,0 +1,747 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  --color-green: #22C55E;
+  --color-yellow: #EAB308;
+  --color-red: #EF4444;
+  --color-q1: #2E86AB;
+  --color-q2: #22C55E;
+  --color-q3: #EAB308;
+  --color-q4: #F97316;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #777777;
+  --border: #404040;
+  --hover: #333333;
+  --color-green: #4ADE80;
+  --color-yellow: #FACC15;
+  --color-red: #F87171;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+}
+
+/* Sección de objetivos */
+.objectivesSection {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.objectivesTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.objectivesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.inputField {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.inputField:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnEqualize {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnEqualize:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnEqualize:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Trimestre inputs */
+.trimestresInputs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.trimestreInput {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border);
+}
+
+.trimestreInput:nth-child(1) {
+  border-top-color: var(--color-q1);
+}
+
+.trimestreInput:nth-child(2) {
+  border-top-color: var(--color-q2);
+}
+
+.trimestreInput:nth-child(3) {
+  border-top-color: var(--color-q3);
+}
+
+.trimestreInput:nth-child(4) {
+  border-top-color: var(--color-q4);
+}
+
+.trimestreInputTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.trimestreMeses {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-md);
+}
+
+.trimestreInput .inputGroup {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Vista anual - 12 columnas */
+.annualView {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.annualViewTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.monthsGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--spacing-sm);
+  align-items: end;
+  min-height: 200px;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+.monthColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.monthBar {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+  position: relative;
+}
+
+.monthBarQ1 {
+  background: var(--color-q1);
+}
+
+.monthBarQ2 {
+  background: var(--color-q2);
+}
+
+.monthBarQ3 {
+  background: var(--color-q3);
+}
+
+.monthBarQ4 {
+  background: var(--color-q4);
+}
+
+.monthLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.monthAmount {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.monthIcons {
+  display: flex;
+  gap: 2px;
+  font-size: 0.75rem;
+}
+
+.objectiveLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--color-red);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.objectiveLabel {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 0.65rem;
+  color: var(--color-red);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Leyenda vista anual */
+.annualLegend {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendQ1 {
+  background: var(--color-q1);
+}
+
+.legendQ2 {
+  background: var(--color-q2);
+}
+
+.legendQ3 {
+  background: var(--color-q3);
+}
+
+.legendQ4 {
+  background: var(--color-q4);
+}
+
+/* Tarjetas de trimestre */
+.trimestresCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.trimestreCard {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border);
+}
+
+.trimestreCard:nth-child(1) {
+  border-top-color: var(--color-q1);
+}
+
+.trimestreCard:nth-child(2) {
+  border-top-color: var(--color-q2);
+}
+
+.trimestreCard:nth-child(3) {
+  border-top-color: var(--color-q3);
+}
+
+.trimestreCard:nth-child(4) {
+  border-top-color: var(--color-q4);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cardMeses {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.semaforo {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.progressContainer {
+  margin-bottom: var(--spacing-md);
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.progressGreen {
+  background: var(--color-green);
+}
+
+.progressYellow {
+  background: var(--color-yellow);
+}
+
+.progressRed {
+  background: var(--color-red);
+}
+
+.cardStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.statPositive {
+  color: var(--color-green);
+}
+
+.statNegative {
+  color: var(--color-red);
+}
+
+.cardFiscal {
+  background: var(--bg-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-sm);
+}
+
+.fiscalDate {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.fiscalModelos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fiscalModelos li {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.fiscalModelos li::before {
+  content: '📄 ';
+}
+
+.cardAlert {
+  background: #FEF3C7;
+  color: #92400E;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin-top: var(--spacing-sm);
+}
+
+[data-theme='dark'] .cardAlert {
+  background: #422006;
+  color: #FDE68A;
+}
+
+/* Panel resumen anual */
+.summaryPanel {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.summaryTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.summaryItem {
+  text-align: center;
+}
+
+.summaryItemLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.summaryItemValue {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.summaryProgressContainer {
+  margin-top: var(--spacing-md);
+}
+
+.summaryProgressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.summaryProgressBar {
+  height: 12px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.summaryProgressFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+/* Contenido educativo */
+.guideSection {
+  padding: var(--spacing-lg);
+}
+
+.guideSection h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.3rem;
+}
+
+.guideSection h3 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.1rem;
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-md);
+}
+
+.guideSection ul,
+.guideSection ol {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+}
+
+.modelosTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+}
+
+.modelosTable th,
+.modelosTable td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.modelosTable th {
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.modelosTable td {
+  color: var(--text-secondary);
+}
+
+.faqItem {
+  margin-bottom: var(--spacing-lg);
+}
+
+.faqQuestion {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.faqAnswer {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+}
+
+.tipsList li {
+  padding: var(--spacing-sm) 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tipsList li::before {
+  content: '💡 ';
+}
+
+.warningBox {
+  background: #FEF3C7;
+  border-left: 4px solid var(--color-yellow);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: var(--spacing-lg) 0;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #422006;
+}
+
+.warningBox p {
+  color: #92400E;
+  font-weight: 500;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningBox p {
+  color: #FDE68A;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .trimestresInputs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .monthsGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .objectivesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .trimestresInputs {
+    grid-template-columns: 1fr;
+  }
+
+  .monthsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .trimestresCards {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cardStats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Focus-visible y accesibilidad */
+.container .inputField:focus-visible,
+.container button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Animaciones respetuosas */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
