@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-04-13
-> **Apps totales**: 525 | **Suites**: 13
+> **Apps totales**: 535 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -21,7 +21,7 @@
 | 🏘️ Inmobiliaria y Hogar | 24 | 🟡 Aceptable |
 | 🎲 Juegos y Ocio | 20 | 🟡 Aceptable |
 | ✈️ Viajes y Turismo | 15 | 🟡 Aceptable (era GAP) |
-| 💼 Freelance y Autónomo | 17 | 🔴 GAP |
+| 💼 Freelance y Autónomo | 62+ | ✅ Bien cubierta |
 
 **Valor diferencial meskeIA**: Gratuito · Sin registro · 100% local en el PC · Total confidencialidad
 
