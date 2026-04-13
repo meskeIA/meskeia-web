@@ -594,6 +594,8 @@ export const implementedAppsUrls = [
   "/visualizador-ciclo-vida-freelance/",   // Explicador visual: fases proyecto freelance, tiempo facturable
   "/visualizador-estructura-costes-autonomo/", // Explicador visual: cascada ingresos a neto autónomo
   "/visualizador-tipos-cliente-freelance/", // Explicador visual: 6 tipos relación cliente-freelance
+  "/test-salud-negocio-freelance/",        // Test 5 dimensiones salud negocio freelance + radar chart
+  "/calculadora-precio-por-proyecto/",     // Precio proyecto freelance: horas, complejidad, imprevistos
 ];
 
 /**

@@ -1221,6 +1221,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-intereses-demora/', icon: '📄', name: 'Intereses de Demora', description: 'Cuando el cliente no paga' },
     { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Autónomo vs SL', description: 'Elige tu forma jurídica' },
   ],
+  'test-salud-negocio-freelance': [
+    { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Las 7 fases de un proyecto' },
+    { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'De lo que facturas a lo que queda' },
+    { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Dependencia de Clientes', description: 'Analiza tu cartera' },
+    { url: '/orientador-tarifa-freelance/', icon: '💶', name: 'Tarifa Freelance', description: 'Calcula tu tarifa por hora' },
+  ],
+  'calculadora-precio-por-proyecto': [
+    { url: '/orientador-tarifa-freelance/', icon: '💶', name: 'Tarifa Freelance', description: 'Calcula tu tarifa por hora' },
+    { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Gestiona tus presupuestos' },
+    { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Fases de un proyecto completo' },
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Factura tu proyecto' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

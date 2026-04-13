@@ -1,0 +1,666 @@
+/* Variables CSS - Paleta meskeIA */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  opacity: 0.95;
+}
+
+/* Grid del formulario */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Inputs */
+.inputGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tooltip {
+  cursor: help;
+  font-size: 0.85rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .input {
+  background: #333333;
+  border-color: #555555;
+  color: #E5E5E5;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .select {
+  background: #333333;
+  border-color: #555555;
+  color: #E5E5E5;
+}
+
+.linkHelper {
+  display: inline-block;
+  margin-top: var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.linkHelper:hover {
+  text-decoration: underline;
+}
+
+/* Slider */
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Resultados */
+.resultados {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Panel de rango de precios */
+.rangoPanel {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.rangoTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.rangoCards {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.rangoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  gap: var(--spacing-sm);
+}
+
+.rangoMinimo {
+  background: #FFF5F5;
+  border: 1px solid #FEB2B2;
+}
+
+[data-theme='dark'] .rangoMinimo {
+  background: #3D2020;
+  border-color: #742A2A;
+}
+
+.rangoRecomendado {
+  background: #F0FFF4;
+  border: 2px solid var(--secondary);
+  transform: scale(1.02);
+}
+
+[data-theme='dark'] .rangoRecomendado {
+  background: #1D3A2A;
+  border-color: var(--secondary);
+}
+
+.rangoIdeal {
+  background: #EBF8FF;
+  border: 1px solid var(--accent);
+}
+
+[data-theme='dark'] .rangoIdeal {
+  background: #1A2A3A;
+  border-color: #2E86AB;
+}
+
+.rangoLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rangoPrecio {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rangoPrecioDestacado {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--secondary);
+}
+
+[data-theme='dark'] .rangoPrecioDestacado {
+  color: #5BBFBB;
+}
+
+.rangoDesc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Barra visual del rango */
+.rangoBarContainer {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.rangoBar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.rangoBarMin {
+  flex: 1;
+  background: linear-gradient(90deg, #FC8181, #F6AD55);
+}
+
+.rangoBarRec {
+  flex: 1;
+  background: linear-gradient(90deg, #F6AD55, #48BB78);
+}
+
+.rangoBarIdeal {
+  flex: 1;
+  background: linear-gradient(90deg, #48BB78, var(--primary));
+}
+
+.rangoBarLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Desglose */
+.desglosePanel {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.desgloseTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tabla th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tabla td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.tabla tr:nth-child(even) {
+  background: var(--hover);
+}
+
+.filaSubtotal {
+  background: rgba(46, 134, 171, 0.05) !important;
+}
+
+[data-theme='dark'] .filaSubtotal {
+  background: rgba(46, 134, 171, 0.1) !important;
+}
+
+.filaTotal {
+  background: rgba(72, 169, 166, 0.1) !important;
+  font-size: 1.05rem;
+}
+
+[data-theme='dark'] .filaTotal {
+  background: rgba(72, 169, 166, 0.15) !important;
+}
+
+.filaTotal td {
+  border-bottom: none;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Métricas */
+.metricasPanel {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.metricasTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.metricasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.metricaCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(72, 169, 166, 0.05));
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+[data-theme='dark'] .metricaCard {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1), rgba(72, 169, 166, 0.1));
+}
+
+.metricaValor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+[data-theme='dark'] .metricaValor {
+  color: var(--accent);
+}
+
+.metricaLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Sección educativa */
+.guideSection {
+  padding: var(--spacing-lg);
+}
+
+.guideSection h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.3rem;
+}
+
+.guideSection h3 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.05rem;
+}
+
+.tablaEducativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.tablaEducativa th {
+  text-align: left;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.tablaEducativa th:first-child {
+  border-radius: var(--radius) 0 0 0;
+}
+
+.tablaEducativa th:last-child {
+  border-radius: 0 var(--radius) 0 0;
+}
+
+.tablaEducativa td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.tablaEducativa tr:nth-child(even) {
+  background: var(--hover);
+}
+
+/* Casos de uso */
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+[data-theme='dark'] .casoCard {
+  background: var(--hover);
+}
+
+.casoCard h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.casoCard p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: var(--spacing-sm);
+}
+
+/* FAQ */
+.faqItem {
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem h3 {
+  color: var(--primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+[data-theme='dark'] .faqItem h3 {
+  color: var(--accent);
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Warning box (indicador v2.0) */
+.warningBox {
+  background: #FFFBEB;
+  border: 1px solid #F59E0B;
+  border-left: 4px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #3D3520;
+  border-color: #B45309;
+}
+
+.warningBox ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+}
+
+.warningBox li {
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningBox li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rangoCards {
+    grid-template-columns: 1fr;
+  }
+
+  .rangoRecomendado {
+    transform: none;
+    order: -1;
+  }
+
+  .metricasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .rangoPrecioDestacado {
+    font-size: 1.6rem;
+  }
+
+  .tabla th,
+  .tabla td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Animaciones respetuosas */
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
