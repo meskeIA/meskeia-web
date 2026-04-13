@@ -1233,6 +1233,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Fases de un proyecto completo' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Factura tu proyecto' },
   ],
+  'checklist-preparar-verifactu': [
+    { url: '/generador-facturas/', icon: '🧾', name: 'Generador de Facturas', description: 'Emite facturas conformes' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Fechas clave del autónomo' },
+    { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Alta Autónomo', description: 'Guía para darte de alta' },
+    { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'Tu estructura financiera' },
+  ],
+  'planificador-vacaciones-autonomo': [
+    { url: '/simulador-colchon-emergencia-freelance/', icon: '🛟', name: 'Colchón de Emergencia', description: 'Meses de supervivencia sin ingresos' },
+    { url: '/planificador-cashflow/', icon: '💰', name: 'Cash Flow', description: 'Planifica tu flujo de caja' },
+    { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Fases de un proyecto' },
+    { url: '/test-salud-negocio-freelance/', icon: '🩺', name: 'Salud del Negocio', description: 'Evalúa 5 dimensiones' },
+  ],
+  'simulador-colchon-emergencia-freelance': [
+    { url: '/planificador-vacaciones-autonomo/', icon: '🏖️', name: 'Vacaciones Autónomo', description: 'Impacto económico del descanso' },
+    { url: '/planificador-cashflow/', icon: '💰', name: 'Cash Flow', description: 'Planifica tu flujo de caja' },
+    { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'De lo que facturas a lo que queda' },
+    { url: '/calculadora-fondo-emergencia/', icon: '🏦', name: 'Fondo de Emergencia', description: 'Versión general del cálculo' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 530,
+  "total_tools": 533,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1674,6 +1674,21 @@
           "slug": "calculadora-precio-por-proyecto",
           "url": "https://meskeia.com/calculadora-precio-por-proyecto/",
           "description": "Precio proyecto freelance: horas, complejidad, imprevistos, gastos y rango de negociación"
+        },
+        {
+          "slug": "checklist-preparar-verifactu",
+          "url": "https://meskeia.com/checklist-preparar-verifactu/",
+          "description": "Checklist 14 pasos para preparar tu negocio para VeriFactu (facturación electrónica 2027)"
+        },
+        {
+          "slug": "planificador-vacaciones-autonomo",
+          "url": "https://meskeia.com/planificador-vacaciones-autonomo/",
+          "description": "Impacto económico de tus vacaciones como autónomo: facturación perdida, compensación y mejores épocas"
+        },
+        {
+          "slug": "simulador-colchon-emergencia-freelance",
+          "url": "https://meskeia.com/simulador-colchon-emergencia-freelance/",
+          "description": "Cuántos meses sobrevives sin ingresos. Semáforo de riesgo y objetivos de ahorro 3-6 meses"
         }
       ]
     },

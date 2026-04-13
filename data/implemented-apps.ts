@@ -596,6 +596,9 @@ export const implementedAppsUrls = [
   "/visualizador-tipos-cliente-freelance/", // Explicador visual: 6 tipos relación cliente-freelance
   "/test-salud-negocio-freelance/",        // Test 5 dimensiones salud negocio freelance + radar chart
   "/calculadora-precio-por-proyecto/",     // Precio proyecto freelance: horas, complejidad, imprevistos
+  "/checklist-preparar-verifactu/",        // Checklist VeriFactu facturación electrónica 2027
+  "/planificador-vacaciones-autonomo/",    // Impacto económico vacaciones autónomo
+  "/simulador-colchon-emergencia-freelance/", // Meses de supervivencia sin ingresos
 ];
 
 /**
