@@ -1203,6 +1203,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Ojo y Visión', description: 'Otro sentido complejo' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'Irrigación del oído interno' },
   ],
+  'visualizador-ciclo-vida-freelance': [
+    { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'De lo que facturas a lo que te queda' },
+    { url: '/visualizador-tipos-cliente-freelance/', icon: '🤝', name: 'Tipos de Cliente', description: '6 relaciones comerciales y sus riesgos' },
+    { url: '/orientador-tarifa-freelance/', icon: '💶', name: 'Tarifa Freelance', description: 'Calcula tu tarifa por hora' },
+    { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Dependencia de Clientes', description: 'Analiza tu cartera' },
+  ],
+  'visualizador-estructura-costes-autonomo': [
+    { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'Versión asalariado: bruto a neto' },
+    { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Las 7 fases de un proyecto' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Calcula tu cuota RETA exacta' },
+    { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Gastos Deducibles', description: 'Qué puedes deducir como autónomo' },
+  ],
+  'visualizador-tipos-cliente-freelance': [
+    { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Fases de un proyecto completo' },
+    { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Dependencia de Clientes', description: 'Analiza concentración de ingresos' },
+    { url: '/orientador-intereses-demora/', icon: '📄', name: 'Intereses de Demora', description: 'Cuando el cliente no paga' },
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Autónomo vs SL', description: 'Elige tu forma jurídica' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

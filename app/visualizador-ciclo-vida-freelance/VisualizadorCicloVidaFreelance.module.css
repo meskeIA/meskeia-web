@@ -1,0 +1,131 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60; --amarillo: #f39c12;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.05rem; opacity: 0.92; }
+
+/* ─── Timeline visual ─── */
+.timelineContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
+.timelineTitulo { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.timelineSubtitulo { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+
+.timelineBarra { display: flex; height: 52px; border-radius: 8px; overflow: hidden; margin-bottom: var(--spacing-sm); }
+.timelineSegmento { display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.2s, transform 0.2s; border: none; padding: 0; min-width: 24px; }
+.timelineSegmento:hover { opacity: 0.85; }
+.timelineSegmentoActivo { opacity: 1; transform: scaleY(1.12); z-index: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.timelineSegmentoIcono { font-size: 1.2rem; filter: brightness(0) invert(1); }
+.timelineSegmento:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.timelineLeyenda { display: flex; gap: var(--spacing-lg); justify-content: center; margin-bottom: var(--spacing-sm); }
+.leyendaItem { display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--text-secondary); }
+.leyendaDot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+.timelineEtiquetas { display: flex; }
+.timelineEtiqueta { text-align: center; font-size: 0.68rem; color: var(--text-muted); }
+
+/* ─── Bloques de fases ─── */
+.fasesGrid { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-xl); }
+.faseWrapper { display: flex; flex-direction: column; align-items: center; }
+
+.faseCard { width: 100%; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }
+.faseCard:hover { border-color: var(--primary); }
+.faseCardActiva { border-color: var(--primary); background: rgba(46, 134, 171, 0.04); }
+.faseCard:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.faseCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); flex: 1; }
+.faseNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.faseIcono { font-size: 1.3rem; flex-shrink: 0; }
+.faseNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+.faseDias { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
+
+.faseEtiqueta { font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+
+.faseFlecha { font-size: 1.2rem; color: var(--text-muted); margin: 0.2rem 0; }
+
+/* Detalle expandido */
+.faseDetalle { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); padding: var(--spacing-lg); }
+.faseDesc { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
+
+.faseTareasBox { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-md); }
+.faseTareasTitle { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
+.faseTareasList { margin: 0; padding-left: var(--spacing-lg); }
+.faseTareasList li { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.15rem; }
+
+.faseCuelloBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-sm); }
+[data-theme='dark'] .faseCuelloBox { background: #422006; border-color: #B45309; }
+.faseCuelloHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; font-size: 0.88rem; color: #92400E; }
+[data-theme='dark'] .faseCuelloHeader { color: #FDE68A; }
+.faseCuelloBox p { font-size: 0.85rem; color: #92400E; line-height: 1.5; margin: 0; }
+[data-theme='dark'] .faseCuelloBox p { color: #FDE68A; }
+
+.faseTipBox { background: #ECFDF5; border: 1px solid #10B981; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+[data-theme='dark'] .faseTipBox { background: #064E3B; border-color: #059669; }
+.faseTipHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; font-size: 0.88rem; color: #065F46; }
+[data-theme='dark'] .faseTipHeader { color: #A7F3D0; }
+.faseTipBox p { font-size: 0.85rem; color: #065F46; line-height: 1.5; margin: 0; }
+[data-theme='dark'] .faseTipBox p { color: #A7F3D0; }
+
+/* ─── Resumen numeros ─── */
+.resumenCard { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
+.resumenTitulo { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
+
+.resumenGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.resumenItem { text-align: center; }
+.resumenIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+.resumenLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
+.resumenValor { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+.resumenBarraContainer { margin-bottom: var(--spacing-lg); }
+.resumenBarraLabel { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-sm) 0; }
+.resumenBarra { display: flex; height: 40px; border-radius: 8px; overflow: hidden; }
+.resumenBarraSegmento { display: flex; align-items: center; justify-content: center; }
+.resumenBarraSegmento span { font-size: 0.72rem; color: white; font-weight: 600; white-space: nowrap; }
+
+/* Calculo tarifa real */
+.tarifaCard { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
+.tarifaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-md) 0; }
+.tarifaComparacion { display: flex; align-items: center; justify-content: center; gap: var(--spacing-lg); margin-bottom: var(--spacing-md); }
+.tarifaColumna { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.tarifaLabel { font-size: 0.78rem; color: var(--text-secondary); }
+.tarifaValorNominal { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); }
+.tarifaFlecha { font-size: 1.5rem; color: var(--text-muted); }
+.tarifaValorReal { font-size: 1.5rem; font-weight: 800; color: var(--rojo); }
+.tarifaNota { font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+/* ─── Insight, warning ─── */
+.insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }
+.insight p { margin: 0; }
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.7rem; }
+  .timelineBarra { height: 44px; }
+  .timelineSegmentoIcono { font-size: 1rem; }
+  .timelineLeyenda { gap: var(--spacing-md); flex-wrap: wrap; }
+  .faseCardHeader { flex-wrap: wrap; }
+  .faseCard { flex-direction: column; align-items: flex-start; }
+  .resumenGrid { grid-template-columns: 1fr; gap: var(--spacing-sm); }
+  .resumenBarra { flex-direction: column; height: auto; }
+  .resumenBarraSegmento { height: 32px; width: 100% !important; }
+  .tarifaComparacion { flex-direction: column; gap: var(--spacing-sm); }
+  .tarifaFlecha { transform: rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timelineSegmento, .faseCard, .faseNumero {
+    transition-duration: 0.01ms !important;
+  }
+}

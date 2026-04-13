@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 525,
+  "total_tools": 528,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -1649,6 +1649,21 @@
           "slug": "visualizador-oido-equilibrio",
           "url": "https://meskeia.com/visualizador-oido-equilibrio/",
           "description": "Cóclea, 15.000 células ciliadas, canales semicirculares, pérdida auditiva y tinnitus"
+        },
+        {
+          "slug": "visualizador-ciclo-vida-freelance",
+          "url": "https://meskeia.com/visualizador-ciclo-vida-freelance/",
+          "description": "7 fases de un proyecto freelance: captación, propuesta, negociación, ejecución, entrega, facturación y cobro"
+        },
+        {
+          "slug": "visualizador-estructura-costes-autonomo",
+          "url": "https://meskeia.com/visualizador-estructura-costes-autonomo/",
+          "description": "Cascada waterfall de ingresos brutos a neto real del autónomo: IVA, RETA, IRPF, gastos"
+        },
+        {
+          "slug": "visualizador-tipos-cliente-freelance",
+          "url": "https://meskeia.com/visualizador-tipos-cliente-freelance/",
+          "description": "6 tipos de relación cliente-freelance en España: puntual, recurrente, agencia, subcontratación, marketplace, falso autónomo"
         }
       ]
     },

@@ -1,0 +1,592 @@
+/* VisualizadorTiposClienteFreelance.module.css */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding-bottom: 2rem;
+}
+
+/* ─── Hero ─── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  margin: 0;
+  max-width: 540px;
+  margin-inline: auto;
+}
+
+/* ─── Controles de vista ─── */
+
+.vistaControles {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem 0.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.vistaBtn {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.vistaBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.vistaBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+.vistaBtnActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.vistaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Tarjetas grid ─── */
+
+.tarjetasGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .tarjetasGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 960px) {
+  .tarjetasGrid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ─── Tarjeta individual ─── */
+
+.tarjeta {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  overflow: hidden;
+}
+
+.tarjeta:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.tarjetaExpandida {
+  grid-column: 1 / -1;
+  border-color: var(--primary);
+}
+
+.tarjetaIlegal {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.03);
+}
+
+[data-theme='dark'] .tarjetaIlegal {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.tarjetaHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.tarjetaHeader:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  border-radius: 10px;
+}
+
+.tarjetaIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.tarjetaIlegal .tarjetaIcono {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.tarjetaInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.tarjetaNombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text-primary);
+}
+
+.tarjetaEstabilidad {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.etiquetaEstabilidad {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.estrellas {
+  display: inline-flex;
+  gap: 1px;
+}
+
+.estrellaActiva {
+  color: #f59e0b;
+  font-size: 0.95rem;
+}
+
+.estrellaInactiva {
+  color: #d1d5db;
+  font-size: 0.95rem;
+}
+
+[data-theme='dark'] .estrellaInactiva {
+  color: #4b5563;
+}
+
+.estrellaIlegal {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.flecha {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+
+.flechaAbierta {
+  transform: rotate(180deg);
+}
+
+/* ─── Detalle expandido ─── */
+
+.tarjetaDetalle {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .tarjetaDetalle {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.descripcion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.facturacion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .facturacion {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.bloqueInfo {
+  margin-bottom: 1rem;
+}
+
+.bloqueInfoTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.lista {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.lista li {
+  margin-bottom: 0.25rem;
+}
+
+/* Bloque alerta normal */
+.bloqueAlerta {
+  background: rgba(245, 158, 11, 0.06);
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+}
+
+[data-theme='dark'] .bloqueAlerta {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* Bloque alerta critica (falso autónomo) */
+.bloqueAlertaCritica {
+  background: rgba(220, 38, 38, 0.06);
+  border-left: 3px solid #dc2626;
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+}
+
+[data-theme='dark'] .bloqueAlertaCritica {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.listaAlerta {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.listaAlerta li {
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+/* Consecuencias legales */
+.consecuenciasLegales {
+  background: rgba(220, 38, 38, 0.04);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+[data-theme='dark'] .consecuenciasLegales {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.consecuenciasLegales p {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Ejemplo */
+.ejemplo {
+  background: rgba(46, 134, 171, 0.04);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .ejemplo {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.ejemploTexto {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ─── Espectro de independencia ─── */
+
+.espectroSection {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.seccionTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 0.25rem;
+}
+
+.seccionSubtitulo {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+.espectroBarra {
+  position: relative;
+  padding: 2.5rem 0 1rem;
+}
+
+.espectroGradiente {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, #22c55e, #f59e0b, #dc2626);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 20px;
+}
+
+.espectroEtiquetaIzq,
+.espectroEtiquetaDer {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  position: absolute;
+  top: 20px;
+}
+
+.espectroEtiquetaIzq {
+  left: 0;
+}
+
+.espectroEtiquetaDer {
+  right: 0;
+}
+
+.espectroPuntos {
+  position: relative;
+  height: 60px;
+  margin-top: -6px;
+}
+
+.espectroPunto {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.espectroPunto:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.espectroPuntoDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.espectroPuntoIlegal .espectroPuntoDot {
+  background: #dc2626;
+}
+
+.espectroPuntoLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─── Tabla comparativa ─── */
+
+.comparativaSection {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.9rem;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  vertical-align: middle;
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.celdaTipo {
+  font-weight: 600;
+}
+
+.filaIlegal {
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.filaIlegal:hover {
+  background: rgba(220, 38, 38, 0.08) !important;
+}
+
+[data-theme='dark'] .filaIlegal {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+[data-theme='dark'] .filaIlegal:hover {
+  background: rgba(220, 38, 38, 0.12) !important;
+}
+
+.riesgoMuyAlto {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.riesgoMedio {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.riesgoBajo {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 639px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+  }
+
+  .tarjetaHeader {
+    padding: 0.85rem 1rem;
+  }
+
+  .tarjetaIcono {
+    font-size: 1.6rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .tarjetaNombre {
+    font-size: 0.95rem;
+  }
+
+  .espectroPuntoLabel {
+    font-size: 0.6rem;
+  }
+
+  .tabla {
+    font-size: 0.8rem;
+  }
+
+  .tabla th,
+  .tabla td {
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+/* ─── Accesibilidad: movimiento reducido ─── */
+
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

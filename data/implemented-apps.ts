@@ -591,6 +591,9 @@ export const implementedAppsUrls = [
   "/visualizador-sistema-respiratorio/",   // Explicador visual: pulmones, alvéolos, intercambio O₂/CO₂, espirometría
   "/visualizador-musculos-movimiento/",    // Explicador visual: sarcómero, actina/miosina, articulaciones
   "/visualizador-oido-equilibrio/",        // Explicador visual: cóclea, canales semicirculares, equilibrio
+  "/visualizador-ciclo-vida-freelance/",   // Explicador visual: fases proyecto freelance, tiempo facturable
+  "/visualizador-estructura-costes-autonomo/", // Explicador visual: cascada ingresos a neto autónomo
+  "/visualizador-tipos-cliente-freelance/", // Explicador visual: 6 tipos relación cliente-freelance
 ];
 
 /**
