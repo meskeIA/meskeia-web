@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-04-06
-> **Apps totales**: 472 | **Suites**: 13
+> **Última actualización**: 2026-04-13
+> **Apps totales**: 525 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -44,6 +44,7 @@
     - ✅ `@modelcontextprotocol/sdk` 1.27.1 → 1.28.0 **completado** (2026-03-30).
     - ✅ `@tanstack/react-query` 5.95.0 → 5.95.2 **completado** (2026-03-30).
     - ✅ `eslint` 9.39.3 → 9.39.4 **completado** (2026-03-30). No subir a v10.
+    - ✅ Next.js 16.2.2 → 16.2.3, React 19.2.4 → 19.2.5, `@anthropic-ai/sdk` 0.82.0 → 0.88.0, `@tanstack/react-query` 5.96.2 → 5.99.0, `mathjs` 15.1.1 → 15.2.0, `dotenv` 17.4.1 → 17.4.2, `baseline-browser-mapping` 2.10.15 → 2.10.18, `eslint-config-next` + `@next/bundle-analyzer` + `@next/third-parties` → 16.2.3. Build 782 páginas OK. **completado** (2026-04-13).
     - 🔴 `typescript` 5.9.3 → 6.0.2 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
