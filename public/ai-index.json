@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 544,
+  "total_tools": 547,
   "updated": "2026-04-20",
   "features": {
     "all_free": true,
@@ -145,6 +145,24 @@
           "slug": "checklist-cambio-regimen-autonomo",
           "url": "https://meskeia.com/checklist-cambio-regimen-autonomo/",
           "description": "Checklist interactivo para cambiar de módulos a estimación directa: pasos, plazos (noviembre-diciembre), modelo 036/037 y nuevas obligaciones. Solo orientativo."
+        },
+        {
+          "name": "El Sistema Linfático — El Sistema Olvidado",
+          "slug": "visualizador-sistema-linfatico",
+          "url": "https://meskeia.com/visualizador-sistema-linfatico/",
+          "description": "Visualizador educativo del sistema linfático: sus 3 funciones (drenaje, inmunidad, absorción grasas), 6 órganos linfáticos primarios y secundarios (médula ósea, timo, ganglios, bazo, amígdalas, placas de Peyer), flujo de la linfa y qué ocurre cuando falla (linfedema, linfoma, linfadenitis)."
+        },
+        {
+          "name": "Osteoporosis — El Ciclo de Remodelado Óseo",
+          "slug": "visualizador-osteoporosis",
+          "url": "https://meskeia.com/visualizador-osteoporosis/",
+          "description": "Visualizador educativo del remodelado óseo: las 4 fases (activación, resorción, transición, formación), balance osteoblastos vs osteoclastos en distintas etapas de la vida, curva de densidad ósea femenina y masculina, y factores de riesgo modificables y no modificables."
+        },
+        {
+          "name": "Hipertensión — Qué le Ocurre al Cuerpo con la Presión Alta",
+          "slug": "visualizador-hipertension",
+          "url": "https://meskeia.com/visualizador-hipertension/",
+          "description": "Visualizador educativo de la hipertensión arterial: etapas según clasificación ESC/ESH 2018, mecanismo de daño arterial en 3 fases (tensión mecánica, remodelado, aterosclerosis), 5 órganos diana (corazón, cerebro, riñón, ojos, arterias) y factores modificables y no modificables."
         },
         {
           "name": "El Microbioma — Billones de Aliados en tu Interior",

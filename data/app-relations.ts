@@ -706,6 +706,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-como-funciona-el-dolor/', icon: '⚡', name: 'Cómo Funciona el Dolor', description: 'Nocicepción y tipos de dolor' },
     { url: '/visualizador-vacunas/', icon: '💉', name: 'Cómo Funcionan las Vacunas', description: 'Inmunidad activa y pasiva' },
   ],
+  'visualizador-sistema-linfatico': [
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Defensa del organismo' },
+    { url: '/visualizador-microbioma/', icon: '🦠', name: 'El Microbioma', description: 'Billones de aliados en tu interior' },
+    { url: '/visualizador-inflamacion/', icon: '🔥', name: 'La Inflamación', description: 'Aliada y enemiga del cuerpo' },
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'Componentes de la Sangre', description: 'Plasma, glóbulos y plaquetas' },
+  ],
+  'visualizador-osteoporosis': [
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Hormonas, glándulas, feedback' },
+    { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'Calcio, vitaminas y metabolismo' },
+    { url: '/test-fragilidad/', icon: '🩺', name: 'Test de Fragilidad', description: 'Escala FRAIL validada' },
+  ],
+  'visualizador-hipertension': [
+    { url: '/visualizador-sistemas-circulatorios/', icon: '❤️', name: 'Sistemas Circulatorios', description: 'Cómo circula la sangre' },
+    { url: '/visualizador-inflamacion/', icon: '🔥', name: 'La Inflamación', description: 'Aterosclerosis y daño vascular' },
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+    { url: '/visualizador-osteoporosis/', icon: '🦴', name: 'Osteoporosis', description: 'Remodelado óseo y densidad' },
+  ],
   'visualizador-viaje-impuestos': [
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagas de renta' },
     { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'Cascada bruto a neto' },

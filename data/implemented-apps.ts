@@ -583,6 +583,9 @@ export const implementedAppsUrls = [
   "/visualizador-sistema-nervioso/",       // Explicador visual: neurona, sinapsis, SNC/SNP, neurotransmisores
   "/visualizador-sistemas-equilibrio/",   // Explicador visual: vestibular, visual, propioceptivo, mareo
   "/visualizador-microbioma/",            // Explicador visual: microbiota intestinal, eje intestino-cerebro, factores
+  "/visualizador-sistema-linfatico/",    // Explicador visual: drenaje, inmunidad, órganos linfáticos, flujo linfa
+  "/visualizador-osteoporosis/",         // Explicador visual: remodelado óseo, osteoblastos vs osteoclastos, densidad
+  "/visualizador-hipertension/",         // Explicador visual: etapas PA, daño arterial, órganos diana
   "/visualizador-como-funciona-el-dolor/", // Explicador visual: nocicepción, 4 fases, tipos, sensibilización central
   "/visualizador-inflamacion/",           // Explicador visual: 5 signos, aguda vs crónica, células, factores
   "/visualizador-sistema-endocrino/",      // Explicador visual: glándulas, hormonas, feedback, eje HPA
