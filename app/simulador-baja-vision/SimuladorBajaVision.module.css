@@ -1,0 +1,604 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.svgFiltros {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Main */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+/* Selector de condición */
+.selectorSeccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.condicionesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.condicionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.9rem 0.5rem;
+  background: var(--bg-primary);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.condicionBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.condicionActiva {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.1) !important;
+}
+
+.condicionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.condicionIcono {
+  font-size: 1.5rem;
+}
+
+.condicionNombre {
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Intensidad */
+.intensidadSeccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.intensidadLabel {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.intensidadEtiquetas {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+/* Info condición */
+.infoCondicion {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.infoHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.infoIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.infoHeader h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.infoPrevalencia {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.infoDesc {
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+
+.impactoGrid {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+}
+
+.impactoTitulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.impactoLista {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.impactoLista li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Demo section */
+.demoSeccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.demoSubtitulo {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 1.25rem;
+}
+
+.demoWrapper {
+  position: relative;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Overlays */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.overlayGlaucoma {
+  background: radial-gradient(
+    ellipse 35% 40% at 50% 50%,
+    transparent 0%,
+    transparent 30%,
+    rgba(0, 0, 0, 0.6) 60%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+}
+
+.overlayMacular {
+  background: radial-gradient(
+    ellipse 20% 20% at 50% 50%,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 40%,
+    transparent 70%
+  );
+}
+
+/* Demo UI */
+.demoContenido {
+  background: #ffffff;
+  color: #1a1a1a;
+  position: relative;
+  z-index: 1;
+}
+
+.demoNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #2E86AB;
+  color: white;
+}
+
+.demoLogo {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.demoNavLinks {
+  display: flex;
+  gap: 1rem;
+}
+
+.demoLink {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.demoHero {
+  padding: 1.5rem 1rem;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  text-align: center;
+}
+
+.demoHero h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.demoHero p {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.demoCta {
+  background: white;
+  color: #2E86AB;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: default;
+}
+
+.demoCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.demoCard {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.demoCardIcono {
+  font-size: 1.2rem;
+}
+
+.demoCard strong {
+  font-size: 0.8rem;
+  color: #1a1a1a;
+}
+
+.demoInput {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+  background: white;
+  color: #1a1a1a;
+}
+
+.demoResultado {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0;
+}
+
+.demoBadges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0 1rem 0.75rem;
+}
+
+.badgeVerde {
+  background: #16a34a;
+  color: white;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.badgeRojo {
+  background: #dc2626;
+  color: white;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.badgeAmarillo {
+  background: #ca8a04;
+  color: white;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.badgeAzul {
+  background: #2563eb;
+  color: white;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.demoTextoSmall {
+  font-size: 0.75rem;
+  color: #666;
+  padding: 0 1rem 0.75rem;
+  margin: 0;
+}
+
+/* Warning box */
+.warningBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.3);
+  border-left: 4px solid var(--secondary);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.warningBox h3 {
+  margin: 0 0 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.warningBox ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.warningBox li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Educativo */
+.educativo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.educativo h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0.5rem 0 0.5rem;
+}
+
+.educativo ul, .educativo ol {
+  padding-left: 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.educativo li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tabla th {
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+}
+
+.tabla td {
+  padding: 0.5rem 0.75rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.faq details {
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.faq summary {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  list-style: none;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary::before {
+  content: '+ ';
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.faq details[open] summary::before {
+  content: '− ';
+}
+
+.faq details p {
+  padding: 0.75rem 1rem;
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  line-height: 1.6;
+  border-top: 1px solid var(--border, #e0e0e0);
+}
+
+/* Dark mode */
+[data-theme='dark'] .demoContenido {
+  background: #1e1e1e;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .demoCard {
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .demoCard strong {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .demoInput {
+  background: #333;
+  border-color: #555;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .demoTextoSmall {
+  color: #999;
+}
+
+[data-theme='dark'] .demoLink {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme='dark'] .condicionBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabla th {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .faq summary {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .faq details p {
+  background: var(--bg-primary);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .condicionesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .demoCardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabla th:nth-child(4),
+  .tabla td:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .condicionBtn,
+  .slider {
+    transition: none;
+  }
+}

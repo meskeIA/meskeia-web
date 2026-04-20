@@ -248,6 +248,7 @@ const disenoColoresApps: RelatedApp[] = [
   { url: '/creador-paletas/', icon: '🌈', name: 'Creador Paletas', description: 'Paletas armónicas' },
   { url: '/generador-gradientes/', icon: '🌅', name: 'Generador Gradientes', description: 'CSS gradients' },
   { url: '/contraste-colores/', icon: '👁️', name: 'Contraste Colores', description: 'Accesibilidad WCAG' },
+  { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador Baja Visión', description: 'Cataratas, daltonismo' },
 ];
 
 const disenoExtraApps: RelatedApp[] = [
@@ -1483,6 +1484,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'creador-paletas': disenoColoresApps.filter(a => a.url !== '/creador-paletas/'),
   'generador-gradientes': disenoColoresApps.filter(a => a.url !== '/generador-gradientes/'),
   'contraste-colores': disenoColoresApps.filter(a => a.url !== '/contraste-colores/'),
+  'simulador-baja-vision': disenoColoresApps.filter(a => a.url !== '/simulador-baja-vision/'),
   'generador-sombras': disenoExtraApps.filter(a => a.url !== '/generador-sombras/'),
   'generador-tipografias': disenoExtraApps.filter(a => a.url !== '/generador-tipografias/'),
   'calculadora-aspectos': [...disenoExtraApps.filter(a => a.url !== '/calculadora-aspectos/').slice(0, 2), ...imagenesApps.slice(0, 2)],

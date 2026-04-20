@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 539,
-  "updated": "2026-04-08",
+  "total_tools": 540,
+  "updated": "2026-04-20",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -145,6 +145,12 @@
           "slug": "checklist-cambio-regimen-autonomo",
           "url": "https://meskeia.com/checklist-cambio-regimen-autonomo/",
           "description": "Checklist interactivo para cambiar de módulos a estimación directa: pasos, plazos (noviembre-diciembre), modelo 036/037 y nuevas obligaciones. Solo orientativo."
+        },
+        {
+          "name": "Simulador de Baja Visión",
+          "slug": "simulador-baja-vision",
+          "url": "https://meskeia.com/simulador-baja-vision/",
+          "description": "Simula cómo ven las personas con cataratas, miopía severa, glaucoma, degeneración macular y daltonismo (protanopia, deuteranopia, tritanopia). Para diseñadores y desarrolladores que quieran validar la accesibilidad visual de sus interfaces."
         },
         {
           "name": "Comparador de Transporte para Viajes",
