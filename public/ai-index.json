@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 541,
+  "total_tools": 544,
   "updated": "2026-04-20",
   "features": {
     "all_free": true,
@@ -145,6 +145,24 @@
           "slug": "checklist-cambio-regimen-autonomo",
           "url": "https://meskeia.com/checklist-cambio-regimen-autonomo/",
           "description": "Checklist interactivo para cambiar de módulos a estimación directa: pasos, plazos (noviembre-diciembre), modelo 036/037 y nuevas obligaciones. Solo orientativo."
+        },
+        {
+          "name": "El Microbioma — Billones de Aliados en tu Interior",
+          "slug": "visualizador-microbioma",
+          "url": "https://meskeia.com/visualizador-microbioma/",
+          "description": "Visualizador educativo del ecosistema microbiano del cuerpo: intestino, piel, boca y pulmones. Eje intestino-cerebro (nervio vago, serotonina, ácidos grasos de cadena corta), factores que alteran el microbioma (antibióticos, dieta, estrés, ejercicio) y cómo mantener la diversidad microbiana."
+        },
+        {
+          "name": "Cómo Funciona el Dolor — Nocicepción y Tipos",
+          "slug": "visualizador-como-funciona-el-dolor",
+          "url": "https://meskeia.com/visualizador-como-funciona-el-dolor/",
+          "description": "Fisiología educativa del dolor: las 4 fases de la nocicepción (transducción, transmisión, modulación, percepción), fibras A-delta vs C, teoría de la puerta de Melzack, tipos de dolor agudo/crónico/neuropático y sensibilización central."
+        },
+        {
+          "name": "La Inflamación — Aliada y Enemiga del Cuerpo",
+          "slug": "visualizador-inflamacion",
+          "url": "https://meskeia.com/visualizador-inflamacion/",
+          "description": "Mecanismo celular de la inflamación: los 5 signos clásicos (rubor, calor, tumor, dolor, impotencia funcional), diferencia entre inflamación aguda protectora y crónica dañina, células protagonistas (mastocitos, neutrófilos, macrófagos M1/M2, linfocitos T) y 6 factores amplificadores."
         },
         {
           "name": "Cómo el Cuerpo Mantiene el Equilibrio",

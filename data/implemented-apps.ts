@@ -582,6 +582,9 @@ export const implementedAppsUrls = [
   "/visualizador-numeros-primos/",         // Explicador visual: criba Eratóstenes, Ulam, RSA, criptografía
   "/visualizador-sistema-nervioso/",       // Explicador visual: neurona, sinapsis, SNC/SNP, neurotransmisores
   "/visualizador-sistemas-equilibrio/",   // Explicador visual: vestibular, visual, propioceptivo, mareo
+  "/visualizador-microbioma/",            // Explicador visual: microbiota intestinal, eje intestino-cerebro, factores
+  "/visualizador-como-funciona-el-dolor/", // Explicador visual: nocicepción, 4 fases, tipos, sensibilización central
+  "/visualizador-inflamacion/",           // Explicador visual: 5 signos, aguda vs crónica, células, factores
   "/visualizador-sistema-endocrino/",      // Explicador visual: glándulas, hormonas, feedback, eje HPA
   "/visualizador-digestion-nutrientes/",   // Explicador visual: macronutrientes, digestión bioquímica, vitaminas
   "/visualizador-minerales-gemas/",        // Explicador visual: escala Mohs, gemas preciosas, formación

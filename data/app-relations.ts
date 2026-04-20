@@ -685,8 +685,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-sistemas-equilibrio': [
     { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
     { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Neuronas, sinapsis, neurotransmisores' },
-    { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador Baja Visión', description: 'Condiciones visuales para diseñadores' },
+    { url: '/visualizador-como-funciona-el-dolor/', icon: '⚡', name: 'Cómo Funciona el Dolor', description: 'Nocicepción y tipos de dolor' },
     { url: '/test-fragilidad/', icon: '🩺', name: 'Test de Fragilidad', description: 'Escala FRAIL validada' },
+  ],
+  'visualizador-microbioma': [
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Defensa del organismo' },
+    { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'De la comida a la célula' },
+    { url: '/visualizador-inflamacion/', icon: '🔥', name: 'La Inflamación', description: 'Aliada y enemiga del cuerpo' },
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+  ],
+  'visualizador-como-funciona-el-dolor': [
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Neuronas, sinapsis, neurotransmisores' },
+    { url: '/visualizador-inflamacion/', icon: '🔥', name: 'La Inflamación', description: 'Aliada y enemiga del cuerpo' },
+    { url: '/visualizador-sistemas-equilibrio/', icon: '⚖️', name: 'Sistemas del Equilibrio', description: 'Vestibular, visual, propioceptivo' },
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+  ],
+  'visualizador-inflamacion': [
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Defensa del organismo' },
+    { url: '/visualizador-microbioma/', icon: '🦠', name: 'El Microbioma', description: 'Billones de aliados en tu interior' },
+    { url: '/visualizador-como-funciona-el-dolor/', icon: '⚡', name: 'Cómo Funciona el Dolor', description: 'Nocicepción y tipos de dolor' },
+    { url: '/visualizador-vacunas/', icon: '💉', name: 'Cómo Funcionan las Vacunas', description: 'Inmunidad activa y pasiva' },
   ],
   'visualizador-viaje-impuestos': [
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagas de renta' },
