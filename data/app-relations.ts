@@ -2122,6 +2122,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Tu sueldo neto con IRPF' },
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
   ],
+  'orientador-contrato-mercantil': [
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
+    { url: '/orientador-facturacion-retencion/', icon: '🧾', name: 'Retenciones en Facturas', description: 'Cuándo y cuánto retener' },
+    { url: '/asistente-constitucion-sociedad/', icon: '🏢', name: 'Constitución Sociedad', description: 'Pasos para crear tu SL' },
+    { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad' },
+  ],
+  'orientador-facturacion-retencion': [
+    { url: '/planificador-trimestres-freelance/', icon: '📅', name: 'Planificador Trimestral', description: 'Fechas modelos 303 y 130' },
+    { url: '/checklist-cambio-regimen-autonomo/', icon: '📋', name: 'Cambio de Régimen Fiscal', description: 'De módulos a directa' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
+    { url: '/orientador-gastos-deducibles/', icon: '💰', name: 'Gastos Deducibles', description: 'Qué puedes desgravar' },
+  ],
+  'checklist-cambio-regimen-autonomo': [
+    { url: '/orientador-facturacion-retencion/', icon: '🧾', name: 'Retenciones en Facturas', description: 'Cuándo y cuánto retener' },
+    { url: '/selector-regimen-fiscal-autonomo/', icon: '🔍', name: 'Selector Régimen Fiscal', description: 'Módulos, directa o SL' },
+    { url: '/planificador-trimestres-freelance/', icon: '📅', name: 'Planificador Trimestral', description: 'Modelos 303, 130 y fechas' },
+    { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Obligaciones y plazos anuales' },
+  ],
   'comparador-autonomo-vs-sl': [
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuota RETA por ingresos reales' },
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagarás en la renta' },

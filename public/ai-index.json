@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 536,
+  "total_tools": 539,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -127,6 +127,24 @@
           "slug": "contador-manual",
           "url": "https://meskeia.com/contador-manual/",
           "description": "Contador manual digital con múltiples contadores independientes, colores personalizables, sonido y vibración."
+        },
+        {
+          "name": "Orientador Contratos Mercantiles",
+          "slug": "orientador-contrato-mercantil",
+          "url": "https://meskeia.com/orientador-contrato-mercantil/",
+          "description": "Oriéntate sobre qué tipo de contrato mercantil necesitas: servicios, obra, compraventa, agencia, NDA o colaboración. Cláusulas esenciales y errores frecuentes. Solo orientativo."
+        },
+        {
+          "name": "Orientador Facturación y Retenciones",
+          "slug": "orientador-facturacion-retencion",
+          "url": "https://meskeia.com/orientador-facturacion-retencion/",
+          "description": "Cuándo aplicar IRPF en facturas, qué porcentaje (15%, 7% inicio, 19% arrendamiento), a quién y cómo declararlo en modelo 111 y 190. Solo orientativo."
+        },
+        {
+          "name": "Checklist Cambio de Régimen Fiscal Autónomo",
+          "slug": "checklist-cambio-regimen-autonomo",
+          "url": "https://meskeia.com/checklist-cambio-regimen-autonomo/",
+          "description": "Checklist interactivo para cambiar de módulos a estimación directa: pasos, plazos (noviembre-diciembre), modelo 036/037 y nuevas obligaciones. Solo orientativo."
         },
         {
           "name": "Comparador de Transporte para Viajes",
