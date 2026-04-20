@@ -174,9 +174,8 @@ export default function PlanificadorVacacionesAutonomoPage() {
         {/* Disclaimer */}
         <DisclaimerCard
           variant="financial"
-          severity="medium"
+          severity="high"
           context="planificador-vacaciones-autonomo"
-          collapsible={true}
         />
 
         {/* Formulario principal */}

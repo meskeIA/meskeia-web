@@ -1,6 +1,6 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-04-13
+> **Última actualización**: 2026-04-20
 > **Apps totales**: 535 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
@@ -58,6 +58,8 @@
 - [x] **Disclaimers: 26 apps corregidas** — severity y collapsible ajustados según DISCLAIMER-POLICY.md. 16 apps nivel 1 → critical, 10 apps nivel 2 → high. Re-auditoría: 0 incidencias. *(resuelto: 2026-03-30)*
 
 - [x] **Dark mode (verificado)** — Los 25 CSS modules sin `[data-theme]` son falsos positivos: usan colores de marca o semánticos intencionales (juegos, espejo, hero). Resto de interfaz usa variables CSS de globals.css. Dark mode funciona correctamente en toda la plataforma. *(verificado: 2026-03-01)*
+
+- [ ] **Disclaimers: 4 apps Suite Freelance incorrectos** — Apps creadas 2026-04-13 con `severity="medium"` y `collapsible={true}` pero al pertenecer a `[freelance, productividad]` o `[freelance, finanzas]` corresponde nivel 2: `severity="high"` + `collapsible={false}`. Apps afectadas: `calculadora-precio-por-proyecto`, `orientador-diversificacion-clientes`, `planificador-vacaciones-autonomo`, `simulador-colchon-emergencia-freelance`. *(detectado: 2026-04-20)*
 
 ---
 

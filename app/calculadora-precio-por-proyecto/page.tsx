@@ -138,7 +138,7 @@ export default function CalculadoraPrecioPorProyectoPage() {
         </header>
 
         <LegalNotice />
-        <DisclaimerCard variant="financial" severity="medium" collapsible context="calculadora-precio-por-proyecto" />
+        <DisclaimerCard variant="financial" severity="high" context="calculadora-precio-por-proyecto" />
 
         {/* Formulario */}
         <div className={styles.formGrid}>

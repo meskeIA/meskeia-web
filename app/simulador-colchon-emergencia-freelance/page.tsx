@@ -449,8 +449,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
 
         <DisclaimerCard
           variant="financial"
-          severity="medium"
-          collapsible={true}
+          severity="high"
           context="simulador-colchon-emergencia-freelance"
         />
 

@@ -251,8 +251,7 @@ export default function OrientadorDiversificacionClientesPage() {
 
         <DisclaimerCard
           variant="financial"
-          severity="medium"
-          collapsible={true}
+          severity="high"
           context="orientador-diversificacion-clientes"
         />
 
