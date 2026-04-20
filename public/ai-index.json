@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 535,
+  "total_tools": 536,
   "updated": "2026-04-08",
   "features": {
     "all_free": true,
@@ -127,6 +127,12 @@
           "slug": "contador-manual",
           "url": "https://meskeia.com/contador-manual/",
           "description": "Contador manual digital con múltiples contadores independientes, colores personalizables, sonido y vibración."
+        },
+        {
+          "name": "Comparador de Transporte para Viajes",
+          "slug": "comparador-transporte-viaje",
+          "url": "https://meskeia.com/comparador-transporte-viaje/",
+          "description": "Compara avión, tren, autobús y coche para cualquier trayecto: coste por persona, tiempo total, emisiones CO₂ y equipaje. Con presets de rutas populares españolas."
         },
         {
           "name": "Presupuesto de Viaje",

@@ -39,6 +39,118 @@ interface Recomendacion {
 }
 
 // ─────────────────────────────────────────────
+// Datos: ejemplos de destino por tipo y presupuesto
+// ─────────────────────────────────────────────
+
+interface EjemploDestino {
+  destino: string;
+  descripcion: string;
+  coste: string;
+}
+
+type PresupuestoIdx = 0 | 1 | 2 | 3;
+
+const PRESUPUESTO_LABELS: Record<PresupuestoIdx, string> = {
+  0: 'Hasta 500 €',
+  1: '500 – 1.000 €',
+  2: '1.000 – 2.000 €',
+  3: 'Más de 2.000 €',
+};
+
+const EJEMPLOS_DESTINO: Record<RecomendacionKey, Record<PresupuestoIdx, EjemploDestino[]>> = {
+  playa: {
+    0: [
+      { destino: 'Costa de Almería — Cabo de Gata', descripcion: 'Playas vírgenes del Parque Natural. Camping o apartamento compartido.', coste: '300–450 €/persona · 1 semana' },
+      { destino: 'Ría de Arousa (Galicia)', descripcion: 'Costa gallega tranquila. Alojamiento rural económico cerca del mar.', coste: '350–490 €/persona · 1 semana' },
+    ],
+    1: [
+      { destino: 'Costa Dorada — Salou o Cambrils', descripcion: 'Vuelo + apartamento turístico. Buena relación calidad-precio en julio-agosto.', coste: '650–900 €/persona · 1 semana' },
+      { destino: 'Algarve (Portugal)', descripcion: 'Vuelo low-cost y alojamiento asequible. Playas de acantilado espectaculares.', coste: '700–1.000 €/persona · 1 semana' },
+    ],
+    2: [
+      { destino: 'Mallorca — Puerto de Pollença', descripcion: 'Hotel 4★ frente al mar, vuelo directo y coche de alquiler para explorar.', coste: '1.200–1.700 €/persona · 10 días' },
+      { destino: 'Canarias — Fuerteventura', descripcion: 'Resort o apartamento en Corralejo. Playas interminables y viento para deportes.', coste: '1.100–1.600 €/persona · 10 días' },
+    ],
+    3: [
+      { destino: 'Maldivas — villa sobre el agua', descripcion: 'Resort premium con overwater bungalow. Snorkel, buceo y desconexión total.', coste: '3.500–6.000 €/persona · 10 días' },
+      { destino: 'Caribe — República Dominicana', descripcion: 'Todo incluido en resort premium o villa privada en Punta Cana.', coste: '2.200–3.500 €/persona · 10–14 días' },
+    ],
+  },
+  montana: {
+    0: [
+      { destino: 'Pirineos Aragoneses — Benasque', descripcion: 'Albergue o camping. Senderismo gratuito en el Parque Posets-Maladeta.', coste: '280–430 €/persona · 5–7 días' },
+      { destino: 'Sierra de Gredos (Ávila)', descripcion: 'Casa rural económica. Rutas accesibles a La Mira o Los Galayos.', coste: '250–400 €/persona · fin de semana largo' },
+    ],
+    1: [
+      { destino: 'Dolomitas (Italia) — intro', descripcion: 'Vuelo low-cost + casa rural en Val Gardena. Ferrata y senderismo para todos.', coste: '700–1.000 €/persona · 1 semana' },
+      { destino: 'Picos de Europa + Costa Cantábrica', descripcion: 'Combinación de alta montaña y playa del norte. Hotel rural o Airbnb.', coste: '650–950 €/persona · 8 días' },
+    ],
+    2: [
+      { destino: 'Dolomitas completo — Alta Via', descripcion: 'Hotel de montaña 4★ y rutas de senderismo de alta gama con guía.', coste: '1.300–1.800 €/persona · 10 días' },
+      { destino: 'Noruega — Ruta de los Fiordos', descripcion: 'Vuelo + tren Bergen + barco Flåm. Cabañas con vistas al fiordo.', coste: '1.500–2.000 €/persona · 9 días' },
+    ],
+    3: [
+      { destino: 'Patagonia — Torres del Paine', descripcion: 'Vuelo intercontinental + trekking guiado premium + lodges en el parque.', coste: '3.000–5.000 €/persona · 16–20 días' },
+      { destino: 'Nepal — Everest Base Camp', descripcion: 'Vuelo a Katmandú + trek de 14 días con guía y portador. Lodges en ruta.', coste: '2.500–3.800 €/persona · 18–22 días' },
+    ],
+  },
+  ciudad: {
+    0: [
+      { destino: 'Lisboa o Oporto (Portugal)', descripcion: 'Tren o bus desde España + Airbnb económico. Gastronomía barata y de calidad.', coste: '300–470 €/persona · 4–5 días' },
+      { destino: 'Praga o Cracovia', descripcion: 'Vuelo low-cost + hostel céntrico. Cerveza barata, museos y arquitectura medieval.', coste: '360–500 €/persona · 4–5 días' },
+    ],
+    1: [
+      { destino: 'Roma + Florencia', descripcion: 'Vuelo directo + hotel bien ubicado. Coliseo, Uffizi, Vaticano y gastronomía italiana.', coste: '700–1.000 €/persona · 6 días' },
+      { destino: 'Ámsterdam + Brujas', descripcion: 'Vuelo + hotel 3★ + Eurail de fin de semana. Canales, museos y mercados.', coste: '650–950 €/persona · 5 días' },
+    ],
+    2: [
+      { destino: 'Londres + Edimburgo', descripcion: 'Vuelo + hotel 4★ + museos premium. Excursión opcional a los Highlands escoceses.', coste: '1.400–1.900 €/persona · 8–10 días' },
+      { destino: 'Tokio (Japón) — primera vez', descripcion: 'Vuelo directo + hotel en Shinjuku + JR Pass. Cultura radicalmente diferente.', coste: '1.600–2.100 €/persona · 10 días' },
+    ],
+    3: [
+      { destino: 'Japón completo — Tokio › Kioto › Osaka › Hiroshima', descripcion: 'JR Pass nacional + hoteles ryokan y occidentales + guía privado.', coste: '3.000–4.800 €/persona · 14–16 días' },
+      { destino: 'Nueva York + Washington D.C.', descripcion: 'Vuelo premium economy + hotel boutique en Manhattan. Museos gratuitos en D.C.', coste: '2.600–4.000 €/persona · 10–12 días' },
+    ],
+  },
+  aventura: {
+    0: [
+      { destino: 'Montanejos + Maestrazgo (Castellón)', descripcion: 'Barranquismo accesible, senderismo y piscinas naturales. Coche compartido.', coste: '200–370 €/persona · fin de semana largo' },
+      { destino: 'Marruecos mochilero — Fez y Merzouga', descripcion: 'Ferry Algeciras–Tánger + autobuses locales + riads económicos. Auténtico.', coste: '450–700 €/persona · 10 días' },
+    ],
+    1: [
+      { destino: 'Islandia mochilera en furgoneta', descripcion: 'Vuelo + van compartida + camping. Auroras, géiseres y glaciares.', coste: '850–1.200 €/persona · 10 días' },
+      { destino: 'Costa Rica — volcanes y selva', descripcion: 'Vuelo en oferta + albergues. Arenal, Monteverde y Playa Manuel Antonio.', coste: '900–1.300 €/persona · 14 días' },
+    ],
+    2: [
+      { destino: 'Islandia — Ring Road completa', descripcion: 'Vuelo + autocaravana confortable + la vuelta completa a la isla.', coste: '1.600–2.200 €/persona · 12–14 días' },
+      { destino: 'Sudáfrica — Safari Kruger + Ciudad del Cabo', descripcion: 'Vuelo + safari guiado + hotel boutique en Cape Town y el Cabo de Buena Esperanza.', coste: '1.700–2.300 €/persona · 12 días' },
+    ],
+    3: [
+      { destino: 'Kilimanjaro + Zanzíbar (Tanzania)', descripcion: 'Ascensión guiada de 7 días al Kilimanjaro + descanso en la isla spice.', coste: '3.200–4.800 €/persona · 16 días' },
+      { destino: 'Patagonia mochilera — W Trek en Torres del Paine', descripcion: 'Vuelo a Punta Arenas + trek autogestionado con refugios + glaciar Perito Moreno.', coste: '2.800–4.000 €/persona · 18–22 días' },
+    ],
+  },
+  organizado: {
+    0: [
+      { destino: 'Circuito Andalucía — Sevilla, Córdoba y Granada', descripcion: 'Autocar con guía hispanohablante. Hotel céntrico y desayunos incluidos.', coste: '490–700 €/persona · 5 días' },
+      { destino: 'Escapada a Ámsterdam en vuelo directo', descripcion: 'Paquete vuelo + hotel con desayuno. Canales, Rijksmuseum y mercado de flores.', coste: '400–600 €/persona · 3–4 días' },
+    ],
+    1: [
+      { destino: 'Turquía — Estambul + Capadocia + Riviera', descripcion: 'Circuito completo en grupo con traslados, hoteles 4★ y mayoría de visitas incluidas.', coste: '850–1.100 €/persona · 10 días' },
+      { destino: 'Circuito Países Bajos + Bélgica', descripcion: 'Ámsterdam, Brujas, Gante y Bruselas en autocar con guía. Hoteles 3★ céntricos.', coste: '800–1.100 €/persona · 8 días (vuelo incluido)' },
+    ],
+    2: [
+      { destino: 'Crucero por el Mediterráneo (7 noches)', descripcion: 'Salida desde Barcelona. Roma, Atenas, Santorini, Dubrovnik. Todo incluido a bordo.', coste: '1.300–1.900 €/persona · 7 noches' },
+      { destino: 'Japón Imperial — circuito organizado', descripcion: 'Tokio, Nikko, Kioto, Nara y Osaka con guía en español. Noches en ryokan.', coste: '1.600–2.200 €/persona · 12 días' },
+    ],
+    3: [
+      { destino: 'Crucero por los Fiordos Noruegos + Islandia', descripcion: 'Expedición premium con excursiones privadas, auroras boreales y cabina con balcón.', coste: '3.200–5.500 €/persona · 14 noches' },
+      { destino: 'Vuelta al Mundo en 30 días', descripcion: 'Bangkok, Bali, Sídney, Fiyi y Nueva York. Hoteles 4–5★ y vuelos intercontinentales.', coste: '6.000–10.000 €/persona · 30 días' },
+    ],
+  },
+};
+
+// ─────────────────────────────────────────────
 // Datos: preguntas con pesos
 // ─────────────────────────────────────────────
 
@@ -447,6 +559,31 @@ export default function SelectorVacaciones() {
                 ))}
               </ul>
             </div>
+
+            {/* Sección presupuesto */}
+            {respuestas[1] !== null && (() => {
+              const budgetIdx = respuestas[1] as PresupuestoIdx;
+              const ejemplos = EJEMPLOS_DESTINO[resultadoKey!][budgetIdx];
+              return (
+                <div className={styles.presupuestoSection} aria-label="Destinos sugeridos según tu presupuesto">
+                  <div className={styles.presupuestoHeader}>
+                    <h3>¿Qué puedes hacer con tu presupuesto?</h3>
+                    <span className={styles.presupuestoBadge}>
+                      {PRESUPUESTO_LABELS[budgetIdx]}/persona
+                    </span>
+                  </div>
+                  <div className={styles.presupuestoGrid}>
+                    {ejemplos.map((ej, idx) => (
+                      <div key={idx} className={styles.presupuestoCard}>
+                        <span className={styles.presupuestoDestino}>{ej.destino}</span>
+                        <p className={styles.presupuestoDesc}>{ej.descripcion}</p>
+                        <span className={styles.presupuestoCoste}>📍 {ej.coste}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Consejos grid */}
             <div className={styles.consejosGrid} aria-label="Consejos prácticos">

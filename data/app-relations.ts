@@ -320,6 +320,7 @@ const productividadApps: RelatedApp[] = [
 
 const viajesApps: RelatedApp[] = [
   { url: '/guia-seguro-viaje/', icon: '🛡️', name: 'Seguro de Viaje', description: 'Qué cobertura necesitas' },
+  { url: '/comparador-transporte-viaje/', icon: '🚄', name: 'Comparador Transporte', description: 'Avión, tren, bus o coche' },
   { url: '/planificador-itinerario/', icon: '🗓️', name: 'Planificador Itinerario', description: 'Organiza días y actividades' },
   { url: '/lista-equipaje/', icon: '🧳', name: 'Lista Equipaje', description: 'Checklist de viaje' },
   { url: '/checklist-documentos-viaje/', icon: '📋', name: 'Documentos de Viaje', description: 'Pasaporte, visado y más' },
@@ -1700,6 +1701,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/auditoria-habilidades-mercado/', icon: '🎯', name: 'Habilidades vs Mercado', description: '¿Lo que ofreces es lo que se necesita?' },
   ],
   'cronometro': productividadApps,
+  'comparador-transporte-viaje': viajesApps.filter(a => a.url !== '/comparador-transporte-viaje/').slice(0, 4),
   'guia-seguro-viaje': viajesApps.filter(a => a.url !== '/guia-seguro-viaje/').slice(0, 4),
   'lista-equipaje': viajesApps.filter(a => a.url !== '/lista-equipaje/').slice(0, 4),
   'checklist-documentos-viaje': viajesApps.filter(a => a.url !== '/checklist-documentos-viaje/').slice(0, 4),

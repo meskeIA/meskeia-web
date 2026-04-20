@@ -177,6 +177,7 @@ export const implementedAppsUrls = [
   "/generador-firma-email/",
   "/lista-equipaje/",              // Checklist personalizado de viaje
   "/conversor-divisas/",           // Conversor de divisas con tipos BCE (30+ divisas, actualización diaria)
+  "/comparador-transporte-viaje/", // Comparador avión, tren, autobús y coche: coste, tiempo, CO₂ y equipaje
   "/presupuesto-viaje/",           // Calculadora de presupuesto de viaje con división de gastos en grupo
   "/enchufes-por-pais/",          // Qué enchufe y adaptador necesitas en cada país (60+ países)
   "/comparador-coste-vida/",      // Coste de vida en 55+ ciudades del mundo: alquiler, comida, transporte e internet

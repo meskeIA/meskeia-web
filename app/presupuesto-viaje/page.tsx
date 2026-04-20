@@ -78,6 +78,7 @@ export default function PresupuestoViaje() {
   const [personas, setPersonas] = useState<number>(2);
   const [divisa, setDivisa] = useState<string>('EUR');
   const [categorias, setCategorias] = useState<Categoria[]>(CATEGORIAS_INICIALES);
+  const [presupuestoMaximo, setPresupuestoMaximo] = useState<number>(0);
 
   // Calcular subtotal de una categoría
   const subtotalCategoria = useCallback((cat: Categoria): number => {
@@ -153,12 +154,38 @@ export default function PresupuestoViaje() {
     setCategorias(prev => [...prev, nuevaCat]);
   };
 
+  // Distribuir presupuesto máximo automáticamente
+  const distribuirPresupuesto = useCallback(() => {
+    if (!presupuestoMaximo || presupuestoMaximo <= 0) return;
+    const distribucion: Record<string, number> = {
+      transporte: 0.30,
+      alojamiento: 0.35,
+      comida: 0.20,
+      actividades: 0.10,
+      otros: 0.05,
+    };
+    setCategorias(prev => prev.map(cat => {
+      const porcentaje = distribucion[cat.id] ?? 0;
+      const importeCategoria = presupuestoMaximo * porcentaje;
+      if (porcentaje === 0 || cat.gastos.length === 0) return cat;
+      const importePorGasto = importeCategoria / cat.gastos.length;
+      return {
+        ...cat,
+        gastos: cat.gastos.map(g => ({
+          ...g,
+          importe: Math.round(importePorGasto * 100) / 100,
+        })),
+      };
+    }));
+  }, [presupuestoMaximo]);
+
   // Reset
   const resetear = () => {
     setDestino('');
     setNumeroDias(7);
     setPersonas(2);
     setDivisa('EUR');
+    setPresupuestoMaximo(0);
     setCategorias(CATEGORIAS_INICIALES.map(cat => ({
       ...cat,
       gastos: cat.gastos.map(g => ({ ...g, importe: 0 })),
@@ -243,7 +270,37 @@ export default function PresupuestoViaje() {
                 ))}
               </select>
             </div>
+
+            <div className={styles.grupoCampo}>
+              <label htmlFor="presupuestoMax">Presupuesto máximo (opcional)</label>
+              <input
+                id="presupuestoMax"
+                type="number"
+                className={styles.inputNumero}
+                value={presupuestoMaximo || ''}
+                onChange={e => setPresupuestoMaximo(parseFloat(e.target.value.replace(',', '.')) || 0)}
+                placeholder="Ej: 2000"
+                min="0"
+                step="any"
+                inputMode="decimal"
+                aria-describedby="presupuestoMax-hint"
+              />
+              <span id="presupuestoMax-hint" className={styles.campoHint}>
+                Presupuesto total del viaje para el grupo
+              </span>
+            </div>
           </div>
+
+          {presupuestoMaximo > 0 && (
+            <button
+              type="button"
+              className={styles.btnDistribuir}
+              onClick={distribuirPresupuesto}
+              aria-label="Distribuir presupuesto máximo automáticamente entre categorías"
+            >
+              ✨ Distribuir automáticamente ({formatCurrency(presupuestoMaximo)})
+            </button>
+          )}
         </section>
 
         {/* Panel de resultados */}
@@ -273,6 +330,42 @@ export default function PresupuestoViaje() {
               )}
             </div>
           </div>
+
+          {/* Barra presupuesto máximo */}
+          {presupuestoMaximo > 0 && (
+            <div className={styles.presupuestoMaxSection} aria-live="polite" aria-label="Estado del presupuesto máximo">
+              {(() => {
+                const porcentajeUsado = Math.round((totalGeneral / presupuestoMaximo) * 100);
+                const sobrante = presupuestoMaximo - totalGeneral;
+                const sobrePresupuesto = totalGeneral > presupuestoMaximo;
+                return (
+                  <>
+                    <div className={styles.presupuestoMaxHeader}>
+                      <span className={styles.presupuestoMaxLabel}>
+                        {sobrePresupuesto ? '⚠️ Sobre presupuesto' : '✅ Dentro del presupuesto'}
+                      </span>
+                      <span className={`${styles.presupuestoMaxValor} ${sobrePresupuesto ? styles.sobrePresupuesto : ''}`}>
+                        {formatNumber(totalGeneral, 2)} / {formatNumber(presupuestoMaximo, 2)} {simboloDivisa}
+                      </span>
+                    </div>
+                    <div className={styles.barraPresupuesto} role="progressbar" aria-valuenow={Math.min(porcentajeUsado, 100)} aria-valuemin={0} aria-valuemax={100}>
+                      <div
+                        className={`${styles.barraPresupuestoRelleno} ${sobrePresupuesto ? styles.barraRoja : porcentajeUsado > 80 ? styles.barraAmbar : styles.barraVerde}`}
+                        style={{ width: `${Math.min(porcentajeUsado, 100)}%` }}
+                      />
+                    </div>
+                    <div className={styles.presupuestoMaxInfo}>
+                      <span>{porcentajeUsado}% del presupuesto</span>
+                      {sobrePresupuesto
+                        ? <span className={styles.textoRojo}>Te excedes en {formatNumber(Math.abs(sobrante), 2)} {simboloDivisa}</span>
+                        : <span className={styles.textoVerde}>Te sobran {formatNumber(sobrante, 2)} {simboloDivisa}</span>
+                      }
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
 
           {/* Desglose por categorías */}
           {totalGeneral > 0 && (

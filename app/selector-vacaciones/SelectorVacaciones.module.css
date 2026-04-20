@@ -442,6 +442,83 @@
   color: var(--secondary);
 }
 
+/* ─── Sección presupuesto en resultado ──────────────────────────── */
+.presupuestoSection {
+  margin: 1.5rem 0;
+}
+
+.presupuestoSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.presupuestoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.presupuestoBadge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--primary);
+}
+
+.presupuestoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .presupuestoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.presupuestoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.1rem 1.15rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border-left: 3px solid var(--secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+[data-theme='dark'] .presupuestoCard {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.presupuestoDestino {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.presupuestoDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.presupuestoCoste {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 0.1rem;
+}
+
 /* ─── Dark mode general ──────────────────────────────────────────── */
 [data-theme='dark'] .pregunta {
   background: var(--bg-card);
