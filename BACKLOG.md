@@ -45,7 +45,8 @@
     - ✅ `@tanstack/react-query` 5.95.0 → 5.95.2 **completado** (2026-03-30).
     - ✅ `eslint` 9.39.3 → 9.39.4 **completado** (2026-03-30). No subir a v10.
     - ✅ Next.js 16.2.2 → 16.2.3, React 19.2.4 → 19.2.5, `@anthropic-ai/sdk` 0.82.0 → 0.88.0, `@tanstack/react-query` 5.96.2 → 5.99.0, `mathjs` 15.1.1 → 15.2.0, `dotenv` 17.4.1 → 17.4.2, `baseline-browser-mapping` 2.10.15 → 2.10.18, `eslint-config-next` + `@next/bundle-analyzer` + `@next/third-parties` → 16.2.3. Build 782 páginas OK. **completado** (2026-04-13).
-    - 🔴 `typescript` 5.9.3 → 6.0.2 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
+    - ✅ Next.js 16.2.3 → 16.2.4, `@next/bundle-analyzer` + `@next/third-parties` + `eslint-config-next` → 16.2.4, `@tanstack/react-query` 5.99.0 → 5.99.2, `hls.js` 1.6.15 → 1.6.16, `baseline-browser-mapping` 2.10.18 → 2.10.20, `@axe-core/playwright` 4.11.1 → 4.11.2, `@anthropic-ai/sdk` 0.88.0 → 0.90.0. Build 535 apps OK. **completado** (2026-04-20).
+    - 🔴 `typescript` 5.9.3 → 6.0.3 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
     - 🟡 `dompurify` CVE moderado (XSS, GHSA-v2wj-7wpq-c8vv): afecta `jspdf` y `html2pdf.js`. `npm audit fix` añadiría 61 paquetes nuevos (riesgo breaking change). Requiere sesión dedicada para revisar si jspdf tiene nueva versión compatible. *(detectado: 2026-03-09)*
@@ -59,7 +60,7 @@
 
 - [x] **Dark mode (verificado)** — Los 25 CSS modules sin `[data-theme]` son falsos positivos: usan colores de marca o semánticos intencionales (juegos, espejo, hero). Resto de interfaz usa variables CSS de globals.css. Dark mode funciona correctamente en toda la plataforma. *(verificado: 2026-03-01)*
 
-- [ ] **Disclaimers: 4 apps Suite Freelance incorrectos** — Apps creadas 2026-04-13 con `severity="medium"` y `collapsible={true}` pero al pertenecer a `[freelance, productividad]` o `[freelance, finanzas]` corresponde nivel 2: `severity="high"` + `collapsible={false}`. Apps afectadas: `calculadora-precio-por-proyecto`, `orientador-diversificacion-clientes`, `planificador-vacaciones-autonomo`, `simulador-colchon-emergencia-freelance`. *(detectado: 2026-04-20)*
+- [x] **Disclaimers: 4 apps Suite Freelance corregidos** — severity="medium"→"high", eliminado collapsible={true} en calculadora-precio-por-proyecto, orientador-diversificacion-clientes, planificador-vacaciones-autonomo, simulador-colchon-emergencia-freelance. *(resuelto: 2026-04-20)*
 
 ---
 
