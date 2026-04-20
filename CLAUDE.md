@@ -362,8 +362,8 @@ Todas las API routes restringidas a `meskeia.com` (no `*`).
 ### Protocolo correcto
 
 ```bash
-# UN solo build, con timeout de 10 minutos (600000ms)
-npm run build  # timeout: 600000
+# UN solo build, con timeout de 3 minutos (180000ms)
+npm run build  # timeout: 180000
 
 # Si falla → diagnosticar error → corregir → UN solo rebuild
 # Si el build se queda "colgado" → verificar si .next/lock existe sin proceso node activo
@@ -371,11 +371,11 @@ npm run build  # timeout: 600000
 
 ### Reglas estrictas
 
-1. **Timeout de 10 minutos** (600000ms) para `npm run build`. El proyecto tiene 360+ páginas y en equipos con recursos limitados puede tardar 5-8 minutos. NO asumir que ha fallado antes de ese tiempo.
+1. **Timeout de 3 minutos** (180000ms) para `npm run build`. El proyecto (535 apps, 792 páginas) tarda ~80 segundos en el PC actual (i7-14700/32GB). NO asumir que ha fallado antes de ese tiempo.
 2. **NUNCA lanzar builds en paralelo** — ni siquiera `npx tsc --noEmit` mientras un build está corriendo.
 3. **NUNCA reintentar un build sin verificar primero** que el anterior ha terminado (comprobar si `.next/lock` existe).
 4. **Si hay lock stale** (lock existe pero no hay proceso `next build` activo): eliminar con `rm -f .next/lock` y ENTONCES hacer UN solo build.
-5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 600000ms para poder ver el resultado directamente.
+5. **No usar `run_in_background`** para builds — ejecutar siempre en foreground con timeout de 180000ms para poder ver el resultado directamente.
 
 ---
 
