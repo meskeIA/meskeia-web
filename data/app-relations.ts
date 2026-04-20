@@ -682,6 +682,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos' },
     { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tu estilo de vida' },
   ],
+  'visualizador-sistemas-equilibrio': [
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Tu cuerpo década a década' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Neuronas, sinapsis, neurotransmisores' },
+    { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador Baja Visión', description: 'Condiciones visuales para diseñadores' },
+    { url: '/test-fragilidad/', icon: '🩺', name: 'Test de Fragilidad', description: 'Escala FRAIL validada' },
+  ],
   'visualizador-viaje-impuestos': [
     { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Cuánto pagas de renta' },
     { url: '/visualizador-sueldo-neto/', icon: '💶', name: 'Tu Sueldo al Desnudo', description: 'Cascada bruto a neto' },

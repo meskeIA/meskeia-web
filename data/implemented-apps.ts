@@ -581,6 +581,7 @@ export const implementedAppsUrls = [
   "/visualizador-geometria-fractales/",    // Explicador visual: Sierpinski, Koch, Mandelbrot, naturaleza
   "/visualizador-numeros-primos/",         // Explicador visual: criba Eratóstenes, Ulam, RSA, criptografía
   "/visualizador-sistema-nervioso/",       // Explicador visual: neurona, sinapsis, SNC/SNP, neurotransmisores
+  "/visualizador-sistemas-equilibrio/",   // Explicador visual: vestibular, visual, propioceptivo, mareo
   "/visualizador-sistema-endocrino/",      // Explicador visual: glándulas, hormonas, feedback, eje HPA
   "/visualizador-digestion-nutrientes/",   // Explicador visual: macronutrientes, digestión bioquímica, vitaminas
   "/visualizador-minerales-gemas/",        // Explicador visual: escala Mohs, gemas preciosas, formación

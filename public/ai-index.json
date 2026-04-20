@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 540,
+  "total_tools": 541,
   "updated": "2026-04-20",
   "features": {
     "all_free": true,
@@ -145,6 +145,12 @@
           "slug": "checklist-cambio-regimen-autonomo",
           "url": "https://meskeia.com/checklist-cambio-regimen-autonomo/",
           "description": "Checklist interactivo para cambiar de módulos a estimación directa: pasos, plazos (noviembre-diciembre), modelo 036/037 y nuevas obligaciones. Solo orientativo."
+        },
+        {
+          "name": "Cómo el Cuerpo Mantiene el Equilibrio",
+          "slug": "visualizador-sistemas-equilibrio",
+          "url": "https://meskeia.com/visualizador-sistemas-equilibrio/",
+          "description": "Visualizador educativo interactivo de los tres sistemas del equilibrio: vestibular (oído interno con otolitos y canales semicirculares), visual (flujo óptico y horizonte) y propioceptivo (receptores de músculos, articulaciones y pie). Incluye simulación de 5 perturbaciones: oscuridad, superficie inestable, giro de cabeza, tensión cervical y envejecimiento."
         },
         {
           "name": "Simulador de Baja Visión",
