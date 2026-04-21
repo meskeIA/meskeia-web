@@ -616,6 +616,9 @@ export const implementedAppsUrls = [
   "/visualizador-piel/",                    // Explicador visual: capas piel, funciones, cicatrización, fototipos
   "/visualizador-higado/",                  // Explicador visual: detoxificación, metabolismo, síntesis proteínas, bilis
   "/visualizador-rinon-filtracion/",        // Explicador visual: nefrona, filtración glomerular, reabsorción, SRAA
+  "/visualizador-farmacocinetica/",         // Explicador visual ADME: absorción, distribución, metabolismo, excreción
+  "/visualizador-cicatrizacion/",           // Explicador visual: 4 fases cicatrización, células, tipos herida, factores
+  "/visualizador-ia-redes-neuronales/",     // Explicador visual: perceptrón, capas, backpropagation, tipos de redes
 ];
 
 /**

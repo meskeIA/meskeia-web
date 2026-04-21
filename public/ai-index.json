@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 550,
+  "total_tools": 553,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1789,6 +1789,24 @@
           "slug": "visualizador-rinon-filtracion",
           "url": "https://meskeia.com/visualizador-rinon-filtracion/",
           "description": "Nefrona y 3 procesos: filtración glomerular (180L/día), reabsorción tubular y secreción. Regulación SRAA y ADH"
+        },
+        {
+          "name": "Farmacocinética",
+          "slug": "visualizador-farmacocinetica",
+          "url": "https://meskeia.com/visualizador-farmacocinetica/",
+          "description": "ADME: absorción (biodisponibilidad, primer paso), distribución (Vd), metabolismo (CYP450, vida media) y excreción. Curva concentración-tiempo"
+        },
+        {
+          "name": "La Cicatrización",
+          "slug": "visualizador-cicatrizacion",
+          "url": "https://meskeia.com/visualizador-cicatrizacion/",
+          "description": "4 fases: hemostasia, inflamación (neutrófilos/macrófagos), proliferación (colágeno/angiogénesis) y remodelado. Tipos de herida y factores"
+        },
+        {
+          "name": "Redes Neuronales e IA",
+          "slug": "visualizador-ia-redes-neuronales",
+          "url": "https://meskeia.com/visualizador-ia-redes-neuronales/",
+          "description": "Del perceptrón al transformer: neuronas artificiales, backpropagation, gradient descent, CNN, RNN, GAN. Simulador interactivo"
         }
       ]
     },

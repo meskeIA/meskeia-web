@@ -1,0 +1,1046 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.subtitulo {
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.65;
+}
+
+/* ── Diagrama ADME ── */
+.admeCirculo {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.admeBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 0.5rem;
+  background: var(--bg-primary);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.2s;
+  min-height: 100px;
+  justify-content: center;
+}
+
+.admeBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.admeBtnActivo {
+  border-color: var(--primary) !important;
+  background: rgba(46, 134, 171, 0.1) !important;
+}
+
+.admeBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.admeBtnIcono {
+  font-size: 1.75rem;
+}
+
+.admeBtnLetra {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.admeBtnLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* ── Contenido ADME ── */
+.admeContenido {
+  background: rgba(46, 134, 171, 0.04);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.admeH3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.admeParagraph {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.admeTablaWrapper {
+  overflow-x: auto;
+}
+
+.admeTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.admeTabla th {
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+  white-space: nowrap;
+}
+
+.admeTabla td {
+  padding: 0.5rem 0.75rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border, #e0e0e0);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.admeTabla tr:last-child td {
+  border-bottom: none;
+}
+
+.tdNota {
+  font-size: 0.8rem !important;
+}
+
+/* ── Sección Distribución ── */
+.vdGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.vdCard {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.vdTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.vdFarmaco {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.vdValor {
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.vdTipo {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vdDesc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Sección Metabolismo ── */
+.faseGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.faseCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.faseTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.faseCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.profarmacoBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ── Sección Excreción ── */
+.excrecionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.excrecionCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.excrecionIcono {
+  font-size: 1.5rem;
+}
+
+.excrecionCard h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.excrecionCard p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.clFormula {
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  padding: 0.875rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── Tabs de herramientas ── */
+.navSecciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid var(--border, #e0e0e0);
+  padding-bottom: 0.75rem;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.tabBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tabActivo {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.tabBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabContenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Sliders ── */
+.slidersGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.sliderLabel {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.sliderHints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── SVG Curva C-T ── */
+.svgWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.curvaSvg {
+  width: 100%;
+  max-width: 480px;
+  display: block;
+  margin: 0 auto;
+  background: var(--bg-primary);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+}
+
+.curvaBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.curvaBadge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+/* ── Calculadora vida media ── */
+.calculadoraBox {
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.18);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.calcTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.calcForm {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.calcField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.calcResultado {
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.calcResultadoLabel {
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+.calcResultadoValor {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.calcResultadoSub {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+/* ── CYP450 ── */
+.cypLegenda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cypBadgeInductor,
+.cypBadgeInhibidor {
+  display: block;
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.cypBadgeInductor {
+  background: rgba(255, 193, 7, 0.1);
+  color: #b8860b;
+  border: 1px solid rgba(255, 193, 7, 0.25);
+}
+
+.cypBadgeInhibidor {
+  background: rgba(220, 53, 69, 0.08);
+  color: #9e2a2b;
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.cypGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.cypCard {
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cypCardInductor {
+  background: rgba(255, 193, 7, 0.06);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.cypCardInhibidor {
+  background: rgba(220, 53, 69, 0.05);
+  border: 1px solid rgba(220, 53, 69, 0.15);
+}
+
+.cypCardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.cypIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.cypNombre {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.cypFuente {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.cypTipoBadge {
+  margin-left: auto;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cypTipoInductor {
+  background: rgba(255, 193, 7, 0.15);
+  color: #b8860b;
+}
+
+.cypTipoInhibidor {
+  background: rgba(220, 53, 69, 0.1);
+  color: #9e2a2b;
+}
+
+.cypEfecto {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.pomelloBox {
+  background: rgba(255, 165, 0, 0.07);
+  border: 1px solid rgba(255, 165, 0, 0.2);
+  border-left: 4px solid #f0a500;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ── Warning Box ── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningBox h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.warningBox p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ── Sección educativa ── */
+.educativo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.educativo p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.educativo h3 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .admeBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .admeBtnActivo {
+  background: rgba(46, 134, 171, 0.18) !important;
+}
+
+[data-theme='dark'] .faseCard {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .vdCard {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .excrecionCard {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .curvaSvg {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .admeTabla th {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .cypBadgeInductor {
+  background: rgba(255, 193, 7, 0.12);
+  color: #d4a017;
+}
+
+[data-theme='dark'] .cypBadgeInhibidor {
+  background: rgba(220, 53, 69, 0.12);
+  color: #e57373;
+}
+
+[data-theme='dark'] .cypCardInductor {
+  background: rgba(255, 193, 7, 0.06);
+}
+
+[data-theme='dark'] .cypCardInhibidor {
+  background: rgba(220, 53, 69, 0.07);
+}
+
+[data-theme='dark'] .cypTipoInductor {
+  color: #d4a017;
+}
+
+[data-theme='dark'] .cypTipoInhibidor {
+  color: #e57373;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .admeCirculo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vdGrid,
+  .faseGrid,
+  .excrecionGrid,
+  .cypGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .slidersGrid,
+  .calcForm {
+    grid-template-columns: 1fr;
+  }
+
+  .navSecciones {
+    gap: 0.375rem;
+  }
+
+  .tabBtn {
+    font-size: 0.82rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .admeTabla th:nth-child(4),
+  .admeTabla td:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admeBtn,
+  .tabBtn,
+  .vdCard {
+    transition: none;
+  }
+}
+
+/* ════════════════════════════════════════════
+   PATRÓN v2.0 — EducationalSection
+════════════════════════════════════════════ */
+
+/* ── 1. Tabla comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.25rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.comparativaTable th {
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.6rem 0.875rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid rgba(46, 134, 171, 0.25);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.875rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border, #e0e0e0);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+/* ── 2. Escenarios / perfiles ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem;
+}
+
+.escenarioCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.escenarioCard > span {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.escenarioCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.escenarioCard p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── 3. FAQ ── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.faqItem {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-bottom: 0.45rem;
+  line-height: 1.4;
+}
+
+.faqItem p {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.faqTip {
+  display: inline-block;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-size: 0.73rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* ── 4. Guía paso a paso ── */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stepGuideTitle {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.stepContent strong {
+  color: var(--text-primary);
+}
+
+/* ── 5. Tips / mejores prácticas ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem;
+}
+
+.tipCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── 6. Warning box v2.0 ── */
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+}
+
+.warningIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.warningHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ── Dark mode v2.0 ── */
+[data-theme='dark'] .comparativaTable th {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .faqList {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .step {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: rgba(72, 169, 166, 0.15);
+}
+
+/* ── Responsive v2.0 ── */
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable th:nth-child(4),
+  .comparativaTable td:nth-child(4) {
+    display: none;
+  }
+
+  .stepNumber {
+    width: 1.75rem;
+    height: 1.75rem;
+    min-width: 1.75rem;
+    font-size: 0.8rem;
+  }
+}

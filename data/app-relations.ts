@@ -1307,6 +1307,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/test-salud-negocio-freelance/', icon: '🩺', name: 'Salud del Negocio', description: 'Evalúa 5 dimensiones' },
     { url: '/calculadora-precio-por-proyecto/', icon: '🧮', name: 'Precio por Proyecto', description: 'Cuánto cobrar' },
   ],
+  'visualizador-farmacocinetica': [
+    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Metabolismo hepático y CYP450 en detalle' },
+    { url: '/visualizador-rinon-filtracion/', icon: '🫘', name: 'El Riñón', description: 'Excreción renal de fármacos' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas', description: 'CYP450 y otras enzimas metabólicas' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Hormonas con cinética similar a fármacos' },
+  ],
+  'visualizador-cicatrizacion': [
+    { url: '/visualizador-piel/', icon: '🧬', name: 'La Piel', description: 'Estructura de los tejidos que cicatrizan' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Neutrófilos y macrófagos en la inflamación' },
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'Plaquetas y coagulación en hemostasia' },
+    { url: '/visualizador-inflamacion/', icon: '🔥', name: 'Inflamación', description: 'Mediadores y fases inflamatorias' },
+  ],
+  'visualizador-ia-redes-neuronales': [
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La neurona biológica que inspiró la IA' },
+    { url: '/test-madurez-digital/', icon: '🤖', name: 'Test Madurez Digital', description: 'Nivel de digitalización con IA' },
+    { url: '/selector-portatil/', icon: '💻', name: 'Selector de Portátil', description: 'Hardware para entrenamiento de modelos' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Física cuántica que inspiró los qubits' },
+  ],
   'visualizador-piel': [
     { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Detoxificación de tóxicos externos' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Células de Langerhans en la piel' },

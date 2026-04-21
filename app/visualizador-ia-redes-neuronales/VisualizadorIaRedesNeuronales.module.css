@@ -1,0 +1,1148 @@
+/* VisualizadorIaRedesNeuronales.module.css */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .hero h1 { font-size: 2.25rem; }
+}
+
+/* ─── Nav Secciones ─── */
+.navSecciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.25rem 1rem;
+  justify-content: center;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid rgba(46, 134, 171, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: 2rem;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.navBtnActivo {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* ─── Main ─── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* ─── Sección genérica ─── */
+.seccion {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.seccionTitulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.seccionDesc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Controles slider ─── */
+.controlGrupo {
+  margin-bottom: 1rem;
+}
+
+.controlLabel {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.controlLabel strong {
+  color: var(--primary);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ─── NEURONA layout ─── */
+.neuronaLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .neuronaLayout {
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+.controlesNeurona {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  height: fit-content;
+}
+
+.fnSelector {
+  margin-top: 0.75rem;
+}
+
+.fnGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.fnBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  background-color: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fnBtn:hover {
+  border-color: var(--primary);
+}
+
+.fnBtnActivo {
+  border-color: var(--primary);
+  background-color: rgba(46, 134, 171, 0.1);
+}
+
+.fnNombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fnRango {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.fnUso {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.diagramaNeurona {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.svgNeurona {
+  width: 100%;
+  height: auto;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  padding: 0.5rem;
+  color: var(--text-primary);
+}
+
+.formulaBox {
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.formulaLinea {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  align-items: baseline;
+}
+
+.formulaLabel {
+  color: var(--text-secondary);
+  min-width: 130px;
+}
+
+.formulaValor {
+  color: var(--text-primary);
+}
+
+/* ─── Info box ─── */
+.infoBox {
+  background-color: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+}
+
+.infoBox strong {
+  display: block;
+  color: var(--secondary);
+  margin-bottom: 0.25rem;
+}
+
+.infoBox p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ─── RED layout ─── */
+.redLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .redLayout {
+    grid-template-columns: 1fr 300px;
+  }
+}
+
+.svgRed {
+  width: 100%;
+  height: auto;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  padding: 0.5rem;
+  color: var(--text-primary);
+}
+
+.infoRed {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nodoInfo {
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  font-size: 0.875rem;
+}
+
+.nodoInfoHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border-left: 3px solid;
+  padding-left: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.nodoInfoTipo {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.nodoInfoId {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.statsCapa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.statsCapa strong {
+  color: var(--primary);
+}
+
+.nodoInfoPlaceholder {
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border: 1px dashed rgba(46, 134, 171, 0.2);
+}
+
+.nodoInfoPlaceholder span {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.leyendaRed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.leyendaDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── ENTRENAMIENTO layout ─── */
+.entrenamientoLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .entrenamientoLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.cicloEntrenamiento {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cicloItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid;
+  border-top: 1px solid rgba(46, 134, 171, 0.1);
+  border-right: 1px solid rgba(46, 134, 171, 0.1);
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.cicloNumero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.cicloTitulo {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+
+.cicloDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.simuladorEntrenamiento {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lrInfo {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.statsEntrenamiento {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.statBox {
+  flex: 1;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.6rem;
+  text-align: center;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValor {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: monospace;
+}
+
+.lossBar {
+  width: 100%;
+  height: 10px;
+  background-color: var(--bg-primary);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+.lossBarFill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease, background-color 0.4s;
+}
+
+.lossBarLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.botonesSim {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btnSimular {
+  flex: 1;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnSimular:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnSimular:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnReset {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btnReset:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.conceptosClave {
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+  padding-top: 0.75rem;
+}
+
+.conceptosTitulo {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.conceptoItem {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+  align-items: flex-start;
+}
+
+.conceptoTerm {
+  font-weight: 600;
+  color: var(--primary);
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.conceptoDef {
+  line-height: 1.4;
+}
+
+/* ─── TIPOS layout ─── */
+.tiposGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .tiposGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tiposGrid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.tipoCard {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.tipoCardAbierta {
+  border-color: var(--primary);
+}
+
+.tipoCardHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.tipoCardHeader:hover {
+  background-color: rgba(46, 134, 171, 0.05);
+}
+
+.tipoIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tipoHeaderTexto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tipoNombre {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.tipoCasoUso {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.tipoChevron {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.tipoCardBody {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.1);
+  animation: fadeIn 0.2s ease;
+}
+
+.tipoDescripcion {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+
+.tipoEjemplo {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background-color: rgba(72, 169, 166, 0.07);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.tipoListas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.tipoVentajas, .tipoLimitaciones {
+  font-size: 0.78rem;
+}
+
+.tipoVentajas strong, .tipoLimitaciones strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.tipoVentajas ul, .tipoLimitaciones ul {
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--text-secondary);
+}
+
+.tipoVentajas li, .tipoLimitaciones li {
+  margin-bottom: 0.2rem;
+  line-height: 1.4;
+}
+
+/* ─── Warning box (indicador v2.0) ─── */
+.warningBox {
+  background-color: rgba(46, 134, 171, 0.07);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.warningBox strong {
+  display: block;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.warningBox p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .navSecciones {
+  border-bottom-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .controlesNeurona,
+[data-theme='dark'] .nodoInfo,
+[data-theme='dark'] .simuladorEntrenamiento,
+[data-theme='dark'] .tipoCard {
+  background-color: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .svgNeurona,
+[data-theme='dark'] .svgRed {
+  background-color: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .nodoInfoPlaceholder {
+  border-color: rgba(46, 134, 171, 0.25);
+  background-color: rgba(46, 134, 171, 0.04);
+}
+
+[data-theme='dark'] .formulaBox {
+  background-color: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .cicloItem {
+  background-color: var(--bg-card);
+}
+
+[data-theme='dark'] .statBox {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .lossBar {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .tipoCardHeader:hover {
+  background-color: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .tipoEjemplo {
+  background-color: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .infoBox {
+  background-color: rgba(72, 169, 166, 0.1);
+}
+
+/* ─── Reducción de movimiento ─── */
+@media (prefers-reduced-motion: reduce) {
+  .seccion {
+    animation: none;
+  }
+  .lossBarFill {
+    transition: none;
+  }
+}
+
+/* ─── Focus states ─── */
+.navBtn:focus-visible,
+.fnBtn:focus-visible,
+.btnSimular:focus-visible,
+.btnReset:focus-visible,
+.tipoCardHeader:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════
+   PATRÓN v2.0 — EducationalSection
+   ══════════════════════════════════════════ */
+
+/* ─── 1. Tabla comparativa ─── */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 560px;
+}
+
+.comparativaTable thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.comparativaTable thead th {
+  color: white;
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparativaTable tbody tr {
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  transition: background-color 0.15s;
+}
+
+.comparativaTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background-color: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  color: var(--text-secondary);
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.comparativaTable td strong {
+  color: var(--primary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background-color: rgba(46, 134, 171, 0.07);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr {
+  border-bottom-color: rgba(46, 134, 171, 0.15);
+}
+
+/* ─── 2. Perfiles de uso ─── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.escenarioCard {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.escenarioIcono {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.escenarioTitulo {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.escenarioDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background-color: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+/* ─── 3. FAQ ─── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.faqItem {
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--primary);
+  border-top: 1px solid rgba(46, 134, 171, 0.1);
+  border-right: 1px solid rgba(46, 134, 171, 0.1);
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.faqPregunta {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqRespuesta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.35rem;
+  line-height: 1.5;
+}
+
+.faqTip {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  margin: 0;
+  background-color: rgba(72, 169, 166, 0.08);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+}
+
+[data-theme='dark'] .faqItem {
+  background-color: var(--bg-card);
+  border-top-color: rgba(46, 134, 171, 0.15);
+  border-right-color: rgba(46, 134, 171, 0.15);
+  border-bottom-color: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .faqTip {
+  background-color: rgba(72, 169, 166, 0.12);
+}
+
+/* ─── 4. Guía paso a paso ─── */
+.stepGuide {
+  margin-bottom: 1.75rem;
+}
+
+.stepGuideTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  flex: 1;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.step:last-child .stepContent {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stepTitulo {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.stepDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .stepContent {
+  border-bottom-color: rgba(46, 134, 171, 0.15);
+}
+
+/* ─── 5. Tips / mejores prácticas ─── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tipsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tipCard {
+  background-color: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.tipTitulo {
+  font-size: 0.875rem;
+  color: var(--primary);
+}
+
+.tipDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .tipCard {
+  background-color: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+/* ─── 6. Warning box v2.0 (indicador de completado) ─── */
+.warningBoxEdu {
+  background-color: rgba(224, 123, 57, 0.06);
+  border: 1px solid rgba(224, 123, 57, 0.3);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningHeader strong {
+  font-size: 0.9rem;
+  color: #c0622a;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBoxEdu {
+  background-color: rgba(224, 123, 57, 0.1);
+  border-color: rgba(224, 123, 57, 0.35);
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #e09060;
+}
+
+/* ─── Responsive móvil v2.0 ─── */
+@media (max-width: 768px) {
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable thead th,
+  .comparativaTable td {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
