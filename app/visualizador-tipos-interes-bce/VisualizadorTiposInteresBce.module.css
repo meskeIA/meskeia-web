@@ -1,0 +1,787 @@
+/* VisualizadorTiposInteresBce.module.css — paleta meskeIA */
+
+/* ── Layout ── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3.5rem 1.5rem 3rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.3rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Secciones ── */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sectionNum {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--primary);
+  opacity: 0.25;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Slider Card ── */
+.sliderCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 1rem;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sliderLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sliderLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sliderValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(
+    to right,
+    var(--primary) 0%,
+    var(--primary) calc(var(--val, 80%) ),
+    #ddd calc(var(--val, 80%) ),
+    #ddd 100%
+  );
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Info Grid ── */
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.infoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.infoCardLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+.infoCardValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+
+.infoCardNote {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ── Política Badge ── */
+.politicaBadge {
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.politicaExpansiva {
+  background: rgba(39, 174, 96, 0.08);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.politicaNeutral {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.3);
+}
+
+.politicaRestrictiva {
+  background: rgba(231, 76, 60, 0.07);
+  border: 1px solid rgba(231, 76, 60, 0.25);
+}
+
+.politicaEtiqueta {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.politicaDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.contextoHistorico {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Comparativa ── */
+.comparativaRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.comparativaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.comparativaFlag {
+  font-size: 1.8rem;
+}
+
+.comparativaLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.comparativaValor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Diagrama de flujo ── */
+.flujoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.flujoNodoBce,
+.flujoNodoBancos {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 1rem;
+  padding: 1.25rem 2rem;
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+.flujoNodoBancos {
+  border-color: var(--secondary);
+}
+
+.flujoNodoIcono {
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+.flujoNodoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.flujoNodoSubtitulo {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.flujoFlecha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.6rem 0;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.flujoFlechaLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.canalesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* ── Botones de canal ── */
+.canalBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background: var(--bg-card);
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: left;
+  width: 100%;
+}
+
+.canalBtn:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
+}
+
+.canalBtnActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.canalBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.canalIcono {
+  font-size: 1.6rem;
+}
+
+.canalTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.canalDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.canalChevron {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  align-self: flex-end;
+}
+
+/* ── Detalle del canal ── */
+.canalDetalle {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.canalDetalleTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.canalDetalleTexto {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.ejemploBox {
+  background: rgba(72, 169, 166, 0.07);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.ejemploLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--secondary);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ejemploTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.impactoRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.impactoAlto,
+.impactoBajo {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+}
+
+.impactoAlto {
+  background: rgba(231, 76, 60, 0.06);
+  border: 1px solid rgba(231, 76, 60, 0.18);
+}
+
+.impactoBajo {
+  background: rgba(39, 174, 96, 0.06);
+  border: 1px solid rgba(39, 174, 96, 0.18);
+}
+
+.impactoIcono {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.impactoLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.impactoTexto {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* ── Ganadores / Perdedores ── */
+.gpGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.gpColumna {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.gpColumnaHeader {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gpColumnaHeaderBajo {
+  background: linear-gradient(135deg, #27ae60 0%, #48A9A6 100%);
+}
+
+.gpColumnaHeader h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.gpSubheader {
+  padding: 0.65rem 1.25rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  background: var(--bg-primary);
+}
+
+.gpGanaLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #27ae60;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gpPierdeLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e74c3c;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gpLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gpGana,
+.gpPierde {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.85rem;
+}
+
+.gpGana {
+  border-left: 3px solid rgba(39, 174, 96, 0.3);
+}
+
+.gpPierde {
+  border-left: 3px solid rgba(231, 76, 60, 0.3);
+}
+
+.gpGana span:first-child,
+.gpPierde span:first-child {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.gpGana strong,
+.gpPierde strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.gpGana p,
+.gpPierde p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* ── Ciclos históricos ── */
+.ciclosList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cicloCard {
+  background: var(--bg-card);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.cicloHeader {
+  padding: 0.75rem 1.25rem;
+}
+
+.expansion .cicloHeader {
+  background: linear-gradient(90deg, rgba(39, 174, 96, 0.15) 0%, transparent 100%);
+  border-left: 4px solid #27ae60;
+}
+
+.crisis .cicloHeader {
+  background: linear-gradient(90deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
+  border-left: 4px solid #e74c3c;
+}
+
+.zeroBound .cicloHeader {
+  background: linear-gradient(90deg, rgba(72, 169, 166, 0.12) 0%, transparent 100%);
+  border-left: 4px solid var(--secondary);
+}
+
+.subida .cicloHeader {
+  background: linear-gradient(90deg, rgba(46, 134, 171, 0.12) 0%, transparent 100%);
+  border-left: 4px solid var(--primary);
+}
+
+.cicloPeriodo {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.cicloBody {
+  padding: 1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cicloItem {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.cicloItem p {
+  margin: 0;
+}
+
+.cicloItemLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.cicloGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* ── Warning Box (EducationalSection) ── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.07);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .sliderCard,
+[data-theme='dark'] .infoCard,
+[data-theme='dark'] .comparativaItem,
+[data-theme='dark'] .flujoNodoBce,
+[data-theme='dark'] .flujoNodoBancos,
+[data-theme='dark'] .canalBtn,
+[data-theme='dark'] .canalDetalle,
+[data-theme='dark'] .gpColumna,
+[data-theme='dark'] .cicloCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .canalBtnActivo {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .gpSubheader {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .gpGana {
+  border-left-color: rgba(39, 174, 96, 0.5);
+}
+
+[data-theme='dark'] .gpPierde {
+  border-left-color: rgba(231, 76, 60, 0.4);
+}
+
+[data-theme='dark'] .impactoAlto {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: rgba(231, 76, 60, 0.25);
+}
+
+[data-theme='dark'] .impactoBajo {
+  background: rgba(39, 174, 96, 0.09);
+  border-color: rgba(39, 174, 96, 0.25);
+}
+
+[data-theme='dark'] .ejemploBox {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .politicaExpansiva {
+  background: rgba(39, 174, 96, 0.1);
+}
+
+[data-theme='dark'] .politicaNeutral {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .politicaRestrictiva {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+[data-theme='dark'] .slider {
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) 80%, #444 80%, #444 100%);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .infoGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .canalesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .gpGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .impactoRow {
+    grid-template-columns: 1fr;
+  }
+
+  .cicloGrid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaRow {
+    flex-direction: column;
+  }
+
+  .comparativaItem {
+    min-width: unset;
+  }
+
+  .sliderCard {
+    padding: 1.25rem 1rem;
+  }
+
+  .flujoNodoBce,
+  .flujoNodoBancos {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sectionNum {
+    font-size: 1.4rem;
+  }
+}
+
+/* ── Movimiento reducido ── */
+@media (prefers-reduced-motion: reduce) {
+  .canalBtn {
+    transition: none;
+  }
+}

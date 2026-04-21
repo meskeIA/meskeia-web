@@ -1,0 +1,991 @@
+/* ── Contenedor principal ─────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  color: white;
+}
+
+.heroContent {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.heroTitulo {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.heroSubtitulo {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  opacity: 0.9;
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 1rem;
+  opacity: 0.85;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Main ─────────────────────────────────────────────────────── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ── Sección ──────────────────────────────────────────────────── */
+.seccion {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.seccionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.seccionIcono {
+  font-size: 2.25rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.seccionSubtitulo {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Slider ───────────────────────────────────────────────────── */
+.sliderContainer {
+  margin-bottom: 1.75rem;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.sliderLabel strong {
+  color: var(--primary);
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  appearance: none;
+  background: linear-gradient(
+    to right,
+    var(--primary) 0%,
+    var(--secondary) 50%,
+    #E74C3C 100%
+  );
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.sliderMarks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
+/* ── Resultados grid ──────────────────────────────────────────── */
+.resultadosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.resultadoCard {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(46, 134, 171, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.resultadoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
+}
+
+.resultadoDestacado {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.resultadoIcono {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.resultadoValor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  word-break: break-word;
+}
+
+.resultadoDestacado .resultadoValor {
+  color: var(--primary);
+  font-size: 1.35rem;
+}
+
+.resultadoLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.resultadoDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Ejemplo concreto ─────────────────────────────────────────── */
+.ejemploConcretoBox {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 4px solid var(--secondary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ejemploConcretoTexto {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.ejemploConcretoTexto:last-child {
+  margin-bottom: 0;
+}
+
+.ejemploConcretoNota {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Barra de velocidad ───────────────────────────────────────── */
+.barraVelocidadContainer {
+  margin-bottom: 1.5rem;
+}
+
+.barraVelocidadLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.barraVelocidadTrack {
+  height: 24px;
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+.barraVelocidadFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), #E74C3C);
+  border-radius: 12px;
+  transition: width 0.2s ease;
+}
+
+.barraVelocidadEscala {
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  transition: width 0.2s ease;
+  background: transparent;
+}
+
+.barraVelocidadEscalaInner {
+  width: 100%;
+  height: 100%;
+  background: rgba(46, 134, 171, 0.3);
+  border-radius: 9px;
+  border: 1px solid rgba(46, 134, 171, 0.4);
+}
+
+/* ── Warning box / notas explicativas ────────────────────────── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningBox strong {
+  color: var(--primary);
+}
+
+/* ── Referencia de velocidades ────────────────────────────────── */
+.referenciaVelocidades {
+  margin-top: 1.5rem;
+}
+
+.referenciaTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.referenciaGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.referenciaBtn {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 0.6rem 0.5rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.referenciaBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+  transform: translateY(-1px);
+}
+
+.referenciaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.referenciaBtnVel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.referenciaBtnGamma {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.referenciaBtnTiempo {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ── Nave (contracción de longitud) ──────────────────────────── */
+.naveContainer {
+  margin-bottom: 1.75rem;
+}
+
+.naveWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.naveLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.naveReposo {
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.naveCuerpo {
+  height: 36px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 8px;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.naveCuerpo::after {
+  content: '🚀';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+
+.naveMovimiento {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.naveMovimiento .naveCuerpo {
+  background: linear-gradient(90deg, #E74C3C 0%, #E67E22 100%);
+  opacity: 0.9;
+}
+
+/* ── Energía (E=mc²) ──────────────────────────────────────────── */
+.masaBotonesContainer {
+  margin-bottom: 1.75rem;
+}
+
+.masaBotonesLabel {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.masaBotones {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.masaBtn {
+  flex: 1;
+  min-width: 120px;
+  background: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.masaBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.masaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.masaBtnActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.masaBtnLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.masaBtnActivo .masaBtnLabel {
+  color: var(--primary);
+}
+
+.masaBtnDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.energiaResultado {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-bottom: 1.5rem;
+  background: rgba(46, 134, 171, 0.04);
+  border-radius: 14px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.energiaFormula {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.energiaFormulaE {
+  color: var(--primary);
+}
+
+.energiaFormulaIgual {
+  color: var(--text-secondary);
+}
+
+.energiaFormulaM {
+  color: var(--secondary);
+}
+
+.energiaFormulaC {
+  color: #E74C3C;
+}
+
+.energiaValor {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+  word-break: break-word;
+}
+
+.energiaSubvalor {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.equivalenciasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.equivalenciaCard {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.equivalenciaIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.equivalenciaValor {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+}
+
+.equivalenciaLabel {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.comparativaEnergias {
+  margin-bottom: 1.5rem;
+}
+
+.comparativaTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.comparativaLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comparativaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  border: 1px solid rgba(46, 134, 171, 0.08);
+}
+
+.comparativaIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.comparativaInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.comparativaTipo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comparativaDesc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.comparativaEnergia {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Paradoja de los gemelos ──────────────────────────────────── */
+.pasosIndicador {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.pasoIndicadorBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pasoIndicadorBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pasoIndicadorBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.pasoIndicadorActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.pasoIndicadorCompletado {
+  background: rgba(72, 169, 166, 0.15);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.pasoContenido {
+  margin-bottom: 1.5rem;
+}
+
+.pasoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.pasoIcono {
+  font-size: 1.75rem;
+}
+
+.pasoTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.pasoDescripcion {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+}
+
+.edadesGrid {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.edadCard {
+  flex: 1;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.edadDestacada {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.edadVs {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.edadIcono {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.edadNombre {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.edadValor {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.edadDestacada .edadValor {
+  color: var(--primary);
+}
+
+.diferenciaBox {
+  background: rgba(231, 76, 60, 0.08);
+  border-left: 4px solid #E74C3C;
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.pasoDetalle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(46, 134, 171, 0.08);
+}
+
+.pasoNavegacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pasoNavBtn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  background: var(--bg-primary);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pasoNavBtn:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.pasoNavBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.pasoNavBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pasoCounter {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ── Sección educacional ──────────────────────────────────────── */
+.educacional {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.educacional h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.25rem 0 0.5rem;
+}
+
+.educacional h3:first-child {
+  margin-top: 0;
+}
+
+.educacional p {
+  margin: 0 0 0.75rem;
+}
+
+.educacional ol,
+.educacional ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.educacional li {
+  margin-bottom: 0.4rem;
+}
+
+/* ── Dark mode ────────────────────────────────────────────────── */
+[data-theme='dark'] .seccion {
+  border-color: rgba(72, 169, 166, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .resultadoCard,
+[data-theme='dark'] .referenciaBtn,
+[data-theme='dark'] .masaBtn,
+[data-theme='dark'] .comparativaItem,
+[data-theme='dark'] .edadCard,
+[data-theme='dark'] .equivalenciaCard,
+[data-theme='dark'] .pasoDetalle {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .masaBtnActivo {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .energiaResultado {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .ejemploConcretoBox {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .barraVelocidadTrack {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .pasoIndicadorBtn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .pasoNavBtn {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .diferenciaBox {
+  background: rgba(231, 76, 60, 0.12);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    padding: 3rem 1rem 2.5rem;
+  }
+
+  .main {
+    padding: 1.5rem 1rem 2rem;
+    gap: 1.75rem;
+  }
+
+  .seccion {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .resultadosGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .referenciaGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .equivalenciasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .masaBotones {
+    flex-direction: column;
+  }
+
+  .masaBtn {
+    min-width: unset;
+  }
+
+  .edadesGrid {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .edadVs {
+    display: none;
+  }
+
+  .comparativaItem {
+    flex-wrap: wrap;
+  }
+
+  .comparativaEnergia {
+    width: 100%;
+    text-align: left;
+    margin-left: calc(1.5rem + 0.75rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitulo {
+    font-size: 1.75rem;
+  }
+
+  .referenciaGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pasosIndicador {
+    gap: 0.35rem;
+  }
+
+  .pasoIndicadorBtn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .energiaFormula {
+    font-size: 2rem;
+  }
+
+  .energiaValor {
+    font-size: 1.4rem;
+  }
+}
+
+/* ── Animaciones reducidas ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .resultadoCard,
+  .referenciaBtn,
+  .masaBtn,
+  .pasoNavBtn,
+  .slider::-webkit-slider-thumb {
+    transition: none;
+  }
+
+  .naveCuerpo {
+    transition: none;
+  }
+
+  .barraVelocidadFill {
+    transition: none;
+  }
+}

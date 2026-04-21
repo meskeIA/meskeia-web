@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 561,
+  "total_tools": 564,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1855,6 +1855,24 @@
           "slug": "visualizador-criptografia",
           "url": "https://meskeia.com/visualizador-criptografia/",
           "description": "AES simétrico, RSA asimétrico, curvas elípticas ECDSA, efecto avalancha SHA-256 en tiempo real, firma digital PKI y handshake TLS animado"
+        },
+        {
+          "name": "Tipos de Interés BCE",
+          "slug": "visualizador-tipos-interes-bce",
+          "url": "https://meskeia.com/visualizador-tipos-interes-bce/",
+          "description": "Ciclo de tipos BCE, cadena de transmisión monetaria: hipotecas variables (Euríbor), crédito empresarial, bolsa y ahorro. Slider interactivo y ciclos históricos"
+        },
+        {
+          "name": "Relatividad Especial",
+          "slug": "visualizador-relatividad-especial",
+          "url": "https://meskeia.com/visualizador-relatividad-especial/",
+          "description": "Dilatación del tiempo (factor γ), contracción de longitud, E=mc² y paradoja de los gemelos con sliders interactivos de velocidad hasta 99.9%c"
+        },
+        {
+          "name": "Mecánica Cuántica",
+          "slug": "visualizador-mecanica-cuantica",
+          "url": "https://meskeia.com/visualizador-mecanica-cuantica/",
+          "description": "Dualidad onda-partícula, principio de incertidumbre de Heisenberg, gato de Schrödinger y efecto túnel. Animaciones interactivas sin ecuaciones complejas"
         }
       ]
     },

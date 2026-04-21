@@ -627,6 +627,9 @@ export const implementedAppsUrls = [
   "/visualizador-cerebro-emociones/",       // Explicador visual: amígdala, neurotransmisores, circuitos, regulación
   "/visualizador-blockchain/",              // Explicador visual: cadena bloques, PoW vs PoS, contratos inteligentes
   "/visualizador-criptografia/",            // Explicador visual: AES/RSA/ECDSA, SHA-256, firma digital, TLS
+  "/visualizador-tipos-interes-bce/",       // Explicador visual: ciclo tipos BCE, cadena transmisión, hipotecas, bolsa
+  "/visualizador-relatividad-especial/",    // Explicador visual: dilatación tiempo, contracción longitud, E=mc², gemelos
+  "/visualizador-mecanica-cuantica/",       // Explicador visual: dualidad, incertidumbre, Schrödinger, efecto túnel
 ];
 
 /**

@@ -1391,6 +1391,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-internet-funcionamiento/', icon: '🌐', name: 'Cómo Funciona Internet', description: 'TLS y HTTPS en acción' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Mecánica cuántica y criptografía cuántica' },
   ],
+  'visualizador-tipos-interes-bce': [
+    { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo reaccionan bonos y bolsa a los tipos' },
+    { url: '/visualizador-deuda-publica/', icon: '🏛️', name: 'Deuda Pública', description: 'Bonos soberanos y prima de riesgo' },
+    { url: '/comparador-hipotecas/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Impacto real del Euríbor en tu cuota' },
+    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Renta fija más atractiva con tipos altos' },
+  ],
+  'visualizador-relatividad-especial': [
+    { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'La otra gran revolución de la física del siglo XX' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'El átomo que la relatividad explica' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'E=mc² aplicado a fisión y fusión' },
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'Física clásica que la relatividad amplía' },
+  ],
+  'visualizador-mecanica-cuantica': [
+    { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'La otra revolución de Einstein' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Mecánica cuántica aplicada al átomo' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Criptografía cuántica y algoritmos post-cuánticos' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Efecto túnel en la fusión solar' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
