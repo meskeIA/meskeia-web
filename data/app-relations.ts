@@ -1307,6 +1307,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/test-salud-negocio-freelance/', icon: '🩺', name: 'Salud del Negocio', description: 'Evalúa 5 dimensiones' },
     { url: '/calculadora-precio-por-proyecto/', icon: '🧮', name: 'Precio por Proyecto', description: 'Cuánto cobrar' },
   ],
+  'visualizador-energia-nuclear': [
+    { url: '/visualizador-produccion-energia/', icon: '⚡', name: 'Producción de Energía', description: 'Mix energético español y mundial' },
+    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'CO₂ y calentamiento global' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Protones, neutrones y fisión' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Tipping Points', description: 'Nuclear vs renovables en la transición' },
+  ],
+  'visualizador-mercados-financieros': [
+    { url: '/visualizador-deuda-publica/', icon: '🏛️', name: 'Deuda Pública', description: 'Bonos soberanos y prima de riesgo' },
+    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto crece tu dinero' },
+    { url: '/comparador-hipotecas/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
+    { url: '/calculadora-rentabilidad-inversion/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
+  ],
+  'visualizador-cambio-climatico-tipping-points': [
+    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Gases y calentamiento' },
+    { url: '/visualizador-energia-nuclear/', icon: '⚛️', name: 'Energía Nuclear', description: 'Nuclear en la transición energética' },
+    { url: '/calculadora-huella-carbono/', icon: '🌱', name: 'Huella de Carbono', description: 'Tu impacto personal' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'Ciclo del Agua', description: 'Cómo cambia el ciclo hidrológico' },
+  ],
+  'visualizador-deuda-publica': [
+    { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo se negocian los bonos' },
+    { url: '/calculadora-rentabilidad-inversion/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
+    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto rinde tu capital' },
+    { url: '/comparador-depositos/', icon: '🏦', name: 'Comparador de Depósitos', description: 'Alternativa a los bonos' },
+  ],
   'visualizador-farmacocinetica': [
     { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Metabolismo hepático y CYP450 en detalle' },
     { url: '/visualizador-rinon-filtracion/', icon: '🫘', name: 'El Riñón', description: 'Excreción renal de fármacos' },

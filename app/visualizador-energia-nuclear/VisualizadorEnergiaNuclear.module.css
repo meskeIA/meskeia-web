@@ -1,0 +1,1414 @@
+/* ================================================
+   Visualizador de Energía Nuclear - meskeIA
+   Paleta: #2E86AB (primary) #48A9A6 (secondary)
+   ================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ---- Navegación de secciones ---- */
+.navSecciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid rgba(46, 134, 171, 0.15);
+  justify-content: center;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.navBtnActivo {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.navBtnActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ---- Contenido principal ---- */
+.contenido {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.seccion {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tituloSeccion {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.introSeccion {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  max-width: 700px;
+}
+
+/* ---- Diagrama fisión ---- */
+.diagramaFision {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.reaccionFision {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nucleoUranio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(46, 134, 171, 0.12);
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.nucleoLabel {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.neutronEntrante {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.flechaFision {
+  font-size: 2rem;
+}
+
+.productosDiv {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.fragmento {
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.neutronesSalientes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.energia {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ---- Cadena de reacción ---- */
+.cadenaContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cadenaContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.cadenaVisual {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.generacion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.genLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.atomoMini {
+  font-size: 1.4rem;
+}
+
+.cadenaTexto {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ---- Control factor k ---- */
+.controlK {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.controlK h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.estadoK {
+  display: inline-block;
+  border: 2px solid;
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.sliderLabel {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 6px;
+}
+
+.sliderEtiquetas {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ---- Grid datos ---- */
+.gridDatos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.datoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.datoValor {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.datoTitulo {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.datoDesc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ---- Escala INES ---- */
+.inesContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.inesContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.inesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inesItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  border-left: 4px solid;
+  border-radius: 4px;
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.inesNivel {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.inesEjemplo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---- Diagrama fusión ---- */
+.diagramaFusion {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.diagramaFusion h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.reaccionFusion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nucleoFusion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.nucleoSubLabel {
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.masSymbol {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.energiaFusion {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-left: 0.5rem;
+}
+
+/* ---- Tabla fusión ---- */
+.comparativaFusion {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.comparativaFusion h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.tablaFusion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tablaHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr 1.5fr;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tablaFila {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr 1.5fr;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid;
+  background: rgba(46, 134, 171, 0.04);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  align-items: center;
+}
+
+.reaccionLabel {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+/* ---- Tokamak ---- */
+.tokamakContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tokamakContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.tokamakDiagrama {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.tokamakAnillo {
+  position: relative;
+  width: 200px;
+  height: 140px;
+  border: 8px solid var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokamakPlasma {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.tokamakTemp {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #E85D4A;
+}
+
+.tokamakLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.tokamakCampo {
+  position: absolute;
+  bottom: -1.8rem;
+  font-size: 0.7rem;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.tokamakDesc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ---- ITER ---- */
+.iterContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.iterContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.iterInfo {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.iterDato {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  min-width: 120px;
+}
+
+.iterNum {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.iterDato span:last-child {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+.lineaTemporal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-left: 3px solid var(--primary);
+  padding-left: 1.25rem;
+}
+
+.eventoTemporal {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.eventoAño {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 45px;
+  font-size: 0.9rem;
+}
+
+.eventoDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.pasado .eventoDesc {
+  color: var(--text-primary);
+}
+
+.actual .eventoDesc {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.futuro .eventoDesc {
+  color: var(--text-muted);
+}
+
+/* ---- Selector reactores ---- */
+.selectorReactores {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.reactorBtn {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.reactorBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.reactorBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ---- Info reactor ---- */
+.reactorInfo {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.reactorInfo h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.reactorDescripcion {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* ---- Diagrama reactor ---- */
+.diagramaReactor {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.drNucleo,
+.drGenerador,
+.drTorre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.6rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drFlechas {
+  font-size: 0.8rem;
+  color: var(--primary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.drSubLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.reactorCaracteristicas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.caracteristicaFila {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  padding-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.caracLabel {
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.caracValor {
+  color: var(--text-primary);
+}
+
+/* ---- España ---- */
+.espanaContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.espanaContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.espanaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.centralCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-top: 3px solid;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.04);
+  font-size: 0.85rem;
+}
+
+.centralTipo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.centralUbicacion {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.centralEstado {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ---- Toggle métrica ---- */
+.toggleMetrica {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.toggleActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ---- Gráfico de barras ---- */
+.graficoBarras {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.barraFila {
+  display: grid;
+  grid-template-columns: 130px 1fr 90px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.barraLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.barraContenedor {
+  height: 24px;
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barraRelleno {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.barraValor {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* ---- Densidad energética ---- */
+.densidadContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.densidadContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.densidadGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.densidadCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.75rem;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.densidadIcono {
+  font-size: 1.6rem;
+}
+
+.densidadFuente {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.densidadValor {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ---- Residuos ---- */
+.residuosContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.residuosContainer h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.residuosGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.residuoCard {
+  padding: 1rem;
+  border-left: 4px solid;
+  border-radius: 4px;
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.residuoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.residuoTipo {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.residuoPorcentaje {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.residuoDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.4rem;
+}
+
+.residuoDuracion {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ---- Dark mode ---- */
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, #1a5f7a 0%, #2d7a76 100%);
+}
+
+[data-theme='dark'] .navSecciones {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .navBtn {
+  border-color: rgba(127, 179, 211, 0.25);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .navBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(127, 179, 211, 0.08);
+}
+
+[data-theme='dark'] .navBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .diagramaFision,
+[data-theme='dark'] .cadenaContainer,
+[data-theme='dark'] .controlK,
+[data-theme='dark'] .datoCard,
+[data-theme='dark'] .inesContainer,
+[data-theme='dark'] .diagramaFusion,
+[data-theme='dark'] .comparativaFusion,
+[data-theme='dark'] .tokamakContainer,
+[data-theme='dark'] .iterContainer,
+[data-theme='dark'] .reactorInfo,
+[data-theme='dark'] .espanaContainer,
+[data-theme='dark'] .graficoBarras,
+[data-theme='dark'] .densidadContainer,
+[data-theme='dark'] .residuosContainer {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .drNucleo,
+[data-theme='dark'] .drGenerador,
+[data-theme='dark'] .drTorre {
+  background: #1A1A1A;
+}
+
+[data-theme='dark'] .tablaHeader {
+  background: #1a5f7a;
+}
+
+[data-theme='dark'] .toggleBtn {
+  border-color: rgba(127, 179, 211, 0.25);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .toggleBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .toggleActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .barraContenedor {
+  background: rgba(127, 179, 211, 0.15);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  .hero {
+    padding: 2rem 1rem 1.5rem;
+  }
+
+  .navSecciones {
+    padding: 1rem;
+  }
+
+  .navBtn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .contenido {
+    padding: 1.5rem 1rem;
+  }
+
+  .barraFila {
+    grid-template-columns: 100px 1fr 70px;
+    font-size: 0.8rem;
+  }
+
+  .tablaHeader,
+  .tablaFila {
+    grid-template-columns: 1.8fr 0.8fr 1fr 1.2fr;
+    font-size: 0.75rem;
+  }
+
+  .diagramaReactor {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .iterInfo {
+    gap: 0.75rem;
+  }
+}
+
+/* ---- Animaciones accesibles ---- */
+@media (prefers-reduced-motion: reduce) {
+  .seccion,
+  .barraRelleno {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ================================================
+   PATRÓN v2.0 — clases educativas
+   ================================================ */
+
+/* ---- 1. Tabla comparativa ---- */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable thead tr {
+  background: var(--primary);
+  color: #fff;
+}
+
+.comparativaTable th {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---- 2. Perfiles de uso ---- */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.18);
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.escenarioIcono {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.escenarioTitulo {
+  font-size: 0.92rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.escenarioDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ---- 3. FAQ ---- */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+}
+
+.faqPregunta {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqRespuesta {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.1);
+  border: 1px solid rgba(72, 169, 166, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ---- 4. Guía paso a paso ---- */
+.stepGuide {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ---- 5. Tips / datos clave ---- */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ---- 6. Warning Box ---- */
+.warningBox {
+  background: rgba(232, 131, 74, 0.08);
+  border: 1px solid rgba(232, 131, 74, 0.4);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.warningHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.warningList li {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 0.25rem;
+}
+
+/* ---- Dark mode v2.0 ---- */
+[data-theme='dark'] .comparativaTable thead tr {
+  background: #1a5f7a;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(127, 179, 211, 0.06);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: rgba(127, 179, 211, 0.12);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .step,
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .faqItem {
+  border-left-color: var(--accent);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(232, 131, 74, 0.07);
+  border-color: rgba(232, 131, 74, 0.35);
+}
+
+/* ---- Responsive v2.0 ---- */
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .step {
+    gap: 0.75rem;
+  }
+}

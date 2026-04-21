@@ -619,6 +619,10 @@ export const implementedAppsUrls = [
   "/visualizador-farmacocinetica/",         // Explicador visual ADME: absorción, distribución, metabolismo, excreción
   "/visualizador-cicatrizacion/",           // Explicador visual: 4 fases cicatrización, células, tipos herida, factores
   "/visualizador-ia-redes-neuronales/",     // Explicador visual: perceptrón, capas, backpropagation, tipos de redes
+  "/visualizador-energia-nuclear/",         // Explicador visual: fisión, fusión, reactores, comparativa CO₂
+  "/visualizador-mercados-financieros/",    // Explicador visual: libro órdenes, activos, índices, participantes
+  "/visualizador-cambio-climatico-tipping-points/", // Explicador visual: 9 tipping points, retroalimentaciones, cascadas
+  "/visualizador-deuda-publica/",           // Explicador visual: bonos soberanos, prima de riesgo, sostenibilidad
 ];
 
 /**

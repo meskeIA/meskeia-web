@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 553,
+  "total_tools": 557,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1807,6 +1807,30 @@
           "slug": "visualizador-ia-redes-neuronales",
           "url": "https://meskeia.com/visualizador-ia-redes-neuronales/",
           "description": "Del perceptrón al transformer: neuronas artificiales, backpropagation, gradient descent, CNN, RNN, GAN. Simulador interactivo"
+        },
+        {
+          "name": "Energía Nuclear",
+          "slug": "visualizador-energia-nuclear",
+          "url": "https://meskeia.com/visualizador-energia-nuclear/",
+          "description": "Fisión (cadena de reacción, factor k), fusión (tokamak, ITER), 4 tipos de reactor y comparativa CO₂/kWh con renovables"
+        },
+        {
+          "name": "Mercados Financieros",
+          "slug": "visualizador-mercados-financieros",
+          "url": "https://meskeia.com/visualizador-mercados-financieros/",
+          "description": "Libro de órdenes (bid/ask/spread), tipos de activos, índices bursátiles y participantes del mercado"
+        },
+        {
+          "name": "Puntos de Inflexión Climáticos",
+          "slug": "visualizador-cambio-climatico-tipping-points",
+          "url": "https://meskeia.com/visualizador-cambio-climatico-tipping-points/",
+          "description": "9 tipping points (Ártico, Amazonas, permafrost, AMOC), retroalimentaciones, cascadas y escenarios IPCC AR6"
+        },
+        {
+          "name": "Deuda Pública",
+          "slug": "visualizador-deuda-publica",
+          "url": "https://meskeia.com/visualizador-deuda-publica/",
+          "description": "Bonos soberanos (Letras, Obligaciones), precio vs yield, prima de riesgo europea y sostenibilidad (regla r vs g)"
         }
       ]
     },
