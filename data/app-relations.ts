@@ -1367,6 +1367,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Aldosterona, ADH, SRAA' },
     { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: '180L filtrados al día' },
   ],
+  'visualizador-envejecimiento-celular': [
+    { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'Neuroplasticidad y envejecimiento cerebral' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Inmunosenescencia y SASP' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Longevidad y límites fisiológicos' },
+    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Detoxificación y disfunción mitocondrial' },
+  ],
+  'visualizador-cerebro-emociones': [
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'Neuroplasticidad y senescencia neuronal' },
+    { url: '/visualizador-sistema-nervioso/', icon: '⚡', name: 'Sistema Nervioso', description: 'Circuitos y transmisión neural' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Cortisol, adrenalina y HPA' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'REM y procesamiento emocional' },
+  ],
+  'visualizador-blockchain': [
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'AES, RSA y SHA-256 que protegen la cadena' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'Otra tecnología disruptiva del siglo XXI' },
+    { url: '/visualizador-internet-funcionamiento/', icon: '🌐', name: 'Cómo Funciona Internet', description: 'Infraestructura sobre la que opera blockchain' },
+    { url: '/simulador-inversion/', icon: '📊', name: 'Simulador de Inversión', description: 'Cripto como activo en cartera' },
+  ],
+  'visualizador-criptografia': [
+    { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'La criptografía que protege la cadena de bloques' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'Otra revolución tecnológica paralela' },
+    { url: '/visualizador-internet-funcionamiento/', icon: '🌐', name: 'Cómo Funciona Internet', description: 'TLS y HTTPS en acción' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Mecánica cuántica y criptografía cuántica' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

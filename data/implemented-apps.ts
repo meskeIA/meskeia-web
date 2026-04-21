@@ -623,6 +623,10 @@ export const implementedAppsUrls = [
   "/visualizador-mercados-financieros/",    // Explicador visual: libro órdenes, activos, índices, participantes
   "/visualizador-cambio-climatico-tipping-points/", // Explicador visual: 9 tipping points, retroalimentaciones, cascadas
   "/visualizador-deuda-publica/",           // Explicador visual: bonos soberanos, prima de riesgo, sostenibilidad
+  "/visualizador-envejecimiento-celular/",  // Explicador visual: telómeros, hallmarks aging, senescencia, reloj Horvath
+  "/visualizador-cerebro-emociones/",       // Explicador visual: amígdala, neurotransmisores, circuitos, regulación
+  "/visualizador-blockchain/",              // Explicador visual: cadena bloques, PoW vs PoS, contratos inteligentes
+  "/visualizador-criptografia/",            // Explicador visual: AES/RSA/ECDSA, SHA-256, firma digital, TLS
 ];
 
 /**

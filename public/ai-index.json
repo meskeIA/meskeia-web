@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 557,
+  "total_tools": 561,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1831,6 +1831,30 @@
           "slug": "visualizador-deuda-publica",
           "url": "https://meskeia.com/visualizador-deuda-publica/",
           "description": "Bonos soberanos (Letras, Obligaciones), precio vs yield, prima de riesgo europea y sostenibilidad (regla r vs g)"
+        },
+        {
+          "name": "Envejecimiento Celular",
+          "slug": "visualizador-envejecimiento-celular",
+          "url": "https://meskeia.com/visualizador-envejecimiento-celular/",
+          "description": "12 Hallmarks of Aging: telómeros, senescencia, SASP, disfunción mitocondrial, inflaenvejecimiento y reloj epigenético de Horvath"
+        },
+        {
+          "name": "Cerebro y Emociones",
+          "slug": "visualizador-cerebro-emociones",
+          "url": "https://meskeia.com/visualizador-cerebro-emociones/",
+          "description": "Amígdala, hipocampo y corteza prefrontal. 6 neurotransmisores emocionales, circuitos del miedo y la recompensa, 4 estrategias de regulación"
+        },
+        {
+          "name": "Blockchain",
+          "slug": "visualizador-blockchain",
+          "url": "https://meskeia.com/visualizador-blockchain/",
+          "description": "Estructura de bloques, hashing, consenso PoW vs PoS, contratos inteligentes y comparativa BTC vs ETH con diagramas interactivos"
+        },
+        {
+          "name": "Criptografía",
+          "slug": "visualizador-criptografia",
+          "url": "https://meskeia.com/visualizador-criptografia/",
+          "description": "AES simétrico, RSA asimétrico, curvas elípticas ECDSA, efecto avalancha SHA-256 en tiempo real, firma digital PKI y handshake TLS animado"
         }
       ]
     },

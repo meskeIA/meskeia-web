@@ -1,0 +1,1125 @@
+/* VisualizadorCerebroEmociones.module.css */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.heroTitulo {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.heroSubtitulo {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ─── Main ─── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* ─── Nav Secciones ─── */
+.navSecciones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .navSecciones {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.navBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.navBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.navBtnActivo {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.navBtnActivo:hover {
+  color: #fff;
+}
+
+.navBtnTitulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.navBtnSub {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ─── Sección panel ─── */
+.seccionPanel {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.seccionContenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.introTexto {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Estructuras ─── */
+.diagramaCerebro {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.cerebroBase {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.cerebroLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.estructuraBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-left: 4px solid var(--estructura-color, var(--primary));
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.estructuraBtn:hover {
+  border-color: var(--estructura-color, var(--primary));
+  transform: translateX(4px);
+}
+
+.estructuraBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.estructuraBtnActiva {
+  background: color-mix(in srgb, var(--estructura-color, var(--primary)) 12%, transparent);
+  border-color: var(--estructura-color, var(--primary));
+}
+
+.estructuraDetalle {
+  background: color-mix(in srgb, var(--estructura-color, var(--primary)) 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--estructura-color, var(--primary)) 30%, transparent);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.estructuraDetalleHeader {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.estructuraDetalleIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.estructuraDetalleTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--estructura-color, var(--primary));
+}
+
+.estructuraDetalleEmocion {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.estructuraDetalleFuncion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.datoClaveBox {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.datoClaveLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.datoClaveTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Triplo modelo */
+.triploModeloBox {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.triploModeloTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.triploModeloGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .triploModeloGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.triploItem {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.triploIcono {
+  font-size: 1.5rem;
+}
+
+.triploItem strong {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.triploItem p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.triploNota {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  padding: 0.5rem;
+  background: var(--bg-card);
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+/* ─── Neurotransmisores ─── */
+.neuroGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .neuroGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.neuroCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 0.75rem;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-top: 4px solid var(--neuro-color, var(--primary));
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.neuroCard:hover {
+  border-color: var(--neuro-color, var(--primary));
+  transform: translateY(-2px);
+}
+
+.neuroCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.neuroCardActiva {
+  background: color-mix(in srgb, var(--neuro-color, var(--primary)) 10%, var(--bg-card));
+  border-color: var(--neuro-color, var(--primary));
+}
+
+.neuroIcono {
+  font-size: 1.75rem;
+}
+
+.neuroNombre {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--neuro-color, var(--primary));
+}
+
+.neuroEmocion {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.neuroToggle {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.neuroDetalle {
+  background: color-mix(in srgb, var(--neuro-color, var(--primary)) 6%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--neuro-color, var(--primary)) 25%, transparent);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.neuroDetalleTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--neuro-color, var(--primary));
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.neuroDetalleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .neuroDetalleGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.neuroDetalleItem {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.neuroDetalleLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.neuroDetalleItem p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Circuitos ─── */
+.circuitoSelector {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.circuitoSelectorBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--bg-primary);
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.circuitoSelectorBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.circuitoSelectorBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.circuitoSelectorBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.circuitoSelectorBtnActivo:hover {
+  color: #fff;
+}
+
+.circuitoDescripcion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  background: var(--bg-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.circuitosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 560px) {
+  .circuitosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.circuitoVia {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.circuitoViaLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
+.circuitoFlujo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.circuitoFlujoItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.circuitoPaso {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.circuitoPasoRapido {
+  background: color-mix(in srgb, #e74c3c 15%, var(--bg-card));
+  color: #c0392b;
+  border: 1px solid color-mix(in srgb, #e74c3c 30%, transparent);
+}
+
+[data-theme='dark'] .circuitoPasoRapido {
+  color: #f1948a;
+}
+
+.circuitoPasoLento {
+  background: color-mix(in srgb, var(--primary) 15%, var(--bg-card));
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.circuitoFlecha {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+  display: block;
+  padding: 0.15rem 0;
+}
+
+/* ─── Warning box (marcador v2.0) ─── */
+.warningBox {
+  background: color-mix(in srgb, #e74c3c 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #e74c3c 25%, transparent);
+  border-left: 4px solid #e74c3c;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: color-mix(in srgb, #e74c3c 10%, var(--bg-card));
+  border-color: color-mix(in srgb, #e74c3c 30%, transparent);
+  border-left-color: #e74c3c;
+}
+
+/* Variante inline (SeccionCircuitos — icono emoji + párrafo) */
+.warningBoxInline {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--secondary) 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--secondary) 30%, transparent);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+[data-theme='dark'] .warningBoxInline {
+  background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card));
+}
+
+.warningBoxInline span {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+}
+
+.warningBoxInline p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Regulación ─── */
+.regulacionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.regulacionCard {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .regulacionCard {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.regulacionCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text-primary);
+  transition: background 0.15s ease;
+}
+
+.regulacionCardHeader:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.regulacionCardHeader:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+[data-theme='dark'] .regulacionCardHeader:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.regulacionIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.regulacionHeaderTexto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.regulacionNombre {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.regulacionZona {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.regulacionToggle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.regulacionEficacia {
+  padding: 0.5rem 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .regulacionEficacia {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.regulacionBarra {
+  display: grid;
+  grid-template-columns: 80px 1fr 36px;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.regulacionBarraLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.regulacionBarraFondo {
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.regulacionBarraRelleno {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.regulacionBarraValor {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.regulacionDetalle {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+[data-theme='dark'] .regulacionDetalle {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.regulacionDetalle p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.regulacionEjemploBox {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.regulacionEjemploLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.regulacionEjemploTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .seccionPanel {
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .navBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .estructuraBtn {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .neuroCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .triploItem {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .datoClaveBox {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .triploNota {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ─── Educational Section v2.0 ─── */
+
+/* 1. Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 540px;
+}
+
+.comparativaTable thead {
+  background: var(--primary);
+  color: #fff;
+}
+
+.comparativaTable th {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: top;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 2. Escenarios / Perfiles */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.1rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.escenarioIcono {
+  font-size: 1.75rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.escenarioCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.escenarioCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* 3. FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+[data-theme='dark'] .faqItem {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.faqItem h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.faqItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.faqTip {
+  font-size: 0.78rem;
+  color: var(--secondary);
+  font-style: italic;
+  padding-top: 0.15rem;
+}
+
+/* 4. Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stepContent h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.stepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* 5. Tips grid */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.tipCard h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* 6. Warning box educativo (v2.0) — complementa el .warningBox existente */
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningHeader h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c0392b;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningHeader h4 {
+  color: #f1948a;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.warningList li::before {
+  content: '×';
+  position: absolute;
+  left: 0;
+  color: #c0392b;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .warningList li::before {
+  color: #f1948a;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .navBtn,
+  .estructuraBtn,
+  .neuroCard,
+  .circuitoSelectorBtn,
+  .circuitoPaso,
+  .regulacionBarraRelleno {
+    animation: none;
+    transition: none;
+  }
+
+  .navBtn:hover,
+  .estructuraBtn:hover,
+  .neuroCard:hover {
+    transform: none;
+  }
+}
