@@ -1,0 +1,1157 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ── Main layout ── */
+.main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Navegación secciones ── */
+.navSecciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.navBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+}
+
+.navBtnActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.navBtnActivo:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* ── Sección común ── */
+.seccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitulo {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Capas ── */
+.pielesDiagrama {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .pielesDiagrama {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cortePiel {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border, #e0e0e0);
+}
+
+.capaBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  height: var(--capa-height, 90px);
+  background: var(--capa-color, #f5f5f5);
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  text-align: left;
+  transition: filter 0.2s, transform 0.1s;
+  width: 100%;
+}
+
+.capaBtn:last-child {
+  border-bottom: none;
+}
+
+.capaBtn:hover {
+  filter: brightness(0.92);
+}
+
+.capaBtnActivo {
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
+  filter: brightness(0.88);
+}
+
+.capaEtiqueta {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.capaGrosor {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 0.2rem;
+}
+
+.capaDetalle {
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.capaDetalleHeader {
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.capaDetalleHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.capaProfundidad {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.65);
+  font-style: italic;
+}
+
+.capaDetalleBody {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.capaInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.capaInfoItem {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.capaInfoLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 60px;
+}
+
+.subcapasBox {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.subcapasBox h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.subcapasBox ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.subcapasBox ul li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.capaFunciones h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.capaFunciones ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.capaFunciones ul li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.capaCuriosidad {
+  display: flex;
+  gap: 0.6rem;
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem;
+}
+
+.capaCuriosidad p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Datos generales */
+.datosGenerales {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 540px) {
+  .datosGenerales {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.datoCard {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.datoIcono {
+  font-size: 1.4rem;
+}
+
+.datoValor {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.datoLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ── Funciones ── */
+.funcionesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.funcionCard {
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.funcionCardExpandida {
+  border-color: var(--primary);
+}
+
+.funcionBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.funcionBtn:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.funcionIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.funcionTexto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.funcionTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.funcionMecanismo {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.funcionChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.funcionDetalle {
+  padding: 0.85rem 1rem 1rem;
+  background: rgba(46, 134, 171, 0.04);
+  border-top: 1px solid var(--border, #e0e0e0);
+}
+
+.funcionDetalle p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ── Cicatrización ── */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+}
+
+@media (max-width: 560px) {
+  .timeline {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.faseBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.8rem 0.5rem;
+  background: transparent;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.faseBtn:hover {
+  border-color: var(--fase-color, var(--primary));
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.faseBtnActiva {
+  border-color: var(--fase-color, var(--primary));
+  background: var(--fase-color, var(--primary));
+  color: white;
+}
+
+.faseNumero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.faseBtnActiva .faseNumero {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.faseIcono {
+  font-size: 1.3rem;
+}
+
+.faseNombreBtn {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.faseDuracionBtn {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.faseDetalle {
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.faseDetalleHeader {
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+}
+
+.faseDetalleHeader span {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.faseDetalleHeader h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.faseDuracion {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.faseDetalleBody {
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.faseDescripcion {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.faseProcesos h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.faseProcesos ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.faseProcesos ul li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* ── Fototipos ── */
+.fototiposSelector {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.fototipoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.6rem;
+  background: transparent;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 64px;
+}
+
+.fototipoBtn:hover {
+  border-color: var(--primary);
+}
+
+.fototipoBtnActivo {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.2);
+}
+
+.fototipoCirculo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  display: block;
+}
+
+.fototipoNumero {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.fototipoDetalle {
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.fototipoDetalleHeader {
+  padding: 1rem 1.2rem;
+}
+
+.fototipoDetalleHeader h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.fototipoDetalleHeader p {
+  margin: 0;
+  font-size: 0.88rem;
+  opacity: 0.8;
+}
+
+.fototipoDetalleBody {
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fototipoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .fototipoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fototipoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.65rem;
+  background: rgba(46, 134, 171, 0.04);
+  border-radius: 8px;
+}
+
+.fototipoItemLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.fototipoItem span:last-child {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.spfBadge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 20px;
+}
+
+.fototipoRecomendacion {
+  display: flex;
+  gap: 0.6rem;
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem;
+}
+
+.fototipoRecomendacion p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Cajas informativas ── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+}
+
+.warningBox h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.warningBox p {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningBox p:last-child {
+  margin-bottom: 0;
+}
+
+.infoBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.25);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+}
+
+.infoBox h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.infoBox p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── Educativo ── */
+.educativo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.educativo p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.educativo h3 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: white;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border, #e0e0e0);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.tabla tbody tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .navSecciones,
+[data-theme='dark'] .seccion,
+[data-theme='dark'] .capaDetalle,
+[data-theme='dark'] .funcionCard,
+[data-theme='dark'] .faseDetalle,
+[data-theme='dark'] .fototipoDetalle {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .navBtn:hover {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .cortePiel {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .capaEtiqueta {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] .capaGrosor {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='dark'] .capaDetalleHeader h3 {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme='dark'] .subcapasBox {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .datoCard {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .funcionCard,
+[data-theme='dark'] .faseBtn {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .funcionDetalle {
+  background: rgba(46, 134, 171, 0.07);
+  border-top-color: #3a3a3a;
+}
+
+[data-theme='dark'] .fototipoBtn {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .fototipoItem {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .infoBox {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tabla tbody tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.07);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PATRÓN v2.0 — Sección educativa enriquecida
+   ══════════════════════════════════════════════════════════ */
+
+/* Subtítulos internos del educativo */
+.eduSubtitulo {
+  margin: 1.25rem 0 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* 1. Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e0e0e0);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border, #e0e0e0);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* 2. Escenarios / perfiles */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.escenarioCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+}
+
+.escenarioCard strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.escenarioCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.escenarioIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: rgba(46, 134, 171, 0.09);
+  border-color: rgba(46, 134, 171, 0.22);
+}
+
+/* 3. FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.faqItem {
+  padding: 0.85rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.faqTip {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+[data-theme='dark'] .faqItem {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.14);
+}
+
+/* 4. Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .step {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+}
+
+/* 5. Tips / mejores prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: 10px;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.1);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+/* 6. Warning box v2.0 (extiende el .warningBox existente con subcomponentes) */
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningHeader strong {
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.warningList li {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ── Accesibilidad ── */
+.navBtn:focus-visible,
+.capaBtn:focus-visible,
+.funcionBtn:focus-visible,
+.faseBtn:focus-visible,
+.fototipoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navBtn,
+  .capaBtn,
+  .funcionBtn,
+  .faseBtn,
+  .fototipoBtn,
+  .funcionCard {
+    transition: none;
+  }
+}

@@ -613,6 +613,9 @@ export const implementedAppsUrls = [
   "/simulador-colchon-emergencia-freelance/", // Meses de supervivencia sin ingresos
   "/planificador-trimestres-freelance/",    // Planificador 4 trimestres fiscales autónomo
   "/orientador-diversificacion-clientes/",  // Índice HHI concentración cartera clientes
+  "/visualizador-piel/",                    // Explicador visual: capas piel, funciones, cicatrización, fototipos
+  "/visualizador-higado/",                  // Explicador visual: detoxificación, metabolismo, síntesis proteínas, bilis
+  "/visualizador-rinon-filtracion/",        // Explicador visual: nefrona, filtración glomerular, reabsorción, SRAA
 ];
 
 /**

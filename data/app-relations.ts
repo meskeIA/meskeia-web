@@ -1307,6 +1307,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/test-salud-negocio-freelance/', icon: '🩺', name: 'Salud del Negocio', description: 'Evalúa 5 dimensiones' },
     { url: '/calculadora-precio-por-proyecto/', icon: '🧮', name: 'Precio por Proyecto', description: 'Cuánto cobrar' },
   ],
+  'visualizador-piel': [
+    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Detoxificación de tóxicos externos' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Células de Langerhans en la piel' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Vitamina D y hormonas' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: '2m² de superficie, 1.5kg de peso' },
+  ],
+  'visualizador-higado': [
+    { url: '/visualizador-rinon-filtracion/', icon: '🫘', name: 'El Riñón', description: 'Filtración final de toxinas' },
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'Factores de coagulación sintetizados' },
+    { url: '/visualizador-digestion-nutrientes/', icon: '🍎', name: 'Digestión y Nutrientes', description: 'Bilis y metabolismo de nutrientes' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Glucagón, insulina y glucemia' },
+  ],
+  'visualizador-rinon-filtracion': [
+    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Primer órgano de detoxificación' },
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'El riñón la filtra continuamente' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Aldosterona, ADH, SRAA' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: '180L filtrados al día' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

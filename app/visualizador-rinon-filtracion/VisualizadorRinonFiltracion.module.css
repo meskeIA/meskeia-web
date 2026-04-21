@@ -1,0 +1,552 @@
+/* VisualizadorRinonFiltracion.module.css */
+
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --rojo: #e74c3c; --verde: #27ae60; --naranja: #e67e22;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large); color: white;
+}
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.05rem; opacity: 0.92; }
+
+/* Navegación */
+.navSecciones {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+}
+.navBtn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: var(--spacing-md) var(--spacing-sm);
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
+  color: var(--text-secondary);
+}
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+/* Sección común */
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg);
+  text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5;
+}
+
+/* SVG riñón */
+.svgZona {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); overflow-x: auto;
+  display: flex; flex-direction: column; align-items: center;
+}
+.rinonSvg { width: 100%; max-width: 420px; height: auto; }
+.svgHint { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: var(--spacing-sm); }
+
+/* Grid zonas renales */
+.zonasGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+.zonaCard {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid;
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  font-size: 0.85rem; color: var(--text-primary); text-align: left;
+}
+.zonaCard:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.zonaCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.zonaCardActiva { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.zonaIcono { font-size: 1.1rem; flex-shrink: 0; }
+.zonaNombre { font-weight: 600; font-size: 0.82rem; }
+
+/* Detalle genérico */
+.detalleCard {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid;
+  border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+  animation: fadeIn 0.2s ease;
+}
+.detalleHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.detalleTitulo { font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--text-primary); }
+.detalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.detalleDato {
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin: 0;
+  background: var(--hover); padding: var(--spacing-sm) var(--spacing-md); border-radius: 8px;
+}
+
+/* Segmentos nefrona */
+.segmentosLista { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.segmentoBtn {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid;
+  border-radius: var(--radius); cursor: pointer; text-align: left;
+  padding: var(--spacing-md) var(--spacing-lg); transition: all 0.2s; color: var(--text-primary);
+  width: 100%;
+}
+.segmentoBtn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.segmentoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.segmentoBtnActivo { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.segmentoBtnHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.segmentoNum {
+  width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; color: white; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+}
+.segmentoIcono { font-size: 1.2rem; flex-shrink: 0; }
+.segmentoTextos { flex: 1; }
+.segmentoNombre { display: block; font-size: 0.92rem; font-weight: 700; }
+.segmentoFuncion { display: block; font-size: 0.8rem; color: var(--text-secondary); }
+.segmentoBadge {
+  font-size: 0.72rem; color: white; padding: 0.2rem 0.5rem; border-radius: 20px;
+  font-weight: 600; white-space: nowrap; flex-shrink: 0;
+}
+.segmentoChevron { font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; }
+.segmentoDetalle {
+  margin-top: var(--spacing-md); padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-primary);
+  line-height: 1.6; text-align: left;
+}
+
+/* Procesos */
+.procesosNav {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+.procesoNavBtn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  padding: var(--spacing-md); background: var(--bg-card); border: 2px solid;
+  border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
+  color: var(--text-primary); font-size: 0.85rem; font-weight: 600;
+}
+.procesoNavBtn:hover { opacity: 0.85; }
+.procesoNavBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.procesoNavActivo { color: white; }
+
+.procesoDetalle {
+  background: var(--bg-card); border: 1px solid var(--border); border-top: 4px solid;
+  border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+}
+.procesoTitulo { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: var(--spacing-sm); }
+.procesoSubtitulo { font-size: 0.9rem; color: var(--text-muted); font-style: italic; margin: 0 0 var(--spacing-md) 0; }
+.procesoDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
+.procesoMecanismo {
+  background: var(--hover); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin-bottom: var(--spacing-md);
+}
+.procesoEjemplosTitle { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
+.procesoEjemplos {
+  list-style: none; padding: 0; margin: 0 0 var(--spacing-md) 0;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.3rem;
+}
+.procesoEjemplos li {
+  font-size: 0.85rem; color: var(--text-primary); padding: 0.25rem 0;
+  padding-left: 1rem; position: relative;
+}
+.procesoEjemplos li::before { content: '•'; color: var(--primary); position: absolute; left: 0; font-weight: 700; }
+.procesoDato {
+  background: var(--hover); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;
+}
+
+/* Tabla resumen */
+.tablaResumen { margin-bottom: var(--spacing-xl); }
+.tablaResumenTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
+.tablaContainer { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+.tabla { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.tabla thead tr { background: var(--primary); color: white; }
+.tabla th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; }
+.tabla td { padding: 0.6rem 1rem; color: var(--text-primary); border-top: 1px solid var(--border); }
+.tabla tbody tr:nth-child(even) { background: var(--hover); }
+
+/* Regulación hormonal */
+.sraaCadena {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+}
+.sraaTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-md) 0; }
+.sraaFlujo {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  justify-content: center;
+}
+.sraaEslabon {
+  display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+  background: var(--hover); border-radius: 8px; padding: 0.5rem 0.8rem;
+  font-size: 0.82rem; text-align: center; color: var(--text-primary);
+  min-width: 90px;
+}
+.sraaEslabon strong { font-size: 0.82rem; }
+.sraaEslabon small { font-size: 0.72rem; color: var(--text-muted); }
+.sraaFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+
+/* Hormonas grid */
+.hormonasGrid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.hormonaCard {
+  background: var(--bg-card); border: 1px solid var(--border); border-top: 4px solid;
+  border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer;
+  text-align: left; transition: all 0.2s; color: var(--text-primary); width: 100%;
+}
+.hormonaCard:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.hormonaCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.hormonaCardActiva { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.hormonaHeader { display: flex; align-items: center; gap: var(--spacing-sm); }
+.hormonaIcono { font-size: 1.4rem; flex-shrink: 0; }
+.hormonaNombre { font-size: 0.92rem; font-weight: 700; margin: 0 0 0.1rem 0; }
+.hormonaSigla { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+.hormonaChevron { margin-left: auto; font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; }
+.hormonaDetalle {
+  margin-top: var(--spacing-md); padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border); animation: fadeIn 0.2s ease;
+}
+.hormonaDl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.8rem; font-size: 0.85rem; }
+.hormonaDl dt { font-weight: 700; color: var(--text-secondary); }
+.hormonaDl dd { margin: 0; color: var(--text-primary); line-height: 1.4; }
+
+/* Warning box (indicador v2.0) — usado también en secciones de visualizador */
+.warningBox {
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+  border: 1px solid #f59e0b; border-left: 4px solid #f59e0b;
+  border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;
+  margin-top: var(--spacing-lg);
+}
+[data-theme='dark'] .warningBox {
+  background: linear-gradient(135deg, #2d2410 0%, #2d1e0a 100%);
+  border-color: #d97706;
+}
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container { padding: var(--spacing-lg) var(--spacing-md); }
+  .title { font-size: 1.6rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .zonasGrid { grid-template-columns: repeat(2, 1fr); }
+  .procesosNav { grid-template-columns: 1fr; }
+  .procesoEjemplos { grid-template-columns: 1fr; }
+  .hormonasGrid { grid-template-columns: 1fr; }
+  .sraaFlujo { flex-direction: column; }
+  .sraaFlecha { transform: rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detalleCard, .hormonaDetalle, .segmentoDetalle { animation: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   PATRÓN v2.0 — Sección educativa
+   ═══════════════════════════════════════════════ */
+
+/* 1. Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: var(--spacing-xl);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 520px;
+}
+
+.comparativaTable thead tr {
+  background: var(--primary);
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  color: var(--text-primary);
+  border-top: 1px solid var(--border);
+  line-height: 1.4;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: rgba(255,255,255,0.04);
+}
+
+/* 2. Escenarios / perfiles */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.escenarioCard {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.escenarioCard span:first-child {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.escenarioCard strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.escenarioCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* 3. FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+.faqTip {
+  display: inline-block;
+  background: linear-gradient(135deg, #e8f4fd, #e0f2f1);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  border: 1px solid rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: rgba(46, 134, 171, 0.3);
+  color: #7FB3D3;
+}
+
+/* 4. Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+  counter-reset: step;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* 5. Tips / mejores prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.tipCard {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.tipCard strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* 6. Warning box v2.0 — errores y mitos */
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.87rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding-left: 0.25rem;
+}
+
+.warningList li strong {
+  color: #b45309;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #fbbf24;
+}
+
+/* Responsive v2.0 */
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.82rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.7rem;
+  }
+}
