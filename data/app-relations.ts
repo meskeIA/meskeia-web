@@ -1407,7 +1407,31 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'La otra revolución de Einstein' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Mecánica cuántica aplicada al átomo' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Criptografía cuántica y algoritmos post-cuánticos' },
-    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Efecto túnel en la fusión solar' },
+    { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'Qubits, puertas y la amenaza al cifrado RSA' },
+  ],
+  'visualizador-corazon-ciclo-cardiaco': [
+    { url: '/visualizador-sistemas-circulatorios/', icon: '❤️', name: 'Sistemas Circulatorios', description: 'Evolución del corazón de 2 a 4 cámaras' },
+    { url: '/visualizador-cuerpo-numeros/', icon: '🫁', name: 'Tu Cuerpo en Números', description: '100.000 km de vasos sanguíneos' },
+    { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'El sistema nervioso que regula el corazón' },
+    { url: '/visualizador-piel/', icon: '🧬', name: 'La Piel', description: 'Otro órgano vital del cuerpo humano' },
+  ],
+  'visualizador-electromagnetismo': [
+    { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'La física que explica las cargas eléctricas' },
+    { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'Einstein y el electromagnetismo' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Cargas eléctricas en el átomo' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Física de campos aplicada' },
+  ],
+  'visualizador-computacion-cuantica': [
+    { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'Los principios físicos detrás de los qubits' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Por qué la computación cuántica amenaza RSA' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'Otra revolución computacional en curso' },
+    { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'Criptografía que también podría verse afectada' },
+  ],
+  'visualizador-oceanos-corrientes': [
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Tipping Points Climáticos', description: 'El colapso del AMOC es un tipping point crítico' },
+    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'El CO₂ que acidifica los océanos' },
+    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'Ciclo del Agua', description: 'Los océanos en el ciclo hidrológico global' },
+    { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'El coste económico del cambio climático' },
   ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },

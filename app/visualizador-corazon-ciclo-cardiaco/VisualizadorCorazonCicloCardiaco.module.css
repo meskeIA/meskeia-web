@@ -1,0 +1,719 @@
+/* ── Contenedor principal ─────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  color: white;
+}
+
+.heroContent {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  opacity: 0.9;
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 1rem;
+  opacity: 0.85;
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Main ─────────────────────────────────────────────────────── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ── Sección ──────────────────────────────────────────────────── */
+.section {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sectionAlt {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(72, 169, 166, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.sectionIcon {
+  font-size: 2.25rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Corazón animado ─────────────────────────────────────────── */
+.corazonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+@keyframes latido {
+  0%   { transform: scale(1); }
+  15%  { transform: scale(1.15); }
+  30%  { transform: scale(1); }
+  45%  { transform: scale(1.08); }
+  60%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+.corazonAnimado {
+  font-size: 5rem;
+  display: block;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(220, 50, 50, 0.4));
+  transition: animation-duration 0.3s ease;
+}
+
+.corazonAnimado.latiendo {
+  animation: latido var(--duracion-latido, 0.8s) ease-in-out infinite;
+}
+
+.faseDisplay {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 260px;
+}
+
+.faseNombre {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.faseDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.corazonBotones {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Botones ─────────────────────────────────────────────────── */
+.btnPrimario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btnPrimario:hover {
+  background: #256fa0;
+  transform: translateY(-1px);
+}
+
+.btnPrimario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btnSecundario:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Slider ──────────────────────────────────────────────────── */
+.sliderLabel {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin-bottom: 0.35rem;
+}
+
+.sliderValores {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.sliderWrapper {
+  margin-bottom: 1.5rem;
+}
+
+/* ── Válvulas ────────────────────────────────────────────────── */
+.valvulasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.valvulaCard {
+  background: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.valvulaCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.15);
+  transform: translateY(-2px);
+}
+
+.valvulaCard.valvulaActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.2);
+}
+
+.valvulaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.valvulaIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.valvulaNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.valvulaTipo {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.valvulaDetalle {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06) 0%, rgba(72, 169, 166, 0.06) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.valvulaDetalleHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.valvulaDetalleIcono {
+  font-size: 2rem;
+}
+
+.valvulaDetalleTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.valvulaDetalleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.valvulaDetalleItem {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.valvulaDetalleItemLabel {
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.valvulaDetalleItemText {
+  color: var(--text-secondary);
+}
+
+/* ── ECG ─────────────────────────────────────────────────────── */
+.ecgContainer {
+  margin-bottom: 1.5rem;
+}
+
+.ecgSvgWrapper {
+  background: #0a1628;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.ecgSvg {
+  width: 100%;
+  height: 100px;
+  display: block;
+}
+
+.ecgOndaLabel {
+  fill: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+  font-family: monospace;
+}
+
+.ecgRitmosBotones {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.ecgRitmoBtn {
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(46, 134, 171, 0.3);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ecgRitmoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.ecgRitmoBtn.ecgRitmoActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.ecgRitmoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ecgOndasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.ecgOndaCard {
+  background: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.12);
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  text-align: center;
+}
+
+.ecgOndaCard:hover {
+  border-color: var(--primary);
+}
+
+.ecgOndaCard.ecgOndaActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+}
+
+.ecgOndaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ecgOndaLetra {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.2rem;
+}
+
+.ecgOndaNombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.ecgOndaDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Gasto cardíaco ──────────────────────────────────────────── */
+.gastoResultado {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.gastoFormula {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+  margin-bottom: 0.5rem;
+}
+
+.gastoValor {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.gastoUnidad {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.gastoBarraContainer {
+  margin-bottom: 1.5rem;
+}
+
+.gastoBarraLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.gastoBarraTrack {
+  height: 14px;
+  background: rgba(46, 134, 171, 0.12);
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gastoBarraFill {
+  height: 100%;
+  border-radius: 7px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  transition: width 0.35s ease;
+}
+
+.gastoReferencias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.gastoRefCard {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  text-align: center;
+}
+
+.gastoRefIcono {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.gastoRefValor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.15rem;
+}
+
+.gastoRefLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* ── Warning box (requerido v2.0) ────────────────────────────── */
+.warningBox {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 1.25rem;
+}
+
+.warningBox strong {
+  color: var(--text-primary);
+}
+
+/* ── Sección educativa ───────────────────────────────────────── */
+.educacional {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.educacional h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.6rem;
+}
+
+.educacional h3:first-child {
+  margin-top: 0;
+}
+
+.educacional p {
+  margin: 0 0 0.75rem;
+}
+
+.educacional ul,
+.educacional ol {
+  margin: 0 0 0.75rem;
+  padding-left: 1.4rem;
+}
+
+.educacional li {
+  margin-bottom: 0.4rem;
+}
+
+.educacional strong {
+  color: var(--text-primary);
+}
+
+.educacional em {
+  color: var(--primary);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── Dark mode ───────────────────────────────────────────────── */
+[data-theme='dark'] .section,
+[data-theme='dark'] .sectionAlt {
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .faseDisplay {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .valvulaCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .valvulaCard.valvulaActiva {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .valvulaDetalle {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .ecgOndaCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .ecgOndaCard.ecgOndaActiva {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .gastoRefCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .gastoBarraTrack {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .valvulaDetalleItemText {
+  color: var(--text-secondary);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hero {
+    padding: 2.5rem 1rem 2rem;
+  }
+
+  .section,
+  .sectionAlt {
+    padding: 1.25rem;
+  }
+
+  .valvulasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ecgOndasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .gastoReferencias {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .corazonAnimado {
+    font-size: 4rem;
+  }
+
+  .gastoValor {
+    font-size: 2.2rem;
+  }
+}
+
+/* ── Animaciones accesibles ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .corazonAnimado.latiendo {
+    animation: none;
+  }
+
+  .gastoBarraFill {
+    transition: none;
+  }
+
+  .btnPrimario:hover,
+  .valvulaCard:hover {
+    transform: none;
+  }
+}

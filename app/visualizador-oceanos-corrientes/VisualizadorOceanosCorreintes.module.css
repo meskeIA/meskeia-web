@@ -1,0 +1,1238 @@
+/* VisualizadorOceanosCorreintes.module.css — meskeIA */
+
+/* ─────────────────────────────────────────────
+   Contenedor principal
+───────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero Section
+───────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: #fff;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.heroDesc {
+  font-size: 0.9rem;
+  opacity: 0.82;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  min-width: 100px;
+}
+
+.heroStatNum {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.heroStatLabel {
+  font-size: 0.72rem;
+  opacity: 0.88;
+  margin-top: 0.2rem;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────
+   Navegación de secciones
+───────────────────────────────────────────── */
+.navSecciones {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.navBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-width: 130px;
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.navBtnActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.3);
+}
+
+.navBtnActivo:hover {
+  color: #fff;
+}
+
+.navBtnIcono {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.navBtnTitulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.navBtnSub {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────
+   Contenido principal
+───────────────────────────────────────────── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+/* ─────────────────────────────────────────────
+   Sección genérica
+───────────────────────────────────────────── */
+.section {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sectionAlt {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.sectionHeader {
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.sectionIcon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 650px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ─────────────────────────────────────────────
+   Botones
+───────────────────────────────────────────── */
+.btnPrimario {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btnPrimario:hover {
+  background: #1a6b8e;
+  transform: translateY(-1px);
+}
+
+.btnPrimario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecundario:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────
+   Toggle Mode
+───────────────────────────────────────────── */
+.toggleGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.toggleLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.toggleBtns {
+  display: flex;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toggleBtn {
+  padding: 0.4rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toggleBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────
+   Slider
+───────────────────────────────────────────── */
+.sliderContainer {
+  margin: 1.25rem 0;
+}
+
+.sliderLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.sliderValor {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--slider-pct, 50%), #e0e0e0 var(--slider-pct, 50%), #e0e0e0 100%);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sliderValores {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+/* ─────────────────────────────────────────────
+   Mapa SVG
+───────────────────────────────────────────── */
+.mapaSvg {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #e8f4f8;
+  overflow: visible;
+}
+
+[data-theme='dark'] .mapaSvg {
+  background: #1a2a35;
+}
+
+.mapaContenedor {
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+
+.mapaLeyenda {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.mapaLeyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.mapaLeyendaDot {
+  width: 20px;
+  height: 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Corrientes animadas (stroke-dashoffset)
+───────────────────────────────────────────── */
+.corrienteCálida {
+  stroke: #e74c3c;
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 12 6;
+  animation: flujoCalido 2.5s linear infinite;
+}
+
+.corrienteFría {
+  stroke: #2E86AB;
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 12 6;
+  animation: flujoFrio 3s linear infinite;
+}
+
+.corrienteDebilitada {
+  opacity: 0.35;
+  stroke-width: 1.5;
+  animation-duration: 6s;
+}
+
+.corrienteGolfo {
+  stroke: #e67e22;
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 14 7;
+  animation: flujoCalido 2s linear infinite;
+}
+
+@keyframes flujoCalido {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -18; }
+}
+
+@keyframes flujoFrio {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -18; }
+}
+
+/* ─────────────────────────────────────────────
+   Sección 1 — Conveyor Belt
+───────────────────────────────────────────── */
+.conveyorLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.conveyorInfo {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.conveyorInfoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.conveyorInfoTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.tiempoTag {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 20px;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 2 — Corriente del Golfo
+───────────────────────────────────────────── */
+.golfoLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.tempComparativa {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tempCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  transition: border-color 0.2s ease;
+}
+
+.tempCard:hover {
+  border-color: var(--primary);
+}
+
+.tempCiudad {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.tempLatitud {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.tempValor {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.tempValorFrio {
+  color: #1a6b8e;
+}
+
+.tempSinCorriente {
+  color: #c0392b;
+}
+
+.tempDelta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.amocSlider {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06), rgba(72, 169, 166, 0.06));
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+.amocImpacto {
+  text-align: center;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.amocImpactoNum {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #c0392b;
+  display: block;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 3 — Acidificación
+───────────────────────────────────────────── */
+.phLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.phEscala {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .phEscala {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.phBarra {
+  position: relative;
+  height: 32px;
+  border-radius: 16px;
+  background: linear-gradient(to right, #e74c3c 0%, #f39c12 25%, #27ae60 50%, #2E86AB 75%, #1a3a8f 100%);
+  margin: 1rem 0 0.5rem;
+  overflow: visible;
+}
+
+.phIndicador {
+  position: absolute;
+  top: -10px;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 52px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: left 0.4s ease;
+}
+
+.phIndicadorLabel {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: var(--bg-card);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.phEtiquetas {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.phValorActual {
+  text-align: center;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.phNum {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.phAnio {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.phEspecies {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.phEspecieCard {
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  text-align: center;
+  background: var(--bg-primary);
+}
+
+.phEspecieCard:hover,
+.phEspecieCardActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.phEspecieIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.phEspecieNombre {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.phEspecieEstado {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.phEspecieEstadoBad {
+  color: #c0392b;
+}
+
+.phEspecieEstadoMid {
+  color: #e67e22;
+}
+
+.phEspecieEstadoOk {
+  color: #27ae60;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 4 — Zonas Muertas
+───────────────────────────────────────────── */
+.zonasLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.zonaDetalle {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.zonaDetalleTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.zonaDetalleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.zonaDetalleItem {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.zonaDetalleItemLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+
+.zonaDetalleDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.eutrofizacion {
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.06), rgba(230, 126, 34, 0.06));
+  border: 1px solid rgba(231, 76, 60, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+.eutrofizacionTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.eutrofizacionPasos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eutrofPaso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.eutrofPasoNum {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.eutrofPasoTexto {
+  padding-top: 0.15rem;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Punto de mapa hipóxico (SVG)
+───────────────────────────────────────────── */
+.zonaHipoxica {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  transform-origin: center;
+}
+
+.zonaHipoxica:hover {
+  transform: scale(1.4);
+}
+
+.zonaHipoxicaActiva {
+  transform: scale(1.5);
+}
+
+/* ─────────────────────────────────────────────
+   Datos cifra destacada
+───────────────────────────────────────────── */
+.cifraGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.cifraCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cifraNum {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.cifraLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ─────────────────────────────────────────────
+   Warning Box (v2.0 marker)
+───────────────────────────────────────────── */
+.warningBox {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.06), rgba(230, 126, 34, 0.06));
+  border: 1px solid rgba(231, 76, 60, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.warningBox span[aria-hidden='true'] {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningBox strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.warningBox p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Sección Educativa — elementos extra
+───────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.comparativaCaption {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.65rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.comparativaTable tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.perfilesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.perfilCard {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.1rem;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.perfilIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.perfilTitulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.perfilDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  border-left: 4px solid var(--primary);
+}
+
+.faqPregunta {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.faqRespuesta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 1.25rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.stepNumber {
+  background: var(--secondary);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  padding-top: 0.15rem;
+  line-height: 1.55;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(72, 169, 166, 0.18);
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.tipCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.faqTip {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .faqTip {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ─────────────────────────────────────────────
+   Nota / Info Box
+───────────────────────────────────────────── */
+.notaBox {
+  background: rgba(46, 134, 171, 0.07);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.notaBox strong {
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .conveyorLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .golfoLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .phLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .zonasLayout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+  .section {
+    padding: 1.25rem;
+  }
+  .navSecciones {
+    padding: 0.75rem;
+    gap: 0.4rem;
+  }
+  .navBtn {
+    min-width: 100px;
+    padding: 0.6rem 0.85rem;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────────── */
+[data-theme='dark'] .section {
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .navBtn {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .tempCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .phEspecieCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .cifraCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .conveyorInfo {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .amocSlider {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .zonaDetalle {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .eutrofizacion {
+  background: rgba(231, 76, 60, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .perfilCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .stepNumber {
+  background: var(--secondary);
+}
+
+[data-theme='dark'] .slider {
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--slider-pct, 50%), #333 var(--slider-pct, 50%), #333 100%);
+}
+
+[data-theme='dark'] .notaBox {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .toggleBtns {
+  border-color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────
+   Reduced Motion
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .corrienteCálida,
+  .corrienteFría,
+  .corrienteGolfo {
+    animation: none;
+  }
+  .zonaHipoxica {
+    transition: none;
+  }
+  .btnPrimario,
+  .btnSecundario,
+  .navBtn {
+    transition: none;
+  }
+}

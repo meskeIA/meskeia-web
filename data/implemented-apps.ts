@@ -630,6 +630,10 @@ export const implementedAppsUrls = [
   "/visualizador-tipos-interes-bce/",       // Explicador visual: ciclo tipos BCE, cadena transmisión, hipotecas, bolsa
   "/visualizador-relatividad-especial/",    // Explicador visual: dilatación tiempo, contracción longitud, E=mc², gemelos
   "/visualizador-mecanica-cuantica/",       // Explicador visual: dualidad, incertidumbre, Schrödinger, efecto túnel
+  "/visualizador-corazon-ciclo-cardiaco/", // Explicador visual: sístole, diástole, válvulas, ECG, gasto cardíaco
+  "/visualizador-electromagnetismo/",      // Explicador visual: campo eléctrico, magnético, inducción Faraday, espectro EM
+  "/visualizador-computacion-cuantica/",   // Explicador visual: qubits, puertas cuánticas, paralelismo, amenaza RSA
+  "/visualizador-oceanos-corrientes/",     // Explicador visual: AMOC, corriente del Golfo, acidificación, zonas muertas
 ];
 
 /**

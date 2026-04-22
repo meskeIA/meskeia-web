@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 564,
+  "total_tools": 568,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1873,6 +1873,30 @@
           "slug": "visualizador-mecanica-cuantica",
           "url": "https://meskeia.com/visualizador-mecanica-cuantica/",
           "description": "Dualidad onda-partícula, principio de incertidumbre de Heisenberg, gato de Schrödinger y efecto túnel. Animaciones interactivas sin ecuaciones complejas"
+        },
+        {
+          "name": "Ciclo Cardíaco",
+          "slug": "visualizador-corazon-ciclo-cardiaco",
+          "url": "https://meskeia.com/visualizador-corazon-ciclo-cardiaco/",
+          "description": "Sístole y diástole animadas, las 4 válvulas cardíacas, trazado ECG interactivo y cálculo de gasto cardíaco en litros por minuto"
+        },
+        {
+          "name": "Electromagnetismo",
+          "slug": "visualizador-electromagnetismo",
+          "url": "https://meskeia.com/visualizador-electromagnetismo/",
+          "description": "Campo eléctrico de cargas puntuales, dipolo magnético, ley de Faraday e inducción, y espectro electromagnético completo con aplicaciones"
+        },
+        {
+          "name": "Computación Cuántica",
+          "slug": "visualizador-computacion-cuantica",
+          "url": "https://meskeia.com/visualizador-computacion-cuantica/",
+          "description": "Qubits vs bits, esfera de Bloch, puertas cuánticas, paralelismo exponencial y por qué el algoritmo de Shor amenaza el cifrado RSA"
+        },
+        {
+          "name": "Océanos y Corrientes",
+          "slug": "visualizador-oceanos-corrientes",
+          "url": "https://meskeia.com/visualizador-oceanos-corrientes/",
+          "description": "Circulación termohalina y AMOC, corriente del Golfo e impacto en Europa, acidificación oceánica por CO₂ y zonas muertas hipóxicas"
         }
       ]
     },
