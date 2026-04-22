@@ -1,0 +1,310 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --naranja: #e67e22;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+/* ─── Hero ──────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large); color: white; text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg); margin-bottom: var(--spacing-xl); margin-top: 80px;
+}
+.heroContent { max-width: 640px; margin: 0 auto; }
+.heroBadge {
+  display: inline-block; background: rgba(255,255,255,0.22); border-radius: 20px;
+  padding: 0.25rem 1rem; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase; margin-bottom: 0.75rem;
+}
+.heroTitle { font-size: 2.6rem; font-weight: 800; margin: 0 0 0.35rem 0; line-height: 1.1; }
+.heroSubtitle { font-size: 1.15rem; font-weight: 600; opacity: 0.92; margin: 0 0 0.6rem 0; }
+.heroDesc { font-size: 0.95rem; opacity: 0.85; margin: 0; line-height: 1.55; }
+
+/* ─── Navegación secciones ───────────────────────── */
+.navSecciones {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);
+}
+.navBtn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card);
+  border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer;
+  transition: all 0.2s; color: var(--text-secondary);
+}
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.5rem; }
+.navTexto { font-size: 0.74rem; font-weight: 600; text-align: center; line-height: 1.2; }
+
+/* ─── Cabecera de sección ────────────────────────── */
+.sectionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.sectionIcon { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+.sectionTitle { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
+.sectionSubtitle { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+
+/* ─── Sección content ────────────────────────────── */
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.contexto {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg);
+  text-align: center; font-size: 1rem; line-height: 1.55; color: var(--text-primary);
+}
+
+/* ─── Curva circadiana SVG ───────────────────────── */
+.curvaZona {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center;
+}
+.curvaCortisolSvg { width: 100%; max-width: 580px; height: auto; display: block; margin: 0 auto; }
+.curvaLeyenda {
+  display: flex; flex-wrap: wrap; gap: var(--spacing-md); justify-content: center;
+  margin-top: var(--spacing-md); font-size: 0.82rem; color: var(--text-secondary);
+}
+.leyendaNormal, .leyendaMalSueno, .leyendaCar { display: flex; align-items: center; gap: 0.4rem; }
+.leyendaLinea { display: inline-block; width: 24px; height: 3px; border-radius: 2px; }
+.leyendaRect { display: inline-block; width: 14px; height: 14px; background: #2E86AB; opacity: 0.18; border-radius: 3px; }
+
+/* ─── Slider ─────────────────────────────────────── */
+.sliderZona {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-md);
+}
+.sliderLabel {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm);
+}
+.sliderValor { font-weight: 600; color: var(--primary); }
+.slider {
+  width: 100%; accent-color: var(--primary); cursor: pointer;
+  height: 6px; border-radius: 3px; margin-bottom: 0.5rem;
+}
+.sliderValores {
+  display: flex; justify-content: space-between;
+  font-size: 0.75rem; color: var(--text-muted);
+}
+
+/* ─── Tarjeta horaria ────────────────────────────── */
+.horarioCard {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--primary);
+  border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);
+}
+.horarioHeader { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-sm); }
+.horarioHora { font-size: 1.2rem; font-weight: 700; color: var(--primary); min-width: 56px; }
+.horarioNivelBarra {
+  flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden;
+}
+.horarioNivelFill {
+  height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 5px; transition: width 0.3s ease;
+}
+.horarioNivelTexto { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); min-width: 32px; text-align: right; }
+.horarioDesc { font-size: 0.93rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.horarioActividades {
+  font-size: 0.85rem; color: var(--text-secondary); display: flex; gap: 0.4rem; flex-wrap: wrap;
+}
+.horarioActividadesLabel { font-weight: 600; color: var(--secondary); }
+
+/* ─── Toggle zona ─────────────────────────────────── */
+.toggleZona { margin-bottom: var(--spacing-lg); }
+
+.alerta {
+  margin-top: var(--spacing-md); background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3);
+  border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;
+}
+
+/* ─── Botones ─────────────────────────────────────── */
+.btnPrimario {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1.4rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; border: none;
+  background: var(--primary); color: white;
+}
+.btnPrimario:hover { filter: brightness(1.1); }
+.btnPrimario:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.btnSecundario {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1.4rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  background: var(--bg-card); border: 2px solid var(--border); color: var(--text-secondary);
+}
+.btnSecundario:hover { border-color: var(--primary); color: var(--primary); }
+.btnSecundario:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.btnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+
+/* ─── Simulador estrés ────────────────────────────── */
+.simuladorZona {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-lg);
+}
+.simuladorBarrometro { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); }
+.simuladorLabel { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+.simuladorBarra {
+  width: 48px; height: 120px; background: var(--hover); border-radius: 24px;
+  overflow: hidden; display: flex; align-items: flex-end; border: 2px solid var(--border);
+}
+.simuladorBarraFill { width: 100%; border-radius: 20px; transition: height 0.2s ease; }
+.simuladorNivel { font-size: 0.85rem; font-weight: 700; }
+.simuladorBotones { display: flex; gap: var(--spacing-md); flex-wrap: wrap; justify-content: center; }
+
+/* ─── Estrés comparación ──────────────────────────── */
+.estresComparacion {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md); margin-bottom: var(--spacing-lg);
+}
+.estresPanel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.estresPanelHeader {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid;
+}
+.estresPanelIcono { font-size: 1.2rem; }
+.estresPanelTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.estresPanelLista { padding: var(--spacing-md) var(--spacing-lg); margin: 0; }
+.estresItem { margin-bottom: 0.6rem; }
+.estresItem dt { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.1rem; }
+.estresItem dd { font-size: 0.87rem; color: var(--text-primary); margin: 0; line-height: 1.4; }
+.itemVerde { color: #27ae60; }
+.itemRojo { color: #e74c3c; }
+
+/* ─── Sistemas grid (8 tarjetas) ─────────────────── */
+.sistemasGrid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm); margin-bottom: var(--spacing-lg);
+}
+.efectoCard {
+  background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+}
+.efectoCard:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.efectoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.efectoCardActiva { border-color: var(--primary); background: rgba(46,134,171,0.06); }
+.efectoIcono { font-size: 1.8rem; }
+.efectoNombre { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); margin: 0; line-height: 1.2; }
+.efectoResumen { font-size: 0.75rem; color: var(--text-secondary); margin: 0; line-height: 1.3; }
+
+/* ─── Sistema detalle ─────────────────────────────── */
+.sistemaDetalle {
+  background: var(--bg-card); border: 1px solid var(--primary); border-radius: var(--radius);
+  padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);
+}
+.sistemaDetalleHeader {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md); font-size: 1.3rem;
+}
+.sistemaDetalleHeader h3 { font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text-primary); }
+.sistemaDetalleGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.sistemaDetalleBloque {
+  background: var(--bg-primary); border-left: 4px solid; border-radius: 8px;
+  padding: var(--spacing-md);
+}
+.sistemaDetalleBloque h4 { font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin: 0 0 0.4rem 0; }
+.sistemaDetalleBloque p { font-size: 0.88rem; color: var(--text-primary); margin: 0; line-height: 1.5; }
+.sistemaDetalleMecanismo {
+  font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;
+  background: var(--bg-primary); border-radius: 8px; padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+.sistemaDetalleDato {
+  font-size: 0.88rem; color: var(--text-primary); background: rgba(46,134,171,0.07);
+  border-radius: 8px; padding: var(--spacing-md); margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+}
+.sistemaDetalleSintoma {
+  font-size: 0.88rem; color: var(--text-primary); background: rgba(231,76,60,0.06);
+  border-radius: 8px; padding: var(--spacing-md); line-height: 1.5;
+}
+
+/* ─── Moduladores ─────────────────────────────────── */
+.filtrosZona { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+.filtroBtn {
+  padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+  border: 2px solid var(--border); background: var(--bg-card); color: var(--text-secondary);
+  cursor: pointer; transition: all 0.2s;
+}
+.filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
+.filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.filtroActivo { border-color: var(--primary); background: var(--primary); color: white; }
+
+.moduladoresGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.moduladoresColumna { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.moduladoresColumnaTitulo {
+  font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+.sinResultados { font-size: 0.88rem; color: var(--text-muted); text-align: center; padding: var(--spacing-md); }
+
+.moduladorCard {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid;
+  border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer;
+  transition: all 0.2s;
+}
+.moduladorCard:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.moduladorCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.moduladorCardHeader { display: flex; align-items: center; gap: 0.5rem; }
+.moduladorIcono { font-size: 1.2rem; flex-shrink: 0; }
+.moduladorFactor { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); flex: 1; }
+.moduladorChevron { font-size: 0.7rem; color: var(--text-muted); }
+.moduladorExplicacion {
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;
+  margin: var(--spacing-sm) 0 0 0; padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Insight ─────────────────────────────────────── */
+.insight {
+  background: rgba(72,169,166,0.09); border: 1px solid rgba(72,169,166,0.3);
+  border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-lg); font-size: 0.92rem; color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* ─── Warning box (marcador v2.0) ───────────────────── */
+.warningBox {
+  background: rgba(231,76,60,0.07); border: 1px solid rgba(231,76,60,0.25);
+  border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.88rem; color: var(--text-primary); line-height: 1.55;
+  margin-top: var(--spacing-lg);
+}
+
+/* ─── Responsive ──────────────────────────────────── */
+@media (max-width: 680px) {
+  .container { padding: var(--spacing-lg) var(--spacing-md); }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .heroTitle { font-size: 2rem; }
+  .estresComparacion { grid-template-columns: 1fr; }
+  .sistemasGrid { grid-template-columns: repeat(2, 1fr); }
+  .moduladoresGrid { grid-template-columns: 1fr; }
+  .sistemaDetalleGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+  .sistemasGrid { grid-template-columns: repeat(2, 1fr); }
+  .simuladorBotones { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container, .navBtn, .btnPrimario, .btnSecundario, .efectoCard,
+  .moduladorCard, .filtroBtn, .horarioNivelFill, .simuladorBarraFill {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

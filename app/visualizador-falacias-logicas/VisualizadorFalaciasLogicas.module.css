@@ -1,0 +1,709 @@
+/* VisualizadorFalaciasLogicas.module.css */
+
+/* ── Contenedor principal ──────────────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+}
+
+.heroSubtitle {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  margin: 0 0 0.6rem;
+}
+
+.heroDesc {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Secciones ─────────────────────────────────────────────────────────────── */
+.section {
+  padding: 3.5rem 1.5rem;
+  background: var(--bg-primary);
+}
+
+.sectionAlt {
+  padding: 3.5rem 1.5rem;
+  background: var(--bg-card);
+}
+
+.sectionInner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.sectionIcon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Botones generales ─────────────────────────────────────────────────────── */
+.btnPrimario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btnPrimario:hover {
+  background: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.btnPrimario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.6rem 1.3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnSecundario:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Familias de falacias ──────────────────────────────────────────────────── */
+.familiasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.familiaCard {
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 1.4rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.familiaCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.15);
+}
+
+.familiaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.familiaCardActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.07);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.18);
+}
+
+.familiaIcono {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.familiaNombre {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.familiaCount {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Detalle de familia */
+.familiaDetalle {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 12px 12px 0;
+  padding: 1.5rem 1.8rem;
+  margin-top: 1rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.familiaDetalleTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.familiaDetalleDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.6rem;
+}
+
+.familiaDetalleEngano {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Grid falacias ─────────────────────────────────────────────────────────── */
+.falaciaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.falaciaCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.falaciaCard:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+}
+
+.falaciaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.falaciaCardExpandida {
+  border-color: var(--primary);
+  background: var(--bg-card);
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  box-shadow: 0 6px 24px rgba(46, 134, 171, 0.14);
+  animation: fadeIn 0.25s ease;
+}
+
+@media (max-width: 640px) {
+  .falaciaCardExpandida {
+    grid-template-columns: 1fr;
+  }
+}
+
+.falaciaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.falaciaIcono {
+  font-size: 1.5rem;
+}
+
+.falaciaNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.falaciaDefinicion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.3rem;
+  line-height: 1.5;
+}
+
+.falaciaExpand {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Contenido expandido */
+.falaciaExpandCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.falaciaExpandLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin: 0 0 0.2rem;
+}
+
+.falaciaExpandText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.falaciaExpandItem {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+}
+
+.falaciaRespuesta {
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--secondary);
+}
+
+/* ── Detector de falacias ──────────────────────────────────────────────────── */
+.detectorGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.ejemploCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.ejemploNum {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.ejemploCita {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  border-left: 3px solid var(--accent);
+  padding-left: 0.8rem;
+}
+
+.ejemploAcciones {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.ejemploRespuesta {
+  margin-top: 0.9rem;
+  background: rgba(46, 134, 171, 0.07);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.ejemploFalacia {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.3rem;
+}
+
+.ejemploExplicacion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.aciertoBadge {
+  display: inline-block;
+  background: var(--secondary);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-left: 0.4rem;
+}
+
+.erroBadge {
+  display: inline-block;
+  background: #e55;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-left: 0.4rem;
+}
+
+.contadorAciertos {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.contadorNum {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.contadorLabel {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Opciones de respuesta (múltiple choice) */
+.opcionesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.opcionBtn {
+  background: var(--bg-primary);
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.opcionBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.opcionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.opcionCorrecta {
+  border-color: var(--secondary) !important;
+  background: rgba(72, 169, 166, 0.1) !important;
+  font-weight: 700;
+}
+
+.opcionIncorrecta {
+  border-color: #e55 !important;
+  background: rgba(238, 85, 85, 0.08) !important;
+  opacity: 0.7;
+}
+
+/* ── Constructor de argumentos ─────────────────────────────────────────────── */
+.constructorPilaresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.pilarCard {
+  background: var(--bg-primary);
+  border: 1.5px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.4rem;
+  text-align: center;
+}
+
+.pilarIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.pilarTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.pilarDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.transformacionesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .transformacionesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.transformacionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.transformacionTema {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  color: #fff;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.transformacionBody {
+  padding: 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.transformacionCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.transformacionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.transformacionLabelMalo {
+  color: #c0392b;
+}
+
+.transformacionLabelBueno {
+  color: var(--secondary);
+}
+
+.transformacionTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.transformacionFalacia {
+  font-size: 0.75rem;
+  color: #c0392b;
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* ── Warning box (marcador v2.0) ───────────────────────────────────────────── */
+.warningBox {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1.5px solid rgba(255, 193, 7, 0.4);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 800px;
+  margin: 1.5rem auto 0;
+}
+
+/* ── Animaciones ───────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .familiaDetalle,
+  .falaciaCardExpandida,
+  .ejemploRespuesta {
+    animation: none;
+  }
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+[data-theme='dark'] .familiaCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .familiaCardActiva {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .familiaDetalle {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .falaciaCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .falaciaCardExpandida {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .falaciaExpandItem {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .falaciaRespuesta {
+  background: rgba(72, 169, 166, 0.14);
+}
+
+[data-theme='dark'] .ejemploCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .ejemploRespuesta {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+[data-theme='dark'] .opcionBtn {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .opcionBtn:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .contadorAciertos {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .pilarCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .transformacionCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 193, 7, 0.07);
+  border-color: rgba(255, 193, 7, 0.25);
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: var(--bg-card);
+}

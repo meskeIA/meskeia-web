@@ -1,0 +1,932 @@
+/* VisualizadorEconomiaCircular.module.css */
+
+/* ===== LAYOUT ===== */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.4rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+
+.heroDesc {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  padding: 3rem 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.sectionAlt {
+  padding: 3rem 1.5rem;
+  background-color: var(--bg-card);
+}
+
+.sectionAlt > * {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionIcon {
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ===== BOTONES ===== */
+.btnPrimario {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btnPrimario:hover {
+  background: #246f92;
+  transform: translateY(-1px);
+}
+
+.btnPrimario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btnSecundario:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ===== TOGGLE LINEAL / CIRCULAR ===== */
+.toggleWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.btnToggle {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 2px solid var(--text-muted);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnToggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnToggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnToggleActivo {
+  background: var(--primary);
+  color: #ffffff;
+  border: 2px solid var(--primary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnToggleActivo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ===== DIAGRAMA COMPARACION ===== */
+.comparacionWrapper {
+  margin-bottom: 2.5rem;
+}
+
+.diagramaLineal,
+.diagramaCircular {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 2px solid rgba(46, 134, 171, 0.15);
+}
+
+.diagramaTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.flujoLineal {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.cicloCircular {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pasoLineal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  min-width: 80px;
+}
+
+.pasoCircular {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  background: rgba(46, 134, 171, 0.07);
+  border-radius: 8px;
+  padding: 0.75rem 0.5rem;
+}
+
+.pasoIcono {
+  font-size: 1.8rem;
+}
+
+.pasoNombre {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pasoCoste {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.flechaLineal {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  align-self: center;
+  margin-top: -1rem;
+}
+
+/* ===== WARNING BOX / SUCCESS BOX ===== */
+.warningBox {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.successBox {
+  background: rgba(72, 169, 166, 0.1);
+  border: 1px solid rgba(72, 169, 166, 0.35);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ===== COMPARATIVA TABLA ===== */
+.comparativaTablaWrapper {
+  margin-top: 2rem;
+}
+
+.comparativaTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.comparativaTabla {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.tablaHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+}
+
+.tablaFila {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.75rem 1rem;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.08);
+  background: var(--bg-card);
+  align-items: center;
+}
+
+.tablaFila:last-child {
+  border-bottom: none;
+}
+
+.tablaCategoria {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tablaLineal {
+  color: #EF4444;
+  font-weight: 600;
+  text-align: center;
+}
+
+.tablaCircular {
+  color: #48A9A6;
+  font-weight: 600;
+  text-align: center;
+}
+
+.tablaAhorro {
+  color: var(--primary);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ===== PIRÁMIDE ESTRATEGIAS ===== */
+.estrategiaPiramide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.estrategiaFila {
+  width: 100%;
+}
+
+.estrategiaCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  background: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.estrategiaCard:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.estrategiaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.estrategiaCardActiva {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  background: rgba(46, 134, 171, 0.08);
+  border: 2px solid var(--primary);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-radius: 10px 10px 0 0;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.estrategiaCardActiva:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.estrategiaPosicion {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 24px;
+}
+
+.estrategiaIcono {
+  font-size: 1.4rem;
+}
+
+.estrategiaNombre {
+  flex: 1;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.estrategiaChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.estrategiaDetalle {
+  background: rgba(46, 134, 171, 0.04);
+  border: 2px solid var(--primary);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 1.25rem;
+}
+
+.estrategiaDescripcion {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.estrategiaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.estrategiaGridItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.estrategiaGridItem strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.estrategiaGridItem span {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ===== DATOS GENERALES ESPAÑA ===== */
+.datosGenerales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.datoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.datoNumero {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.datoLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ===== BARRAS MATERIALES ===== */
+.materialesWrapper {
+  margin-bottom: 2.5rem;
+}
+
+.materialesTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.materialBarra {
+  display: grid;
+  grid-template-columns: 140px 1fr 100px;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.materialNombre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.materialBarraWrapper {
+  position: relative;
+  height: 14px;
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.materialBarraActual {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.5s ease;
+}
+
+.materialBarraObjetivo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-right: 2px dashed rgba(46, 134, 171, 0.5);
+  background: transparent;
+}
+
+.materialStats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.materialStats span:first-child {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.materialObjetivo {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ===== SLIDER ALEMANIA ===== */
+.sliderAlemaniaWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.sliderTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+}
+
+.sliderResultados {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.sliderResultadoCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sliderResultadoNumero {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.sliderResultadoLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* ===== CASOS DE EXITO ===== */
+.casosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.casoCard {
+  background: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.casoCard:hover {
+  border-color: var(--primary);
+}
+
+.casoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.casoHeader:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.casoHeader:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.casoIcono {
+  font-size: 1.8rem;
+}
+
+.casoTituloWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.casoEmpresa {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.casoPais {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.casoChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.casoDetalle {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.casoSeccion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.casoSeccion strong {
+  font-size: 0.8rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.casoSeccion p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.casoSeccionDestacada {
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.casoSeccionDestacada strong {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.casoSeccionDestacada p {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== SECCIÓN EDUCATIVA ===== */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.eduCardTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.eduCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .diagramaLineal,
+[data-theme='dark'] .diagramaCircular {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .tablaFila {
+  background: var(--bg-card);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .estrategiaCard {
+  background: var(--bg-primary);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .estrategiaCard:hover {
+  background: rgba(46, 134, 171, 0.07);
+}
+
+[data-theme='dark'] .estrategiaCardActiva {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .estrategiaDetalle {
+  background: rgba(46, 134, 171, 0.07);
+}
+
+[data-theme='dark'] .datoCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .sliderAlemaniaWrapper {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .casoCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .casoCard:hover {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .casoHeader:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .eduCard {
+  background: var(--bg-primary);
+  border-color: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme='dark'] .successBox {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+[data-theme='dark'] .pasoCircular {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .materialBarraWrapper {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .section,
+  .sectionAlt {
+    padding: 2rem 1rem;
+  }
+
+  .cicloCircular {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .flujoLineal {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .flechaLineal {
+    transform: rotate(90deg);
+    margin: 0;
+  }
+
+  .tablaHeader,
+  .tablaFila {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    font-size: 0.75rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .materialBarra {
+    grid-template-columns: 100px 1fr 80px;
+    gap: 0.5rem;
+  }
+
+  .sliderResultados {
+    grid-template-columns: 1fr;
+  }
+
+  .casosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .eduGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ACCESIBILIDAD ===== */
+@media (prefers-reduced-motion: reduce) {
+  .materialBarraActual,
+  .estrategiaCard,
+  .estrategiaCardActiva,
+  .casoCard,
+  .btnPrimario,
+  .btnSecundario,
+  .btnToggle,
+  .btnToggleActivo {
+    transition: none;
+  }
+}

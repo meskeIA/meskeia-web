@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 571,
+  "total_tools": 575,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1915,6 +1915,30 @@
           "slug": "visualizador-comercio-internacional",
           "url": "https://meskeia.com/visualizador-comercio-internacional/",
           "description": "Ventaja comparativa de Ricardo, balanza comercial de España, efecto de los tipos de cambio en exportaciones, y simulador de aranceles con guerra comercial EEUU-China"
+        },
+        {
+          "name": "Falacias Lógicas",
+          "slug": "visualizador-falacias-logicas",
+          "url": "https://meskeia.com/visualizador-falacias-logicas/",
+          "description": "12 falacias lógicas en 5 familias con detector interactivo y constructor de argumentos. Ad hominem, hombre de paja, pendiente resbaladiza y más"
+        },
+        {
+          "name": "Evolución Humana",
+          "slug": "visualizador-evolucion-humana",
+          "url": "https://meskeia.com/visualizador-evolucion-humana/",
+          "description": "Timeline de 8 especies de homínidos, comparativa anatómica cráneo-cerebro-pelvis, mapa de migraciones Out of Africa y revolución cognitiva"
+        },
+        {
+          "name": "Economía Circular",
+          "slug": "visualizador-economia-circular",
+          "url": "https://meskeia.com/visualizador-economia-circular/",
+          "description": "Modelo lineal vs circular con animación SVG, pirámide de las 7 R, datos de reciclaje en España y 4 casos reales de empresas con economía circular"
+        },
+        {
+          "name": "Cortisol - La Hormona del Estrés",
+          "slug": "visualizador-cortisol",
+          "url": "https://meskeia.com/visualizador-cortisol/",
+          "description": "Curva circadiana del cortisol con slider horario, simulador de estrés agudo vs crónico, impacto en 8 sistemas corporales y 20 moduladores de hábitos"
         }
       ]
     },

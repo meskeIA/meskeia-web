@@ -1451,6 +1451,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena de producción global en la práctica' },
     { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'Déficit exterior y financiación internacional' },
   ],
+  'visualizador-falacias-logicas': [
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Errores sistemáticos en el pensamiento' },
+    { url: '/test-pensamiento-critico/', icon: '🔍', name: 'Test Pensamiento Crítico', description: 'Evalúa tu razonamiento lógico' },
+    { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'El origen cognitivo de nuestros razonamientos' },
+    { url: '/visualizador-falacias-logicas/', icon: '❌', name: 'Falacias Lógicas', description: 'Guía visual de errores de razonamiento' },
+  ],
+  'visualizador-evolucion-humana': [
+    { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'Cómo razona el cerebro humano' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'La base molecular de la herencia' },
+    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El cerebro moderno que heredamos' },
+    { url: '/visualizador-ecosistemas/', icon: '🌿', name: 'Ecosistemas', description: 'El entorno que moldeó nuestra evolución' },
+  ],
+  'visualizador-economia-circular': [
+    { url: '/calculadora-huella-carbono/', icon: '🌍', name: 'Huella de Carbono', description: 'Tu impacto ambiental personal' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'Los puntos de no retorno del planeta' },
+    { url: '/visualizador-energia-nuclear/', icon: '⚛️', name: 'Energía Nuclear', description: 'Energía sin carbono en el mix energético' },
+    { url: '/calculadora-reciclaje-ahorro/', icon: '♻️', name: 'Reciclaje y Ahorro', description: 'El impacto económico de reciclar' },
+  ],
+  'visualizador-cortisol': [
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'Todas las hormonas y sus interacciones' },
+    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Cómo el estrés afecta la memoria' },
+    { url: '/visualizador-ciclo-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'El cortisol y el ritmo circadiano del sueño' },
+    { url: '/visualizador-piel-barrera-cutanea/', icon: '🫁', name: 'Piel y Barrera Cutánea', description: 'El cortisol y su efecto en la piel' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

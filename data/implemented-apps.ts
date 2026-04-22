@@ -637,6 +637,10 @@ export const implementedAppsUrls = [
   "/visualizador-llm-funcionamiento/",     // Explicador visual: tokens, embeddings, atención transformers, temperatura
   "/visualizador-ciclo-economico/",        // Explicador visual: 4 fases ciclo, indicadores leading/lagging, yield curve
   "/visualizador-comercio-internacional/", // Explicador visual: ventaja comparativa, balanza, tipos cambio, aranceles
+  "/visualizador-falacias-logicas/",       // 12 falacias en 5 familias, detector interactivo, constructor de argumentos
+  "/visualizador-evolucion-humana/",       // Timeline 8 homínidos, comparativa anatómica, mapa Out of Africa
+  "/visualizador-economia-circular/",      // Lineal vs circular SVG, pirámide 7R, datos reciclaje España, casos reales
+  "/visualizador-cortisol/",              // Curva circadiana, estrés agudo/crónico, 8 sistemas corporales, 20 hábitos
 ];
 
 /**
