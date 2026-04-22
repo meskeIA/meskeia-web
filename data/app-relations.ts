@@ -1433,6 +1433,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'Ciclo del Agua', description: 'Los océanos en el ciclo hidrológico global' },
     { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'El coste económico del cambio climático' },
   ],
+  'visualizador-llm-funcionamiento': [
+    { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'La computación cuántica podría acelerar los LLMs' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'IA y Redes Neuronales', description: 'Las redes que hacen posibles los transformers' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Cómo se protegen las comunicaciones con los LLMs' },
+    { url: '/curso-optimizacion-ia/', icon: '📊', name: 'Curso GEO/AEO', description: 'Optimiza tu contenido para que los LLMs te citen' },
+  ],
+  'visualizador-ciclo-economico': [
+    { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Cómo el BCE usa los tipos para modular el ciclo' },
+    { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'La bolsa como indicador leading del ciclo' },
+    { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'El ciclo y la sostenibilidad de la deuda' },
+    { url: '/visualizador-comercio-internacional/', icon: '🌍', name: 'Comercio Internacional', description: 'El comercio refleja y amplifica el ciclo económico' },
+  ],
+  'visualizador-comercio-internacional': [
+    { url: '/visualizador-ciclo-economico/', icon: '📈', name: 'Ciclo Económico', description: 'Cómo el ciclo afecta a las exportaciones' },
+    { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Los tipos determinan el tipo de cambio del euro' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena de producción global en la práctica' },
+    { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'Déficit exterior y financiación internacional' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

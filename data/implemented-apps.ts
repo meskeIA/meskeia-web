@@ -634,6 +634,9 @@ export const implementedAppsUrls = [
   "/visualizador-electromagnetismo/",      // Explicador visual: campo eléctrico, magnético, inducción Faraday, espectro EM
   "/visualizador-computacion-cuantica/",   // Explicador visual: qubits, puertas cuánticas, paralelismo, amenaza RSA
   "/visualizador-oceanos-corrientes/",     // Explicador visual: AMOC, corriente del Golfo, acidificación, zonas muertas
+  "/visualizador-llm-funcionamiento/",     // Explicador visual: tokens, embeddings, atención transformers, temperatura
+  "/visualizador-ciclo-economico/",        // Explicador visual: 4 fases ciclo, indicadores leading/lagging, yield curve
+  "/visualizador-comercio-internacional/", // Explicador visual: ventaja comparativa, balanza, tipos cambio, aranceles
 ];
 
 /**

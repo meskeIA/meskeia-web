@@ -1,0 +1,962 @@
+/* ──────────────────────────────────────────────────────────────
+   Paleta meskeIA — VisualizadorCicloEconomico
+   ────────────────────────────────────────────────────────────── */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+}
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Hero
+   ────────────────────────────────────────────────────────────── */
+.hero {
+  margin-top: 80px;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md);
+}
+
+.heroTitle {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0 0 var(--spacing-sm);
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Secciones
+   ────────────────────────────────────────────────────────────── */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.sectionAlt {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: #1e1e1e;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.sectionIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   SVG ciclo económico
+   ────────────────────────────────────────────────────────────── */
+.cicloSvgWrapper {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+[data-theme='dark'] .cicloSvgWrapper {
+  background: #222;
+}
+
+.cicloSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.btnPausarAnim {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnPausarAnim:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.btnPausarAnim:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Tarjetas de fase
+   ────────────────────────────────────────────────────────────── */
+.fasesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.faseCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: var(--spacing-sm) var(--spacing-xs);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s, transform 0.15s;
+  font-family: inherit;
+}
+
+.faseCard:hover {
+  transform: translateY(-2px);
+}
+
+.faseCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.faseCardActiva {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.faseCardIcono {
+  font-size: 1.5rem;
+}
+
+.faseCardNombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Detalle de fase
+   ────────────────────────────────────────────────────────────── */
+.faseDetalle {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: border-left-color 0.3s;
+}
+
+[data-theme='dark'] .faseDetalle {
+  background: #222;
+}
+
+.faseDetalleTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.faseDetalleTitulo h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.faseDuracion {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.15rem 0.6rem;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.faseDetalleDesc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0 0 var(--spacing-md);
+}
+
+.faseIndicadoresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.faseIndicador {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.faseIndicadorLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.faseIndicadorValor {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.faseEjemplos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.faseEjemplo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+}
+
+.faseEjemploFlag {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Sección 2: Indicadores
+   ────────────────────────────────────────────────────────────── */
+.regionToggle {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.btnToggle {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btnToggle:hover {
+  background: var(--hover);
+}
+
+.btnToggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnToggleActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.indicadoresColumnas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.indicadoresColumna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.indicadoresColHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.colHeader_leading {
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.colHeader_coincident {
+  background: #fef9c3;
+  border: 1px solid #fde68a;
+}
+
+.colHeader_lagging {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+[data-theme='dark'] .colHeader_leading {
+  background: #14532d44;
+  border-color: #16a34a44;
+}
+
+[data-theme='dark'] .colHeader_coincident {
+  background: #78350f44;
+  border-color: #d9770044;
+}
+
+[data-theme='dark'] .colHeader_lagging {
+  background: #7f1d1d44;
+  border-color: #b91c1c44;
+}
+
+.indicadoresColIcono {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.indicadoresColTipo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.indicadoresColDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.indicadorCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  font-family: inherit;
+  width: 100%;
+}
+
+.indicadorCard:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.indicadorCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.indicadorCardActivo {
+  border-color: var(--primary);
+  background: #2e86ab12;
+}
+
+[data-theme='dark'] .indicadorCardActivo {
+  background: #2e86ab22;
+}
+
+.indicadorIcono {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.indicadorNombre {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.indicadorChevron {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Panel detalle indicador */
+.indicadorDetalle {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.indDetalle_leading {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.indDetalle_coincident {
+  background: #fefce8;
+  border-color: #fde68a;
+}
+
+.indDetalle_lagging {
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+[data-theme='dark'] .indDetalle_leading {
+  background: #14532d22;
+  border-color: #16a34a44;
+}
+
+[data-theme='dark'] .indDetalle_coincident {
+  background: #78350f22;
+  border-color: #d9770044;
+}
+
+[data-theme='dark'] .indDetalle_lagging {
+  background: #7f1d1d22;
+  border-color: #b91c1c44;
+}
+
+.indicadorDetalleTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.indicadorTipoBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  margin-left: auto;
+}
+
+.tipoBadge_leading {
+  background: #22c55e;
+  color: white;
+}
+
+.tipoBadge_coincident {
+  background: #eab308;
+  color: white;
+}
+
+.tipoBadge_lagging {
+  background: #ef4444;
+  color: white;
+}
+
+.porQueBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.porQueBox strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.datosActualesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.datoActual {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: border-color 0.2s;
+}
+
+.datoActual strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.datoActualResaltado {
+  border-color: var(--primary);
+  background: #2e86ab0a;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Sección 3: Yield curve
+   ────────────────────────────────────────────────────────────── */
+.curvaEstadoBtns {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.btnPrimario {
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btnPrimario:hover {
+  filter: brightness(0.88);
+  transform: translateY(-1px);
+}
+
+.btnPrimario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnPrimarioActivo {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btnSecundario {
+  padding: 0.55rem 1.2rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btnSecundario:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.yieldCurveWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.yieldCurve {
+  width: 100%;
+  height: auto;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm);
+  display: block;
+}
+
+[data-theme='dark'] .yieldCurve {
+  background: #222;
+}
+
+.yieldInterpretacion {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  transition: border-color 0.3s;
+}
+
+.yieldInterpretacion h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.yieldInterpretacion p {
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Sección 4: Simulador
+   ────────────────────────────────────────────────────────────── */
+.simuladorAviso {
+  background: #fef9c3;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.88rem;
+  color: #92400e;
+  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+}
+
+[data-theme='dark'] .simuladorAviso {
+  background: #78350f22;
+  border-color: #d9770044;
+  color: #fbbf24;
+}
+
+.preguntasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.preguntaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.preguntaTexto {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.preguntaNum {
+  color: var(--primary);
+}
+
+.preguntaDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+.preguntaBtns {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.btnRespuesta {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--hover);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btnRespuesta:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnRespuestaSi {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+
+.btnRespuestaNo {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+/* Resultado simulador */
+.simuladorResultado {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.simuladorResultadoHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.simuladorResultadoIcono {
+  font-size: 2.2rem;
+}
+
+.simuladorResultadoHeader h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.simuladorSiguiente {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+}
+
+.simuladorSiguiente strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.simuladorDisclaimer {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Warning Box (requerido v2.0)
+   ────────────────────────────────────────────────────────────── */
+.warningBox {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #78350f22;
+  border-color: #d9770044;
+  border-left-color: #f59e0b;
+  color: var(--text-primary);
+}
+
+.historialLista {
+  margin: var(--spacing-sm) 0;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.historialLista li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.warningBoxNota {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: var(--spacing-xs) 0 0;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Responsive
+   ────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .indicadoresColumnas {
+    grid-template-columns: 1fr;
+  }
+
+  .fasesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .faseIndicadoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .preguntasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .datosActualesRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .heroTitle {
+    font-size: 1.7rem;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+  }
+
+  .section {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .sectionTitle {
+    font-size: 1.15rem;
+  }
+
+  .curvaEstadoBtns {
+    flex-direction: column;
+  }
+
+  .regionToggle {
+    flex-direction: column;
+  }
+
+  .simuladorResultadoHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faseCard,
+  .indicadorCard,
+  .btnPrimario,
+  .btnSecundario,
+  .btnToggle,
+  .btnRespuesta,
+  .btnPausarAnim {
+    transition: none;
+  }
+}

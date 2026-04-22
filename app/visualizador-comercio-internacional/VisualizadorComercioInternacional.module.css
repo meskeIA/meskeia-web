@@ -1,0 +1,1172 @@
+/* ===================================================
+   Visualizador Comercio Internacional — meskeIA
+   Paleta: #2E86AB (primary) / #48A9A6 (secondary)
+   =================================================== */
+
+/* ─── Contenedor base ─── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ─── Navegación de secciones ─── */
+.navSecciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.navBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 0.75rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.navBtn:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
+  transform: translateY(-1px);
+}
+
+.navBtnActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  box-shadow: 0 2px 12px rgba(46, 134, 171, 0.2);
+}
+
+.navBtnIcono {
+  font-size: 1.6rem;
+  display: block;
+}
+
+.navBtnTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.navBtnSub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* ─── Secciones generales ─── */
+.section {
+  max-width: 900px;
+  margin: 0 auto 3rem;
+  padding: 0 1.5rem;
+}
+
+.sectionAlt {
+  background: rgba(46, 134, 171, 0.04);
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.15);
+}
+
+.sectionIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  line-height: 1.25;
+}
+
+.sectionSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Ventaja Comparativa ─── */
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.paisCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.paisNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+.sliderGrupo {
+  margin-bottom: 1rem;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.sliderLabel strong {
+  color: var(--primary);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 4px;
+}
+
+.sliderValores {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Tabla comparativa */
+.tablaComparativaWrapper {
+  margin-bottom: 1.5rem;
+}
+
+.tablaComparativaTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.tablaCaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tablaComparativa th,
+.tablaComparativa td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.tablaComparativa thead tr {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.tablaComparativa th {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.tablaComparativa tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Ventajas */
+.ventajasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ventajaCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.ventajaCardDestacada {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.ventajaTipo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.ventajaDetalle {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.ventajaDetalle strong {
+  color: var(--primary);
+}
+
+.ventajaExplicacion {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0.75rem 0 0;
+  line-height: 1.5;
+}
+
+/* Toggle comercio */
+.comercioToggle {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+/* Producción */
+.produccionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.produccionCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.produccionTotal {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.produccionPais {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.produccionDato {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0.25rem 0;
+}
+
+/* ─── Balanza Comercial ─── */
+.selectorPais {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.btnPais {
+  padding: 0.6rem 1.25rem;
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPais:hover {
+  border-color: var(--primary);
+}
+
+.btnPaisActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+}
+
+.flujoSvg {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.svgDiagrama {
+  width: 100%;
+  height: auto;
+}
+
+.balanzaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.balanzaCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border-left: 4px solid transparent;
+}
+
+.balanzaPositiva {
+  border-left-color: #27AE60;
+}
+
+.balanzaNegativa {
+  border-left-color: #E74C3C;
+}
+
+.balanzaTipo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin: 0 0 0.4rem;
+}
+
+.balanzaDescripcion {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.balanzaValor {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 0.4rem;
+  color: var(--text-primary);
+}
+
+.balanzaPositiva .balanzaValor {
+  color: #27AE60;
+}
+
+.balanzaNegativa .balanzaValor {
+  color: #E74C3C;
+}
+
+.balanzaEstado {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.balanzaInfo {
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.balanzaExportTop {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.balanzaNota {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Tipos de Cambio ─── */
+.cambioControles {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cambioGrupo {
+  margin-bottom: 1.25rem;
+}
+
+.cambioGrupo:last-child {
+  margin-bottom: 0;
+}
+
+.divButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.btnPaisSmall {
+  padding: 0.4rem 0.85rem;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPaisSmall:hover {
+  border-color: var(--primary);
+}
+
+.cambioResultados {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cambioTipoCambio {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.cambioTipoLabel {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.cambioTipoValor {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 0.35rem;
+}
+
+.cambioTipoBase {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.cambioEfectos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cambioEfecto {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  border-left: 4px solid transparent;
+}
+
+.efectoPositivo {
+  border-left-color: #27AE60;
+  background: rgba(39, 174, 96, 0.04);
+}
+
+.efectoNegativo {
+  border-left-color: #E74C3C;
+  background: rgba(231, 76, 60, 0.04);
+}
+
+.efectoNeutro {
+  border-left-color: var(--text-muted);
+}
+
+.cambioEfectoTitulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.cambioEfectoDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.textoPositivo {
+  color: #27AE60;
+}
+
+.textoNegativo {
+  color: #E74C3C;
+}
+
+.ejemploCambio {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ejemploTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.ejemploDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.ejemploDescDestacado {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.mapaMental {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.mapaTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.mapaFlujo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mapaPaso {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mapaBurbuja {
+  background: rgba(46, 134, 171, 0.1);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.mapaFlecha {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ─── Aranceles ─── */
+.simuladorArancel {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.simuladorTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1.25rem;
+}
+
+.simuladorControles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Barra de aranceles */
+.barraAranceles {
+  display: flex;
+  height: 42px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.barraBase {
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: width 0.3s ease;
+  min-width: 50px;
+}
+
+.barraArancel {
+  background: #E74C3C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: width 0.3s ease;
+  min-width: 40px;
+}
+
+.arancelResultados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.arancelResultado {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.arancelResultadoTotal {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.arancelResultadoLabel {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.4rem;
+}
+
+.arancelResultadoValor {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.arancelResultadoTotal .arancelResultadoValor {
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+/* Tipos de barreras */
+.barrerasTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.barrerasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.barreraCard {
+  background: var(--bg-card);
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  color: var(--text-primary);
+}
+
+.barreraCard:hover {
+  border-color: var(--barrera-color, var(--primary));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.barreraCardActiva {
+  border-color: var(--barrera-color, var(--primary));
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.barreraIcono {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.barreraNombre {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.barreraDetalle {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.barreraDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.barreraEjemplo {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Timeline */
+.timeline {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.timelineTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+
+.timelineLinea {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timelineLinea::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(46, 134, 171, 0.25);
+}
+
+.timelineHito {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-left: 1.25rem;
+}
+
+.timelineHito:last-child {
+  margin-bottom: 0;
+}
+
+.timelineFecha {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.3rem;
+}
+
+.timelinePunto {
+  position: absolute;
+  left: -1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 2px rgba(46, 134, 171, 0.3);
+}
+
+.timelineContenido {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.timelineTituloHito {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.timelineDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.4rem;
+}
+
+.timelineImpacto {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ─── Sección educativa ─── */
+.educativoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.educativoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.educativoTitulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.educativoTexto {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─── Botones generales ─── */
+.btnPrimario {
+  padding: 0.6rem 1.25rem;
+  background: var(--primary);
+  color: #fff;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPrimario:hover {
+  background: #1a6a8a;
+  border-color: #1a6a8a;
+}
+
+.btnPrimario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  padding: 0.6rem 1.25rem;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid rgba(46, 134, 171, 0.35);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecundario:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Warning Box (v2.0 requerido) ─── */
+.warningBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(46, 134, 171, 0.07);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.warningBox p {
+  margin: 0;
+}
+
+/* ─── Dark Mode ─── */
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .navBtn {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .navBtnActivo {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .paisCard,
+[data-theme='dark'] .ventajaCard,
+[data-theme='dark'] .produccionCard,
+[data-theme='dark'] .balanzaCard,
+[data-theme='dark'] .cambioControles,
+[data-theme='dark'] .cambioTipoCambio,
+[data-theme='dark'] .cambioEfecto,
+[data-theme='dark'] .ejemploCambio,
+[data-theme='dark'] .mapaMental,
+[data-theme='dark'] .simuladorArancel,
+[data-theme='dark'] .timeline,
+[data-theme='dark'] .educativoCard,
+[data-theme='dark'] .flujoSvg {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .tablaComparativa {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tablaComparativa th,
+[data-theme='dark'] .tablaComparativa td {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .tablaComparativa thead tr {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .arancelResultado {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .barreraCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .timelineContenido {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .balanzaInfo {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .mapaBurbuja {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .timelineLinea::before {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .timelinePunto {
+  border-color: var(--bg-card);
+}
+
+/* ─── Accesibilidad ─── */
+.navBtn:focus-visible,
+.btnPais:focus-visible,
+.btnPaisSmall:focus-visible,
+.barreraCard:focus-visible,
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .comparativaGrid,
+  .ventajasGrid,
+  .simuladorControles,
+  .cambioResultados {
+    grid-template-columns: 1fr;
+  }
+
+  .navSecciones {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mapaFlujo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mapaFlecha {
+    transform: rotate(90deg);
+  }
+
+  .balanzaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .arancelResultados {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .barrerasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Animaciones respetuosas ─── */
+@media (prefers-reduced-motion: reduce) {
+  .navBtn,
+  .btnPrimario,
+  .btnSecundario,
+  .barreraCard,
+  .barraBase,
+  .barraArancel {
+    transition-duration: 0.01ms !important;
+  }
+}
