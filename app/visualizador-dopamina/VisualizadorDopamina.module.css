@@ -1,0 +1,734 @@
+/* VisualizadorDopamina.module.css */
+/* Paleta meskeIA + acento dopaminérgico #7B5EA7 */
+
+/* ─────────────────────────────────────────────
+   Layout base
+───────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  opacity: 0.9;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ─────────────────────────────────────────────
+   Secciones generales
+───────────────────────────────────────────── */
+
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.sectionIntro {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 2rem;
+  max-width: 720px;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 1: Circuito de Recompensa
+───────────────────────────────────────────── */
+
+.circuitoContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Indicadores de paso */
+.stepIndicator {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.indicadorPunto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(46, 134, 171, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+.indicadorPunto:hover {
+  background: rgba(46, 134, 171, 0.5);
+  transform: scale(1.15);
+}
+
+.indicadorActivo {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
+/* Contenido del paso */
+.pasoContenido {
+  min-height: 280px;
+}
+
+.pasoHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pasoNumero {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pasoTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #7B5EA7;
+  margin: 0;
+}
+
+.pasoDescripcion {
+  color: var(--text-primary);
+  line-height: 1.75;
+  margin: 0 0 1.5rem;
+  font-size: 1rem;
+}
+
+.pasoVisualizacion {
+  margin: 1.5rem 0;
+}
+
+.pasoDato {
+  background: rgba(123, 94, 167, 0.08);
+  border-left: 3px solid #7B5EA7;
+  border-radius: 0 8px 8px 0;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Controles */
+.stepControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.12);
+  gap: 1rem;
+}
+
+.btnControl {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btnControl:hover:not(:disabled) {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.btnControl:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnControl:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepCounterText {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────
+   Diagrama Paso 1: ATV → Núcleo Accumbens
+───────────────────────────────────────────── */
+
+.diagramaPaso1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.5rem 0;
+}
+
+.cajaCerebral {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(46, 134, 171, 0.1);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 160px;
+}
+
+.cajaDestino {
+  background: rgba(123, 94, 167, 0.1);
+  border-color: #7B5EA7;
+}
+
+.cajaLabel {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.cajaSubLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.flechaCircuito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.flechaLinea {
+  display: block;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), #7B5EA7);
+  border-radius: 2px;
+}
+
+.flechaPunta {
+  color: #7B5EA7;
+  font-size: 1.1rem;
+  animation: pulsar 1.4s ease-in-out infinite;
+}
+
+.flechaEtiqueta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+@keyframes pulsar {
+  0%, 100% { opacity: 1; transform: translateX(0); }
+  50% { opacity: 0.5; transform: translateX(4px); }
+}
+
+/* ─────────────────────────────────────────────
+   SVG Gráfica Anticipación (Paso 2)
+───────────────────────────────────────────── */
+
+.svgAnticipacionWrapper {
+  overflow-x: auto;
+}
+
+.svgAnticipacion {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Error de Predicción (Paso 3)
+───────────────────────────────────────────── */
+
+.errorPrediccionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .errorPrediccionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.errorCaso {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.errorFlecha {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.errorEtiqueta {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.errorDescripcion {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Bucle Habitual (Paso 4)
+───────────────────────────────────────────── */
+
+.bucleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.bucleItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bucleNodo {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1), rgba(123, 94, 167, 0.1));
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  white-space: pre-line;
+}
+
+.bucleFlecha {
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 2: Grid de Contextos (4×2)
+───────────────────────────────────────────── */
+
+.gridContextos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .gridContextos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .gridContextos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contextCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: default;
+}
+
+.contextCard:hover {
+  box-shadow: 0 6px 24px rgba(46, 134, 171, 0.14);
+  transform: translateY(-2px);
+}
+
+.contextIcono {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.contextTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.contextDescripcion {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 3: Comparativa Parkinson
+───────────────────────────────────────────── */
+
+.parkinssonComparativa {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .parkinssonComparativa {
+    grid-template-columns: 1fr;
+  }
+}
+
+.parkinsonPanel {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.parkinsonPanelAfectado {
+  border-color: rgba(224, 112, 112, 0.25);
+}
+
+.parkinsonPanelTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+
+.parkinsonBadgeNormal {
+  background: rgba(72, 169, 166, 0.15);
+  color: #48A9A6;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.parkinsonBadgeAfectado {
+  background: rgba(224, 112, 112, 0.12);
+  color: #E07070;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Visualización de neuronas */
+.neuronasContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 1rem;
+  min-height: 50px;
+}
+
+.neuronaNormal {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #7B5EA7;
+  opacity: 0.85;
+}
+
+.neuronaLost {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(123, 94, 167, 0.15);
+  border: 1px dashed rgba(123, 94, 167, 0.3);
+}
+
+.parkinsonDescripcion {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.parkinsonFlecha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.flechaFuerte {
+  color: #48A9A6;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -2px;
+}
+
+.flechaDebil {
+  color: #E07070;
+  font-size: 0.9rem;
+}
+
+.parkinsonNota {
+  background: rgba(46, 134, 171, 0.05);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1.25rem 1.5rem;
+}
+
+.parkinsonNota p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 0.75rem;
+}
+
+.parkinsonNota p:last-child {
+  margin: 0;
+}
+
+.parkinsonCierre {
+  font-style: italic;
+  color: var(--text-muted) !important;
+  font-size: 0.82rem !important;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 4: Grid Moduladores (5×2)
+───────────────────────────────────────────── */
+
+.gridModuladores {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .gridModuladores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .gridModuladores {
+    grid-template-columns: 1fr;
+  }
+}
+
+.moduladorCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.moduladorCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.moduladorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.moduladorIcono {
+  font-size: 1.4rem;
+}
+
+.moduladorBadge {
+  font-size: 0.95rem;
+  font-weight: 800;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.badgeArriba {
+  background: rgba(72, 169, 166, 0.15);
+  color: #48A9A6;
+}
+
+.badgeAbajo {
+  background: rgba(224, 112, 112, 0.12);
+  color: #E07070;
+}
+
+.badgeComplejo {
+  background: rgba(230, 160, 50, 0.12);
+  color: #B07800;
+}
+
+.moduladorTitulo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.moduladorDescripcion {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Warning Box (v2.0 marker)
+───────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(255, 243, 205, 0.6);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .circuitoContainer {
+  border-color: rgba(46, 134, 171, 0.25);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .cajaCerebral {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .cajaDestino {
+  background: rgba(123, 94, 167, 0.15);
+}
+
+[data-theme='dark'] .contextCard {
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .moduladorCard {
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .parkinsonPanel {
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .parkinsonPanelAfectado {
+  border-color: rgba(224, 112, 112, 0.3);
+}
+
+[data-theme='dark'] .parkinsonNota {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .pasoDato {
+  background: rgba(123, 94, 167, 0.12);
+}
+
+[data-theme='dark'] .errorCaso {
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .bucleNodo {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.15), rgba(123, 94, 167, 0.15));
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 243, 205, 0.08);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .badgeComplejo {
+  color: #E0A030;
+}
+
+/* ─────────────────────────────────────────────
+   Reduced motion
+───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .flechaPunta {
+    animation: none;
+  }
+  .contextCard,
+  .moduladorCard {
+    transition: none;
+  }
+  .btnControl {
+    transition: none;
+  }
+}

@@ -645,6 +645,10 @@ export const implementedAppsUrls = [
   "/visualizador-desigualdad-riqueza/",   // Curva de Lorenz interactiva, Gini, efecto acumulación, políticas redistributivas
   "/visualizador-impacto-ia-sectores/",   // Automatización por sector, empleos en riesgo/emergentes, timeline IA, habilidades futuro
   "/visualizador-estadistica-cotidiana/", // Bayes, regresión media, paradoja Simpson, sesgo supervivencia, ley grandes números
+  "/visualizador-insulina-glucosa/",      // Curva glucosa, mecanismo insulina celular, índice glucémico, insulinorresistencia
+  "/visualizador-tiroides/",              // Eje HPT con feedback animado, T3/T4, hipo vs hiper, 8 factores
+  "/visualizador-oxitocina/",             // 10 situaciones, mapa corporal, oxitocina vs vasopresina, 6 datos ciencia
+  "/visualizador-dopamina/",              // Circuito recompensa 4 pasos, 8 contextos, Parkinson, 10 moduladores
 ];
 
 /**

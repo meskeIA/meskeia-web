@@ -1,0 +1,597 @@
+/* ============================================
+   VisualizadorInsulinaGlucosa.module.css
+   Paleta meskeIA: #2E86AB (azul) / #48A9A6 (teal)
+   ============================================ */
+
+/* ── Layout principal ── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcon {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ── Secciones ── */
+.section {
+  max-width: 860px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── Selector de perfil glucosa ── */
+.selectorPerfil {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.btnPerfil {
+  padding: 0.45rem 1rem;
+  border: 2px solid #2E86AB;
+  border-radius: 20px;
+  background: transparent;
+  color: #2E86AB;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnPerfil:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.btnPerfilActivo {
+  background: #2E86AB;
+  color: white;
+}
+
+.btnPerfilActivo:hover {
+  background: #246d8c;
+}
+
+.perfilDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 1rem;
+  font-style: italic;
+}
+
+.marcadoresComidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+}
+
+/* ── Chart ── */
+.chartContainer {
+  height: 300px;
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.notaGrafico {
+  font-size: 0.8rem;
+  color: var(--text-muted, #999);
+  text-align: center;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Animación celular ── */
+.animacionCelular {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stepIndicatorContainer {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stepDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #D0D0D0;
+  transition: background 0.25s ease;
+}
+
+.stepDotActivo {
+  background: #2E86AB;
+}
+
+.stepTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0;
+  text-align: center;
+}
+
+.svgCelula {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  display: block;
+}
+
+.stepTexto {
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stepBotones {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btnNav {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #2E86AB;
+  border-radius: 8px;
+  background: transparent;
+  color: #2E86AB;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnNav:hover:not(:disabled) {
+  background: #2E86AB;
+  color: white;
+}
+
+.btnNav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepCounter {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ── Índice glucémico ── */
+.filtroIG {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.btnFiltroIG {
+  padding: 0.35rem 0.85rem;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg-primary, #FAFAFA);
+  color: var(--text-secondary, #666);
+}
+
+.btnFiltroIG:hover {
+  opacity: 0.85;
+}
+
+.btnFiltroIGActivo {
+  color: white;
+}
+
+.btnFiltro_todos {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.btnFiltro_todos.btnFiltroIGActivo {
+  background: #2E86AB;
+  color: white;
+}
+
+.btnFiltro_bajo {
+  border-color: #22C55E;
+  color: #22C55E;
+}
+
+.btnFiltro_bajo.btnFiltroIGActivo {
+  background: #22C55E;
+  color: white;
+}
+
+.btnFiltro_medio {
+  border-color: #F59E0B;
+  color: #F59E0B;
+}
+
+.btnFiltro_medio.btnFiltroIGActivo {
+  background: #F59E0B;
+  color: white;
+}
+
+.btnFiltro_alto {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+.btnFiltro_alto.btnFiltroIGActivo {
+  background: #EF4444;
+  color: white;
+}
+
+.tablaIG {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tablaIGHeader {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(46, 134, 171, 0.08);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tablaIGFila {
+  display: grid;
+  grid-template-columns: 1fr 60px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.55rem 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background 0.15s ease;
+}
+
+.tablaIGFila:hover {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.nombreAlimento {
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.valorIG {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  text-align: center;
+}
+
+.barraIGWrapper {
+  height: 14px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.barraIG {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.4s ease;
+}
+
+.barraIG_bajo {
+  background: #22C55E;
+}
+
+.barraIG_medio {
+  background: #F59E0B;
+}
+
+.barraIG_alto {
+  background: #EF4444;
+}
+
+/* ── Comparativa resistencia ── */
+.comparativaResistencia {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.columnaComparativa {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.columnaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.columnaHeader h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.columnaHeaderOk {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+}
+
+.columnaHeaderAlert {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+}
+
+.listaComparativa {
+  list-style: none;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.listaComparativa li {
+  font-size: 0.88rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.5;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.listaComparativa li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #2E86AB;
+}
+
+.textoResistencia {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #2E86AB;
+}
+
+/* ── Educativo ── */
+.educContent h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.educContent h3:first-child {
+  margin-top: 0;
+}
+
+.educContent p {
+  font-size: 0.93rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.7;
+  margin: 0 0 0.6rem;
+}
+
+.educContent ul {
+  padding-left: 1.4rem;
+  margin: 0.4rem 0 0.8rem;
+}
+
+.educContent li {
+  font-size: 0.92rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+  margin-bottom: 0.3rem;
+}
+
+/* ── Warning Box (v2.0 marker) ── */
+.warningBox {
+  background: #FFFBEB;
+  border-left: 4px solid #2E86AB;
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  margin-top: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+}
+
+.warningBox strong {
+  color: #2E86AB;
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary, #1A1A1A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .section {
+  background: var(--bg-card, #2A2A2A);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .btnPerfil {
+  color: #7FB3D3;
+  border-color: #7FB3D3;
+}
+
+[data-theme='dark'] .btnPerfil:hover {
+  background: rgba(127, 179, 211, 0.1);
+}
+
+[data-theme='dark'] .btnPerfilActivo {
+  background: #2E86AB;
+  color: white;
+  border-color: #2E86AB;
+}
+
+[data-theme='dark'] .tablaIG {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .tablaIGHeader {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tablaIGFila {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .tablaIGFila:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .barraIGWrapper {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .columnaComparativa {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 251, 235, 0.08);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .textoResistencia {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .btnFiltroIG {
+  background: var(--bg-card, #2A2A2A);
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .btnNav {
+  color: #7FB3D3;
+  border-color: #7FB3D3;
+}
+
+[data-theme='dark'] .btnNav:hover:not(:disabled) {
+  background: #2E86AB;
+  color: white;
+  border-color: #2E86AB;
+}
+
+[data-theme='dark'] .educContent p,
+[data-theme='dark'] .educContent li {
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .comparativaResistencia {
+    grid-template-columns: 1fr;
+  }
+
+  .selectorPerfil {
+    flex-direction: column;
+  }
+
+  .btnPerfil {
+    text-align: center;
+  }
+
+  .marcadoresComidas {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .tablaIGHeader,
+  .tablaIGFila {
+    grid-template-columns: 1fr 50px 1fr;
+    gap: 0.3rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .chartContainer {
+    height: 240px;
+  }
+}
+
+/* ── Animaciones reducidas ── */
+@media (prefers-reduced-motion: reduce) {
+  .btnPerfil,
+  .btnNav,
+  .barraIG,
+  .stepDot {
+    transition: none;
+  }
+}

@@ -1499,6 +1499,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sesgos-cognitivos/', icon: '🔍', name: 'Sesgos Cognitivos', description: 'Por qué nuestra intuición estadística falla' },
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'La estadística detrás de los mercados' },
   ],
+  'visualizador-insulina-glucosa': [
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'Otra hormona clave en el metabolismo energético' },
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'El panorama completo de todas las hormonas' },
+    { url: '/visualizador-tiroides/', icon: '🦋', name: 'Tiroides', description: 'La glándula que regula el metabolismo basal' },
+    { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'Cómo el azúcar activa el circuito de recompensa' },
+  ],
+  'visualizador-tiroides': [
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'El contexto hormonal completo' },
+    { url: '/visualizador-insulina-glucosa/', icon: '🩸', name: 'Insulina y Glucosa', description: 'Otra hormona que regula el metabolismo' },
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'Cortisol e hipotiroidismo comparten síntomas de fatiga' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'La función tiroidea cambia con la edad' },
+  ],
+  'visualizador-oxitocina': [
+    { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'La otra hormona del bienestar y la motivación' },
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'La oxitocina reduce el cortisol en situaciones de estrés' },
+    { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'El sustrato neurológico de los vínculos sociales' },
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'Oxitocina en el contexto hormonal completo' },
+  ],
+  'visualizador-dopamina': [
+    { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'La hormona del vínculo social que trabaja con la dopamina' },
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'Estrés crónico y su efecto en el sistema dopaminérgico' },
+    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Dopamina y consolidación de memoria' },
+    { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'Emociones y el circuito de recompensa' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

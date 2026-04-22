@@ -1,0 +1,660 @@
+/* VisualizadorTiroides.module.css */
+
+/* ── Contenedor ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ── Main ── */
+.main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Sección ── */
+.seccion {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+
+[data-theme='dark'] .seccion {
+  border-color: #3a3a3a;
+}
+
+.tituloSeccion {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.subtituloSeccion {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* ── Eje hormonal ── */
+.ejeHormonal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1.25rem;
+}
+
+.nivelEje {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  font-size: 0.95rem;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nivelHipotalamo {
+  background: #e8f4fd;
+  border-color: #2E86AB;
+  color: #1a5276;
+}
+
+.nivelHipofisis {
+  background: #eaf5fb;
+  border-color: #48A9A6;
+  color: #0e6655;
+}
+
+.nivelTiroides {
+  background: #fef9e7;
+  border-color: #f0b429;
+  color: #7d6608;
+}
+
+.nivelCelulas {
+  background: #eafaf1;
+  border-color: #27ae60;
+  color: #1d6a3d;
+}
+
+[data-theme='dark'] .nivelHipotalamo {
+  background: #1a2e3a;
+  color: #7fb3d3;
+  border-color: #2E86AB;
+}
+
+[data-theme='dark'] .nivelHipofisis {
+  background: #1a2e2e;
+  color: #48A9A6;
+  border-color: #48A9A6;
+}
+
+[data-theme='dark'] .nivelTiroides {
+  background: #2e2a1a;
+  color: #f0c040;
+  border-color: #c49a1a;
+}
+
+[data-theme='dark'] .nivelCelulas {
+  background: #1a2e22;
+  color: #5dbb78;
+  border-color: #27ae60;
+}
+
+.nivelIcono {
+  font-size: 1.8rem;
+}
+
+.nivelDescripcion {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.flechaEje {
+  font-size: 1.5rem;
+  color: var(--primary);
+  line-height: 1.2;
+  margin: 0.15rem 0;
+  user-select: none;
+}
+
+/* ── Flecha de feedback ── */
+.flechaFeedback {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.flechaFeedbackActiva {
+  display: flex;
+  animation: aparecer 0.4s ease;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.flechaFeedbackLinea {
+  display: block;
+  width: 3px;
+  height: 180px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #e74c3c 0px,
+    #e74c3c 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  border-radius: 2px;
+  position: relative;
+}
+
+.flechaFeedbackLinea::before {
+  content: '↑';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #e74c3c;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.flechaFeedbackEtiqueta {
+  font-size: 0.72rem;
+  color: #e74c3c;
+  max-width: 120px;
+  text-align: right;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+/* ── Botón feedback ── */
+.btnFeedback {
+  display: block;
+  margin: 0 auto 1rem;
+  padding: 0.6rem 1.4rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btnFeedback:hover {
+  background: #236e8e;
+  transform: translateY(-1px);
+}
+
+.btnFeedback:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.textoBucle {
+  background: #fef9e7;
+  border-left: 4px solid #f0b429;
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  color: #5a4600;
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .textoBucle {
+  background: #2a2510;
+  border-left-color: #c49a1a;
+  color: #d4c060;
+}
+
+/* ── Tarjetas hormonas ── */
+.tarjetasHormonas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .tarjetasHormonas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tarjetaHormona {
+  background: var(--bg-primary);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .tarjetaHormona {
+  border-color: #3a3a3a;
+}
+
+.tarjetaHormonaCabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.tarjetaHormonaIcono {
+  font-size: 2rem;
+}
+
+.tarjetaHormonaCabecera h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.tarjetaHormonaBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #e8f4fd;
+  color: #2E86AB;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+
+.tarjetaHormonaBadgeActiva {
+  background: #eafaf1;
+  color: #27ae60;
+}
+
+[data-theme='dark'] .tarjetaHormonaBadge {
+  background: #1a2e3a;
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .tarjetaHormonaBadgeActiva {
+  background: #1a2e22;
+  color: #5dbb78;
+}
+
+.tarjetaHormonaLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.tarjetaHormonaLista li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--accent, #7fb3d3);
+}
+
+.tarjetaHormonaLista li strong {
+  color: var(--text-primary);
+}
+
+/* ── Nota yodo ── */
+.notaYodo {
+  background: #fef9e7;
+  border: 1px solid #f0c040;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: #5a4600;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .notaYodo {
+  background: #2a2510;
+  border-color: #c49a1a;
+  color: #d4c060;
+}
+
+/* ── Tabla comparativa ── */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e0e0e0);
+}
+
+[data-theme='dark'] .tablaWrapper {
+  border-color: #3a3a3a;
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.thAspecto,
+.thEstado {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.thAspecto {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  width: 30%;
+}
+
+.estadoHipo {
+  background: #e8f4fd;
+  color: #2E86AB;
+}
+
+.estadoHiper {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+[data-theme='dark'] .thAspecto {
+  background: #222;
+}
+
+[data-theme='dark'] .estadoHipo {
+  background: #1a2e3a;
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .estadoHiper {
+  background: #2e1a1a;
+  color: #e57373;
+}
+
+.tdAspecto,
+.tdEstado {
+  padding: 0.65rem 1rem;
+  vertical-align: middle;
+  line-height: 1.45;
+  border-top: 1px solid var(--border, #e0e0e0);
+}
+
+[data-theme='dark'] .tdAspecto,
+[data-theme='dark'] .tdEstado {
+  border-top-color: #3a3a3a;
+}
+
+.tdAspecto {
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.tdHipo {
+  color: #2E86AB;
+  background: #f7fbfe;
+}
+
+.tdHiper {
+  color: #c0392b;
+  background: #fef8f7;
+}
+
+[data-theme='dark'] .tdAspecto {
+  background: #222;
+}
+
+[data-theme='dark'] .tdHipo {
+  background: #1c2a32;
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .tdHiper {
+  background: #2a1c1c;
+  color: #e57373;
+}
+
+.trPar .tdAspecto,
+.trPar .tdHipo,
+.trPar .tdHiper {
+  /* mantiene fondo de columna */
+}
+
+.notaComparativa {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border, #e0e0e0);
+}
+
+[data-theme='dark'] .notaComparativa {
+  border-top-color: #3a3a3a;
+}
+
+/* ── Grid factores ── */
+.gridFactores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .gridFactores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .gridFactores {
+    grid-template-columns: 1fr;
+  }
+}
+
+.factorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 0.75rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  width: 100%;
+}
+
+.factorCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
+  transform: translateY(-1px);
+}
+
+.factorCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.factorCardActiva {
+  border-color: var(--primary);
+  background: #e8f4fd;
+}
+
+[data-theme='dark'] .factorCard {
+  border-color: #3a3a3a;
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .factorCardActiva {
+  background: #1a2e3a;
+  border-color: var(--primary);
+}
+
+.factorIcono {
+  font-size: 1.75rem;
+}
+
+.factorTitulo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.factorDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 0.3rem;
+}
+
+.notaFactores {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Sección educativa ── */
+.educativo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.educativoBloque {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+[data-theme='dark'] .educativoBloque {
+  border-bottom-color: #3a3a3a;
+}
+
+.educativoBloque:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.educativoBloque h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.educativoBloque p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Warning box (marcador v2.0) ── */
+.warningBox {
+  background: #fffbeb;
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  font-size: 0.88rem;
+  color: #5a4600;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2510;
+  border-left-color: var(--primary);
+  color: #d4c060;
+}
+
+/* ── Responsive general ── */
+@media (max-width: 640px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .seccion {
+    padding: 1.25rem;
+  }
+
+  .tituloSeccion {
+    font-size: 1.1rem;
+  }
+
+  .ejeHormonal {
+    margin-right: 0;
+  }
+
+  .flechaFeedback {
+    display: none !important;
+  }
+}
+
+/* ── Animaciones respetuosas ── */
+@media (prefers-reduced-motion: reduce) {
+  .btnFeedback,
+  .factorCard,
+  .flechaFeedbackActiva {
+    animation: none !important;
+    transition: none !important;
+  }
+}

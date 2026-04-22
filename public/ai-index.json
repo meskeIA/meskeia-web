@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 579,
+  "total_tools": 583,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1963,6 +1963,30 @@
           "slug": "visualizador-estadistica-cotidiana",
           "url": "https://meskeia.com/visualizador-estadistica-cotidiana/",
           "description": "Probabilidad condicional (Bayes), regresión a la media, paradoja de Simpson (Berkeley), sesgo de supervivencia (aviones WWII) y ley de los grandes números con simuladores interactivos"
+        },
+        {
+          "name": "Insulina y Glucosa",
+          "slug": "visualizador-insulina-glucosa",
+          "url": "https://meskeia.com/visualizador-insulina-glucosa/",
+          "description": "Curva de glucosa a lo largo del día con 3 perfiles, mecanismo de acción celular de la insulina en 3 pasos, índice glucémico de 12 alimentos y comparativa fisiológica de resistencia insulínica"
+        },
+        {
+          "name": "Tiroides",
+          "slug": "visualizador-tiroides",
+          "url": "https://meskeia.com/visualizador-tiroides/",
+          "description": "Eje hipotálamo-hipófisis-tiroides con feedback animado, diferencia entre T3 y T4, comparativa fisiológica de tiroides hipo e hiperactivo y 8 factores que influyen en la función tiroidea"
+        },
+        {
+          "name": "Oxitocina",
+          "slug": "visualizador-oxitocina",
+          "url": "https://meskeia.com/visualizador-oxitocina/",
+          "description": "10 situaciones que liberan oxitocina, mapa corporal de efectos con silueta SVG, comparativa oxitocina vs vasopresina y 6 datos de investigación sobre la hormona del vínculo social"
+        },
+        {
+          "name": "Dopamina",
+          "slug": "visualizador-dopamina",
+          "url": "https://meskeia.com/visualizador-dopamina/",
+          "description": "Circuito de recompensa mesolímbico en 4 pasos navegables, dopamina en 8 contextos (redes sociales, videojuegos, adicción), mecanismo del Parkinson y 10 moduladores naturales del sistema dopaminérgico"
         }
       ]
     },

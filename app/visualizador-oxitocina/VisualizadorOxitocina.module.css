@@ -1,0 +1,521 @@
+/* ============================================================
+   VISUALIZADOR OXITOCINA — CSS Module
+   Paleta meskeIA base (#2E86AB, #48A9A6)
+   Acentos cálidos para elementos de oxitocina:
+     #E8A598 (rosa salmón) para oxitocina
+     #F5C6A0 (melocotón) para vasopresina
+   ============================================================ */
+
+/* ---- Container ---- */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroEmoji {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 500;
+  margin: 0 0 1rem;
+  opacity: 0.92;
+}
+
+.heroDesc {
+  font-size: 1rem;
+  max-width: 680px;
+  margin: 0 auto;
+  opacity: 0.88;
+  line-height: 1.65;
+}
+
+/* ---- Secciones genéricas ---- */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary);
+  margin: 0 0 1.75rem;
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+/* ---- BLOQUE 1: Grid de situaciones ---- */
+.gridSituaciones {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .gridSituaciones {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .gridSituaciones {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.situacionCard {
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 1rem 0.5rem;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.situacionCard:hover {
+  border-color: #E8A598;
+  box-shadow: 0 4px 12px rgba(232, 165, 152, 0.25);
+  transform: translateY(-2px);
+}
+
+.situacionCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.situacionActiva {
+  border-color: #E8A598;
+  background: linear-gradient(135deg, #fff5f3 0%, #fff9f7 100%);
+  box-shadow: 0 4px 16px rgba(232, 165, 152, 0.35);
+}
+
+[data-theme='dark'] .situacionActiva {
+  background: rgba(232, 165, 152, 0.1);
+}
+
+.situacionEmoji {
+  font-size: 1.8rem;
+  line-height: 1;
+  display: block;
+}
+
+.situacionNombre {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* Panel de explicación */
+.panelExplicacion {
+  background: linear-gradient(135deg, #fff5f3 0%, #fff9f5 100%);
+  border: 1.5px solid #E8A598;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 0.5rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+[data-theme='dark'] .panelExplicacion {
+  background: rgba(232, 165, 152, 0.08);
+  border-color: rgba(232, 165, 152, 0.4);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  color: var(--primary);
+}
+
+.panelExplicacion p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+/* ---- BLOQUE 2: Silueta corporal ---- */
+.siluetaWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.siluetaContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.siluetaSvg {
+  width: 180px;
+  height: 432px;
+  color: var(--primary);
+  overflow: visible;
+}
+
+.puntoCirculo {
+  fill: #E8A598;
+  stroke: #fff;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: fill 0.2s, transform 0.2s;
+  transform-origin: center;
+  animation: pulsar 2.5s ease-in-out infinite;
+}
+
+.puntoCirculo:hover {
+  fill: var(--primary);
+  transform: scale(1.2);
+}
+
+.puntoActivo {
+  fill: var(--primary);
+  animation: none;
+  transform: scale(1.15);
+}
+
+@keyframes pulsar {
+  0%, 100% { r: 12; opacity: 1; }
+  50%       { r: 13.5; opacity: 0.85; }
+}
+
+.puntoEmoji {
+  fill: transparent;
+  pointer-events: none;
+}
+
+/* Leyenda de puntos */
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  border: 1.5px solid #E8A598;
+  background: var(--bg-card);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.leyendaItem:hover {
+  background: #fff5f3;
+  color: var(--text-primary);
+}
+
+.leyendaActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .leyendaItem:hover {
+  background: rgba(232, 165, 152, 0.12);
+}
+
+[data-theme='dark'] .leyendaActiva {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Info efecto */
+.infoEfecto {
+  background: var(--bg-card);
+  border: 1.5px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  max-width: 580px;
+  animation: slideDown 0.2s ease-out;
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.1);
+}
+
+.infoEfectoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+}
+
+.infoEfecto p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+/* ---- BLOQUE 3: Tabla comparativa ---- */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 560px;
+}
+
+.tablaComparativa thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+}
+
+.tablaComparativa th {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+}
+
+.tablaComparativa td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  color: var(--text-primary);
+  line-height: 1.5;
+  background: var(--bg-card);
+}
+
+.tablaComparativa tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.tablaComparativa td:first-child {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.colOxitocina {
+  border-bottom: 3px solid #E8A598;
+}
+
+.colVasopresina {
+  border-bottom: 3px solid #F5C6A0;
+}
+
+[data-theme='dark'] .tablaComparativa td {
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+
+[data-theme='dark'] .tablaComparativa tbody tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* Nota paradoja */
+.notaParadoja {
+  background: linear-gradient(135deg, #fff9f0 0%, #fff5f3 100%);
+  border-left: 4px solid #E8A598;
+  border-radius: 0 12px 12px 0;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.93rem;
+}
+
+[data-theme='dark'] .notaParadoja {
+  background: rgba(232, 165, 152, 0.08);
+}
+
+.notaParadoja span {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.notaParadoja p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+/* ---- BLOQUE 4: Tarjetas de datos ---- */
+.gridDatos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .gridDatos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .gridDatos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tarjetaDato {
+  background: var(--bg-card);
+  border: 1.5px solid rgba(232, 165, 152, 0.35);
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.tarjetaDato:hover {
+  border-color: #E8A598;
+  box-shadow: 0 4px 14px rgba(232, 165, 152, 0.2);
+}
+
+.tarjetaEmoji {
+  font-size: 1.75rem;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.tarjetaTitulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+}
+
+.tarjetaTexto {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ---- Warning Box (marcador v2.0) ---- */
+.warningBox {
+  background: #fffbea;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left-color: var(--accent);
+}
+
+/* ---- EducationalSection content ---- */
+.section h2,
+:global(.educational-content) h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.75rem 0 0.5rem;
+}
+
+:global(.educational-content) h2:first-child {
+  margin-top: 0;
+}
+
+:global(.educational-content) p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
+/* ---- Dark mode: bg-card ---- */
+[data-theme='dark'] .situacionCard {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .panelExplicacion {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tarjetaDato {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .infoEfecto {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.15);
+}
+
+/* ---- Animaciones accesibles ---- */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
