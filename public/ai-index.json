@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 575,
+  "total_tools": 579,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1939,6 +1939,30 @@
           "slug": "visualizador-cortisol",
           "url": "https://meskeia.com/visualizador-cortisol/",
           "description": "Curva circadiana del cortisol con slider horario, simulador de estrés agudo vs crónico, impacto en 8 sistemas corporales y 20 moduladores de hábitos"
+        },
+        {
+          "name": "Geopolítica de los Recursos",
+          "slug": "visualizador-geopolitica-recursos",
+          "url": "https://meskeia.com/visualizador-geopolitica-recursos/",
+          "description": "Distribución global de petróleo, litio, tierras raras y cobre: top productores, dependencia de Europa, conflictos históricos y proyección de demanda de minerales críticos hasta 2040"
+        },
+        {
+          "name": "Desigualdad de la Riqueza",
+          "slug": "visualizador-desigualdad-riqueza",
+          "url": "https://meskeia.com/visualizador-desigualdad-riqueza/",
+          "description": "Curva de Lorenz interactiva con selector de país, coeficiente Gini, datos del 1% más rico, simulador del efecto acumulación del capital y comparativa de políticas redistributivas"
+        },
+        {
+          "name": "Impacto de la IA en los Sectores",
+          "slug": "visualizador-impacto-ia-sectores",
+          "url": "https://meskeia.com/visualizador-impacto-ia-sectores/",
+          "description": "Automatización por sector laboral: empleos en riesgo y emergentes por sector, timeline de adopción IA hasta 2030 y las 5 habilidades que más protegen frente a la automatización"
+        },
+        {
+          "name": "Estadística en la Vida Cotidiana",
+          "slug": "visualizador-estadistica-cotidiana",
+          "url": "https://meskeia.com/visualizador-estadistica-cotidiana/",
+          "description": "Probabilidad condicional (Bayes), regresión a la media, paradoja de Simpson (Berkeley), sesgo de supervivencia (aviones WWII) y ley de los grandes números con simuladores interactivos"
         }
       ]
     },

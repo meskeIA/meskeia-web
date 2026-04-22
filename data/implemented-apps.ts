@@ -641,6 +641,10 @@ export const implementedAppsUrls = [
   "/visualizador-evolucion-humana/",       // Timeline 8 homínidos, comparativa anatómica, mapa Out of Africa
   "/visualizador-economia-circular/",      // Lineal vs circular SVG, pirámide 7R, datos reciclaje España, casos reales
   "/visualizador-cortisol/",              // Curva circadiana, estrés agudo/crónico, 8 sistemas corporales, 20 hábitos
+  "/visualizador-geopolitica-recursos/",  // Recursos estratégicos: top productores, dependencia UE, conflictos, proyección 2040
+  "/visualizador-desigualdad-riqueza/",   // Curva de Lorenz interactiva, Gini, efecto acumulación, políticas redistributivas
+  "/visualizador-impacto-ia-sectores/",   // Automatización por sector, empleos en riesgo/emergentes, timeline IA, habilidades futuro
+  "/visualizador-estadistica-cotidiana/", // Bayes, regresión media, paradoja Simpson, sesgo supervivencia, ley grandes números
 ];
 
 /**

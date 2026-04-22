@@ -1475,6 +1475,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ciclo-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'El cortisol y el ritmo circadiano del sueño' },
     { url: '/visualizador-piel-barrera-cutanea/', icon: '🫁', name: 'Piel y Barrera Cutánea', description: 'El cortisol y su efecto en la piel' },
   ],
+  'visualizador-geopolitica-recursos': [
+    { url: '/visualizador-comercio-internacional/', icon: '🌍', name: 'Comercio Internacional', description: 'Los recursos son el núcleo del comercio global' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'La transición energética y sus minerales críticos' },
+    { url: '/visualizador-economia-circular/', icon: '♻️', name: 'Economía Circular', description: 'Reducir la dependencia de recursos vírgenes' },
+    { url: '/visualizador-desigualdad-riqueza/', icon: '📊', name: 'Desigualdad de la Riqueza', description: 'Los recursos generan riqueza concentrada' },
+  ],
+  'visualizador-desigualdad-riqueza': [
+    { url: '/visualizador-geopolitica-recursos/', icon: '🌍', name: 'Geopolítica de los Recursos', description: 'El control de recursos y la concentración de riqueza' },
+    { url: '/visualizador-ciclo-economico/', icon: '📈', name: 'Ciclo Económico', description: 'Cómo el ciclo afecta a la desigualdad' },
+    { url: '/visualizador-deuda-publica/', icon: '💰', name: 'Deuda Pública', description: 'Gasto social y redistribución' },
+    { url: '/visualizador-estadistica-cotidiana/', icon: '📐', name: 'Estadística Cotidiana', description: 'Cómo leer correctamente los datos de desigualdad' },
+  ],
+  'visualizador-impacto-ia-sectores': [
+    { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo Funcionan los LLMs', description: 'La tecnología detrás de la automatización' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'IA y Redes Neuronales', description: 'El sustrato técnico de la IA que automatiza' },
+    { url: '/visualizador-computacion-cuantica/', icon: '⚛️', name: 'Computación Cuántica', description: 'La próxima ola de automatización tecnológica' },
+    { url: '/visualizador-desigualdad-riqueza/', icon: '📊', name: 'Desigualdad de la Riqueza', description: 'El impacto de la IA en la distribución del trabajo' },
+  ],
+  'visualizador-estadistica-cotidiana': [
+    { url: '/visualizador-desigualdad-riqueza/', icon: '📊', name: 'Desigualdad de la Riqueza', description: 'Curva de Lorenz y Gini: estadística aplicada' },
+    { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'Errores de razonamiento relacionados con probabilidad' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🔍', name: 'Sesgos Cognitivos', description: 'Por qué nuestra intuición estadística falla' },
+    { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'La estadística detrás de los mercados' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

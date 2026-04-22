@@ -1,0 +1,520 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  opacity: 0.9;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Secciones */
+.section {
+  max-width: 900px;
+  margin: 2.5rem auto;
+  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.subtitulo {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 2rem 0 0.5rem;
+}
+
+.descripcion {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+/* Selector de país */
+.selectorRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.selectorLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.selectorPais {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.selectorPais:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.selectorPais:hover {
+  border-color: var(--secondary);
+}
+
+/* Badge Gini */
+.giniBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 0.5rem 1.2rem;
+  min-width: 120px;
+}
+
+.giniBadgeLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+.giniBadgeValor {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Chart wrapper */
+.chartWrapper {
+  position: relative;
+  width: 100%;
+  margin: 0 0 1rem;
+}
+
+.notaGrafico {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+}
+
+/* Tarjetas de datos impactantes */
+.gridTarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tarjetaDato {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-top: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tarjetaDato:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.15);
+}
+
+.tarjetaIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tarjetaTitulo {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.4rem;
+  line-height: 1.4;
+}
+
+.tarjetaValor {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 0.3rem;
+  line-height: 1.1;
+}
+
+.tarjetaSubtitulo {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.tarjetaFuente {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Barras horizontales */
+.barraHorizontal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.barraLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+.barraPista {
+  flex: 1;
+  height: 20px;
+  background: rgba(46, 134, 171, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barraRelleno {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.barraPorcentaje {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Slider simulador */
+.sliderContainer {
+  margin: 1.5rem 0;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.sliderValor {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  outline: none;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Resultado acumulación */
+.resultadoAcumulacion {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.tarjetaAcumulacion {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.tarjetaRica {
+  border-color: var(--primary);
+  border-width: 2px;
+}
+
+.tarjetaAcuTitulo {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.tarjetaAcuValor {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 0.3rem;
+  word-break: break-all;
+}
+
+.tarjetaAcuSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Resultado brecha */
+.resultadoBrecha {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.brechaItem {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  min-width: 160px;
+}
+
+.brechaLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+
+.brechaValor {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Tabla comparativa */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaComparativa th {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablaComparativa th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.tablaComparativa th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.tablaComparativa td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.tablaComparativa tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaComparativa tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.celdaNumero {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.celdaReduccion {
+  text-align: center;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.mensajeClave {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid var(--primary);
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Warning box (marcador v2.0) */
+.warningBox {
+  background: #fffbea;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0 0;
+  font-size: 0.9rem;
+  color: #5a4200;
+  line-height: 1.6;
+}
+
+/* Bloques educativos */
+.eduBloque {
+  margin-bottom: 1.5rem;
+}
+
+.eduBloque:last-child {
+  margin-bottom: 0;
+}
+
+.eduBloque h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.eduBloque p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Dark mode */
+[data-theme='dark'] .section {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .tarjetaDato {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .tarjetaAcumulacion {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .tablaComparativa tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 200, 0, 0.08);
+  color: #e8c96a;
+}
+
+[data-theme='dark'] .mensajeClave {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .brechaItem {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .section {
+    margin: 1.5rem 1rem;
+    padding: 1.25rem;
+  }
+
+  .selectorRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .giniBadge {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .gridTarjetas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .resultadoAcumulacion {
+    grid-template-columns: 1fr;
+  }
+
+  .resultadoBrecha {
+    flex-direction: column;
+  }
+
+  .tarjetaAcuValor {
+    font-size: 1.2rem;
+  }
+}
+
+/* Preferencia movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .tarjetaDato,
+  .barraRelleno,
+  .selectorPais {
+    transition: none;
+  }
+}
