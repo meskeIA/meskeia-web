@@ -825,6 +825,7 @@
   cursor: pointer;
   transition: transform 0.15s ease;
   transform-origin: center;
+  transform-box: fill-box;
 }
 
 .zonaHipoxica:hover {
