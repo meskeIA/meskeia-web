@@ -241,6 +241,7 @@ export default function VisualizadorTiposInteresBce() {
             value={tipoBce}
             onChange={(e) => setTipoBce(parseFloat(e.target.value))}
             className={styles.slider}
+            style={{ '--val': `${(tipoBce / 5) * 100}%` } as React.CSSProperties}
             aria-label="Tipo de interés del BCE"
           />
 
