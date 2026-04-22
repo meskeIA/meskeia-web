@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 583,
+  "total_tools": 587,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -1987,6 +1987,30 @@
           "slug": "visualizador-dopamina",
           "url": "https://meskeia.com/visualizador-dopamina/",
           "description": "Circuito de recompensa mesolímbico en 4 pasos navegables, dopamina en 8 contextos (redes sociales, videojuegos, adicción), mecanismo del Parkinson y 10 moduladores naturales del sistema dopaminérgico"
+        },
+        {
+          "name": "Testosterona",
+          "slug": "visualizador-testosterona",
+          "url": "https://meskeia.com/visualizador-testosterona/",
+          "description": "Producción en hombres y mujeres con toggle, eje HPG con feedback, curva de niveles a lo largo de la vida, efectos en 8 sistemas corporales y 10 factores moduladores"
+        },
+        {
+          "name": "Estrógenos",
+          "slug": "visualizador-estrogenos",
+          "url": "https://meskeia.com/visualizador-estrogenos/",
+          "description": "Los tres estrógenos (E1/E2/E3), gráfico doble del ciclo menstrual de 28 días, efectos en 7 sistemas corporales, estrógenos en hombres y las 4 fases de la menopausia"
+        },
+        {
+          "name": "Melatonina",
+          "slug": "visualizador-melatonina",
+          "url": "https://meskeia.com/visualizador-melatonina/",
+          "description": "Curva circadiana melatonina vs cortisol en 24 horas, simulador del efecto de la luz (solar, pantalla, oscuridad), producción por edad y estación, y mecanismo del jet lag"
+        },
+        {
+          "name": "Endorfinas",
+          "slug": "visualizador-endorfinas",
+          "url": "https://meskeia.com/visualizador-endorfinas/",
+          "description": "El mito del runner's high desmentido (es anandamida, no endorfinas), los 3 tipos de endorfinas, 8 activadores del sistema opioide endógeno y diferencia con opioides externos"
         }
       ]
     },

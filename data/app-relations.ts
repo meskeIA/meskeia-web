@@ -1523,6 +1523,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'Dopamina y consolidación de memoria' },
     { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'Emociones y el circuito de recompensa' },
   ],
+  'visualizador-testosterona': [
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'El panorama hormonal completo' },
+    { url: '/visualizador-estrogenos/', icon: '🌸', name: 'Estrógenos', description: 'La otra hormona sexual clave — en ambos sexos' },
+    { url: '/visualizador-insulina-glucosa/', icon: '🩸', name: 'Insulina y Glucosa', description: 'Testosterona e insulina comparten efectos metabólicos' },
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'El cortisol crónico inhibe la producción de testosterona' },
+  ],
+  'visualizador-estrogenos': [
+    { url: '/visualizador-testosterona/', icon: '💪', name: 'Testosterona', description: 'La hormona sexual complementaria — en ambos sexos' },
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'El contexto hormonal completo' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'Los estrógenos influyen en la calidad del sueño' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'La caída estrogénica y el envejecimiento' },
+  ],
+  'visualizador-melatonina': [
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'El yin y yang del ritmo circadiano' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'Melatonina y arquitectura del sueño' },
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'La melatonina en el contexto hormonal' },
+    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sueño y la consolidación de memoria' },
+  ],
+  'visualizador-endorfinas': [
+    { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'El otro sistema del placer y la recompensa' },
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'Ejercicio: endorfinas suben, cortisol se regula' },
+    { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'El contacto social activa tanto oxitocina como endorfinas' },
+    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sistema opioide y la motivación de aprender' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

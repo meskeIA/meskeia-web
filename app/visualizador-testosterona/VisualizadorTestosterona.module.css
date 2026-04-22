@@ -1,0 +1,526 @@
+/* VisualizadorTestosterona.module.css */
+
+/* ── Contenedor ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ── Main ── */
+.main {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Sección ── */
+.seccion {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+
+[data-theme='dark'] .seccion {
+  border-color: #3a3a3a;
+}
+
+.tituloSeccion {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.subtituloSeccion {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ── Toggle Género ── */
+.toggleGenero {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.btnGenero {
+  flex: 1;
+  padding: 0.6rem 1.25rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnGenero:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.btnGeneroActivo {
+  background: var(--primary);
+  color: white;
+}
+
+.btnGenero:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Panel Género ── */
+.panelGenero {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+[data-theme='dark'] .panelGenero {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.panelIcono {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.panelInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.panelFila {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.92rem;
+}
+
+.panelFila strong {
+  color: var(--primary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.panelFila span {
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ── Eje HPG ── */
+.tituloEje {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.ejeHPG {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 0.5rem;
+}
+
+.nivelEje {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.nivelHipotalamo {
+  background: rgba(46, 134, 171, 0.12);
+  border: 2px solid #2E86AB;
+}
+
+.nivelHipofisis {
+  background: rgba(72, 169, 166, 0.12);
+  border: 2px solid #48A9A6;
+}
+
+.nivelGonadas {
+  background: rgba(127, 179, 211, 0.12);
+  border: 2px solid #7FB3D3;
+}
+
+[data-theme='dark'] .nivelHipotalamo {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .nivelHipofisis {
+  background: rgba(72, 169, 166, 0.2);
+}
+
+[data-theme='dark'] .nivelGonadas {
+  background: rgba(127, 179, 211, 0.2);
+}
+
+.nivelIcono {
+  font-size: 1.6rem;
+}
+
+.nivelEje strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.nivelDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.flechaEje {
+  font-size: 1.5rem;
+  color: var(--primary);
+  line-height: 1.2;
+  padding: 0.2rem 0;
+}
+
+.feedbackTag {
+  margin-top: 0.8rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background: rgba(46, 134, 171, 0.07);
+  border: 1px dashed var(--primary);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+  max-width: 380px;
+}
+
+[data-theme='dark'] .feedbackTag {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+/* ── Gráfico ── */
+.chartContainer {
+  height: 300px;
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.notaGrafico {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Grid Sistemas ── */
+.gridSistemas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.sistemaCard {
+  background: var(--bg-primary);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.sistemaCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
+}
+
+.sistemaCardActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+  grid-column: span 2;
+}
+
+.sistemaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .sistemaCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .sistemaCardActivo {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .sistemaCard:hover {
+  border-color: var(--primary);
+}
+
+.sistemaIcono {
+  font-size: 1.6rem;
+}
+
+.sistemaTitulo {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.sistemaDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  text-align: left;
+  margin: 0.4rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.2);
+  width: 100%;
+}
+
+/* ── Grid Moduladores ── */
+.gridModuladores {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.moduladorCard {
+  background: var(--bg-primary);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+[data-theme='dark'] .moduladorCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+.moduladorIcono {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.moduladorCuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.moduladorFactor {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.moduladorDesc {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Badge ── */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.badgeUp {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badgeDown {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.badgeMix {
+  background: #fff8e1;
+  color: #e65100;
+}
+
+[data-theme='dark'] .badgeUp {
+  background: rgba(46, 125, 50, 0.2);
+  color: #81c784;
+}
+
+[data-theme='dark'] .badgeDown {
+  background: rgba(198, 40, 40, 0.2);
+  color: #ef9a9a;
+}
+
+[data-theme='dark'] .badgeMix {
+  background: rgba(230, 81, 0, 0.2);
+  color: #ffcc02;
+}
+
+.notaModuladores {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 1rem 0 0;
+  line-height: 1.5;
+}
+
+/* ── Educacional ── */
+.educacional {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.educacional h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0.5rem 0 0.25rem;
+}
+
+.educacional p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Warning Box (marcador v2.0) ── */
+.warningBox {
+  background: #fffde7;
+  border: 1px solid #2E86AB;
+  border-left: 4px solid #2E86AB;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  color: #1a1a1a;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--text-primary);
+  border-color: var(--primary);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 800px) {
+  .gridSistemas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sistemaCardActivo {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .seccion {
+    padding: 1.25rem;
+  }
+
+  .gridSistemas {
+    grid-template-columns: 1fr;
+  }
+
+  .sistemaCardActivo {
+    grid-column: span 1;
+  }
+
+  .gridModuladores {
+    grid-template-columns: 1fr;
+  }
+
+  .panelGenero {
+    flex-direction: column;
+  }
+
+  .nivelEje {
+    max-width: 100%;
+  }
+
+  .feedbackTag {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnGenero,
+  .sistemaCard {
+    transition: none;
+  }
+}

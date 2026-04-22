@@ -1,0 +1,623 @@
+/* ═══════════════════════════════════════════════
+   VisualizadorEndorfinas.module.css
+   Paleta meskeIA — #2E86AB / #48A9A6
+   ═══════════════════════════════════════════════ */
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ── Secciones ── */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitulo {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.75rem;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 1 — Tarjeta intro + grid tipos
+   ───────────────────────────────────────────── */
+
+.tarjetaIntro {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.07) 0%, rgba(72, 169, 166, 0.07) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tarjetaIntroTexto {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.tarjetaIntroDestacado {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .tarjetaIntroDestacado {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tarjetaIntroIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Grid 3 tipos de endorfinas */
+.gridTipos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 720px) {
+  .gridTipos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.tipoCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .tipoCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.tipoNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.tipoSubtitulo {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tipoDescripcion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.875rem;
+}
+
+.tipoDetalles {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tipoDetalles li {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  padding-left: 1.1rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.tipoDetalles li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-size: 0.75rem;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 2 — Mito vs Realidad + Anandamida
+   ───────────────────────────────────────────── */
+
+.mitoRealidad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 620px) {
+  .mitoRealidad {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mitoColumna {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.realidadColumna {
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.mitoHeader,
+.realidadHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+}
+
+.mitoHeader h3,
+.realidadHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.mitoIcono {
+  font-size: 1.4rem;
+}
+
+.realidadIcono {
+  font-size: 1.4rem;
+}
+
+.mitoColumna p,
+.realidadColumna p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 0.75rem;
+}
+
+.mitoColumna p:last-child,
+.realidadColumna p:last-child {
+  margin-bottom: 0;
+}
+
+.mitoOrigen {
+  font-size: 0.83rem !important;
+  color: var(--text-muted) !important;
+  font-style: italic;
+}
+
+/* Tarjeta anandamida */
+.tarjetaAnandamida {
+  background: linear-gradient(135deg, rgba(72, 169, 166, 0.1) 0%, rgba(127, 179, 211, 0.08) 100%);
+  border: 2px solid var(--secondary);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.anandamidaHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.anandamidaIcono {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.anandamidaNombre {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.anandamidaSubtitulo {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.anandamidaLista {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.anandamidaLista li {
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding-left: 1.4rem;
+  position: relative;
+}
+
+.anandamidaLista li::before {
+  content: '●';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+  font-size: 0.6rem;
+  top: 0.45em;
+}
+
+.anandamidaEstudio {
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  border-left: 3px solid var(--secondary);
+}
+
+[data-theme='dark'] .anandamidaEstudio {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Conclusión del mito */
+.conclusionMito {
+  background: var(--bg-card);
+  border: 1px solid rgba(72, 169, 166, 0.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+[data-theme='dark'] .conclusionMito {
+  background: var(--bg-card);
+  border-color: rgba(72, 169, 166, 0.2);
+}
+
+.conclusionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.conclusionIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.conclusionItem div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.conclusionItem strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.conclusionItem span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.conclusionSeparador {
+  font-size: 2rem;
+  color: var(--secondary);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.conclusionTexto {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0.5rem 0 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 0.875rem;
+}
+
+[data-theme='dark'] .conclusionTexto {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 3 — Grid activadores
+   ───────────────────────────────────────────── */
+
+.gridActivadores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 860px) {
+  .gridActivadores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .gridActivadores {
+    grid-template-columns: 1fr;
+  }
+}
+
+.activadorCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.1rem 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.activadorCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.activadorCardActivo {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(46, 134, 171, 0.18);
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.04) 0%, rgba(72, 169, 166, 0.04) 100%);
+}
+
+[data-theme='dark'] .activadorCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.activadorIcono {
+  font-size: 1.75rem;
+  line-height: 1;
+  display: block;
+}
+
+.activadorNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.activadorMecanismo {
+  font-size: 0.78rem;
+  color: var(--secondary);
+  display: block;
+  line-height: 1.4;
+}
+
+.activadorDetalle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+  padding-top: 0.625rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+/* Eliminar estilos de botón nativo */
+.activadorCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 4 — Tabla comparativa
+   ───────────────────────────────────────────── */
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .tablaWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaComparativa thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+}
+
+.tablaComparativa th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.tablaComparativa td {
+  padding: 0.875rem 1rem;
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.tablaComparativa tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+[data-theme='dark'] .tablaComparativa tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tablaComparativa tbody tr:not(:last-child) td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .tablaComparativa tbody tr:not(:last-child) td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.tablaAspecto {
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.tablaEndogeno {
+  color: var(--text-secondary);
+}
+
+.tablaExterno {
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Warning box (marcador v2.0)
+   ───────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(255, 249, 196, 0.7);
+  border: 1px solid rgba(46, 134, 171, 0.35);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.3);
+  color: var(--text-secondary);
+}
+
+.warningBox p {
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Sección educativa (contenido interno)
+   ───────────────────────────────────────────── */
+
+.educativo h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.25rem 0 0.5rem;
+}
+
+.educativo h3:first-child {
+  margin-top: 0;
+}
+
+.educativo p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 0.75rem;
+}
+
+.educativo ul {
+  padding-left: 1.25rem;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.educativo li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.educativo .warningBox {
+  margin-top: 1.25rem;
+}
+
+/* ─────────────────────────────────────────────
+   Responsive: animaciones reducidas
+   ───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -649,6 +649,10 @@ export const implementedAppsUrls = [
   "/visualizador-tiroides/",              // Eje HPT con feedback animado, T3/T4, hipo vs hiper, 8 factores
   "/visualizador-oxitocina/",             // 10 situaciones, mapa corporal, oxitocina vs vasopresina, 6 datos ciencia
   "/visualizador-dopamina/",              // Circuito recompensa 4 pasos, 8 contextos, Parkinson, 10 moduladores
+  "/visualizador-testosterona/",          // Eje HPG toggle hombre/mujer, curva vital, 8 sistemas, 10 moduladores
+  "/visualizador-estrogenos/",            // E1/E2/E3, ciclo 28 días, 7 sistemas, estrógenos en hombres, menopausia
+  "/visualizador-melatonina/",            // Curva circadiana vs cortisol, simulador luz, por edad/estación, jet lag
+  "/visualizador-endorfinas/",            // Mito runner's high (anandamida), 3 tipos, 8 activadores, vs opioides externos
 ];
 
 /**
