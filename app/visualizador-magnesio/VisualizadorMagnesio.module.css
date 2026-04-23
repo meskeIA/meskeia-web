@@ -1,0 +1,779 @@
+/* VisualizadorMagnesio.module.css */
+/* Paleta meskeIA — acento magnesio #2E86AB / #48A9A6 */
+
+/* ─────────────────────────────────────────────
+   Layout base
+───────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 680px;
+  margin-inline: auto;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Secciones
+───────────────────────────────────────────── */
+
+.section {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionAlt {
+  background-color: var(--bg-card);
+  max-width: 100%;
+  padding: 3rem 0;
+}
+
+.sectionAlt > .section {
+  padding: 0 1.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 1rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 2rem;
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 1 — Rueda de reacciones (Polar Area)
+───────────────────────────────────────────── */
+
+.reactionsWheel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .reactionsWheel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.polarChartWrap {
+  position: relative;
+  max-width: 360px;
+  margin-inline: auto;
+}
+
+.chartHint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted, #999);
+  margin-top: 0.5rem;
+}
+
+.categoryLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.categoryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid var(--bg-card, #eee);
+  border-left-width: 4px;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s, box-shadow 0.18s;
+  font-family: inherit;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.categoryBtn:hover {
+  background: rgba(46, 134, 171, 0.07);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.12);
+}
+
+.categoryBtnActive {
+  background: rgba(46, 134, 171, 0.1);
+  box-shadow: 0 2px 12px rgba(46, 134, 171, 0.2);
+}
+
+.categoryBtn:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.categoryName {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.categoryValue {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.categoryDetail {
+  background: rgba(46, 134, 171, 0.07);
+  border: 1.5px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.categoryDetail h3 {
+  margin: 0 0 0.75rem;
+  color: var(--primary, #2E86AB);
+  font-size: 1.1rem;
+}
+
+.categoryDetail p {
+  margin: 0 0 1rem;
+  line-height: 1.65;
+  color: var(--text-secondary, #666);
+}
+
+/* warningBox — indicador v2.0 */
+.warningBox {
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 4px solid var(--secondary, #48A9A6);
+  border-radius: 4px 8px 8px 4px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 2 — Equilibrio Ca/Mg músculo
+───────────────────────────────────────────── */
+
+.muscleEquilibrium {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.muscleStateSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.muscleStateBtn {
+  background: var(--bg-primary, #fafafa);
+  border: 1.5px solid rgba(46, 134, 171, 0.3);
+  border-radius: 24px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text-primary, #1a1a1a);
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.muscleStateBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.muscleStateBtnActive {
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  border-color: var(--primary, #2E86AB);
+}
+
+.muscleStateBtn:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.muscleState {
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1.5px solid rgba(46, 134, 171, 0.15);
+  animation: fadeIn 0.22s ease;
+}
+
+.muscleStateVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  min-height: 80px;
+}
+
+.ionMg {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2E86AB;
+  padding: 0.4rem 0.9rem;
+  background: rgba(46, 134, 171, 0.12);
+  border-radius: 20px;
+}
+
+.ionCa {
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 0.4rem 0.9rem;
+  background: rgba(255, 107, 53, 0.1);
+  border-radius: 20px;
+}
+
+.canalBlockado {
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.actinaMiosina {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FF6B35;
+}
+
+.tensionLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF6B35;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sercaLabel {
+  font-size: 1rem;
+  color: #48A9A6;
+  font-weight: 600;
+}
+
+.relajacionLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #48A9A6;
+}
+
+.deficitLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF3355;
+}
+
+.espasmoLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF3355;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.muscleVisualReposo,
+.muscleVisualContraccion,
+.muscleVisualRelajacion,
+.muscleVisualDeficit {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.muscleStateTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.4rem;
+}
+
+.muscleStateDesc {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary, #555);
+  margin: 0 0 0.75rem;
+}
+
+.muscleStateDetail {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 3 — Receptor NMDA
+───────────────────────────────────────────── */
+
+.nmdaSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .nmdaSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nmdaDiagram {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nmdaReceptor,
+.nmdaActivado {
+  background: var(--bg-card, #fff);
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  min-width: 160px;
+  flex: 1;
+}
+
+.nmdaLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nmdaChannel {
+  background: rgba(255, 51, 85, 0.08);
+  border: 2px dashed rgba(255, 51, 85, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.nmdaChannelOpen {
+  background: rgba(46, 134, 171, 0.08);
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nmdaMgBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.nmdaMgBlock span:first-child {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FF6B35;
+}
+
+.nmdaBlockText {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.nmdaMgSale {
+  font-size: 0.9rem;
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.nmdaGlutamate {
+  font-size: 0.78rem;
+  color: var(--text-muted, #999);
+  line-height: 1.4;
+}
+
+.nmdaPlasticidad {
+  font-size: 0.82rem;
+  color: var(--secondary, #48A9A6);
+  font-weight: 600;
+}
+
+.nmdaArrow {
+  font-size: 2rem;
+  color: var(--primary, #2E86AB);
+  font-weight: 700;
+}
+
+.nmdaImplicaciones {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nmdaImplicaciones h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: var(--primary, #2E86AB);
+}
+
+.nmdaCard {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.nmdaCardIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.nmdaCard strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 0.3rem;
+}
+
+.nmdaCard p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 4 — Deficiencia silenciosa
+───────────────────────────────────────────── */
+
+.deficiencyBanner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(46, 134, 171, 0.07);
+  border: 1.5px solid rgba(46, 134, 171, 0.2);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.deficiencyPercent {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--primary, #2E86AB);
+  flex-shrink: 0;
+}
+
+.deficiencyText {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #555);
+  line-height: 1.6;
+}
+
+.deficiencySection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.symptomCard {
+  background: var(--bg-card, #fff);
+  border: 1.5px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.symptomCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text-primary, #1a1a1a);
+  transition: background 0.15s;
+}
+
+.symptomCardHeader:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.symptomCardHeader:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: -2px;
+}
+
+.symptomIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.symptomSistema {
+  flex: 1;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.symptomToggle {
+  font-size: 0.8rem;
+  color: var(--text-muted, #999);
+}
+
+.symptomList {
+  list-style: none;
+  padding: 0.5rem 1.25rem 1.25rem 3.5rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  animation: fadeIn 0.18s ease;
+}
+
+.symptomItem {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+.causasDeplecion {
+  margin-top: 1.5rem;
+}
+
+.causasDeplecion h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 1rem;
+}
+
+.causasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.causaCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--bg-card, #fff);
+  border: 1.5px solid rgba(46, 134, 171, 0.12);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.causaIcon {
+  font-size: 1.3rem;
+}
+
+.causaNombre {
+  font-size: 0.88rem;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.causaDetalle {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #777);
+  line-height: 1.4;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 5 — Fuentes alimentarias
+───────────────────────────────────────────── */
+
+.sourcesChart {
+  position: relative;
+  height: 380px;
+  margin-bottom: 1rem;
+}
+
+.idrReferencia {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted, #999);
+}
+
+.idrLine {
+  display: inline-block;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  border-radius: 2px;
+}
+
+.idrText {
+  white-space: nowrap;
+}
+
+.waterNote {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  background: rgba(72, 169, 166, 0.07);
+  border-left: 3px solid var(--secondary, #48A9A6);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   Animación
+───────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .categoryDetail,
+  .muscleState,
+  .symptomList {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .categoryBtn {
+  background: var(--bg-card, #2a2a2a);
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .categoryBtn:hover {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .categoryBtnActive {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .categoryDetail {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .muscleStateBtn {
+  background: var(--bg-card, #2a2a2a);
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .muscleState {
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .muscleStateVisual {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .nmdaReceptor,
+[data-theme='dark'] .nmdaActivado {
+  background: var(--bg-card, #2a2a2a);
+}
+
+[data-theme='dark'] .nmdaCard {
+  background: var(--bg-card, #2a2a2a);
+}
+
+[data-theme='dark'] .symptomCard {
+  background: var(--bg-card, #2a2a2a);
+}
+
+[data-theme='dark'] .symptomCardHeader:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .causaCard {
+  background: var(--bg-card, #2a2a2a);
+}
+
+[data-theme='dark'] .deficiencyBanner {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .waterNote {
+  background: rgba(72, 169, 166, 0.1);
+}

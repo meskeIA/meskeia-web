@@ -1,0 +1,785 @@
+/* VisualizadorHierro.module.css */
+/* Paleta meskeIA + acento hemático #C0392B */
+
+/* ─────────────────────────────────────────────
+   Layout base
+───────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  opacity: 0.9;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ─────────────────────────────────────────────
+   Secciones generales
+───────────────────────────────────────────── */
+
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.sectionIntro {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 2rem;
+  max-width: 720px;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 1: Distribución (Donut)
+───────────────────────────────────────────── */
+
+.distributionSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.donutWrapper {
+  position: relative;
+  width: min(320px, 90vw);
+  height: min(320px, 90vw);
+}
+
+.donutCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donutCenterIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.donutCenterText {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+.donutLeyenda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 560px;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: var(--bg-card);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.2s, background 0.2s;
+  font-size: 0.9rem;
+}
+
+.leyendaItem:hover {
+  border-color: var(--accent, #7FB3D3);
+}
+
+.leyendaItemActivo {
+  border-color: var(--sector-color, var(--primary));
+  background-color: color-mix(in srgb, var(--sector-color, var(--primary)) 8%, var(--bg-card));
+}
+
+.leyendaColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.leyendaNombre {
+  flex: 1;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.leyendaPorcentaje {
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.sectorInfoBox {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  border-left: 4px solid;
+  border-radius: 0 12px 12px 0;
+  padding: 1.25rem 1.5rem;
+  animation: fadeInUp 0.2s ease;
+}
+
+.sectorInfoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.sectorInfoDescripcion {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.donutHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 2: Absorción hemo vs no hemo
+───────────────────────────────────────────── */
+
+.vitaminCSlider {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.sliderReferencia {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 0.5rem;
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--secondary, #48A9A6);
+  cursor: pointer;
+  height: 6px;
+}
+
+.sliderMarks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+}
+
+.absorptionComparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .absorptionComparison {
+    grid-template-columns: 1fr;
+  }
+}
+
+.absorptionSide {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.absorptionHemo {
+  border-color: rgba(192, 57, 43, 0.3);
+}
+
+.absorptionNoHemo {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.absorptionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.absorptionIcon {
+  font-size: 1.5rem;
+}
+
+.absorptionTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.absorptionSubtitulo {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+  font-style: italic;
+}
+
+.absorptionDataGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.absorptionDato {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.absorptionLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.absorptionValor {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.absorptionValorDestacado {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.absorptionValorMini {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.absorptionValorBueno {
+  font-size: 0.88rem;
+  color: #27AE60;
+  font-weight: 600;
+}
+
+.absorptionValorMalo {
+  font-size: 0.88rem;
+  color: #C0392B;
+  font-weight: 600;
+}
+
+.barraAbsorcion {
+  position: relative;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .barraAbsorcion {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.barraRelleno {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.5s ease;
+}
+
+.barraHemo {
+  background: linear-gradient(90deg, #C0392B, #E74C3C);
+}
+
+.barraNoHemo {
+  background: linear-gradient(90deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+}
+
+.barraEtiqueta {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.absorcionNota {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 3: Hepcidina
+───────────────────────────────────────────── */
+
+.hepcidinDiagram {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.escenariosBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.escenarioBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 24px;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.escenarioBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.escenarioBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.escenarioBtnParadoja.escenarioBtnActivo {
+  background: #E67E22;
+  border-color: #E67E22;
+}
+
+.hepcidinFlujo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hepcidinIndicador {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 240px;
+  border: 2px solid;
+}
+
+.hepcidinAlta {
+  border-color: #C0392B;
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.hepcidinBaja {
+  border-color: #27AE60;
+  background: rgba(39, 174, 96, 0.08);
+}
+
+.hepcidinLabel {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.hepcidinValor {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.hepcidinFlechaBajada {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+}
+
+.ferroportinaBox {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 240px;
+  border: 2px solid;
+  transition: all 0.3s;
+}
+
+.ferroportinaActiva {
+  border-color: #27AE60;
+  background: rgba(39, 174, 96, 0.08);
+}
+
+.ferroportinaInactiva {
+  border-color: #C0392B;
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.ferroportinaLabel {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.ferroportinaEstado {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hepcidinDescripcion {
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 10px;
+  padding: 1.25rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.hepcidinDescripcion p {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.hepcidinConsecuencia {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+  padding-top: 0.75rem;
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUE 4: Espectro clínico
+───────────────────────────────────────────── */
+
+.clinicalSpectrum {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.spectrumBarWrapper {
+  padding: 0 1rem;
+}
+
+.spectrumBar {
+  position: relative;
+  height: 80px;
+  margin-bottom: 0.5rem;
+}
+
+.spectrumGradient {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 8px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, #C0392B 0%, #E67E22 20%, #27AE60 50%, #E67E22 75%, #8B0000 100%);
+  border-radius: 4px;
+  z-index: 0;
+}
+
+.spectrumPoint {
+  position: absolute;
+  transform: translateX(-50%);
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  z-index: 1;
+  transition: transform 0.15s;
+}
+
+.spectrumPoint:hover {
+  transform: translateX(-50%) scale(1.1);
+}
+
+.spectrumPointActivo {
+  transform: translateX(-50%) scale(1.15);
+}
+
+.spectrumPointDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.2s;
+  margin-top: 26px;
+}
+
+.spectrumPointActivo .spectrumPointDot {
+  box-shadow: 0 0 0 4px var(--point-color, var(--primary)), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.spectrumPointLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  max-width: 80px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.spectrumAxisLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+}
+
+.estadoDetalle {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border-left: 5px solid;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  animation: fadeInUp 0.2s ease;
+}
+
+.estadoTitulo {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.estadoDescripcion {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.25rem;
+}
+
+.estadoAnalytics {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.estadoAnalitica {
+  flex: 1;
+  min-width: 180px;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.analiticaLabel {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.analiticaValor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.estadoSintomas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sintomasLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sintomasList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sintomasList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Warning box (v2.0 requerido)
+───────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(192, 57, 43, 0.06);
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 1.5rem;
+}
+
+.warningBox strong {
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Animaciones
+───────────────────────────────────────────── */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .leyendaItem {
+  background: var(--bg-card);
+  border-color: transparent;
+}
+
+[data-theme='dark'] .absorptionSide {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .hepcidinDiagram {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .absorcionNota {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(192, 57, 43, 0.1);
+  border-color: rgba(192, 57, 43, 0.3);
+}
+
+[data-theme='dark'] .estadoDetalle {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .sectorInfoBox {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .vitaminCSlider {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .circuitoContainer {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .hepcidinDescripcion {
+  background: rgba(46, 134, 171, 0.1);
+}

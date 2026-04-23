@@ -1571,6 +1571,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'La pérdida de neuronas colinérgicas en el Alzheimer' },
     { url: '/visualizador-adrenalina/', icon: '⚡', name: 'Adrenalina', description: 'El antagonista funcional: simpático vs parasimpático' },
   ],
+  'visualizador-vitamina-d': [
+    { url: '/vitaminas-minerales/', icon: '🍋', name: 'Vitaminas y Minerales', description: 'El mapa completo de vitaminas y minerales esenciales' },
+    { url: '/visualizador-vitamina-b12/', icon: '🔴', name: 'Vitamina B12', description: 'Otra vitamina con mecanismo y absorción especiales' },
+    { url: '/visualizador-hierro/', icon: '🩸', name: 'Hierro', description: 'Otro micronutriente crítico con absorción compleja' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'La vitamina D regula directamente la inmunidad' },
+  ],
+  'visualizador-vitamina-b12': [
+    { url: '/vitaminas-minerales/', icon: '🍋', name: 'Vitaminas y Minerales', description: 'El mapa completo de vitaminas y minerales esenciales' },
+    { url: '/visualizador-vitamina-d/', icon: '☀️', name: 'Vitamina D', description: 'Otra vitamina con mecanismo hormonal y síntesis especial' },
+    { url: '/visualizador-hierro/', icon: '🩸', name: 'Hierro', description: 'El déficit de hierro también causa anemia, igual que el de B12' },
+    { url: '/visualizador-serotonina/', icon: '😊', name: 'Serotonina', description: 'La B12 es cofactor en la síntesis de neurotransmisores' },
+  ],
+  'visualizador-hierro': [
+    { url: '/vitaminas-minerales/', icon: '🍋', name: 'Vitaminas y Minerales', description: 'El mapa completo de vitaminas y minerales esenciales' },
+    { url: '/visualizador-vitamina-b12/', icon: '🔴', name: 'Vitamina B12', description: 'Otra deficiencia que causa anemia con mecanismo diferente' },
+    { url: '/visualizador-vitamina-d/', icon: '☀️', name: 'Vitamina D', description: 'Otro micronutriente crítico para la salud ósea e inmune' },
+    { url: '/visualizador-magnesio/', icon: '⚡', name: 'Magnesio', description: 'Otro mineral con déficit silencioso e infradiagnosticado' },
+  ],
+  'visualizador-magnesio': [
+    { url: '/vitaminas-minerales/', icon: '🍋', name: 'Vitaminas y Minerales', description: 'El mapa completo de vitaminas y minerales esenciales' },
+    { url: '/visualizador-hierro/', icon: '🩸', name: 'Hierro', description: 'Otro mineral con déficit común e infradiagnosticado' },
+    { url: '/visualizador-vitamina-d/', icon: '☀️', name: 'Vitamina D', description: 'Otra vitamina con paradoja de deficiencia en España' },
+    { url: '/visualizador-gaba/', icon: '🛑', name: 'GABA', description: 'El magnesio modula el receptor NMDA, análogo al equilibrio GABA/glutamato' },
+  ],
   'visualizador-aspirina': [
     { url: '/visualizador-analgesicos/', icon: '💊', name: 'Comparativa 3 Analgésicos', description: 'Aspirina vs paracetamol vs ibuprofeno — cuándo usar cada uno' },
     { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Otro grupo de fármacos con mecanismo molecular fascinante' },

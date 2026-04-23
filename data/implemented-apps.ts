@@ -668,6 +668,10 @@ export const implementedAppsUrls = [
   "/visualizador-gaba/",                 // Balance GABA/glutamato, GABA-A vs GABA-B, 5 moduladores alostéricos
   "/visualizador-adrenalina/",           // Neurotransmisor+hormona, cascada 8 pasos, receptores α/β, EpiPen, estrés
   "/visualizador-acetilcolina/",         // UNM, parasimpático, nicotínico vs muscarínico, AChE, Alzheimer, Botox
+  "/visualizador-vitamina-d/",           // Síntesis solar 5 pasos, VDR en 37 tejidos, niveles ng/mL, paradoja España
+  "/visualizador-vitamina-b12/",         // Ciclo metilación, factor intrínseco, 5 grupos riesgo, síntomas neurológicos
+  "/visualizador-hierro/",               // Donut distribución corporal, hemo vs no hemo, hepcidina, espectro ferropénico
+  "/visualizador-magnesio/",             // 300 reacciones, equilibrio Ca/Mg músculo, NMDA, déficit silencioso
 ];
 
 /**

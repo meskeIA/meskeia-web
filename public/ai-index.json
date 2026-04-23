@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 602,
+  "total_tools": 606,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -2035,6 +2035,30 @@
           "slug": "visualizador-acetilcolina",
           "url": "https://meskeia.com/visualizador-acetilcolina/",
           "description": "El primer neurotransmisor descubierto. Unión neuromuscular, sistema parasimpático, receptores nicotínicos vs muscarínicos, Alzheimer, Botox y organofosforados"
+        },
+        {
+          "name": "Vitamina D",
+          "slug": "visualizador-vitamina-d",
+          "url": "https://meskeia.com/visualizador-vitamina-d/",
+          "description": "Síntesis solar en 5 pasos (UVB → calcitriol), receptores VDR en 37 tejidos, niveles óptimos en ng/mL y la paradoja de la deficiencia en España pese al sol"
+        },
+        {
+          "name": "Vitamina B12",
+          "slug": "visualizador-vitamina-b12",
+          "url": "https://meskeia.com/visualizador-vitamina-b12/",
+          "description": "Ciclo de metilación SAM-homocisteína, sistema de absorción por factor intrínseco, 5 grupos de riesgo (veganos, mayores de 50, metformina) y síntomas neurológicos que preceden a la anemia"
+        },
+        {
+          "name": "El Hierro",
+          "slug": "visualizador-hierro",
+          "url": "https://meskeia.com/visualizador-hierro/",
+          "description": "Distribución del hierro en el cuerpo, absorción hemo vs no hemo con efecto de la vitamina C, regulación por hepcidina y espectro desde anemia ferropénica hasta hemocromatosis"
+        },
+        {
+          "name": "El Magnesio",
+          "slug": "visualizador-magnesio",
+          "url": "https://meskeia.com/visualizador-magnesio/",
+          "description": "Cofactor de 300+ reacciones enzimáticas, equilibrio calcio/magnesio en la contracción muscular, modulador del receptor NMDA y el déficit más infradiagnosticado"
         },
         {
           "name": "Aspirina",

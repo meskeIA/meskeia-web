@@ -1,0 +1,777 @@
+/* VisualizadorVitaminaB12.module.css */
+/* Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal) */
+
+/* ─── Contenedor principal ──────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+}
+
+/* ─── Hero: gradiente estándar meskeIA ───────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ─── Secciones ──────────────────────────────── */
+.section {
+  max-width: 860px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1rem;
+}
+
+.sectionWrapper {
+  max-width: 860px;
+  margin: 0 auto 2rem;
+  padding: 0 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 2rem 0 0.5rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary, #666666);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Insight box ────────────────────────────── */
+.insightBox {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  font-size: 0.92rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+  margin-top: 1.25rem;
+}
+
+.insightBox strong {
+  color: var(--primary, #2E86AB);
+}
+
+/* ─── Warning box (v2.0 indicator) ──────────── */
+.warningBox {
+  background: rgba(231, 76, 60, 0.08);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-left: 4px solid #E74C3C;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  font-size: 0.92rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+  margin-top: 1.5rem;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.warningBox strong {
+  color: #C0392B;
+}
+
+/* ─── Alert box ──────────────────────────────── */
+.alertBox {
+  background: rgba(231, 76, 60, 0.08);
+  border-left: 3px solid #E74C3C;
+  border-radius: 0 6px 6px 0;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  color: #C0392B;
+  margin-top: 0.75rem;
+  line-height: 1.5;
+}
+
+/* ─── Ciclo de Metilación ────────────────────── */
+.methylCycle {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 600px) {
+  .methylCycle {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.methylNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 0.75rem;
+  background: var(--bg-card, #FFFFFF);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  font-family: inherit;
+}
+
+.methylNode:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.methylNode:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.methylNodeActive {
+  background: rgba(46, 134, 171, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.methylAbrev {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.methylNombre {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #666666);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.methylDetail {
+  background: var(--bg-card, #FFFFFF);
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.methylDetail strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.methylDetail p {
+  margin: 0;
+  color: var(--text-secondary, #666666);
+}
+
+/* ─── Flujo de Absorción ─────────────────────── */
+.absorptionFlow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 700px) {
+  .absorptionFlow {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.absorptionStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 0.6rem;
+  background: var(--bg-card, #FFFFFF);
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.absorptionStep:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary, #2E86AB);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.absorptionStep:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.absorptionStepActive {
+  border-color: var(--primary, #2E86AB);
+  background: rgba(46, 134, 171, 0.05);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.15);
+  transform: translateY(-2px);
+}
+
+.stepIcono {
+  font-size: 1.6rem;
+}
+
+.stepNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--primary, #2E86AB);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.stepLugar {
+  font-size: 0.72rem;
+  color: var(--text-muted, #999999);
+  line-height: 1.3;
+}
+
+.stepTitulo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.3;
+}
+
+.absorptionDetail {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-secondary, #666666);
+  margin-bottom: 1rem;
+}
+
+.absorptionDetail p {
+  margin: 0;
+}
+
+/* ─── Grupos de Riesgo ───────────────────────── */
+.riskCards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.riskCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.riskCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.riskCardExpanded {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.riskCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.riskCardHeader:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: -2px;
+}
+
+.riskIcono {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.riskTitulo {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.riskBadge {
+  color: #FFFFFF;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.riskChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999999);
+  flex-shrink: 0;
+}
+
+.riskDesc {
+  margin: 0;
+  padding: 0 1rem 0.9rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+}
+
+.riskDetalle {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.riskDetalle p {
+  margin: 0 0 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+}
+
+.prevalenciaBox {
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.prevalenciaBox strong {
+  color: var(--secondary, #48A9A6);
+}
+
+/* ─── Síntomas por nivel ─────────────────────── */
+.trackSelector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.trackBtn {
+  padding: 0.55rem 1.1rem;
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 20px;
+  background: var(--bg-card, #FFFFFF);
+  color: var(--text-secondary, #666666);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  font-family: inherit;
+}
+
+.trackBtn:hover {
+  border-color: var(--primary, #2E86AB);
+  color: var(--primary, #2E86AB);
+}
+
+.trackBtn:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.trackBtnActive {
+  border-color: var(--primary, #2E86AB);
+  background: var(--primary, #2E86AB);
+  color: #FFFFFF;
+}
+
+.symptomsTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 1.25rem;
+}
+
+.timelineStep {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 0;
+  position: relative;
+}
+
+.timelineStep:first-child {
+  border-radius: 10px 10px 0 0;
+}
+
+.timelineStep:last-child {
+  border-radius: 0 0 10px 10px;
+}
+
+.timelineStep + .timelineStep {
+  border-top: none;
+}
+
+.timelineStepAlerta {
+  background: rgba(231, 76, 60, 0.04);
+  border-left: 3px solid #E74C3C;
+}
+
+.timelineNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--primary, #2E86AB);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.timelineStepAlerta .timelineNum {
+  background: #E74C3C;
+}
+
+.timelineContent {
+  flex: 1;
+}
+
+.timelineLabel {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.25rem;
+}
+
+.timelineStepAlerta .timelineLabel {
+  color: #C0392B;
+}
+
+.timelineDesc {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.55;
+}
+
+/* ─── Sección Educativa ──────────────────────── */
+.eduContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.eduTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 1rem 0 0.25rem;
+}
+
+.eduTitle:first-child {
+  margin-top: 0;
+}
+
+.eduText {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.eduList {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.7;
+  margin: 0.5rem 0 0;
+  padding-left: 1.5rem;
+}
+
+.eduList li {
+  margin-bottom: 0.35rem;
+}
+
+.eduList li strong {
+  color: var(--primary, #2E86AB);
+}
+
+/* ─── Fuentes alimentarias ───────────────────── */
+.fuentesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.fuenteRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.86rem;
+}
+
+.fuenteNombre {
+  color: var(--text-primary, #1A1A1A);
+  font-weight: 500;
+}
+
+.fuenteBar {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fuenteBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.fuenteValor {
+  color: var(--text-secondary, #666666);
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+/* ─── Dark mode ──────────────────────────────── */
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary, #1A1A1A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .sectionDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(231, 76, 60, 0.12);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .alertBox {
+  background: rgba(231, 76, 60, 0.12);
+}
+
+[data-theme='dark'] .methylNode {
+  background: var(--bg-card, #2A2A2A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .methylNodeActive {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .methylNombre {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .methylDetail {
+  background: var(--bg-card, #2A2A2A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .methylDetail p {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .absorptionStep {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .absorptionStepActive {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .stepTitulo {
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .absorptionDetail {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(46, 134, 171, 0.25);
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .riskCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .riskTitulo {
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .riskDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .riskDetalle {
+  background: rgba(46, 134, 171, 0.06);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .riskDetalle p {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .prevalenciaBox {
+  background: rgba(72, 169, 166, 0.12);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .trackBtn {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .trackBtnActive {
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .timelineStep {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .timelineStepAlerta {
+  background: rgba(231, 76, 60, 0.08);
+}
+
+[data-theme='dark'] .timelineLabel {
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .timelineDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .eduText {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .eduList {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .fuenteNombre {
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .fuenteBar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .fuenteValor {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Responsive ─────────────────────────────── */
+@media (max-width: 480px) {
+  .fuenteRow {
+    grid-template-columns: 1fr auto;
+  }
+
+  .fuenteBar {
+    display: none;
+  }
+
+  .methylCycle {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .absorptionFlow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─── Animaciones accesibles ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .methylNode,
+  .absorptionStep,
+  .riskCard,
+  .trackBtn,
+  .fuenteBarFill {
+    transition: none;
+  }
+}
