@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 596,
+  "total_tools": 600,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -2011,6 +2011,30 @@
           "slug": "visualizador-endorfinas",
           "url": "https://meskeia.com/visualizador-endorfinas/",
           "description": "El mito del runner's high desmentido (es anandamida, no endorfinas), los 3 tipos de endorfinas, 8 activadores del sistema opioide endógeno y diferencia con opioides externos"
+        },
+        {
+          "name": "Serotonina",
+          "slug": "visualizador-serotonina",
+          "url": "https://meskeia.com/visualizador-serotonina/",
+          "description": "El 90% de la serotonina está en el intestino. Síntesis desde triptófano, 4 funciones (ánimo, sueño, apetito, intestino), mecanismo SSRI y eje intestino-cerebro"
+        },
+        {
+          "name": "GABA",
+          "slug": "visualizador-gaba",
+          "url": "https://meskeia.com/visualizador-gaba/",
+          "description": "El gran freno del sistema nervioso. Balance GABA/glutamato, GABA-A vs GABA-B, 5 moduladores alostéricos (benzodiacepinas, alcohol, anestésicos) y condiciones relacionadas"
+        },
+        {
+          "name": "Adrenalina",
+          "slug": "visualizador-adrenalina",
+          "url": "https://meskeia.com/visualizador-adrenalina/",
+          "description": "Neurotransmisor (noradrenalina) y hormona (epinefrina). Cascada lucha-huida en 8 pasos, receptores α y β, EpiPen en anafilaxia y estrés agudo vs crónico"
+        },
+        {
+          "name": "Acetilcolina",
+          "slug": "visualizador-acetilcolina",
+          "url": "https://meskeia.com/visualizador-acetilcolina/",
+          "description": "El primer neurotransmisor descubierto. Unión neuromuscular, sistema parasimpático, receptores nicotínicos vs muscarínicos, Alzheimer, Botox y organofosforados"
         },
         {
           "name": "Aspirina",

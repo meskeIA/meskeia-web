@@ -662,6 +662,10 @@ export const implementedAppsUrls = [
   "/visualizador-antibioticos/",         // 5 mecanismos, bacteriostático vs bactericida, 3 resistencias, virus vs bacteria
   "/visualizador-paracetamol-ibuprofeno/", // SNC vs periférico, tabla 10 características, NAPQI, 5 escenarios educativos
   "/visualizador-anestesia/",            // 3 tipos, 5 componentes general, GABA-A+NMDA, 3 teorías consciencia, BIS
+  "/visualizador-serotonina/",           // 90% intestino, síntesis triptófano, 4 funciones, mecanismo SSRI 2-4 semanas
+  "/visualizador-gaba/",                 // Balance GABA/glutamato, GABA-A vs GABA-B, 5 moduladores alostéricos
+  "/visualizador-adrenalina/",           // Neurotransmisor+hormona, cascada 8 pasos, receptores α/β, EpiPen, estrés
+  "/visualizador-acetilcolina/",         // UNM, parasimpático, nicotínico vs muscarínico, AChE, Alzheimer, Botox
 ];
 
 /**

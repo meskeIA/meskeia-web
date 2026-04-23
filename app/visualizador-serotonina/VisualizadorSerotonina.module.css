@@ -1,0 +1,799 @@
+/* VisualizadorSerotonina.module.css */
+/* Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal) */
+
+/* ─── Contenedor ──────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+}
+
+/* ─── Hero ──────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.7rem, 4.5vw, 2.9rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ─── Secciones ──────────────────────────── */
+.section {
+  max-width: 880px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 2rem 0 0.5rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary, #666666);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Distribución: layout ──────────────────── */
+.distribucionLayout {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.distribucionChart {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
+.distribucionCentro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.distribucionCentroNum {
+  display: block;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #2E86AB;
+  line-height: 1;
+}
+
+.distribucionCentroLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #666666);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.distribucionLeyenda {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.leyendaItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.leyendaColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.leyendaTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.leyendaPct {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.leyendaLugar {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.leyendaDetalle {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.45;
+}
+
+/* ─── Insight box ──────────────────────────── */
+.insightBox {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid #2E86AB;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  font-size: 0.92rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+}
+
+.insightBox strong {
+  color: #2E86AB;
+}
+
+/* ─── Síntesis grid ──────────────────────── */
+.sintesisGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.sintesisPaso {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--bg-card, #ffffff);
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.sintesisPaso:hover {
+  border-color: var(--paso-color, #2E86AB);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.12);
+}
+
+.sintesisPasoActivo {
+  border-color: var(--paso-color, #2E86AB);
+  box-shadow: 0 3px 12px rgba(46, 134, 171, 0.18);
+}
+
+.sintesisPaso:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.sintesisNumero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sintesisContenido {
+  flex: 1;
+}
+
+.sintesisNombre {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.15rem;
+}
+
+.sintesisEnzima {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666666);
+  font-style: italic;
+  margin-bottom: 0.1rem;
+}
+
+.sintesisDesc {
+  font-size: 0.87rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+}
+
+.sintesisChevron {
+  font-size: 0.72rem;
+  color: var(--text-muted, #999999);
+  flex-shrink: 0;
+  margin-top: 0.4rem;
+}
+
+/* ─── Flujo visual de síntesis ──────────────── */
+.sintesisFlujo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #ffffff;
+}
+
+.flujoItem {
+  border-radius: 20px;
+  padding: 0.3rem 0.7rem;
+  font-weight: 600;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.flujoFlecha {
+  color: var(--text-muted, #999999);
+  font-size: 0.9rem;
+}
+
+/* ─── Funciones: nav y panel ──────────────── */
+.funcionesNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.funcionBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-card, #ffffff);
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text-primary, #1A1A1A);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.funcionBtn:hover {
+  border-color: #2E86AB;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.12);
+}
+
+.funcionBtnActivo {
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(46, 134, 171, 0.3);
+}
+
+.funcionBtn:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.funcionPanel {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border-left: 4px solid #2E86AB;
+}
+
+.funcionPanelHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.75rem;
+}
+
+.funcionPanelTexto {
+  font-size: 0.92rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ─── Sinapsis: tabs ──────────────────────── */
+.sinapsisTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.sinapsisTab {
+  padding: 0.5rem 1.25rem;
+  background: var(--bg-card, #ffffff);
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.sinapsisTab:hover {
+  border-color: #2E86AB;
+}
+
+.sinapsisTabActivo {
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.sinapsisTab:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+/* ─── Sinapsis: diagrama ──────────────────── */
+.sinapsisDiagram {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sinapsisContenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sinapsisNeurona {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.sinapsisNeuronaTitulo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary, #666666);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sinapsisMolecula {
+  display: inline-block;
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.sinapsisFlujoDown {
+  font-size: 1.4rem;
+  color: var(--text-muted, #999999);
+  align-self: center;
+}
+
+.sinapsisHendidura {
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px dashed #48A9A6;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sinapsisHendiduraTxt {
+  width: 100%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary, #666666);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sinapsisMoleculaFlotante {
+  display: inline-block;
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.sinapsisMoleculaFlotanteAcum {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.sinapsisMolPeq {
+  display: inline-block;
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.sinapsisSert {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666666);
+  font-style: italic;
+}
+
+.ssriTag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(235, 87, 87, 0.12);
+  border: 1px solid rgba(235, 87, 87, 0.35);
+  border-radius: 8px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #c0392b;
+}
+
+.sinapsisReceptor {
+  display: inline-block;
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.sinapsisDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+  margin: 0;
+  border-top: 1px solid var(--border-color, #E5E5E5);
+  padding-top: 0.75rem;
+}
+
+.sinapsisDesc strong {
+  color: #2E86AB;
+}
+
+/* ─── FAQ grid ──────────────────────────── */
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.9rem;
+}
+
+.faqCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.faqCard:hover {
+  border-color: #48A9A6;
+  box-shadow: 0 2px 8px rgba(72, 169, 166, 0.1);
+}
+
+.faqPregunta {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0 0 0.5rem;
+  line-height: 1.35;
+}
+
+.faqRespuesta {
+  font-size: 0.84rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Warning box (marcador v2.0) ──────────── */
+.warningBox {
+  background: #FFFBEB;
+  border: 1px solid #2E86AB;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  font-size: 0.88rem;
+  color: #444444;
+  line-height: 1.6;
+  margin-top: 1.5rem;
+}
+
+.warningBox strong {
+  color: #2E86AB;
+}
+
+/* ─── Dark mode ──────────────────────────── */
+[data-theme='dark'] .container {
+  background-color: #1A1A1A;
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sectionDesc {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .leyendaLugar {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .leyendaDetalle {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .distribucionCentroLabel {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(46, 134, 171, 0.12);
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .insightBox strong {
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .sintesisPaso {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sintesisPasoActivo {
+  border-color: var(--paso-color, #2E86AB);
+}
+
+[data-theme='dark'] .sintesisNombre {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sintesisEnzima {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .sintesisDesc {
+  color: #C0C0C0;
+}
+
+[data-theme='dark'] .flujoFlecha {
+  color: #666666;
+}
+
+[data-theme='dark'] .funcionBtn {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .funcionBtnActivo {
+  color: #ffffff;
+  border-color: transparent;
+}
+
+[data-theme='dark'] .funcionPanel {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+  border-left-color: #2E86AB;
+}
+
+[data-theme='dark'] .funcionPanelHeader {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .funcionPanelTexto {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .sinapsisTab {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sinapsisTabActivo {
+  color: #ffffff;
+  border-color: transparent;
+}
+
+[data-theme='dark'] .sinapsisDiagram {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .sinapsisNeurona {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .sinapsisNeuronaTitulo {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .sinapsisHendidura {
+  background: rgba(72, 169, 166, 0.08);
+}
+
+[data-theme='dark'] .sinapsisHendiduraTxt {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .sinapsisSert {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .sinapsisReceptor {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sinapsisDesc {
+  color: #B0B0B0;
+  border-top-color: #3A3A3A;
+}
+
+[data-theme='dark'] .sinapsisDesc strong {
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .ssriTag {
+  background: rgba(235, 87, 87, 0.18);
+  color: #e87c7c;
+}
+
+[data-theme='dark'] .faqCard {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .faqPregunta {
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .faqRespuesta {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: #2E86AB;
+  color: #C0C0C0;
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #7FB3D3;
+}
+
+/* ─── Animaciones (respeta prefers-reduced-motion) ─ */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Responsive ─────────────────────────── */
+@media (max-width: 640px) {
+  .distribucionLayout {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .distribucionChart {
+    width: 180px;
+    height: 180px;
+  }
+
+  .distribucionLeyenda {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .funcionesNav {
+    gap: 0.4rem;
+  }
+
+  .funcionBtn {
+    font-size: 0.82rem;
+    padding: 0.5rem 0.8rem;
+  }
+
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sinapsisTabs {
+    gap: 0.4rem;
+  }
+
+  .sinapsisTab {
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+  }
+
+  .heroTitle {
+    font-size: 1.7rem;
+  }
+
+  .sintesisFlujo {
+    gap: 0.3rem;
+  }
+
+  .flujoItem {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+  }
+}

@@ -1547,6 +1547,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'El contacto social activa tanto oxitocina como endorfinas' },
     { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sistema opioide y la motivación de aprender' },
   ],
+  'visualizador-serotonina': [
+    { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'El otro gran neurotransmisor del estado de ánimo y el placer' },
+    { url: '/visualizador-gaba/', icon: '🛑', name: 'GABA', description: 'El freno del sistema nervioso: equilibra la excitación' },
+    { url: '/visualizador-melatonina/', icon: '🌙', name: 'Melatonina', description: 'La serotonina es el precursor de la melatonina del sueño' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Las neuronas del rafe que producen serotonina' },
+  ],
+  'visualizador-gaba': [
+    { url: '/visualizador-serotonina/', icon: '😊', name: 'Serotonina', description: 'El otro neurotransmisor clave del bienestar emocional' },
+    { url: '/visualizador-adrenalina/', icon: '⚡', name: 'Adrenalina', description: 'El opuesto excitatorio: lucha-huida vs descanso-GABA' },
+    { url: '/visualizador-anestesia/', icon: '😴', name: 'Anestesia', description: 'Los anestésicos actúan sobre los receptores GABA-A' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'El equilibrio excitación/inhibición en el cerebro' },
+  ],
+  'visualizador-adrenalina': [
+    { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'El eje HPA activa cortisol segundos después que la adrenalina' },
+    { url: '/visualizador-gaba/', icon: '🛑', name: 'GABA', description: 'El freno GABAérgico que equilibra la excitación adrenérgica' },
+    { url: '/visualizador-sistema-endocrino/', icon: '🫧', name: 'Sistema Endocrino', description: 'La glándula adrenal dentro del sistema endocrino completo' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'El sistema simpático que activa la liberación de adrenalina' },
+  ],
+  'visualizador-acetilcolina': [
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La neurona y la transmisión sináptica donde actúa la ACh' },
+    { url: '/visualizador-musculos-movimiento/', icon: '💪', name: 'Músculos y Movimiento', description: 'La unión neuromuscular que la ACh activa' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'La pérdida de neuronas colinérgicas en el Alzheimer' },
+    { url: '/visualizador-adrenalina/', icon: '⚡', name: 'Adrenalina', description: 'El antagonista funcional: simpático vs parasimpático' },
+  ],
   'visualizador-aspirina': [
     { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Otro grupo de fármacos con mecanismo molecular fascinante' },
     { url: '/visualizador-paracetamol-ibuprofeno/', icon: '⚖️', name: 'Paracetamol vs Ibuprofeno', description: 'Otros inhibidores del dolor con mecanismos distintos' },
