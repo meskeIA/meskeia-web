@@ -1572,22 +1572,34 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adrenalina/', icon: '⚡', name: 'Adrenalina', description: 'El antagonista funcional: simpático vs parasimpático' },
   ],
   'visualizador-aspirina': [
+    { url: '/visualizador-analgesicos/', icon: '💊', name: 'Comparativa 3 Analgésicos', description: 'Aspirina vs paracetamol vs ibuprofeno — cuándo usar cada uno' },
     { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Otro grupo de fármacos con mecanismo molecular fascinante' },
-    { url: '/visualizador-paracetamol-ibuprofeno/', icon: '⚖️', name: 'Paracetamol vs Ibuprofeno', description: 'Otros inhibidores del dolor con mecanismos distintos' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Las prostaglandinas forman parte de la respuesta inflamatoria' },
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo', description: 'La COX es una enzima — cómo funcionan en general' },
   ],
   'visualizador-antibioticos': [
     { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Otro fármaco con mecanismo molecular preciso' },
-    { url: '/visualizador-paracetamol-ibuprofeno/', icon: '⚖️', name: 'Paracetamol vs Ibuprofeno', description: 'Analgésicos que actúan diferente a los antibióticos' },
+    { url: '/visualizador-analgesicos/', icon: '💊', name: 'Comparativa 3 Analgésicos', description: 'Analgésicos que actúan diferente a los antibióticos' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Los antibióticos ayudan al sistema inmune — no lo sustituyen' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula', description: 'Diferencias entre célula eucariota y bacteria procariota' },
   ],
-  'visualizador-paracetamol-ibuprofeno': [
-    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Otro AINE con mecanismo COX distinto al ibuprofeno' },
-    { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Fármacos que actúan sobre bacterias, no sobre el dolor' },
-    { url: '/visualizador-anestesia/', icon: '😴', name: 'Anestesia', description: 'Otro mecanismo de control del dolor a nivel central' },
-    { url: '/visualizador-higado/', icon: '🫁', name: 'Hígado', description: 'El hígado metaboliza el paracetamol — cómo funciona' },
+  'visualizador-analgesicos': [
+    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Profundiza en el mecanismo COX irreversible y 120 años de historia' },
+    { url: '/visualizador-paracetamol/', icon: '🟡', name: 'Paracetamol en Detalle', description: 'Cómo actúa en el SNC y el metabolismo hepático NAPQI' },
+    { url: '/visualizador-ibuprofeno/', icon: '🔴', name: 'Ibuprofeno en Detalle', description: 'COX reversible, selectividad y el caso Vioxx' },
+    { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Otro grupo de fármacos con mecanismo molecular fascinante' },
+  ],
+  'visualizador-paracetamol': [
+    { url: '/visualizador-analgesicos/', icon: '💊', name: 'Comparativa 3 Analgésicos', description: 'Aspirina vs paracetamol vs ibuprofeno — cuándo elegir cada uno' },
+    { url: '/visualizador-ibuprofeno/', icon: '🔴', name: 'Ibuprofeno', description: 'El analgésico COX periférico que sí tiene efecto antiinflamatorio' },
+    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'El tercer gran analgésico con mecanismo irreversible' },
+    { url: '/visualizador-higado/', icon: '🫁', name: 'Hígado', description: 'El órgano que metaboliza el NAPQI — clave para entender la toxicidad' },
+  ],
+  'visualizador-ibuprofeno': [
+    { url: '/visualizador-analgesicos/', icon: '💊', name: 'Comparativa 3 Analgésicos', description: 'Aspirina vs paracetamol vs ibuprofeno — cuándo elegir cada uno' },
+    { url: '/visualizador-paracetamol/', icon: '🟡', name: 'Paracetamol', description: 'El analgésico SNC que no inflama tejidos periféricos' },
+    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'El AINE que inhibe COX de forma irreversible' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo', description: 'La COX que el ibuprofeno inhibe es una enzima — cómo funcionan' },
   ],
   'visualizador-anestesia': [
     { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Control del dolor a nivel periférico (vs central en anestesia)' },

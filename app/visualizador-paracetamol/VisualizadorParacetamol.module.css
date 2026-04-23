@@ -1,0 +1,687 @@
+/* VisualizadorParacetamol.module.css */
+/* Paleta meskeIA — acento alerta #C0392B para NAPQI */
+
+/* ─────────────────────────────────────────────
+   Layout base
+───────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: #fff;
+  padding: 3.5rem 1.5rem 3rem;
+}
+
+.heroContent {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 600;
+  opacity: 0.9;
+  margin: 0 0 1rem;
+}
+
+.heroDesc {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  opacity: 0.85;
+  margin: 0;
+  line-height: 1.7;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ─────────────────────────────────────────────
+   Secciones generales
+───────────────────────────────────────────── */
+
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.75rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary, #666666);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 2rem;
+  max-width: 720px;
+}
+
+.subTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 2rem 0 1rem;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 1: Grid de hipótesis de mecanismo
+───────────────────────────────────────────── */
+
+.mecanismoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .mecanismoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mecanismoCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 14px;
+  padding: 1.4rem;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.mecanismoCard:hover {
+  box-shadow: 0 6px 24px rgba(46, 134, 171, 0.12);
+  transform: translateY(-2px);
+}
+
+.mecanismoNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.mecanismoCardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.5rem;
+}
+
+.mecanismoCardDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 1: Insight Box
+───────────────────────────────────────────── */
+
+.insightBox {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 0 12px 12px 0;
+  padding: 1.1rem 1.4rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.7;
+}
+
+.insightBox p {
+  margin: 0 0 0.5rem;
+}
+
+.insightBox p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 2: Metabolismo — Diagrama vertical
+───────────────────────────────────────────── */
+
+.metabolismoFlujo {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+
+.metabolismoPaso {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.1rem 1.3rem;
+}
+
+.metabolismoNAPQI {
+  border-color: rgba(192, 57, 43, 0.35);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.metabolismoAntidoto {
+  border-color: rgba(72, 169, 166, 0.35);
+  background: rgba(72, 169, 166, 0.05);
+}
+
+.metabolismoNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.metabolismoNAPQI .metabolismoNumero {
+  background: #C0392B;
+}
+
+.metabolismoAntidoto .metabolismoNumero {
+  background: var(--secondary, #48A9A6);
+}
+
+.metabolismoPasoInfo {
+  flex: 1;
+}
+
+.metabolismoPasoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.metabolismoPasoNombre {
+  font-size: 0.95rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.metabolismoPorcentaje {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary, #2E86AB);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 10px;
+}
+
+.metabolismoNAPQI .metabolismoPorcentaje {
+  background: rgba(192, 57, 43, 0.1);
+  color: #C0392B;
+}
+
+.metabolismoPasoDesc {
+  font-size: 0.84rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.metabolismoConector {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-muted, #999999);
+  padding: 0.25rem 0;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 3: Slider de peso
+───────────────────────────────────────────── */
+
+.sliderWrapper {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.sliderAviso {
+  font-size: 0.82rem;
+  color: var(--text-muted, #999999);
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin: 0 0 1.25rem;
+  line-height: 1.55;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary, #1A1A1A);
+  margin-bottom: 0.6rem;
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--primary, #2E86AB);
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.sliderInput:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 4px;
+}
+
+.sliderResult {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 560px) {
+  .sliderResult {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sliderDato {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.3rem;
+  background: var(--bg-primary, #FAFAFA);
+  border-radius: 10px;
+  padding: 0.85rem;
+}
+
+.sliderDatoNum {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary, #2E86AB);
+  line-height: 1;
+}
+
+.sliderDatoLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted, #999999);
+  line-height: 1.4;
+}
+
+.margenAlerta {
+  color: #C0392B;
+}
+
+.barraProgreso {
+  position: relative;
+  height: 12px;
+  background: rgba(46, 134, 171, 0.12);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.barraRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.barraPorcentaje {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(calc(100% + 0.5rem));
+  font-size: 0.75rem;
+  color: var(--text-muted, #999999);
+  white-space: nowrap;
+}
+
+.sliderNota {
+  font-size: 0.78rem;
+  color: var(--text-muted, #999999);
+  margin: 0.5rem 0 0;
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 3: Grid de perfiles (2+3)
+───────────────────────────────────────────── */
+
+.perfilesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 700px) {
+  .perfilesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .perfilesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.perfilCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.perfilCard:hover {
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+  transform: translateY(-2px);
+}
+
+.perfilIcono {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.perfilTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.5rem;
+}
+
+.perfilDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 4: Cifras impactantes
+───────────────────────────────────────────── */
+
+.cifrasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 640px) {
+  .cifrasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cifraBox {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cifraNum {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800;
+  color: #C0392B;
+  line-height: 1.1;
+}
+
+.cifraLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 4: Timeline de daño hepático
+───────────────────────────────────────────── */
+
+.timelineDano {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 1.5rem;
+  border-left: 3px solid rgba(46, 134, 171, 0.2);
+  margin-bottom: 1.5rem;
+}
+
+.timelineHito {
+  position: relative;
+  padding: 1rem 1rem 1rem 1.5rem;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 10px;
+  margin-left: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.timelineHito::before {
+  content: '';
+  position: absolute;
+  left: -1.45rem;
+  top: 1.2rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary, #2E86AB);
+  border: 2px solid var(--bg-primary, #FAFAFA);
+}
+
+.timelineHitoAlerta {
+  border-color: rgba(192, 57, 43, 0.25);
+  background: rgba(192, 57, 43, 0.03);
+}
+
+.timelineHitoAlerta::before {
+  background: #C0392B;
+}
+
+.timelineTiempo {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.35rem;
+}
+
+.timelineHitoAlerta .timelineTiempo {
+  color: #C0392B;
+}
+
+.timelineDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Warning Box (v2.0 marker)
+───────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(255, 243, 205, 0.6);
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .mecanismoCard {
+  border-color: rgba(46, 134, 171, 0.22);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .metabolismoPaso {
+  border-color: rgba(46, 134, 171, 0.22);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .metabolismoNAPQI {
+  border-color: rgba(192, 57, 43, 0.45);
+  background: rgba(192, 57, 43, 0.08);
+}
+
+[data-theme='dark'] .metabolismoAntidoto {
+  border-color: rgba(72, 169, 166, 0.45);
+  background: rgba(72, 169, 166, 0.08);
+}
+
+[data-theme='dark'] .sliderWrapper {
+  border-color: rgba(46, 134, 171, 0.25);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .sliderAviso {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .sliderDato {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .barraProgreso {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .perfilCard {
+  border-color: rgba(46, 134, 171, 0.2);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .cifraBox {
+  border-color: rgba(192, 57, 43, 0.3);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .timelineHito {
+  border-color: rgba(46, 134, 171, 0.2);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .timelineHitoAlerta {
+  border-color: rgba(192, 57, 43, 0.35);
+  background: rgba(192, 57, 43, 0.06);
+}
+
+[data-theme='dark'] .timelineDano {
+  border-left-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .timelineHito::before {
+  border-color: var(--bg-card);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 243, 205, 0.07);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .metabolismoPorcentaje {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .metabolismoNAPQI .metabolismoPorcentaje {
+  background: rgba(192, 57, 43, 0.18);
+}
+
+/* ─────────────────────────────────────────────
+   Reduced motion
+───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .mecanismoCard,
+  .perfilCard {
+    transition: none;
+  }
+
+  .barraRelleno {
+    transition: none;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Responsive general
+───────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .section {
+    padding: 2.5rem 1rem;
+  }
+
+  .hero {
+    padding: 2.5rem 1rem 2rem;
+  }
+}

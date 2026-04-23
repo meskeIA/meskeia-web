@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 600,
+  "total_tools": 602,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -2049,10 +2049,22 @@
           "description": "5 mecanismos de acción (pared celular, ribosoma 30S/50S, ADN, membrana), bacteriostático vs bactericida, 3 mecanismos de resistencia y la crisis global: 700.000 muertes/año"
         },
         {
-          "name": "Paracetamol vs Ibuprofeno",
-          "slug": "visualizador-paracetamol-ibuprofeno",
-          "url": "https://meskeia.com/visualizador-paracetamol-ibuprofeno/",
-          "description": "Por qué no son intercambiables: paracetamol actúa en el SNC (no antiinflamatorio), ibuprofeno inhibe COX periféricas. Metabolismo, órganos de riesgo y escenarios educativos"
+          "name": "Comparativa 3 Analgésicos",
+          "slug": "visualizador-analgesicos",
+          "url": "https://meskeia.com/visualizador-analgesicos/",
+          "description": "Aspirina, paracetamol e ibuprofeno en una sola vista: mecanismos COX/SNC, tabla comparativa de 12 características y 5 escenarios clínicos para saber cuál elegir"
+        },
+        {
+          "name": "Paracetamol",
+          "slug": "visualizador-paracetamol",
+          "url": "https://meskeia.com/visualizador-paracetamol/",
+          "description": "El paracetamol no es antiinflamatorio: actúa en el SNC. Metabolismo hepático NAPQI, umbral de toxicidad, dosis máxima y perfiles de población de riesgo"
+        },
+        {
+          "name": "Ibuprofeno",
+          "slug": "visualizador-ibuprofeno",
+          "url": "https://meskeia.com/visualizador-ibuprofeno/",
+          "description": "Inhibidor COX reversible en tejidos periféricos: mecanismo antiinflamatorio real, selectividad COX-1/COX-2, efectos adversos gástricos y renales, y el caso Vioxx"
         },
         {
           "name": "Anestesia",

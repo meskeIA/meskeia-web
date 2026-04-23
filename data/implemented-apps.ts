@@ -660,7 +660,9 @@ export const implementedAppsUrls = [
   "/visualizador-telomerasa/",           // Acortamiento telómeros, telomerasa repara, paradoja cáncer 90%, longevidad
   "/visualizador-aspirina/",             // COX-1/COX-2 irreversible, 4 efectos, timeline 120 años, comparativa coxibs
   "/visualizador-antibioticos/",         // 5 mecanismos, bacteriostático vs bactericida, 3 resistencias, virus vs bacteria
-  "/visualizador-paracetamol-ibuprofeno/", // SNC vs periférico, tabla 10 características, NAPQI, 5 escenarios educativos
+  "/visualizador-analgesicos/",            // Comparativa 3 analgésicos: aspirina+paracetamol+ibuprofeno, tabla 12 características, 5 escenarios
+  "/visualizador-paracetamol/",            // Mecanismo SNC, NAPQI metabolismo hepático, umbral toxicidad, perfiles de población
+  "/visualizador-ibuprofeno/",             // COX-1/COX-2 reversible, selectividad, efectos gástrico/renal, caso Vioxx
   "/visualizador-anestesia/",            // 3 tipos, 5 componentes general, GABA-A+NMDA, 3 teorías consciencia, BIS
   "/visualizador-serotonina/",           // 90% intestino, síntesis triptófano, 4 funciones, mecanismo SSRI 2-4 semanas
   "/visualizador-gaba/",                 // Balance GABA/glutamato, GABA-A vs GABA-B, 5 moduladores alostéricos
