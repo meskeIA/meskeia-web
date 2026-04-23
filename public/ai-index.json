@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 592,
+  "total_tools": 596,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -2011,6 +2011,30 @@
           "slug": "visualizador-endorfinas",
           "url": "https://meskeia.com/visualizador-endorfinas/",
           "description": "El mito del runner's high desmentido (es anandamida, no endorfinas), los 3 tipos de endorfinas, 8 activadores del sistema opioide endógeno y diferencia con opioides externos"
+        },
+        {
+          "name": "Aspirina",
+          "slug": "visualizador-aspirina",
+          "url": "https://meskeia.com/visualizador-aspirina/",
+          "description": "Mecanismo molecular de la aspirina: inhibición irreversible de COX-1 y COX-2, síntesis de prostaglandinas, 4 efectos (antipirético, analgésico, antiinflamatorio, antiagregante) y 120 años de historia"
+        },
+        {
+          "name": "Antibióticos",
+          "slug": "visualizador-antibioticos",
+          "url": "https://meskeia.com/visualizador-antibioticos/",
+          "description": "5 mecanismos de acción (pared celular, ribosoma 30S/50S, ADN, membrana), bacteriostático vs bactericida, 3 mecanismos de resistencia y la crisis global: 700.000 muertes/año"
+        },
+        {
+          "name": "Paracetamol vs Ibuprofeno",
+          "slug": "visualizador-paracetamol-ibuprofeno",
+          "url": "https://meskeia.com/visualizador-paracetamol-ibuprofeno/",
+          "description": "Por qué no son intercambiables: paracetamol actúa en el SNC (no antiinflamatorio), ibuprofeno inhibe COX periféricas. Metabolismo, órganos de riesgo y escenarios educativos"
+        },
+        {
+          "name": "Anestesia",
+          "slug": "visualizador-anestesia",
+          "url": "https://meskeia.com/visualizador-anestesia/",
+          "description": "Los 3 tipos de anestesia, 5 componentes de la general, mecanismos GABA-A y NMDA, 3 teorías de la consciencia y monitorización intraoperatoria (BIS, ECG, capnografía)"
         },
         {
           "name": "Lactasa",

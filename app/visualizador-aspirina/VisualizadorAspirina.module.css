@@ -1,0 +1,713 @@
+/* VisualizadorAspirina.module.css */
+/* Paleta meskeIA: #2E86AB azul, #48A9A6 teal */
+
+/* ─────────────────────────────────────────────
+   Layout base
+───────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+}
+
+.heroContent {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 100px;
+  padding: 0.3rem 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.4px;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  opacity: 0.85;
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+  opacity: 0.78;
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────
+   Secciones generales
+───────────────────────────────────────────── */
+
+.section {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionAlt {
+  background: var(--bg-card);
+  max-width: 100%;
+}
+
+.sectionAlt > div,
+.sectionAlt > h2,
+.sectionAlt > p,
+.sectionAlt > table,
+.sectionAlt > .tablaWrapper,
+.sectionAlt > .efectosGrid,
+.sectionAlt > .insightBox {
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionTitle {
+  font-size: clamp(1.25rem, 2.8vw, 1.8rem);
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.6rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 2rem;
+  max-width: 720px;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 1: Mecanismo — indicadores de paso
+───────────────────────────────────────────── */
+
+.stepIndicator {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.indicadorPunto {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(46, 134, 171, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+.indicadorPunto:hover {
+  background: rgba(46, 134, 171, 0.55);
+  transform: scale(1.2);
+}
+
+.indicadorActivo {
+  background: var(--primary, #2E86AB) !important;
+  transform: scale(1.3);
+}
+
+/* ─────────────────────────────────────────────
+   Grid de tarjetas de mecanismo
+───────────────────────────────────────────── */
+
+.mecanismoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mecanismoCard {
+  background: var(--bg-card);
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  border-radius: 14px;
+  padding: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mecanismoCard:hover {
+  border-color: rgba(46, 134, 171, 0.45);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+  transform: translateY(-2px);
+}
+
+.mecanismoCardActiva {
+  border-color: var(--primary, #2E86AB) !important;
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.2) !important;
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.mecanismoIcono {
+  font-size: 1.6rem;
+  margin-bottom: 0.2rem;
+}
+
+.mecanismoNumero {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.mecanismoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.mecanismoDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   Detalle del paso seleccionado
+───────────────────────────────────────────── */
+
+.pasoDetalle {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.pasoDetalleHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pasoDetalleIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.pasoDetalleNumero {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 0.2rem;
+}
+
+.pasoDetalleTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0;
+}
+
+.pasoDetalleTexto {
+  color: var(--text-primary);
+  line-height: 1.75;
+  margin: 0 0 1.25rem;
+  font-size: 0.98rem;
+}
+
+.irreversibleBox {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary, #48A9A6);
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* Controles de navegación */
+.stepControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.stepBtn {
+  background: transparent;
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  border-radius: 8px;
+  color: var(--primary, #2E86AB);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.stepBtn:hover:not(:disabled) {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: var(--primary, #2E86AB);
+}
+
+.stepBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.stepCounter {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 2: Los 4 efectos
+───────────────────────────────────────────── */
+
+.efectosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0 1.5rem 2rem;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.efectoCard {
+  background: var(--bg-primary);
+  border: 2px solid rgba(46, 134, 171, 0.15);
+  border-radius: 14px;
+  padding: 1.35rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  position: relative;
+}
+
+.efectoCard:hover {
+  border-color: var(--efecto-color, #2E86AB);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.efectoCardActivo {
+  border-color: var(--efecto-color, #2E86AB) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+  background: var(--bg-card);
+}
+
+.efectoIcono {
+  font-size: 2rem;
+}
+
+.efectoNombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.efectoDosis {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.efectoMecanismo {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0.5rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.efectoToggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────
+   Sección 3: Timeline histórico
+───────────────────────────────────────────── */
+
+.timeline {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.hitoBtn {
+  background: var(--bg-card);
+  border: 1.5px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.hitoBtn:hover {
+  border-color: var(--primary, #2E86AB);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.hitoBtnActivo {
+  border-color: var(--primary, #2E86AB) !important;
+  background: rgba(46, 134, 171, 0.08) !important;
+}
+
+.hitoAnio {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+}
+
+.hitoTituloBreve {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.hitoDetalle {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.hitoDetalleAnio {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.2rem;
+}
+
+.hitoDetalleTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.9rem;
+}
+
+.hitoDetalleTexto {
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
+.hitoRelevancia {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid var(--primary, #2E86AB);
+  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Sección 4: Tabla comparativa COX
+───────────────────────────────────────────── */
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 0 1.5rem;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+
+.tablaComparativa thead tr {
+  background: linear-gradient(90deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: #fff;
+}
+
+.thCaracteristica,
+.thCox1,
+.thCox2 {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.tablaComparativa tbody tr {
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  transition: background 0.15s;
+}
+
+.tablaComparativa tbody tr:last-child {
+  border-bottom: none;
+}
+
+.tablaComparativa tbody tr:hover {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.tdCaracteristica {
+  padding: 0.8rem 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 30%;
+}
+
+.tdCox1 {
+  padding: 0.8rem 1rem;
+  color: var(--text-secondary);
+  border-left: 2px solid rgba(46, 134, 171, 0.15);
+}
+
+.tdCox2 {
+  padding: 0.8rem 1rem;
+  color: var(--text-secondary);
+  border-left: 2px solid rgba(72, 169, 166, 0.2);
+}
+
+/* ─────────────────────────────────────────────
+   Insight Box y Warning Box
+───────────────────────────────────────────── */
+
+.insightBox {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 0 12px 12px 0;
+  padding: 1.1rem 1.4rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 1.5rem 1rem;
+  max-width: calc(980px - 3rem);
+}
+
+/* ─────────────────────────────────────────────
+   Educational Section
+───────────────────────────────────────────── */
+
+.educSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eduTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 1rem 0 0.3rem;
+}
+
+.eduTexto {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin: 0;
+}
+
+.warningBox {
+  background: #FFF8E6;
+  border: 1px solid #F5C842;
+  border-left: 4px solid #F5A623;
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: #5C4200;
+  line-height: 1.65;
+  margin-top: 1.25rem;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .mecanismoCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .mecanismoCardActiva {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .pasoDetalle {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .irreversibleBox {
+  background: rgba(72, 169, 166, 0.1);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .efectoCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .efectoCardActivo {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .hitoBtn {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .hitoBtnActivo {
+  background: rgba(46, 134, 171, 0.12) !important;
+}
+
+[data-theme='dark'] .hitoDetalle {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .hitoRelevancia {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .tablaComparativa {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tablaComparativa tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 166, 35, 0.1);
+  border-color: rgba(245, 166, 35, 0.3);
+  border-left-color: #F5A623;
+  color: #E5C97A;
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: var(--bg-card);
+}
+
+/* ─────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .mecanismoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .efectosGrid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 1.5rem;
+  }
+
+  .timeline {
+    flex-direction: column;
+  }
+
+  .hitoBtn {
+    min-width: unset;
+  }
+
+  .hitoDetalle {
+    padding: 1.25rem;
+  }
+
+  .tablaWrapper {
+    padding: 0 0.5rem;
+  }
+
+  .tdCaracteristica {
+    width: 35%;
+    font-size: 0.8rem;
+  }
+
+  .tdCox1,
+  .tdCox2 {
+    font-size: 0.8rem;
+  }
+
+  .insightBox {
+    margin: 0 0.5rem 1rem;
+  }
+
+  .pasoDetalle {
+    padding: 1.25rem;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Prefers-reduced-motion
+───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .mecanismoCard,
+  .efectoCard,
+  .hitoBtn,
+  .indicadorPunto,
+  .stepBtn {
+    transition: none !important;
+    transform: none !important;
+  }
+}

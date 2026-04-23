@@ -1547,6 +1547,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'El contacto social activa tanto oxitocina como endorfinas' },
     { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sistema opioide y la motivación de aprender' },
   ],
+  'visualizador-aspirina': [
+    { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Otro grupo de fármacos con mecanismo molecular fascinante' },
+    { url: '/visualizador-paracetamol-ibuprofeno/', icon: '⚖️', name: 'Paracetamol vs Ibuprofeno', description: 'Otros inhibidores del dolor con mecanismos distintos' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Las prostaglandinas forman parte de la respuesta inflamatoria' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo', description: 'La COX es una enzima — cómo funcionan en general' },
+  ],
+  'visualizador-antibioticos': [
+    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Otro fármaco con mecanismo molecular preciso' },
+    { url: '/visualizador-paracetamol-ibuprofeno/', icon: '⚖️', name: 'Paracetamol vs Ibuprofeno', description: 'Analgésicos que actúan diferente a los antibióticos' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Los antibióticos ayudan al sistema inmune — no lo sustituyen' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula', description: 'Diferencias entre célula eucariota y bacteria procariota' },
+  ],
+  'visualizador-paracetamol-ibuprofeno': [
+    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Otro AINE con mecanismo COX distinto al ibuprofeno' },
+    { url: '/visualizador-antibioticos/', icon: '🦠', name: 'Antibióticos', description: 'Fármacos que actúan sobre bacterias, no sobre el dolor' },
+    { url: '/visualizador-anestesia/', icon: '😴', name: 'Anestesia', description: 'Otro mecanismo de control del dolor a nivel central' },
+    { url: '/visualizador-higado/', icon: '🫁', name: 'Hígado', description: 'El hígado metaboliza el paracetamol — cómo funciona' },
+  ],
+  'visualizador-anestesia': [
+    { url: '/visualizador-aspirina/', icon: '💊', name: 'Aspirina', description: 'Control del dolor a nivel periférico (vs central en anestesia)' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La anestesia actúa sobre los canales iónicos de los nervios' },
+    { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'El enigma de la consciencia que la anestesia interrumpe' },
+    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🎓', name: 'Neurociencia del Aprendizaje', description: 'Memoria implícita bajo anestesia: un fenómeno sorprendente' },
+  ],
   'visualizador-lactasa': [
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
     { url: '/visualizador-catalasa/', icon: '⚗️', name: 'Catalasa', description: 'Otra enzima espectacular: 40M reacciones/s' },

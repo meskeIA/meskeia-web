@@ -1,0 +1,592 @@
+/* VisualizadorAnestesia.module.css */
+/* Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal) */
+
+/* ─── Contenedor ──────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+}
+
+/* ─── Hero: gradiente estándar meskeIA ──────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ─── Secciones ──────────────────────────── */
+.section {
+  max-width: 900px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 2rem 0 0.5rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary, #666666);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Insight Box ──────────────────────────── */
+.insightBox {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid #2E86AB;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  font-size: 0.92rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+}
+
+.insightBox strong {
+  color: #2E86AB;
+}
+
+/* ─── Nav de tipos ──────────────────────────── */
+.tiposNav {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.tipoBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 140px;
+  padding: 0.85rem 1.1rem;
+  background: var(--bg-card, #FFFFFF);
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666666);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  text-align: left;
+}
+
+.tipoBtn:hover {
+  border-color: #2E86AB;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
+  color: var(--text-primary, #1A1A1A);
+}
+
+.tipoBtn:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.tipoBtnActivo {
+  background: rgba(46, 134, 171, 0.07);
+  box-shadow: 0 2px 10px rgba(46, 134, 171, 0.2);
+  font-weight: 700;
+}
+
+/* ─── Panel de tipo ──────────────────────────── */
+.tipoPanel {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 14px;
+  padding: 1.5rem;
+  animation: fadeInPanel 0.25s ease;
+}
+
+@keyframes fadeInPanel {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tipoPanelGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.tipoPanelCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tipoPanelBloque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tipoPanelSubtitulo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.tipoPanelTexto {
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.tipoPanelLista {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tipoPanelLista li {
+  font-size: 0.88rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.4;
+}
+
+/* ─── Componentes de anestesia general ────────── */
+.componentesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.componenteCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.componenteCard:hover {
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.12);
+  transform: translateY(-2px);
+}
+
+.componenteNumero {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.componenteIcono {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.componenteTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0;
+}
+
+.componenteDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Pasos moleculares ──────────────────────── */
+.pasosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.pasoCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-top: 4px solid #2E86AB;
+  border-radius: 12px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.pasoCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.pasoNumero {
+  width: 32px;
+  height: 32px;
+  background-color: #2E86AB;
+  color: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.pasoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.pasoDesc {
+  font-size: 0.87rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Teorías de la consciencia ──────────────── */
+.teoriaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.teoriaCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.teoriaCard:hover {
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.1);
+}
+
+.teoriaTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.teoriaDesc {
+  font-size: 0.87rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.teoriaAutor {
+  font-size: 0.78rem;
+  color: var(--text-muted, #999999);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ─── Monitores ──────────────────────────────── */
+.monitoresGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.monitorCard {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-top: 4px solid #2E86AB;
+  border-radius: 12px;
+  padding: 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.monitorCard:hover {
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.12);
+}
+
+.monitorIcono {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.monitorNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.monitorDesc {
+  font-size: 0.87rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.55;
+  margin: 0;
+  flex: 1;
+}
+
+.monitorValor {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  align-self: flex-start;
+}
+
+/* ─── Warning box (marcador v2.0) ──────────────── */
+.warningBox {
+  background: #FFFBEB;
+  border: 1px solid #2E86AB;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  font-size: 0.88rem;
+  color: #444444;
+  line-height: 1.65;
+  margin-top: 1.5rem;
+}
+
+.warningBox strong {
+  color: #2E86AB;
+}
+
+/* ─── Dark mode ──────────────────────────────── */
+[data-theme='dark'] .container {
+  background-color: #1A1A1A;
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .sectionDesc {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(46, 134, 171, 0.12);
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .tipoBtn {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .tipoBtn:hover {
+  color: #E5E5E5;
+  border-color: #2E86AB;
+}
+
+[data-theme='dark'] .tipoBtnActivo {
+  background: rgba(46, 134, 171, 0.15);
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .tipoPanel {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .tipoPanelTexto {
+  color: #D0D0D0;
+}
+
+[data-theme='dark'] .tipoPanelLista li {
+  color: #D0D0D0;
+}
+
+[data-theme='dark'] .componenteCard {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .componenteTitulo {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .componenteDesc {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .pasoCard {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .pasoTitulo {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .pasoDesc {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .teoriaCard {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .teoriaDesc {
+  color: #D0D0D0;
+}
+
+[data-theme='dark'] .teoriaAutor {
+  color: #888888;
+}
+
+[data-theme='dark'] .monitorCard {
+  background: #2A2A2A;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .monitorNombre {
+  color: #E5E5E5;
+}
+
+[data-theme='dark'] .monitorDesc {
+  color: #B0B0B0;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: #2E86AB;
+  color: #C0C0C0;
+}
+
+/* ─── Animaciones (respeta prefers-reduced-motion) ─ */
+@media (prefers-reduced-motion: reduce) {
+  .componenteCard,
+  .pasoCard,
+  .teoriaCard,
+  .monitorCard,
+  .tipoBtn {
+    transition: none;
+  }
+
+  .tipoPanel {
+    animation: none;
+  }
+}
+
+/* ─── Responsive ─────────────────────────────── */
+@media (max-width: 720px) {
+  .tipoPanelGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .monitoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pasosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .teoriaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .componentesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tipoBtn {
+    min-width: 100px;
+    font-size: 0.82rem;
+    padding: 0.7rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .componentesGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .heroTitle {
+    font-size: 1.55rem;
+  }
+}

@@ -658,6 +658,10 @@ export const implementedAppsUrls = [
   "/visualizador-atp-sintasa/",          // Motor F0F1 animado, quimiosmosis 4 pasos, calculadora ATP diario, 4 inhibidores
   "/visualizador-adn-polimerasa/",       // Horquilla replicación 5 pasos, fidelidad 10⁻⁹, PCR + COVID, 5 polimerasas eucariotas
   "/visualizador-telomerasa/",           // Acortamiento telómeros, telomerasa repara, paradoja cáncer 90%, longevidad
+  "/visualizador-aspirina/",             // COX-1/COX-2 irreversible, 4 efectos, timeline 120 años, comparativa coxibs
+  "/visualizador-antibioticos/",         // 5 mecanismos, bacteriostático vs bactericida, 3 resistencias, virus vs bacteria
+  "/visualizador-paracetamol-ibuprofeno/", // SNC vs periférico, tabla 10 características, NAPQI, 5 escenarios educativos
+  "/visualizador-anestesia/",            // 3 tipos, 5 componentes general, GABA-A+NMDA, 3 teorías consciencia, BIS
 ];
 
 /**
