@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 587,
+  "total_tools": 592,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -2011,6 +2011,36 @@
           "slug": "visualizador-endorfinas",
           "url": "https://meskeia.com/visualizador-endorfinas/",
           "description": "El mito del runner's high desmentido (es anandamida, no endorfinas), los 3 tipos de endorfinas, 8 activadores del sistema opioide endógeno y diferencia con opioides externos"
+        },
+        {
+          "name": "Lactasa",
+          "slug": "visualizador-lactasa",
+          "url": "https://meskeia.com/visualizador-lactasa/",
+          "description": "Cómo la lactasa descompone la lactosa, por qué el 65% de adultos la pierde, la revolución evolutiva de la persistencia lactásica y el mecanismo de la intolerancia"
+        },
+        {
+          "name": "Catalasa",
+          "slug": "visualizador-catalasa",
+          "url": "https://meskeia.com/visualizador-catalasa/",
+          "description": "La enzima más rápida: 40 millones de reacciones por segundo. Experimento interactivo hígado crudo vs cocinado, usos industriales y daño oxidativo"
+        },
+        {
+          "name": "ATP Sintasa",
+          "slug": "visualizador-atp-sintasa",
+          "url": "https://meskeia.com/visualizador-atp-sintasa/",
+          "description": "El motor molecular F0F1 que produce el 95% del ATP celular: quimiosmosis animada, calculadora de ATP diario según peso y los 4 inhibidores más peligrosos"
+        },
+        {
+          "name": "ADN Polimerasa",
+          "slug": "visualizador-adn-polimerasa",
+          "url": "https://meskeia.com/visualizador-adn-polimerasa/",
+          "description": "Horquilla de replicación en 5 pasos, fidelidad de 1 error por 10⁹ bases, conexión con PCR y COVID-19, y comparativa de las 5 polimerasas eucariotas"
+        },
+        {
+          "name": "Telomerasa",
+          "slug": "visualizador-telomerasa",
+          "url": "https://meskeia.com/visualizador-telomerasa/",
+          "description": "Acortamiento de telómeros con cada división, reparación por telomerasa, paradoja del cáncer (activa en el 90% de tumores) e investigación en longevidad"
         }
       ]
     },

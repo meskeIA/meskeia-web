@@ -653,6 +653,11 @@ export const implementedAppsUrls = [
   "/visualizador-estrogenos/",            // E1/E2/E3, ciclo 28 días, 7 sistemas, estrógenos en hombres, menopausia
   "/visualizador-melatonina/",            // Curva circadiana vs cortisol, simulador luz, por edad/estación, jet lag
   "/visualizador-endorfinas/",            // Mito runner's high (anandamida), 3 tipos, 8 activadores, vs opioides externos
+  "/visualizador-lactasa/",              // Hidrólisis lactosa 3 pasos, 65% adultos, persistencia lactásica, mecanismo intolerancia
+  "/visualizador-catalasa/",             // 40M reacciones/s, experimento hígado crudo/cocinado, daño oxidativo, 6 usos industriales
+  "/visualizador-atp-sintasa/",          // Motor F0F1 animado, quimiosmosis 4 pasos, calculadora ATP diario, 4 inhibidores
+  "/visualizador-adn-polimerasa/",       // Horquilla replicación 5 pasos, fidelidad 10⁻⁹, PCR + COVID, 5 polimerasas eucariotas
+  "/visualizador-telomerasa/",           // Acortamiento telómeros, telomerasa repara, paradoja cáncer 90%, longevidad
 ];
 
 /**

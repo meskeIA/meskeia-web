@@ -1,0 +1,700 @@
+/* VisualizadorAdnPolimerasa.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones ─────────────────────────────────── */
+.section {
+  max-width: 960px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Bloque 1: Horquilla ───────────────────────── */
+.horquillaContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.indicadorPasos {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.indicadorPunto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #d0d0d0;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.indicadorPunto:hover {
+  background: var(--accent);
+  transform: scale(1.2);
+}
+
+.indicadorPuntoActivo {
+  background: var(--primary);
+  transform: scale(1.3);
+}
+
+.pasoContenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.svgWrapper {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.svgHorquilla {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.pasoTexto {
+  flex: 1;
+  width: 100%;
+}
+
+.pasoTitulo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+}
+
+.pasoNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.pasoDescripcion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stepControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.btnPaso {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btnPaso:hover:not(:disabled) {
+  background: var(--secondary);
+}
+
+.btnPaso:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnPaso:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.contadorPasos {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  min-width: 48px;
+  text-align: center;
+}
+
+/* ─── Bloque 2: Tarjetas de datos ───────────────── */
+.gridTarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.tarjetaDato {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.tarjetaDato:hover {
+  transform: translateY(-2px);
+}
+
+.tarjetaIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tarjetaTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.4rem;
+}
+
+.tarjetaValor {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.tarjetaDescripcion {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Barra de fidelidad */
+.barraFidelidadContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.barraFidelidadTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.barraFidelidad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.barraEtapa {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.barraBloque {
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  min-width: 120px;
+  transition: width 0.4s ease;
+}
+
+.barraBloque span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+.barraEtiqueta {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.barraLeyenda {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0.75rem 0 0;
+}
+
+/* ─── Bloque 3: PCR ─────────────────────────────── */
+.tarjetaIntro {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(46, 134, 171, 0.07);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tarjetaIntroIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.cicloPCR {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 1.75rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.cicloPaso {
+  flex: 1;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.cicloPaso:last-child {
+  border-right: none;
+}
+
+.temperaturaTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+
+.cicloPasoTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.cicloPasoDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cicloFlecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.resultadoPCR {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.resultadoPCRNumero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.resultadoPCRGrande {
+  font-size: 2rem;
+  font-weight: 800;
+  opacity: 0.95;
+}
+
+.resultadoPCREqual {
+  font-size: 1.5rem;
+  opacity: 0.7;
+}
+
+.resultadoPCRCopias {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.resultadoPCRDesc {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.tarjetaCovid {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tarjetaCovidIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Bloque 4: Tabla polimerasas ───────────────── */
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.tablaPolimerasa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+}
+
+.tablaPolimerasa thead tr {
+  background: var(--primary);
+  color: white;
+}
+
+.tablaPolimerasa th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.tablaPolimerasa td {
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.filaImpar {
+  background: var(--bg-card);
+}
+
+.filaPar {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.tablaPolimerasa tbody tr:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.celdaNombre {
+  font-weight: 800;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+}
+
+.badgeUbicacion {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badgeNucleo {
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--primary);
+}
+
+.badgeMito {
+  background: rgba(39, 174, 96, 0.15);
+  color: #27ae60;
+}
+
+.celdaDetalle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.tarjetaCuriosidad {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(243, 156, 18, 0.07);
+  border: 1px solid rgba(243, 156, 18, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tarjetaCuriosidadIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── EducationalSection content ────────────────── */
+.educationalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.educationalItem {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.educationalItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.educationalItem h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.educationalItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.warningBox {
+  background: rgba(243, 156, 18, 0.1);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  border-left: 4px solid #f39c12;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ─── Dark mode ─────────────────────────────────── */
+[data-theme='dark'] .horquillaContainer,
+[data-theme='dark'] .tarjetaDato,
+[data-theme='dark'] .barraFidelidadContainer,
+[data-theme='dark'] .cicloPCR,
+[data-theme='dark'] .tablaWrapper,
+[data-theme='dark'] .tablaPolimerasa {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .svgWrapper {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .tarjetaIntro {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .tarjetaCovid {
+  background: rgba(72, 169, 166, 0.1);
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+[data-theme='dark'] .tarjetaCuriosidad {
+  background: rgba(243, 156, 18, 0.08);
+  border-color: rgba(243, 156, 18, 0.25);
+}
+
+[data-theme='dark'] .filaImpar {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .filaPar {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .tablaPolimerasa tbody tr:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .educationalItem {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(243, 156, 18, 0.08);
+  border-color: rgba(243, 156, 18, 0.25);
+}
+
+[data-theme='dark'] .cicloPaso {
+  border-right-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ─── Responsive ────────────────────────────────── */
+@media (min-width: 640px) {
+  .pasoContenido {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .svgWrapper {
+    width: 380px;
+    min-width: 320px;
+  }
+}
+
+@media (max-width: 639px) {
+  .cicloPCR {
+    flex-direction: column;
+  }
+
+  .cicloPaso {
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .cicloPaso:last-child {
+    border-bottom: none;
+  }
+
+  .cicloFlecha {
+    transform: rotate(90deg);
+    padding: 0.25rem 0;
+    align-self: center;
+  }
+
+  .gridTarjetas {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .gridTarjetas {
+    grid-template-columns: 1fr;
+  }
+
+  .resultadoPCRNumero {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjetaDato,
+  .btnPaso,
+  .indicadorPunto,
+  .barraBloque {
+    transition: none;
+  }
+}

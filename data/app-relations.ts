@@ -1547,6 +1547,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-oxitocina/', icon: '🤝', name: 'Oxitocina', description: 'El contacto social activa tanto oxitocina como endorfinas' },
     { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sistema opioide y la motivación de aprender' },
   ],
+  'visualizador-lactasa': [
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
+    { url: '/visualizador-catalasa/', icon: '⚗️', name: 'Catalasa', description: 'Otra enzima espectacular: 40M reacciones/s' },
+    { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'La mutación que permitió digerir leche en adultos' },
+    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos' },
+  ],
+  'visualizador-catalasa': [
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
+    { url: '/visualizador-lactasa/', icon: '🥛', name: 'Lactasa', description: 'Otra enzima con historia evolutiva fascinante' },
+    { url: '/visualizador-atp-sintasa/', icon: '⚙️', name: 'ATP Sintasa', description: 'El motor molecular de la energía celular' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'El daño oxidativo y las defensas antioxidantes' },
+  ],
+  'visualizador-atp-sintasa': [
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
+    { url: '/visualizador-catalasa/', icon: '⚗️', name: 'Catalasa', description: 'La cadena respiratoria y el H₂O₂' },
+    { url: '/visualizador-adn-polimerasa/', icon: '🧬', name: 'ADN Polimerasa', description: 'Otra máquina molecular con Premio Nobel' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'Mitocondria, ROS y senescencia' },
+  ],
+  'visualizador-adn-polimerasa': [
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN: Código Genético', description: 'El código que la ADN polimerasa replica' },
+    { url: '/visualizador-telomerasa/', icon: '⏳', name: 'Telomerasa', description: 'La enzima que completa lo que la polimerasa no puede' },
+    { url: '/visualizador-atp-sintasa/', icon: '⚙️', name: 'ATP Sintasa', description: 'Otro motor molecular Premio Nobel' },
+  ],
+  'visualizador-telomerasa': [
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas del Cuerpo Humano', description: 'El panorama completo de las enzimas' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'El papel de los telómeros en la senescencia' },
+    { url: '/visualizador-adn-polimerasa/', icon: '🧬', name: 'ADN Polimerasa', description: 'La enzima que replica y el problema del extremo' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN: Código Genético', description: 'El código que los telómeros protegen' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

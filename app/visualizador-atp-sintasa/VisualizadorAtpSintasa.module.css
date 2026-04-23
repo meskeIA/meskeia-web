@@ -1,0 +1,1037 @@
+/* VisualizadorAtpSintasa.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: #ffffff;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0 0 2rem;
+}
+
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  min-width: 120px;
+}
+
+.heroStatNum {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.heroStatLabel {
+  font-size: 0.75rem;
+  opacity: 0.85;
+  text-align: center;
+  margin-top: 0.2rem;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.sectionAlt {
+  background-color: var(--bg-card);
+  max-width: 100%;
+  padding: 3rem 1.5rem;
+}
+
+.sectionAlt .section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.sectionHeader h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionHeader p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ===== BLOQUE 1: MOTOR ===== */
+.motorWrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.motorControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.btnMotor {
+  padding: 0.6rem 1.5rem;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnMotor:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btnMotorActivo {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.motorEstado {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Contenedor de la membrana y el motor */
+.membranaContainer {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  background: linear-gradient(
+    to bottom,
+    #1a3a4a 0%,
+    #1a3a4a 35%,
+    #2E86AB 40%,
+    #2E86AB 60%,
+    #e8f4f8 65%,
+    #e8f4f8 100%
+  );
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+[data-theme='dark'] .membranaContainer {
+  background: linear-gradient(
+    to bottom,
+    #0d1f2d 0%,
+    #0d1f2d 35%,
+    #1a4060 40%,
+    #1a4060 60%,
+    #1a2a35 65%,
+    #1a2a35 100%
+  );
+}
+
+.compartimentoLabel {
+  position: absolute;
+  left: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+[data-theme='dark'] .compartimentoLabel {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.compartimentoLabel:last-of-type {
+  color: rgba(30, 70, 90, 0.9);
+}
+
+[data-theme='dark'] .compartimentoLabel:last-of-type {
+  color: rgba(180, 210, 230, 0.8);
+}
+
+.hPlus {
+  font-size: 0.7rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Carril de protones */
+.protonCarril {
+  position: absolute;
+  top: 8%;
+  width: 60px;
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.protonBola {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0c040;
+  color: #333;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+}
+
+.protonAnimado {
+  animation: descenderProton 2.4s ease-in-out infinite;
+}
+
+@keyframes descenderProton {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(60px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
+
+/* Membrana: línea visual */
+.membranaLinea {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.membranaLabel {
+  position: absolute;
+  right: 1rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+/* F0: cilindro en la membrana */
+.motorF0Wrapper {
+  position: relative;
+  z-index: 2;
+}
+
+.motorF0 {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #48A9A6, #2E86AB);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  gap: 4px;
+  cursor: default;
+}
+
+.motorGirando {
+  animation: girar 3s linear infinite;
+}
+
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.f0Anillos {
+  display: flex;
+  gap: 3px;
+}
+
+.f0Anillo {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* F1: cabeza con subunidades beta */
+.motorF1Wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0 0.5rem;
+  flex: 1;
+}
+
+.motorF1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.f1Titulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a4060;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+[data-theme='dark'] .f1Titulo {
+  color: #e0f0ff;
+  background: rgba(30, 60, 90, 0.6);
+}
+
+.subunidadesWrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.subunidadBeta {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  transition: background 0.5s, border-color 0.5s;
+  gap: 0.2rem;
+}
+
+.betaLabel {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.betaEstado {
+  font-size: 0.65rem;
+  opacity: 0.9;
+}
+
+/* Estados de las subunidades */
+.betaAbierto {
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+[data-theme='dark'] .betaAbierto {
+  background: #1a3d24;
+  border-color: #28a745;
+  color: #a3d9b1;
+}
+
+.betaCerrado {
+  background: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+[data-theme='dark'] .betaCerrado {
+  background: #3d2f00;
+  border-color: #ffc107;
+  color: #ffd966;
+}
+
+.betaSemiabierto {
+  background: #cce5ff;
+  border-color: #007bff;
+  color: #004085;
+}
+
+[data-theme='dark'] .betaSemiabierto {
+  background: #003366;
+  border-color: #007bff;
+  color: #80c0ff;
+}
+
+.atpFlecha {
+  font-size: 0.85rem;
+  color: #1a4060;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+}
+
+[data-theme='dark'] .atpFlecha {
+  color: #c0e0ff;
+  background: rgba(30, 60, 90, 0.5);
+}
+
+.motorExplicacion {
+  margin-top: 1.5rem;
+}
+
+.infoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.infoIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.infoBox p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== BLOQUE 2: QUIMIOÓSMOSIS ===== */
+.stepContainer {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.stepProgress {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.stepDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+.stepDot:hover {
+  transform: scale(1.2);
+}
+
+.stepDotActivo {
+  background: var(--primary);
+  transform: scale(1.2);
+}
+
+.stepDotCompletado {
+  background: var(--secondary);
+}
+
+.stepCard {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 2rem;
+  border-top: 4px solid var(--primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  position: relative;
+  min-height: 280px;
+}
+
+[data-theme='dark'] .stepCard {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stepNumero {
+  display: inline-block;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.stepIcono {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.stepTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.stepDescripcion {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+.stepDetalle {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  border-left: 3px solid var(--accent);
+}
+
+.stepDetalle p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+.stepControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  gap: 1rem;
+}
+
+.btnStep {
+  padding: 0.6rem 1.25rem;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnStep:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.btnStep:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepIndicador {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ===== BLOQUE 3: ATP CALCULADORA ===== */
+.atpCalculadora {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sliderWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.sliderATP {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.sliderATP::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.sliderATP::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.sliderRango {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.resultadoATP {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 16px;
+  padding: 2rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+.resultadoPrincipal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.resultadoNumero {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.resultadoDesc {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-top: 0.4rem;
+}
+
+.resultadoExplicacion {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.atpTarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.atpTarjeta {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.atpTarjetaIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.atpTarjetaInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.atpTarjetaInfo strong {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.atpTarjetaInfo span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.comparativaATP {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.75rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.comparativaATP h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+}
+
+.barrasWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.barraItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.barraLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.barraContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 24px;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 4px;
+  overflow: visible;
+  position: relative;
+}
+
+.barraFill {
+  height: 100%;
+  border-radius: 4px;
+  min-width: 4px;
+  transition: width 0.6s ease;
+}
+
+.barraValor {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.comparativaNote {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 1rem 0 0;
+}
+
+/* ===== BLOQUE 4: INHIBIDORES ===== */
+.inhibidoresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto 1.5rem;
+}
+
+.tarjetaInhibidor {
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  background: var(--bg-primary);
+  border-top: 4px solid transparent;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tarjetaInhibidor:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .tarjetaInhibidor:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.inhibidorInvestigacion {
+  border-top-color: #48A9A6;
+}
+
+.inhibidorPeligroso {
+  border-top-color: #E63946;
+}
+
+.inhibidorNatural {
+  border-top-color: #28a745;
+}
+
+.inhibidorHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.inhibidorIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.inhibidorNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.inhibidorTipo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.inhibidorCuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inhibidorItem strong {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+
+.inhibidorItem p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.inhibidorContexto {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.inhibidorContexto p {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== WARNING BOX ===== */
+.warningBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #fff8e1;
+  border: 1px solid #ffc107;
+  border-left: 4px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem auto 0;
+  max-width: 900px;
+  font-size: 0.875rem;
+  color: #6d4c00;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2000;
+  border-color: #ffc107;
+  color: #ffd966;
+}
+
+.warningBox span {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.warningBox p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== CONTENIDO EDUCATIVO ===== */
+.educContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.educItem {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.educItem:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.educItem h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.educItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .heroStats {
+    gap: 0.75rem;
+  }
+
+  .heroStat {
+    min-width: 100px;
+    padding: 0.6rem 0.875rem;
+  }
+
+  .heroStatNum {
+    font-size: 1.2rem;
+  }
+
+  .section {
+    padding: 2rem 1rem;
+  }
+
+  .membranaContainer {
+    min-height: 360px;
+  }
+
+  .stepCard {
+    padding: 1.25rem;
+    min-height: 260px;
+  }
+
+  .stepTitulo {
+    font-size: 1rem;
+  }
+
+  .inhibidoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .atpTarjetas {
+    grid-template-columns: 1fr;
+  }
+
+  .resultadoNumero {
+    font-size: 2.25rem;
+  }
+
+  .subunidadBeta {
+    width: 60px;
+    height: 60px;
+    font-size: 0.7rem;
+  }
+
+  .motorF0 {
+    width: 60px;
+    height: 60px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== ANIMACIONES REDUCIDAS ===== */
+@media (prefers-reduced-motion: reduce) {
+  .motorGirando {
+    animation: none;
+  }
+
+  .protonAnimado {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .tarjetaInhibidor {
+    transition: none;
+  }
+}

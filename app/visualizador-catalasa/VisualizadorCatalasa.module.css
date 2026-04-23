@@ -1,0 +1,676 @@
+/* ─────────────────────────────────────────────
+   VisualizadorCatalasa.module.css
+   Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal)
+   ───────────────────────────────────────────── */
+
+/* ── Layout principal ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroEmoji {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitulo {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  opacity: 0.92;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  opacity: 0.82;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ── Secciones ── */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.sectionTitulo {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary);
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+/* ── BLOQUE 1: Ecuación química ── */
+.ecuacionContainer {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.ecuacionQuimica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  font-family: 'Georgia', serif;
+  margin-bottom: 0.5rem;
+}
+
+.reactivo {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.08);
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+}
+
+.producto {
+  color: #27ae60;
+  background: rgba(39, 174, 96, 0.08);
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+}
+
+.flecha {
+  color: var(--primary);
+  font-size: 1.8rem;
+}
+
+.mas {
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+}
+
+.ecuacionLabel {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.catalasaLabel {
+  font-style: italic;
+  color: var(--primary);
+  font-weight: 600;
+  margin-right: 0.3rem;
+}
+
+/* ── Demo reacción ── */
+.reaccionDemo {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.tuboWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tuboEnsayo {
+  width: 90px;
+  height: 200px;
+  overflow: visible;
+}
+
+/* Animación burbujas en el tubo */
+@keyframes subirBurbuja {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-130px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+.burbujaTubo {
+  animation: subirBurbuja 1.4s ease-out infinite;
+}
+
+/* ── Contador ── */
+.reaccionInfo {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.contadorReacciones {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.contadorLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.contadorNumero {
+  display: block;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.contadorMax {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin-top: 0.3rem;
+}
+
+.botonesReaccion {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btnActivar {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  min-width: 140px;
+}
+
+.btnActivar:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnActivar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btnActivar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnReiniciar {
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.btnReiniciar:hover {
+  background: rgba(46, 134, 171, 0.1);
+  transform: translateY(-1px);
+}
+
+.btnReiniciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Tarjeta comparativa */
+.tarjetaComparativa {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+}
+
+.tarjetaComparativaTexto {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ── BLOQUE 2: Grid de daño ── */
+.gridDano {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.danoCarta {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.danoCarta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+}
+
+.danoIcono {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.danoTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.danoTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── BLOQUE 3: Experimento ── */
+.selectorSustancia {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.btnSustancia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.9rem 0.75rem;
+  background: var(--bg-card);
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.btnSustancia:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btnSustanciaActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.btnSustanciaDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.btnSustancia:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Experimento visual */
+.experimentoVisual {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.vasoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vasoReaccion {
+  width: 120px;
+  height: 180px;
+  overflow: visible;
+}
+
+/* Animación burbujas del vaso */
+@keyframes subirBurbujaVaso {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-80px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.burbujaVaso {
+  animation: subirBurbujaVaso 1.8s ease-out infinite;
+}
+
+.vasoLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+/* Barra de actividad */
+.experimentoInfo {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.barraActividadContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+}
+
+.barraActividadLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.barraActividadLabel strong {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.barraActividadFondo {
+  height: 16px;
+  background: rgba(46, 134, 171, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.barraActividadRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}
+
+.barraActividadEscala {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.experimentoExplicacion {
+  background: rgba(72, 169, 166, 0.06);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.experimentoExplicacion p {
+  margin: 0;
+}
+
+/* Tarjeta temperatura */
+.tarjetaTemperatura {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(231, 76, 60, 0.06);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+}
+
+.tarjetaTemperaturaIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.tarjetaTemperatura p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── BLOQUE 4: Grid aplicaciones ── */
+.gridAplicaciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.aplicacionCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.4rem;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.aplicacionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.35);
+}
+
+.aplicacionIcono {
+  font-size: 2rem;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.aplicacionTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.aplicacionDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Sección educativa ── */
+.educContent h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.educContent h3:first-child {
+  margin-top: 0;
+}
+
+.educContent p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 0.75rem;
+}
+
+/* WarningBox (indicador v2.0 completo) */
+.warningBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 1.25rem;
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, #1a5f7a 0%, #2a7a77 100%);
+}
+
+[data-theme='dark'] .danoCarta,
+[data-theme='dark'] .aplicacionCard,
+[data-theme='dark'] .contadorReacciones,
+[data-theme='dark'] .barraActividadContainer {
+  background: var(--bg-card);
+  border-color: rgba(72, 169, 166, 0.2);
+}
+
+[data-theme='dark'] .tarjetaComparativa {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12), rgba(72, 169, 166, 0.12));
+}
+
+[data-theme='dark'] .tarjetaTemperatura {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+[data-theme='dark'] .btnSustancia {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+[data-theme='dark'] .btnSustanciaActivo {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: var(--secondary);
+}
+
+[data-theme='dark'] .experimentoExplicacion {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .barraActividadFondo {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+/* ── Animaciones respeto reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .burbujaTubo,
+  .burbujaVaso {
+    animation: none;
+    opacity: 0;
+  }
+
+  .btnActivar,
+  .btnReiniciar,
+  .danoCarta,
+  .aplicacionCard,
+  .btnSustancia {
+    transition: none;
+  }
+
+  .barraActividadRelleno {
+    transition: none;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .section {
+    padding: 1.75rem 1rem;
+  }
+
+  .reaccionDemo {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .experimentoVisual {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .selectorSustancia {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .botonesReaccion {
+    flex-direction: column;
+  }
+
+  .btnActivar,
+  .btnReiniciar {
+    width: 100%;
+  }
+}

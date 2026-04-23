@@ -1,0 +1,434 @@
+/* VisualizadorTelomerasa.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  opacity: 0.92;
+  margin: 0;
+}
+
+/* ---- Sección genérica ---- */
+.section {
+  max-width: 860px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1.2rem;
+}
+
+.subtituloBloque {
+  color: var(--text-secondary);
+  margin: -0.6rem 0 1.4rem;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+/* ---- Bloque 1: pasos ---- */
+.pasoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pasoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.pasoNumero {
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pasoTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cromosomaContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.2rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+.svgCromosoma {
+  max-width: 100%;
+  height: auto;
+}
+
+.pasoDescripcion {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.stepControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.btnPaso {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  min-width: 110px;
+}
+
+.btnPaso:hover:not(:disabled) {
+  background: var(--secondary);
+}
+
+.btnPaso:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnPaso:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.pasoDots {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.dotActivo {
+  background: var(--primary);
+}
+
+/* ---- Bloque 2: grid células ---- */
+.gridCelulas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.tarjetaCelula {
+  background: var(--bg-primary);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tarjetaCancer {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.04);
+}
+
+[data-theme='dark'] .tarjetaCancer {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.nombreCelula {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.barraActividad {
+  display: flex;
+  gap: 4px;
+  margin: 0.1rem 0;
+}
+
+.bloqueBarra {
+  width: 20px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.bloqueAzul {
+  background: var(--primary);
+}
+
+.bloqueRojo {
+  background: #ef4444;
+}
+
+.bloqueVacio {
+  background: rgba(100, 100, 100, 0.15);
+}
+
+.nivelLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.descCelula {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---- Bloque 3: chart ---- */
+.leyendaZonas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+}
+
+.zonaVerde {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.zonaAnaranjada {
+  color: #ea580c;
+  font-weight: 600;
+}
+
+.zonaRoja {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.chartContainer {
+  height: 280px;
+  position: relative;
+  margin-bottom: 0.8rem;
+}
+
+.notaChart {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  text-align: center;
+}
+
+/* ---- Bloque 4: columnas duales ---- */
+.columnasDual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .columnasDual {
+    grid-template-columns: 1fr;
+  }
+}
+
+.columnaAzul,
+.columnaRoja {
+  border-radius: 10px;
+  padding: 1.2rem;
+}
+
+.columnaAzul {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.3);
+}
+
+.columnaRoja {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+[data-theme='dark'] .columnaAzul {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+[data-theme='dark'] .columnaRoja {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.colHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.colIcono {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.colHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.colEtiqueta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.colLista {
+  padding-left: 1.2rem;
+  margin: 0 0 0.8rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.colLista li {
+  margin-bottom: 0.35rem;
+}
+
+.itemDestacado {
+  font-weight: 600;
+  color: var(--text-primary) !important;
+}
+
+.analogia {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ---- Warning box ---- */
+.warningBox {
+  background: rgba(249, 115, 22, 0.08);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  border-left: 4px solid #f97316;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 0.8rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.45);
+}
+
+/* ---- Responsive general ---- */
+@media (max-width: 640px) {
+  .section {
+    padding: 1.4rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stepControls {
+    justify-content: center;
+  }
+
+  .gridCelulas {
+    grid-template-columns: 1fr;
+  }
+
+  .chartContainer {
+    height: 240px;
+  }
+
+  .leyendaZonas {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+}
+
+/* ---- Dark mode general ---- */
+[data-theme='dark'] .section {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .tarjetaCelula {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .dot {
+  border-color: var(--accent);
+}
+
+[data-theme='dark'] .dotActivo {
+  background: var(--accent);
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .btnPaso,
+  .dot,
+  .bloqueBarra {
+    transition: none !important;
+  }
+}

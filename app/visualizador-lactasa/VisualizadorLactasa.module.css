@@ -1,0 +1,605 @@
+/* VisualizadorLactasa.module.css — Paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.25;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Secciones */
+.section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+[data-theme='dark'] .section {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.75rem;
+}
+
+/* Bloque 1: Steps */
+.stepContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .stepContainer {
+  border-color: rgba(46, 134, 171, 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.stepIndicadores {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.stepIndicador {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: 2px solid #D1D5DB;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stepIndicador:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.stepIndicadorActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.stepIndicadorCompletado {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+.stepContenido {
+  text-align: center;
+  min-height: 260px;
+}
+
+.stepTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.stepDescripcion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 580px;
+  margin: 0 auto 1.5rem;
+}
+
+/* SVG / Moléculas */
+.svgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 110px;
+  padding: 1rem 0;
+}
+
+.moleculaLactosa {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-direction: column;
+}
+
+.moleculaCirculo {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.moleculaEnlace {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+  margin: 0 0.25rem;
+}
+
+.moleculaEtiqueta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+/* Pasos union y ruptura */
+.moleculaUnion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.moleculaUnion .moleculaLactosa {
+  flex-direction: row;
+}
+
+.flechaAbajo {
+  font-size: 1.4rem;
+  color: var(--primary);
+}
+
+.enzimaCaja {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enzimaIcono {
+  font-size: 1.1rem;
+}
+
+.moleculaProductos {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.moleculaProducto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.masSigno {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* Controles de step */
+.stepControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+[data-theme='dark'] .stepControls {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+.btnControl {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.btnControl:hover:not(:disabled) {
+  background: var(--secondary);
+}
+
+.btnControl:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnControl:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.stepCounter {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  min-width: 4rem;
+  text-align: center;
+}
+
+/* Bloque 2: Chart */
+.chartWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  max-height: 420px;
+}
+
+.leyendaColores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.leyendaDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.notaDatos {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Bloque 3: Flujo intolerancia */
+.flujoIntolerancia {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.flujoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tarjetaFlujo {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
+  width: 175px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjetaFlujo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tarjetaFlujo {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.flujoIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.flujoTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.flujoDescripcion {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.flechaFlujo {
+  font-size: 1.6rem;
+  color: var(--primary);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* Bloque 4: Evolución */
+.tarjetaEvolucion {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.evolucionIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 0.9rem;
+}
+
+.evolucionIntro:last-child {
+  margin-bottom: 0;
+}
+
+/* Timeline */
+.timelineEvolucion {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 2rem;
+  padding-left: 0.5rem;
+}
+
+.puntoTimeline {
+  display: grid;
+  grid-template-columns: 130px 40px 1fr;
+  align-items: center;
+  gap: 0;
+  padding: 0.6rem 0;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.puntoTimeline:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.puntoTimelineDestacado .timelineAnio {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.puntoTimelineDestacado .timelineDot {
+  background: var(--primary);
+  width: 14px;
+  height: 14px;
+}
+
+.timelineAnio {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: right;
+  padding-right: 0.75rem;
+}
+
+.timelineConector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  height: 100%;
+  min-height: 50px;
+}
+
+.timelineLinea {
+  width: 2px;
+  flex: 1;
+  background: rgba(46, 134, 171, 0.25);
+}
+
+.timelineDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--secondary);
+  flex-shrink: 0;
+}
+
+.timelineEvento {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  padding-left: 0.75rem;
+}
+
+/* Tarjeta dato destacado */
+.tarjetaDato {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.datoCifra {
+  font-size: 2.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.datoTexto {
+  font-size: 1rem;
+  line-height: 1.55;
+  opacity: 0.93;
+}
+
+/* Sección educativa */
+.educSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.educSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.2rem 0 0.3rem;
+}
+
+.educSection h3:first-child {
+  margin-top: 0;
+}
+
+.educSection p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Warning box (indicador de v2.0) */
+.warningBox {
+  background: #FFFBEB;
+  border: 1px solid var(--primary);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+  color: #92400E;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+  .section {
+    padding: 2rem 1rem;
+  }
+
+  .flujoIntolerancia {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .flujoItem {
+    flex-direction: column;
+  }
+
+  .flechaFlujo {
+    transform: rotate(90deg);
+    font-size: 1.3rem;
+  }
+
+  .tarjetaFlujo {
+    width: 90%;
+    max-width: 300px;
+  }
+
+  .puntoTimeline {
+    grid-template-columns: 110px 30px 1fr;
+  }
+
+  .timelineAnio {
+    font-size: 0.75rem;
+  }
+
+  .timelineEvento {
+    font-size: 0.82rem;
+  }
+
+  .tarjetaDato {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .datoCifra {
+    font-size: 2.2rem;
+  }
+
+  .moleculaProductos {
+    gap: 0.8rem;
+  }
+
+  .moleculaCirculo {
+    width: 2.8rem;
+    height: 2.8rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnControl,
+  .tarjetaFlujo {
+    transition: none;
+  }
+}
