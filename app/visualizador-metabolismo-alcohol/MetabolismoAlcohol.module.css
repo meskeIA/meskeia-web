@@ -1,0 +1,473 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tabActiva {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Sección */
+.seccion {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2rem;
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.seccionSubtitulo {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+/* Ruta metabólica */
+.rutaFlujo {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+
+.rutaGrupo {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pasoCaja {
+  display: flex;
+  gap: 1rem;
+  border-radius: 12px;
+  padding: 1.25rem;
+  border-left: 4px solid transparent;
+}
+
+.pasoPeligro {
+  background: #FFF7F7;
+  border-left-color: #DC2626;
+}
+
+.pasoSeguro {
+  background: #F0FFF4;
+  border-left-color: #16A34A;
+}
+
+[data-theme='dark'] .pasoPeligro {
+  background: #3B1212;
+}
+
+[data-theme='dark'] .pasoSeguro {
+  background: #0F2A18;
+}
+
+.pasoNumero {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 28px;
+}
+
+.pasoContent {
+  flex: 1;
+}
+
+.pasoReaccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.pasoReactivo {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.pasoEnzima {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.pasoProducto {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.pasoIcono {
+  font-size: 1.5rem;
+  float: right;
+  margin: -0.5rem 0 0.5rem 1rem;
+}
+
+.pasoDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.rutaConector {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  padding: 0.25rem 0;
+}
+
+/* Órganos */
+.organosSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.organoBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--text-muted);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.organoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.organoBtnActivo {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.organoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.organoDetalle {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.organoHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.organoIconoGrande {
+  font-size: 2.5rem;
+}
+
+.organoNombre {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.organoBloque {
+  margin-bottom: 1rem;
+}
+
+.organoBloqueTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.organoBloqueText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.organoLista {
+  list-style: disc;
+  padding-left: 1.4rem;
+  margin: 0;
+}
+
+.organoLista li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
+}
+
+.datosClave {
+  background: #EFF6FF;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .datosClave {
+  background: #1e3a5f;
+}
+
+/* ALDH2 */
+.aldh2Intro {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.aldh2Intro p {
+  margin: 0 0 0.75rem;
+}
+
+.aldh2Intro p:last-child {
+  margin: 0;
+}
+
+.aldh2Grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.aldh2Card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border-top: 4px solid transparent;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.aldh2Porcentaje {
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.aldh2Poblacion {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.aldh2Desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+.aldh2Riesgo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 1rem;
+  width: fit-content;
+}
+
+/* Cerebro */
+.cerebroGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.cerebroCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.cerebroCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.cerebroCard p,
+.cerebroCard ul {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.cerebroCard ul {
+  padding-left: 1.2rem;
+}
+
+.cerebroCard li {
+  margin-bottom: 0.35rem;
+}
+
+.peligroAbstinencia {
+  background: #FEF3C7;
+  border-left: 3px solid #D97706;
+  border-radius: 0 6px 6px 0;
+  padding: 0.7rem;
+  font-size: 0.83rem;
+  color: #92400E;
+  margin-top: 0.6rem;
+}
+
+[data-theme='dark'] .peligroAbstinencia {
+  background: #451A00;
+  color: #FDE68A;
+}
+
+/* Alertas */
+.warningBox {
+  background: #FEF3C7;
+  border-left: 4px solid #D97706;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem;
+  font-size: 0.88rem;
+  color: #92400E;
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #451A00;
+  color: #FDE68A;
+}
+
+.infoBox {
+  background: #EFF6FF;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .infoBox {
+  background: #1e3a5f;
+}
+
+/* Dark mode base */
+[data-theme='dark'] .organoDetalle,
+[data-theme='dark'] .aldh2Intro,
+[data-theme='dark'] .aldh2Card,
+[data-theme='dark'] .cerebroCard {
+  background: var(--bg-card);
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .tabs {
+    padding: 1rem;
+  }
+
+  .seccion {
+    padding: 1rem;
+  }
+
+  .pasoCaja {
+    flex-direction: column;
+  }
+
+  .organosSelector {
+    flex-direction: column;
+  }
+}

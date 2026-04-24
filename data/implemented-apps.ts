@@ -676,6 +676,9 @@ export const implementedAppsUrls = [
   "/visualizador-silicio/",              // Bandas energía, dopado N/P, unión P-N, 7 pasos arena→chip, Ley de Moore
   "/visualizador-hidrogeno/",            // Distribución cósmica, fusión pp, pila PEM, 5 colores H₂, densidad energética
   "/visualizador-oro/",                  // Relatividad efecto, configuración 6s, nobleza química, electrónica, AuNP medicina
+  "/visualizador-ayuno-intermitente/",   // Fases metabólicas hora a hora, autofagia, tipos de protocolo, contraindicaciones
+  "/visualizador-metabolismo-alcohol/",  // ADH→acetaldehído→ALDH2, multi-órgano, variante ALDH2*2, cerebro GABA/NMDA
+  "/visualizador-indice-glucemico/",     // IG vs Carga Glucémica, paradoja sandía, tabla 26 alimentos, fibra, curva glucosa
 ];
 
 /**

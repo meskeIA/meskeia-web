@@ -1,0 +1,520 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tabActiva {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Sección */
+.seccion {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2rem;
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.seccionSubtitulo {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.timelineItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 110px;
+  text-align: center;
+}
+
+.timelineItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.timelineActivo {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.timelineIcono {
+  font-size: 1.5rem;
+}
+
+.timelineRango {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.timelineTitulo {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Detalle fase */
+.faseDetalle {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.faseHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.faseIconoGrande {
+  font-size: 2.5rem;
+}
+
+.faseTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.25rem;
+}
+
+.faseRango {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.faseMetrics {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metricValor {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.faseDescripcion {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.procesosList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.procesoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.procesoCheck {
+  color: var(--primary);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Autofagia */
+.autofagiaIntro {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.autofagiaIcono {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.autofagiaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.autofagiaCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.autofagiaCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.autofagiaCard p,
+.autofagiaCard ul {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.autofagiaCard ul {
+  padding-left: 1.2rem;
+}
+
+.autofagiaCard li {
+  margin-bottom: 0.4rem;
+}
+
+/* Tipos de ayuno */
+.tiposGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tipoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.tipoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.tipoIcono {
+  font-size: 1.5rem;
+}
+
+.tipoNombre {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.2rem;
+}
+
+.tipoProtocolo {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.tipoVentanas {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.ventanaAyuno {
+  background: #FEF3C7;
+  color: #92400E;
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.ventanaComer {
+  background: #D1FAE5;
+  color: #065F46;
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .ventanaAyuno {
+  background: #78350F;
+  color: #FDE68A;
+}
+
+[data-theme='dark'] .ventanaComer {
+  background: #064E3B;
+  color: #6EE7B7;
+}
+
+.tipoDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Contraindicaciones */
+.contraLeyenda {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.contraAbsoluta {
+  color: #DC2626;
+}
+
+.contraRelativa {
+  color: #D97706;
+}
+
+.contraGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.contraCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border-left: 4px solid transparent;
+}
+
+.contraCardAbsoluta {
+  border-left-color: #DC2626;
+}
+
+.contraCardRelativa {
+  border-left-color: #D97706;
+}
+
+.contraHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.contraIcono {
+  font-size: 1.3rem;
+}
+
+.contraGrupo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.contraBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.badgeAbsoluta {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.badgeRelativa {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+[data-theme='dark'] .badgeAbsoluta {
+  background: #7F1D1D;
+  color: #FCA5A5;
+}
+
+[data-theme='dark'] .badgeRelativa {
+  background: #78350F;
+  color: #FDE68A;
+}
+
+.contraRazon {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Nota y advertencias */
+.nota {
+  background: #EFF6FF;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+}
+
+[data-theme='dark'] .nota {
+  background: #1e3a5f;
+}
+
+.warningBox {
+  background: #FEF3C7;
+  border-left: 4px solid #D97706;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem;
+  font-size: 0.88rem;
+  color: #92400E;
+  margin-top: 1rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #451A00;
+  color: #FDE68A;
+}
+
+/* Dark mode */
+[data-theme='dark'] .faseDetalle,
+[data-theme='dark'] .autofagiaIntro,
+[data-theme='dark'] .autofagiaCard,
+[data-theme='dark'] .tipoCard,
+[data-theme='dark'] .contraCard,
+[data-theme='dark'] .timelineItem {
+  background: var(--bg-card);
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .tabs {
+    padding: 1rem;
+  }
+
+  .seccion {
+    padding: 1rem;
+  }
+
+  .faseMetrics {
+    gap: 1rem;
+  }
+
+  .timeline {
+    flex-direction: column;
+  }
+
+  .timelineItem {
+    flex-direction: row;
+    min-width: unset;
+    text-align: left;
+  }
+}

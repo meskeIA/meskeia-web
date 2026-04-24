@@ -1,0 +1,520 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Tabs principales */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tabActiva {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Sección */
+.seccion {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2rem;
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.seccionSubtitulo {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+/* Conceptos */
+.conceptoTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.conceptoTab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border: 2px solid var(--text-muted);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.conceptoTab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.conceptoTabActivo {
+  font-weight: 600;
+}
+
+.conceptoTab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.conceptoDetalle {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.conceptoHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.conceptoIconoGrande {
+  font-size: 2.2rem;
+}
+
+.conceptoTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.formulaBox {
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.formulaLabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.formula {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.conceptoBloque {
+  margin-bottom: 1rem;
+}
+
+.conceptoBloqueTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.conceptoBloqueText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Paradojas */
+.paradojasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.paradojaCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.paradojaCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.paradojaCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Categorías */
+.categoriasTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.categoriaTab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: 2px solid var(--text-muted);
+  border-radius: 2rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.categoriaTab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.categoriaTabActiva {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.categoriaTab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Tabla */
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 0.75rem;
+}
+
+[data-theme='dark'] .tablaWrapper {
+  border-color: #374151;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabla thead {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tabla th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filaTabla {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s;
+}
+
+.filaTabla:hover {
+  background: #F8FAFC;
+}
+
+[data-theme='dark'] .filaTabla {
+  border-bottom-color: #1f2937;
+}
+
+[data-theme='dark'] .filaTabla:hover {
+  background: #1f2937;
+}
+
+.tabla td {
+  padding: 0.65rem 1rem;
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.celdaNombre {
+  max-width: 260px;
+}
+
+.nombreAlimento {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.datoAlimento {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.celdaNumero {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.nivelBadge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tablaLeyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Fibra */
+.fibraIntro {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.fibraGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.fibraCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border-top: 4px solid transparent;
+  padding: 1.25rem;
+}
+
+.fibraCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.fibraCard p,
+.fibraCard ul {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.fibraCard ul {
+  padding-left: 1.2rem;
+}
+
+.fibraCard li {
+  margin-bottom: 0.35rem;
+}
+
+/* Curva */
+.curvaLeyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.curvaLeyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 1rem;
+  background: transparent;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.curvaLeyendaActiva {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.curvaLeyendaInactiva {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.curvaLeyendaItem:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.curvaColorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.graficaWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grafica {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.curvaNota {
+  background: #EFF6FF;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .curvaNota {
+  background: #1e3a5f;
+}
+
+.curvaInsights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.insightCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.1rem;
+}
+
+.insightCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.insightCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Dark mode */
+[data-theme='dark'] .conceptoDetalle,
+[data-theme='dark'] .paradojaCard,
+[data-theme='dark'] .fibraIntro,
+[data-theme='dark'] .fibraCard,
+[data-theme='dark'] .graficaWrapper,
+[data-theme='dark'] .insightCard {
+  background: var(--bg-card);
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+  .tabs,
+  .seccion {
+    padding: 1rem;
+  }
+  .conceptoTabs {
+    flex-direction: column;
+  }
+}

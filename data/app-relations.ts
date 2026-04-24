@@ -1685,6 +1685,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adn-polimerasa/', icon: '🧬', name: 'ADN Polimerasa', description: 'La enzima que replica y el problema del extremo' },
     { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN: Código Genético', description: 'El código que los telómeros protegen' },
   ],
+  'visualizador-ayuno-intermitente': [
+    { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'El ayuno modifica la composición bacteriana intestinal' },
+    { url: '/visualizador-insulina-glucosa/', icon: '💉', name: 'Insulina y Glucosa', description: 'La insulina cae durante el ayuno — el eje central del proceso' },
+    { url: '/visualizador-indice-glucemico/', icon: '📊', name: 'Índice Glucémico', description: 'Cómo los alimentos afectan la glucemia al romper el ayuno' },
+    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Lo que ocurre en el tracto digestivo durante el ayuno' },
+  ],
+  'visualizador-metabolismo-alcohol': [
+    { url: '/visualizador-higado/', icon: '🫀', name: 'Hígado', description: 'Anatomía y funciones del órgano que metaboliza el alcohol' },
+    { url: '/visualizador-farmacocinetica/', icon: '⚗️', name: 'Farmacocinética', description: 'El proceso ADME que también aplica al etanol' },
+    { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias orales producen acetaldehído directamente' },
+    { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'El alcohol actúa sobre GABA y NMDA en el cerebro' },
+  ],
+  'visualizador-indice-glucemico': [
+    { url: '/visualizador-insulina-glucosa/', icon: '💉', name: 'Insulina y Glucosa', description: 'La respuesta de insulina al IG: el eje del proceso glucémico' },
+    { url: '/visualizador-ayuno-intermitente/', icon: '⏳', name: 'Ayuno Intermitente', description: 'Cómo el ayuno restablece la sensibilidad a la insulina' },
+    { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias intestinales modulan la respuesta glucémica' },
+    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },
