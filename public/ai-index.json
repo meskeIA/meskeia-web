@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 613,
+  "total_tools": 617,
   "updated": "2026-04-24",
   "features": {
     "all_free": true,
@@ -2167,6 +2167,30 @@
           "slug": "visualizador-indice-glucemico",
           "url": "https://meskeia.com/visualizador-indice-glucemico/",
           "description": "La paradoja de la sandía (IG=76, CG=4): diferencia entre índice glucémico, carga glucémica e índice insulínico. Tabla de 26 alimentos, fibra como modulador y curva de glucosa post-comida"
+        },
+        {
+          "name": "Vuelo de Avión: El Gran Mito de Bernoulli",
+          "slug": "visualizador-vuelo-avion",
+          "url": "https://meskeia.com/visualizador-vuelo-avion/",
+          "description": "Por qué los aviones NO vuelan por Bernoulli. Sustentación real: ángulo de ataque, circulación y presión diferencial. Slider interactivo de ángulo, detección de stall y casos especiales (vuelo invertido, planeadores)"
+        },
+        {
+          "name": "Motor de Combustión: Ciclo Otto y Pérdidas Térmicas",
+          "slug": "visualizador-motor-combustion",
+          "url": "https://meskeia.com/visualizador-motor-combustion/",
+          "description": "Ciclo Otto de 4 tiempos animado, eficiencia real 30-40%, dónde va el 60-70% restante (calor, fricción, bomba, accesorios) y comparativa frente al motor eléctrico en 10 aspectos"
+        },
+        {
+          "name": "Motor Eléctrico: Campo Magnético Rotante y Regeneración",
+          "slug": "visualizador-motor-electrico",
+          "url": "https://meskeia.com/visualizador-motor-electrico/",
+          "description": "Campo magnético trifásico rotante, estátor/rotor, inversor IGBT, frenado regenerativo (recupera 15-25% energía en ciudad) y eficiencia 85-95% frente al 30-40% de la combustión"
+        },
+        {
+          "name": "Efecto Doppler: De las Sirenas al Redshift de Galaxias",
+          "slug": "visualizador-efecto-doppler",
+          "url": "https://meskeia.com/visualizador-efecto-doppler/",
+          "description": "Fórmula Doppler interactiva con slider de velocidad (0-340 m/s), aplicaciones radar policial, ecografía Doppler, SONAR y radar meteorológico, y redshift cósmico con fórmula relativista para z hasta 2"
         }
       ]
     },

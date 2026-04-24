@@ -1,0 +1,92 @@
+.container { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); }
+.hero { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; padding: 3rem 2rem; text-align: center; }
+.heroIcon { font-size: 3rem; margin-bottom: 1rem; }
+.hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; margin: 0 0 0.75rem; }
+.hero p { font-size: 1.1rem; opacity: 0.92; max-width: 640px; margin: 0 auto; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1.5rem 2rem; max-width: 900px; margin: 0 auto; }
+.tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: 2px solid var(--primary); border-radius: 2rem; background: transparent; color: var(--primary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.tab:hover { background: var(--primary); color: #fff; }
+.tabActiva { background: var(--primary); color: #fff; }
+.tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.seccion { max-width: 900px; margin: 0 auto; padding: 1rem 2rem 2rem; }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0 0 0.5rem; }
+.seccionSubtitulo { color: var(--text-secondary); margin: 0 0 1.5rem; }
+
+/* Ciclo Otto */
+.tiemposNav { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.25rem; }
+.tiempoBtn { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border: 2px solid var(--text-muted); border-radius: 2rem; background: transparent; color: var(--text-secondary); font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+.tiempoBtn:hover { border-color: var(--primary); }
+.tiempoBtnActivo { font-weight: 600; color: var(--text-primary); }
+.tiempoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tiempoNum { font-size: 1rem; font-weight: 900; }
+.cilindroDiagrama { display: flex; justify-content: center; margin-bottom: 1.25rem; background: var(--bg-card); border-radius: 12px; padding: 1rem; }
+.cilindroSvg { width: 160px; height: 210px; }
+.tiempoDetalle { background: var(--bg-card); border-left: 4px solid var(--primary); border-radius: 12px; padding: 1.25rem; margin-bottom: 0.75rem; }
+.tiempoMeta { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.tiempoMetaItem { display: flex; flex-direction: column; gap: 0.2rem; }
+.tiempoMetaLabel { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.tiempoMetaValor { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
+.tiempoDesc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 0.75rem; }
+.tiempoExtra { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; padding: 0.75rem; background: #F8FAFC; border-radius: 6px; }
+[data-theme='dark'] .tiempoExtra { background: #1f2937; }
+
+/* Eficiencia */
+.eficienciaIntro { background: var(--bg-card); border-radius: 12px; padding: 1.1rem; margin-bottom: 1.25rem; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+.sliderSection { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
+.sliderLabel { display: block; font-size: 0.9rem; margin-bottom: 0.5rem; }
+.slider { width: 100%; accent-color: var(--primary); cursor: pointer; margin-bottom: 0.25rem; }
+.sliderMarks { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 1rem; }
+.eficienciaMetrics { display: flex; flex-direction: column; gap: 0.75rem; }
+.eficienciaMetric { display: flex; align-items: center; gap: 0.75rem; }
+.eficienciaLabel { font-size: 0.85rem; color: var(--text-secondary); min-width: 200px; }
+.eficienciaBarra { flex: 1; height: 16px; background: #e5e7eb; border-radius: 8px; overflow: hidden; }
+[data-theme='dark'] .eficienciaBarra { background: #374151; }
+.eficienciaBarraFill { height: 100%; border-radius: 8px; transition: width 0.4s; }
+.eficienciaValor { font-size: 1rem; font-weight: 700; min-width: 42px; text-align: right; }
+.eficienciaGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.eficienciaCard { background: var(--bg-card); border-radius: 12px; padding: 1.1rem; }
+.eficienciaCard h3 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.5rem; }
+.eficienciaCard p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+.bigNumber { font-size: 2.2rem; font-weight: 900; margin: 0.25rem 0; }
+
+/* Pérdidas */
+.sankeyWrapper { background: var(--bg-card); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+.sankeyDiagrama { width: 100%; height: auto; display: block; }
+.perdidasGrid { display: flex; flex-direction: column; gap: 0.75rem; }
+.perdidaCard { background: var(--bg-card); border-radius: 10px; padding: 1rem; }
+.perdidaHeader { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; }
+.perdidaBar { height: 8px; border-radius: 4px; flex-shrink: 0; }
+.perdidaPorcentaje { font-size: 1.1rem; font-weight: 900; min-width: 36px; }
+.perdidaNombre { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+.perdidaDesc { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* Comparativa */
+.tablaWrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 1rem; }
+[data-theme='dark'] .tablaWrapper { border-color: #374151; }
+.tablaComp { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.tablaComp thead { background: var(--primary); color: #fff; }
+.tablaComp th { padding: 0.75rem 1rem; text-align: left; font-weight: 600; }
+.filaComp { border-bottom: 1px solid #f3f4f6; }
+[data-theme='dark'] .filaComp { border-bottom-color: #1f2937; }
+.filaComp:hover { background: #F8FAFC; }
+[data-theme='dark'] .filaComp:hover { background: #1f2937; }
+.celdaAspecto { padding: 0.65rem 1rem; font-weight: 600; color: var(--text-primary); }
+.celdaValor { padding: 0.65rem 1rem; color: var(--text-secondary); }
+.ganador { background: #F0FFF4; color: var(--text-primary); }
+[data-theme='dark'] .ganador { background: #052e16; }
+.ganadorMarca { color: #16A34A; }
+
+.warningBox { background: #FEF3C7; border-left: 4px solid #D97706; border-radius: 0 8px 8px 0; padding: 1rem; font-size: 0.88rem; color: #92400E; margin-top: 1rem; }
+[data-theme='dark'] .warningBox { background: #451A00; color: #FDE68A; }
+.infoBox { background: #EFF6FF; border-left: 4px solid var(--primary); border-radius: 0 8px 8px 0; padding: 0.9rem 1rem; font-size: 0.88rem; color: var(--text-secondary); margin-top: 1rem; }
+[data-theme='dark'] .infoBox { background: #1e3a5f; }
+
+@media (max-width: 600px) {
+  .hero { padding: 2rem 1rem; }
+  .tabs, .seccion { padding: 1rem; }
+  .eficienciaMetric { flex-direction: column; align-items: flex-start; }
+  .eficienciaLabel { min-width: unset; }
+  .tiemposNav { flex-direction: column; }
+}

@@ -679,6 +679,10 @@ export const implementedAppsUrls = [
   "/visualizador-ayuno-intermitente/",   // Fases metabólicas hora a hora, autofagia, tipos de protocolo, contraindicaciones
   "/visualizador-metabolismo-alcohol/",  // ADH→acetaldehído→ALDH2, multi-órgano, variante ALDH2*2, cerebro GABA/NMDA
   "/visualizador-indice-glucemico/",     // IG vs Carga Glucémica, paradoja sandía, tabla 26 alimentos, fibra, curva glucosa
+  "/visualizador-vuelo-avion/",          // Mito Bernoulli vs ángulo de ataque, slider, stall, vuelo invertido, 4 fuerzas
+  "/visualizador-motor-combustion/",     // Ciclo Otto SVG, slider compresión, Sankey energía, comparativa eléctrico
+  "/visualizador-motor-electrico/",      // Campo magnético rotante, inversor IGBT, regeneración 15-25%, comparativa 8 aspectos
+  "/visualizador-efecto-doppler/",       // Ondas comprimidas/expandidas, slider velocidad, radar/ecografía/SONAR, redshift cósmico
 ];
 
 /**

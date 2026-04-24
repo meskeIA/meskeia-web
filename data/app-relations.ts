@@ -1703,6 +1703,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias intestinales modulan la respuesta glucémica' },
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
   ],
+  'visualizador-vuelo-avion': [
+    { url: '/visualizador-motor-combustion/', icon: '🔥', name: 'Motor de Combustión', description: 'El motor que propulsa los aviones convencionales' },
+    { url: '/visualizador-motor-electrico/', icon: '⚡', name: 'Motor Eléctrico', description: 'El motor de los aviones eléctricos del futuro' },
+    { url: '/visualizador-efecto-doppler/', icon: '🌊', name: 'Efecto Doppler', description: 'El radar Doppler guía los aviones en tormenta' },
+    { url: '/visualizador-electromagnetismo/', icon: '⚡', name: 'Electromagnetismo', description: 'Las ondas de radio detrás del radar aeronáutico' },
+  ],
+  'visualizador-motor-combustion': [
+    { url: '/visualizador-vuelo-avion/', icon: '✈️', name: 'Vuelo de Avión', description: 'El motor a reacción como versión extrema del ciclo Otto' },
+    { url: '/visualizador-motor-electrico/', icon: '⚡', name: 'Motor Eléctrico', description: 'La alternativa con 85-95% de eficiencia frente al 30-40%' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Otra forma de generar calor para mover turbinas' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌍', name: 'Cambio Climático', description: 'El CO₂ que emite la combustión y sus consecuencias' },
+  ],
+  'visualizador-motor-electrico': [
+    { url: '/visualizador-motor-combustion/', icon: '🔥', name: 'Motor de Combustión', description: 'El contrincante: ciclo Otto y sus pérdidas térmicas' },
+    { url: '/visualizador-electromagnetismo/', icon: '⚡', name: 'Electromagnetismo', description: 'La inducción de Faraday que hace girar el rotor' },
+    { url: '/visualizador-vuelo-avion/', icon: '✈️', name: 'Vuelo de Avión', description: 'Propulsión eléctrica en aviación emergente' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'La electricidad que alimenta los motores eléctricos' },
+  ],
+  'visualizador-efecto-doppler': [
+    { url: '/visualizador-sonido-ondas/', icon: '🔊', name: 'Sonido y Ondas', description: 'Propiedades fundamentales de las ondas sonoras' },
+    { url: '/visualizador-electromagnetismo/', icon: '⚡', name: 'Electromagnetismo', description: 'Doppler también aplica a la luz y el espectro EM' },
+    { url: '/visualizador-relatividad-especial/', icon: '🌌', name: 'Relatividad Especial', description: 'El redshift cósmico necesita la fórmula relativista a z alto' },
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'El radar Doppler usa microondas del espectro EM' },
+  ],
   'selector-calefaccion': [
     { url: '/calculadora-eficiencia-energetica/', icon: '⚡', name: 'Eficiencia Energética', description: 'Ahorro y amortización de mejoras' },
     { url: '/calculadora-gasto-energetico/', icon: '💡', name: 'Gasto Energético', description: 'Consumo eléctrico de electrodomésticos' },

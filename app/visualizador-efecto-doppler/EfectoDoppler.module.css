@@ -1,0 +1,896 @@
+/* EfectoDoppler.module.css — paleta meskeIA */
+
+/* ==========================================
+   LAYOUT
+   ========================================== */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  opacity: 0.92;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   TABS
+   ========================================== */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 1.25rem 1.5rem 0;
+  background: var(--bg-card);
+  border-bottom: 2px solid #e8ecf0;
+  justify-content: center;
+}
+
+[data-theme='dark'] .tabs {
+  background: var(--bg-card);
+  border-bottom-color: #3a3a3a;
+}
+
+.tab {
+  padding: 0.6rem 1.1rem;
+  border: 1.5px solid #d0d8e0;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.tab:hover {
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabActive {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .tab {
+  border-color: #3a3a3a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabActive {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ==========================================
+   CONTENIDO
+   ========================================== */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.intro {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ==========================================
+   SVG ANIMADO
+   ========================================== */
+.svgWrapper {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 12px;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .svgWrapper {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+.dopplerSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ==========================================
+   FÓRMULA
+   ========================================== */
+.formulaBox {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+.formulaTitulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.formulaDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.fObs {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.igual {
+  color: var(--text-primary);
+}
+
+.fraccion {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.95rem;
+  border-left: 1px solid #ccc;
+  padding-left: 0.5rem;
+  margin-left: 0.25rem;
+}
+
+.num {
+  border-bottom: 2px solid var(--text-primary);
+  padding-bottom: 2px;
+  margin-bottom: 3px;
+  color: var(--primary);
+}
+
+.den {
+  color: var(--secondary);
+}
+
+.formulaTerminos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.termino {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--accent);
+}
+
+/* ==========================================
+   EJEMPLOS
+   ========================================== */
+.ejemploBox {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .ejemploBox {
+  border-color: #3a3a3a;
+}
+
+.ejemploTitulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.ejemploGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.ejemploCard {
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  border: 1.5px solid transparent;
+}
+
+.ejemploAcercando {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: var(--primary);
+}
+
+.ejemploFuente {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: var(--secondary);
+}
+
+.ejemploAlejando {
+  background: rgba(127, 179, 211, 0.12);
+  border-color: var(--accent);
+}
+
+.ejemploIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.ejemploLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.ejemploValor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.ejemploSub {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.ejemploCalculo {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  font-family: monospace;
+}
+
+/* ==========================================
+   SLIDER
+   ========================================== */
+.sliderSection {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .sliderSection {
+  border-color: #3a3a3a;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sliderLabel {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.sliderKmh {
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-left: 0.35rem;
+}
+
+.machBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.machNormal {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+}
+
+.machMedio {
+  background: rgba(255, 165, 0, 0.12);
+  color: #c07000;
+}
+
+.machPeligro {
+  background: rgba(220, 50, 50, 0.12);
+  color: #c01010;
+}
+
+.sliderInput {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--val, 50%), #e0e8ef var(--val, 50%));
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.sliderInput::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
+}
+
+.sliderInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.sliderMarks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.casosRapidos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.casoBtn {
+  padding: 0.35rem 0.85rem;
+  border: 1.5px solid #d0d8e0;
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.casoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.casoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .casoBtn {
+  border-color: #3a3a3a;
+}
+
+/* ==========================================
+   ALERTAS SÓNICAS
+   ========================================== */
+.alertSonica {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem 1.25rem;
+  background: rgba(220, 50, 50, 0.08);
+  border: 1.5px solid rgba(220, 50, 50, 0.3);
+  border-radius: 10px;
+  color: #b00000;
+}
+
+.alertSubsonica {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 140, 0, 0.08);
+  border: 1.5px solid rgba(255, 140, 0, 0.3);
+  border-radius: 10px;
+  color: #c07000;
+}
+
+.alertIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.alertSonica strong,
+.alertSubsonica strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.alertSonica p,
+.alertSubsonica p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .alertSonica {
+  background: rgba(220, 50, 50, 0.12);
+  color: #ff6666;
+}
+
+[data-theme='dark'] .alertSubsonica {
+  background: rgba(255, 140, 0, 0.12);
+  color: #ffaa44;
+}
+
+/* ==========================================
+   DISPLAY FRECUENCIAS
+   ========================================== */
+.frecuenciaDisplay {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.freqCard {
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1.5px solid transparent;
+}
+
+.freqAcer {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: var(--primary);
+}
+
+.freqBase {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: var(--secondary);
+}
+
+.freqAlej {
+  background: rgba(127, 179, 211, 0.1);
+  border-color: var(--accent);
+}
+
+.freqLabel {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.freqValor {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.freqVar {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.freqFormula {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+/* ==========================================
+   APP CARDS (Aplicaciones)
+   ========================================== */
+.appCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.appCard {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.appCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .appCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+.appEmoji {
+  font-size: 2.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.appTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.appDesc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.appDato {
+  font-size: 0.82rem;
+  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--secondary);
+}
+
+/* ==========================================
+   COSMOS
+   ========================================== */
+.cosmosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.cosmosCard {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+[data-theme='dark'] .cosmosCard {
+  border-color: #3a3a3a;
+}
+
+.cosmosCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0.5rem 0;
+}
+
+.cosmosCard p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.cosmosIcon {
+  font-size: 2rem;
+}
+
+.redshiftSection {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .redshiftSection {
+  border-color: #3a3a3a;
+}
+
+.redshiftDisplay {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.redshiftCard {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 10px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.redshiftLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+
+.redshiftValor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.2rem;
+  line-height: 1.1;
+}
+
+.redshiftSub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.espectroTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.espectroDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.espectroBarra {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.redshiftFormula {
+  font-size: 1rem;
+  line-height: 2;
+  color: var(--text-primary);
+}
+
+.redshiftFormulaVel {
+  font-size: 0.9rem;
+}
+
+.relativista {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================
+   EDUCACIONAL COLAPSABLE
+   ========================================== */
+.educacional {
+  max-width: 860px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1.5rem;
+}
+
+.educacionalSummary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-radius: 10px;
+  list-style: none;
+  transition: background 0.2s;
+}
+
+.educacionalSummary::-webkit-details-marker {
+  display: none;
+}
+
+.educacionalSummary:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.educacionalSummary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .educacionalSummary {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+.educacionalContenido {
+  background: var(--bg-card);
+  border: 1.5px solid #e0e8ef;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 1.5rem 1.25rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .educacionalContenido {
+  border-color: #3a3a3a;
+}
+
+.educacionalContenido h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.25rem 0 0.5rem;
+}
+
+.educacionalContenido h3:first-child {
+  margin-top: 0;
+}
+
+.educacionalContenido p {
+  margin: 0 0 0.75rem;
+  font-size: 0.92rem;
+}
+
+/* Indicador v2.0 - requerido por estándares meskeIA */
+.warningBox {
+  display: none;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 640px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .content {
+    padding: 1.5rem 1rem;
+  }
+
+  .educacional {
+    padding: 0 1rem;
+  }
+
+  .tabs {
+    padding: 1rem 1rem 0;
+    gap: 0.3rem;
+  }
+
+  .tab {
+    font-size: 0.82rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .frecuenciaDisplay {
+    grid-template-columns: 1fr;
+  }
+
+  .freqValor {
+    font-size: 1.3rem;
+  }
+
+  .ejemploGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .redshiftDisplay {
+    grid-template-columns: 1fr;
+  }
+
+  .sliderMarks {
+    display: none;
+  }
+}
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .sliderInput {
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--val, 50%), #3a3a3a var(--val, 50%));
+}
+
+[data-theme='dark'] .fraccion {
+  border-left-color: #555;
+}
+
+[data-theme='dark'] .termino {
+  border-left-color: #4a6a80;
+}
+
+[data-theme='dark'] .casoBtn {
+  color: var(--text-secondary);
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  .appCard {
+    transition: none;
+  }
+
+  .tab {
+    transition: none;
+  }
+
+  .casoBtn {
+    transition: none;
+  }
+
+  .educacionalSummary {
+    transition: none;
+  }
+}
