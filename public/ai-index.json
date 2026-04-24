@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 620,
+  "total_tools": 623,
   "updated": "2026-04-24",
   "features": {
     "all_free": true,
@@ -1903,6 +1903,24 @@
           "slug": "visualizador-llm-funcionamiento",
           "url": "https://meskeia.com/visualizador-llm-funcionamiento/",
           "description": "Tokenización interactiva, espacio semántico de embeddings, matriz de atención transformers y efecto de la temperatura en la generación de texto"
+        },
+        {
+          "name": "Inflación: Por Qué Suben los Precios",
+          "slug": "visualizador-inflacion",
+          "url": "https://meskeia.com/visualizador-inflacion/",
+          "description": "Las 3 causas mecánicas de la inflación (demanda, costes, monetaria), espiral salarios-precios y expectativas, sesgos del IPC y por qué la inflación no afecta igual a todos, y transmisión de política monetaria del BCE"
+        },
+        {
+          "name": "Burbuja Especulativa: Las 5 Fases de Minsky",
+          "slug": "visualizador-burbuja-especulativa",
+          "url": "https://meskeia.com/visualizador-burbuja-especulativa/",
+          "description": "Anatomía del ciclo boom-crash: 5 fases de Minsky aplicadas a tulipanes 1637, dot-com 2000, subprime 2008 y cripto. Los 6 sesgos que alimentan las burbujas (FOMO, manada, anclaje) y checklist de alerta"
+        },
+        {
+          "name": "Fondo de Inversión: Por Dentro",
+          "slug": "visualizador-fondo-inversion",
+          "url": "https://meskeia.com/visualizador-fondo-inversion/",
+          "description": "NAV diario, gestora vs depositario, gestión activa vs indexada (SPIVA: 85% de fondos activos no baten el índice en 10 años), slider de comisiones a 30 años y qué significa diversificar de verdad"
         },
         {
           "name": "Ciclo Económico",

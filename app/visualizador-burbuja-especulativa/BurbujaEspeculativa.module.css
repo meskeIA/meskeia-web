@@ -1,0 +1,910 @@
+/* BurbujaEspeculativa.module.css — Paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.25;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-card);
+  padding: 0 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .tabs {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.9rem 1.2rem;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Contenido principal ── */
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.introTexto {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.introTexto p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .introTexto {
+  background: var(--bg-card);
+}
+
+/* ── Curva SVG ── */
+.curvaSvgWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem 1rem 0.75rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+[data-theme='dark'] .curvaSvgWrapper {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.curvaSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  color: var(--text-primary);
+}
+
+.curvaNota {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0.5rem 0 0;
+  font-style: italic;
+}
+
+/* ── Fases de Minsky ── */
+.fasesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faseCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.faseCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 12px rgba(46, 134, 171, 0.12);
+}
+
+.faseCardActive {
+  border-color: var(--primary);
+  box-shadow: 0 2px 16px rgba(46, 134, 171, 0.16);
+}
+
+[data-theme='dark'] .faseCard {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .faseCardActive {
+  border-color: var(--primary);
+}
+
+.faseHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.faseNumero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.faseIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.faseTitulos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.faseNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.faseResumen {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.faseChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.faseDetalle {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+[data-theme='dark'] .faseDetalle {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+.faseDescripcion {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
+.faseColumnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .faseColumnas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.faseColumna {
+  /* columna individual */
+}
+
+.faseSubtitulo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.faselista,
+.faselistaEjemplos {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.faselista li,
+.faselistaEjemplos li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.faselistaEjemplos li {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Casos históricos ── */
+.casosGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.casoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid var(--primary);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.casoCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.casoCardActive {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'] .casoCard {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: var(--primary);
+}
+
+.casoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+
+.casoIcono {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.casoTitulos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.casoActivo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.casoPeriodo {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+}
+
+.casoChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.casoDetalle {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .casoDetalle {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.casoDescripcion {
+  margin: 0.75rem 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+.casoDatos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  margin: 0;
+}
+
+.casoDatos dt {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  align-self: start;
+  padding-top: 2px;
+}
+
+.casoDatos dd {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.casosDatoCaida {
+  color: #EF4444 !important;
+  font-weight: 600;
+}
+
+/* Tabla comparativa */
+.tablaWrapper {
+  margin-top: 2rem;
+}
+
+.tablaTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+.tablaScroll {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .tablaScroll {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.9rem;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+[data-theme='dark'] .tabla tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.tablaCaida {
+  color: #EF4444 !important;
+  font-weight: 600;
+}
+
+/* ── Sesgos cognitivos ── */
+.sesgosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sesgoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s;
+}
+
+.sesgoCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .sesgoCard {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sesgoIcono {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.sesgoNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.sesgoDescripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.sesgoEjemplo {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .sesgoEjemplo {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Crédito como amplificador ── */
+.creditoBox {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme='dark'] .creditoBox {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.creditoTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.creditoBox p {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.creditoBucle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: rgba(46, 134, 171, 0.07);
+  border-radius: 8px;
+}
+
+.creditoBucleItem {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.creditoFlecha {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.creditoInverso {
+  font-size: 0.88rem;
+  color: #EF4444;
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+/* ── Checklist ── */
+.checklistWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .checklistWrapper {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.checklistTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checklistSubtitulo {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.checkItem:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='dark'] .checkItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.checkInput {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.checkTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.alertaResultado {
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.93rem;
+  font-weight: 500;
+}
+
+.alertaNinguna {
+  background: rgba(72, 169, 166, 0.1);
+  color: #48A9A6;
+  border: 1px solid rgba(72, 169, 166, 0.2);
+}
+
+.alertaBaja {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.alertaMedia {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.alertaAlta {
+  background: rgba(239, 68, 68, 0.1);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alertaBar {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .alertaBar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.alertaBarFill {
+  height: 100%;
+  border-radius: 3px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+/* ── Límites ── */
+.limitesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.limiteCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .limiteCard {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.limiteIcono {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.limiteCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.limiteCard p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Alert Box (cita de Keynes) ── */
+.alertBox {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 12px 12px 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.alertBoxIcono {
+  font-size: 1.5rem;
+}
+
+.alertBoxCita {
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.alertBoxAutor {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-style: normal;
+}
+
+/* ── Si puedes ── */
+.siPuedesWrapper {
+  margin-bottom: 2rem;
+}
+
+.siPuedesTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.siPuedesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.75rem;
+}
+
+.siPuedesItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+[data-theme='dark'] .siPuedesItem {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.siPuedesIcono {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.siPuedesItem p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── Warning box (v2.0 indicador + aviso educativo) ── */
+.warningBox {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-left: 4px solid #F59E0B;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 1.5rem;
+}
+
+/* ── Sección educativa ── */
+.educSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.25rem 0 0.4rem;
+}
+
+.educSection h3:first-child {
+  margin-top: 0;
+}
+
+.educSection p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 0.75rem;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .alertaBarFill,
+  .faseCard,
+  .casoCard,
+  .sesgoCard,
+  .tab,
+  .checkItem {
+    transition: none !important;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .tabs {
+    gap: 0;
+    padding: 0 0.5rem;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  .content {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .sesgosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .siPuedesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .creditoBucle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .creditoFlecha {
+    transform: rotate(90deg);
+  }
+
+  .casoDatos {
+    grid-template-columns: 1fr;
+  }
+
+  .casoDatos dt {
+    margin-top: 0.5rem;
+  }
+
+  .casoDatos dt:first-child {
+    margin-top: 0;
+  }
+}

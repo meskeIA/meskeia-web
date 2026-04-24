@@ -686,6 +686,9 @@ export const implementedAppsUrls = [
   "/visualizador-el-nino/",              // Circulación Walker, El Niño/La Niña, teleconexiones, SOI/ONI, timeline ENSO
   "/visualizador-ciclo-carbono-completo/", // 5 reservorios, flujos Gt C/año, perturbación humana, slider emisiones, soluciones
   "/visualizador-terremotos-tsunamis/",  // Fallas, ondas P/S, Richter vs Mercalli, propagación tsunamis, DART
+  "/visualizador-inflacion/",            // 3 causas mecánicas, espiral salarios-precios, sesgos IPC, BCE transmisión
+  "/visualizador-burbuja-especulativa/", // 5 fases Minsky, 5 casos históricos, 6 sesgos, checklist alerta
+  "/visualizador-fondo-inversion/",      // NAV, activa vs indexada, SPIVA, slider comisiones 30 años, diversificación
 ];
 
 /**

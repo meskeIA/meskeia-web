@@ -1703,6 +1703,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias intestinales modulan la respuesta glucémica' },
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
   ],
+  'visualizador-inflacion': [
+    { url: '/visualizador-burbuja-especulativa/', icon: '🫧', name: 'Burbuja Especulativa', description: 'La inflación descontrolada puede desencadenar ciclos especulativos' },
+    { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'El principal instrumento del BCE para controlar la inflación' },
+    { url: '/visualizador-ciclo-economico/', icon: '📊', name: 'Ciclo Económico', description: 'La inflación varía según la fase del ciclo expansivo o recesivo' },
+    { url: '/estimador-inflacion/', icon: '🧮', name: 'Estimador de Inflación', description: 'Calcula el impacto real de la inflación en tu poder adquisitivo' },
+  ],
+  'visualizador-burbuja-especulativa': [
+    { url: '/visualizador-inflacion/', icon: '📈', name: 'Inflación', description: 'La política monetaria expansiva suele preceder a las burbujas' },
+    { url: '/visualizador-mercados-financieros/', icon: '📊', name: 'Mercados Financieros', description: 'Cómo funcionan los mercados donde se forman y explotan las burbujas' },
+    { url: '/visualizador-fondo-inversion/', icon: '📦', name: 'Fondos de Inversión', description: 'Cómo un fondo bien diversificado protege frente a burbujas' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Los sesgos psicológicos que hacen racional entrar en una burbuja' },
+  ],
+  'visualizador-fondo-inversion': [
+    { url: '/visualizador-burbuja-especulativa/', icon: '🫧', name: 'Burbuja Especulativa', description: 'Cómo una cartera diversificada protege del boom-crash' },
+    { url: '/visualizador-mercados-financieros/', icon: '📊', name: 'Mercados Financieros', description: 'Los mercados donde operan los fondos de inversión' },
+    { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Cómo los tipos condicionan la rentabilidad de bonos y acciones' },
+    { url: '/visualizador-ciclo-economico/', icon: '📈', name: 'Ciclo Económico', description: 'En qué fase del ciclo tiene más sentido cada tipo de fondo' },
+  ],
   'visualizador-el-nino': [
     { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌍', name: 'Cambio Climático', description: 'El calentamiento global está intensificando los episodios de El Niño' },
     { url: '/visualizador-oceanos-corrientes/', icon: '🌊', name: 'Océanos y Corrientes', description: 'Las corrientes oceánicas que El Niño altera a escala global' },
