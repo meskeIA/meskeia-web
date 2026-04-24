@@ -689,6 +689,9 @@ export const implementedAppsUrls = [
   "/visualizador-inflacion/",            // 3 causas mecánicas, espiral salarios-precios, sesgos IPC, BCE transmisión
   "/visualizador-burbuja-especulativa/", // 5 fases Minsky, 5 casos históricos, 6 sesgos, checklist alerta
   "/visualizador-fondo-inversion/",      // NAV, activa vs indexada, SPIVA, slider comisiones 30 años, diversificación
+  "/visualizador-toma-decisiones/",      // Sistema 1/2 Kahneman, fatiga decisional, 4 heurísticos, nudges y arquitectura elección
+  "/visualizador-algoritmos-ordenacion/", // Burbuja/Inserción/Quicksort/Mergesort animados, Big O, guía de cuándo usar
+  "/visualizador-base-datos-relacional/", // Tablas FK/PK, 4 tipos JOIN, índices B-Tree, ACID, SQL vs NoSQL
 ];
 
 /**

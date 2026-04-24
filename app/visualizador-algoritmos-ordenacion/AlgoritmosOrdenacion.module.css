@@ -1,0 +1,788 @@
+/* AlgoritmosOrdenacion.module.css */
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 660px;
+  margin: 0 auto;
+  line-height: 1.55;
+}
+
+/* ─── Tabs ───────────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 1rem 1.5rem 0;
+  border-bottom: 2px solid var(--accent);
+  overflow-x: auto;
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+.tabActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+.tabActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─── Content ─────────────────────────────────────────────────────────────── */
+
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.seccion h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* ─── Selector de algoritmo ─────────────────────────────────────────────── */
+
+.algoritmoSelector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.algoBtn {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--accent);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.algoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.algoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.algoBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.algoBtnActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─── Controles ──────────────────────────────────────────────────────────── */
+
+.controles {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btnSecundario {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid var(--secondary);
+  background: transparent;
+  color: var(--secondary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnSecundario:hover {
+  background: var(--secondary);
+  color: #fff;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* ─── Barras ─────────────────────────────────────────────────────────────── */
+
+.barrasContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 200px;
+  padding: 1rem;
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.barra {
+  flex: 1;
+  min-width: 20px;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+  transition: height 0.15s ease, background-color 0.15s ease;
+  position: relative;
+}
+
+.barraNormal {
+  background-color: var(--primary);
+}
+
+.barraComparando {
+  background-color: #e74c3c;
+}
+
+.barraIntercambiando {
+  background-color: #f39c12;
+}
+
+.barraOrdenada {
+  background-color: #27ae60;
+}
+
+.barraValor {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  line-height: 1;
+}
+
+/* ─── Leyenda ─────────────────────────────────────────────────────────────── */
+
+.leyenda {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.dotNormal { background: var(--primary); }
+.dotComparando { background: #e74c3c; }
+.dotIntercambiando { background: #f39c12; }
+.dotOrdenada { background: #27ae60; }
+
+/* ─── Descripción y contadores ───────────────────────────────────────────── */
+
+.descripcionPaso {
+  background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card));
+  border-left: 4px solid var(--secondary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  min-height: 2.8rem;
+  display: flex;
+  align-items: center;
+}
+
+.controlesNavegacion {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btnPaso {
+  padding: 0.55rem 1.1rem;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPaso:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnPaso:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPaso:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnPlay {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnPlay:hover {
+  opacity: 0.88;
+}
+
+.btnPlay:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.contadorPasos {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.contadorPasos strong {
+  color: var(--primary);
+}
+
+/* ─── Tarjetas Cómo funciona ─────────────────────────────────────────────── */
+
+.tarjetasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.algoritmoCard {
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.cardEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.algoritmoCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.algoritmoCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-card));
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.cardMetaRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.metaLabel {
+  color: var(--text-secondary);
+}
+
+.bigOCell {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cardUso {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--secondary) 10%, var(--bg-card));
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+/* ─── Tabla Big O ─────────────────────────────────────────────────────────── */
+
+.tablaWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.complejidadTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 560px;
+}
+
+.complejidadTable th,
+.complejidadTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.complejidadTable th {
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.complejidadTable tr:hover td {
+  background: color-mix(in srgb, var(--primary) 4%, var(--bg-card));
+}
+
+.notaTabla {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+/* ─── Crecimiento Big O ───────────────────────────────────────────────────── */
+
+.crecimientoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.crecimientoSection h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.crecimientoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.crecimientoCard {
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nValor {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.opRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.opLabel {
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+.opValorLento {
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.opValorRapido {
+  font-weight: 700;
+  color: #27ae60;
+}
+
+/* ─── Slider ──────────────────────────────────────────────────────────────── */
+
+.sliderSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sliderSection h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sliderLabel {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.ratioDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ratioFila {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.barraBig {
+  height: 18px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.ratioFila:first-child .barraBig {
+  background: #e74c3c;
+}
+
+.ratioBadge {
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.ratioBadge strong {
+  color: var(--primary);
+}
+
+/* ─── Warning box (v2.0 marker) ─────────────────────────────────────────── */
+
+.warningBox {
+  background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--secondary) 35%, transparent);
+  border-left: 4px solid var(--secondary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.warningBox strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--secondary);
+}
+
+.warningBox p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ─── Árbol de decisión ──────────────────────────────────────────────────── */
+
+.arbolDecision {
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.arbolDecision h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+.decisionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  counter-reset: decision;
+}
+
+.decisionList li {
+  counter-increment: decision;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+  font-size: 0.9rem;
+}
+
+.decisionList li::before {
+  content: counter(decision) '.';
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 1.2rem;
+  flex-shrink: 0;
+}
+
+.decisionCondicion {
+  color: var(--text-secondary);
+  flex: 1 1 auto;
+}
+
+.decisionResultado {
+  color: var(--text-primary);
+  flex: 1 1 auto;
+}
+
+/* ─── Lenguajes reales ───────────────────────────────────────────────────── */
+
+.lenguajesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lenguajesSection h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.lenguajesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.lenguajeCard {
+  background: var(--bg-card);
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lenguajeName {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lenguajeSort {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.lenguajeDetalle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.notaLenguajes {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.notaLenguajes code {
+  background: color-mix(in srgb, var(--primary) 15%, var(--bg-card));
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.88em;
+  color: var(--primary);
+}
+
+/* ─── Educacional ─────────────────────────────────────────────────────────── */
+
+.educacional {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.educacional h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.25rem;
+}
+
+.educacional p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─── Dark Mode ───────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .algoritmoCard,
+[data-theme='dark'] .arbolDecision,
+[data-theme='dark'] .crecimientoCard,
+[data-theme='dark'] .lenguajeCard,
+[data-theme='dark'] .barrasContainer {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .complejidadTable th {
+  background: color-mix(in srgb, var(--primary) 18%, var(--bg-card));
+}
+
+[data-theme='dark'] .barraNormal {
+  background-color: var(--accent);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .tarjetasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .crecimientoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lenguajesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .decisionList li {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .barrasContainer {
+    height: 160px;
+  }
+
+  .barraValor {
+    font-size: 0.55rem;
+  }
+}
+
+/* ─── Animaciones accesibles ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .barra {
+    transition: none !important;
+  }
+
+  .barraBig {
+    transition: none !important;
+  }
+
+  /* Desactivar auto-play visualmente: no se puede desactivar el setInterval
+     desde CSS, pero sí comunicar al usuario que las animaciones están reducidas */
+}

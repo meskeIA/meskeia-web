@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 623,
+  "total_tools": 626,
   "updated": "2026-04-24",
   "features": {
     "all_free": true,
@@ -1933,6 +1933,24 @@
           "slug": "visualizador-comercio-internacional",
           "url": "https://meskeia.com/visualizador-comercio-internacional/",
           "description": "Ventaja comparativa de Ricardo, balanza comercial de España, efecto de los tipos de cambio en exportaciones, y simulador de aranceles con guerra comercial EEUU-China"
+        },
+        {
+          "name": "Toma de Decisiones: Sistemas 1 y 2 de Kahneman",
+          "slug": "visualizador-toma-decisiones",
+          "url": "https://meskeia.com/visualizador-toma-decisiones/",
+          "description": "Sistemas 1 (automático) y 2 (deliberativo) de Kahneman, fatiga decisional (experimento de los jueces israelíes), 4 heurísticos interactivos (disponibilidad, representatividad, anclaje, framing) y arquitectura de elección con nudges"
+        },
+        {
+          "name": "Algoritmos de Ordenación: Visualizador Paso a Paso",
+          "slug": "visualizador-algoritmos-ordenacion",
+          "url": "https://meskeia.com/visualizador-algoritmos-ordenacion/",
+          "description": "Burbuja, Inserción, Selección, Quicksort y Mergesort visualizados paso a paso con barras coloreadas. Complejidad Big O comparada y guía de cuándo usar cada algoritmo en la práctica"
+        },
+        {
+          "name": "Base de Datos Relacional: Tablas, JOIN e Índices",
+          "slug": "visualizador-base-datos-relacional",
+          "url": "https://meskeia.com/visualizador-base-datos-relacional/",
+          "description": "Tablas con claves primarias/foráneas interactivas, 4 tipos de JOIN con diagrama de Venn, índices B-Tree que aceleran 1000x las consultas, transacciones ACID con transferencia bancaria y comparativa SQL vs NoSQL"
         },
         {
           "name": "Falacias Lógicas",

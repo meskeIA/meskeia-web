@@ -1,0 +1,920 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   visualizador-base-datos-relacional — CSS Module meskeIA
+   Paleta: --primary #2E86AB | --secondary #48A9A6 | --accent #7FB3D3
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Layout base ─────────────────────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ─── Tabs ────────────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem 0;
+  border-bottom: 2px solid var(--primary);
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.tab {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab:hover {
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+}
+
+.tabActive {
+  background: var(--primary);
+  color: #fff;
+}
+
+.tabActive:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─── Contenido general ───────────────────────────────────────────────────── */
+
+.content {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 2rem 1.5rem 2.5rem;
+}
+
+.content h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.intro {
+  color: var(--text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
+  max-width: 780px;
+}
+
+.subheading {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 2rem 0 0.6rem;
+}
+
+.subheadingH2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 2.5rem 0 0.75rem;
+}
+
+.subDesc {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  max-width: 720px;
+}
+
+/* ─── Tables BD (Tab 1) ───────────────────────────────────────────────────── */
+
+.tablasBD {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+
+.tablaBD {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  flex: 1;
+  min-width: 260px;
+  background: var(--bg-card);
+}
+
+.tablaBDWide {
+  width: 100%;
+  flex: none;
+}
+
+.tablaHeader {
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+}
+
+.headerClientes {
+  background: var(--primary);
+}
+
+.headerPedidos {
+  background: #2a9d5c;
+}
+
+.headerProductos {
+  background: #d67c2c;
+}
+
+.tablaBD table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.tablaBD th {
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tablaBD td {
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.tablaBD tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaBD tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.filaResaltada td {
+  background: rgba(46, 134, 171, 0.12) !important;
+  font-weight: 600;
+}
+
+.pkCell {
+  font-weight: 700;
+  color: var(--primary) !important;
+  font-family: monospace;
+}
+
+.fkCell {
+  background: none;
+  border: none;
+  font-family: monospace;
+  font-weight: 700;
+  color: #2a9d5c;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline dotted;
+  font-size: 0.84rem;
+}
+
+.fkCell:hover {
+  color: var(--primary);
+}
+
+.fkCell:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.conectorFK {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 1rem 0;
+  align-self: center;
+}
+
+.flechaFK {
+  font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: 0.02em;
+}
+
+/* Tags PK y FK en intro */
+.pkTag {
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.fkTag {
+  color: #2a9d5c;
+  background: rgba(42, 157, 92, 0.1);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+/* Conceptos clave grid */
+.conceptosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.conceptoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+}
+
+.conceptoCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.conceptoCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ─── JOIN (Tab 2) ────────────────────────────────────────────────────────── */
+
+.joinSelectorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.joinBtn {
+  padding: 0.65rem 1rem;
+  border: 2px solid rgba(46, 134, 171, 0.25);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.joinBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.joinBtnActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.joinBtnActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.joinBtn:focus-visible,
+.joinBtnActivo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.joinDetalle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .joinDetalle {
+    grid-template-columns: 1fr;
+  }
+}
+
+.joinLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.vennDiagram {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+}
+
+.joinDescripcion {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.joinUso {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+.sqlCode {
+  background: #1a1a2e;
+  color: #7fb3d3;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre;
+}
+
+.sqlCode code {
+  background: none;
+  color: inherit;
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.joinRight h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.joinResult {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.joinResult th {
+  background: rgba(46, 134, 171, 0.08);
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--primary);
+}
+
+.joinResult td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+.joinResult tr:last-child td {
+  border-bottom: none;
+}
+
+.filaNull td {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.nullTag {
+  color: var(--text-muted);
+  font-family: monospace;
+  font-size: 0.82rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.joinCount {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0;
+  text-align: right;
+}
+
+/* ─── Índices (Tab 3) ─────────────────────────────────────────────────────── */
+
+.sliderSection {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.sliderBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sliderBtn {
+  padding: 0.45rem 1rem;
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  font-family: monospace;
+}
+
+.sliderBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sliderBtnActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.sliderBtn:focus-visible,
+.sliderBtnActivo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.rendimientoDisplay {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .rendimientoDisplay {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rendCard {
+  border-radius: 10px;
+  padding: 1.1rem;
+  text-align: center;
+}
+
+.rendLento {
+  background: rgba(220, 60, 60, 0.07);
+  border: 2px solid rgba(220, 60, 60, 0.25);
+}
+
+.rendRapido {
+  background: rgba(42, 157, 92, 0.07);
+  border: 2px solid rgba(42, 157, 92, 0.3);
+}
+
+.rendLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.rendValor {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: monospace;
+  letter-spacing: -0.02em;
+}
+
+.rendLento .rendValor {
+  color: #c0392b;
+}
+
+.rendRapido .rendValor {
+  color: #27ae60;
+}
+
+.rendSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.rendVs {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.arbolBtree {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  margin-bottom: 2rem;
+}
+
+.tiposGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tipoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.tipoCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0 0 0.4rem;
+}
+
+.tipoCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tipoCard code {
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: var(--primary);
+}
+
+/* ─── ACID (Tab 4) ────────────────────────────────────────────────────────── */
+
+.escenarioBox {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.escenarioBox h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.acidGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.acidCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.2rem;
+  position: relative;
+}
+
+.acidLetra {
+  position: absolute;
+  top: -14px;
+  left: 16px;
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.acidCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0.5rem 0 0.5rem;
+}
+
+.acidCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Comparativa SQL vs NoSQL */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 500px;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.comparativaTable th:first-child {
+  border-radius: 10px 0 0 0;
+}
+
+.comparativaTable th:last-child {
+  border-radius: 0 10px 0 0;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.celVerde {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.celAmbar {
+  color: #d68910;
+  font-weight: 600;
+}
+
+/* ─── Warning Box (v2.0 — OBLIGATORIO) ───────────────────────────────────── */
+
+.warningBox {
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 1.5rem;
+}
+
+.warningBox strong {
+  color: var(--primary);
+}
+
+/* ─── Sección educativa ───────────────────────────────────────────────────── */
+
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+}
+
+.eduCard h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0 0 0.45rem;
+}
+
+.eduCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.58;
+  margin: 0;
+}
+
+.eduCard code {
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: var(--primary);
+}
+
+/* ─── Dark Mode ───────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .tablaBD,
+[data-theme='dark'] .conceptoCard,
+[data-theme='dark'] .tipoCard,
+[data-theme='dark'] .acidCard,
+[data-theme='dark'] .escenarioBox,
+[data-theme='dark'] .sliderSection,
+[data-theme='dark'] .eduCard {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.15);
+}
+
+[data-theme='dark'] .tablaBD th {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .tablaBD td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .tablaBD tr:hover td {
+  background: rgba(127, 179, 211, 0.06);
+}
+
+[data-theme='dark'] .filaResaltada td {
+  background: rgba(46, 134, 171, 0.18) !important;
+}
+
+[data-theme='dark'] .joinResult th {
+  background: rgba(127, 179, 211, 0.08);
+}
+
+[data-theme='dark'] .joinResult td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .nullTag {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(127, 179, 211, 0.04);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .rendLento {
+  background: rgba(220, 60, 60, 0.1);
+  border-color: rgba(220, 60, 60, 0.35);
+}
+
+[data-theme='dark'] .rendRapido {
+  background: rgba(42, 157, 92, 0.1);
+  border-color: rgba(42, 157, 92, 0.35);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(127, 179, 211, 0.08);
+  border-left-color: var(--accent);
+}
+
+[data-theme='dark'] .joinBtn {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .sliderBtn {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.2);
+}
+
+[data-theme='dark'] .pkCell {
+  color: var(--accent) !important;
+}
+
+/* ─── Accesibilidad ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .joinBtn,
+  .sliderBtn,
+  .fkCell {
+    transition: none;
+  }
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .tablasBD {
+    flex-direction: column;
+  }
+
+  .conectorFK {
+    flex-direction: row;
+    padding: 0.5rem 0;
+  }
+
+  .tabs {
+    gap: 0.3rem;
+    padding: 1rem 1rem 0;
+  }
+
+  .tab {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .content {
+    padding: 1.5rem 1rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .acidGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .joinSelectorGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .rendimientoDisplay {
+    gap: 0.75rem;
+  }
+}

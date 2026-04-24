@@ -1703,6 +1703,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias intestinales modulan la respuesta glucémica' },
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
   ],
+  'visualizador-toma-decisiones': [
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Los sesgos individuales que el Sistema 1 introduce en cada decisión' },
+    { url: '/analisis-decision-reversible/', icon: '🔄', name: 'Decisión Reversible', description: 'El marco Bezos para distinguir decisiones de alto y bajo riesgo' },
+    { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'Cómo la amígdala y la emoción secuestran al Sistema 2' },
+    { url: '/visualizador-memoria-humana/', icon: '🧩', name: 'Memoria', description: 'Cómo la memoria de trabajo limita la capacidad del Sistema 2' },
+  ],
+  'visualizador-algoritmos-ordenacion': [
+    { url: '/visualizador-base-datos-relacional/', icon: '🗄️', name: 'Base de Datos Relacional', description: 'Los algoritmos de ordenación son clave en la construcción de índices B-Tree' },
+    { url: '/visualizador-criptografia/', icon: '🔒', name: 'Criptografía', description: 'Los algoritmos de búsqueda binaria son la base de las estructuras criptográficas' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'El backpropagation también depende de algoritmos eficientes de búsqueda y ordenación' },
+    { url: '/visualizador-llm-funcionamiento/', icon: '💬', name: 'LLMs', description: 'Los transformers usan atención que requiere operaciones de ordenación eficiente' },
+  ],
+  'visualizador-base-datos-relacional': [
+    { url: '/visualizador-algoritmos-ordenacion/', icon: '📊', name: 'Algoritmos de Ordenación', description: 'Los índices B-Tree se construyen con algoritmos de ordenación eficientes' },
+    { url: '/visualizador-criptografia/', icon: '🔒', name: 'Criptografía', description: 'Las BD usan hashing y cifrado para proteger contraseñas y datos sensibles' },
+    { url: '/visualizador-llm-funcionamiento/', icon: '💬', name: 'LLMs', description: 'Los grandes modelos de lenguaje almacenan embeddings en bases de datos vectoriales' },
+    { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'Una blockchain es una BD distribuida con propiedades de inmutabilidad' },
+  ],
   'visualizador-inflacion': [
     { url: '/visualizador-burbuja-especulativa/', icon: '🫧', name: 'Burbuja Especulativa', description: 'La inflación descontrolada puede desencadenar ciclos especulativos' },
     { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'El principal instrumento del BCE para controlar la inflación' },
