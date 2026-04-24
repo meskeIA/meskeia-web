@@ -1571,6 +1571,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'La pérdida de neuronas colinérgicas en el Alzheimer' },
     { url: '/visualizador-adrenalina/', icon: '⚡', name: 'Adrenalina', description: 'El antagonista funcional: simpático vs parasimpático' },
   ],
+  'visualizador-carbono': [
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El carbono (C, nº 6) en el contexto de todos los elementos' },
+    { url: '/visualizador-silicio/', icon: '💻', name: 'Silicio', description: 'El semiconductor que comparte grupo con el carbono' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'El ciclo del carbono perturbado: el motor del calentamiento global' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula', description: 'La vida = química del carbono: ADN, proteínas, lípidos' },
+  ],
+  'visualizador-silicio': [
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El silicio (Si, nº 14) en el contexto de todos los elementos' },
+    { url: '/visualizador-carbono/', icon: '⚛️', name: 'Carbono', description: 'El grafeno de carbono como semiconductor del futuro' },
+    { url: '/visualizador-computacion-cuantica/', icon: '⚛️', name: 'Computación Cuántica', description: 'Los límites del silicio y el siguiente paradigma computacional' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Los chips de silicio que hacen posible el cifrado moderno' },
+  ],
+  'visualizador-hidrogeno': [
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El hidrógeno (H, nº 1) en el contexto de todos los elementos' },
+    { url: '/visualizador-carbono/', icon: '⚛️', name: 'Carbono', description: 'El otro elemento clave en energía: combustibles fósiles vs H₂ verde' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Fusión (H) vs fisión (U): las dos fuentes sin CO₂' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'El hidrógeno verde como solución de descarbonización' },
+  ],
+  'visualizador-oro': [
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El oro (Au, nº 79) en el contexto de todos los elementos' },
+    { url: '/visualizador-relatividad-especial/', icon: '💫', name: 'Relatividad Especial', description: 'La teoría de Einstein que explica por qué el oro es amarillo' },
+    { url: '/visualizador-silicio/', icon: '💻', name: 'Silicio', description: 'Los chips que el oro conecta: semiconductores y circuitos integrados' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Bitcoin vs oro físico: los dos "valores refugio" comparados' },
+  ],
   'visualizador-vitamina-d': [
     { url: '/vitaminas-minerales/', icon: '🍋', name: 'Vitaminas y Minerales', description: 'El mapa completo de vitaminas y minerales esenciales' },
     { url: '/visualizador-vitamina-b12/', icon: '🔴', name: 'Vitamina B12', description: 'Otra vitamina con mecanismo y absorción especiales' },

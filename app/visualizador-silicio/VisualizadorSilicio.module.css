@@ -1,0 +1,858 @@
+/* VisualizadorSilicio.module.css - Visualizador del Silicio Semiconductor */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: white;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroIcon {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ===== SECCIONES ===== */
+.seccion {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #E5E5E5);
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seccionDesc {
+  color: var(--text-secondary, #666666);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.75rem;
+}
+
+/* ===== BANDAS DE ENERGÍA ===== */
+.bandasSelector {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.bandaBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.65rem 1.2rem;
+  border: 2px solid var(--border-color, #E5E5E5);
+  border-radius: 10px;
+  background: var(--bg-card, #FFFFFF);
+  color: var(--text-primary, #1A1A1A);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.bandaBtn:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
+.bandaBtnActivo {
+  border-color: var(--primary, #2E86AB);
+  background: var(--primary, #2E86AB);
+  color: white;
+}
+
+.bandaMaterial {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.bandasGrid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .bandasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bandaDiagram {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--color-banda, #2E86AB);
+  min-height: 200px;
+}
+
+.bandaConduccion {
+  background: color-mix(in srgb, var(--color-banda, #2E86AB) 15%, transparent);
+  padding: 1rem;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.bandaProhibida {
+  background: var(--bg-primary, #FAFAFA);
+  border-top: 2px dashed var(--color-banda, #2E86AB);
+  border-bottom: 2px dashed var(--color-banda, #2E86AB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height 0.4s ease;
+  padding: 0.25rem;
+}
+
+.bandaValencia {
+  background: color-mix(in srgb, var(--color-banda, #2E86AB) 25%, transparent);
+  padding: 1rem;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.bandaLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666666);
+  text-align: center;
+}
+
+.gapLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted, #999999);
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.electronesLibres,
+.electronesValencia {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.electronPunt {
+  font-size: 1.1rem;
+  color: var(--color-banda, #2E86AB);
+  animation: flotarElectron 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes flotarElectron {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .electronPunt {
+    animation: none;
+  }
+}
+
+.bandaInfo {
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+}
+
+.bandaInfoTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.bandaInfoDesc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #666666);
+  margin: 0 0 1rem;
+}
+
+.bandaDatalist {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.75rem;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.bandaDatalist dt {
+  font-weight: 600;
+  color: var(--text-secondary, #666666);
+}
+
+.bandaDatalist dd {
+  margin: 0;
+  color: var(--text-primary, #1A1A1A);
+}
+
+/* ===== WARNING BOX (indicador v2.0) ===== */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ===== DOPADO ===== */
+.dopingSelector {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.dopingBtn {
+  padding: 0.65rem 1.5rem;
+  border-radius: 10px;
+  border: 2px solid var(--border-color, #E5E5E5);
+  background: var(--bg-card, #FFFFFF);
+  color: var(--text-primary, #1A1A1A);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dopingBtnN {
+  border-color: #2E86AB;
+  background: #2E86AB;
+  color: white;
+}
+
+.dopingBtnP {
+  border-color: #E55A5A;
+  background: #E55A5A;
+  color: white;
+}
+
+.dopingContent {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .dopingContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cristalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+  position: relative;
+}
+
+.atomoCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 0.4rem;
+  border-radius: 8px;
+  gap: 0.2rem;
+  transition: transform 0.2s;
+}
+
+.atomoSi {
+  background: rgba(46, 134, 171, 0.12);
+  border: 2px solid rgba(46, 134, 171, 0.4);
+}
+
+.atomoN {
+  background: rgba(46, 134, 171, 0.25);
+  border: 2px solid #2E86AB;
+  box-shadow: 0 0 8px rgba(46, 134, 171, 0.5);
+  animation: pulsoAtomo 1.5s ease-in-out infinite;
+}
+
+.atomoP {
+  background: rgba(229, 90, 90, 0.2);
+  border: 2px solid #E55A5A;
+  box-shadow: 0 0 8px rgba(229, 90, 90, 0.4);
+  animation: pulsoAtomo 1.5s ease-in-out infinite;
+}
+
+@keyframes pulsoAtomo {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atomoN,
+  .atomoP {
+    animation: none;
+  }
+}
+
+.atomoSimbolo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.atomoElectrones {
+  font-size: 0.65rem;
+  color: var(--text-secondary, #666666);
+}
+
+.electronLibreFloat {
+  position: absolute;
+  top: -0.75rem;
+  right: -0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  animation: orbitar 2s linear infinite;
+}
+
+.electronLibreIcon {
+  background: #2E86AB;
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.electronLibreLabel {
+  font-size: 0.65rem;
+  color: #2E86AB;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@keyframes orbitar {
+  from { transform: rotate(0deg) translateX(4px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(4px) rotate(-360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .electronLibreFloat {
+    animation: none;
+  }
+}
+
+.huecoFloat {
+  position: absolute;
+  top: -0.75rem;
+  right: -0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.huecoIcon {
+  background: transparent;
+  color: #E55A5A;
+  border: 2px solid #E55A5A;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  animation: pulsarHueco 1.2s ease-in-out infinite;
+}
+
+@keyframes pulsarHueco {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .huecoIcon {
+    animation: none;
+  }
+}
+
+.huecoLabel {
+  font-size: 0.65rem;
+  color: #E55A5A;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dopingInfo {
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+}
+
+.dopingTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.dopingLista {
+  padding-left: 1.25rem;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.5;
+}
+
+/* ===== UNIÓN P-N ===== */
+.diodoWrapper {
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 14px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+}
+
+.diodoVisual {
+  display: flex;
+  height: 100px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.zonaP {
+  flex: 1;
+  background: rgba(229, 90, 90, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.3s;
+}
+
+.zonaN {
+  flex: 1;
+  background: rgba(46, 134, 171, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: background 0.3s;
+}
+
+.zonaActiva.zonaP {
+  background: rgba(229, 90, 90, 0.35);
+}
+
+.zonaActiva.zonaN {
+  background: rgba(46, 134, 171, 0.35);
+}
+
+.zonaTitulo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary, #666666);
+}
+
+.huecosMini {
+  font-size: 1.2rem;
+  color: #E55A5A;
+  letter-spacing: 0.2rem;
+}
+
+.electronsMini {
+  font-size: 1.2rem;
+  color: #2E86AB;
+  letter-spacing: 0.2rem;
+}
+
+.depletionZone {
+  width: 80px;
+  background: var(--bg-primary, #FAFAFA);
+  border-left: 2px dashed #E55A5A;
+  border-right: 2px dashed #2E86AB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s;
+  flex-shrink: 0;
+}
+
+.depletionGrande {
+  width: 130px;
+}
+
+.depletionPequena {
+  width: 30px;
+}
+
+.depletionLabel {
+  font-size: 0.6rem;
+  color: var(--text-muted, #999999);
+  text-align: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.corrienteIndicador {
+  padding: 0.6rem 1rem;
+  background: rgba(46, 134, 171, 0.12);
+  border-radius: 8px;
+  color: #2E86AB;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.bloqueadoIndicador {
+  padding: 0.6rem 1rem;
+  background: rgba(229, 90, 90, 0.1);
+  border-radius: 8px;
+  color: #E55A5A;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.neutroIndicador {
+  padding: 0.6rem 1rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  color: var(--text-muted, #999999);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+[data-theme='dark'] .neutroIndicador {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sliderWrapper {
+  margin-bottom: 1.25rem;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  margin-bottom: 0.5rem;
+}
+
+.sliderVoltaje {
+  width: 100%;
+  accent-color: var(--primary, #2E86AB);
+  cursor: pointer;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted, #999999);
+  margin-top: 0.25rem;
+}
+
+.transistorInfo {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--border-color, #E5E5E5);
+  padding-top: 1.25rem;
+}
+
+.transistorTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.transistorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 580px) {
+  .transistorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.transistorCard {
+  background: var(--bg-primary, #FAFAFA);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+}
+
+.transistorCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--primary, #2E86AB);
+}
+
+.transistorCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ===== PROCESO: ARENA A CHIP ===== */
+.procesoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.procesoStep {
+  background: var(--bg-card, #FFFFFF);
+  border: 1px solid var(--border-color, #E5E5E5);
+  border-radius: 10px;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.procesoStep:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
+.procesoStep:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.procesoStepActivo {
+  border-color: var(--primary, #2E86AB);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
+}
+
+.pasoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pasoNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--primary, #2E86AB);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pasoIcono {
+  font-size: 1.3rem;
+}
+
+.pasoTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.pasoDesc {
+  margin: 0.75rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.55;
+  padding-left: 2.6rem;
+}
+
+/* ===== LEY DE MOORE ===== */
+.moorChart {
+  height: 360px;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+  margin-bottom: 1.5rem;
+}
+
+.murosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .murosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.muroCard {
+  border-radius: 12px;
+  padding: 1.1rem;
+  border: 1px solid var(--border-color, #E5E5E5);
+}
+
+.muroCard h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+.muroCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary, #666666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.muroCuantico {
+  background: rgba(255, 160, 30, 0.07);
+  border-color: rgba(255, 160, 30, 0.35);
+}
+
+.muroMemoria {
+  background: rgba(46, 134, 171, 0.07);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.muroCuanticoFis {
+  background: rgba(150, 90, 200, 0.07);
+  border-color: rgba(150, 90, 200, 0.3);
+}
+
+/* ===== DATO DESTACADO ===== */
+.datoDestacado {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.55;
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .datoDestacado {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .container {
+  background: var(--bg-primary, #1A1A1A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .seccionTitulo {
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .bandaBtn {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .bandaInfo,
+[data-theme='dark'] .dopingInfo,
+[data-theme='dark'] .diodoWrapper,
+[data-theme='dark'] .procesoStep,
+[data-theme='dark'] .moorChart {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .transistorCard,
+[data-theme='dark'] .muroCard {
+  background: #222222;
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .cristalGrid {
+  background: var(--bg-card, #2A2A2A);
+  border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .depletionZone {
+  background: #1A1A1A;
+}
+
+[data-theme='dark'] .bandaProhibida {
+  background: #1A1A1A;
+}
+
+[data-theme='dark'] .seccion {
+  border-color: #3A3A3A;
+}

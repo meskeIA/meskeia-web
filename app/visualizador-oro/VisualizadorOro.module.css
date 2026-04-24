@@ -1,0 +1,956 @@
+/* VisualizadorOro.module.css — paleta meskeIA */
+/* Variable local de acento dorado (solo en esta app) */
+
+.container {
+  --color-gold: #D4A017;
+  --color-gold-light: #F0C040;
+  --color-gold-muted: rgba(212, 160, 23, 0.15);
+
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  opacity: 0.92;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones comunes ─────────────────────────── */
+.section {
+  max-width: 960px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Sección 1: Configuración electrónica ──────── */
+.configElectronica {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.orbitalDiagram {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.nucleo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, var(--color-gold) 0%, #b8860b 100%);
+  color: white;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 4px 16px rgba(212, 160, 23, 0.4);
+}
+
+.nucleoTexto {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.nucleoSub {
+  font-size: 0.65rem;
+  opacity: 0.9;
+}
+
+.capaXe {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+}
+
+.capaXeLabel {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.capaXeSub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.subcapa4f,
+.subcapa5d,
+.subcapa6s {
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.subcapa4f {
+  background: rgba(149, 165, 166, 0.1);
+  border: 1px solid rgba(149, 165, 166, 0.3);
+}
+
+.subcapaDestacada {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1.5px solid var(--primary);
+}
+
+.subcapaOro {
+  background: var(--color-gold-muted);
+  border: 2px solid var(--color-gold);
+}
+
+.subcapaLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.electronRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.electron {
+  background: var(--text-muted);
+  color: white;
+  font-size: 0.6rem;
+  padding: 2px 5px;
+  border-radius: 10px;
+}
+
+.electronDestacado {
+  background: var(--primary);
+  color: white;
+  font-size: 0.6rem;
+  padding: 2px 5px;
+  border-radius: 10px;
+}
+
+.electronOro {
+  background: var(--color-gold);
+  color: white;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(212, 160, 23, 0.4);
+}
+
+.subcapaNota {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Comparativa Grupo 11 */
+.comparativaGrupo11 {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.comparativaTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem;
+  text-align: center;
+}
+
+.comparativaSubtitulo {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.2rem;
+}
+
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metalCard {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 4px solid;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.metalSimbol {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.metalNombre {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.metalConfig {
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: 'Courier New', monospace;
+  color: var(--text-secondary);
+}
+
+.metalNota {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ─── Sección 2: Relativista ────────────────────── */
+.relativistaWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.velocidadIndicator {
+  text-align: center;
+}
+
+.velocidadLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+}
+
+.velocidadBarra {
+  position: relative;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 20px;
+  height: 32px;
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.velocidadRelleno {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--color-gold) 0%, #b8860b 100%);
+  transition: width 0.6s ease;
+}
+
+.velocidadValor {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.velocidadSub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+}
+
+/* Cadena causal */
+.causalChain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.causalPaso {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.causalNumero {
+  background: var(--color-gold);
+  color: white;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(212, 160, 23, 0.3);
+}
+
+.causalTexto {
+  flex: 1;
+}
+
+.causalTexto strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.causalTexto p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Consecuencias */
+.contraccionVisual {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 1.5rem;
+}
+
+.contraccionTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.consecuenciasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.consecuenciaCard {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.consecuenciaIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.consecuenciaCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.consecuenciaCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Toggle sin relatividad */
+.relatividadToggleSection {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 1.25rem;
+}
+
+.btnRelatividad {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 2px solid var(--color-gold);
+  color: var(--color-gold);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnRelatividad:hover {
+  background: var(--color-gold-muted);
+}
+
+.btnRelatividad:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.sinRelatividadPanel {
+  margin-top: 1rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.sinRelatividadTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+
+.sinRelatividadGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sinRelatividadCard {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sinRelatividadHeader {
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.sinRelatividadLista {
+  padding: 0.75rem 1rem;
+  margin: 0;
+  list-style: disc;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+}
+
+.sinRelatividadLista li {
+  margin-bottom: 0.3rem;
+}
+
+.sinRelatividadNota {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Sección 3: Escala de nobleza ─────────────── */
+.noblezaScale {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.noblezaEje {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.noblezaEjeMin,
+.noblezaEjeMax {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.noblezaEjeTitulo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.noblezaBarraContenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.metalBar {
+  display: grid;
+  grid-template-columns: 80px 1fr 160px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.metalBarLabel {
+  display: flex;
+  flex-direction: column;
+}
+
+.metalBarSimbol {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.metalBarNombre {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.metalBarTrack {
+  position: relative;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.metalBarFill {
+  height: 100%;
+  border-radius: 20px;
+  min-width: 4px;
+  transition: width 0.4s ease;
+}
+
+.metalBarValor {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.metalBarDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.aguaRegiaNote {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--color-gold-muted);
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.aguaRegiaNote strong {
+  color: var(--text-primary);
+}
+
+/* ─── Sección 4: Electrónica ────────────────────── */
+.electronicsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.useCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.useCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.useCardIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.useCardSector {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.3rem;
+}
+
+.useCardDato {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  margin: 0 0 0.5rem;
+}
+
+.useCardDetalle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ewasteNote {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ewasteNote strong {
+  color: var(--text-primary);
+}
+
+/* ─── Sección 5: Medicina ───────────────────────── */
+.medicinaSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.medicinaCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.medicnaToggle {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: background 0.2s;
+}
+
+.medicnaToggle:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.medicnaToggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.medicnaToggleTitulo {
+  flex: 1;
+}
+
+.medicnaToggleFlecha {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.medicinaResumen {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  padding: 0 1.25rem 1rem;
+  line-height: 1.55;
+}
+
+.nanoparticula {
+  background: rgba(46, 134, 171, 0.05);
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+  padding: 0.75rem 1.25rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.nanoparticula p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Test de embarazo visual */
+.testEmbarazoVisual {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.testTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.testSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.testStep {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.testStepNum {
+  color: white;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.testStepTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ─── Educational Section ───────────────────────── */
+.educationalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.educationalItem {
+  padding: 0;
+}
+
+.educationalItem h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.educationalItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ─── Warning box (v2.0 indicator) ─────────────── */
+.warningBox {
+  background: var(--color-gold-muted);
+  border: 1px solid rgba(212, 160, 23, 0.35);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
+.warningBox strong {
+  color: var(--text-primary);
+}
+
+/* ─── Dark mode ─────────────────────────────────── */
+[data-theme='dark'] .orbitalDiagram,
+[data-theme='dark'] .comparativaGrupo11,
+[data-theme='dark'] .relativistaWrapper,
+[data-theme='dark'] .noblezaScale,
+[data-theme='dark'] .useCard,
+[data-theme='dark'] .medicinaCard,
+[data-theme='dark'] .testEmbarazoVisual {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .metalCard {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .capaXe {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .subcapa4f {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .consecuenciaCard {
+  background: var(--bg-primary);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .metalBarTrack {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .metalBarValor {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .sinRelatividadLista {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .sinRelatividadCard {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .nanoparticula {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .aguaRegiaNote {
+  background: rgba(212, 160, 23, 0.08);
+  border-color: rgba(212, 160, 23, 0.2);
+}
+
+[data-theme='dark'] .ewasteNote {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(212, 160, 23, 0.08);
+  border-color: rgba(212, 160, 23, 0.2);
+}
+
+/* ─── Responsive ────────────────────────────────── */
+@media (max-width: 640px) {
+  .metalBar {
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .metalBarDesc {
+    grid-column: 1 / -1;
+    padding-left: 0;
+  }
+
+  .sinRelatividadGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .electronicsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .consecuenciasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .noblezaEje {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ─── Animaciones respetuosas ───────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .useCard,
+  .useCard:hover {
+    transform: none;
+    transition: none;
+  }
+
+  .sinRelatividadPanel,
+  .nanoparticula {
+    animation: none;
+  }
+
+  .velocidadRelleno,
+  .metalBarFill {
+    transition: none;
+  }
+}

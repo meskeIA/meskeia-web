@@ -672,6 +672,10 @@ export const implementedAppsUrls = [
   "/visualizador-vitamina-b12/",         // Ciclo metilación, factor intrínseco, 5 grupos riesgo, síntomas neurológicos
   "/visualizador-hierro/",               // Donut distribución corporal, hemo vs no hemo, hepcidina, espectro ferropénico
   "/visualizador-magnesio/",             // 300 reacciones, equilibrio Ca/Mg músculo, NMDA, déficit silencioso
+  "/visualizador-carbono/",              // 4 alótropos, ciclo del carbono Gt C/año, química orgánica, C-14 slider
+  "/visualizador-silicio/",              // Bandas energía, dopado N/P, unión P-N, 7 pasos arena→chip, Ley de Moore
+  "/visualizador-hidrogeno/",            // Distribución cósmica, fusión pp, pila PEM, 5 colores H₂, densidad energética
+  "/visualizador-oro/",                  // Relatividad efecto, configuración 6s, nobleza química, electrónica, AuNP medicina
 ];
 
 /**

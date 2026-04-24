@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 606,
+  "total_tools": 610,
   "updated": "2026-04-21",
   "features": {
     "all_free": true,
@@ -2059,6 +2059,30 @@
           "slug": "visualizador-magnesio",
           "url": "https://meskeia.com/visualizador-magnesio/",
           "description": "Cofactor de 300+ reacciones enzimáticas, equilibrio calcio/magnesio en la contracción muscular, modulador del receptor NMDA y el déficit más infradiagnosticado"
+        },
+        {
+          "name": "El Carbono",
+          "slug": "visualizador-carbono",
+          "url": "https://meskeia.com/visualizador-carbono/",
+          "description": "Los 4 alótropos (grafito/diamante/grafeno/fullereno), el ciclo del carbono en Gt C/año, química orgánica y datación radiométrica con C-14"
+        },
+        {
+          "name": "El Silicio",
+          "slug": "visualizador-silicio",
+          "url": "https://meskeia.com/visualizador-silicio/",
+          "description": "De la arena al chip: bandas de energía, dopado N/P, unión P-N, fabricación de chips en 7 pasos y la Ley de Moore con sus límites cuánticos"
+        },
+        {
+          "name": "El Hidrógeno",
+          "slug": "visualizador-hidrogeno",
+          "url": "https://meskeia.com/visualizador-hidrogeno/",
+          "description": "Del Big Bang a la pila de combustible: fusión nuclear (cadena pp), pila PEM, los 5 colores del hidrógeno y comparativa de densidad energética"
+        },
+        {
+          "name": "El Oro",
+          "slug": "visualizador-oro",
+          "url": "https://meskeia.com/visualizador-oro/",
+          "description": "La relatividad especial explica por qué el oro es amarillo y no se oxida: efecto relativista en el orbital 6s, nobleza química, usos en electrónica y nanopartículas en medicina"
         },
         {
           "name": "Aspirina",

@@ -1,0 +1,21 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'El Oro: Por Qué la Relatividad Explica su Color y su Nobleza | meskeIA',
+  description: 'La relatividad especial de Einstein explica por qué el oro es amarillo, no se oxida y es vital en electrónica. Configuración electrónica, nanopartículas y medicina.',
+  keywords: [
+    'por que el oro es amarillo',
+    'por que el oro no se oxida',
+    'oro relatividad',
+    'oro electrónica',
+    'nanopartículas oro',
+    'oro medicina',
+    'configuracion electronica oro',
+    'oro metal noble',
+  ],
+  openGraph: {
+    title: 'El Oro: Por Qué la Relatividad Explica su Color y su Nobleza',
+    description: 'Einstein explica por qué el oro es amarillo, no se oxida y está en cada circuito electrónico',
+    type: 'website',
+  },
+};
