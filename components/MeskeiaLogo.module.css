@@ -86,18 +86,6 @@
 .ia {
   font-weight: 800;
   color: #2E86AB;
-  font-size: 1.15em;
-}
-
-.ia::before {
-  content: '';
-  display: inline-block;
-  width: 1px;
-  height: 0.7em;
-  background: #48A9A6;
-  margin: 0 5px;
-  vertical-align: -0.1em;
-  opacity: 0.8;
 }
 
 /* Toggle de tema */
