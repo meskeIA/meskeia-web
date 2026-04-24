@@ -1,0 +1,710 @@
+/* ElNino.module.css — meskeIA */
+
+/* ─────────────────────────────────────────────
+   Contenedor principal
+───────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Main
+───────────────────────────────────────────── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/* ─────────────────────────────────────────────
+   Tabs
+───────────────────────────────────────────── */
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .tabs {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.85rem 0.5rem;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  font-size: 0.8rem;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.tab:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.tabActive {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  color: var(--primary);
+}
+
+.tabTitulo {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.tabSub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ─────────────────────────────────────────────
+   Contenido de tabs
+───────────────────────────────────────────── */
+.content {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sectionTitle {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.intro {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+/* ─────────────────────────────────────────────
+   Diagrama SVG del Pacífico
+───────────────────────────────────────────── */
+.svgWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.75rem;
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+.pacificSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 220px;
+}
+
+/* ─────────────────────────────────────────────
+   Grid de mecanismos (Tab Normal)
+───────────────────────────────────────────── */
+.mecanismosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 560px) {
+  .mecanismosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mecanismoCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.mecanismoCard h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.mecanismoCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Datos destacados
+───────────────────────────────────────────── */
+.datosDestacados {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  min-width: 140px;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.datoNumero {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.datoLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+  line-height: 1.3;
+}
+
+/* ─────────────────────────────────────────────
+   Cambios El Niño / La Niña
+───────────────────────────────────────────── */
+.cambiosNino {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 1.75rem;
+  border-left: 4px solid var(--primary);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.cambiosNino h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.7rem;
+  color: var(--text-primary);
+}
+
+.cambiosList {
+  margin: 0;
+  padding-left: 1.4rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────
+   Teleconexiones
+───────────────────────────────────────────── */
+.teleconexTitulo,
+.comparativaTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.85rem;
+}
+
+.teleconexGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 520px) {
+  .teleconexGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.teleconexCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.teleconexCard div {
+  flex: 1;
+}
+
+.teleconexCard strong {
+  font-size: 0.88rem;
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.teleconexCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.teleconexIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* Colores de cada variante */
+.ninoCard {
+  background: color-mix(in srgb, #FF6B35 8%, var(--bg-card));
+  border-color: color-mix(in srgb, #FF6B35 25%, transparent);
+}
+
+.niniaCard {
+  background: color-mix(in srgb, #1E88E5 8%, var(--bg-card));
+  border-color: color-mix(in srgb, #1E88E5 25%, transparent);
+}
+
+/* ─────────────────────────────────────────────
+   Tabla comparativa
+───────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.7rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-muted) 20%, transparent);
+  vertical-align: top;
+}
+
+.comparativaTable thead th {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-card));
+}
+
+.aspectoCell {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.normalCell {
+  color: var(--text-secondary);
+}
+
+.normalCell:first-child {
+  background: color-mix(in srgb, #78909C 8%, var(--bg-card));
+  color: #546E7A;
+}
+
+.ninoCell {
+  background: color-mix(in srgb, #FF6B35 6%, var(--bg-card));
+  color: #BF360C;
+}
+
+.niniaCell {
+  background: color-mix(in srgb, #1E88E5 6%, var(--bg-card));
+  color: #0D47A1;
+}
+
+/* ─────────────────────────────────────────────
+   Índices ENSO (Tab predicción)
+───────────────────────────────────────────── */
+.indicesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 540px) {
+  .indicesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.indiceCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.indiceCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+  color: var(--text-primary);
+}
+
+.indiceSubtitulo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 0.65rem;
+  font-style: italic;
+}
+
+.indiceCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.indiceValores {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.valorNino {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #BF360C;
+  background: color-mix(in srgb, #FF6B35 10%, var(--bg-card));
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+.valorNinia {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0D47A1;
+  background: color-mix(in srgb, #1E88E5 10%, var(--bg-card));
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* ─────────────────────────────────────────────
+   Timeline ENSO
+───────────────────────────────────────────── */
+.timelineTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.85rem;
+}
+
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.eventoBase {
+  display: grid;
+  grid-template-columns: 70px auto 40px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.eventoNino {
+  background: color-mix(in srgb, #FF6B35 10%, var(--bg-card));
+  border-left: 4px solid #FF6B35;
+}
+
+.eventoNinia {
+  background: color-mix(in srgb, #1E88E5 10%, var(--bg-card));
+  border-left: 4px solid #1E88E5;
+}
+
+.eventoAnio {
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.eventoTipo {
+  font-weight: 600;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.eventoIntensidad {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.eventoDesc {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 500px) {
+  .eventoBase {
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .eventoTipo,
+  .eventoIntensidad {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Tarjetas de modelos y España
+───────────────────────────────────────────── */
+.modelosCard,
+.espanaCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.modelosCard h3,
+.espanaCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.6rem;
+  color: var(--primary);
+}
+
+.modelosCard p,
+.espanaCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.6rem;
+}
+
+.espanaList {
+  margin: 0.5rem 0 0;
+  padding-left: 1.3rem;
+  color: var(--text-secondary);
+  font-size: 0.87rem;
+  line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────
+   Warning Box (indicador v2.0 — obligatorio)
+───────────────────────────────────────────── */
+.warningBox {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  background: color-mix(in srgb, #FF6B35 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #FF6B35 30%, transparent);
+  border-left: 4px solid #FF6B35;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-top: 1.25rem;
+  font-size: 0.88rem;
+}
+
+.warningBox span[aria-hidden] {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.warningBox div strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--text-primary);
+  font-size: 0.93rem;
+}
+
+.warningBox div p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Sección educativa
+───────────────────────────────────────────── */
+.educSection h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 1.1rem 0 0.4rem;
+}
+
+.educSection h3:first-child {
+  margin-top: 0;
+}
+
+.educSection p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 0.5rem;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────────── */
+[data-theme='dark'] .tab {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+[data-theme='dark'] .tabActive {
+  background: color-mix(in srgb, var(--primary) 15%, var(--bg-card));
+}
+
+[data-theme='dark'] .svgWrapper {
+  border-color: color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+[data-theme='dark'] .mecanismoCard,
+[data-theme='dark'] .cambiosNino,
+[data-theme='dark'] .indiceCard,
+[data-theme='dark'] .modelosCard,
+[data-theme='dark'] .espanaCard {
+  background: var(--bg-card);
+  border-color: color-mix(in srgb, var(--secondary) 30%, transparent);
+}
+
+[data-theme='dark'] .ninoCard {
+  background: color-mix(in srgb, #FF6B35 12%, var(--bg-card));
+  border-color: color-mix(in srgb, #FF6B35 35%, transparent);
+}
+
+[data-theme='dark'] .niniaCard {
+  background: color-mix(in srgb, #1E88E5 12%, var(--bg-card));
+  border-color: color-mix(in srgb, #1E88E5 35%, transparent);
+}
+
+[data-theme='dark'] .ninoCell {
+  background: color-mix(in srgb, #FF6B35 10%, var(--bg-card));
+  color: #FF8A65;
+}
+
+[data-theme='dark'] .niniaCell {
+  background: color-mix(in srgb, #1E88E5 10%, var(--bg-card));
+  color: #64B5F6;
+}
+
+[data-theme='dark'] .comparativaTable thead th {
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+}
+
+[data-theme='dark'] .eventoNino {
+  background: color-mix(in srgb, #FF6B35 15%, var(--bg-card));
+}
+
+[data-theme='dark'] .eventoNinia {
+  background: color-mix(in srgb, #1E88E5 15%, var(--bg-card));
+}
+
+[data-theme='dark'] .valorNino {
+  background: color-mix(in srgb, #FF6B35 15%, var(--bg-card));
+  color: #FF8A65;
+}
+
+[data-theme='dark'] .valorNinia {
+  background: color-mix(in srgb, #1E88E5 15%, var(--bg-card));
+  color: #64B5F6;
+}
+
+[data-theme='dark'] .warningBox {
+  background: color-mix(in srgb, #FF6B35 12%, var(--bg-card));
+  border-color: color-mix(in srgb, #FF6B35 40%, transparent);
+}
+
+[data-theme='dark'] .dato {
+  background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+/* ─────────────────────────────────────────────
+   Reduced motion
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .content {
+    animation: none;
+  }
+
+  .tab {
+    transition: none;
+  }
+}

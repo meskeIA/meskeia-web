@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 617,
+  "total_tools": 620,
   "updated": "2026-04-24",
   "features": {
     "all_free": true,
@@ -2167,6 +2167,24 @@
           "slug": "visualizador-indice-glucemico",
           "url": "https://meskeia.com/visualizador-indice-glucemico/",
           "description": "La paradoja de la sandía (IG=76, CG=4): diferencia entre índice glucémico, carga glucémica e índice insulínico. Tabla de 26 alimentos, fibra como modulador y curva de glucosa post-comida"
+        },
+        {
+          "name": "El Niño y La Niña: ENSO Explicado",
+          "slug": "visualizador-el-nino",
+          "url": "https://meskeia.com/visualizador-el-nino/",
+          "description": "Circulación Walker en el Pacífico tropical, desplazamiento del agua cálida en El Niño/La Niña, teleconexiones globales (sequías en Australia, lluvias en Perú), índices SOI y ONI, y timeline de eventos históricos desde 1972"
+        },
+        {
+          "name": "Ciclo del Carbono Completo: Reservorios y Flujos",
+          "slug": "visualizador-ciclo-carbono-completo",
+          "url": "https://meskeia.com/visualizador-ciclo-carbono-completo/",
+          "description": "Los 5 grandes reservorios (atmósfera 870 Gt, océanos 38.000 Gt, biota, suelos/permafrost, litosfera) y flujos naturales y antropogénicos en Gt C/año. Slider de reducción de emisiones proyecta CO₂ a 2100"
+        },
+        {
+          "name": "Terremotos y Tsunamis: De la Falla al Impacto",
+          "slug": "visualizador-terremotos-tsunamis",
+          "url": "https://meskeia.com/visualizador-terremotos-tsunamis/",
+          "description": "Tres tipos de fallas geológicas, ondas sísmicas P/S/superficiales, slider de magnitud Mw 4-9 con energía en julios, propagación de tsunamis a 800 km/h y shoaling costero, sistema DART de alerta temprana"
         },
         {
           "name": "Vuelo de Avión: El Gran Mito de Bernoulli",

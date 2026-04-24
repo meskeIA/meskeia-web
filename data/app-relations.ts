@@ -1703,6 +1703,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias intestinales modulan la respuesta glucémica' },
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
   ],
+  'visualizador-el-nino': [
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌍', name: 'Cambio Climático', description: 'El calentamiento global está intensificando los episodios de El Niño' },
+    { url: '/visualizador-oceanos-corrientes/', icon: '🌊', name: 'Océanos y Corrientes', description: 'Las corrientes oceánicas que El Niño altera a escala global' },
+    { url: '/visualizador-efecto-invernadero/', icon: '♨️', name: 'Efecto Invernadero', description: 'El mecanismo que amplifica los extremos climáticos del ENSO' },
+    { url: '/visualizador-terremotos-tsunamis/', icon: '🌋', name: 'Terremotos y Tsunamis', description: 'Otros fenómenos naturales de gran escala con impacto global' },
+  ],
+  'visualizador-ciclo-carbono-completo': [
+    { url: '/visualizador-carbono/', icon: '⚛️', name: 'El Carbono', description: 'Alótropos, química orgánica y datación C-14 del elemento carbono' },
+    { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌍', name: 'Cambio Climático', description: 'Los puntos de no retorno que el exceso de CO₂ puede desencadenar' },
+    { url: '/visualizador-oceanos-corrientes/', icon: '🌊', name: 'Océanos y Corrientes', description: 'Los océanos como mayor sumidero de carbono del planeta' },
+    { url: '/visualizador-efecto-invernadero/', icon: '♨️', name: 'Efecto Invernadero', description: 'Cómo el CO₂ extra retiene el calor en la atmósfera' },
+  ],
+  'visualizador-terremotos-tsunamis': [
+    { url: '/visualizador-el-nino/', icon: '🌊', name: 'El Niño y La Niña', description: 'Otro fenómeno natural de gran escala con impacto global' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Los tsunamis pueden afectar a centrales nucleares costeras (Fukushima)' },
+    { url: '/visualizador-oceanos-corrientes/', icon: '🌊', name: 'Océanos y Corrientes', description: 'Los tsunamis interactúan con las corrientes y la batimetría oceánica' },
+    { url: '/visualizador-ciclo-carbono-completo/', icon: '🌍', name: 'Ciclo del Carbono', description: 'Los volcanes submarinos también emiten CO₂ al ciclo global' },
+  ],
   'visualizador-vuelo-avion': [
     { url: '/visualizador-motor-combustion/', icon: '🔥', name: 'Motor de Combustión', description: 'El motor que propulsa los aviones convencionales' },
     { url: '/visualizador-motor-electrico/', icon: '⚡', name: 'Motor Eléctrico', description: 'El motor de los aviones eléctricos del futuro' },

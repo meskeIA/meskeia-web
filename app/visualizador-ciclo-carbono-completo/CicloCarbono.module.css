@@ -1,0 +1,998 @@
+/* CicloCarbono.module.css — meskeIA */
+
+/* ─────────────────────────────────────────────
+   Contenedor principal
+───────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero Section
+───────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroIcon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: #fff;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.heroStatNum {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.heroStatLabel {
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+/* ─────────────────────────────────────────────
+   Tabs
+───────────────────────────────────────────── */
+.tabsWrapper {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+.tabs {
+  display: flex;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  gap: 0.25rem;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+  color: var(--text-secondary);
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+.tabActive {
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.tabIcon {
+  font-size: 1.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.tabTitulo {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.tabSub {
+  font-size: 0.72rem;
+  opacity: 0.75;
+  margin-top: 0.1rem;
+}
+
+/* ─────────────────────────────────────────────
+   Content Panel
+───────────────────────────────────────────── */
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.sectionHeader {
+  margin-bottom: 2rem;
+}
+
+.sectionHeader h2 {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionHeader p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.subsectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 2.5rem 0 1rem;
+}
+
+/* ─────────────────────────────────────────────
+   Reservorios
+───────────────────────────────────────────── */
+.logScaleNote {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.reservoirGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reservoirCard {
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s;
+}
+
+.reservoirCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.reservoirCardActive {
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.15);
+}
+
+.reservoirCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.reservoirIcon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.reservoirInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.reservoirName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.reservoirAmount {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.logBar {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.logBarFill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+
+.reservoirDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.reservoirDetail {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.reservoirDetail p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.datoImpactante {
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 3px solid;
+  border-radius: 0 8px 8px 0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Warning Box (v2.0 indicator)
+───────────────────────────────────────────── */
+.warningBox {
+  background: rgba(231, 76, 60, 0.08);
+  border: 1px solid rgba(231, 76, 60, 0.25);
+  border-left: 4px solid #E74C3C;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-top: 2rem;
+}
+
+.warningBox strong {
+  color: #C0392B;
+}
+
+/* ─────────────────────────────────────────────
+   Flujos
+───────────────────────────────────────────── */
+.balanceGlobal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+}
+
+.balanceItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.balanceVal {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.balanceLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.balanceSep {
+  font-size: 2rem;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.balanceNote {
+  text-align: center;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 2rem;
+}
+
+.flujosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.flujoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 2px solid transparent;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.flujoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.flujoSalida {
+  border-left: 4px solid #27AE60;
+}
+
+.flujoEntrada {
+  border-left: 4px solid #E74C3C;
+}
+
+.flujoNeutro {
+  border-left: 4px solid #2E86AB;
+}
+
+.flujoCardActive {
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.15);
+}
+
+.flujoHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.flujoIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.flujoInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.flujoNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.flujoValor {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.flujoRuta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+  font-style: italic;
+}
+
+.flujoDesc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.flujoMecanismo {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.oceanoBox {
+  background: rgba(26, 110, 138, 0.06);
+  border: 1px solid rgba(26, 110, 138, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.oceanoBox h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.oceanoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.oceanoItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.oceanoItem p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Perturbación humana
+───────────────────────────────────────────── */
+.emisionesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.emisionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.emisionTotal {
+  background: rgba(46, 134, 171, 0.06);
+  border: 2px solid var(--primary);
+}
+
+.emisionIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.emisionLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.emisionValor {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.emisionSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Destino */
+.destinoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.destinoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.destinoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.destinoIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.destinoInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.destinoNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.destinoValor {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.destinoBarra {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.destinoBarraFill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.destinoConsecuencia {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Slider */
+.sliderSection {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sliderSection h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.sliderDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.sliderWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sliderLabel {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.emisionResult {
+  border: 2px solid;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: border-color 0.3s;
+}
+
+.emisionResultTop {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.emisionResultNum {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emisionResultLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.emisionResultDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Tipping point box */
+.tippingBox {
+  background: rgba(142, 107, 191, 0.06);
+  border: 1px solid rgba(142, 107, 191, 0.3);
+  border-left: 4px solid #8E6BBF;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.tippingBox h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.tippingBox p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.tippingBox p:last-child {
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Soluciones
+───────────────────────────────────────────── */
+.solucionesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.solucionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border-top: 4px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.solucionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.solucionIcon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.solucionNombre {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.15rem;
+}
+
+.solucionPotencial {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.solucionEstado {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.solucionEstadoDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.solucionDesc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.solucionLimit {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+}
+
+.solucionBarra {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.solucionBarraFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.solucionBarraLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: right;
+}
+
+/* Persistencia CO₂ */
+.persistenciaBox {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid var(--secondary);
+}
+
+.persistenciaBox h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.persistenciaBox p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.persistenciaLista {
+  padding-left: 1.4rem;
+  margin: 0.5rem 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.persistenciaLista li {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.persistenciaConclusion {
+  font-weight: 600;
+  color: var(--primary) !important;
+}
+
+/* ─────────────────────────────────────────────
+   Sección educativa
+───────────────────────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.eduItem h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.eduItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  line-height: 1.6;
+}
+
+.eduItem p:last-child {
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────────── */
+[data-theme='dark'] .tabsWrapper {
+  background-color: var(--bg-card);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .reservoirCard,
+[data-theme='dark'] .flujoCard,
+[data-theme='dark'] .emisionCard,
+[data-theme='dark'] .destinoCard,
+[data-theme='dark'] .sliderSection,
+[data-theme='dark'] .solucionCard,
+[data-theme='dark'] .persistenciaBox,
+[data-theme='dark'] .balanceGlobal {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .logBar,
+[data-theme='dark'] .destinoBarra,
+[data-theme='dark'] .solucionBarra {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .logScaleNote {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .oceanoBox {
+  background: rgba(26, 110, 138, 0.1);
+  border-color: rgba(26, 110, 138, 0.3);
+}
+
+[data-theme='dark'] .tippingBox {
+  background: rgba(142, 107, 191, 0.1);
+  border-color: rgba(142, 107, 191, 0.35);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+[data-theme='dark'] .emisionTotal {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .solucionLimit {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .reservoirDetail {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .flujoMecanismo {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .datoImpactante {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* ─────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .heroStats {
+    gap: 1.2rem;
+  }
+
+  .heroStatNum {
+    font-size: 1.1rem;
+  }
+
+  .tabs {
+    padding: 0 0.5rem;
+  }
+
+  .tab {
+    padding: 0.75rem 0.9rem;
+  }
+
+  .tabSub {
+    display: none;
+  }
+
+  .content {
+    padding: 1.5rem 1rem;
+  }
+
+  .flujosGrid,
+  .solucionesGrid,
+  .eduGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .emisionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .balanceGlobal {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .balanceSep {
+    transform: rotate(90deg);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Reduced Motion
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .reservoirCard,
+  .flujoCard,
+  .tab,
+  .emisionResult,
+  .logBarFill,
+  .destinoBarraFill,
+  .solucionBarraFill {
+    transition: none !important;
+  }
+
+  .reservoirCard:hover,
+  .flujoCard:hover {
+    transform: none !important;
+  }
+}
