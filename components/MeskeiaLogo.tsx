@@ -34,7 +34,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   const logoContent = (
     <>
       <div className={styles.logoIcon}>
-        <svg viewBox="0 0 132 132" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg viewBox="0 0 132 132" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
           <defs>
             <linearGradient id="meskeia-bg" x1="0" y1="0" x2="132" y2="132" gradientUnits="userSpaceOnUse">
               <stop offset="0%"   stopColor="#3A9BC1"/>
