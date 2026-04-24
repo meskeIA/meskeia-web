@@ -215,6 +215,11 @@ export default function AyunoIntermitentePage() {
           especialmente si tienes alguna condición de salud. Consulta la pestaña{' '}
           <em>Contraindicaciones</em> para conocer los grupos en los que el ayuno puede ser perjudicial.
         </p>
+        <p>
+          <strong>TÚ ERES RESPONSABLE</strong> de consultar con un profesional antes de actuar sobre esta
+          información. <strong>meskeIA no ejerce actividades sanitarias reguladas y no se responsabiliza
+          de las consecuencias derivadas del uso de esta herramienta.</strong>
+        </p>
       </DisclaimerCard>
 
       {/* Navegación tabs */}

@@ -219,6 +219,11 @@ export default function MetabolismoAlcoholPage() {
           para la Investigación del Cáncer (IARC) clasifica el alcohol como carcinógeno del Grupo 1 (evidencia
           suficiente en humanos). Si tienes dudas sobre tu consumo de alcohol, consulta con un profesional sanitario.
         </p>
+        <p>
+          <strong>TÚ ERES RESPONSABLE</strong> de consultar con un profesional antes de actuar sobre esta
+          información. <strong>meskeIA no ejerce actividades sanitarias reguladas y no se responsabiliza
+          de las consecuencias derivadas del uso de esta herramienta.</strong>
+        </p>
       </DisclaimerCard>
 
       {/* Navegación tabs */}
