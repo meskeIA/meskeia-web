@@ -63,97 +63,28 @@
 .logoIcon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.logoIcon::before {
-  content: '';
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  top: 12.5px;
-  left: 12.5px;
-}
-
-.logoIcon::after {
-  content: '';
-  position: absolute;
-  width: 7.5px;
-  height: 7.5px;
-  background: #2E86AB;
-  border-radius: 50%;
-  top: 16.25px;
-  left: 16.25px;
-}
-
-.neuralNetwork {
-  position: absolute;
+.logoIcon svg {
   width: 100%;
   height: 100%;
-  opacity: 0.3;
-}
-
-.neuralDot {
-  position: absolute;
-  width: 2.5px;
-  height: 2.5px;
-  background: white;
-  border-radius: 50%;
-}
-
-.neuralDot:nth-child(1) {
-  top: 5px;
-  left: 7px;
-}
-
-.neuralDot:nth-child(2) {
-  top: 10px;
-  right: 6px;
-}
-
-.neuralDot:nth-child(3) {
-  bottom: 8px;
-  left: 5px;
-}
-
-.neuralDot:nth-child(4) {
-  bottom: 5px;
-  right: 10px;
+  display: block;
 }
 
 .logoText {
   font-size: 1.4rem;
-  font-weight: 600;
-  color: #2C3E50;
+  letter-spacing: -0.01em;
 }
 
 .meske {
-  color: #2E86AB;
+  font-weight: 200;
+  color: #2C3E50;
 }
 
 .ia {
-  color: #48A9A6;
-  font-weight: 700;
-  position: relative;
-}
-
-.ia::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #48A9A6, #7FB3D3);
-  border-radius: 1px;
+  font-weight: 800;
+  color: #2E86AB;
 }
 
 /* Toggle de tema */
@@ -214,22 +145,8 @@
   }
 
   .logoIcon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .logoIcon::before {
-    width: 9px;
-    height: 9px;
-    top: 7.5px;
-    left: 7.5px;
-  }
-
-  .logoIcon::after {
-    width: 4px;
-    height: 4px;
-    top: 10px;
-    left: 10px;
+    width: 28px;
+    height: 28px;
   }
 
   .logoText {
