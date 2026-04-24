@@ -14,7 +14,7 @@
 
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useId } from 'react';
 import styles from './MeskeiaLogo.module.css';
 
 interface MeskeiaLogoProps {
@@ -26,6 +26,9 @@ interface MeskeiaLogoProps {
 export default function MeskeiaLogo({ disableLink = false, inline = false, showThemeToggle = true }: MeskeiaLogoProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const uid = useId().replace(/:/g, '');
+  const bgId = `meskeia-bg-${uid}`;
+  const coreId = `meskeia-core-${uid}`;
 
   useEffect(() => {
     setMounted(true);
@@ -36,19 +39,19 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
       <div className={styles.logoIcon}>
         <svg viewBox="0 0 132 132" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
           <defs>
-            <linearGradient id="meskeia-bg" x1="0" y1="0" x2="132" y2="132" gradientUnits="userSpaceOnUse">
+            <linearGradient id={bgId} x1="0" y1="0" x2="132" y2="132" gradientUnits="userSpaceOnUse">
               <stop offset="0%"   stopColor="#3A9BC1"/>
               <stop offset="45%"  stopColor="#2E86AB"/>
               <stop offset="100%" stopColor="#1F6A8B"/>
             </linearGradient>
-            <radialGradient id="meskeia-core" cx="50%" cy="45%" r="55%">
+            <radialGradient id={coreId} cx="50%" cy="45%" r="55%">
               <stop offset="0%"   stopColor="#FFFFFF"/>
               <stop offset="60%"  stopColor="#9BDCD8"/>
               <stop offset="100%" stopColor="#48A9A6"/>
             </radialGradient>
           </defs>
-          <rect width="132" height="132" rx="29" fill="url(#meskeia-bg)"/>
-          <circle cx="66" cy="66" r="18" fill="url(#meskeia-core)"/>
+          <rect width="132" height="132" rx="29" fill={`url(#${bgId})`}/>
+          <circle cx="66" cy="66" r="18" fill={`url(#${coreId})`}/>
           <circle cx="66" cy="66" r="7"  fill="#1F6A8B"/>
           <g fill="#FFFFFF">
             <circle cx="26"  cy="26"  r="4.5"/>
