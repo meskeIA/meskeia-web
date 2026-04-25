@@ -1,0 +1,456 @@
+/* ============================================================
+   visualizador-migracion-global — MigracionGlobal.module.css
+   Paleta meskeIA: #2E86AB / #48A9A6
+   ============================================================ */
+
+/* --- Layout base --- */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* --- Hero --- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* --- Sección mapa --- */
+.mapaSection {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 16px 16px;
+}
+
+.mapaInstrucciones {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+
+.mapaWrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e5e5e5);
+  background-color: var(--bg-card);
+}
+
+.mapaSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Textos SVG adaptativos al tema */
+.mapaSvg text {
+  fill: var(--text-primary);
+}
+
+/* Flujos (paths) */
+.flujoPath {
+  transition: stroke-opacity 0.2s ease, stroke-width 0.2s ease;
+}
+
+.flujoPath:hover {
+  stroke-opacity: 1 !important;
+}
+
+/* Nodos de regiones */
+.regionNodo circle {
+  transition: opacity 0.2s ease, r 0.15s ease;
+}
+
+.regionNodo:hover circle {
+  opacity: 1 !important;
+}
+
+/* --- Leyenda --- */
+.leyenda {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 14px;
+  padding: 0 8px;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.leyendaLinea {
+  display: inline-block;
+  width: 32px;
+  height: 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* --- Panel de detalle (región o flujo) --- */
+.panelDetalle {
+  position: relative;
+  max-width: 860px;
+  margin: 16px auto;
+  padding: 20px 48px 20px 20px;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  border-left: 4px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.panelDetalle h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.panelDetalle p {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.panelDetalle p:last-child {
+  margin-bottom: 0;
+}
+
+.cifraDestacada {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--primary) !important;
+  margin-bottom: 6px !important;
+}
+
+.tipoBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.btnCerrar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: background-color 0.15s;
+}
+
+.btnCerrar:hover {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.btnCerrar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* --- Insight box --- */
+.insightBox {
+  max-width: 860px;
+  margin: 16px auto 0;
+  padding: 16px 20px;
+  border-left: 4px solid var(--primary);
+  background-color: var(--bg-card);
+  border-radius: 0 8px 8px 0;
+}
+
+.insightBox p {
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.insightBox p:last-child {
+  margin-bottom: 0;
+}
+
+.insightBox strong {
+  color: var(--primary);
+}
+
+.insightFuente {
+  font-size: 0.82rem !important;
+  color: var(--text-muted) !important;
+}
+
+/* --- Secciones generales --- */
+.comparativaSection,
+.factoresSection {
+  max-width: 860px;
+  margin: 32px auto 0;
+  padding: 0 16px;
+}
+
+.comparativaSection h2,
+.factoresSection h2 {
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.sectionSubtitulo {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 20px;
+}
+
+/* --- Grid comparativa --- */
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.comparativaColumna {
+  padding: 20px;
+  border-radius: 12px;
+  border-top: 4px solid transparent;
+}
+
+.columnaRefugiados {
+  border-top-color: #E74C3C;
+  background-color: #fef5f4;
+}
+
+.columnaEconomica {
+  border-top-color: var(--primary);
+  background-color: #eef7fb;
+}
+
+.comparativaTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.comparativaLista {
+  margin: 0;
+  padding: 0;
+}
+
+.comparativaLista dt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.comparativaLista dt:first-child {
+  margin-top: 0;
+}
+
+.comparativaLista dd {
+  margin: 2px 0 0;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.comparativaCifra {
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Factores push/pull --- */
+.factoresGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.factoresGrupo {
+  /* sin estilos de fondo propios */
+}
+
+.factoresGrupoTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tarjetasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tarjeta {
+  padding: 14px;
+  border-radius: 10px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+}
+
+.tarjetaPush {
+  border-top: 3px solid #E74C3C;
+}
+
+.tarjetaPull {
+  border-top: 3px solid var(--primary);
+}
+
+.tarjetaIcono {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.tarjetaTitulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.tarjetaTexto {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Warning box (dentro de EducationalSection) --- */
+.warningBox {
+  background-color: #fff8e1;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-top: 16px;
+  font-size: 0.88rem;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+/* --- Dark mode --- */
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .mapaWrapper {
+  border-color: #444;
+}
+
+[data-theme='dark'] .panelDetalle {
+  background-color: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .insightBox {
+  background-color: var(--bg-card);
+}
+
+[data-theme='dark'] .columnaRefugiados {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+[data-theme='dark'] .columnaEconomica {
+  background-color: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .tarjeta {
+  background-color: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .warningBox {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #fde68a;
+  border-left-color: #f59e0b;
+}
+
+[data-theme='dark'] .btnCerrar:hover {
+  background-color: #333;
+}
+
+/* --- Accesibilidad: movimiento reducido --- */
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Responsive --- */
+@media (max-width: 700px) {
+  .comparativaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .factoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tarjetasGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .leyenda {
+    gap: 12px;
+  }
+
+  .panelDetalle {
+    margin: 12px 12px;
+  }
+
+  .insightBox {
+    margin: 12px 12px 0;
+  }
+}
+
+@media (max-width: 440px) {
+  .tarjetasGrid {
+    grid-template-columns: 1fr;
+  }
+}

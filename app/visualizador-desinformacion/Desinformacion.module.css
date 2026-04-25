@@ -1,0 +1,542 @@
+/* ── Contenedor ────────────────────────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Secciones ──────────────────────────────────────────────────────────────── */
+
+.section {
+  padding: 3rem 1.5rem;
+  background: var(--bg-primary);
+}
+
+.sectionAlt {
+  padding: 3rem 1.5rem;
+  background: var(--bg-card);
+}
+
+.sectionInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sectionIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Etapas ─────────────────────────────────────────────────────────────────── */
+
+.etapasGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.etapaTarjeta {
+  border: none;
+  border-top: 4px solid transparent;
+  border-radius: 8px;
+  background: var(--bg-card);
+  padding: 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.etapaTarjeta:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.etapaActiva {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.etapaIcono {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.etapaTitulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.etapaResumen {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Panel de detalle de etapa ──────────────────────────────────────────────── */
+
+.panelDetalle {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 16px;
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.panelDetalleHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 1.4rem;
+}
+
+.panelDetalleTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.panelDetalleParrafo {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 0.8rem;
+}
+
+.panelDetalleParrafo:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Insight box MIT ────────────────────────────────────────────────────────── */
+
+.insightBox {
+  border-left: 4px solid var(--accent);
+  padding: 20px 24px;
+  border-radius: 0 8px 8px 0;
+  background: var(--bg-primary);
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.insightLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.insightTexto {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+.insightFuente {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Sesgos ─────────────────────────────────────────────────────────────────── */
+
+.sesgosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.sesgoBloq {
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: var(--bg-card);
+  transition: all 0.2s ease;
+  text-align: left;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.sesgoBloq:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sesgoBloq[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.sesgoBloq:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sesgoHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sesgoIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sesgoNombre {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.sesgoResumen {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sesgoDetalle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  animation: fadeIn 0.25s ease;
+}
+
+/* ── Pasos de verificación ──────────────────────────────────────────────────── */
+
+.pasosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pasoCard {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 20px 16px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.pasoBadge {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pasoTitulo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.pasoDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Recursos ───────────────────────────────────────────────────────────────── */
+
+.recursosBox {
+  text-align: center;
+}
+
+.recursosLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+}
+
+.recursosLista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.recursoChip {
+  display: inline-block;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(46, 134, 171, 0.25);
+}
+
+/* ── DSA ────────────────────────────────────────────────────────────────────── */
+
+.dsaBox {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 4px solid var(--secondary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.dsaHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.dsaIcono {
+  font-size: 1.5rem;
+}
+
+.dsaTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dsaLista {
+  margin: 0 0 12px;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dsaLista li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.dsaFuente {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Warning box ────────────────────────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 4px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 1.5rem;
+}
+
+/* ── Animaciones ────────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelDetalle,
+  .sesgoDetalle {
+    animation: none;
+  }
+
+  .etapaTarjeta,
+  .sesgoBloq {
+    transition: none;
+  }
+}
+
+/* ── Dark mode ──────────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .etapaTarjeta {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .etapaTarjeta:hover,
+[data-theme='dark'] .etapaActiva {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .panelDetalle {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .insightBox {
+  background: #1e2d35;
+}
+
+[data-theme='dark'] .sesgoBloq {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .sesgoBloq[aria-pressed='true'] {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .sesgoDetalle {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .pasoCard {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .recursoChip {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .dsaBox {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: var(--bg-card);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .etapasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .etapasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sesgosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 2rem 1rem 2rem;
+  }
+
+  .section,
+  .sectionAlt {
+    padding: 2rem 1rem;
+  }
+}

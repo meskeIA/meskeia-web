@@ -3149,6 +3149,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-combustible/', icon: '⛽', name: 'Calculadora de Combustible', description: 'Coste real de tus desplazamientos' },
     { url: '/selector-seguro-coche/', icon: '🛡️', name: 'Selector Seguro de Coche', description: '¿Terceros o todo riesgo?' },
   ],
+
+  // EJE C — Sociedad
+  'visualizador-piramide-poblacion': [
+    { url: '/visualizador-jubilacion-perspectiva/', icon: '🏖️', name: 'Perspectiva de Jubilación', description: 'El envejecimiento de la pirámide impacta directamente en el sistema de pensiones' },
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales de población y demografía' },
+    { url: '/visualizador-migracion-global/', icon: '✈️', name: 'Migración Global', description: 'La inmigración es el principal factor que modera el envejecimiento en España' },
+    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Envejecimiento del Cuerpo', description: 'Los cambios fisiológicos que afectan a una población cada vez más mayor' },
+  ],
+  'visualizador-desinformacion': [
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Los sesgos que hacen que los bulos encuentren terreno fértil en nuestra mente' },
+    { url: '/visualizador-falacias-logicas/', icon: '🗣️', name: 'Falacias Lógicas', description: 'Los errores de razonamiento que los bulos explotan para parecer convincentes' },
+    { url: '/visualizador-estadistica-cotidiana/', icon: '📊', name: 'Estadística Cotidiana', description: 'Cómo la estadística mal interpretada se convierte en desinformación' },
+    { url: '/visualizador-toma-decisiones/', icon: '🤔', name: 'Toma de Decisiones', description: 'El Sistema 1 automático es el principal vector de propagación de bulos' },
+  ],
+  'visualizador-migracion-global': [
+    { url: '/visualizador-piramide-poblacion/', icon: '👥', name: 'Pirámide de Población', description: 'La migración como factor moderador del envejecimiento demográfico de España' },
+    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales de desigualdad y diversidad humana' },
+    { url: '/visualizador-desigualdad-riqueza/', icon: '📊', name: 'Desigualdad de Riqueza', description: 'La desigualdad económica es un factor push fundamental en la migración global' },
+    { url: '/visualizador-comercio-internacional/', icon: '🚢', name: 'Comercio Internacional', description: 'Globalización económica y sus vínculos con los flujos migratorios' },
+  ],
 };
 
 /**

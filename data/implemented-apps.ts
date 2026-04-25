@@ -692,6 +692,9 @@ export const implementedAppsUrls = [
   "/visualizador-toma-decisiones/",      // Sistema 1/2 Kahneman, fatiga decisional, 4 heurísticos, nudges y arquitectura elección
   "/visualizador-algoritmos-ordenacion/", // Burbuja/Inserción/Quicksort/Mergesort animados, Big O, guía de cuándo usar
   "/visualizador-base-datos-relacional/", // Tablas FK/PK, 4 tipos JOIN, índices B-Tree, ACID, SQL vs NoSQL
+  "/visualizador-piramide-poblacion/",    // Pirámide España 1950→2100 animada, tasa dependencia, edad mediana, INE/EUROSTAT
+  "/visualizador-desinformacion/",        // Ciclo bulo 4 etapas, 6 sesgos cognitivos, 5 pasos verificación, DSA 2023
+  "/visualizador-migracion-global/",      // Mapa SVG 6 regiones, 7 flujos UNHCR 2024, refugiados vs migrantes, push/pull
 ];
 
 /**

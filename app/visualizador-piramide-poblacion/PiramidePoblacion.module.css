@@ -1,0 +1,307 @@
+/* ============================================
+   Pirámide de Población — CSS Module
+   meskeIA — paleta oficial
+   ============================================ */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* ── Hero ───────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 48px 24px;
+  border-radius: 16px;
+  margin: 24px 0;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 12px;
+  color: white;
+}
+
+.subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  margin: 0;
+  opacity: 0.9;
+  color: white;
+}
+
+/* ── Selector de año ────────────────────────── */
+
+.selectorSection {
+  text-align: center;
+  margin: 32px 0 24px;
+}
+
+.selectorBotones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.btnAno {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--primary);
+}
+
+.btnAno:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnAno:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnAnoActivo {
+  background: var(--primary);
+  color: white;
+}
+
+.etiquetaAno {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Pirámide ───────────────────────────────── */
+
+.piramideSection {
+  margin: 0 0 32px;
+}
+
+.leyenda {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.leyendaHombres {
+  color: var(--primary);
+}
+
+.leyendaMujeres {
+  color: var(--secondary);
+}
+
+.piramide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.piramideFila {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ladoHombres {
+  display: flex;
+  justify-content: flex-end;
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.barraHombres {
+  height: 18px;
+  background: var(--primary);
+  border-radius: 3px 0 0 3px;
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+
+.ladoMujeres {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.barraMujeres {
+  height: 18px;
+  background: var(--secondary);
+  border-radius: 0 3px 3px 0;
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+
+.etiquetaEdad {
+  width: 50px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ejeX {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+  padding: 0 4px;
+}
+
+/* ── Indicadores ────────────────────────────── */
+
+.indicadoresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 0 0 32px;
+}
+
+.indicadorCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.indicadorValor {
+  font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+}
+
+.indicadorLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+/* ── Insight box ────────────────────────────── */
+
+.insightBox {
+  border-left: 4px solid var(--primary);
+  padding: 16px 20px;
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+/* ── Warning box (dentro de EducationalSection) ── */
+
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+/* ── Dark Mode ──────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .indicadorCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .btnAno {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .btnAnoActivo {
+  background: var(--primary);
+  color: white;
+}
+
+/* ── Responsive ─────────────────────────────── */
+
+@media (max-width: 600px) {
+  .ladoHombres {
+    width: 120px;
+  }
+
+  .ladoMujeres {
+    width: 120px;
+  }
+
+  .barraHombres,
+  .barraMujeres {
+    /* Las barras se recalculan con anchoMax en JS — aquí solo limitamos el max */
+    max-width: 120px;
+  }
+
+  .indicadoresGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .indicadorCard {
+    padding: 16px 12px;
+  }
+
+  .ejeX {
+    font-size: 0.7rem;
+  }
+
+  .btnAno {
+    padding: 6px 12px;
+    font-size: 0.88rem;
+  }
+}
+
+/* ── Reduced motion ─────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .barraHombres,
+  .barraMujeres {
+    transition: none;
+  }
+
+  .btnAno {
+    transition: none;
+  }
+}
