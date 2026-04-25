@@ -1,0 +1,477 @@
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 56px 24px 48px;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  opacity: 0.92;
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+/* ── Secciones ───────────────────────────────────────────────────────────── */
+.seccion {
+  margin: 40px 0;
+}
+
+.tituloSeccion {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 6px;
+}
+
+.descripcionSeccion {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 20px;
+  line-height: 1.55;
+}
+
+/* ── Oferta/Demanda: botones ─────────────────────────────────────────────── */
+.botonesOfertaDemanda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.btnModo {
+  padding: 8px 18px;
+  border-radius: 22px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnModo:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.btnModo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnModoActivo {
+  background: var(--primary);
+  color: white;
+}
+
+/* ── Gráfica wrapper ─────────────────────────────────────────────────────── */
+.graficaWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 20px 12px 12px;
+  overflow-x: auto;
+}
+
+[data-theme='dark'] .graficaWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Etiqueta modo activo ────────────────────────────────────────────────── */
+.etiquetaModo {
+  margin: 14px 0 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid var(--primary);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  min-height: 2.6rem;
+}
+
+[data-theme='dark'] .etiquetaModo {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+/* ── Leyenda ─────────────────────────────────────────────────────────────── */
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.leyendaColorD,
+.leyendaColorO,
+.leyendaColorE {
+  display: inline-block;
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.leyendaColorD { background: #2E86AB; }
+.leyendaColorO { background: #48A9A6; }
+.leyendaColorE { background: #F4A261; border-radius: 50%; width: 10px; height: 10px; }
+
+/* ── Nota al pie de gráfica ──────────────────────────────────────────────── */
+.notaGrafica {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+
+/* ── Hitos de burbuja ────────────────────────────────────────────────────── */
+.hitosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.hitoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+[data-theme='dark'] .hitoCard {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #2A2A2A;
+}
+
+.hitoIcono {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.hitoAnio {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.hitoTexto {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* ── Ciudades: ratio precio/renta ────────────────────────────────────────── */
+.ciudadesLista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ciudadFila {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+[data-theme='dark'] .ciudadFila {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #2A2A2A;
+}
+
+.ciudadEncabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.ciudadNombre {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--text-primary);
+}
+
+.ciudadAnios {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.barraContenedor {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+[data-theme='dark'] .barraContenedor {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.barraRelleno {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.ciudadDetalle {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ── Accesibilidad generacional ──────────────────────────────────────────── */
+.generacionesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.generacionCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .generacionCard {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #2A2A2A;
+}
+
+.generacionHeader {
+  padding: 16px;
+  text-align: center;
+}
+
+.generacionIcono {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.generacionTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+  color: var(--text-primary);
+}
+
+.generacionEra {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.generacionLista {
+  list-style: none;
+  padding: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .generacionLista {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+.generacionLista li {
+  line-height: 1.45;
+}
+
+.esfuerzoMeter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .esfuerzoMeter {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+.esfuerzoLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.esfuerzoBarra {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .esfuerzoBarra {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.esfuerzoRelleno {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.esfuerzoPct {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ── Alquiler vs Compra ──────────────────────────────────────────────────── */
+.vsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.vsCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .vsCard {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #2A2A2A;
+}
+
+.vsHeader {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.3rem;
+}
+
+.vsHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.vsLista {
+  list-style: none;
+  padding: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .vsLista {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+.vsLista li {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 14px;
+  position: relative;
+}
+
+.vsLista li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ── Warning Box (v2.0) ──────────────────────────────────────────────────── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 16px;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ── Dark mode: overrides locales ────────────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Animaciones reducidas ───────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hero {
+    padding: 40px 16px 36px;
+  }
+
+  .ciudadDetalle {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .leyenda {
+    gap: 10px;
+  }
+
+  .esfuerzoMeter {
+    flex-wrap: wrap;
+  }
+}

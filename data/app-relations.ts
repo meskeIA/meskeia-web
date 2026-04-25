@@ -3190,6 +3190,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El equilibrio de Nash se encuentra buscando puntos críticos (derivada = 0)' },
   ],
 
+  // EJE F — Economía aplicada (2026-04-25)
+  'visualizador-sistema-pensiones': [
+    { url: '/visualizador-jubilacion-perspectiva/', icon: '⏳', name: 'Jubilación en Perspectiva', description: 'Tu timeline personal de cotización: cuántos años llevas y qué pensión generarás' },
+    { url: '/simulador-jubilacion-publica/', icon: '🔢', name: 'Simulador Jubilación', description: 'Calcula tu pensión pública estimada con tus datos de cotización reales' },
+    { url: '/visualizador-piramide-poblacion/', icon: '👥', name: 'Pirámide de Población', description: 'La presión demográfica que explica el reto de sostenibilidad del sistema' },
+    { url: '/visualizador-desempleo-tipos/', icon: '📉', name: 'Tipos de Desempleo', description: 'El empleo y la cotización son la base financiera del sistema de reparto' },
+  ],
+  'visualizador-mercado-inmobiliario': [
+    { url: '/amortizacion-hipoteca/', icon: '🏦', name: 'Amortización de Hipoteca', description: 'Calcula las cuotas y el coste total de tu hipoteca con datos reales' },
+    { url: '/visualizador-tipos-interes-bce/', icon: '📊', name: 'Tipos de Interés BCE', description: 'Los tipos del BCE determinan el Euribor y el coste de las hipotecas variables' },
+    { url: '/visualizador-inflacion/', icon: '💸', name: 'Inflación', description: 'La inflación erosiona el ahorro pero puede beneficiar a los propietarios de activos reales' },
+    { url: '/visualizador-sistema-pensiones/', icon: '👴', name: 'Sistema de Pensiones', description: 'La vivienda como activo alternativo para complementar la pensión pública' },
+  ],
+  'visualizador-desempleo-tipos': [
+    { url: '/visualizador-sistema-pensiones/', icon: '👴', name: 'Sistema de Pensiones', description: 'El empleo y la cotización son el combustible del sistema de reparto de pensiones' },
+    { url: '/visualizador-ciclo-economico/', icon: '🔄', name: 'Ciclo Económico', description: 'El desempleo cíclico sigue el ciclo económico: sube en recesión, baja en expansión' },
+    { url: '/visualizador-inflacion/', icon: '💸', name: 'Inflación', description: 'La curva de Phillips relaciona inflación y desempleo: menos paro = más inflación' },
+    { url: '/visualizador-teoria-juegos/', icon: '🎲', name: 'Teoría de Juegos', description: 'La negociación laboral entre sindicatos y empresas es un juego de coordinación' },
+  ],
+
   // EJE B — Fisiología (2026-04-25)
   'visualizador-ciclo-menstrual': [
     { url: '/visualizador-estrogenos/', icon: '🟣', name: 'Estrógenos', description: 'Biología completa del estrógeno: hueso, cardiovascular, tejidos y menopausia' },

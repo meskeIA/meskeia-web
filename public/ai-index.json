@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 637,
+  "total_tools": 640,
   "updated": "2026-04-25",
   "features": {
     "all_free": true,
@@ -1987,6 +1987,24 @@
           "slug": "visualizador-teoria-juegos",
           "url": "https://meskeia.com/visualizador-teoria-juegos/",
           "description": "Dilema del Prisionero interactivo con 3 estrategias del ordenador. Equilibrio de Nash, tabla de pagos, juegos suma cero vs cooperativos, Tragedia de los Comunes con slider y 4 aplicaciones reales (Guerra Fría, clima, evolución, subastas)"
+        },
+        {
+          "name": "Sistema de Pensiones: Reparto, Demografía y Reformas",
+          "slug": "visualizador-sistema-pensiones",
+          "url": "https://meskeia.com/visualizador-sistema-pensiones/",
+          "description": "Reparto vs capitalización con SVG, slider de ratio trabajadores/pensionistas 1975-2050, KPIs gasto 2024, timeline de 6 reformas y proyecciones AIREF hasta 2050. Fondo de Reserva histórico."
+        },
+        {
+          "name": "Mercado Inmobiliario: Burbuja, Precios y Accesibilidad",
+          "slug": "visualizador-mercado-inmobiliario",
+          "url": "https://meskeia.com/visualizador-mercado-inmobiliario/",
+          "description": "Curvas oferta/demanda SVG interactivas, índice de precios burbuja 2008 (2000-2024), ratio precio/renta en 6 ciudades, brecha generacional Gen X vs Millennials y análisis alquiler vs compra con regla del 5%."
+        },
+        {
+          "name": "Tipos de Desempleo: Friccional, Estructural y Cíclico",
+          "slug": "visualizador-desempleo-tipos",
+          "url": "https://meskeia.com/visualizador-desempleo-tipos/",
+          "description": "4 tipos de desempleo con ejemplos, NAIRU y comparativa internacional, curva de Beveridge SVG, evolución histórica España vs UE 2000-2024 (máximo 26% en 2013), políticas activas vs pasivas."
         },
         {
           "name": "Ciclo Menstrual: Fases y Hormonas",

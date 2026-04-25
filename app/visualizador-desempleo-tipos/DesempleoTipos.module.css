@@ -1,0 +1,723 @@
+/* ── Contenedor principal ─────────────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 56px 24px 48px;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 12px;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Secciones ─────────────────────────────────────────────────────────────── */
+
+.section {
+  padding: 48px 24px;
+}
+
+.sectionAlt {
+  padding: 48px 24px;
+  background: rgba(46, 134, 171, 0.04);
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.sectionInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.sectionIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.sectionTitle {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.sectionSubtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Tipos de desempleo: grid de cards ─────────────────────────────────────── */
+
+.tiposGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .tiposGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.tipoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .tipoCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Variantes de color por tipo */
+.tipoCard_friccional {
+  border-left: 4px solid #48A9A6;
+}
+.tipoCard_friccional:hover,
+.tipoCard_friccional.tipoCardActivo {
+  border-color: #48A9A6;
+  background: rgba(72, 169, 166, 0.06);
+}
+
+.tipoCard_estructural {
+  border-left: 4px solid #E67E22;
+}
+.tipoCard_estructural:hover,
+.tipoCard_estructural.tipoCardActivo {
+  border-color: #E67E22;
+  background: rgba(230, 126, 34, 0.06);
+}
+
+.tipoCard_ciclico {
+  border-left: 4px solid #E74C3C;
+}
+.tipoCard_ciclico:hover,
+.tipoCard_ciclico.tipoCardActivo {
+  border-color: #E74C3C;
+  background: rgba(231, 76, 60, 0.06);
+}
+
+.tipoCard_estacional {
+  border-left: 4px solid #9B59B6;
+}
+.tipoCard_estacional:hover,
+.tipoCard_estacional.tipoCardActivo {
+  border-color: #9B59B6;
+  background: rgba(155, 89, 182, 0.06);
+}
+
+[data-theme='dark'] .tipoCard_friccional:hover,
+[data-theme='dark'] .tipoCard_friccional.tipoCardActivo {
+  background: rgba(72, 169, 166, 0.12);
+}
+[data-theme='dark'] .tipoCard_estructural:hover,
+[data-theme='dark'] .tipoCard_estructural.tipoCardActivo {
+  background: rgba(230, 126, 34, 0.12);
+}
+[data-theme='dark'] .tipoCard_ciclico:hover,
+[data-theme='dark'] .tipoCard_ciclico.tipoCardActivo {
+  background: rgba(231, 76, 60, 0.12);
+}
+[data-theme='dark'] .tipoCard_estacional:hover,
+[data-theme='dark'] .tipoCard_estacional.tipoCardActivo {
+  background: rgba(155, 89, 182, 0.12);
+}
+
+.tipoCardActivo {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tipoIcono {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.tipoNombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tipoTagline {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.tipoPct {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+[data-theme='dark'] .tipoPct {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Detalle del tipo seleccionado ─────────────────────────────────────────── */
+
+.tipoDetalle {
+  border-radius: 12px;
+  padding: 24px;
+  border: 1.5px solid transparent;
+  margin-top: 8px;
+  background: var(--bg-card);
+}
+
+.tipoDetalle_friccional {
+  border-color: #48A9A6;
+  background: rgba(72, 169, 166, 0.05);
+}
+.tipoDetalle_estructural {
+  border-color: #E67E22;
+  background: rgba(230, 126, 34, 0.05);
+}
+.tipoDetalle_ciclico {
+  border-color: #E74C3C;
+  background: rgba(231, 76, 60, 0.05);
+}
+.tipoDetalle_estacional {
+  border-color: #9B59B6;
+  background: rgba(155, 89, 182, 0.05);
+}
+
+[data-theme='dark'] .tipoDetalle_friccional { background: rgba(72, 169, 166, 0.1); }
+[data-theme='dark'] .tipoDetalle_estructural { background: rgba(230, 126, 34, 0.1); }
+[data-theme='dark'] .tipoDetalle_ciclico { background: rgba(231, 76, 60, 0.1); }
+[data-theme='dark'] .tipoDetalle_estacional { background: rgba(155, 89, 182, 0.1); }
+
+.tipoDetalleHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 1.5rem;
+}
+
+.tipoDetalleTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipoDetalleDesc {
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.tipoDetalleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+  .tipoDetalleGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipoDetalleDato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+[data-theme='dark'] .tipoDetalleDato {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tipoDetalleDatoLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tipoDetalleDatoVal {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tipoDetalleBloque {
+  margin-bottom: 12px;
+}
+
+.tipoDetalleBloqueLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── NAIRU ─────────────────────────────────────────────────────────────────── */
+
+.nairu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nairuBadge {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--primary);
+  border-radius: 10px;
+  padding: 14px 20px;
+}
+
+[data-theme='dark'] .nairuBadge {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.nairuAcronimo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.nairuDef {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.nairuExplicacion {
+  font-size: 0.97rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.nairuPaisesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 580px) {
+  .nairuPaisesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nairuPais {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .nairuPais {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.nairuPaisFlag {
+  font-size: 1.5rem;
+}
+
+.nairuPaisNombre {
+  font-weight: 700;
+  font-size: 0.97rem;
+  color: var(--text-primary);
+}
+
+.nairuPaisPct {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.nairuPctAlto { color: #E74C3C; }
+.nairuPctMedio { color: #E67E22; }
+.nairuPctBajo { color: #27AE60; }
+
+.nairuPaisComentario {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.nairuConclusión {
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .nairuConclusión {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+.nairuConclusión p {
+  margin: 0;
+}
+
+/* ── Curva de Beveridge ────────────────────────────────────────────────────── */
+
+.beveridgeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.beveridgeSvg {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: block;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 8px;
+}
+
+[data-theme='dark'] .beveridgeSvg {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.beveridgeExplicacion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.beveridgeExplicacion p {
+  margin: 0;
+}
+
+/* ── Gráfico histórico ─────────────────────────────────────────────────────── */
+
+.graficoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.leyenda {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.leyendaDot {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.leyendaDotEspania { background: #E74C3C; }
+.leyendaDotUE { background: #2E86AB; }
+
+.graficoSvg {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 8px;
+}
+
+[data-theme='dark'] .graficoSvg {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.graficoFuente {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.hitosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 580px) {
+  .hitosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hitoCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-theme='dark'] .hitoCard {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hitoAnio {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hitoTexto {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Tabs de políticas ─────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(46, 134, 171, 0.3);
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 10px 24px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: none;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tab:hover {
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+}
+
+.tabActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+.tabActivo:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .tab {
+  background: var(--bg-card);
+}
+
+.tabPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabIntro {
+  font-size: 0.97rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  margin: 0;
+  padding: 14px 18px;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary);
+}
+
+[data-theme='dark'] .tabIntro {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.politicaLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.politicaLista li {
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border-left: 3px solid var(--secondary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .politicaLista li {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.tabConclusión {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 14px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabConclusión {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.tabConclusión p {
+  margin: 0;
+}
+
+/* ── Warning Box (patrón v2.0) ─────────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ── Focus visible ─────────────────────────────────────────────────────────── */
+
+.tipoCard:focus-visible,
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Animaciones con preferencias de movimiento reducido ───────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
