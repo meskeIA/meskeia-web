@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 632,
+  "total_tools": 635,
   "updated": "2026-04-25",
   "features": {
     "all_free": true,
@@ -1987,6 +1987,24 @@
           "slug": "visualizador-teoria-juegos",
           "url": "https://meskeia.com/visualizador-teoria-juegos/",
           "description": "Dilema del Prisionero interactivo con 3 estrategias del ordenador. Equilibrio de Nash, tabla de pagos, juegos suma cero vs cooperativos, Tragedia de los Comunes con slider y 4 aplicaciones reales (Guerra Fría, clima, evolución, subastas)"
+        },
+        {
+          "name": "Relatividad General: Curvatura del Espacio-Tiempo",
+          "slug": "visualizador-relatividad-general",
+          "url": "https://meskeia.com/visualizador-relatividad-general/",
+          "description": "Malla SVG 13×13 deformada por masa gravitatoria. Slider de masa (1-8: Tierra→Agujero negro), 5 conceptos interactivos (geodésicas, lentes gravitacionales, ondas LIGO, corrección GPS), nota diferencial respecto a relatividad especial"
+        },
+        {
+          "name": "Caos y Mariposa: El Atractor de Lorenz",
+          "slug": "visualizador-caos-mariposa",
+          "url": "https://meskeia.com/visualizador-caos-mariposa/",
+          "description": "Atractor de Lorenz animado en Canvas 2D con σ=10, ρ=28, β=8/3 y 7000 pasos. Dos trayectorias azul/naranja divergentes, slider de épsilon para efecto mariposa, aplicaciones en meteorología y cardiología"
+        },
+        {
+          "name": "Superconductividad: Efecto Meissner y Pares de Cooper",
+          "slug": "visualizador-superconductividad",
+          "url": "https://meskeia.com/visualizador-superconductividad/",
+          "description": "Efecto Meissner con levitación CSS animada, pares de Cooper, 8 materiales con temperatura crítica (4,2K→250K). Slider de temperatura para la transición, aplicaciones actuales (MRI, Maglev, ITER) y futuras (computación cuántica)"
         },
         {
           "name": "Falacias Lógicas",

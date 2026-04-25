@@ -1,0 +1,730 @@
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 56px 24px 48px;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* ── Secciones ───────────────────────────────────────────────────────────── */
+.seccion {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.tituloSeccion {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 6px;
+}
+
+.descripcionSeccion {
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+}
+
+/* ── Selector de material ────────────────────────────────────────────────── */
+.materialSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.materialBtn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.materialBtn:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.materialBtnActivo {
+  background: var(--primary);
+  color: white;
+}
+
+/* Info del material */
+.materialInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: 8px;
+}
+
+.tipoBadge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tipoConvencional {
+  background: rgba(41, 128, 185, 0.15);
+  color: #2980B9;
+}
+
+.tipoAltaTc {
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--primary);
+}
+
+.tipoAmbiente {
+  background: rgba(39, 174, 96, 0.15);
+  color: #27AE60;
+}
+
+.tcDestacado {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ── Slider de temperatura ───────────────────────────────────────────────── */
+.sliderWrapper {
+  margin-bottom: 56px;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.tempCelsius {
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.slider {
+  width: 100%;
+  cursor: pointer;
+  accent-color: var(--primary);
+  height: 6px;
+}
+
+.sliderMarcas {
+  position: relative;
+  height: 36px;
+  margin-top: 6px;
+}
+
+.marca {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.marcaLinea {
+  width: 1.5px;
+  height: 8px;
+  background: var(--text-muted);
+}
+
+.marcaEtiqueta {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* ── Diagrama de fase ────────────────────────────────────────────────────── */
+.diagrama {
+  display: flex;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  margin: 12px 0 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.zonaSuper {
+  background: linear-gradient(90deg, #2E86AB, #48A9A6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  overflow: hidden;
+  transition: width 0.4s ease;
+  flex-shrink: 0;
+}
+
+.zonaNormal {
+  flex: 1;
+  background: rgba(150, 150, 150, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  transition: width 0.4s ease;
+  min-width: 80px;
+}
+
+.marcadorTemp {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #E74C3C;
+  border-radius: 2px;
+  transition: left 0.3s ease;
+  z-index: 2;
+}
+
+.marcadorTc {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1px;
+  transition: left 0.4s ease;
+  z-index: 1;
+}
+
+/* Badge de estado */
+.estadoBadge {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.estadoSuper {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+  border: 1.5px solid rgba(46, 134, 171, 0.3);
+}
+
+.estadoNormal {
+  background: rgba(150, 150, 150, 0.1);
+  color: var(--text-secondary);
+  border: 1.5px solid rgba(150, 150, 150, 0.25);
+}
+
+/* ── Demostración Efecto Meissner ────────────────────────────────────────── */
+.meissnerDemo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  min-height: 240px;
+  position: relative;
+  gap: 8px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+/* Imán */
+.iman {
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  user-select: none;
+  transition: transform 0.6s ease;
+  transform: translateY(0);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.imanLevita {
+  transform: translateY(-55px);
+  animation: flotar 2s ease-in-out infinite;
+}
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(-55px); }
+  50%       { transform: translateY(-45px); }
+}
+
+.poloN {
+  background: #E74C3C;
+  color: white;
+  padding: 10px 28px;
+  border-radius: 6px 6px 0 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.poloS {
+  background: #2980B9;
+  color: white;
+  padding: 10px 28px;
+  border-radius: 0 0 6px 6px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Líneas de campo magnético */
+.lineasCampo {
+  width: 200px;
+  height: 60px;
+  position: relative;
+  margin-top: -4px;
+}
+
+.svgCampo {
+  width: 100%;
+  height: 100%;
+}
+
+/* Plataforma del material */
+.material {
+  background: var(--bg-primary);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 12px 28px;
+  text-align: center;
+  transition: background 0.5s, border-color 0.4s;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.materialActivo {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: var(--secondary);
+}
+
+.materialNombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.tempLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.meissnerDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 4px 0 0;
+  max-width: 480px;
+  font-style: italic;
+}
+
+/* ── Sección Pares de Cooper ─────────────────────────────────────────────── */
+.cooperSection {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.cooperIntro {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+}
+
+/* Animación red cristalina */
+.redCristalina {
+  position: relative;
+  height: 80px;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(46, 134, 171, 0.04) 0px,
+    rgba(46, 134, 171, 0.04) 1px,
+    transparent 1px,
+    transparent 16px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    rgba(46, 134, 171, 0.04) 0px,
+    rgba(46, 134, 171, 0.04) 1px,
+    transparent 1px,
+    transparent 16px
+  );
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 16px 0;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.ionesGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+}
+
+.ion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.electron1,
+.electron2 {
+  position: absolute;
+  top: 28%;
+  background: #E74C3C;
+  color: white;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
+}
+
+.electron1 {
+  animation: moverElectron1 3s linear infinite;
+}
+
+.electron2 {
+  animation: moverElectron2 3s linear infinite;
+  animation-delay: -0.3s;
+}
+
+@keyframes moverElectron1 {
+  0%   { left: 5%; }
+  100% { left: 78%; }
+}
+
+@keyframes moverElectron2 {
+  0%   { left: 15%; }
+  100% { left: 88%; }
+}
+
+.enlaceCooper {
+  position: absolute;
+  top: 38px;
+  left: 5%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(231, 76, 60, 0.6), rgba(231, 76, 60, 0.1));
+  animation: moverEnlace 3s linear infinite;
+  width: 50px;
+  border-radius: 1px;
+}
+
+@keyframes moverEnlace {
+  0%   { left: 8%; }
+  100% { left: 78%; }
+}
+
+.cooperLabel {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Tarjetas de hechos */
+.cooperFacts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.factCard {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  border: 1px solid rgba(46, 134, 171, 0.1);
+}
+
+.factCard strong {
+  display: block;
+  color: var(--primary);
+  margin-bottom: 6px;
+  font-size: 0.88rem;
+}
+
+.factCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ── Insight Box ─────────────────────────────────────────────────────────── */
+.insightBox {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 18px 22px;
+  border-left: 4px solid var(--primary);
+  background: var(--bg-card);
+  border-radius: 0 10px 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-inline: auto;
+  padding-inline: 22px;
+}
+
+.insightBox strong {
+  color: var(--primary);
+}
+
+/* ── Sección Aplicaciones ────────────────────────────────────────────────── */
+.subTitulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 24px 0 12px;
+}
+
+.subTituloFuturo {
+  margin-top: 28px;
+}
+
+.aplicacionesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.aplicacionCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  display: flex;
+  gap: 12px;
+  border-top: 3px solid var(--primary);
+  border: 1px solid rgba(46, 134, 171, 0.1);
+  border-top: 3px solid var(--primary);
+}
+
+.aplicacionFutura {
+  border-top-color: var(--secondary);
+  opacity: 0.92;
+}
+
+.aplicacionIcono {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.aplicacionCard strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.aplicacionCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ── Sección educativa ───────────────────────────────────────────────────── */
+.educContent h4 {
+  color: var(--primary);
+  font-size: 1rem;
+  margin: 20px 0 6px;
+}
+
+.educContent h4:first-child {
+  margin-top: 0;
+}
+
+.educContent p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+}
+
+/* ── Warning Box ─────────────────────────────────────────────────────────── */
+.warningBox {
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: rgba(241, 196, 15, 0.08);
+  border-left: 4px solid #F39C12;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningBox strong {
+  color: #E67E22;
+}
+
+/* ── Dark Mode ───────────────────────────────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .materialBtn {
+  border-color: var(--primary);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .materialBtnActivo {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .materialBtn:hover {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .materialInfo {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .zonaNormal {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .meissnerDemo {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .material {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .materialActivo {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .cooperSection {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .factCard {
+  background: var(--bg-primary);
+  border-color: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .insightBox {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .aplicacionCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(241, 196, 15, 0.06);
+}
+
+[data-theme='dark'] .tipoConvencional {
+  background: rgba(41, 128, 185, 0.2);
+  color: #5DADE2;
+}
+
+[data-theme='dark'] .tipoAltaTc {
+  background: rgba(46, 134, 171, 0.2);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .tipoAmbiente {
+  background: rgba(39, 174, 96, 0.2);
+  color: #58D68D;
+}
+
+/* ── Animaciones accesibles ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cooperFacts {
+    grid-template-columns: 1fr;
+  }
+
+  .aplicacionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .materialBtn {
+    font-size: 0.76rem;
+    padding: 5px 10px;
+  }
+
+  .meissnerDemo {
+    padding: 24px 12px;
+  }
+
+  .tcDestacado {
+    margin-left: 0;
+  }
+}

@@ -3189,6 +3189,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estadistica-cotidiana/', icon: '📊', name: 'Estadística Cotidiana', description: 'El valor esperado y la probabilidad son la base matemática de la teoría de juegos' },
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El equilibrio de Nash se encuentra buscando puntos críticos (derivada = 0)' },
   ],
+
+  // EJE E — Física avanzada (2026-04-25)
+  'visualizador-relatividad-general': [
+    { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'La relatividad especial (1905) es el punto de partida: sin gravedad, solo velocidad' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'Relatividad general y mecánica cuántica: las dos grandes teorías incompatibles' },
+    { url: '/visualizador-caos-mariposa/', icon: '🦋', name: 'Caos y Mariposa', description: 'Los sistemas caóticos también surgen en la dinámica relativista de agujeros negros' },
+    { url: '/visualizador-astrofisica/', icon: '🌠', name: 'Astrofísica', description: 'La relatividad general describe la estructura y evolución del universo a gran escala' },
+  ],
+  'visualizador-caos-mariposa': [
+    { url: '/visualizador-geometria-fractales/', icon: '❄️', name: 'Geometría Fractal', description: 'Los fractales y el caos comparten la autosimilaridad y la sensibilidad a condiciones iniciales' },
+    { url: '/visualizador-relatividad-general/', icon: '🌌', name: 'Relatividad General', description: 'El caos aparece también en las órbitas relativistas cercanas a agujeros negros' },
+    { url: '/visualizador-estadistica-cotidiana/', icon: '📊', name: 'Estadística Cotidiana', description: 'Los sistemas caóticos son deterministas pero estadísticamente impredecibles a largo plazo' },
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El sistema de Lorenz son ecuaciones diferenciales ordinarias integradas numéricamente' },
+  ],
+  'visualizador-superconductividad': [
+    { url: '/visualizador-electromagnetismo/', icon: '🔌', name: 'Electromagnetismo', description: 'El efecto Meissner expulsa el campo magnético: el diamagnetismo perfecto de los superconductores' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'ITER usa superconductores de NbTi para los imanes toroidales del reactor de fusión' },
+    { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'Los qubits superconductores operan cerca del cero absoluto, igual que los superconductores clásicos' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La teoría BCS de superconductividad es un triunfo de la mecánica cuántica aplicada' },
+  ],
 };
 
 /**
