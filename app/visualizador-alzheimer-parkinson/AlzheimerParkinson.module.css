@@ -1,0 +1,119 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 940px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333; }
+
+/* Hero */
+.hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: var(--radius-large); color: white; }
+.title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+.subtitle { font-size: 1.1rem; opacity: 0.92; }
+
+/* Tabs de enfermedad */
+.tabNav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
+.tabBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-lg); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-large); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 1rem; font-weight: 600; }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tabBtnActivo { border-color: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; }
+.tabBtnActivo:hover { color: white; }
+.tabBtnSub { font-size: 0.72rem; font-weight: 400; opacity: 0.85; }
+
+/* Contenido de tab */
+.tabContent { margin-bottom: var(--spacing-xl); }
+
+/* Secciones */
+.seccion { margin-bottom: calc(var(--spacing-xl) * 1.5); }
+.seccionTitulo { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); border-bottom: 2px solid var(--border); padding-bottom: var(--spacing-sm); }
+.seccionTexto { font-size: 0.95rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
+
+/* Zona SVG */
+.svgZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); overflow-x: auto; }
+.diagramaSvg { width: 100%; height: auto; display: block; }
+
+/* Leyenda de vías SVG */
+.svgLeyenda { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; margin-bottom: var(--spacing-md); }
+.svgLeyendaBtn { padding: 0.4rem 1rem; border-radius: 20px; border: 2px solid; background: var(--bg-card); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s; color: var(--text-primary); }
+.svgLeyendaBtn:hover { opacity: 0.85; }
+.svgLeyendaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.svgLeyendaBtnActivo { color: white; }
+
+/* Detalle SVG seleccionado */
+.svgDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-md); animation: fadeIn 0.2s ease; }
+.svgDetalleTitle { font-size: 1rem; font-weight: 700; margin: 0 0 var(--spacing-sm) 0; }
+.svgDetalle p { font-size: 0.9rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
+
+/* Cards de información */
+.infoGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
+.infoCard { background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.infoCardTitle { font-size: 0.95rem; font-weight: 700; margin: 0 0 var(--spacing-sm) 0; }
+.infoCard p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
+.infoLista { list-style: none; padding: 0; margin: 0; font-size: 0.86rem; color: var(--text-primary); line-height: 1.8; }
+.infoLista li::before { content: '→'; color: var(--primary); font-weight: 700; margin-right: 0.5rem; }
+
+/* Highlight box */
+.highlightBox { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid rgba(46,134,171,0.2); border-left: 5px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+[data-theme='dark'] .highlightBox { background: rgba(46,134,171,0.08); border-color: rgba(46,134,171,0.3); }
+.highlightTitle { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 var(--spacing-sm) 0; }
+.highlightBox p { font-size: 0.9rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
+
+/* Dato destacado (número grande) */
+.datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.datoDestacadoValor { font-size: 2.4rem; font-weight: 800; color: var(--primary); flex-shrink: 0; }
+.datoDestacadoLabel { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
+
+/* Switch normal/parkinson */
+.estadoSwitch { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap; }
+.switchBtn { padding: 0.5rem 1.2rem; border-radius: 20px; border: 2px solid; background: var(--bg-card); cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all 0.2s; color: var(--text-primary); }
+.switchBtn:hover { opacity: 0.85; }
+.switchBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.switchBtnActivo { color: white; }
+
+/* Comparación ganglios basales */
+.comparacionGB { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); margin-top: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+.comparacionGBCol { background: var(--bg-card); border: 1px solid var(--border); border-top: 4px solid; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
+.comparacionGBCol h4 { font-size: 0.92rem; font-weight: 700; margin: 0 0 var(--spacing-sm) 0; }
+.circuitoPaso { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
+.circuitoResultado { font-size: 0.82rem; font-weight: 600; line-height: 1.4; margin: 0; }
+
+/* Warning y educational */
+.warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
+[data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
+
+/* Animación */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { margin-top: 60px; padding: var(--spacing-lg); }
+  .title { font-size: 1.8rem; }
+  .infoGrid { grid-template-columns: 1fr; }
+  .comparacionGB { grid-template-columns: 1fr; }
+  .svgZona { padding: var(--spacing-sm); }
+  .datoDestacado { flex-direction: column; text-align: center; }
+  .svgLeyenda { justify-content: center; }
+  .estadoSwitch { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .title { font-size: 1.5rem; }
+  .tabNav { grid-template-columns: 1fr; }
+  .tabBtn { flex-direction: row; justify-content: center; gap: var(--spacing-sm); }
+  .tabBtnSub { display: none; }
+  .seccionTitulo { font-size: 1.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container .tabBtn,
+  .container .switchBtn,
+  .container .svgLeyendaBtn,
+  .container .svgDetalle {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -3190,6 +3190,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El equilibrio de Nash se encuentra buscando puntos críticos (derivada = 0)' },
   ],
 
+  // EJE A — Enfermedades de alto impacto (2026-04-25)
+  'visualizador-ciclo-viral': [
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Cómo el sistema inmune detecta y combate los virus en sus distintas fases de infección' },
+    { url: '/visualizador-vacunas/', icon: '💉', name: 'Vacunas', description: 'Las vacunas entrenan al sistema inmune antes de que el virus llegue a completar su ciclo de replicación' },
+    { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Las proteínas de la cápside y envoltura viral tienen estructuras 3D muy específicas que determinan el tropismo' },
+    { url: '/visualizador-adn-replicacion/', icon: '🔬', name: 'ADN y Replicación', description: 'Los virus ADN aprovechan la maquinaria de replicación celular; los ARN llevan su propia polimerasa' },
+  ],
+  'visualizador-diabetes-mecanismo': [
+    { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'La insulina y el glucagón son las hormonas pancreáticas dentro del sistema endocrino completo' },
+    { url: '/visualizador-higado/', icon: '🫀', name: 'Hígado', description: 'El hígado es el órgano central de la gluconeogénesis y el almacenamiento de glucógeno regulado por insulina' },
+    { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'La insulina es una proteína pequeña cuya estructura 3D es esencial para su unión al receptor' },
+    { url: '/visualizador-ciclo-viral/', icon: '🦠', name: 'Ciclo Viral', description: 'Algunos virus (Coxsackie B4) se han propuesto como desencadenantes del proceso autoinmune en la diabetes tipo 1' },
+  ],
+  'visualizador-alzheimer-parkinson': [
+    { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Alzheimer y Parkinson son proteinopatías: enfermedades causadas por proteínas mal plegadas (Aβ, Tau, α-sinucleína)' },
+    { url: '/visualizador-neurona/', icon: '⚡', name: 'La Neurona', description: 'Cómo funciona una neurona sana: potencial de acción, sinapsis y neurotransmisores que se alteran en estas enfermedades' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La anatomía del sistema nervioso central donde se desarrollan los procesos neurodegenerativos' },
+    { url: '/visualizador-neurotransmisores/', icon: '💬', name: 'Neurotransmisores', description: 'La dopamina (Parkinson) y la acetilcolina (Alzheimer) son los neurotransmisores más afectados' },
+  ],
+  'visualizador-cancer': [
+    { url: '/visualizador-adn-replicacion/', icon: '🔬', name: 'ADN y Replicación', description: 'Los errores en la replicación del ADN y los fallos en su reparación son el origen de las mutaciones cancerígenas' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'La inmunoterapia activa el sistema inmune para que reconozca y destruya las células tumorales' },
+    { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Los oncogenes y genes supresores codifican proteínas cuya función depende de su plegamiento 3D correcto' },
+    { url: '/visualizador-alzheimer-parkinson/', icon: '🧠', name: 'Alzheimer y Parkinson', description: 'Como el cáncer, son enfermedades de acumulación de proteínas disfuncionales, aunque con mecanismos distintos' },
+  ],
+
   // EJE F — Economía aplicada (2026-04-25)
   'visualizador-sistema-pensiones': [
     { url: '/visualizador-jubilacion-perspectiva/', icon: '⏳', name: 'Jubilación en Perspectiva', description: 'Tu timeline personal de cotización: cuántos años llevas y qué pensión generarás' },

@@ -698,6 +698,10 @@ export const implementedAppsUrls = [
   "/visualizador-calculo-visual/",        // Canvas 2D: límites, tangente derivada, área Riemann integral — 3 funciones con sliders
   "/visualizador-numeros-complejos/",     // Plano Argand SVG, operaciones geométricas, forma polar, Euler e^(iπ)+1=0, apps
   "/visualizador-teoria-juegos/",         // Dilema prisionero interactivo, Nash, suma cero, tragedia comunes, 4 apps reales
+  "/visualizador-ciclo-viral/",            // 6 etapas ciclo replicación, ADN vs ARN vs retrovirus, latencia, evasión inmune
+  "/visualizador-diabetes-mecanismo/",    // Páncreas SVG alfa/beta, ciclo insulina-glucagón, tipo 1/2/gestacional, HbA1c molecular
+  "/visualizador-alzheimer-parkinson/",   // APP/Aβ/Tau (Alzheimer), α-sinucleína/Lewy/circuito dopaminérgico (Parkinson)
+  "/visualizador-cancer/",               // Oncogenes/supresores, 6 hallmarks Hanahan&Weinberg, PD-1/PD-L1 inmunoterapia
   "/visualizador-sistema-pensiones/",      // Reparto vs capitalización, slider ratio 1975-2050, reformas timeline, AIREF proyecciones
   "/visualizador-mercado-inmobiliario/",   // Oferta/demanda SVG, burbuja 2008, ratio precio/renta 6 ciudades, accesibilidad generacional
   "/visualizador-desempleo-tipos/",        // 4 tipos desempleo, NAIRU, curva Beveridge, histórico España vs UE, políticas activas/pasivas

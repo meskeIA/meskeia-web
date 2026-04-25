@@ -1,0 +1,643 @@
+/* DiabetesMecanismo.module.css */
+/* Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal) */
+
+/* ─── Contenedor ──────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary, #1A1A1A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Hero ──────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* ─── Secciones ──────────────────────────── */
+.section {
+  max-width: 900px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 2.5rem 0 0.5rem;
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.sectionDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+[data-theme='dark'] .sectionDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Toggle de estado glucosa ──────────────── */
+.toggleRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  padding: 0.55rem 1.25rem;
+  border-radius: 24px;
+  border: 2px solid var(--primary, #2E86AB);
+  background: transparent;
+  color: var(--primary, #2E86AB);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.toggleBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.toggleBtnActivo {
+  background: var(--primary, #2E86AB);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .toggleBtn {
+  border-color: #7FB3D3;
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .toggleBtnActivo {
+  background: #2E86AB;
+  color: #ffffff;
+  border-color: #2E86AB;
+}
+
+/* ─── Layout páncreas ──────────────────────── */
+.pancreasLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .pancreasLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pancreassvgWrapper {
+  background: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .pancreassvgWrapper {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.pancreasSvg {
+  width: 100%;
+  height: auto;
+}
+
+/* ─── Panel de estado ──────────────────────── */
+.estadoPanel {
+  background: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .estadoPanel {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.estadoBadge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.estadoBadgeAlta {
+  background: rgba(46, 134, 171, 0.12);
+  color: #2E86AB;
+  border: 1px solid rgba(46, 134, 171, 0.3);
+}
+
+.estadoBadgeBaja {
+  background: rgba(230, 126, 34, 0.12);
+  color: #C0392B;
+  border: 1px solid rgba(230, 126, 34, 0.3);
+}
+
+.cascadaList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cascadaList li {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .cascadaList li {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.cascadaNum {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary, #2E86AB);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+/* ─── Tabs de tipos ──────────────────────── */
+.tabsRow {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.15);
+}
+
+.tab {
+  padding: 0.65rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #666666);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: var(--primary, #2E86AB);
+}
+
+.tabActivo {
+  color: var(--primary, #2E86AB);
+  border-bottom-color: var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .tab {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .tabActivo {
+  color: #7FB3D3;
+  border-bottom-color: #7FB3D3;
+}
+
+/* ─── Panel de tipo ──────────────────────── */
+.tipoPanel {
+  background: var(--bg-card, #ffffff);
+  border-radius: 0 12px 12px 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: none;
+}
+
+[data-theme='dark'] .tipoPanel {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.tipoPanelInner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tipoHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.tipoIcono {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tipoTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.25rem;
+}
+
+[data-theme='dark'] .tipoTitulo {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.tipoSubtitulo {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  margin: 0;
+  font-style: italic;
+}
+
+[data-theme='dark'] .tipoSubtitulo {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── SVG tipos ──────────────────────────── */
+.svgContainer {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .svgContainer {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.tipoSvg {
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+}
+
+/* ─── Pasos mecanismo ────────────────────── */
+.mecanimoSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.mecanismoStep {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .mecanismoStep {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.mecanismoStepNum {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+/* ─── Nota histórica ─────────────────────── */
+.notaHistorica {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.84rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+[data-theme='dark'] .notaHistorica {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── HbA1c ──────────────────────────────── */
+.hba1cLayout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 680px) {
+  .hba1cLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hba1cSvgWrapper {
+  background: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .hba1cSvgWrapper {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.hba1cSvg {
+  width: 100%;
+  height: auto;
+}
+
+.hba1cExplicacion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hba1cStep {
+  background: var(--bg-card, #ffffff);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .hba1cStep {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.hba1cStepTitulo {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin-bottom: 0.4rem;
+}
+
+.hba1cStep p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .hba1cStep p {
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Complicaciones Grid ────────────────── */
+.complicacionesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.complicacionCard {
+  background: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  padding: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.complicacionCard:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.complicacionCardActiva {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'] .complicacionCard {
+  background: var(--bg-card, #2A2A2A);
+}
+
+.complicacionIndicador {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 0.25rem;
+}
+
+.complicacionNombre {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0;
+  line-height: 1.3;
+  transition: color 0.18s;
+}
+
+[data-theme='dark'] .complicacionNombre {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.complicacionSubtitulo {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666666);
+  margin: 0;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+[data-theme='dark'] .complicacionSubtitulo {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+.complicacionDescripcion {
+  font-size: 0.84rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  text-align: left;
+}
+
+[data-theme='dark'] .complicacionDescripcion {
+  color: var(--text-primary, #E5E5E5);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Insight / Info Box ─────────────────── */
+.insightBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.25);
+  border-left: 4px solid var(--secondary, #48A9A6);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.2rem;
+  font-size: 0.88rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.65;
+}
+
+[data-theme='dark'] .insightBox {
+  background: rgba(72, 169, 166, 0.12);
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── EducationalSection: grid interior ──── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.1rem;
+  margin-bottom: 1.25rem;
+}
+
+.eduCard {
+  background: rgba(0, 0, 0, 0.025);
+  border-radius: 10px;
+  padding: 1.1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .eduCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.eduCardTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.6rem;
+  line-height: 1.3;
+}
+
+.eduCard p {
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.5rem;
+}
+
+.eduCard p:last-child {
+  margin-bottom: 0;
+}
+
+[data-theme='dark'] .eduCard p {
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Warning Box ────────────────────────── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary, #2E86AB);
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Accesibilidad: movimiento reducido ─── */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

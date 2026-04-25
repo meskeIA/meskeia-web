@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 640,
+  "total_tools": 644,
   "updated": "2026-04-25",
   "features": {
     "all_free": true,
@@ -1987,6 +1987,30 @@
           "slug": "visualizador-teoria-juegos",
           "url": "https://meskeia.com/visualizador-teoria-juegos/",
           "description": "Dilema del Prisionero interactivo con 3 estrategias del ordenador. Equilibrio de Nash, tabla de pagos, juegos suma cero vs cooperativos, Tragedia de los Comunes con slider y 4 aplicaciones reales (Guerra Fría, clima, evolución, subastas)"
+        },
+        {
+          "name": "Ciclo de Replicación Viral: Cómo se Reproducen los Virus",
+          "slug": "visualizador-ciclo-viral",
+          "url": "https://meskeia.com/visualizador-ciclo-viral/",
+          "description": "6 etapas del ciclo replicativo viral (adhesión→liberación), virus ADN vs ARN vs retrovirus, latencia herpes, variación antigénica influenza, tropismo celular. Biología molecular pura sin síntomas."
+        },
+        {
+          "name": "Diabetes: Mecanismo Biológico de Insulina y Glucagón",
+          "slug": "visualizador-diabetes-mecanismo",
+          "url": "https://meskeia.com/visualizador-diabetes-mecanismo/",
+          "description": "Páncreas SVG con células alfa/beta, ciclo insulina-glucagón, tipo 1 (autoinmune), tipo 2 (resistencia IRS-1), gestacional (lactógeno placentario), HbA1c molecular y glucotoxicidad. Sin síntomas ni valores diagnósticos."
+        },
+        {
+          "name": "Alzheimer y Parkinson: Mecanismo Neurobiológico",
+          "slug": "visualizador-alzheimer-parkinson",
+          "url": "https://meskeia.com/visualizador-alzheimer-parkinson/",
+          "description": "Alzheimer: APP/BACE1/Aβ42, Tau hiperfosforilada, ovillos neurofibrilares, cascada amiloide. Parkinson: α-sinucleína, cuerpos de Lewy, vía nigroestriada, circuito ganglios basales D1/D2. Sin síntomas ni pronóstico."
+        },
+        {
+          "name": "Cáncer: Biología Molecular, Hallmarks e Inmunoterapia",
+          "slug": "visualizador-cancer",
+          "url": "https://meskeia.com/visualizador-cancer/",
+          "description": "Oncogenes (RAS/MYC/HER2) vs supresores (TP53/RB1/BRCA1-2), 6 Hallmarks de Hanahan & Weinberg, mecanismo PD-1/PD-L1 de inmunoterapia con SVG de 3 estados, tipos por origen celular. Sin síntomas ni estadísticas."
         },
         {
           "name": "Sistema de Pensiones: Reparto, Demografía y Reformas",

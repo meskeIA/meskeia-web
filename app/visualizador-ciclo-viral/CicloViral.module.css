@@ -1,0 +1,555 @@
+/* CicloViral.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones ─────────────────────────────────── */
+.section {
+  max-width: 1000px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Ciclo visualizador ─────────────────────────── */
+.cicloWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .cicloWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.svgContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.svgCelula {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── Panel de detalle ───────────────────────────── */
+.panelDetalle {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.etapaCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.etapaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.etapaNumero {
+  background: var(--primary);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.etapaIcono {
+  font-size: 1.4rem;
+  margin-right: 0.25rem;
+}
+
+.etapaNombre {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.etapaDescripcion {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.etapaDetalle {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.etapaDetalle p {
+  margin: 0;
+}
+
+.etapaEjemplo {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  padding: 0.65rem 0.9rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.etapaEjemplo p {
+  margin: 0.3rem 0 0;
+  color: var(--text-secondary);
+}
+
+.btnCerrar {
+  align-self: flex-end;
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+}
+
+.btnCerrar:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnCerrar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Panel vacío */
+.panelVacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.panelVacioIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+.panelVacio p {
+  font-size: 0.9rem;
+  max-width: 260px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.etapaLista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.etapaBoton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+
+.etapaBoton:hover {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: var(--primary);
+}
+
+.etapaBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.etapaBotonNum {
+  background: var(--primary);
+  color: white;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* ─── Tabs ADN / ARN / Retrovirus ────────────────── */
+.tabsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.5rem 1.25rem;
+  border-radius: 24px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.tab:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabActivo {
+  background: var(--primary);
+  color: white;
+}
+
+/* ─── Tabla comparativa ──────────────────────────── */
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.25rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.88rem;
+}
+
+.tabla thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.tabla thead th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-weight: 700;
+}
+
+.tabla tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.tabla tbody tr:last-child {
+  border-bottom: none;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.tabla td {
+  padding: 0.7rem 1rem;
+  line-height: 1.45;
+  vertical-align: top;
+}
+
+.celdaAspecto {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.colActiva {
+  background: rgba(46, 134, 171, 0.08) !important;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.colInactiva {
+  color: var(--text-secondary);
+  opacity: 0.75;
+}
+
+/* ─── Tarjeta de detalle de tipo ─────────────────── */
+.tipoDetalle {
+  margin-top: 0;
+}
+
+.tipoCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  line-height: 1.65;
+}
+
+.tipoCard h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.tipoCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.tipoCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Evasión inmune ─────────────────────────────── */
+.evasionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.evasionCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.evasionIcono {
+  font-size: 2.2rem;
+  display: block;
+}
+
+.evasionTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.evasionDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.evasionEjemplo {
+  font-size: 0.83rem;
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: auto;
+}
+
+/* ─── Sección educativa ──────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.eduCard h4 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Warning box ─────────────────────────────────── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Dark mode ──────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .svgContainer,
+[data-theme='dark'] .panelDetalle,
+[data-theme='dark'] .tipoCard,
+[data-theme='dark'] .evasionCard,
+[data-theme='dark'] .eduCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .svgCelula ellipse[fill='url(#gradCelula)'] {
+  fill: #1e3a4a;
+}
+
+[data-theme='dark'] .etapaDetalle {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .etapaEjemplo,
+[data-theme='dark'] .evasionEjemplo {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .tabla {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabla tbody tr {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .tabla tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .colActiva {
+  background: rgba(46, 134, 171, 0.15) !important;
+}
+
+[data-theme='dark'] .etapaBoton {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .etapaBoton:hover {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ─── Motion reducida ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
