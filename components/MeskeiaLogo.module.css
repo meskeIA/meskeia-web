@@ -126,6 +126,24 @@
 }
 
 /* Dark mode */
+[data-theme='dark'] .logoContainer {
+  background: rgba(42, 42, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .logoContainer:hover {
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .meske {
+  color: #C0D4E0;
+}
+
+[data-theme='dark'] .ia {
+  color: #3FA5D1;
+}
+
 [data-theme='dark'] .themeToggle {
   background: rgba(42, 42, 42, 0.95);
   border-color: rgba(255, 255, 255, 0.1);
@@ -133,7 +151,7 @@
 }
 
 [data-theme='dark'] .themeToggle:hover {
-  border-color: var(--primary, #2E86AB);
+  border-color: var(--primary, #3FA5D1);
 }
 
 @media (max-width: 768px) {
