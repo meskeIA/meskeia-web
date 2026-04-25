@@ -901,6 +901,19 @@
   color: var(--primary);
 }
 
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .pageWrapper {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2D2D2D;
+  --text-primary: #E8E8E8;
+  --text-secondary: #B0B0B0;
+  --text-muted: #808080;
+  --border: #404040;
+  --hover: #383838;
+  --focus: rgba(63, 165, 209, 0.15);
+  background: #1A1A1A;
+}
+
 /* ===== RESPONSIVE VISTAS ===== */
 @media (max-width: 768px) {
   .searchSection {
