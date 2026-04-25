@@ -695,6 +695,9 @@ export const implementedAppsUrls = [
   "/visualizador-piramide-poblacion/",    // Pirámide España 1950→2100 animada, tasa dependencia, edad mediana, INE/EUROSTAT
   "/visualizador-desinformacion/",        // Ciclo bulo 4 etapas, 6 sesgos cognitivos, 5 pasos verificación, DSA 2023
   "/visualizador-migracion-global/",      // Mapa SVG 6 regiones, 7 flujos UNHCR 2024, refugiados vs migrantes, push/pull
+  "/visualizador-calculo-visual/",        // Canvas 2D: límites, tangente derivada, área Riemann integral — 3 funciones con sliders
+  "/visualizador-numeros-complejos/",     // Plano Argand SVG, operaciones geométricas, forma polar, Euler e^(iπ)+1=0, apps
+  "/visualizador-teoria-juegos/",         // Dilema prisionero interactivo, Nash, suma cero, tragedia comunes, 4 apps reales
 ];
 
 /**

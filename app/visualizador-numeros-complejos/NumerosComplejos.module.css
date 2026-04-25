@@ -1,0 +1,535 @@
+/* NumerosComplejos.module.css */
+
+/* ─────────────────────────────────────────────
+   Contenedor principal
+───────────────────────────────────────────── */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 16px;
+  padding: 48px 32px;
+  text-align: center;
+  margin: 24px 0 16px;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Secciones
+───────────────────────────────────────────── */
+
+.seccion {
+  margin: 32px 0;
+}
+
+.seccionTitulo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 8px;
+}
+
+.seccionDesc {
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ─────────────────────────────────────────────
+   Contexto / intro de sección
+───────────────────────────────────────────── */
+
+.contexto {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary);
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+.contexto p + p {
+  margin-top: 10px;
+}
+
+/* ─────────────────────────────────────────────
+   Historia cards (sección 1)
+───────────────────────────────────────────── */
+
+.historiasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .historiasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.historiaCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.historiaIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.historiaCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 8px;
+}
+
+.historiaCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   Plano de Argand
+───────────────────────────────────────────── */
+
+.argandWrapper {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.argandSvg {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+/* Textos del SVG en dark mode */
+[data-theme='dark'] .argandSvg text {
+  fill: var(--text-primary);
+}
+
+[data-theme='dark'] .argandSvg {
+  background: var(--bg-card);
+}
+
+/* ─────────────────────────────────────────────
+   Botones de operación
+───────────────────────────────────────────── */
+
+.operacionBtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.opBtn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.opBtn:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.opBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+.opBtnActivo:hover {
+  background: var(--primary);
+}
+
+/* ─────────────────────────────────────────────
+   Sliders
+───────────────────────────────────────────── */
+
+.slidersGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 480px) {
+  .slidersGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sliderItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sliderLabel {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.sliderLabel strong {
+  color: var(--primary);
+}
+
+.sliderItem input[type='range'] {
+  accent-color: var(--primary);
+  width: 100%;
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────
+   Resultado cálculo
+───────────────────────────────────────────── */
+
+.resultadoCalculo {
+  font-family: 'Courier New', Courier, monospace;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 16px 20px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  line-height: 2;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.resultadoLinea {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  margin: 2px 0;
+}
+
+/* ─────────────────────────────────────────────
+   Insight operación
+───────────────────────────────────────────── */
+
+.insightOperacion {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--secondary);
+  background: rgba(72, 169, 166, 0.06);
+  border-radius: 0 8px 8px 0;
+}
+
+/* ─────────────────────────────────────────────
+   Forma Polar
+───────────────────────────────────────────── */
+
+.polarCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px 24px;
+  border-left: 4px solid var(--primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.polarCard p {
+  margin: 0 0 12px;
+}
+
+.polarLista {
+  margin: 0 0 4px;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+}
+
+.polarLista li {
+  margin-bottom: 6px;
+}
+
+.polarLista strong {
+  color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────
+   Círculo de Euler
+───────────────────────────────────────────── */
+
+.eulerSvgWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.eulerSvg {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .eulerSvg text {
+  fill: var(--text-primary);
+}
+
+.eulerBox {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.eulerBox p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.eulerFormula {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 8px 0 !important;
+}
+
+.eulerDesc {
+  font-size: 0.9rem !important;
+  color: var(--text-secondary) !important;
+  margin-top: 12px !important;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────────
+   Aplicaciones
+───────────────────────────────────────────── */
+
+.aplicacionesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 680px) {
+  .aplicacionesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aplicacionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.aplicacionIcono {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.aplicacionCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 8px;
+}
+
+.aplicacionCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   Nota sobre fractales
+───────────────────────────────────────────── */
+
+.notaFractales {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 16px 20px;
+  border-left: 3px solid var(--secondary);
+  font-size: 0.9rem;
+  margin: 24px 0;
+  color: var(--text-primary);
+}
+
+.notaFractales p {
+  margin: 0;
+}
+
+.link {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.link:hover {
+  opacity: 0.8;
+}
+
+/* ─────────────────────────────────────────────
+   Warning box (EducationalSection)
+───────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 20px;
+  line-height: 1.5;
+}
+
+.warningBox strong {
+  color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────
+   Dark mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, #1e6a8a 0%, #306e6c 100%);
+}
+
+[data-theme='dark'] .contexto {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .historiaCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .historiaCard p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .argandSvg {
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .resultadoCalculo {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .polarCard {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .eulerSvg {
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .eulerBox {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12), rgba(72, 169, 166, 0.12));
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .aplicacionCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .notaFractales {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.3);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .insightOperacion {
+  background: rgba(72, 169, 166, 0.08);
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Accesibilidad: Movimiento reducido
+───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .opBtn,
+  .aplicacionCard,
+  .historiaCard {
+    transition: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Focus visible
+───────────────────────────────────────────── */
+
+.opBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

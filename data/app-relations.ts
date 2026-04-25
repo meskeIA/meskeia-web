@@ -3169,6 +3169,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-desigualdad-riqueza/', icon: '📊', name: 'Desigualdad de Riqueza', description: 'La desigualdad económica es un factor push fundamental en la migración global' },
     { url: '/visualizador-comercio-internacional/', icon: '🚢', name: 'Comercio Internacional', description: 'Globalización económica y sus vínculos con los flujos migratorios' },
   ],
+
+  // EJE D — Matemáticas visuales
+  'visualizador-calculo-visual': [
+    { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones que Gobiernan el Mundo', description: 'Las funciones que el cálculo analiza: lineales, exponenciales, logarítmicas' },
+    { url: '/calculadora-calculo/', icon: '🧮', name: 'Calculadora de Cálculo', description: 'Calcula derivadas, integrales y límites exactos de cualquier función' },
+    { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'Las derivadas de funciones complejas y la transformada de Fourier usan el cálculo' },
+    { url: '/visualizador-teoria-juegos/', icon: '🎲', name: 'Teoría de Juegos', description: 'El equilibrio de Nash se encuentra optimizando funciones con derivadas' },
+  ],
+  'visualizador-numeros-complejos': [
+    { url: '/visualizador-matrices/', icon: '🔢', name: 'Matrices y Transformaciones', description: 'Las matrices también representan rotaciones y escalados en el plano' },
+    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Fractales', description: 'El conjunto de Mandelbrot y los fractales de Julia son aplicaciones de los complejos' },
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'La transformada de Fourier combina cálculo y números complejos' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La función de onda ψ es de valor complejo — los complejos son esenciales en cuántica' },
+  ],
+  'visualizador-teoria-juegos': [
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Los sesgos que nos alejan del comportamiento racional que asume la teoría de juegos' },
+    { url: '/visualizador-toma-decisiones/', icon: '🤔', name: 'Toma de Decisiones', description: 'Sistema 1 y 2 de Kahneman: por qué no siempre jugamos el equilibrio de Nash' },
+    { url: '/visualizador-estadistica-cotidiana/', icon: '📊', name: 'Estadística Cotidiana', description: 'El valor esperado y la probabilidad son la base matemática de la teoría de juegos' },
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El equilibrio de Nash se encuentra buscando puntos críticos (derivada = 0)' },
+  ],
 };
 
 /**

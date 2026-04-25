@@ -1,0 +1,851 @@
+/* ── Contenedor principal ─────────────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 56px 24px 48px;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 12px;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Secciones ─────────────────────────────────────────────────────────────── */
+
+.section {
+  padding: 48px 24px;
+}
+
+.sectionAlt {
+  padding: 48px 24px;
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.sectionInner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.sectionIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.sectionTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Estrategia del PC ─────────────────────────────────────────────────────── */
+
+.estrategiaContainer {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.estrategiaLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.estrategiaSelector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.estrategiaBtn {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.estrategiaBtn:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.estrategiaBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+.estrategiaBtnActivo:hover {
+  background: var(--primary);
+}
+
+.estrategiaDesc {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Panel de juego ────────────────────────────────────────────────────────── */
+
+.dilemaPantalla {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.narrativa {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 24px;
+  font-style: italic;
+}
+
+.eleccionBtns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.btnCooperar {
+  background: #27ae60;
+  color: #fff;
+  padding: 20px 32px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 160px;
+}
+
+.btnCooperar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(39, 174, 96, 0.35);
+}
+
+.btnCooperar:focus-visible {
+  outline: 2px solid #27ae60;
+  outline-offset: 3px;
+}
+
+.btnDelatar {
+  background: #c0392b;
+  color: #fff;
+  padding: 20px 32px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 160px;
+}
+
+.btnDelatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.35);
+}
+
+.btnDelatar:focus-visible {
+  outline: 2px solid #c0392b;
+  outline-offset: 3px;
+}
+
+/* ── Panel resultado ───────────────────────────────────────────────────────── */
+
+.resultadoPantalla {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.eleccionReveal {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.condenas {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.condenaTu {
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+}
+
+.condenaB {
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: rgba(192, 57, 43, 0.1);
+  color: var(--text-primary);
+}
+
+.mensajeContexto {
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 12px 0 20px;
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+.btnOtraRonda {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.15s;
+}
+
+.btnOtraRonda:hover {
+  background: var(--secondary);
+}
+
+.btnOtraRonda:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/* ── Historial ─────────────────────────────────────────────────────────────── */
+
+.historialSection {
+  margin-top: 8px;
+}
+
+.historialLabel {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.historialTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.historialTabla th,
+.historialTabla td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.historialTabla th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.83rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filaNash {
+  background: rgba(231, 76, 60, 0.08);
+}
+
+/* ── Tabla de pagos ────────────────────────────────────────────────────────── */
+
+.tablaContainer {
+  margin-bottom: 24px;
+}
+
+.tablaTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tablaPagos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tablaPagos th,
+.tablaPagos td {
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tablaPagos th {
+  background: rgba(46, 134, 171, 0.08);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.celdaOptima {
+  background: rgba(39, 174, 96, 0.12);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.celdaNash {
+  background: rgba(231, 76, 60, 0.12);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.celdaMala {
+  background: rgba(192, 57, 43, 0.06);
+  color: var(--text-primary);
+}
+
+.nashExplicacion {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px 24px;
+  border-left: 4px solid var(--primary);
+}
+
+.nashExplicacion p {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.nashExplicacion p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Suma cero vs cooperativos ─────────────────────────────────────────────── */
+
+.sumaZeroCoopGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.sumaZeroCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 4px solid #c0392b;
+}
+
+.sumaZeroTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.sumaZeroDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.sumaZeroEjemplos {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+
+.miniTablaWrapper {
+  margin-top: 12px;
+}
+
+.miniTablaTitulo {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.miniTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.miniTabla th,
+.miniTabla td {
+  padding: 6px 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.miniTabla th {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+.cooperativoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 4px solid #27ae60;
+}
+
+.cooperativoTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.cooperativoDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.cooperativoEjemplos {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+
+.cooperativoClave {
+  background: rgba(39, 174, 96, 0.06);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.cooperativoClave p {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.cooperativoClave p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Tragedia de los comunes ───────────────────────────────────────────────── */
+
+.comunesSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sliderContainer {
+  margin-bottom: 20px;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.vacasGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 1.4rem;
+  margin: 16px 0;
+}
+
+.vacaVerde {
+  filter: hue-rotate(0deg);
+  opacity: 1;
+}
+
+.vacaRoja {
+  filter: hue-rotate(100deg) saturate(2);
+  opacity: 0.85;
+}
+
+.barraRecursoContainer {
+  margin: 16px 0;
+}
+
+.barraRecursoLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+}
+
+.barraRecursoFondo {
+  height: 24px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.barraRecurso {
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #c0392b 0%, #e67e22 40%, #27ae60 100%);
+  background-size: 200% 100%;
+  background-position: right center;
+  transition: width 0.5s ease;
+}
+
+.textoPastores {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 3px solid var(--primary);
+}
+
+.comunesExplicacion {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.comunesExplicacion p {
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.comunesExplicacion p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Insight Box ───────────────────────────────────────────────────────────── */
+
+.insightBox {
+  border-left: 4px solid var(--primary);
+  background: var(--bg-card);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+}
+
+.insightLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin: 0 0 10px;
+}
+
+.insightTexto {
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Aplicaciones reales ───────────────────────────────────────────────────── */
+
+.aplicacionesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.aplicacionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  border-top: 3px solid var(--primary);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 3px solid var(--primary);
+}
+
+.aplicacionIcono {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.aplicacionTitulo {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+
+.aplicacionTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Warning Box ───────────────────────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 20px;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .estrategiaContainer,
+[data-theme='dark'] .dilemaPantalla,
+[data-theme='dark'] .resultadoPantalla,
+[data-theme='dark'] .historialTabla,
+[data-theme='dark'] .nashExplicacion,
+[data-theme='dark'] .sumaZeroCard,
+[data-theme='dark'] .cooperativoCard,
+[data-theme='dark'] .comunesSection,
+[data-theme='dark'] .insightBox,
+[data-theme='dark'] .aplicacionCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .tablaPagos th {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tablaPagos th,
+[data-theme='dark'] .tablaPagos td {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .miniTabla th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .miniTabla th,
+[data-theme='dark'] .miniTabla td {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .historialTabla th,
+[data-theme='dark'] .historialTabla td {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .filaNash {
+  background: rgba(231, 76, 60, 0.12);
+}
+
+[data-theme='dark'] .barraRecursoFondo {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .comunesExplicacion {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .cooperativoClave {
+  background: rgba(39, 174, 96, 0.1);
+}
+
+[data-theme='dark'] .sectionAlt {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 40px 16px 36px;
+  }
+
+  .section,
+  .sectionAlt {
+    padding: 36px 16px;
+  }
+
+  .sumaZeroCoopGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .aplicacionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .eleccionBtns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btnCooperar,
+  .btnDelatar {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  .condenas {
+    gap: 16px;
+  }
+
+  .condenaTu,
+  .condenaB {
+    font-size: 1.1rem;
+    padding: 10px 18px;
+  }
+
+  .eleccionReveal {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .tablaPagos th,
+  .tablaPagos td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .estrategiaSelector {
+    flex-direction: column;
+  }
+
+  .estrategiaBtn {
+    text-align: center;
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .btnCooperar,
+  .btnDelatar,
+  .btnOtraRonda,
+  .barraRecurso {
+    transition: none !important;
+  }
+
+  .btnCooperar:hover,
+  .btnDelatar:hover {
+    transform: none;
+  }
+}

@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 629,
+  "total_tools": 632,
   "updated": "2026-04-25",
   "features": {
     "all_free": true,
@@ -1969,6 +1969,24 @@
           "slug": "visualizador-migracion-global",
           "url": "https://meskeia.com/visualizador-migracion-global/",
           "description": "Mapa SVG interactivo de los principales flujos migratorios globales. 6 regiones, 7 rutas principales: Ucrania, Siria, Venezuela, Afganistán, corredor México-EEUU. Diferencia refugiados vs migrantes económicos, push/pull factors. Datos UNHCR e IOM 2024"
+        },
+        {
+          "name": "Cálculo Visual: Límites, Derivadas e Integrales",
+          "slug": "visualizador-calculo-visual",
+          "url": "https://meskeia.com/visualizador-calculo-visual/",
+          "description": "Visualizador animado de cálculo diferencial e integral con Canvas 2D. Límites (aproximación gráfica), derivadas (tangente deslizante) e integrales (área de Riemann) sobre 3 funciones seleccionables con sliders interactivos"
+        },
+        {
+          "name": "Números Complejos: El Plano de Argand",
+          "slug": "visualizador-numeros-complejos",
+          "url": "https://meskeia.com/visualizador-numeros-complejos/",
+          "description": "Plano de Argand interactivo con SVG: suma, resta, producto y conjugado de números complejos como operaciones geométricas. Forma polar, fórmula de Euler e^(iπ)+1=0 y aplicaciones en circuitos AC, Fourier y mecánica cuántica"
+        },
+        {
+          "name": "Teoría de Juegos: Dilema del Prisionero y Nash",
+          "slug": "visualizador-teoria-juegos",
+          "url": "https://meskeia.com/visualizador-teoria-juegos/",
+          "description": "Dilema del Prisionero interactivo con 3 estrategias del ordenador. Equilibrio de Nash, tabla de pagos, juegos suma cero vs cooperativos, Tragedia de los Comunes con slider y 4 aplicaciones reales (Guerra Fría, clima, evolución, subastas)"
         },
         {
           "name": "Falacias Lógicas",
