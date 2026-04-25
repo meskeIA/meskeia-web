@@ -698,6 +698,8 @@ export const implementedAppsUrls = [
   "/visualizador-calculo-visual/",        // Canvas 2D: límites, tangente derivada, área Riemann integral — 3 funciones con sliders
   "/visualizador-numeros-complejos/",     // Plano Argand SVG, operaciones geométricas, forma polar, Euler e^(iπ)+1=0, apps
   "/visualizador-teoria-juegos/",         // Dilema prisionero interactivo, Nash, suma cero, tragedia comunes, 4 apps reales
+  "/visualizador-ciclo-menstrual/",        // Gráfico SVG 4 hormonas×28 días, 4 fases clicables, SOP, anticonceptivos
+  "/visualizador-proteinas-plegamiento/", // 4 niveles estructura SVG, funnel energético, 6 tipos funcionales, 4 enfermedades mal plegamiento
   "/visualizador-relatividad-general/",   // Malla SVG espacio-tiempo deformada, mass slider, geodésicas, LIGO, GPS
   "/visualizador-caos-mariposa/",         // Atractor Lorenz Canvas 2D, 7000 pasos, dos trayectorias divergentes, efecto mariposa
   "/visualizador-superconductividad/",    // Efecto Meissner CSS animado, pares de Cooper, 8 materiales, Tc slider

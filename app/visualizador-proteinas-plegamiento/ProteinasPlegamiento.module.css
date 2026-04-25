@@ -1,0 +1,202 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #888888;
+  --border: #404040; --hover: #333333;
+}
+
+/* ─── Hero ─── */
+.hero {
+  text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large); color: white;
+}
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.05rem; opacity: 0.92; margin: 0; }
+
+/* ─── Secciones ─── */
+.seccion {
+  margin-bottom: calc(var(--spacing-xl) * 1.5);
+}
+.seccionTitulo {
+  font-size: 1.5rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 0.4rem; text-align: center;
+}
+.seccionDesc {
+  font-size: 0.95rem; color: var(--text-secondary);
+  text-align: center; margin-bottom: var(--spacing-lg);
+}
+
+/* ─── Tabs de nivel ─── */
+.nivelTabs {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+.nivelTab {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: var(--spacing-md) var(--spacing-sm);
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
+  color: var(--text-secondary);
+}
+.nivelTab:hover { border-color: var(--primary); color: var(--primary); }
+.nivelTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.nivelTabActivo {
+  border-color: var(--primary); background: var(--primary); color: white;
+}
+.nivelTabActivo:hover { background: var(--primary); color: white; }
+.nivelNum { font-size: 1.4rem; font-weight: 800; }
+.nivelLabel { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+/* ─── Panel de nivel ─── */
+.nivelPanel {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+  animation: fadeIn 0.25s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+.nivelHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.nivelTitulo { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.2rem; }
+.nivelSubtitulo { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
+
+.nivelSvgWrap {
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: var(--spacing-lg); overflow-x: auto;
+}
+.nivelDesc {
+  font-size: 0.92rem; color: var(--text-primary); line-height: 1.65;
+  text-align: center; max-width: 680px; margin: 0 auto;
+}
+
+/* ─── SVG helpers ─── */
+.svgFull { width: 100%; max-width: 460px; height: auto; display: block; }
+.svgMed { width: 100%; max-width: 320px; height: auto; display: block; }
+
+[data-theme='dark'] .svgFull text,
+[data-theme='dark'] .svgMed text { fill: var(--text-primary); }
+
+/* ─── Funnel ─── */
+.funnelContainer {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl);
+  align-items: center;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+}
+.funnelTexto { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.funnelSubtitulo { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 0.4rem; }
+.funnelTexto p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+
+/* ─── Tipos funcionales ─── */
+.tiposGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md);
+}
+.tipoCard {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg) var(--spacing-md);
+  cursor: pointer; transition: all 0.2s; text-align: center;
+  width: 100%;
+}
+.tipoCard:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.tipoCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.tipoCardActivo { border-color: var(--primary); background: rgba(46,134,171,0.06); }
+.tipoIcono { font-size: 2rem; }
+.tipoNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+.tipoDetalle {
+  margin-top: var(--spacing-sm); text-align: left; width: 100%;
+  border-top: 1px solid var(--border); padding-top: var(--spacing-sm);
+  animation: fadeIn 0.2s ease-out;
+}
+.tipoDesc { font-size: 0.82rem; color: var(--text-primary); line-height: 1.55; margin: 0 0 0.4rem; }
+.tipoEjemplos { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+/* ─── Enfermedades ─── */
+.enfermedadesGrid { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.enfermedadCard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.enfermedadBtn {
+  display: flex; align-items: center; gap: var(--spacing-md);
+  width: 100%; padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent; border: none; cursor: pointer;
+  text-align: left; transition: background 0.15s;
+}
+.enfermedadBtn:hover { background: var(--hover); }
+.enfermedadBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.enfermedadIcono { font-size: 1.8rem; flex-shrink: 0; }
+.enfermedadInfo { flex: 1; }
+.enfermedadNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem; }
+.enfermedadProteina { font-size: 0.82rem; color: var(--secondary); margin: 0; font-weight: 600; }
+.enfermedadToggle { font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
+
+.enfermedadDetalle {
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  border-top: 1px solid var(--border); animation: fadeIn 0.2s ease-out;
+}
+.enfermedadMecanismo {
+  font-size: 0.88rem; color: var(--text-primary); line-height: 1.6;
+  margin: 0 0 var(--spacing-sm);
+  background: rgba(46,134,171,0.07); border-left: 3px solid var(--primary);
+  padding: 0.5rem 0.75rem; border-radius: 0 6px 6px 0;
+}
+[data-theme='dark'] .enfermedadMecanismo { background: rgba(46,134,171,0.14); }
+.enfermedadTexto { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+
+/* ─── Chaperonas ─── */
+.chaperonasBox {
+  margin-top: var(--spacing-xl); background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--spacing-lg); border-top: 3px solid var(--secondary);
+}
+.chaperonasHeader { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+.chaperonasIcono { font-size: 1.8rem; }
+.chaperonasTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.chaperonasTexto { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; margin: 0 0 var(--spacing-sm); }
+.chaperonasTexto:last-child { margin-bottom: 0; }
+
+/* ─── Warning box (EducationalSection) ─── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin-top: var(--spacing-md);
+}
+[data-theme='dark'] .warningBox { background: rgba(46, 134, 171, 0.15); }
+
+/* ─── Accesibilidad: movimiento reducido ─── */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 700px) {
+  .container { padding: var(--spacing-lg) var(--spacing-md); }
+  .title { font-size: 1.7rem; }
+  .nivelTabs { grid-template-columns: repeat(2, 1fr); }
+  .tiposGrid { grid-template-columns: repeat(2, 1fr); }
+  .funnelContainer { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .tiposGrid { grid-template-columns: 1fr; }
+  .nivelTabs { grid-template-columns: repeat(2, 1fr); }
+}

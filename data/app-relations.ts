@@ -3190,6 +3190,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El equilibrio de Nash se encuentra buscando puntos críticos (derivada = 0)' },
   ],
 
+  // EJE B — Fisiología (2026-04-25)
+  'visualizador-ciclo-menstrual': [
+    { url: '/visualizador-estrogenos/', icon: '🟣', name: 'Estrógenos', description: 'Biología completa del estrógeno: hueso, cardiovascular, tejidos y menopausia' },
+    { url: '/visualizador-sistema-reproductor/', icon: '🫀', name: 'Sistema Reproductor', description: 'Anatomía del aparato reproductor femenino y masculino' },
+    { url: '/visualizador-tiroides/', icon: '🦋', name: 'Tiroides', description: 'El tiroides regula el metabolismo basal e interactúa con el ciclo menstrual' },
+    { url: '/seguimiento-ciclo-menstrual/', icon: '📅', name: 'Seguimiento de Ciclo', description: 'Predice tus próximos ciclos, ventana fértil y ovulación con tu tracker personal' },
+  ],
+  'visualizador-proteinas-plegamiento': [
+    { url: '/visualizador-adn-replicacion/', icon: '🧬', name: 'ADN y Replicación', description: 'El ADN codifica la secuencia de aminoácidos que determina el plegamiento proteínico' },
+    { url: '/visualizador-alzheimer-parkinson/', icon: '🧠', name: 'Alzheimer y Parkinson', description: 'Ambas enfermedades están causadas por proteínas mal plegadas: Aβ/tau y α-sinucleína' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Los anticuerpos son proteínas con plegamiento preciso que reconoce antígenos específicos' },
+    { url: '/visualizador-enzimas/', icon: '🧪', name: 'Enzimas', description: 'Las enzimas son proteínas cuya actividad catalítica depende de su plegamiento 3D exacto' },
+  ],
+
   // EJE E — Física avanzada (2026-04-25)
   'visualizador-relatividad-general': [
     { url: '/visualizador-relatividad-especial/', icon: '⚡', name: 'Relatividad Especial', description: 'La relatividad especial (1905) es el punto de partida: sin gravedad, solo velocidad' },

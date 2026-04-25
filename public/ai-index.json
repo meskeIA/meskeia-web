@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 635,
+  "total_tools": 637,
   "updated": "2026-04-25",
   "features": {
     "all_free": true,
@@ -1987,6 +1987,18 @@
           "slug": "visualizador-teoria-juegos",
           "url": "https://meskeia.com/visualizador-teoria-juegos/",
           "description": "Dilema del Prisionero interactivo con 3 estrategias del ordenador. Equilibrio de Nash, tabla de pagos, juegos suma cero vs cooperativos, Tragedia de los Comunes con slider y 4 aplicaciones reales (Guerra Fría, clima, evolución, subastas)"
+        },
+        {
+          "name": "Ciclo Menstrual: Fases y Hormonas",
+          "slug": "visualizador-ciclo-menstrual",
+          "url": "https://meskeia.com/visualizador-ciclo-menstrual/",
+          "description": "Gráfico SVG de las 4 hormonas (FSH, LH, estrógeno, progesterona) a lo largo del ciclo de 28 días. 4 fases clicables, SOP y mecanismo de anticonceptivos hormonales. Educativo, diferente del tracker personal."
+        },
+        {
+          "name": "Plegamiento de Proteínas: Estructura y Enfermedades",
+          "slug": "visualizador-proteinas-plegamiento",
+          "url": "https://meskeia.com/visualizador-proteinas-plegamiento/",
+          "description": "4 niveles de estructura proteínica con SVGs interactivos, funnel energético de Gibbs, 6 tipos funcionales y 4 enfermedades de mal plegamiento: Alzheimer (Aβ/tau), Parkinson (α-sinucleína), priones y fibrosis quística."
         },
         {
           "name": "Relatividad General: Curvatura del Espacio-Tiempo",
