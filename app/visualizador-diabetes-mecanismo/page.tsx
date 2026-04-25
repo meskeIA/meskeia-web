@@ -92,7 +92,7 @@ function BloquePancreas() {
       <div className={styles.pancreasLayout}>
         {/* SVG esquemático del páncreas */}
         <div className={styles.pancreassvgWrapper}>
-          <svg viewBox="0 0 320 180" className={styles.pancreasSvg} role="img" aria-label="Esquema del páncreas con células beta y alfa">
+          <svg viewBox="0 0 320 200" className={styles.pancreasSvg} role="img" aria-label="Esquema del páncreas con células beta y alfa">
             {/* Cuerpo del páncreas */}
             <ellipse cx="160" cy="90" rx="130" ry="62" fill="#FFF3E0" stroke="#E0C8A0" strokeWidth="2" />
             {/* Textura lobular */}
@@ -105,26 +105,34 @@ function BloquePancreas() {
             <circle cx="95" cy="85" r="22" fill={esAlta ? 'rgba(46,134,171,0.15)' : 'rgba(230,126,34,0.15)'} stroke={esAlta ? '#2E86AB' : '#E67E22'} strokeWidth="1.5" />
             {/* Células β (azul) */}
             <circle cx="88" cy="80" r="7" fill={esAlta ? '#2E86AB' : '#ccc'} />
+            <text x="88" y="83" textAnchor="middle" fontSize="8" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
             <circle cx="102" cy="82" r="6" fill={esAlta ? '#2E86AB' : '#ccc'} />
+            <text x="102" y="85" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
             <circle cx="93" cy="93" r="6" fill={esAlta ? '#2E86AB' : '#ccc'} />
+            <text x="93" y="96" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
             {/* Célula α (naranja) */}
             <circle cx="103" cy="72" r="5" fill={!esAlta ? '#E67E22' : '#ccc'} />
+            <text x="103" y="75" textAnchor="middle" fontSize="6" fill={!esAlta ? 'white' : '#888'} fontWeight="bold">α</text>
 
             {/* Islote 2 */}
             <circle cx="185" cy="75" r="20" fill={esAlta ? 'rgba(46,134,171,0.15)' : 'rgba(230,126,34,0.15)'} stroke={esAlta ? '#2E86AB' : '#E67E22'} strokeWidth="1.5" />
             <circle cx="178" cy="70" r="6" fill={esAlta ? '#2E86AB' : '#ccc'} />
+            <text x="178" y="73" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
             <circle cx="192" cy="73" r="7" fill={esAlta ? '#2E86AB' : '#ccc'} />
+            <text x="192" y="76" textAnchor="middle" fontSize="8" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
             <circle cx="183" cy="84" r="5" fill={esAlta ? '#2E86AB' : '#ccc'} />
+            <text x="183" y="87" textAnchor="middle" fontSize="6" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
             <circle cx="194" cy="63" r="5" fill={!esAlta ? '#E67E22' : '#ccc'} />
+            <text x="194" y="66" textAnchor="middle" fontSize="6" fill={!esAlta ? 'white' : '#888'} fontWeight="bold">α</text>
 
             {/* Etiquetas */}
-            <text x="160" y="168" textAnchor="middle" fontSize="11" fill="#888" fontStyle="italic">Islotes de Langerhans (páncreas endocrino)</text>
+            <text x="160" y="178" textAnchor="middle" fontSize="11" fill="#888" fontStyle="italic">Islotes de Langerhans (páncreas endocrino)</text>
 
             {/* Leyenda células */}
-            <circle cx="30" cy="165" r="5" fill="#2E86AB" />
-            <text x="38" y="169" fontSize="10" fill="#555">Células β (insulina)</text>
-            <circle cx="150" cy="165" r="5" fill="#E67E22" />
-            <text x="158" y="169" fontSize="10" fill="#555">Células α (glucagón)</text>
+            <circle cx="30" cy="188" r="5" fill="#2E86AB" />
+            <text x="38" y="192" fontSize="10" fill="#555">Células β (insulina)</text>
+            <circle cx="150" cy="188" r="5" fill="#E67E22" />
+            <text x="158" y="192" fontSize="10" fill="#555">Células α (glucagón)</text>
           </svg>
         </div>
 
@@ -335,7 +343,7 @@ function BloqueTipos() {
 
             {/* SVG: receptor de insulina resistente */}
             <div className={styles.svgContainer}>
-              <svg viewBox="0 0 340 130" className={styles.tipoSvg} role="img" aria-label="Diagrama de la resistencia a la insulina en el receptor celular">
+              <svg viewBox="0 0 340 148" className={styles.tipoSvg} role="img" aria-label="Diagrama de la resistencia a la insulina en el receptor celular">
                 {/* Membrana celular */}
                 <rect x="0" y="60" width="340" height="8" fill="#E8F4F8" stroke="#B0D4E0" strokeWidth="1" />
                 <text x="10" y="75" fontSize="9" fill="#888">Membrana celular</text>
@@ -343,38 +351,54 @@ function BloqueTipos() {
                 {/* Receptor de insulina — lado izquierdo (normal) */}
                 <text x="65" y="20" textAnchor="middle" fontSize="10" fill="#2E86AB" fontWeight="bold">Normal</text>
                 {/* Subunidades α extracelulares */}
-                <rect x="45" y="30" width="18" height="28" rx="4" fill="#2E86AB" opacity="0.8" />
-                <rect x="68" y="30" width="18" height="28" rx="4" fill="#2E86AB" opacity="0.8" />
+                <rect x="45" y="30" width="18" height="28" rx="4" fill="url(#gradNorm)" />
+                <rect x="68" y="30" width="18" height="28" rx="4" fill="url(#gradNorm)" />
                 {/* Insulina unida */}
                 <ellipse cx="65" cy="24" rx="16" ry="8" fill="#48A9A6" opacity="0.9" />
                 <text x="65" y="27" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">Insulina</text>
                 {/* Subunidades β transmembrana */}
-                <rect x="50" y="58" width="12" height="22" rx="2" fill="#1A6E8F" />
-                <rect x="68" y="58" width="12" height="22" rx="2" fill="#1A6E8F" />
+                <rect x="50" y="58" width="12" height="22" rx="2" fill="url(#gradNormDark)" />
+                <rect x="68" y="58" width="12" height="22" rx="2" fill="url(#gradNormDark)" />
                 {/* GLUT4 que se activa */}
                 <rect x="42" y="85" width="42" height="18" rx="6" fill="#27AE60" opacity="0.85" />
                 <text x="63" y="98" textAnchor="middle" fontSize="9" fill="white" fontWeight="bold">GLUT4 ✓</text>
                 {/* Flecha de glucosa entrando */}
                 <path d="M 63 110 L 63 120" stroke="#27AE60" strokeWidth="2" markerEnd="url(#arrowGreen)" />
-                <text x="63" y="132" textAnchor="middle" fontSize="9" fill="#27AE60">Glucosa entra</text>
+                <text x="63" y="144" textAnchor="middle" fontSize="9" fill="#27AE60">Glucosa entra</text>
 
                 {/* Separador */}
                 <line x1="168" y1="10" x2="168" y2="135" stroke="#ddd" strokeWidth="1" strokeDasharray="4 3" />
 
                 {/* Receptor de insulina — lado derecho (resistente) */}
                 <text x="253" y="20" textAnchor="middle" fontSize="10" fill="#E74C3C" fontWeight="bold">Resistente</text>
-                <rect x="233" y="30" width="18" height="28" rx="4" fill="#aaa" opacity="0.6" />
-                <rect x="256" y="30" width="18" height="28" rx="4" fill="#aaa" opacity="0.6" />
+                <rect x="233" y="30" width="18" height="28" rx="4" fill="url(#gradRes)" />
+                <rect x="256" y="30" width="18" height="28" rx="4" fill="url(#gradRes)" />
                 <ellipse cx="253" cy="24" rx="16" ry="8" fill="#48A9A6" opacity="0.9" />
                 <text x="253" y="27" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">Insulina</text>
-                <rect x="238" y="58" width="12" height="22" rx="2" fill="#888" />
-                <rect x="256" y="58" width="12" height="22" rx="2" fill="#888" />
+                <rect x="238" y="58" width="12" height="22" rx="2" fill="url(#gradResDark)" />
+                <rect x="256" y="58" width="12" height="22" rx="2" fill="url(#gradResDark)" />
                 {/* IRS-1 bloqueado */}
                 <rect x="228" y="85" width="50" height="18" rx="6" fill="#E74C3C" opacity="0.25" stroke="#E74C3C" strokeWidth="1.5" />
                 <text x="253" y="98" textAnchor="middle" fontSize="9" fill="#C0392B" fontWeight="bold">GLUT4 ✗</text>
-                <text x="253" y="132" textAnchor="middle" fontSize="9" fill="#C0392B">Glucosa no entra</text>
+                <text x="253" y="144" textAnchor="middle" fontSize="9" fill="#C0392B">Glucosa no entra</text>
 
                 <defs>
+                  <linearGradient id="gradNorm" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#7FBCD4" />
+                    <stop offset="100%" stopColor="#2E86AB" />
+                  </linearGradient>
+                  <linearGradient id="gradNormDark" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2E86AB" />
+                    <stop offset="100%" stopColor="#1A6E8F" />
+                  </linearGradient>
+                  <linearGradient id="gradRes" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#cccccc" />
+                    <stop offset="100%" stopColor="#aaaaaa" />
+                  </linearGradient>
+                  <linearGradient id="gradResDark" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#aaaaaa" />
+                    <stop offset="100%" stopColor="#888888" />
+                  </linearGradient>
                   <marker id="arrowGreen" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
                     <path d="M0,0 L6,3 L0,6 Z" fill="#27AE60" />
                   </marker>
