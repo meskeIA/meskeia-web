@@ -1,11 +1,40 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Fuse from 'fuse.js';
-import type { FuseResult } from 'fuse.js';
+import MiniSearch from 'minisearch';
 import { Application, applicationsDatabase, moments, suites, SuiteType } from '@/data/applications';
 import AsistenteChat from './AsistenteChat';
 import styles from './SearchBar.module.css';
+
+type AppResult = {
+  id: string;
+  score: number;
+  name: string;
+  description: string;
+  icon: string;
+  url: string;
+  suites: SuiteType[];
+  contexts?: string[];
+};
+
+type AppDoc = Application & { id: string };
+
+const indicePrincipal = new MiniSearch<AppDoc>({
+  idField: 'id',
+  fields: ['name', 'description', 'keywords', 'suites'],
+  storeFields: ['name', 'description', 'icon', 'url', 'suites', 'contexts'],
+  extractField: (document, fieldName) => {
+    const val = (document as unknown as Record<string, unknown>)[fieldName];
+    if (Array.isArray(val)) return val.join(' ');
+    return String(val ?? '');
+  },
+  searchOptions: {
+    boost: { name: 3, keywords: 2, description: 1.5 },
+    fuzzy: 0.2,
+    prefix: true,
+  },
+});
+indicePrincipal.addAll(applicationsDatabase.map(app => ({ ...app, id: app.url })));
 
 interface SearchBarProps {
   large?: boolean;
@@ -60,27 +89,11 @@ const extractKeywords = (text: string): string => {
 export default function SearchBar({ large = false }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<FuseResult<Application>[]>([]);
+  const [results, setResults] = useState<AppResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-
-  // Configurar Fuse.js
-  const fuse = useRef(
-    new Fuse(applicationsDatabase, {
-      keys: [
-        { name: 'name', weight: 0.4 },
-        { name: 'description', weight: 0.3 },
-        { name: 'keywords', weight: 0.2 },
-        { name: 'suites', weight: 0.1 },
-      ],
-      threshold: 0.4,
-      includeScore: true,
-      minMatchCharLength: 2,
-      ignoreLocation: true,
-    })
-  );
 
   // Atajo de teclado Ctrl+K o Cmd+K (solo para versión modal pequeña)
   useEffect(() => {
@@ -151,8 +164,8 @@ export default function SearchBar({ large = false }: SearchBarProps) {
       return;
     }
 
-    const searchResults = fuse.current.search(keywords);
-    setResults(searchResults.slice(0, 6)); // Máximo 6 resultados
+    const searchResults = indicePrincipal.search(keywords) as unknown as AppResult[];
+    setResults(searchResults.slice(0, 6));
     setSelectedIndex(-1);
     if (large) setShowDropdown(true);
   };
@@ -173,7 +186,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
 
       case 'Enter':
         if (selectedIndex >= 0 && results[selectedIndex]) {
-          window.location.href = results[selectedIndex].item.url;
+          window.location.href = results[selectedIndex].url;
         }
         break;
     }
@@ -208,14 +221,14 @@ export default function SearchBar({ large = false }: SearchBarProps) {
         results.map((result, index) => (
           <a
             key={index}
-            href={result.item.url}
+            href={result.url}
             className={`${styles.resultItemCompact} ${
               index === selectedIndex ? styles.selected : ''
             }`}
             onClick={handleResultClick}
           >
-            <span className={styles.resultIconCompact}>{result.item.icon}</span>
-            <span className={styles.resultTitleCompact}>{result.item.name}</span>
+            <span className={styles.resultIconCompact}>{result.icon}</span>
+            <span className={styles.resultTitleCompact}>{result.name}</span>
           </a>
         ))
       )}
@@ -235,30 +248,30 @@ export default function SearchBar({ large = false }: SearchBarProps) {
         </div>
       ) : (
         results.map((result, index) => {
-          const appMoments = result.item.contexts?.map(contextId =>
+          const appMoments = result.contexts?.map(contextId =>
             moments.find(m => m.id === contextId)
           ).filter(Boolean) || [];
 
           return (
             <a
               key={index}
-              href={result.item.url}
+              href={result.url}
               className={`${styles.resultItem} ${
                 index === selectedIndex ? styles.selected : ''
               }`}
               onClick={handleResultClick}
             >
-              <div className={styles.resultIcon}>{result.item.icon}</div>
+              <div className={styles.resultIcon}>{result.icon}</div>
               <div className={styles.resultContent}>
                 <div className={styles.resultTitle}>
-                  {result.item.name}
+                  {result.name}
                 </div>
                 <div className={styles.resultDescription}>
-                  {result.item.description}
+                  {result.description}
                 </div>
                 <div className={styles.resultMeta}>
                   <span className={styles.resultSuites}>
-                    {result.item.suites.map((suiteId: SuiteType) =>
+                    {result.suites.map((suiteId: SuiteType) =>
                       suites.find(s => s.id === suiteId)?.icon
                     ).join(' ')}
                   </span>

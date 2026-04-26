@@ -1,28 +1,34 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import Fuse from 'fuse.js';
-import { applicationsDatabase } from '@/data/applications';
+import MiniSearch from 'minisearch';
+import { Application, applicationsDatabase } from '@/data/applications';
 import { implementedAppsUrls } from '@/data/implemented-apps';
 import styles from './AsistenteChat.module.css';
 
-// Solo apps implementadas, instancia compartida
+type AppDoc = Application & { id: string };
+type AppResult = { id: string; score: number; name: string; description: string; icon: string; url: string };
+
 const appsImplementadas = applicationsDatabase.filter((app) =>
   implementedAppsUrls.includes(app.url)
 );
 
-const fuseAsistente = new Fuse(appsImplementadas, {
-  keys: [
-    { name: 'name', weight: 0.4 },
-    { name: 'description', weight: 0.3 },
-    { name: 'keywords', weight: 0.2 },
-    { name: 'suites', weight: 0.1 },
-  ],
-  threshold: 0.4,
-  includeScore: true,
-  minMatchCharLength: 2,
-  ignoreLocation: true,
+const indiceAsistente = new MiniSearch<AppDoc>({
+  idField: 'id',
+  fields: ['name', 'description', 'keywords', 'suites'],
+  storeFields: ['name', 'description', 'icon', 'url'],
+  extractField: (document, fieldName) => {
+    const val = (document as unknown as Record<string, unknown>)[fieldName];
+    if (Array.isArray(val)) return val.join(' ');
+    return String(val ?? '');
+  },
+  searchOptions: {
+    boost: { name: 3, keywords: 2, description: 1.5 },
+    fuzzy: 0.2,
+    prefix: true,
+  },
 });
+indiceAsistente.addAll(appsImplementadas.map(app => ({ ...app, id: app.url })));
 
 export default function AsistenteChat() {
   const [consulta, setConsulta] = useState('');
@@ -32,9 +38,9 @@ export default function AsistenteChat() {
     inputRef.current?.focus();
   }, []);
 
-  const resultados = useMemo(() => {
+  const resultados = useMemo((): AppResult[] => {
     if (consulta.trim().length < 2) return [];
-    return fuseAsistente.search(consulta.trim()).slice(0, 5);
+    return indiceAsistente.search(consulta.trim()).slice(0, 5) as unknown as AppResult[];
   }, [consulta]);
 
   const limpiar = () => {
@@ -69,12 +75,12 @@ export default function AsistenteChat() {
 
       {resultados.length > 0 && (
         <div className={styles.appCards}>
-          {resultados.map(({ item }) => (
-            <a key={item.url} href={item.url} className={styles.appCard}>
-              <span className={styles.appCardIcon}>{item.icon}</span>
+          {resultados.map((result) => (
+            <a key={result.url} href={result.url} className={styles.appCard}>
+              <span className={styles.appCardIcon}>{result.icon}</span>
               <div className={styles.appCardBody}>
-                <div className={styles.appCardName}>{item.name}</div>
-                <div className={styles.appCardDesc}>{item.description}</div>
+                <div className={styles.appCardName}>{result.name}</div>
+                <div className={styles.appCardDesc}>{result.description}</div>
               </div>
             </a>
           ))}
