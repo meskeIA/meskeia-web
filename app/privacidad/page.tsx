@@ -53,7 +53,7 @@ export default function PrivacidadPage() {
 
           <h2>1. Información del Responsable</h2>
           <p><strong>Responsable del tratamiento:</strong> meskeIA (proyecto personal sin actividad económica)</p>
-          <p><strong>Contacto:</strong> meskeia24@gmail.com</p>
+          <p><strong>Contacto:</strong> <a href="/contacto">Formulario de contacto anónimo</a></p>
           <p><strong>Ámbito de aplicación:</strong> Esta política se aplica a todas las utilidades web disponibles en meskeIA.</p>
 
           <h2>2. Qué Datos Recopilamos y Qué NO</h2>

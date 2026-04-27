@@ -53,6 +53,12 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
           <span className={styles.linkTextFull}>Política de Privacidad</span>
           <span className={styles.linkTextShort}>Privacidad</span>
         </Link>
+
+        <span className={styles.separator}>|</span>
+
+        <Link href="/contacto" className={styles.link}>
+          Contacto
+        </Link>
       </div>
 
       {lastUpdated && (

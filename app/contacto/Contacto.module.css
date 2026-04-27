@@ -1,0 +1,232 @@
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 120px 2rem 80px;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Formulario */
+.form {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.required {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+.select,
+.textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 150px;
+  line-height: 1.6;
+}
+
+.charCount {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Botón enviar */
+.submitButton {
+  padding: 0.85rem 2rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  font-family: inherit;
+  align-self: flex-start;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #256d8a;
+  transform: translateY(-1px);
+}
+
+.submitButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.submitButton:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Estado de éxito */
+.successBox {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.successIcon {
+  font-size: 3rem;
+}
+
+.successBox h2 {
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+.successBox p {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.resetButton {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: none;
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.resetButton:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.resetButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Estado de error */
+.errorBox {
+  padding: 0.75rem 1rem;
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: 8px;
+  color: #c0392b;
+  font-size: 0.95rem;
+}
+
+/* Honeypot: completamente oculto para humanos */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Dark mode */
+[data-theme='dark'] .card {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .select,
+[data-theme='dark'] .textarea {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .select:focus,
+[data-theme='dark'] .textarea:focus {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .errorBox {
+  background: rgba(220, 53, 69, 0.15);
+  border-color: rgba(220, 53, 69, 0.4);
+  color: #f5a5ab;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 100px 1rem 60px;
+  }
+
+  .card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .submitButton {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -183,7 +183,7 @@ export default function AcercaPage() {
             gratuito y no implica ninguna relación contractual onerosa entre el usuario y el titular.
           </p>
           <p style={{ marginTop: '12px' }}>
-            Para cualquier consulta: <strong>meskeia24@gmail.com</strong>
+            Para cualquier consulta: <a href="/contacto" className={styles.link}>formulario de contacto anónimo</a>
           </p>
         </div>
 
