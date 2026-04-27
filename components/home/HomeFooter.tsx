@@ -31,6 +31,10 @@ export default function HomeFooter() {
             Términos
           </Link>
           <span className={styles.dot}>•</span>
+          <Link href="/contacto" className={styles.link}>
+            Contacto
+          </Link>
+          <span className={styles.dot}>•</span>
           <button
             type="button"
             onClick={() => {
