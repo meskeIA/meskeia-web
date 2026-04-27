@@ -8,7 +8,6 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import RecentAppTracker from '@/components/RecentAppTracker';
 import TransparencyBanner from '@/components/TransparencyBanner';
 import { Providers } from './providers';
-import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -120,7 +119,6 @@ export default function RootLayout({
           </ThemeProvider>
         </Providers>
       </body>
-      <GoogleAnalytics gaId="G-SPPGLJBQ4Z" />
     </html>
   );
 }

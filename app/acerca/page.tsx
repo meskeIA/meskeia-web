@@ -173,6 +173,20 @@ export default function AcercaPage() {
           </p>
         </div>
 
+        {/* Aviso Legal */}
+        <h2 className={styles.sectionTitle}>Aviso Legal</h2>
+        <div className={styles.section}>
+          <p>
+            meskeIA es un <strong>proyecto personal</strong> sin actividad económica ni ánimo de lucro.
+            No genera ingresos, no tiene forma jurídica societaria y es mantenido íntegramente
+            por su autor a título particular. El acceso y uso de todas las herramientas es
+            gratuito y no implica ninguna relación contractual onerosa entre el usuario y el titular.
+          </p>
+          <p style={{ marginTop: '12px' }}>
+            Para cualquier consulta: <strong>meskeia24@gmail.com</strong>
+          </p>
+        </div>
+
         <div className={styles.ctaContainer}>
           <Link href="/" className={styles.ctaButton}>Explorar Aplicaciones</Link>
         </div>

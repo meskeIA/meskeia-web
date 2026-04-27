@@ -17,7 +17,7 @@ export default function TerminosPage() {
         <article className={styles.legalDocument}>
           <div className={styles.documentHeader}>
             <h1 className={styles.documentTitle}>Términos de Uso y Condiciones</h1>
-            <p className={styles.lastUpdated}>Última actualización: 2 de febrero de 2026</p>
+            <p className={styles.lastUpdated}>Última actualización: 27 de abril de 2026</p>
           </div>
 
           <InfoBox type="warning" title="IMPORTANTE - LEA ANTES DE USAR" icon="⚠️">
@@ -28,25 +28,26 @@ export default function TerminosPage() {
           <p>Al acceder y utilizar las utilidades web de <strong>meskeIA</strong>, usted acepta cumplir con estos Términos de Uso y todas las leyes y regulaciones aplicables. Estos términos constituyen un acuerdo legal vinculante entre usted y meskeIA.</p>
 
           <h2>2. Descripción del Servicio</h2>
-          <p>meskeIA proporciona una <strong>biblioteca gratuita de utilidades web</strong> que incluye, pero no se limita a:</p>
+          <p>meskeIA proporciona una <strong>biblioteca gratuita de más de 600 utilidades web</strong> en español, organizadas en suites temáticas que incluyen, entre otras:</p>
           <ul>
-            <li>Generadores de contraseñas</li>
-            <li>Calculadoras financieras y de préstamos</li>
-            <li>Herramientas de productividad y temporizadores</li>
-            <li>Generadores de paletas de colores</li>
-            <li>Información meteorológica</li>
-            <li><strong>Calculadoras relacionadas con la salud (únicamente informativas)</strong></li>
+            <li>Calculadoras financieras, fiscales e inmobiliarias</li>
+            <li>Herramientas de salud y bienestar (únicamente informativas)</li>
+            <li>Visualizadores interactivos de ciencia, medicina y tecnología</li>
+            <li>Herramientas para freelancers y autónomos</li>
+            <li>Apps educativas para estudiantes (matemáticas, física, química)</li>
+            <li>Herramientas de productividad, diseño y marketing</li>
+            <li>Juegos, quizzes y entretenimiento</li>
+            <li>Cursos y guías de decisión</li>
           </ul>
 
           <InfoBox type="info" title="RECOPILACIÓN DE ESTADÍSTICAS" icon="📊">
-            <p><strong>Para mejorar nuestro servicio, utilizamos Google Analytics que recopila información básica de uso:</strong></p>
+            <p><strong>Para mejorar nuestro servicio, utilizamos un sistema de analytics propio (server-side, sin cookies) que recopila información básica de uso:</strong></p>
             <ul>
               <li>Páginas visitadas y tiempo en el sitio</li>
-              <li>País de origen (datos agregados)</li>
+              <li>País de origen (datos agregados y anónimos)</li>
               <li>Tipo de dispositivo utilizado</li>
-              <li>Flujo de navegación entre páginas</li>
             </ul>
-            <p><strong>IMPORTANTE:</strong> Esta recopilación estadística NO incluye los datos que introduce en las calculadoras. Sus cálculos, contraseñas, información financiera y de salud permanecen completamente privados.</p>
+            <p><strong>IMPORTANTE:</strong> Este sistema no instala cookies en su navegador. La recopilación estadística NO incluye los datos que introduce en las herramientas. Sus cálculos e información personal permanecen completamente privados.</p>
           </InfoBox>
 
           <InfoBox type="medical" title="SECCIÓN ESPECIAL: CALCULADORA DE SALUD" icon="⚕️">
@@ -172,7 +173,7 @@ export default function TerminosPage() {
           <h2>5. Privacidad y Datos</h2>
 
           <InfoBox type="info" title="COMPROMISO DE PRIVACIDAD" icon="🔒">
-            <p>Las herramientas funcionan <strong>completamente en su navegador</strong> para datos sensibles. Utilizamos Google Analytics únicamente para estadísticas básicas de uso del sitio web. Para más información, consulte nuestra <Link href="/privacidad" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>Política de Privacidad</Link>.</p>
+            <p>Las herramientas funcionan <strong>completamente en su navegador</strong> para datos sensibles. Utilizamos un sistema de analytics propio (server-side, sin cookies) únicamente para estadísticas básicas de uso. Para más información, consulte nuestra <Link href="/privacidad" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>Política de Privacidad</Link>.</p>
 
             <p><strong>DATOS DE SALUD:</strong> La información de salud que introduce en nuestra calculadora es especialmente sensible. Por esta razón, garantizamos que:</p>
             <ul>
@@ -239,7 +240,7 @@ export default function TerminosPage() {
             <li>Modificar, suspender o discontinuar cualquier herramienta</li>
             <li>Actualizar estos términos en cualquier momento</li>
             <li>Cambiar la funcionalidad de las utilidades</li>
-            <li>Actualizar configuraciones de Google Analytics</li>
+            <li>Actualizar el sistema de estadísticas de uso</li>
             <li><strong>Actualizar algoritmos de cálculo médico según nuevos estándares científicos</strong></li>
           </ul>
 

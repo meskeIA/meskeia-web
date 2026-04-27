@@ -44,7 +44,7 @@ export default function PrivacidadPage() {
         <article className={styles.legalDocument}>
           <div className={styles.documentHeader}>
             <h1 className={styles.documentTitle}>Política de Privacidad</h1>
-            <p className={styles.lastUpdated}>Última actualización: 26 de enero de 2026</p>
+            <p className={styles.lastUpdated}>Última actualización: 27 de abril de 2026</p>
           </div>
 
           <InfoBox type="success" title="COMPROMISO DE PRIVACIDAD" icon="🔒">
@@ -52,7 +52,8 @@ export default function PrivacidadPage() {
           </InfoBox>
 
           <h2>1. Información del Responsable</h2>
-          <p><strong>Responsable del tratamiento:</strong> meskeIA</p>
+          <p><strong>Responsable del tratamiento:</strong> meskeIA (proyecto personal sin actividad económica)</p>
+          <p><strong>Contacto:</strong> meskeia24@gmail.com</p>
           <p><strong>Ámbito de aplicación:</strong> Esta política se aplica a todas las utilidades web disponibles en meskeIA.</p>
 
           <h2>2. Qué Datos Recopilamos y Qué NO</h2>
@@ -111,15 +112,21 @@ export default function PrivacidadPage() {
             )}
           </div>
 
-          <h2>4. Analytics Propio</h2>
+          <h2>4. Analytics Propio (Turso)</h2>
 
           <InfoBox type="info" title="ESTADÍSTICAS BÁSICAS Y ANÓNIMAS" icon="📊">
-            <p><strong>Utilizamos un sistema de analytics propio para entender qué herramientas son más útiles:</strong></p>
+            <p><strong>Utilizamos un sistema de analytics propio (servidor Turso) para entender qué herramientas son más útiles:</strong></p>
             <ul>
               <li><strong>Páginas visitadas</strong> (qué calculadoras son más populares)</li>
               <li><strong>Tiempo aproximado de uso</strong> (si las herramientas son útiles)</li>
               <li><strong>País de origen</strong> (datos agregados y anónimos, derivados de IP)</li>
               <li><strong>Tipo de dispositivo</strong> (móvil o escritorio)</li>
+            </ul>
+            <p><strong>Características técnicas de este sistema:</strong></p>
+            <ul>
+              <li>Procesamiento <strong>server-side</strong>: no instala ninguna cookie en su navegador</li>
+              <li>No utiliza scripts de terceros en su dispositivo</li>
+              <li>Los datos son agregados y anónimos desde el origen</li>
             </ul>
             <p><strong>NO registramos:</strong></p>
             <ul>
@@ -188,7 +195,7 @@ export default function PrivacidadPage() {
 
           <InfoBox type="success" title="SIN COOKIES DE SEGUIMIENTO" icon="🍪">
             <p><strong>meskeIA NO utiliza cookies de seguimiento ni de terceros.</strong></p>
-            <p>Usamos <strong>localStorage</strong> (almacenamiento local del navegador) para guardar sus preferencias. A diferencia de las cookies:</p>
+            <p>El sistema de analytics es <strong>server-side</strong> (no instala cookies en su navegador). Usamos <strong>localStorage</strong> (almacenamiento local del navegador) para guardar sus preferencias. A diferencia de las cookies:</p>
             <ul>
               <li>Los datos NO se envían automáticamente al servidor</li>
               <li>NO hay cookies de publicidad ni de tracking</li>
