@@ -20,8 +20,8 @@ export default function AcercaPage() {
         <div className={styles.intro}>
           <p>
             <strong>meskeIA</strong> es una biblioteca de <strong>aplicaciones web gratuitas</strong> en español.
-            Apps de finanzas, matemáticas, productividad, creatividad y mucho más.
-            Todas funcionan <strong>sin registro</strong>, <strong>sin anuncios</strong> y <strong>100% en español</strong>.
+            Calculadoras, visualizadores interactivos, guías de decisión, herramientas de productividad y mucho más.
+            Todo funciona <strong>sin registro</strong>, <strong>sin anuncios</strong>, <strong>sin instalar nada</strong> y <strong>100% en español</strong>.
           </p>
 
           <div className={styles.stats}>
@@ -46,32 +46,42 @@ export default function AcercaPage() {
           <div className={styles.casosUso}>
             <div className={styles.caso}>
               <h3>💼 Inversores y Ahorradores</h3>
-              <p>Calculadoras de hipotecas, interés compuesto, TAE, IRPF, ratios financieros y análisis de inversiones.</p>
+              <p>Calculadoras de hipotecas, interés compuesto, TAE, IRPF, pensiones, herencias y análisis de inversiones.</p>
             </div>
 
             <div className={styles.caso}>
-              <h3>🎓 Estudiantes</h3>
-              <p>Herramientas matemáticas, calculadoras científicas, conversores de unidades, generadores de estadísticas.</p>
+              <h3>🎓 Estudiantes y Bachillerato</h3>
+              <p>Visualizadores de física, química y biología. Calculadoras científicas, estadísticas y conversores de unidades para el estudio.</p>
             </div>
 
             <div className={styles.caso}>
-              <h3>💻 Profesionales</h3>
-              <p>Gestión de tiempo, temporizadores Pomodoro, generadores de texto, herramientas de productividad.</p>
+              <h3>💻 Profesionales y Trabajadores</h3>
+              <p>Gestión del tiempo, Pomodoro, herramientas de productividad, generadores de texto y utilidades del día a día.</p>
             </div>
 
             <div className={styles.caso}>
               <h3>🎨 Creativos y Diseñadores</h3>
-              <p>Generadores de paletas de colores, tipografías, gradientes, códigos QR y herramientas visuales.</p>
+              <p>Paletas de colores, tipografías, gradientes, códigos QR, iconos SVG y herramientas visuales para proyectos creativos.</p>
             </div>
 
             <div className={styles.caso}>
-              <h3>🏢 Emprendedores</h3>
-              <p>Calculadoras de ROI, punto de equilibrio, modelos de negocio y análisis de viabilidad.</p>
+              <h3>🏢 Emprendedores y Autónomos</h3>
+              <p>Calculadoras de ROI, punto de equilibrio, cuota de autónomos, precio de proyecto, facturación y planificación de negocio.</p>
             </div>
 
             <div className={styles.caso}>
               <h3>🏥 Salud y Bienestar</h3>
-              <p>Calculadoras de IMC, calorías, macronutrientes y herramientas de seguimiento personal.</p>
+              <p>Calculadoras de IMC, calorías y macronutrientes. Visualizadores de mecanismos biológicos, fármacos, vitaminas y hormonas.</p>
+            </div>
+
+            <div className={styles.caso}>
+              <h3>🔬 Curiosos del Conocimiento</h3>
+              <p>Más de 200 visualizadores interactivos de economía, ciencia, historia, geopolítica y fenómenos cotidianos para entender el mundo.</p>
+            </div>
+
+            <div className={styles.caso}>
+              <h3>👨‍👩‍👧 Familias y Cuidadores</h3>
+              <p>Herramientas para gestionar la dependencia, planificar cuidados, calcular prestaciones y organizar el bienestar familiar.</p>
             </div>
           </div>
         </div>
