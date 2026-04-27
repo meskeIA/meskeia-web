@@ -296,8 +296,7 @@ export default function VisualizadorInsulinaGlucosa() {
 
       <DisclaimerCard
         variant="medical"
-        severity="low"
-        collapsible={true}
+        severity="high"
       />
 
       {/* ── BLOQUE 1: Curva de glucosa ── */}

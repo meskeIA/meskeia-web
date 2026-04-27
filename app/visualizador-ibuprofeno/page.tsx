@@ -365,7 +365,7 @@ export default function VisualizadorIbuprofeno() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── SECCIÓN 1: El mecanismo COX ── */}
       <section className={styles.section}>

@@ -297,7 +297,7 @@ export default function VisualizadorEstrogenos() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── Bloque 1: Los Tres Estrógenos ── */}
       <section className={styles.section}>

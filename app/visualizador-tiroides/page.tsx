@@ -127,8 +127,7 @@ export default function VisualizadorTiroides() {
       <main className={styles.main}>
         <DisclaimerCard
           variant="medical"
-          severity="low"
-          collapsible={true}
+          severity="high"
         />
 
         {/* Bloque 1 — Eje hipotálamo-hipófisis-tiroides */}

@@ -452,8 +452,7 @@ export default function VisualizadorVitaminaDPage() {
 
       <DisclaimerCard
         variant="medical"
-        severity="low"
-        collapsible={true}
+        severity="high"
       />
 
       <BloqueSintesis />

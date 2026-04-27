@@ -464,7 +464,7 @@ export default function VisualizadorAdrenalina() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       <BloqueDobleIdentidad />
       <BloqueTimeline />

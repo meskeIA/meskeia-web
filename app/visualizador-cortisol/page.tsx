@@ -719,8 +719,7 @@ export default function VisualizadorCortisolPage() {
 
         <DisclaimerCard
           variant="medical"
-          severity="low"
-          collapsible={true}
+          severity="high"
         />
 
         {/* Navegación de secciones */}

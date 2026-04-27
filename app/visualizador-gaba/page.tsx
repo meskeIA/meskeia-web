@@ -393,7 +393,7 @@ export default function VisualizadorGaba() {
 
       {/* ── DISCLAIMER ── */}
       <div className={styles.section}>
-        <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+        <DisclaimerCard variant="medical" severity="high" />
       </div>
 
       {/* ── SECCIÓN EDUCATIVA ── */}

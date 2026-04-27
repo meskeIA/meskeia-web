@@ -544,7 +544,7 @@ export default function VisualizadorHierro() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── BLOQUE 1: Distribución del hierro ── */}
       <section className={styles.section} aria-labelledby="titulo-distribucion">

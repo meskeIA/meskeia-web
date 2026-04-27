@@ -314,7 +314,7 @@ export default function VisualizadorAntibioticos() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── SECCIÓN 1: 5 mecanismos de acción ── */}
       <section className={styles.section}>

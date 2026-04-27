@@ -480,7 +480,7 @@ export default function VisualizadorVitaminaB12Page() {
       <BloqueSintomas />
 
       <div className={styles.sectionWrapper}>
-        <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+        <DisclaimerCard variant="medical" severity="high" />
       </div>
 
       <EducationalSection

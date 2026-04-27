@@ -500,7 +500,7 @@ export default function VisualizadorAnestesiaPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       <BloqueTiposAnestesia />
       <BloqueComponentesGeneral />

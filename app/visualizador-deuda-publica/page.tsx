@@ -154,8 +154,7 @@ export default function VisualizadorDeudaPublica() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
-        collapsible={true}
+        severity="high"
       >
         Esta herramienta explica el funcionamiento de la deuda pública con fines exclusivamente educativos. Los datos macroeconómicos mostrados son orientativos y pueden no reflejar la situación más reciente. No constituye asesoramiento financiero ni fiscal.
       </DisclaimerCard>

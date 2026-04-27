@@ -408,7 +408,7 @@ export default function VisualizadorAspirina() {
 
       {/* DISCLAIMER */}
       <div className={styles.section}>
-        <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+        <DisclaimerCard variant="medical" severity="high" />
       </div>
 
       {/* EDUCATIONAL SECTION */}

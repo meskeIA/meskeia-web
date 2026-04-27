@@ -261,7 +261,7 @@ export default function VisualizadorParacetamol() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── SECCIÓN 1: Mecanismo ── */}
       <section className={styles.section} aria-labelledby="titulo-mecanismo">

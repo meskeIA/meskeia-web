@@ -597,7 +597,7 @@ export default function VisualizadorMagnesio() {
 
       {/* Disclaimer */}
       <div className={styles.section}>
-        <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+        <DisclaimerCard variant="medical" severity="high" />
       </div>
 
       {/* Sección educativa */}

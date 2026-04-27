@@ -614,7 +614,7 @@ export default function VisualizadorTiposInteresBce() {
       </section>
 
       {/* ── Disclaimer ── */}
-      <DisclaimerCard variant="financial" severity="medium" collapsible={true} context="visualizador-tipos-interes-bce">
+      <DisclaimerCard variant="financial" severity="high" context="visualizador-tipos-interes-bce">
         <p>
           Este visualizador tiene finalidad <strong>exclusivamente educativa</strong>. Los datos históricos y cifras
           de ejemplo son aproximaciones ilustrativas. Los tipos de interés del BCE cambian periódicamente; consulta{' '}

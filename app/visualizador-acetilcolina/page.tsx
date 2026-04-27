@@ -395,7 +395,7 @@ export default function VisualizadorAcetilcolina() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* ── SECCIÓN 1: Los 3 sistemas ── */}
       <section className={styles.section} aria-labelledby="titulo-sistemas">

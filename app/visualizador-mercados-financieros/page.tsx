@@ -299,8 +299,7 @@ export default function VisualizadorMercadosFinancieros() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
-        collapsible={true}
+        severity="high"
         context="visualizador-mercados-financieros"
       >
         Esta herramienta explica el funcionamiento de los mercados financieros con fines exclusivamente educativos. No constituye asesoramiento de inversión ni recomendación de compra o venta de activos. Invertir conlleva riesgo de pérdida del capital. Consulta a un asesor financiero antes de tomar decisiones de inversión.

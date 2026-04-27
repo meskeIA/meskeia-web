@@ -407,7 +407,7 @@ export default function VisualizadorAnalgesicos() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="medical" severity="low" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" />
 
       {/* SECCIÓN 1: Toggle 3 fármacos */}
       <section className={styles.section}>
