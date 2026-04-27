@@ -31,6 +31,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   ...generateBaseMetadata(),
   manifest: '/manifest.json',
+  verification: {
+    google: '2Ytijr-l5aJo-wEh4UwcIvnrBDbIqOD8d9_PKF2UcJw',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
