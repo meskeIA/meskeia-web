@@ -164,7 +164,7 @@ export default function PrivacidadPage() {
               <tr>
                 <td><strong>Supresión</strong></td>
                 <td>Eliminar sus datos</td>
-                <td>Use el botón &quot;Borrar datos locales&quot; arriba o contacte por email</td>
+                <td>Use el botón &quot;Borrar datos locales&quot; arriba o el <a href="/contacto">formulario de contacto</a></td>
               </tr>
               <tr>
                 <td><strong>Portabilidad</strong></td>
