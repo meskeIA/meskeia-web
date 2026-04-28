@@ -1,0 +1,574 @@
+/* CineticaQuimica.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones ─────────────────────────────────── */
+.section {
+  max-width: 1000px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Perfil de energía ──────────────────────────── */
+.perfilWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .perfilWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.svgContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.svgGrafico {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.controlsPanel {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.controlGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.controlLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.controlValor {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggleBtn {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  background: #ccc;
+}
+
+.toggleBtnActivo {
+  background: var(--secondary);
+}
+
+.toggleBtnHandle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggleBtnActivo .toggleBtnHandle {
+  transform: translateX(20px);
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.ejemplosBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.btnEjemplo {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btnEjemplo:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.btnEjemplo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnEjemploActivo {
+  background: var(--primary);
+  color: white;
+}
+
+.leyendaPeril {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.leyendaLinea {
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ─── Arrhenius ──────────────────────────────────── */
+.arrheniusWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .arrheniusWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formulaBox {
+  background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.formulaTeX {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Georgia', serif;
+  letter-spacing: 0.03em;
+}
+
+.formulaDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+.arrheniusGraficos {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.arrheniusValorBox {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.arrheniusValorBox strong {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.arrheniusValorBox span {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.reglaPractica {
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid var(--secondary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Órdenes de reacción ───────────────────────── */
+.ordenesWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ordenesGraficos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 700px) {
+  .ordenesGraficos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ordenCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ordenTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+  text-align: center;
+}
+
+.ordenFormula {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-family: 'Georgia', serif;
+  text-align: center;
+  margin: 0;
+}
+
+.ordenEjemplo {
+  font-size: 0.78rem;
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.kSliderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.kSliderRow label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.kSliderRow input {
+  flex: 1;
+  accent-color: var(--primary);
+}
+
+.vidaMediaBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.vidaMediaBox strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.vidaMediaValores {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.vidaMediaItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.vidaMediaItem span:first-child {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.vidaMediaItem span:last-child {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ─── Factores ───────────────────────────────────── */
+.factoresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.factorCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.factorCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.factorCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.factorCardActivo {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.15);
+}
+
+.factorIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+.factorTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.factorMecanismo {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.factorEjemplo {
+  font-size: 0.82rem;
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: auto;
+}
+
+/* ─── Sección educativa ──────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.eduCard h4 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Warning box (indicador patrón v2.0) ────────── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: 0.85rem 1.1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 0.25rem;
+}
+
+/* ─── Dark mode ──────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .svgContainer,
+[data-theme='dark'] .controlsPanel,
+[data-theme='dark'] .ordenCard,
+[data-theme='dark'] .factorCard,
+[data-theme='dark'] .eduCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .formulaBox {
+  background: linear-gradient(135deg, rgba(46,134,171,0.12) 0%, rgba(72,169,166,0.12) 100%);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .arrheniusValorBox,
+[data-theme='dark'] .vidaMediaBox {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .factorEjemplo,
+[data-theme='dark'] .ordenEjemplo,
+[data-theme='dark'] .reglaPractica {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .toggleBtn {
+  background: #555;
+}
+
+[data-theme='dark'] .factorCard:hover,
+[data-theme='dark'] .factorCardActivo {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.2);
+}
+
+/* ─── Motion reducida ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container .toggleBtnHandle,
+  .container .toggleBtn,
+  .container .btnEjemplo,
+  .container .factorCard,
+  .container .btnCerrar {
+    transition-duration: 0.01ms !important;
+  }
+}

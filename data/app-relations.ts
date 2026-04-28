@@ -3216,6 +3216,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'El análisis espectral aplica Fourier a series temporales para detectar señales estadísticamente' },
   ],
 
+  // EJE C — Química avanzada (2026-04-28)
+  'visualizador-termodinamica-quimica': [
+    { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'La termodinámica dice si una reacción puede ocurrir; la cinética dice a qué velocidad ocurrirá' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Los fundamentos de las reacciones antes de profundizar en su energética' },
+    { url: '/visualizador-electroquimica/', icon: '🔋', name: 'Electroquímica', description: 'El criterio ΔG < 0 determina si una pila galvánica genera corriente espontáneamente' },
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica Física', description: 'La termodinámica química parte de los mismos principios aplicados a sistemas químicos' },
+  ],
+  'visualizador-cinetica-quimica': [
+    { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'La termodinámica dice si una reacción puede ocurrir; la cinética dice a qué velocidad' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧬', name: 'Enzimas', description: 'Las enzimas son biocatalizadores — reducen la Ea de reacciones metabólicas vitales' },
+    { url: '/visualizador-catalasa/', icon: '⚗️', name: 'Catalasa', description: 'La catalasa descompone H₂O₂ a 40 millones de reacciones por segundo — cinética enzimática extrema' },
+    { url: '/visualizador-estados-materia/', icon: '🔴', name: 'Estados de la Materia', description: 'La temperatura afecta tanto la cinética como los estados — el mismo parámetro, efectos diferentes' },
+  ],
+  'visualizador-electroquimica': [
+    { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'FEM > 0 equivale a ΔG < 0 — la electroquímica y la termodinámica están matemáticamente conectadas' },
+    { url: '/visualizador-hidrogeno/', icon: '💧', name: 'Hidrógeno', description: 'La electrólisis del agua produce hidrógeno verde — el coste energético explicado por el sobrepotencial' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los electrones que fluyen en la pila son los mismos que estudias en la estructura electrónica' },
+    { url: '/visualizador-enlaces-quimicos/', icon: '🔗', name: 'Enlaces Químicos', description: 'La reactividad en la serie electroquímica refleja la energía de los enlaces y la electronegatividad' },
+  ],
+
   // EJE B — Biología molecular de frontera (2026-04-28)
   'visualizador-epigenetica': [
     { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'El ADN no cambia en epigenética — cambia cómo se lee. Primero entiende el código que se regula' },

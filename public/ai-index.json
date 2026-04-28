@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 654,
+  "total_tools": 657,
   "updated": "2026-04-28",
   "features": {
     "all_free": true,
@@ -2095,6 +2095,24 @@
           "slug": "visualizador-agujeros-negros",
           "url": "https://meskeia.com/visualizador-agujeros-negros/",
           "description": "Anatomía SVG interactiva clicable (singularidad, horizonte de sucesos, esfera de fotones, ergosfera, disco de acreción, jets), calculadora de radio de Schwarzschild con slider de masa, espaguetización animada, 4 tipos de agujeros negros y tabla de evaporación por radiación de Hawking"
+        },
+        {
+          "name": "Termodinámica Química: ΔG, Equilibrio y Le Chatelier",
+          "slug": "visualizador-termodinamica-quimica",
+          "url": "https://meskeia.com/visualizador-termodinamica-quimica/",
+          "description": "Diagrama de entalpía SVG con slider de catalizador, calculadora ΔG=ΔH-TΔS con los 4 casos de signo, equilibrio Kₑq con ΔG°=-RT·ln(Kₑq), y simulador de Le Chatelier sobre la síntesis Haber-Bosch con 3 perturbaciones animadas"
+        },
+        {
+          "name": "Cinética Química: Arrhenius, Órdenes y Catalizadores",
+          "slug": "visualizador-cinetica-quimica",
+          "url": "https://meskeia.com/visualizador-cinetica-quimica/",
+          "description": "Perfil de energía de reacción con slider Ea y toggle catalizador, calculadora Arrhenius k=A·e^(-Ea/RT) con gráfico linealizado ln(k) vs 1/T, curvas de concentración para órdenes 0/1/2 con semivida calculada, y 5 factores que afectan la velocidad"
+        },
+        {
+          "name": "Electroquímica: Pilas, Electrólisis y Baterías Li-ion",
+          "slug": "visualizador-electroquimica",
+          "url": "https://meskeia.com/visualizador-electroquimica/",
+          "description": "Pila de Daniell SVG animada con electrones e iones en tiempo real, serie electroquímica interactiva con calculadora de FEM, electrólisis del agua con slider de voltaje y ratio H₂:O₂ 2:1, mecanismo batería Li-ion con intercalación animada y tabla comparativa de tecnologías"
         },
         {
           "name": "Epigenética: Metilación, Histonas e Imprinting",

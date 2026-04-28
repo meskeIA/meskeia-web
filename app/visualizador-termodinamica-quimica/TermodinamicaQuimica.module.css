@@ -1,0 +1,256 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+.hero {
+  text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large); color: white;
+}
+.title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: inherit; }
+.subtitle { font-size: 1.05rem; opacity: 0.92; margin: 0; }
+
+/* Navegación */
+.navSecciones {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);
+}
+.navBtn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card);
+  border: 2px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
+}
+.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.navActivo:hover { background: var(--primary); color: white; }
+.navIcono { font-size: 1.6rem; }
+.navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+.seccionHeader { text-align: center; margin-bottom: var(--spacing-lg); }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+.seccionSubtitulo { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
+.seccionContent { margin-bottom: var(--spacing-xl); }
+
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ─── Sección 1: Diagrama de Entalpía ─── */
+.ejemplosRow {
+  display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap;
+}
+.ejemploBtn {
+  flex: 1; min-width: 140px; padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+  transition: all 0.2s; line-height: 1.3; text-align: center;
+}
+.ejemploBtn:hover { border-color: var(--primary); color: var(--primary); }
+.ejemploBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ejemploBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+
+.svgWrapper {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md); overflow: hidden;
+}
+
+.sliderRow {
+  display: flex; align-items: center; gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+.sliderLabel { font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); min-width: 130px; }
+.slider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 3px; background: var(--border); cursor: pointer; outline: none;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--primary); cursor: pointer;
+}
+.slider:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.sliderValue {
+  font-size: 0.85rem; font-weight: 700; color: var(--primary);
+  min-width: 60px; text-align: right;
+}
+
+/* ─── Sección 2: Energía Libre de Gibbs ─── */
+.formulaCentral {
+  text-align: center; font-size: 1.6rem; font-weight: 700;
+  color: var(--primary); padding: var(--spacing-md);
+  background: var(--bg-card); border: 2px solid var(--primary);
+  border-radius: var(--radius); margin-bottom: var(--spacing-lg);
+  letter-spacing: 0.03em;
+}
+
+.resultadoGibbs {
+  text-align: center; padding: var(--spacing-lg);
+  border-radius: var(--radius); margin-bottom: var(--spacing-lg);
+  transition: background 0.4s, border-color 0.4s;
+}
+.resultadoEspontanea { background: #F0FDF4; border: 2px solid #22C55E; }
+.resultadoNoEspontanea { background: #FFF1F2; border: 2px solid #F43F5E; }
+.resultadoEquilibrio { background: #FFFBEB; border: 2px solid #F59E0B; }
+[data-theme='dark'] .resultadoEspontanea { background: #052e16; border-color: #22C55E; }
+[data-theme='dark'] .resultadoNoEspontanea { background: #2d0a0e; border-color: #F43F5E; }
+[data-theme='dark'] .resultadoEquilibrio { background: #1c1a06; border-color: #F59E0B; }
+
+.resultadoDG { font-size: 2rem; font-weight: 800; margin-bottom: 0.3rem; }
+.resultadoDesc { font-size: 0.95rem; font-weight: 600; margin: 0; }
+
+.tablaCasos { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+.tablaCasos th {
+  background: var(--primary); color: white; padding: var(--spacing-sm);
+  text-align: left; font-weight: 600;
+}
+.tablaCasos td { padding: var(--spacing-sm); border-bottom: 1px solid var(--border); color: var(--text-primary); }
+.tablaCasos tr:last-child td { border-bottom: none; }
+.filaActiva { background: rgba(46, 134, 171, 0.1); font-weight: 600; }
+[data-theme='dark'] .filaActiva { background: rgba(46, 134, 171, 0.2); }
+.signoPos { color: #F43F5E; font-weight: 700; }
+.signoNeg { color: #22C55E; font-weight: 700; }
+.signoCero { color: #F59E0B; font-weight: 700; }
+
+/* ─── Sección 3: Equilibrio Kₑq ─── */
+.keqDisplay {
+  text-align: center; margin-bottom: var(--spacing-md);
+}
+.keqValor { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+.keqLabel { font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+.equilibrioBarras {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md); margin-bottom: var(--spacing-md);
+}
+.barraItem { display: flex; flex-direction: column; gap: 0.4rem; }
+.barraLabel { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.barraTrack {
+  background: var(--hover); border-radius: 6px; height: 28px;
+  overflow: hidden; position: relative;
+}
+.barraFill {
+  height: 100%; border-radius: 6px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 8px;
+}
+.barraReactivos { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.barraProductos { background: linear-gradient(90deg, var(--secondary), var(--primary)); }
+.barraTexto { font-size: 0.75rem; font-weight: 700; color: white; white-space: nowrap; }
+
+.relacionGibbs {
+  background: var(--hover); border-radius: var(--radius);
+  padding: var(--spacing-md); text-align: center;
+  font-size: 0.9rem; color: var(--text-secondary);
+}
+.relacionGibbs strong { color: var(--primary); font-size: 1rem; display: block; margin-top: 0.3rem; }
+
+/* SVG equilibrio */
+.svgEquilibrio { width: 100%; overflow: visible; }
+
+/* ─── Sección 4: Le Chatelier ─── */
+.haberInfo {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg); text-align: center;
+}
+.haberFormula { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.3rem; }
+.haberStats { font-size: 0.85rem; opacity: 0.9; margin: 0; }
+
+.perturbaciones {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm); margin-bottom: var(--spacing-lg);
+}
+.pertBtn {
+  padding: var(--spacing-md) var(--spacing-sm);
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
+  color: var(--text-secondary); font-size: 0.82rem; font-weight: 600;
+  text-align: center; line-height: 1.4;
+}
+.pertBtn:hover { border-color: var(--secondary); color: var(--secondary); }
+.pertBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pertBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.pertIcono { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
+
+.lechatResult {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+.lechatReaccion { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: center; margin-bottom: var(--spacing-md); }
+.lechatExplicacion {
+  font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;
+  margin-bottom: var(--spacing-md);
+}
+.lechatDesplaza {
+  text-align: center; font-size: 1rem; font-weight: 700;
+  padding: var(--spacing-sm); border-radius: 8px;
+}
+.haciaProductos { background: #F0FDF4; color: #166534; }
+.haciaReactivos { background: #FFF1F2; color: #9F1239; }
+[data-theme='dark'] .haciaProductos { background: #052e16; color: #86efac; }
+[data-theme='dark'] .haciaReactivos { background: #2d0a0e; color: #fda4af; }
+
+.barrasHaber {
+  display: flex; flex-direction: column; gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+.barraHaberItem { display: flex; align-items: center; gap: var(--spacing-sm); }
+.barraHaberLabel { font-size: 0.82rem; font-weight: 600; min-width: 50px; color: var(--text-secondary); }
+.barraHaberTrack {
+  flex: 1; background: var(--hover); border-radius: 4px;
+  height: 22px; overflow: hidden;
+}
+.barraHaberFill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; align-items: center; padding-left: 6px;
+}
+.barraHaberN2 { background: linear-gradient(90deg, #6366F1, #818CF8); }
+.barraHaberH2 { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.barraHaberNH3 { background: linear-gradient(90deg, var(--secondary), var(--primary)); }
+.barraHaberTexto { font-size: 0.72rem; font-weight: 700; color: white; }
+
+/* ─── Warning Box (indicador patrón v2.0) ─── */
+.warningBox {
+  background: #FFFBEB; border: 1.5px solid #F59E0B;
+  border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.88rem; color: #78350F; line-height: 1.6; margin-top: var(--spacing-md);
+}
+[data-theme='dark'] .warningBox { background: #1c1a06; color: #FCD34D; border-color: #B45309; }
+.warningBox strong { color: #B45309; }
+[data-theme='dark'] .warningBox strong { color: #FCD34D; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container { padding: var(--spacing-lg) var(--spacing-md); }
+  .title { font-size: 1.7rem; }
+  .navSecciones { grid-template-columns: repeat(2, 1fr); }
+  .perturbaciones { grid-template-columns: 1fr; }
+  .equilibrioBarras { grid-template-columns: 1fr; }
+  .ejemplosRow { flex-direction: column; }
+  .tablaCasos { font-size: 0.75rem; }
+  .formulaCentral { font-size: 1.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraFill, .barraHaberFill { transition-duration: 0.01ms !important; }
+}

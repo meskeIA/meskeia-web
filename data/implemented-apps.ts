@@ -720,6 +720,9 @@ export const implementedAppsUrls = [
   "/visualizador-epigenetica/",             // Nucleosoma SVG, slider CpG, histonas clicables, imprinting IGF2/H19
   "/visualizador-evolucion-molecular/",     // Mutaciones ADN, reloj molecular, árbol filogenético, pseudogenes/ERVs
   "/visualizador-modelos-epidemiologicos/", // Simulador SIR/SEIR, curvas Euler, Rₜ, comparativa 5 enfermedades
+  "/visualizador-termodinamica-quimica/",   // ΔH SVG + catalizador slider, ΔG=ΔH-TΔS, Kₑq, Le Chatelier Haber
+  "/visualizador-cinetica-quimica/",        // Perfil Ea SVG, Arrhenius k vs T, órdenes 0/1/2, 5 factores velocidad
+  "/visualizador-electroquimica/",          // Daniell SVG animada, serie electroquímica, electrólisis, Li-ion
 ];
 
 /**
