@@ -1,0 +1,462 @@
+/* Exoplanetas.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones ─────────────────────────────────── */
+.section {
+  max-width: 1000px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Espacio Fondo ──────────────────────────────── */
+.espacioFondo {
+  background: #0a0a1a;
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.estrellasDecorativas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.estrellaPoint {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* ─── Método Tránsito ─────────────────────────────── */
+.transitoWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.transitoSvgBox {
+  background: #0a0a1a;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.curvaLuzBox {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.controlSlider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sliderLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.sliderLabel span {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.datosTransito {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.datoChip {
+  background: rgba(46, 134, 171, 0.12);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Animación órbita del planeta */
+@keyframes orbitarPlaneta {
+  from { transform: rotate(0deg) translateX(var(--orbit-radius, 80px)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--orbit-radius, 80px)) rotate(-360deg); }
+}
+
+.orbitGroup {
+  transform-origin: center;
+  animation: orbitarPlaneta 6s linear infinite;
+}
+
+/* ─── Método Velocidad Radial ─────────────────────── */
+.radialWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.radialSvgBox {
+  background: #0a0a1a;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.leyendaRadial {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.leyendaDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@keyframes wobbleEstrella {
+  0%   { transform: translateX(0px); }
+  25%  { transform: translateX(var(--wobble-amp, 6px)); }
+  75%  { transform: translateX(calc(var(--wobble-amp, 6px) * -1)); }
+  100% { transform: translateX(0px); }
+}
+
+.wobbleGroup {
+  animation: wobbleEstrella 4s ease-in-out infinite;
+}
+
+/* ─── Zona Habitable ──────────────────────────────── */
+.zonaWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.tiposBotones {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btnTipo {
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnTipo:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.btnTipoActivo {
+  background: var(--primary);
+  color: white;
+}
+
+.zonaSvgBox {
+  background: #0a0a1a;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.leyendaZona {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.leyendaZonaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.leyendaCircle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── Clasificación Cards ─────────────────────────── */
+.clasificacionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.clasificacionCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.clasificacionCard:hover {
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.15);
+}
+
+.cardSvgWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.cardTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+
+.cardDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.cardEjemplos {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ─── Distribución scatter ─────────────────────────── */
+.scatterWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.scatterSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.tooltipExo {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.83rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  max-width: 220px;
+}
+
+.tooltipNombre {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.scatterLeyenda {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.scatterLeyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Warning Box (v2.0 indicator) ───────────────── */
+.warningBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.35);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0.5rem 0;
+}
+
+.warningBox strong {
+  color: var(--secondary);
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* ─── Dark Mode ─────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .curvaLuzBox,
+[data-theme='dark'] .clasificacionCard,
+[data-theme='dark'] .scatterWrapper {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .clasificacionCard:hover {
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .datoChip {
+  background: rgba(46, 134, 171, 0.2);
+  border-color: rgba(46, 134, 171, 0.4);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: rgba(72, 169, 166, 0.4);
+}
+
+[data-theme='dark'] .tooltipExo {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.4);
+}
+
+/* ─── Responsive ──────────────────────────────────── */
+@media (max-width: 640px) {
+  .tiposBotones {
+    gap: 0.5rem;
+  }
+
+  .btnTipo {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.82rem;
+  }
+
+  .datosTransito {
+    gap: 0.5rem;
+  }
+
+  .datoChip {
+    font-size: 0.78rem;
+    padding: 0.28rem 0.7rem;
+  }
+
+  .clasificacionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Focus accesibilidad ─────────────────────────── */
+.btnTipo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sliderInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbitGroup,
+  .wobbleGroup {
+    animation: none;
+  }
+}

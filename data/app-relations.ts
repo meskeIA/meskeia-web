@@ -3216,6 +3216,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'El análisis espectral aplica Fourier a series temporales para detectar señales estadísticamente' },
   ],
 
+  // EJE D — Cosmos y astrofísica profunda (2026-04-28)
+  'visualizador-cosmologia': [
+    { url: '/visualizador-escala-universo/', icon: '🔭', name: 'Escala del Universo', description: 'Desde el quark hasta el universo observable — la perspectiva de escala que la cosmología necesita' },
+    { url: '/visualizador-relatividad-general/', icon: '🌀', name: 'Relatividad General', description: 'La expansión del universo y la energía oscura se describen con las ecuaciones de Einstein' },
+    { url: '/visualizador-agujeros-negros/', icon: '🕳️', name: 'Agujeros Negros', description: 'Los agujeros negros supermasivos en los centros galácticos son actores clave en la evolución cósmica' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'Vida de una Estrella', description: 'Las primeras estrellas (Población III) forjaron los elementos del universo temprano' },
+  ],
+  'visualizador-agujeros-negros': [
+    { url: '/visualizador-relatividad-general/', icon: '🌀', name: 'Relatividad General', description: 'Los agujeros negros son la predicción más extrema de las ecuaciones de campo de Einstein' },
+    { url: '/visualizador-cosmologia/', icon: '🌌', name: 'Cosmología', description: 'Los agujeros negros supermasivos regulan la formación de galaxias en el universo a gran escala' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'Vida de una Estrella', description: 'Los agujeros negros estelares son el destino final de estrellas con más de ~25 masas solares' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La radiación de Hawking surge de aplicar la mecánica cuántica al horizonte de sucesos' },
+  ],
+  'visualizador-exoplanetas': [
+    { url: '/visualizador-sistema-solar/', icon: '☀️', name: 'Sistema Solar', description: 'Nuestro sistema solar es el patrón de referencia para comparar los sistemas de exoplanetas detectados' },
+    { url: '/visualizador-vida-estrella/', icon: '⭐', name: 'Vida de una Estrella', description: 'El tipo estelar determina la zona habitable y la duración de la ventana para que evolucione la vida' },
+    { url: '/visualizador-cosmologia/', icon: '🌌', name: 'Cosmología', description: 'Los 100.000 millones de exoplanetas de la Vía Láctea son solo una fracción de los del universo observable' },
+    { url: '/visualizador-escala-universo/', icon: '🔭', name: 'Escala del Universo', description: 'Las distancias a los sistemas exoplanetarios ponen en perspectiva la inmensidad del cosmos' },
+  ],
+
   // EJE A — Enfermedades de alto impacto (2026-04-25)
   'visualizador-ciclo-viral': [
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Cómo el sistema inmune detecta y combate los virus en sus distintas fases de infección' },

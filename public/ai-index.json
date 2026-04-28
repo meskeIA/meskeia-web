@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 648,
+  "total_tools": 651,
   "updated": "2026-04-28",
   "features": {
     "all_free": true,
@@ -2083,6 +2083,24 @@
           "slug": "visualizador-estadistica-inferencial",
           "url": "https://meskeia.com/visualizador-estadistica-inferencial/",
           "description": "Distribución bajo H₀ con p-valor calculado en tiempo real, errores tipo I/II con distribuciones solapadas y sliders, simulación de 100 intervalos de confianza, potencia estadística y la explicación correcta de qué es (y no es) el p-valor"
+        },
+        {
+          "name": "Cosmología: Composición del Universo y su Destino",
+          "slug": "visualizador-cosmologia",
+          "url": "https://meskeia.com/visualizador-cosmologia/",
+          "description": "Donut SVG animado de la composición del universo (5% materia, 27% materia oscura, 68% energía oscura), línea de tiempo cósmica desde el Big Bang, curva de expansión a(t), geometría del universo plana/abierta/cerrada y 4 destinos posibles (Big Freeze, Big Rip, Big Crunch, Big Bounce)"
+        },
+        {
+          "name": "Agujeros Negros: Anatomía, Hawking y Espaguetización",
+          "slug": "visualizador-agujeros-negros",
+          "url": "https://meskeia.com/visualizador-agujeros-negros/",
+          "description": "Anatomía SVG interactiva clicable (singularidad, horizonte de sucesos, esfera de fotones, ergosfera, disco de acreción, jets), calculadora de radio de Schwarzschild con slider de masa, espaguetización animada, 4 tipos de agujeros negros y tabla de evaporación por radiación de Hawking"
+        },
+        {
+          "name": "Exoplanetas: Tránsito, Zona Habitable y Kepler",
+          "slug": "visualizador-exoplanetas",
+          "url": "https://meskeia.com/visualizador-exoplanetas/",
+          "description": "Método de tránsito con planeta animado y curva de luz dinámica, velocidad radial con wobble estelar, zona habitable de Goldilocks por tipo estelar (M/G/F) con planetas reales posicionados, clasificación de exoplanetas y scatter de 5.500+ planetas confirmados en escala logarítmica"
         },
         {
           "name": "Falacias Lógicas",

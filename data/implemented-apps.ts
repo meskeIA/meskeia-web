@@ -714,6 +714,9 @@ export const implementedAppsUrls = [
   "/visualizador-teoria-grafos/",         // Dijkstra animado, Königsberg SVG, detector propiedades, 4 grafos predefinidos
   "/visualizador-topologia/",             // 5 superficies SVG, genus selector, nudos topológicos, tabla Euler
   "/visualizador-estadistica-inferencial/", // p-valor SVG, errores tipo I/II, 100 IC simulados, potencia estadística
+  "/visualizador-cosmologia/",              // Tarta SVG universo, timeline Big Bang, curva a(t), geometría, 4 destinos
+  "/visualizador-agujeros-negros/",         // Anatomía SVG clicable, calc. Schwarzschild, espaguetización, Hawking
+  "/visualizador-exoplanetas/",             // Tránsito animado + curva luz, wobble, zona Goldilocks, scatter 5500+
 ];
 
 /**
