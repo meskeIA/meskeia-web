@@ -3216,6 +3216,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'El análisis espectral aplica Fourier a series temporales para detectar señales estadísticamente' },
   ],
 
+  // EJE B — Biología molecular de frontera (2026-04-28)
+  'visualizador-epigenetica': [
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'El ADN no cambia en epigenética — cambia cómo se lee. Primero entiende el código que se regula' },
+    { url: '/visualizador-seleccion-natural/', icon: '🌱', name: 'Selección Natural', description: 'Algunos cambios epigenéticos heredables pueden ser seleccionados igual que las mutaciones genéticas' },
+    { url: '/visualizador-envejecimiento-celular/', icon: '⏳', name: 'Envejecimiento Celular', description: 'El reloj epigenético de Horvath mide la edad biológica mediante patrones de metilación del ADN' },
+    { url: '/visualizador-cancer/', icon: '🔬', name: 'Cáncer', description: 'La hipermetilación de genes supresores tumorales como BRCA1 es un mecanismo epigenético clave en cáncer' },
+  ],
+  'visualizador-evolucion-molecular': [
+    { url: '/visualizador-seleccion-natural/', icon: '🌱', name: 'Selección Natural', description: 'La evolución molecular y la selección natural son dos caras del mismo proceso — macro y micro' },
+    { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'Los árboles filogenéticos moleculares confirman y refinan el árbol de homínidos fósil' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'Las mutaciones que acumula el reloj molecular son cambios en las bases del ADN que ya conoces' },
+    { url: '/visualizador-epigenetica/', icon: '🧬', name: 'Epigenética', description: 'La epigenética añade otra capa: cambios heredables en la expresión génica sin cambiar la secuencia' },
+  ],
+  'visualizador-modelos-epidemiologicos': [
+    { url: '/visualizador-vacunas/', icon: '💉', name: 'Vacunas', description: 'Las vacunas reducen β (transmisión) y aumentan el compartimento R — conecta el modelo con la intervención' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'El compartimento R del modelo SIR es la población con inmunidad — el sistema inmune la genera' },
+    { url: '/visualizador-estadistica-inferencial/', icon: '📊', name: 'Estadística Inferencial', description: 'Estimar β y γ desde datos reales requiere inferencia estadística — los parámetros no se conocen directamente' },
+    { url: '/visualizador-ciclo-viral/', icon: '🦠', name: 'Ciclo Viral', description: 'El compartimento I del modelo SIR es donde ocurre la replicación viral que ya conoces a nivel molecular' },
+  ],
+
   // EJE D — Cosmos y astrofísica profunda (2026-04-28)
   'visualizador-cosmologia': [
     { url: '/visualizador-escala-universo/', icon: '🔭', name: 'Escala del Universo', description: 'Desde el quark hasta el universo observable — la perspectiva de escala que la cosmología necesita' },

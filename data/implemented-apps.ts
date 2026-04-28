@@ -717,6 +717,9 @@ export const implementedAppsUrls = [
   "/visualizador-cosmologia/",              // Tarta SVG universo, timeline Big Bang, curva a(t), geometría, 4 destinos
   "/visualizador-agujeros-negros/",         // Anatomía SVG clicable, calc. Schwarzschild, espaguetización, Hawking
   "/visualizador-exoplanetas/",             // Tránsito animado + curva luz, wobble, zona Goldilocks, scatter 5500+
+  "/visualizador-epigenetica/",             // Nucleosoma SVG, slider CpG, histonas clicables, imprinting IGF2/H19
+  "/visualizador-evolucion-molecular/",     // Mutaciones ADN, reloj molecular, árbol filogenético, pseudogenes/ERVs
+  "/visualizador-modelos-epidemiologicos/", // Simulador SIR/SEIR, curvas Euler, Rₜ, comparativa 5 enfermedades
 ];
 
 /**

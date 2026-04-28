@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 651,
+  "total_tools": 654,
   "updated": "2026-04-28",
   "features": {
     "all_free": true,
@@ -2095,6 +2095,24 @@
           "slug": "visualizador-agujeros-negros",
           "url": "https://meskeia.com/visualizador-agujeros-negros/",
           "description": "Anatomía SVG interactiva clicable (singularidad, horizonte de sucesos, esfera de fotones, ergosfera, disco de acreción, jets), calculadora de radio de Schwarzschild con slider de masa, espaguetización animada, 4 tipos de agujeros negros y tabla de evaporación por radiación de Hawking"
+        },
+        {
+          "name": "Epigenética: Metilación, Histonas e Imprinting",
+          "slug": "visualizador-epigenetica",
+          "url": "https://meskeia.com/visualizador-epigenetica/",
+          "description": "Nucleosoma SVG con toggle activo/silenciado, metilación del ADN con slider CpG progresivo, 4 modificaciones de histonas clicables (acetilación, K4me, K27me, fosforilación), imprinting genómico IGF2/H19, y 5 factores epigenéticos con mecanismo molecular. DisclaimerCard severity=high."
+        },
+        {
+          "name": "Evolución Molecular: Relojes, Filogenética y Kimura",
+          "slug": "visualizador-evolucion-molecular",
+          "url": "https://meskeia.com/visualizador-evolucion-molecular/",
+          "description": "Mutaciones sinónimas/no sinónimas en secuencia de ADN interactiva, reloj molecular con slider 0-100 Ma y fórmula d=2μt, constructor de árbol filogenético con 5 especies (primates o cetáceos) y selector MRCA, más evidencia molecular de evolución: pseudogenes GULOP, ERVs, secuencias Alu"
+        },
+        {
+          "name": "Modelos Epidemiológicos: SIR, SEIR y Rₜ",
+          "slug": "visualizador-modelos-epidemiologicos",
+          "url": "https://meskeia.com/visualizador-modelos-epidemiologicos/",
+          "description": "Simulador SIR con sliders β/γ/I₀ y curvas en tiempo real (integración de Euler), modelo SEIR con período de incubación comparado con SIR, número reproductivo efectivo Rₜ con medidas de control, y comparativa de 5 enfermedades reales (gripe, COVID-19, sarampión, Ébola, viruela). DisclaimerCard severity=high."
         },
         {
           "name": "Exoplanetas: Tránsito, Zona Habitable y Kepler",

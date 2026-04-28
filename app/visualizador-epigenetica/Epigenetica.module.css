@@ -1,0 +1,746 @@
+/* Epigenetica.module.css — paleta meskeIA */
+
+/* ─── Contenedor ──────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #FAFAFA);
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary, #1A1A1A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Hero ──────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* ─── Secciones ──────────────────────────────── */
+.section {
+  max-width: 900px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 2.5rem 0 0.4rem;
+  text-align: center;
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--accent, #7FB3D3);
+}
+
+.sectionDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+[data-theme='dark'] .sectionDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Nucleosoma (Sección 1) ─────────────────── */
+.nucleosomaWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .nucleosomaWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.svgCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .svgCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toggleRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.toggleBtn {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid var(--primary, #2E86AB);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--primary, #2E86AB);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  background: var(--primary, #2E86AB);
+  color: #ffffff;
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.toggleBtnActive {
+  background: var(--primary, #2E86AB);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .toggleBtn {
+  border-color: var(--accent, #7FB3D3);
+  color: var(--accent, #7FB3D3);
+}
+
+[data-theme='dark'] .toggleBtn:hover,
+[data-theme='dark'] .toggleBtnActive {
+  background: var(--accent, #7FB3D3);
+  color: #1A1A1A;
+}
+
+.estadoPanel {
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 3px solid var(--primary, #2E86AB);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+}
+
+[data-theme='dark'] .estadoPanel {
+  background: rgba(127, 179, 211, 0.1);
+  border-left-color: var(--accent, #7FB3D3);
+}
+
+.estadoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.5rem;
+}
+
+[data-theme='dark'] .estadoTitulo {
+  color: var(--accent, #7FB3D3);
+}
+
+.estadoTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .estadoTexto {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Metilación (Sección 2) ─────────────────── */
+.metilacionWrapper {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .metilacionWrapper {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.sliderLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .sliderLabel {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.slider {
+  flex: 1;
+  min-width: 120px;
+  accent-color: var(--primary, #2E86AB);
+  cursor: pointer;
+}
+
+.sliderValue {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  min-width: 40px;
+}
+
+[data-theme='dark'] .sliderValue {
+  color: var(--accent, #7FB3D3);
+}
+
+.genesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .genesRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.genCard {
+  background: var(--bg-primary, #FAFAFA);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: border-color 0.3s;
+}
+
+.genCardActivo {
+  border-color: var(--secondary, #48A9A6);
+}
+
+.genCardSilenciado {
+  border-color: #e74c3c;
+}
+
+[data-theme='dark'] .genCard {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.genNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.genEstado {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 10px;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.estadoActivo {
+  background: rgba(72, 169, 166, 0.15);
+  color: var(--secondary, #48A9A6);
+}
+
+.estadoSilenciado {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.genDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .genDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Histonas (Sección 3) ───────────────────── */
+.histonasWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .histonasWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.histonaDetalle {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  min-height: 220px;
+}
+
+[data-theme='dark'] .histonaDetalle {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.histonaDetalleTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.4rem;
+}
+
+[data-theme='dark'] .histonaDetalleTitulo {
+  color: var(--accent, #7FB3D3);
+}
+
+.histonaDetalleEnzima {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666666);
+  margin: 0 0 0.75rem;
+}
+
+[data-theme='dark'] .histonaDetalleEnzima {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+.histonaDetalleEfecto {
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 10px;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.efectoActiva {
+  background: rgba(72, 169, 166, 0.15);
+  color: #2a7c79;
+}
+
+.efectoSilencia {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+}
+
+.efectoSenal {
+  background: rgba(241, 196, 15, 0.15);
+  color: #9a7d0a;
+}
+
+[data-theme='dark'] .efectoActiva {
+  color: var(--secondary, #48A9A6);
+}
+
+[data-theme='dark'] .efectoSilencia {
+  color: #e74c3c;
+}
+
+[data-theme='dark'] .efectoSenal {
+  color: #f1c40f;
+}
+
+.histonaDetalleContexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .histonaDetalleContexto {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+.histonaSvgCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .histonaSvgCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ─── Imprinting (Sección 4) ─────────────────── */
+.imprintingWrapper {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .imprintingWrapper {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.imprintingToggle {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.imprintingGenesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .imprintingGenesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.imprintingGenCard {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border: 2px solid transparent;
+}
+
+.imprintingPaterno {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: var(--primary, #2E86AB);
+}
+
+.imprintingMaterno {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: var(--secondary, #48A9A6);
+}
+
+[data-theme='dark'] .imprintingPaterno {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .imprintingMaterno {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+.imprintingGenNombre {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 0.25rem;
+  color: var(--text-primary, #1A1A1A);
+}
+
+[data-theme='dark'] .imprintingGenNombre {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.imprintingGenOrigen {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666666);
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme='dark'] .imprintingGenOrigen {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+.imprintingEstadoBadge {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.2rem 0.75rem;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+}
+
+.badgeActivo {
+  background: rgba(72, 169, 166, 0.2);
+  color: #2a7c79;
+}
+
+.badgeSilenciado {
+  background: rgba(153, 153, 153, 0.15);
+  color: var(--text-muted, #999999);
+}
+
+[data-theme='dark'] .badgeActivo {
+  color: var(--secondary, #48A9A6);
+}
+
+.imprintingGenDesc {
+  font-size: 0.87rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .imprintingGenDesc {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Factores (Sección 5) ───────────────────── */
+.factoresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.factorCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.factorCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .factorCard {
+  background: var(--bg-card, #2A2A2A);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.factorIcono {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.factorNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.25rem;
+}
+
+[data-theme='dark'] .factorNombre {
+  color: var(--text-primary, #E5E5E5);
+}
+
+.factorImpactoBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.impactoAlto {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+}
+
+.impactoMedio {
+  background: rgba(241, 196, 15, 0.12);
+  color: #9a7d0a;
+}
+
+.impactoBajo {
+  background: rgba(72, 169, 166, 0.12);
+  color: #2a7c79;
+}
+
+[data-theme='dark'] .impactoAlto {
+  color: #e74c3c;
+}
+
+[data-theme='dark'] .impactoMedio {
+  color: #f1c40f;
+}
+
+[data-theme='dark'] .impactoBajo {
+  color: var(--secondary, #48A9A6);
+}
+
+.factorMecanismo {
+  font-size: 0.87rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+[data-theme='dark'] .factorMecanismo {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+.factorAviso {
+  font-size: 0.8rem;
+  color: var(--text-muted, #999999);
+  line-height: 1.5;
+  font-style: italic;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 0.6rem;
+  margin: 0;
+}
+
+[data-theme='dark'] .factorAviso {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  color: #777777;
+}
+
+/* ─── Educational Section ────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.eduCard {
+  background: var(--bg-primary, #FAFAFA);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .eduCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.eduCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 0.6rem;
+}
+
+[data-theme='dark'] .eduCard h3 {
+  color: var(--accent, #7FB3D3);
+}
+
+.eduCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.65;
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p:last-child {
+  margin-bottom: 0;
+}
+
+[data-theme='dark'] .eduCard p {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+/* ─── Warning Box (v2.0 indicator) ──────────── */
+.warningBox {
+  background: rgba(241, 196, 15, 0.1);
+  border-left: 4px solid #f1c40f;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(241, 196, 15, 0.08);
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Nota informativa ────────────────────────── */
+.notaInfo {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.87rem;
+  color: var(--text-secondary, #666666);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+[data-theme='dark'] .notaInfo {
+  background: rgba(127, 179, 211, 0.08);
+  border-color: rgba(127, 179, 211, 0.2);
+  color: var(--text-secondary, #B0B0B0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .factorCard,
+  .toggleBtn {
+    transition-duration: 0.01ms !important;
+  }
+}
