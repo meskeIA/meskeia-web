@@ -3216,6 +3216,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'El análisis espectral aplica Fourier a series temporales para detectar señales estadísticamente' },
   ],
 
+  // EJE E — Geopolítica y sociedad contemporánea (2026-04-28)
+  'visualizador-geopolitica-energetica': [
+    { url: '/visualizador-geopolitica-recursos/', icon: '⛏️', name: 'Geopolítica de Recursos', description: 'Minerales estratégicos, agua y tierra — el contexto más amplio de la geopolítica de recursos' },
+    { url: '/visualizador-cadenas-suministro/', icon: '🚢', name: 'Cadenas de Suministro', description: 'La energía es el input crítico de toda cadena de suministro global' },
+    { url: '/visualizador-comercio-internacional/', icon: '🌍', name: 'Comercio Internacional', description: 'Los flujos energéticos son una parte fundamental del comercio internacional de materias primas' },
+    { url: '/visualizador-hidrogeno/', icon: '💧', name: 'Hidrógeno', description: 'El hidrógeno verde como vector energético emergente en la nueva geopolítica de la energía' },
+  ],
+  'visualizador-cadenas-suministro': [
+    { url: '/visualizador-geopolitica-energetica/', icon: '⚡', name: 'Geopolítica Energética', description: 'La energía es el insumo que mueve toda la cadena de suministro global' },
+    { url: '/visualizador-comercio-internacional/', icon: '🌍', name: 'Comercio Internacional', description: 'Las cadenas de suministro son la infraestructura física del comercio internacional' },
+    { url: '/visualizador-inflacion/', icon: '📈', name: 'Inflación', description: 'Las disrupciones en cadenas de suministro son una causa directa de presiones inflacionarias' },
+    { url: '/visualizador-historia-dinero/', icon: '💰', name: 'Historia del Dinero', description: 'El sistema financiero global financia y asegura las cadenas de suministro internacionales' },
+  ],
+  'visualizador-regimenes-politicos': [
+    { url: '/curso-teoria-politica/', icon: '🏛️', name: 'Curso de Teoría Política', description: 'Profundiza en los fundamentos teóricos de estos sistemas: Platón, Aristóteles, Hobbes, Locke y más' },
+    { url: '/visualizador-proceso-legislativo/', icon: '⚖️', name: 'Proceso Legislativo', description: 'Cómo funciona la producción de leyes en un sistema democrático representativo' },
+    { url: '/visualizador-sistema-electoral/', icon: '🗳️', name: 'Sistema Electoral', description: 'Los sistemas electorales son uno de los mecanismos estructurales que diferencian los regímenes' },
+    { url: '/visualizador-desinformacion/', icon: '📰', name: 'Desinformación', description: 'La libertad de prensa y el pluralismo informativo son características estructurales de algunos regímenes' },
+  ],
+
   // EJE C — Química avanzada (2026-04-28)
   'visualizador-termodinamica-quimica': [
     { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'La termodinámica dice si una reacción puede ocurrir; la cinética dice a qué velocidad ocurrirá' },

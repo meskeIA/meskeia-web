@@ -1,0 +1,667 @@
+/* CadenasSuministro.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones ─────────────────────────────────── */
+.section {
+  max-width: 1000px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Smartphone: grid principal ───────────────── */
+.smartphoneGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .smartphoneGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.svgContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.svgDiagrama {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── Panel de detalle componente ───────────────── */
+.panelDetalle {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panelVacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.panelVacioIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+.panelVacio p {
+  font-size: 0.9rem;
+  max-width: 260px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.componenteHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.componenteIcono {
+  font-size: 2rem;
+  display: block;
+  flex-shrink: 0;
+}
+
+.componenteNombre {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.componentePais {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.componenteEmpresa {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.componenteCoste {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.costeLabel {
+  color: var(--text-secondary);
+}
+
+.costeBadge {
+  background: var(--primary);
+  color: white;
+  padding: 0.2rem 0.65rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.componenteCurioso {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  padding: 0.65rem 0.9rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: auto;
+}
+
+.contadorPaises {
+  text-align: center;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 12px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ─── JIT vs JIC ───────────────────────────────── */
+.jitWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sliderContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sliderLabel {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sliderValor {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.sliderInput {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 6px;
+}
+
+.comparativaJit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .comparativaJit {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jitCard {
+  background: var(--bg-card);
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.jitCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.jitIcono {
+  font-size: 1.6rem;
+}
+
+.jitNombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.jitSubnombre {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.jitEstado {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+}
+
+.jitEstadoOk {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+}
+
+.jitEstadoCrisis {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.jitPropiedad {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.jitPropiedad strong {
+  color: var(--text-primary);
+}
+
+/* ─── Timeline disrupciones ─────────────────────── */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+}
+
+.timelineItem {
+  position: relative;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.timelineItem:last-child {
+  margin-bottom: 0;
+}
+
+.timelinePunto {
+  position: absolute;
+  left: -1.65rem;
+  top: 0.8rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--primary);
+  z-index: 1;
+  transition: transform 0.18s;
+}
+
+.timelineItem:hover .timelinePunto {
+  transform: scale(1.3);
+}
+
+.timelineCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.18s;
+}
+
+.timelineCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.15);
+}
+
+.timelineCardActiva {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.2);
+}
+
+.timelineAnio {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.25rem;
+}
+
+.timelineTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.timelineResumen {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.timelineDetalle {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.timelineStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.timelineStat {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+}
+
+.timelineStatNum {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+}
+
+.timelineStatLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.timelineLeccion {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ─── Reshoring: mapa conceptual ─────────────────── */
+.reshoringGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.reshoringCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.reshoringIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+.reshoringNombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.reshoringDef {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.reshoringEjemplo {
+  font-size: 0.83rem;
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0 6px 6px 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: auto;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.25rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.88rem;
+}
+
+.tabla thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.tabla thead th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-weight: 700;
+}
+
+.tabla tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.tabla tbody tr:last-child {
+  border-bottom: none;
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.tabla td {
+  padding: 0.7rem 1rem;
+  line-height: 1.45;
+  vertical-align: top;
+}
+
+.celdaAspecto {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.tendencia {
+  text-align: center;
+  padding: 1.1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tendencia strong {
+  color: var(--primary);
+}
+
+/* ─── Sección educativa ──────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.eduCard h4 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Warning box ─────────────────────────────────── */
+.warningBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Dark mode ──────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .svgContainer,
+[data-theme='dark'] .panelDetalle,
+[data-theme='dark'] .sliderContainer,
+[data-theme='dark'] .jitCard,
+[data-theme='dark'] .timelineCard,
+[data-theme='dark'] .reshoringCard,
+[data-theme='dark'] .tabla,
+[data-theme='dark'] .eduCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .tabla tbody tr {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .tabla tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .componenteEmpresa {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .componenteCurioso,
+[data-theme='dark'] .timelineLeccion,
+[data-theme='dark'] .reshoringEjemplo {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .timelineStat {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .timelineDetalle {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .jitEstadoOk {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tendencia {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .timeline::before {
+  opacity: 0.7;
+}
+
+[data-theme='dark'] .timelinePunto {
+  border-color: var(--bg-card);
+}
+
+/* ─── Motion reducida ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

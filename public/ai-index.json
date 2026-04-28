@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 657,
+  "total_tools": 660,
   "updated": "2026-04-28",
   "features": {
     "all_free": true,
@@ -2095,6 +2095,24 @@
           "slug": "visualizador-agujeros-negros",
           "url": "https://meskeia.com/visualizador-agujeros-negros/",
           "description": "Anatomía SVG interactiva clicable (singularidad, horizonte de sucesos, esfera de fotones, ergosfera, disco de acreción, jets), calculadora de radio de Schwarzschild con slider de masa, espaguetización animada, 4 tipos de agujeros negros y tabla de evaporación por radiación de Hawking"
+        },
+        {
+          "name": "Geopolítica Energética: Flujos, Dependencias e Infraestructuras",
+          "slug": "visualizador-geopolitica-energetica",
+          "url": "https://meskeia.com/visualizador-geopolitica-energetica/",
+          "description": "Diagrama de flujos energéticos de la UE por región de origen, mix eléctrico de 6 regiones mundiales con slider 2010-2023, tabla de infraestructuras (gasoductos y terminales GNL) e inversión renovable comparada. Datos IEA/Eurostat. Sin narrativa normativa. DisclaimerCard severity=medium."
+        },
+        {
+          "name": "Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring",
+          "slug": "visualizador-cadenas-suministro",
+          "url": "https://meskeia.com/visualizador-cadenas-suministro/",
+          "description": "Viaje de un smartphone por ~40 países con 8 componentes clicables, comparativa JIT vs JIC con slider de disrupción, timeline de 5 grandes disrupciones históricas documentadas (semiconductores, Suez, COVID, Tailandia, Japón) y estrategias de reshoring/nearshoring/friendshoring"
+        },
+        {
+          "name": "Regímenes Políticos: Tipología y Características Estructurales",
+          "slug": "visualizador-regimenes-politicos",
+          "url": "https://meskeia.com/visualizador-regimenes-politicos/",
+          "description": "Visualizador tipológico puramente académico. Matriz interactiva 8 características × 6 regímenes, espectro bidimensional de sistemas (poder distribuido/concentrado × legitimidad), evolución histórica agregada por siglo y 5 mecanismos de transición política. Sin rankings de países ni índices externos. DisclaimerCard severity=medium."
         },
         {
           "name": "Termodinámica Química: ΔG, Equilibrio y Le Chatelier",

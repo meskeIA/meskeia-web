@@ -1,0 +1,535 @@
+/* RegimenesPoliticos.module.css — paleta meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Secciones ─────────────────────────────────── */
+.section {
+  max-width: 1100px;
+  margin: 0 auto 2.5rem;
+  padding: 2rem 1.5rem;
+}
+
+.tituloSeccion {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.subtituloSeccion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Nota metodológica ──────────────────────────── */
+.notaMetodologica {
+  background: rgba(46, 134, 171, 0.07);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 0.85rem 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.notaMetodologica strong {
+  color: var(--primary);
+}
+
+/* ─── Matriz de características ─────────────────── */
+.matrizWrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.matrizTabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 0.82rem;
+  min-width: 780px;
+}
+
+.matrizTabla thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+}
+
+.matrizTabla thead th {
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.matrizTabla thead th:first-child {
+  text-align: left;
+  min-width: 180px;
+}
+
+.matrizTabla tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  transition: background 0.15s;
+}
+
+.matrizTabla tbody tr:last-child {
+  border-bottom: none;
+}
+
+.matrizTabla tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.matrizTabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.celdaCaracteristica {
+  padding: 0.7rem 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.celdaValor {
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: transform 0.12s, box-shadow 0.12s;
+  position: relative;
+}
+
+.celdaValor:hover {
+  transform: scale(1.2);
+  z-index: 1;
+}
+
+.celdaValor:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Panel de explicación de celda ─────────────── */
+.panelCelda {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1.25rem 1.5rem;
+  margin-top: 0.5rem;
+  animation: slideDown 0.18s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panelCeldaHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.panelCeldaRegimen {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.panelCeldaCaract {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.panelCeldaTexto {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.btnCerrar {
+  margin-top: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+}
+
+.btnCerrar:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.btnCerrar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Espectro de sistemas (SVG) ────────────────── */
+.svgContainer {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+}
+
+.svgEspectro {
+  width: 100%;
+  height: auto;
+  display: block;
+  min-width: 540px;
+}
+
+.leyendaEspectro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.leyendaColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ─── Gráfico de área histórica ─────────────────── */
+.graficaWrapper {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+}
+
+.svgHistorico {
+  width: 100%;
+  height: auto;
+  display: block;
+  min-width: 560px;
+}
+
+.notaGrafica {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.75rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* ─── Cards de transición ───────────────────────── */
+.transicionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.transicionCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.transicionCard:hover {
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.15);
+  transform: translateY(-2px);
+}
+
+.transicionIcono {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.transicionTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.transicionDefinicion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+.transicionMecanismo {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.transicionMecanismo strong {
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.transicionEjemplos {
+  border-left: 3px solid var(--secondary);
+  padding: 0.5rem 0.8rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.transicionEjemplos strong {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+/* ─── Sección educativa ──────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 680px) {
+  .eduGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.eduCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.eduCard h4 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.eduCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.65rem;
+}
+
+.eduCard p:last-child {
+  margin-bottom: 0;
+}
+
+.enlaceCurso {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  margin-top: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.enlaceCurso p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+  line-height: 1.55;
+}
+
+.enlaceCurso a {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.18s;
+}
+
+.enlaceCurso a:hover {
+  background: var(--secondary);
+}
+
+/* ─── Warning Box (indicador v2.0) ───────────────── */
+.warningBox {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  margin: 1.5rem 0 0;
+  font-size: 0.87rem;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+/* ─── Dark mode ─────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .notaMetodologica {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .matrizWrapper,
+[data-theme='dark'] .svgContainer,
+[data-theme='dark'] .graficaWrapper {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .matrizTabla {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .matrizTabla tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .matrizTabla tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .matrizTabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .panelCelda {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .transicionCard {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .transicionCard:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .transicionMecanismo {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .eduCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .enlaceCurso {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.12) 0%, rgba(72, 169, 166, 0.12) 100%);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #451a03;
+  border-color: #d97706;
+  color: #fde68a;
+}
+
+/* ─── Responsive ─────────────────────────────────── */
+@media (max-width: 600px) {
+  .transicionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celdaValor,
+  .transicionCard {
+    transition: none;
+  }
+
+  .panelCelda {
+    animation: none;
+  }
+}

@@ -723,6 +723,9 @@ export const implementedAppsUrls = [
   "/visualizador-termodinamica-quimica/",   // ΔH SVG + catalizador slider, ΔG=ΔH-TΔS, Kₑq, Le Chatelier Haber
   "/visualizador-cinetica-quimica/",        // Perfil Ea SVG, Arrhenius k vs T, órdenes 0/1/2, 5 factores velocidad
   "/visualizador-electroquimica/",          // Daniell SVG animada, serie electroquímica, electrólisis, Li-ion
+  "/visualizador-geopolitica-energetica/",  // Flujos UE SVG, mix mundial 2010-2023, infraestructuras, renovables
+  "/visualizador-cadenas-suministro/",      // Smartphone 40 países, JIT vs JIC, 5 disrupciones, reshoring
+  "/visualizador-regimenes-politicos/",     // Matriz 8×6, espectro 2 ejes, evolución siglos, 5 transiciones
 ];
 
 /**

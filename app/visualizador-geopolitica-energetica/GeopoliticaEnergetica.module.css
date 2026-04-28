@@ -1,0 +1,568 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Secciones */
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary);
+}
+
+.sectionSubtitle {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 0;
+}
+
+/* Tabs de toggle */
+.toggleTabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.toggleTab {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleTab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.toggleTabActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Bloque 1: Sankey simplificado */
+.sankeyWrapper {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.sankeyTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.sankeyDiagram {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 300px;
+}
+
+.sankeyRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sankeyLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 130px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.sankeyBarTrack {
+  flex: 1;
+  background: #f0f0f0;
+  border-radius: 4px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.sankeyBar {
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  transition: width 0.4s ease;
+  min-width: 32px;
+}
+
+.sankeyPct {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 44px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.sankeyNote {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.comparisonToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.compBtn {
+  padding: 0.4rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compBtnActive {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
+/* Bloque 2: Mix energético */
+.mixWrapper {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sliderRow label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.sliderRow input[type='range'] {
+  flex: 1;
+  accent-color: var(--primary);
+}
+
+.sliderYear {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  width: 44px;
+  text-align: center;
+}
+
+.mixGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.mixRegionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mixRegionLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 110px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.mixBar {
+  flex: 1;
+  display: flex;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.mixBarSegment {
+  height: 100%;
+  transition: width 0.4s ease;
+  min-width: 0;
+}
+
+.mixLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.mixLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.mixLegendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Bloque 3: Infraestructuras */
+.infraWrapper {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.infraDiagram {
+  min-width: 320px;
+}
+
+.infraTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.infraTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.infraTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.infraTable td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.infraTable tr:hover td {
+  background: #f8f9fa;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.statusOperativo {
+  background: #d4edda;
+  color: #155724;
+}
+
+.statusSuspendido {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.statusConstruccion {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Bloque 4: Inversión renovable */
+.inversionWrapper {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.barChartH {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.barChartRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.barChartLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 120px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.barChartTrack {
+  flex: 1;
+  background: #f0f0f0;
+  border-radius: 4px;
+  height: 22px;
+  overflow: hidden;
+}
+
+.barChartFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+}
+
+.barChartFill span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+}
+
+.barChartValue {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 70px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.inversionToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.inversionSource {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Warning box (indicador de patrón v2.0 completo) */
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #ffc107;
+  border-left: 4px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: #5d4037;
+  line-height: 1.6;
+  margin: 1.5rem 0 0;
+}
+
+.warningBox strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #4e3900;
+}
+
+/* Tarjetas de datos destacados */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Dark mode */
+[data-theme='dark'] .sankeyWrapper,
+[data-theme='dark'] .mixWrapper,
+[data-theme='dark'] .infraWrapper,
+[data-theme='dark'] .inversionWrapper,
+[data-theme='dark'] .statCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .sankeyBarTrack,
+[data-theme='dark'] .barChartTrack {
+  background: #3a3a3a;
+}
+
+[data-theme='dark'] .separator {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .infraTable td {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .infraTable tr:hover td {
+  background: #333333;
+}
+
+[data-theme='dark'] .toggleTab {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .compBtn {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2500;
+  border-color: #ffc107;
+  color: #e0c060;
+}
+
+[data-theme='dark'] .warningBox strong {
+  color: #ffd740;
+}
+
+[data-theme='dark'] .statusOperativo {
+  background: #1a3a20;
+  color: #6fcf97;
+}
+
+[data-theme='dark'] .statusSuspendido {
+  background: #3a1a1a;
+  color: #eb5757;
+}
+
+[data-theme='dark'] .statusConstruccion {
+  background: #3a2e00;
+  color: #f2c94c;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .sankeyLabel {
+    width: 90px;
+    font-size: 0.78rem;
+  }
+
+  .mixRegionLabel {
+    width: 80px;
+    font-size: 0.78rem;
+  }
+
+  .barChartLabel {
+    width: 90px;
+    font-size: 0.78rem;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sankeyBar,
+  .mixBarSegment,
+  .barChartFill {
+    transition: none;
+  }
+}
