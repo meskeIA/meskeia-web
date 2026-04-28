@@ -3190,6 +3190,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El equilibrio de Nash se encuentra buscando puntos críticos (derivada = 0)' },
   ],
 
+  // EJE A — Matemáticas visuales III (2026-04-28)
+  'visualizador-transformada-fourier': [
+    { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'La transformada de Fourier compleja usa exponenciales complejas e^(iωt)' },
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'Las series de Fourier son integrales — el cálculo es la herramienta que las construye' },
+    { url: '/visualizador-estadistica-inferencial/', icon: '📊', name: 'Estadística Inferencial', description: 'El análisis espectral y el análisis de Fourier se aplican en tests estadísticos de series temporales' },
+    { url: '/visualizador-caos-mariposa/', icon: '🦋', name: 'Caos y el Atractor de Lorenz', description: 'Los sistemas caóticos se analizan en el dominio de frecuencias con Fourier' },
+  ],
+  'visualizador-teoria-grafos': [
+    { url: '/visualizador-algoritmos-ordenacion/', icon: '⚡', name: 'Algoritmos de Ordenación', description: 'Dijkstra y los algoritmos de ordenación comparten el lenguaje de la complejidad Big O' },
+    { url: '/visualizador-base-datos-relacional/', icon: '🗄️', name: 'Bases de Datos', description: 'Los índices B-Tree y el query optimizer usan grafos internamente para el plan de ejecución' },
+    { url: '/visualizador-teoria-juegos/', icon: '🎲', name: 'Teoría de Juegos', description: 'Las redes sociales como grafos y el comportamiento estratégico entre nodos conectados' },
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El flujo máximo y algunos algoritmos de grafos se formulan como problemas de optimización' },
+  ],
+  'visualizador-topologia': [
+    { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'El plano complejo es un espacio topológico — Riemann trabajó con superficies de Riemann' },
+    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Fractales', description: 'Los fractales tienen dimensiones topológicas no enteras y estructuras autosimilares' },
+    { url: '/visualizador-teoria-grafos/', icon: '🕸️', name: 'Teoría de Grafos', description: 'La fórmula de Euler V-E+F=2 conecta la topología de las superficies con la teoría de grafos' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'Los materiales topológicos cuánticos (aislantes topológicos) son una frontera de la física actual' },
+  ],
+  'visualizador-estadistica-inferencial': [
+    { url: '/visualizador-estadistica-cotidiana/', icon: '📐', name: 'Estadística Cotidiana', description: 'Estadística descriptiva: medias, medianas y varianza — la base antes de inferir' },
+    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad', description: 'La distribución nula H₀ en el test de hipótesis se construye a partir de probabilidad' },
+    { url: '/visualizador-teoria-juegos/', icon: '🎲', name: 'Teoría de Juegos', description: 'Los juegos con información incompleta usan probabilidades bayesianas para tomar decisiones' },
+    { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'El análisis espectral aplica Fourier a series temporales para detectar señales estadísticamente' },
+  ],
+
   // EJE A — Enfermedades de alto impacto (2026-04-25)
   'visualizador-ciclo-viral': [
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Cómo el sistema inmune detecta y combate los virus en sus distintas fases de infección' },

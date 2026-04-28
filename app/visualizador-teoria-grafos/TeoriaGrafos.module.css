@@ -1,0 +1,972 @@
+/* Visualizador de Teoría de Grafos - meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+}
+
+/* ======== HERO ======== */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ======== SECTION TITLE ======== */
+.sectionTitle {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* ======== GRAPH SELECTOR ======== */
+.graphSelectorSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.graphSelectorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.graphBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.graphBtn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
+}
+
+.graphBtnActive {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.graphBtnName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.graphBtnDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ======== MAIN PANEL ======== */
+.mainPanel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .mainPanel {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ======== SVG PANEL ======== */
+.svgPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-md);
+  position: relative;
+}
+
+.graphSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.graphNode {
+  cursor: pointer;
+}
+
+.graphNode circle {
+  transition: fill 0.3s ease, stroke 0.2s ease;
+}
+
+.graphNode:hover circle {
+  filter: brightness(0.9);
+}
+
+.edgeHighlighted {
+  animation: pulseEdge 0.6s ease-in-out;
+}
+
+@keyframes pulseEdge {
+  0%, 100% { stroke-width: 3; }
+  50% { stroke-width: 5; }
+}
+
+.edgeLabel {
+  pointer-events: none;
+  font-family: var(--font-mono, monospace);
+}
+
+.selectHint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+/* ======== PROPERTIES PANEL ======== */
+.propertiesPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.propGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.propItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-sm);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.propYes {
+  border-color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+}
+
+.propNo {
+  border-color: #E63946;
+  background: rgba(230, 57, 70, 0.05);
+}
+
+.propLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.propValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.degreesTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.degreeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.degreeItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bg-primary);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.degreeNode {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.degreeBadge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.konigNote {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(230, 57, 70, 0.08);
+  border-left: 3px solid #E63946;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+/* ======== DIJKSTRA SECTION ======== */
+.dijkstraSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.dijkstraIntro {
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 0.95rem;
+}
+
+.dijkstraControls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.nodeSelectRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.selectNodeBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.selectNodeBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.selectNodeBtnActive {
+  background: var(--primary);
+  color: white;
+}
+
+.selectNodeBtnActive strong {
+  color: white;
+}
+
+.arrow {
+  font-size: 1.4rem;
+  color: var(--primary);
+}
+
+.modeRow {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.modeBtn {
+  padding: 6px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.modeBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.modeBtnActive {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.actionRow {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecondary {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.btnSecondary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Step display */
+.stepDisplay {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.stepCounter {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.stepDescription {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* Distances panel */
+.distancesPanel {
+  margin-top: var(--spacing-md);
+}
+
+.distancesTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.distancesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.distanceItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-width: 80px;
+}
+
+.distanceTarget {
+  border-color: #E63946;
+  background: rgba(230, 57, 70, 0.06);
+}
+
+.distanceNode {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.distanceValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ======== LEGEND ======== */
+.legendSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.legendDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ======== APPS SECTION ======== */
+.appsSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.appsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.appCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.appCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.12);
+}
+
+.appIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.appCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.appCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ======== EDUCATIONAL SECTION ======== */
+.eduSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduSectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.eduParagraph {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+/* Concept grid */
+.conceptGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.conceptCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.conceptCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.conceptCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Euler rule */
+.eulerRule {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.eulerList {
+  margin: var(--spacing-sm) 0 0 var(--spacing-lg);
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* Compare grid */
+.compareGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 600px) {
+  .compareGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compareCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.compareTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.compareCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.5;
+}
+
+.compareComplexity {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem !important;
+  background: var(--bg-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.compareExample {
+  font-style: italic;
+  font-size: 0.85rem !important;
+  color: var(--text-muted) !important;
+}
+
+/* Steps list */
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stepItem {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Complexity box */
+.complexityBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.complexityList {
+  margin: var(--spacing-sm) 0 0 var(--spacing-lg);
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* Types grid */
+.typesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.typeCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.typeCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--secondary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.typeCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Warning Box — indicador de patrón v2.0 */
+.warningBox {
+  background: rgba(244, 162, 97, 0.1);
+  border: 2px solid #F4A261;
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.warningTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #C45E1A;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.warningBox p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.warningList {
+  margin: var(--spacing-sm) 0 0 var(--spacing-lg);
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* ======== DARK MODE ======== */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .graphBtn {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .graphBtnActive {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .graphBtnName {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .graphBtnDesc {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .svgPanel {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .graphSvg text {
+  fill: #E5E5E5;
+}
+
+[data-theme='dark'] .edgeLabel {
+  fill: #999;
+}
+
+[data-theme='dark'] .propertiesPanel {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .propItem {
+  background: var(--bg-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .propYes {
+  border-color: var(--secondary);
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .propNo {
+  border-color: #E63946;
+  background: rgba(230, 57, 70, 0.08);
+}
+
+[data-theme='dark'] .degreeItem {
+  background: var(--bg-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .konigNote {
+  background: rgba(230, 57, 70, 0.12);
+}
+
+[data-theme='dark'] .dijkstraSection {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .selectNodeBtn {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .modeBtn {
+  background: var(--bg-primary);
+  border-color: #444;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .modeBtnActive {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .stepDisplay {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .distanceItem {
+  background: var(--bg-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .distanceTarget {
+  border-color: #E63946;
+  background: rgba(230, 57, 70, 0.1);
+}
+
+[data-theme='dark'] .appCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .conceptCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .compareCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .compareComplexity {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .typeCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .eulerRule {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .complexityBox {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: var(--secondary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(244, 162, 97, 0.08);
+}
+
+[data-theme='dark'] .warningTitle {
+  color: #F4A261;
+}
+
+[data-theme='dark'] .legendDot {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .graphSelectorGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .conceptGrid,
+  .typesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nodeSelectRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actionRow {
+    flex-direction: column;
+  }
+
+  .distancesGrid {
+    justify-content: center;
+  }
+}
+
+/* ======== ANIMACIONES ======== */
+@media (prefers-reduced-motion: reduce) {
+  .graphNode circle,
+  .graphBtn,
+  .btnPrimary,
+  .btnSecondary,
+  .appCard {
+    transition: none;
+  }
+
+  .edgeHighlighted {
+    animation: none;
+  }
+}

@@ -1,0 +1,508 @@
+/* ═══════════════════════════════════════════════════════
+   Visualizador Estadística Inferencial — CSS Module
+   Paleta meskeIA: #2E86AB (azul), #48A9A6 (teal)
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Layout principal ─── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ─── Navegación de secciones ─── */
+.seccionNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 2rem 1.5rem 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.seccionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.8rem 1.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  text-align: center;
+  font-family: inherit;
+}
+
+.seccionBtn:hover {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.seccionBtnActivo {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.seccionBtn:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.seccionIcono {
+  font-size: 1.6rem;
+}
+
+.seccionTitulo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.seccionSubtitulo {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Área de contenido ─── */
+.contenido {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+}
+
+/* ─── Cards de bloques ─── */
+.bloqueCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+}
+
+.bloqueCard h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.bloqueDescripcion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+/* ─── Controles (sliders) ─── */
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.controlRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.controlLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.controlValor {
+  font-weight: 700;
+  color: #2E86AB;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  accent-color: #2E86AB;
+  cursor: pointer;
+}
+
+/* ─── SVG contenedor ─── */
+.svgWrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 1rem;
+}
+
+.svgWrapper svg {
+  display: block;
+  width: 100%;
+}
+
+/* ─── Resultado destacado ─── */
+.resultado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.resultadoItem {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.resultadoItem .label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.resultadoItem .valor {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #2E86AB;
+  line-height: 1;
+}
+
+.resultadoItem .valorRechaza {
+  color: #e53e3e;
+}
+
+.resultadoItem .valorAcepta {
+  color: #38a169;
+}
+
+/* ─── Mensaje interpretativo ─── */
+.mensajeInterpretacion {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid #2E86AB;
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.mensajeRechaza {
+  background: rgba(229, 62, 62, 0.08);
+  border-left-color: #e53e3e;
+}
+
+.mensajeAcepta {
+  background: rgba(56, 161, 105, 0.08);
+  border-left-color: #38a169;
+}
+
+/* ─── Grid leyenda errores ─── */
+.leyendaErrores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.leyendaItem {
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.leyendaVP { background: rgba(56, 161, 105, 0.15); color: #276749; border: 1px solid rgba(56,161,105,0.3); }
+.leyendaFP { background: rgba(229, 62, 62, 0.12); color: #c53030; border: 1px solid rgba(229,62,62,0.3); }
+.leyendaFN { background: rgba(237, 137, 54, 0.12); color: #c05621; border: 1px solid rgba(237,137,54,0.3); }
+.leyendaVN { background: rgba(113, 128, 150, 0.12); color: #4a5568; border: 1px solid rgba(113,128,150,0.3); }
+
+.leyendaItem small {
+  display: block;
+  font-weight: 400;
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+/* ─── Grid IC simulación ─── */
+.icGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 1rem 0;
+}
+
+.icFila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.icBarra {
+  height: 10px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.icBarraCaptura { background: #2E86AB; }
+.icBarraMiss { background: #e53e3e; }
+
+.icParametro {
+  width: 2px;
+  height: 10px;
+  background: #1a1a1a;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* ─── Contador IC ─── */
+.icContador {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.icContador span {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.icContador strong {
+  font-size: 1.1rem;
+  color: #2E86AB;
+}
+
+/* ─── Warning box ─── */
+.warningBox {
+  background: rgba(229, 62, 62, 0.08);
+  border: 1.5px solid rgba(229, 62, 62, 0.35);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin-top: 0.75rem;
+}
+
+.warningBox strong {
+  color: #c53030;
+}
+
+/* ─── Botones ─── */
+.btnPrimario {
+  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+
+.btnPrimario:hover { opacity: 0.9; }
+.btnPrimario:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  margin-left: 0.5rem;
+}
+
+.btnSecundario:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.botonesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+/* ─── Potencia barra ─── */
+.potenciaWrapper {
+  margin-top: 1rem;
+}
+
+.potenciaLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.potenciaBarraTrack {
+  height: 24px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.potenciaBarraFill {
+  height: 100%;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #2E86AB, #48A9A6);
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  min-width: 40px;
+}
+
+.potenciaInterpretacion {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Dark mode ─── */
+[data-theme='dark'] .bloqueCard {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .svgWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .resultadoItem {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .seccionBtn {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .seccionBtn:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .seccionBtnActivo {
+  background: rgba(46, 134, 171, 0.18);
+  border-color: #48A9A6;
+}
+
+[data-theme='dark'] .mensajeInterpretacion {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .mensajeRechaza {
+  background: rgba(229, 62, 62, 0.12);
+}
+
+[data-theme='dark'] .mensajeAcepta {
+  background: rgba(56, 161, 105, 0.12);
+}
+
+[data-theme='dark'] .leyendaVP { background: rgba(56, 161, 105, 0.2); color: #68d391; }
+[data-theme='dark'] .leyendaFP { background: rgba(229, 62, 62, 0.18); color: #fc8181; }
+[data-theme='dark'] .leyendaFN { background: rgba(237, 137, 54, 0.18); color: #f6ad55; }
+[data-theme='dark'] .leyendaVN { background: rgba(113, 128, 150, 0.18); color: #a0aec0; }
+
+[data-theme='dark'] .warningBox {
+  background: rgba(229, 62, 62, 0.12);
+  border-color: rgba(229, 62, 62, 0.45);
+}
+
+[data-theme='dark'] .warningBox strong { color: #fc8181; }
+
+[data-theme='dark'] .btnSecundario {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] .potenciaBarraTrack {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .icParametro {
+  background: #e2e8f0;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .bloqueCard {
+    padding: 1.4rem 1.1rem;
+  }
+  .leyendaErrores {
+    grid-template-columns: 1fr 1fr;
+  }
+  .resultado {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ─── Animaciones respetuosas ─── */
+@media (prefers-reduced-motion: reduce) {
+  .potenciaBarraFill,
+  .seccionBtn,
+  .icBarra,
+  .btnPrimario,
+  .btnSecundario {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

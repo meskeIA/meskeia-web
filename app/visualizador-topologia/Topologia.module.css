@@ -1,0 +1,243 @@
+.container {
+  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #999999;
+  --border: #E5E5E5; --hover: #F5F5F5;
+  --radius: 12px; --radius-large: 16px;
+  --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+  max-width: 960px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary); min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0; --text-muted: #888888; --border: #404040; --hover: #333333;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+.heroIcono { font-size: 3rem; margin-bottom: var(--spacing-sm); }
+.titulo { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); line-height: 1.2; }
+.subtitulo { font-size: 1.05rem; opacity: 0.92; max-width: 620px; margin: 0 auto var(--spacing-sm); line-height: 1.55; }
+.heroNota { font-size: 0.85rem; opacity: 0.78; margin: 0; }
+
+/* ── Secciones ── */
+.seccionTitulo {
+  font-size: 1.25rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.seccionSubtitulo {
+  font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-lg);
+}
+.seccion { margin-bottom: calc(var(--spacing-xl) * 1.5); }
+
+/* ── Galería de superficies ── */
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.superficieCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  text-align: center;
+}
+.superficieCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46,134,171,0.15);
+  transform: translateY(-2px);
+}
+.superficieCardActiva {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(46,134,171,0.25);
+  background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%);
+}
+
+.svgWrapper {
+  width: 100%; aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.6rem;
+}
+.svgWrapper svg { width: 90%; height: 90%; }
+
+.superficieNombre {
+  font-size: 0.9rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+.superficieGenus {
+  font-size: 0.75rem; color: var(--text-secondary);
+}
+
+/* ── Panel de detalle de superficie ── */
+.detallePanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.detalleSvgGrande {
+  display: flex; align-items: center; justify-content: center;
+}
+.detalleSvgGrande svg { width: 180px; height: 180px; }
+
+.detalleInfo h3 {
+  font-size: 1.3rem; font-weight: 700; color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+.detalleInfo p {
+  font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md);
+}
+
+.propsBadges {
+  display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--spacing-md);
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+}
+.badgeVerde { background: #d4f5e9; color: #1a7a52; }
+.badgeRojo { background: #fde8e8; color: #9b1c1c; }
+.badgeAzul { background: #dbeafe; color: #1e40af; }
+.badgeMorado { background: #ede9fe; color: #5b21b6; }
+
+[data-theme='dark'] .badgeVerde { background: rgba(26,122,82,0.25); color: #6ee7b7; }
+[data-theme='dark'] .badgeRojo { background: rgba(155,28,28,0.25); color: #fca5a5; }
+[data-theme='dark'] .badgeAzul { background: rgba(30,64,175,0.25); color: #93c5fd; }
+[data-theme='dark'] .badgeMorado { background: rgba(91,33,182,0.25); color: #c4b5fd; }
+
+/* ── Selector de genus ── */
+.genusSelectorWrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.genusTabs {
+  display: flex; gap: 0.5rem; margin-bottom: var(--spacing-lg); flex-wrap: wrap;
+}
+.genusTab {
+  padding: 0.45rem 1rem; border-radius: 20px; border: 2px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.genusTab:hover { border-color: var(--primary); color: var(--primary); }
+.genusTabActivo {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-color: transparent; color: white;
+}
+
+.genusVisualizacion {
+  display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap;
+}
+.genusSvgArea {
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 220px;
+}
+.genusSvgArea svg { width: 200px; height: 180px; }
+
+.genusDescripcion { flex: 1; min-width: 200px; }
+.genusDescripcion h4 {
+  font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem;
+}
+.genusDescripcion p {
+  font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-sm);
+}
+.genusChi {
+  display: inline-block; font-size: 1.1rem; font-weight: 700;
+  color: var(--primary); background: rgba(46,134,171,0.1); padding: 0.3rem 0.8rem;
+  border-radius: 8px; margin-top: 0.4rem;
+}
+
+/* ── Nudos ── */
+.nudosGrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+.nudoCard {
+  background: var(--bg-card); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: var(--spacing-md); text-align: center;
+  cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.nudoCard:hover { border-color: var(--secondary); box-shadow: 0 4px 12px rgba(72,169,166,0.2); }
+.nudoCardActivo { border-color: var(--secondary); box-shadow: 0 4px 16px rgba(72,169,166,0.3); }
+.nudoSvgWrap {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.6rem; height: 110px;
+}
+.nudoSvgWrap svg { width: 100px; height: 100px; }
+.nudoNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.nudoNotacion { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.nudoDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* ── Tabla de propiedades (Euler) ── */
+.tablaWrap {
+  overflow-x: auto; margin-bottom: var(--spacing-xl);
+}
+.tabla {
+  width: 100%; border-collapse: collapse; font-size: 0.9rem;
+}
+.tabla thead tr { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+.tabla thead th {
+  padding: 0.75rem 1rem; color: white; font-weight: 600; text-align: left; white-space: nowrap;
+}
+.tabla tbody tr { border-bottom: 1px solid var(--border); }
+.tabla tbody tr:hover { background: var(--hover); }
+.tabla tbody td { padding: 0.7rem 1rem; color: var(--text-primary); vertical-align: middle; }
+.tablaSi { color: #1a7a52; font-weight: 600; }
+.tablaNo { color: #9b1c1c; font-weight: 600; }
+[data-theme='dark'] .tablaSi { color: #6ee7b7; }
+[data-theme='dark'] .tablaNo { color: #fca5a5; }
+.chiDestacado { font-weight: 700; color: var(--primary); }
+
+/* ── warningBox (v2.0) ── */
+.warningBox {
+  background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+.warningBox strong { color: var(--primary); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .container { padding: var(--spacing-xl) var(--spacing-md); }
+  .titulo { font-size: 1.7rem; }
+  .galeria { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .detallePanel { grid-template-columns: 1fr; }
+  .detalleSvgGrande svg { width: 140px; height: 140px; }
+  .genusVisualizacion { flex-direction: column; }
+  .genusSvgArea { flex: none; }
+  .nudosGrid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .superficieCard,
+  .nudoCard { transition: none; }
+}

@@ -710,6 +710,10 @@ export const implementedAppsUrls = [
   "/visualizador-relatividad-general/",   // Malla SVG espacio-tiempo deformada, mass slider, geodésicas, LIGO, GPS
   "/visualizador-caos-mariposa/",         // Atractor Lorenz Canvas 2D, 7000 pasos, dos trayectorias divergentes, efecto mariposa
   "/visualizador-superconductividad/",    // Efecto Meissner CSS animado, pares de Cooper, 8 materiales, Tc slider
+  "/visualizador-transformada-fourier/",  // Síntesis señal Canvas, espectro SVG, señales preconfiguradas, epiciclos animados
+  "/visualizador-teoria-grafos/",         // Dijkstra animado, Königsberg SVG, detector propiedades, 4 grafos predefinidos
+  "/visualizador-topologia/",             // 5 superficies SVG, genus selector, nudos topológicos, tabla Euler
+  "/visualizador-estadistica-inferencial/", // p-valor SVG, errores tipo I/II, 100 IC simulados, potencia estadística
 ];
 
 /**
