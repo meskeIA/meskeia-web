@@ -3317,7 +3317,27 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'FEM > 0 equivale a ΔG < 0 — la electroquímica y la termodinámica están matemáticamente conectadas' },
     { url: '/visualizador-hidrogeno/', icon: '💧', name: 'Hidrógeno', description: 'La electrólisis del agua produce hidrógeno verde — el coste energético explicado por el sobrepotencial' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los electrones que fluyen en la pila son los mismos que estudias en la estructura electrónica' },
-    { url: '/visualizador-enlaces-quimicos/', icon: '🔗', name: 'Enlaces Químicos', description: 'La reactividad en la serie electroquímica refleja la energía de los enlaces y la electronegatividad' },
+    { url: '/visualizador-polimeros-materiales/', icon: '🧪', name: 'Polímeros y Materiales', description: 'La electroquímica explica la corrosión metálica, clave para entender la durabilidad de los materiales poliméricos' },
+  ],
+
+  // EJE C — Química orgánica y nuclear (Roadmap v4, 2026-04-30)
+  'visualizador-quimica-organica': [
+    { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'La esterificación y las reacciones orgánicas en equilibrio se rigen por el mismo ΔG que estudias aquí' },
+    { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'Las reacciones de sustitución nucleófila tienen perfiles de energía de activación explicados por la cinética' },
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los orbitales atómicos y la hibridación sp³/sp² del carbono son la base de la geometría orgánica' },
+    { url: '/visualizador-polimeros-materiales/', icon: '🧪', name: 'Polímeros y Materiales', description: 'La polimerización por condensación (nylon, PET) aplica directamente las reacciones de esterificación y amidación' },
+  ],
+  'visualizador-radioactividad': [
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'La radioactividad es una propiedad nuclear — entender el núcleo atómico es el punto de partida' },
+    { url: '/visualizador-energia-nuclear/', icon: '⚡', name: 'Energía Nuclear', description: 'La fisión del U-235 en reactores nucleares emite radiación γ y neutrones — la misma física de este visualizador' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '🔬', name: 'Mecánica Cuántica', description: 'La desintegración radiactiva es intrínsecamente probabilística — la mecánica cuántica describe por qué' },
+    { url: '/visualizador-particulas-subatomicas/', icon: '⚛️', name: 'Partículas Subatómicas', description: 'Los positrones de la desintegración β⁺ son antielectrones — el Modelo Estándar explica su existencia' },
+  ],
+  'visualizador-polimeros-materiales': [
+    { url: '/visualizador-quimica-organica/', icon: '⚗️', name: 'Química Orgánica', description: 'Los monómeros son moléculas orgánicas con grupos funcionales reactivos — primero entiende la química orgánica' },
+    { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'La Tg y Tm de los polímeros se explican desde la termodinámica de las transiciones de fase' },
+    { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'Viaje de la Basura', description: 'El destino final de los plásticos depende de su código de reciclaje — conecta aquí con el ciclo de residuos' },
+    { url: '/visualizador-electroquimica/', icon: '🔋', name: 'Electroquímica', description: 'La corrosión metálica y la síntesis electroquímica afectan a los materiales compuestos de polímeros y metales' },
   ],
 
   // EJE B — Biología molecular de frontera (2026-04-28)

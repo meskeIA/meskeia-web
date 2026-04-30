@@ -1,0 +1,1304 @@
+/* PolimerosMateriales.module.css — meskeIA paleta oficial */
+
+/* ─── Contenedor principal ─────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #fff;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  margin: 0;
+  opacity: 0.92;
+}
+
+/* ─── Tab Bar ───────────────────────────────────────────── */
+.tabBar {
+  display: flex;
+  gap: 0;
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--primary);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 1rem;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex-shrink: 0;
+  padding: 0.85rem 1.4rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
+/* ─── Secciones ─────────────────────────────────────────── */
+.seccion {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.seccionTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1.5rem;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 0.5rem;
+}
+
+.instruccion {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* ─── Polimerización ────────────────────────────────────── */
+.polimerizacionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.mecanismoBox {
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.mecanismoTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.75rem;
+}
+
+.mecanismoDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.55;
+}
+
+.sliderRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.sliderLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.cadenaAnimada {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 3rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px dashed var(--accent);
+}
+
+.monomeroBadge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-family: monospace;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  animation: aparece 0.25s ease-out;
+}
+
+@keyframes aparece {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monomeroBadge {
+    animation: none;
+  }
+}
+
+/* Diagrama condensación */
+.condensacionDiagrama {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px dashed var(--accent);
+  min-height: 4rem;
+}
+
+.grupoFuncional {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.grupoBadge {
+  display: inline-block;
+  color: #fff;
+  font-size: 0.8rem;
+  font-family: monospace;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+.grupoNombre {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.masSigno {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.flechaReaccion {
+  font-size: 1.4rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Ejemplos */
+.ejemplosLista {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.ejemplosLista ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.ejemplosLista li {
+  margin-bottom: 0.25rem;
+}
+
+/* Tabla comparativa */
+.tablaComparativa {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--accent);
+}
+
+.tablaTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.tablaScroll {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--accent);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla tr:hover td {
+  background: var(--bg-primary);
+}
+
+.si {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.no {
+  color: #c62828;
+  font-weight: 600;
+}
+
+/* ─── Propiedades ───────────────────────────────────────── */
+.propiedadesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.polimeroBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--accent);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.polimeroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.polimeroBtnActive {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.codigoBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.polimeroBtnActive .codigoBadge {
+  background: rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+.propiedadesPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.propiedadesHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.polimeroNombre {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.codigoReciclaje {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary);
+  background: var(--bg-primary);
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+}
+
+.unidadRepetitiva {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.unidadRepetitiva code {
+  background: var(--bg-primary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.propiedadesBarras {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.barraPropiedad {
+  display: grid;
+  grid-template-columns: 220px 1fr 80px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.barraNombre {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.barraTrack {
+  height: 10px;
+  background: var(--bg-primary);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid var(--accent);
+}
+
+.barraFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.barraFillBajo {
+  background: #e65100;
+}
+
+.barraValor {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.usosList {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.usosList ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.usosList li {
+  margin-bottom: 0.2rem;
+}
+
+/* Warning box (Tm vs Tg) */
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #f0a500;
+  border-left: 4px solid #f0a500;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.warningBox h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #b76b00;
+  margin: 0 0 0.6rem;
+}
+
+.warningBox p {
+  font-size: 0.875rem;
+  color: #5c4000;
+  margin: 0 0 0.5rem;
+  line-height: 1.55;
+}
+
+.warningBox p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Clasificación ─────────────────────────────────────── */
+.clasificacionTree {
+  margin-bottom: 2rem;
+}
+
+.raiz {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.nodoRaiz {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.nivel1 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.nivel2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.subnodos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nodo {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 2px solid var(--accent);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.nodo:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.nodoActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.nodoSecundario {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-primary);
+}
+
+.nodoDetalle {
+  background: var(--bg-card);
+  border: 1px solid var(--primary);
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nodoDetalle {
+    animation: none;
+  }
+}
+
+.nodoDetalleTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.propiedadClave {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.nodoDescripcion {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  line-height: 1.55;
+}
+
+.ejemplosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ejemploBadge {
+  display: inline-block;
+  background: var(--bg-primary);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Códigos reciclaje */
+.codigosSeccion {
+  margin-top: 2rem;
+}
+
+.codigosTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.codigoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.codigoCard {
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.codigoNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.codigoSigla {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.codigoNombre {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.codigoEjemplos {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ─── Sostenibilidad ────────────────────────────────────── */
+.cicloVidaSeccion {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--accent);
+}
+
+.subseccionTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.cicloVida {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  position: relative;
+}
+
+.cicloEtapa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 80px;
+  position: relative;
+}
+
+.cicloIcono {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.cicloLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cicloDesc {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.cicloFlecha {
+  font-size: 1.2rem;
+  color: var(--accent);
+  align-self: center;
+  margin-bottom: 1rem;
+}
+
+/* Biodegradabilidad */
+.biodegSeccion {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--accent);
+}
+
+.biodegGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.biodegFila {
+  display: grid;
+  grid-template-columns: 130px 1fr 120px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.biodegMaterial {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.biodegBarraTrack {
+  height: 14px;
+  background: var(--bg-primary);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--accent);
+}
+
+.biodegBarraFill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.5s ease;
+}
+
+.biodegTiempo {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* Biopolímeros */
+.biopolimerosSeccion {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--accent);
+}
+
+/* Economía circular */
+.economiaCircular {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--accent);
+}
+
+.economiaDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.nivelGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.nivelCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--accent);
+  border-left: 4px solid;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.nivelHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.nivelNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.nivelIcono {
+  font-size: 1.1rem;
+}
+
+.nivelNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nivelPorcentaje {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+}
+
+.nivelDesc {
+  font-size: 0.845rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.fuenteNota {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ─── Dark Mode ─────────────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .mecanismoBox,
+[data-theme='dark'] .propiedadesPanel,
+[data-theme='dark'] .tablaComparativa,
+[data-theme='dark'] .cicloVidaSeccion,
+[data-theme='dark'] .biodegSeccion,
+[data-theme='dark'] .biopolimerosSeccion,
+[data-theme='dark'] .economiaCircular,
+[data-theme='dark'] .codigoCard,
+[data-theme='dark'] .nodoDetalle {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .cadenaAnimada,
+[data-theme='dark'] .condensacionDiagrama {
+  background: var(--bg-primary);
+  border-color: #555;
+}
+
+[data-theme='dark'] .nodo {
+  background: var(--bg-card);
+  border-color: #555;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .nodoSecundario {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .nodoActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .polimeroBtn {
+  background: var(--bg-card);
+  border-color: #555;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .polimeroBtnActive {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2d2200;
+  border-color: #8a5c00;
+}
+
+[data-theme='dark'] .warningBox h4 {
+  color: #f0c060;
+}
+
+[data-theme='dark'] .warningBox p {
+  color: #d4b06e;
+}
+
+[data-theme='dark'] .tabla th {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: #444;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabla tr:hover td {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .ejemploBadge {
+  background: var(--bg-primary);
+  border-color: #555;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .nivelCard {
+  background: var(--bg-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .biodegBarraTrack {
+  background: var(--bg-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .barraTrack {
+  background: var(--bg-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .unidadRepetitiva code {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .codigoReciclaje {
+  background: var(--bg-primary);
+  border-color: #555;
+}
+
+[data-theme='dark'] .tabBar {
+  background: var(--bg-card);
+  border-bottom-color: var(--primary);
+}
+
+[data-theme='dark'] .si {
+  color: #81c784;
+}
+
+[data-theme='dark'] .no {
+  color: #ef9a9a;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1.25rem;
+  }
+
+  .polimerizacionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nivel1,
+  .nivel2 {
+    grid-template-columns: 1fr;
+  }
+
+  .subnodos {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .subnodos .nodo {
+    width: auto;
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .barraPropiedad {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+
+  .barraNombre {
+    font-size: 0.8rem;
+  }
+
+  .barraValor {
+    text-align: left;
+  }
+
+  .biodegFila {
+    grid-template-columns: 110px 1fr 90px;
+  }
+
+  .codigoGrid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .cicloVida {
+    gap: 0.2rem;
+  }
+
+  .cicloEtapa {
+    min-width: 65px;
+  }
+
+  .cicloIcono {
+    font-size: 1.3rem;
+  }
+
+  .propiedadesGrid {
+    justify-content: flex-start;
+  }
+
+  .nivelHeader {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabBar {
+    padding: 0 0.5rem;
+  }
+
+  .tab {
+    padding: 0.75rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .seccion {
+    padding: 1.5rem 1rem;
+  }
+
+  .biodegFila {
+    grid-template-columns: 90px 1fr 70px;
+    font-size: 0.78rem;
+  }
+
+  .condensacionDiagrama {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cicloVida {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cicloFlecha {
+    transform: rotate(90deg);
+    margin: 0;
+  }
+}
+
+/* ─── EducationalSection v2.0 ───────────────────────────── */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.comparativaTable tr:nth-child(even) {
+  background: #f5f5f5;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) {
+  background: #333;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #444;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #444;
+  background: #2a2a2a;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+}
+
+[data-theme='dark'] .faqItem {
+  background: #2a2a2a;
+}
+
+.faqTip {
+  background: #e8f4f8;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+[data-theme='dark'] .faqTip {
+  background: #1e3a4a;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #444;
+  background: #2a2a2a;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningBoxEdu {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+[data-theme='dark'] .warningBoxEdu {
+  background: #2d2400;
+  border-color: #b45309;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.25rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  padding: 0.5rem 0.75rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .warningList li {
+  background: rgba(180, 83, 9, 0.15);
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+}

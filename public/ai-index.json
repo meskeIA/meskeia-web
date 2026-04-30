@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 670,
+  "total_tools": 673,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2143,6 +2143,24 @@
           "slug": "visualizador-particulas-subatomicas",
           "url": "https://meskeia.com/visualizador-particulas-subatomicas/",
           "description": "Tabla del Modelo Estándar interactiva (6 quarks, 6 leptones, bosones gauge y Higgs), diagramas de Feynman animados para las 4 fuerzas fundamentales, mecanismo de Higgs y adquisición de masa, y datos del LHC con energías de colisión y descubrimientos; 4 tabs de física de partículas"
+        },
+        {
+          "name": "Química Orgánica: Grupos Funcionales y Reacciones Interactivas",
+          "slug": "visualizador-quimica-organica",
+          "url": "https://meskeia.com/visualizador-quimica-organica/",
+          "description": "8 grupos funcionales orgánicos con SVG de molécula y polaridad (alcanos, alcoholes, cetonas, ácidos, ésteres, aminas), 4 reacciones básicas (adición, SN2, esterificación, oxidación alcoholes), aromaticidad con regla de Hückel y 3 tipos de isomería (estructural, geométrica cis/trans, óptica)"
+        },
+        {
+          "name": "Radioactividad: Desintegración, Vida Media y Datación",
+          "slug": "visualizador-radioactividad",
+          "url": "https://meskeia.com/visualizador-radioactividad/",
+          "description": "Comparativa de 5 tipos de radiación (α, β⁻, β⁺, γ, neutrones) con penetración SVG, ley de desintegración exponencial N(t)=N₀·e^(-λt) con gráfica y selector de isótopos reales (C-14, I-131, Tc-99m), datación por carbono-14 con calculadora de edad, y tabla de dosis en Gy/Sv con fuentes naturales y efectos biológicos"
+        },
+        {
+          "name": "Polímeros y Materiales: Plásticos, Propiedades y Reciclaje",
+          "slug": "visualizador-polimeros-materiales",
+          "url": "https://meskeia.com/visualizador-polimeros-materiales/",
+          "description": "Polimerización por adición (PE, PVC, PS con slider grado de polimerización) vs condensación (nylon, PET con animación liberación H₂O), propiedades Tm/Tg/densidad de 6 polímeros con barras comparativas, árbol de clasificación termoplásticos/termoestables/elastómeros, 7 códigos de reciclaje y sostenibilidad con barras logarítmicas de biodegradación"
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

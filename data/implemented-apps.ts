@@ -726,6 +726,10 @@ export const implementedAppsUrls = [
   "/visualizador-optica-ondulatoria/",      // Doble rendija Young, difracción sinc², polarización Malus, coherencia láser
   "/visualizador-circuitos-electronicos/",  // R/L/C impedancia, RC carga/descarga, transistor BJT, puertas lógicas, chip
   "/visualizador-particulas-subatomicas/",  // Modelo Estándar 17 partículas, Feynman, Higgs, LHC, materia-antimateria
+  // EJE C — Química orgánica y nuclear (Roadmap v4, 2026-04-30)
+  "/visualizador-quimica-organica/",        // 8 grupos funcionales, 4 reacciones, aromaticidad Hückel, isomería cis/trans/óptica
+  "/visualizador-radioactividad/",          // α/β/γ comparativa, ley desintegración N(t)=N₀e^(-λt), carbono-14, dosis Sv/Gy
+  "/visualizador-polimeros-materiales/",    // Adición vs condensación, Tm/Tg, termoplásticos/termoestables, 7 códigos reciclaje
   "/visualizador-cosmologia/",              // Tarta SVG universo, timeline Big Bang, curva a(t), geometría, 4 destinos
   "/visualizador-agujeros-negros/",         // Anatomía SVG clicable, calc. Schwarzschild, espaguetización, Hawking
   "/visualizador-exoplanetas/",             // Tránsito animado + curva luz, wobble, zona Goldilocks, scatter 5500+
