@@ -429,31 +429,32 @@ function Climograma({ biomaId }: { biomaId: string }) {
 
   const tempMin = Math.min(...datos.map((d) => d.temp));
   const tempMax = Math.max(...datos.map((d) => d.temp));
-  const rangoTemp = Math.max(tempMax - tempMin, 10);
   const precipMax = Math.max(...datos.map((d) => d.precip));
-  const escalaPrec = precipMax > 100 ? 2 : 1;
+
+  // Walter-Lieth dual scale: ≤100mm → p/2 as °C equiv; >100mm → compressed (50 + (p-100)/10)
+  const precipToTempEq = (p: number): number =>
+    p <= 100 ? p / 2 : 50 + (p - 100) / 10;
+
+  // Expand y-axis to fit both temperature values and precipitation equivalents
+  const precipMaxEq = precipToTempEq(precipMax);
+  const axisMin = Math.min(tempMin, 0) - 5;
+  const axisMax = Math.max(tempMax, precipMaxEq) + 5;
+  const axisRange = axisMax - axisMin;
 
   const xMes = (i: number) =>
     margenIzq + (i * anchoGrafico) / 11 + anchoGrafico / 22;
 
-  const yTemp = (t: number) =>
-    margenSup +
-    altoGrafico -
-    ((t - tempMin) / rangoTemp) * altoGrafico;
+  const yPos = (value: number) =>
+    margenSup + altoGrafico * (1 - (value - axisMin) / axisRange);
 
-  const yPrec = (p: number) => {
-    const tEq = p / escalaPrec;
-    const tMinEsc = tempMin - 2;
-    const tMaxEsc = tempMax + 2;
-    const rango2 = Math.max(tMaxEsc - tMinEsc, 10);
-    return margenSup + altoGrafico - ((tEq - tMinEsc) / rango2) * altoGrafico;
-  };
+  const yTemp = (t: number) => yPos(t);
+
+  // Precipitation as bars from 0-baseline up
+  const yBaseline = yPos(Math.max(axisMin, 0));
+  const yPrecTop = (p: number) => Math.max(margenSup, yPos(precipToTempEq(p)));
 
   const puntosTemp = datos
     .map((d, i) => `${xMes(i)},${yTemp(d.temp)}`)
-    .join(' ');
-  const puntosPrec = datos
-    .map((d, i) => `${xMes(i)},${yPrec(d.precip)}`)
     .join(' ');
 
   const tempAnual =
@@ -524,14 +525,23 @@ function Climograma({ biomaId }: { biomaId: string }) {
             </text>
           ))}
 
-          {/* Área precipitación (azul) */}
-          <polyline
-            points={puntosPrec}
-            fill="none"
-            stroke="#2E86AB"
-            strokeWidth="2"
-            opacity="0.7"
-          />
+          {/* Barras precipitación (azul) — Walter-Lieth */}
+          {datos.map((d, i) => {
+            const barWidth = (anchoGrafico / 12) * 0.65;
+            const top = yPrecTop(d.precip);
+            const bottom = Math.min(yBaseline, margenSup + altoGrafico);
+            return (
+              <rect
+                key={i}
+                x={xMes(i) - barWidth / 2}
+                y={top}
+                width={barWidth}
+                height={Math.max(0, bottom - top)}
+                fill="#2E86AB"
+                opacity="0.55"
+              />
+            );
+          })}
 
           {/* Línea temperatura (rojo) */}
           <polyline
@@ -546,7 +556,7 @@ function Climograma({ biomaId }: { biomaId: string }) {
           <text x={margenIzq + 18} y={margenSup + 9} fontSize="8" fill="#888">
             Temperatura (°C)
           </text>
-          <rect x={margenIzq + 4} y={margenSup + 14} width="10" height="4" fill="#2E86AB" opacity="0.7" />
+          <rect x={margenIzq + 4} y={margenSup + 12} width="10" height="8" fill="#2E86AB" opacity="0.55" />
           <text x={margenIzq + 18} y={margenSup + 19} fontSize="8" fill="#888">
             Precipitación (mm)
           </text>
