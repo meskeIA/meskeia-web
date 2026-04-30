@@ -3595,7 +3595,37 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Románico, Gótico, Renacimiento y Barroco son períodos compartidos por arquitectura y artes visuales' },
     { url: '/visualizador-urbanismo/', icon: '🏙️', name: 'Urbanismo', description: 'Los estilos arquitectónicos dan forma a la ciudad: el urbanismo es arquitectura a escala urbana' },
     { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Movimientos Musicales', description: 'La Bauhaus diseñó para el mundo moderno; la música de ese período también rompía moldes académicos' },
-    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'El Renacimiento arquitectónico de Brunelleschi es contemporáneo del humanismo literario de Petrarca' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'El hierro y el acero de la Revolución Industrial permitieron el modernismo y el rascacielos' },
+  ],
+
+  // ─── Cronologías culturales Grupo 2 (2026-04-30) ──────────────────────────
+
+  'visualizador-historia-medicina': [
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'La medicina digital y la telemedicina nacen en la misma era que el cloud computing y el big data' },
+    { url: '/visualizador-derechos-humanos/', icon: '⚖️', name: 'Derechos Humanos', description: 'El derecho a la salud es un derecho humano fundamental consagrado en la Declaración Universal de 1948' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'La farmacología industrial y la radiología nacen en la misma era que la Segunda Revolución Industrial' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El juramento hipocrático es filosofía aplicada; la bioética moderna dialoga con el existencialismo' },
+  ],
+
+  'visualizador-historia-internet': [
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'La medicina digital, el diagnóstico por IA y la telemedicina son hijas directas de la revolución de Internet' },
+    { url: '/visualizador-derechos-humanos/', icon: '⚖️', name: 'Derechos Humanos', description: 'Los derechos digitales y la privacidad online son la frontera más nueva de los derechos humanos' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'Internet es el motor de la Tercera y Cuarta Revolución Industrial: sin red, no hay fábrica inteligente' },
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'Los centros de datos y la arquitectura paramétrica (BIM) son hijos de la era digital' },
+  ],
+
+  'visualizador-derechos-humanos': [
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'El derecho a la salud es un derecho humano; la bioética nació cuando la medicina superó sus propios límites' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Los derechos digitales y la privacidad online son la nueva frontera de los derechos humanos del siglo XXI' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'Los derechos laborales y el movimiento obrero nacieron como respuesta a las condiciones de la Revolución Industrial' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Locke, Rousseau y Kant son los padres filosóficos de los derechos humanos modernos' },
+  ],
+
+  'visualizador-revoluciones-industriales': [
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'La bacteriología, la farmacología industrial y la radiología nacen en plena Segunda Revolución Industrial' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet es el motor de la Tercera Revolución Industrial; la IA generativa impulsa la Cuarta' },
+    { url: '/visualizador-derechos-humanos/', icon: '⚖️', name: 'Derechos Humanos', description: 'Los derechos laborales, la jornada de 8 horas y la abolición del trabajo infantil son conquistas de la era industrial' },
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'El hierro, el acero y el hormigón de la Revolución Industrial hicieron posibles el modernismo y el rascacielos' },
   ],
 };
 

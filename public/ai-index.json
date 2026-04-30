@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 694,
+  "total_tools": 698,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2287,6 +2287,30 @@
           "slug": "visualizador-arquitectura-estilos",
           "url": "https://meskeia.com/visualizador-arquitectura-estilos/",
           "description": "Visualizador interactivo de 16 estilos arquitectónicos desde la arquitectura griega clásica (-700 a.C.) hasta la arquitectura sostenible y paramétrica. Arquitectos clave, edificios icónicos, materiales y contexto histórico. Timeline SVG scrollable con soporte para años a.C., tabla comparativa filtrable y timeline doble vertical con eventos históricos paralelos."
+        },
+        {
+          "name": "Historia de la Medicina: Cronología de Hipócrates a la Medicina de Precisión",
+          "slug": "visualizador-historia-medicina",
+          "url": "https://meskeia.com/visualizador-historia-medicina/",
+          "description": "Visualizador interactivo de 2.500 años de historia médica. 14 períodos desde la medicina hipocrática (-460 a.C.) hasta la medicina de precisión e IA. Timeline SVG con soporte para años a.C., tabla comparativa y contexto histórico en 6 eras (Antigüedad, Edad Media, Renacimiento, Medicina industrial, Revolución biomédica, Biomedicina digital)."
+        },
+        {
+          "name": "Historia de Internet: Cronología de ARPANET a la IA Generativa",
+          "slug": "visualizador-historia-internet",
+          "url": "https://meskeia.com/visualizador-historia-internet/",
+          "description": "Visualizador interactivo de la evolución de Internet desde 1969. 14 hitos desde ARPANET hasta la IA generativa. Timeline SVG interactivo, tabla comparativa de etapas y contexto histórico en 6 eras (Red experimental, Protocolos y DNS, La WWW, Burbuja y Web 2.0, Era Móvil y Social, IA y Cloud)."
+        },
+        {
+          "name": "Historia de los Derechos Humanos: Cronología de la Magna Carta a los Derechos Digitales",
+          "slug": "visualizador-derechos-humanos",
+          "url": "https://meskeia.com/visualizador-derechos-humanos/",
+          "description": "Visualizador interactivo de 800 años de derechos humanos. 13 movimientos desde la Magna Carta (1215) hasta los derechos digitales. Timeline SVG, tabla comparativa y 6 eras históricas (Fundamentos medievales, Ilustración, Abolicionismo, Sistema ONU, Derechos Civiles, Derechos Digitales)."
+        },
+        {
+          "name": "Revoluciones Industriales: Cronología de la Máquina de Vapor a la Industria 5.0",
+          "slug": "visualizador-revoluciones-industriales",
+          "url": "https://meskeia.com/visualizador-revoluciones-industriales/",
+          "description": "Visualizador interactivo de las revoluciones industriales. 13 fases desde la manufactura preindustrial (1400) hasta la IA industrial. Timeline SVG, tabla comparativa de tecnologías motrices y 6 eras industriales (Preindustrial, 1ª Rev., 2ª Rev., 3ª Rev., Industria 4.0, Industria 5.0 e IA)."
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

@@ -767,6 +767,11 @@ export const implementedAppsUrls = [
   "/visualizador-filosofia/",             // 16 corrientes filosóficas, años a.C., filósofos, conceptos, pregunta central
   "/visualizador-literatura-movimientos/", // 15 movimientos literarios, épica griega→posmodernismo, autores, géneros
   "/visualizador-arquitectura-estilos/",  // 16 estilos arquitectónicos, griego clásico→sostenible, edificios icónicos
+  // Cronologías culturales Grupo 2 (2026-04-30)
+  "/visualizador-historia-medicina/",     // 14 períodos médicos, Hipócrates→medicina precisión IA, años a.C.
+  "/visualizador-historia-internet/",     // 14 hitos, ARPANET 1969→IA generativa, 6 eras digitales
+  "/visualizador-derechos-humanos/",      // 13 movimientos, Magna Carta 1215→derechos digitales, 6 eras
+  "/visualizador-revoluciones-industriales/", // 13 fases, preindustrial 1400→Industria 5.0 IA
 ];
 
 /**
