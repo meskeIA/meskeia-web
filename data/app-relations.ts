@@ -812,7 +812,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes del cuerpo' },
     { url: '/visualizador-desarrollo-farmaco/', icon: '💊', name: 'Cómo se Descubre un Medicamento', description: 'Del laboratorio a la farmacia' },
     { url: '/visualizador-coste-sanidad/', icon: '🏥', name: 'Lo que Cuesta Enfermarse', description: 'Sanidad pública vs privada' },
-    { url: '/visualizador-mundo-100-personas/', icon: '🌍', name: 'El Mundo en 100 Personas', description: 'Estadísticas globales' },
+    { url: '/visualizador-historia-epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'Cada vacuna llegó como respuesta a una epidemia devastadora — el arco completo desde la infección al control' },
   ],
   'visualizador-viaje-basura': [
     { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica invisible' },
@@ -955,7 +955,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-fotosintesis': [
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
-    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
+    { url: '/visualizador-ciclo-nitrogeno/', icon: '🔄', name: 'Ciclo del Nitrógeno', description: 'El nitrógeno asimilado por las raíces es tan esencial para la fotosíntesis como la luz solar' },
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
   ],
 
@@ -1046,7 +1046,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-ecosistema': [
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
     { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Ciclo hidrológico' },
-    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
+    { url: '/visualizador-ciclo-nitrogeno/', icon: '🔄', name: 'Ciclo del Nitrógeno', description: 'El nitrógeno disponible en el suelo es el factor limitante de la productividad primaria del ecosistema' },
     { url: '/visualizador-biomas-terrestres/', icon: '🌿', name: 'Biomas Terrestres', description: 'Cada bioma es un ecosistema a escala global — mismas reglas tróficas, distintos climas y latitudes' },
   ],
   'visualizador-fosiles-tiempo-geologico': [
@@ -1442,7 +1442,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-ciclo-economico': [
     { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Cómo el BCE usa los tipos para modular el ciclo' },
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'La bolsa como indicador leading del ciclo' },
-    { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'El ciclo y la sostenibilidad de la deuda' },
+    { url: '/visualizador-estructuras-mercado/', icon: '🏪', name: 'Estructuras de Mercado', description: 'La estructura del mercado (monopolio, oligopolio) determina cómo se transmiten los shocks cíclicos' },
     { url: '/visualizador-comercio-internacional/', icon: '🌍', name: 'Comercio Internacional', description: 'El comercio refleja y amplifica el ciclo económico' },
   ],
   'visualizador-comercio-internacional': [
@@ -3232,7 +3232,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-regimenes-politicos': [
     { url: '/curso-teoria-politica/', icon: '🏛️', name: 'Curso de Teoría Política', description: 'Profundiza en los fundamentos teóricos de estos sistemas: Platón, Aristóteles, Hobbes, Locke y más' },
     { url: '/visualizador-proceso-legislativo/', icon: '⚖️', name: 'Proceso Legislativo', description: 'Cómo funciona la producción de leyes en un sistema democrático representativo' },
-    { url: '/visualizador-sistema-electoral/', icon: '🗳️', name: 'Sistema Electoral', description: 'Los sistemas electorales son uno de los mecanismos estructurales que diferencian los regímenes' },
+    { url: '/visualizador-estratificacion-social/', icon: '📊', name: 'Estratificación Social', description: 'Los regímenes determinan la movilidad social: democracias nórdicas con alta movilidad vs sistemas con élites cerradas' },
     { url: '/visualizador-desinformacion/', icon: '📰', name: 'Desinformación', description: 'La libertad de prensa y el pluralismo informativo son características estructurales de algunos regímenes' },
   ],
 
@@ -3356,7 +3356,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-modelos-epidemiologicos': [
     { url: '/visualizador-vacunas/', icon: '💉', name: 'Vacunas', description: 'Las vacunas reducen β (transmisión) y aumentan el compartimento R — conecta el modelo con la intervención' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'El compartimento R del modelo SIR es la población con inmunidad — el sistema inmune la genera' },
-    { url: '/visualizador-estadistica-inferencial/', icon: '📊', name: 'Estadística Inferencial', description: 'Estimar β y γ desde datos reales requiere inferencia estadística — los parámetros no se conocen directamente' },
+    { url: '/visualizador-historia-epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'Los modelos SIR/SEIR explican matemáticamente lo que cada epidemia histórica demostró empíricamente' },
     { url: '/visualizador-ciclo-viral/', icon: '🦠', name: 'Ciclo Viral', description: 'El compartimento I del modelo SIR es donde ocurre la replicación viral que ya conoces a nivel molecular' },
   ],
 
@@ -3521,7 +3521,51 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ecosistema/', icon: '🌿', name: 'Ecosistema', description: 'Cada bioma es un tipo de ecosistema a escala global: mismas reglas tróficas, distintas condiciones climáticas' },
     { url: '/visualizador-ciclo-carbono-completo/', icon: '♻️', name: 'Ciclo del Carbono', description: 'Los biomas son los grandes reservorios de carbono terrestre — la deforestación altera el ciclo global' },
     { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'Viaje de la Basura', description: 'Los residuos plásticos llegan a todos los biomas: desde la tundra ártica hasta los arrecifes de coral' },
-    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'El clima es el factor determinante de qué bioma existe en cada latitud — temperatura y precipitación anuales' },
+    { url: '/visualizador-ciclo-nitrogeno/', icon: '🔄', name: 'Ciclo del Nitrógeno', description: 'El ciclo del nitrógeno determina la fertilidad del suelo y la productividad primaria de cada bioma' },
+  ],
+
+  // EJE F — Sociedad, economía y cultura (Roadmap v4, 2026-04-30)
+  'visualizador-estructuras-mercado': [
+    { url: '/visualizador-ciclo-economico/', icon: '📈', name: 'Ciclo Económico', description: 'Las estructuras de mercado determinan cómo los shocks cíclicos se transmiten a precios y cantidades' },
+    { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Los tipos de interés modifican el coste de capital y alteran el equilibrio en mercados imperfectos' },
+    { url: '/visualizador-inflacion/', icon: '📉', name: 'Inflación', description: 'El poder de mercado de los monopolios permite trasladar la inflación de costes a precios finales' },
+    { url: '/visualizador-estratificacion-social/', icon: '📊', name: 'Estratificación Social', description: 'La concentración del mercado es una de las causas estructurales de la desigualdad económica' },
+  ],
+  'visualizador-seguros-riesgo': [
+    { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Los tipos de interés determinan el rendimiento de las reservas técnicas de las aseguradoras' },
+    { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'Los bancos y aseguradoras son los dos grandes intermediarios financieros que gestionan el riesgo' },
+    { url: '/visualizador-inflacion/', icon: '📈', name: 'Inflación', description: 'La inflación erosiona el valor real de las indemnizaciones y obliga a actualizar las primas periódicamente' },
+    { url: '/visualizador-estructuras-mercado/', icon: '🏪', name: 'Estructuras de Mercado', description: 'El sector asegurador es un oligopolio en la mayoría de países — con regulación específica antiprivatera' },
+  ],
+  'visualizador-historia-epidemias': [
+    { url: '/visualizador-modelos-epidemiologicos/', icon: '🦠', name: 'Modelos Epidemiológicos', description: 'Los modelos SIR/SEIR actuales explican matemáticamente lo que las epidemias históricas mostraron empíricamente' },
+    { url: '/visualizador-vacunas/', icon: '💉', name: 'Cómo Funcionan las Vacunas', description: 'La historia de las epidemias es inseparable de la historia de las vacunas que las controlaron' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'El sistema inmune es el protagonista silencioso de cada epidemia: inmunidad de rebaño y respuesta humoral' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La Muerte Negra transformó el arte gótico; la gripe española marcó el expresionismo de entreguerras' },
+  ],
+  'visualizador-urbanismo': [
+    { url: '/visualizador-estratificacion-social/', icon: '📊', name: 'Estratificación Social', description: 'La zonificación urbana reproduce y amplifica la estratificación social: barrios por clase económica' },
+    { url: '/visualizador-cadenas-suministro/', icon: '🚢', name: 'Cadenas de Suministro', description: 'La logística urbana (last-mile delivery, hubs) es el punto donde las cadenas de suministro llegan al ciudadano' },
+    { url: '/visualizador-regimenes-politicos/', icon: '🏛️', name: 'Regímenes Políticos', description: 'El urbanismo refleja el sistema político: ciudades-jardín socialistas, megalópolis neoliberales, ciudades planificadas' },
+    { url: '/visualizador-estructuras-mercado/', icon: '🏪', name: 'Estructuras de Mercado', description: 'El mercado inmobiliario urbano es un oligopolio local con altas barreras de entrada y poder de fijación de precios' },
+  ],
+  'visualizador-estratificacion-social': [
+    { url: '/visualizador-ciclo-economico/', icon: '📈', name: 'Ciclo Económico', description: 'Las recesiones golpean más a las clases bajas y ensanchan la brecha entre estratos durante las crisis' },
+    { url: '/visualizador-regimenes-politicos/', icon: '🏛️', name: 'Regímenes Políticos', description: 'El sistema político determina la movilidad social: democracias nórdicas vs sistemas con élites cerradas' },
+    { url: '/visualizador-estructuras-mercado/', icon: '🏪', name: 'Estructuras de Mercado', description: 'La concentración de mercado y la desigualdad salarial son dos caras del mismo fenómeno estructural' },
+    { url: '/visualizador-urbanismo/', icon: '🏙️', name: 'Urbanismo', description: 'La segregación residencial urbana reproduce la estratificación social en el espacio físico de la ciudad' },
+  ],
+  'visualizador-ciclo-nitrogeno': [
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'La fotosíntesis fija el carbono; el ciclo del nitrógeno fija el nitrógeno — los dos grandes ciclos de la vida' },
+    { url: '/visualizador-ecosistema/', icon: '🌿', name: 'Ecosistemas', description: 'El ciclo del nitrógeno determina la productividad primaria y la capacidad de carga de cada ecosistema' },
+    { url: '/visualizador-transporte-plantas/', icon: '🌱', name: 'Transporte en Plantas', description: 'El nitrato (NO₃⁻) absorbido por las raíces asciende por el xilema hasta los cloroplastos de las hojas' },
+    { url: '/visualizador-biomas-terrestres/', icon: '🌍', name: 'Biomas Terrestres', description: 'La disponibilidad de nitrógeno es uno de los factores que limita la productividad de cada bioma' },
+  ],
+  'visualizador-arte-movimientos': [
+    { url: '/visualizador-regimenes-politicos/', icon: '🏛️', name: 'Regímenes Políticos', description: 'El arte siempre refleja el sistema político de su época: el realismo socialista, el arte oficial de los totalitarismos' },
+    { url: '/visualizador-historia-epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'La Muerte Negra transformó la iconografía medieval; el COVID aceleró el arte digital y los NFT' },
+    { url: '/visualizador-estratificacion-social/', icon: '📊', name: 'Estratificación Social', description: 'El arte y el mercado del arte son a la vez reflejo y agente de la estratificación social y el capital cultural' },
+    { url: '/visualizador-historia-civilizaciones/', icon: '🏛️', name: 'Historia de las Civilizaciones', description: 'Cada civilización produce el arte que la define: de las pirámides a las vanguardias del siglo XX' },
   ],
 };
 

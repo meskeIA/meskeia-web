@@ -1,0 +1,1052 @@
+/* ─────────────────────────────────────────────
+   Visualizador de Urbanismo — CSS Module meskeIA
+   ───────────────────────────────────────────── */
+
+/* Contenedor principal */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  color: white;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  opacity: 0.92;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* Main */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+/* Tab Navigation */
+.tabNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.5rem;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tabBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+}
+
+.tabBtnActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  font-weight: 700;
+}
+
+.tabBtnActivo:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.tabBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Tab Content */
+.tabContent {
+  min-height: 320px;
+}
+
+/* Section Card */
+.sectionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1.25rem;
+}
+
+/* ─── Tab 1: Modelos Urbanos ─── */
+
+.modelosBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.modeloBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.modeloBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.modeloBtnActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  font-weight: 700;
+}
+
+.modeloBtnActivo:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.modeloBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.modeloBtnNombre {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.modeloBtnAutor {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.instruccion {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.svgWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: rgba(46, 134, 171, 0.04);
+  padding: 0.5rem;
+}
+
+.detallePanel {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.detalleTitulo {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.detalleDesc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.detallePanelVacio {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+}
+
+/* ─── Tab 2: Densidad ─── */
+
+.ciudadesWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.barraLabel {
+  font-size: 11px;
+  fill: var(--text-primary);
+}
+
+.barraValor {
+  font-size: 10px;
+  fill: var(--text-secondary);
+}
+
+.megadensa {
+  fill: #c0392b;
+  background-color: #c0392b;
+  color: white;
+}
+
+.densa {
+  fill: #e67e22;
+  background-color: #e67e22;
+  color: white;
+}
+
+.media {
+  fill: #f39c12;
+  background-color: #f39c12;
+  color: white;
+}
+
+.baja {
+  fill: #27ae60;
+  background-color: #27ae60;
+  color: white;
+}
+
+.dispersa {
+  fill: #2980b9;
+  background-color: #2980b9;
+  color: white;
+}
+
+.leyendaDensidad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.leyendaItem {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.tipoBadge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.densidadInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ─── Tab 3: Movilidad ─── */
+
+.tipoCiudadSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.movilidadGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.movilidadCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  border: 2px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.movilidadCard:hover {
+  border-color: var(--primary);
+}
+
+.movilidadCardActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  box-shadow: 0 0 0 2px rgba(46, 134, 171, 0.2);
+}
+
+.movilidadCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.movilidadIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.movilidadNombre {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.movilidadMetrica {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.metricaLabel {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.metricaValor {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.movilidadDetalle {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.radarWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.radarLeyenda {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.radarAzul {
+  color: #2E86AB;
+}
+
+.radarRojo {
+  color: #c0392b;
+}
+
+.movilidadStats {
+  flex: 1;
+  min-width: 180px;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 0.88rem;
+  gap: 0.5rem;
+}
+
+.statRow:last-child {
+  border-bottom: none;
+}
+
+.statRow span {
+  color: var(--text-secondary);
+}
+
+.statRow strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* ─── Tab 4: Sostenibilidad ─── */
+
+.sostenibilidadLayout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.sostenibilidadGrid {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sliderLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sliderLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sliderValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.hexWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Score box */
+.scoreBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 2px solid;
+  gap: 0.25rem;
+  text-align: center;
+  margin-top: 0.75rem;
+}
+
+.scoreValor {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.scoreClasificacion {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.scoreSub {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.scoreEjemplar {
+  border-color: #27ae60;
+  background: rgba(39, 174, 96, 0.08);
+  color: #1e8449;
+}
+
+.scoreSostenible {
+  border-color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  color: #2c8783;
+}
+
+.scoreTransicion {
+  border-color: #f39c12;
+  background: rgba(243, 156, 18, 0.08);
+  color: #b7770d;
+}
+
+.scoreConvencional {
+  border-color: #7f8c8d;
+  background: rgba(127, 140, 141, 0.08);
+  color: #5d6d7e;
+}
+
+/* ─────────────────────────────────────────────
+   Clases v2.0 — Contenido Educativo Enriquecido
+   ───────────────────────────────────────────── */
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+  background: var(--bg-card);
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  color: var(--text-secondary);
+  line-height: 1.45;
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+/* Escenarios / Casos de Uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.escenarioCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.escenarioCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioCard p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.escenarioCard strong {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* FAQ */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.4rem;
+}
+
+.faqTip {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--secondary);
+  font-style: italic;
+  margin-top: 0.3rem;
+}
+
+/* Guía Paso a Paso */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  counter-reset: step-counter;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.stepContent p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Tips / Mejores Prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: border-color 0.15s;
+}
+
+.tipCard:hover {
+  border-color: var(--secondary);
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ─── Warningbox (indicador v2.0) ─── */
+.warningBox {
+  background: rgba(243, 156, 18, 0.1);
+  border: 1px solid rgba(243, 156, 18, 0.4);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  color: #7d6608;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+   ───────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .sectionCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .tabBtn {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabBtn:hover {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tabBtnActivo {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .modeloBtn {
+  border-color: rgba(46, 134, 171, 0.35);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .modeloBtn:hover {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .modeloBtnActivo {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .svgWrapper {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .detallePanel {
+  background: rgba(46, 134, 171, 0.1);
+  border-left-color: var(--primary);
+}
+
+[data-theme='dark'] .detalleTitulo {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .detalleDesc {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .detallePanelVacio {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .movilidadCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .movilidadCardActivo {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .statRow {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .barraLabel {
+  fill: var(--text-primary);
+}
+
+[data-theme='dark'] .barraValor {
+  fill: var(--text-secondary);
+}
+
+[data-theme='dark'] .sliderLabel {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .scoreEjemplar {
+  color: #58d68d;
+  background: rgba(39, 174, 96, 0.12);
+}
+
+[data-theme='dark'] .scoreSostenible {
+  color: #76d7d4;
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .scoreTransicion {
+  color: #f8c471;
+  background: rgba(243, 156, 18, 0.12);
+}
+
+[data-theme='dark'] .scoreConvencional {
+  color: #aab7b8;
+  background: rgba(127, 140, 141, 0.12);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(243, 156, 18, 0.12);
+  color: #f8c471;
+}
+
+/* ─── Dark mode v2.0 ─── */
+
+[data-theme='dark'] .tableWrapper {
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(46, 134, 171, 0.15);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .escenarioCard:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .escenarioCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .faqItem strong {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .faqItem p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqTip {
+  color: var(--secondary);
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .stepContent strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stepContent p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.08);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+[data-theme='dark'] .tipCard:hover {
+  border-color: var(--secondary);
+}
+
+[data-theme='dark'] .tipCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tipCard p {
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Responsive
+   ───────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .main {
+    padding: 1.25rem 0.75rem 2rem;
+  }
+
+  .tabNav {
+    gap: 0.35rem;
+  }
+
+  .tabBtn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .sectionCard {
+    padding: 1rem;
+  }
+
+  .movilidadGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .movilidadDetalle {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sostenibilidadLayout {
+    flex-direction: column;
+  }
+
+  .hexWrapper {
+    width: 100%;
+  }
+
+  .modelosBtns {
+    flex-direction: column;
+  }
+
+  .modeloBtn {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .tipoCiudadSelector {
+    flex-direction: column;
+  }
+
+  /* v2.0 responsive */
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: row;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .movilidadGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .heroTitle {
+    font-size: 1.4rem;
+  }
+}

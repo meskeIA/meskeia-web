@@ -1,0 +1,990 @@
+/* ============================================
+   EstructurasMercado.module.css
+   Visualizador de Estructuras de Mercado
+   Paleta meskeIA: #2E86AB / #48A9A6
+   ============================================ */
+
+/* ---- LAYOUT ---- */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.75rem;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+/* ---- TABS ---- */
+
+.tabNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.tabBtn {
+  padding: 0.55rem 1.1rem;
+  border: 2px solid #d0d0d0;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+
+.tabBtn:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.tabBtn:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.tabBtnActivo {
+  border-color: #2E86AB;
+  background: #2E86AB;
+  color: #ffffff;
+}
+
+.tabBtnActivo:hover {
+  background: #256f8e;
+  color: #ffffff;
+}
+
+/* ---- CONTENIDO DE TAB ---- */
+
+.tabContent {
+  animation: fadeIn 0.22s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sectionCard {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0 0 0.6rem;
+}
+
+.sectionDesc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+/* ---- SELECTOR ESTRUCTURA ---- */
+
+.selectorEstructura {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.btnEstructura {
+  padding: 0.4rem 0.85rem;
+  border: 2px solid #d0d0d0;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.btnEstructura:hover {
+  border-color: #48A9A6;
+  color: #48A9A6;
+}
+
+.btnEstructura:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.btnEstructuraActivo {
+  border-color: #48A9A6;
+  background: #48A9A6;
+  color: #ffffff;
+}
+
+/* ---- TABLA COMPARATIVA ---- */
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable thead tr {
+  background: #2E86AB;
+  color: #ffffff;
+}
+
+.comparativaTable th {
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.filaActiva {
+  background: rgba(72, 169, 166, 0.12) !important;
+  border-left: 4px solid #48A9A6;
+}
+
+/* ---- SVG ---- */
+
+.svgWrapper {
+  width: 100%;
+  max-width: 480px;
+  margin: 1.25rem auto;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  background: var(--bg-primary);
+  padding: 0.5rem;
+}
+
+/* ---- BADGES ---- */
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+  justify-content: center;
+}
+
+.badgeInfo,
+.badgePrecio,
+.badgeCantidad {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badgeInfo {
+  background: rgba(127, 179, 211, 0.2);
+  color: #2E86AB;
+  border: 1px solid #7FB3D3;
+}
+
+.badgePrecio {
+  background: rgba(232, 63, 111, 0.12);
+  color: #c03060;
+  border: 1px solid rgba(232, 63, 111, 0.4);
+}
+
+.badgeCantidad {
+  background: rgba(72, 169, 166, 0.15);
+  color: #2e8a87;
+  border: 1px solid rgba(72, 169, 166, 0.4);
+}
+
+/* ---- LEYENDA ---- */
+
+.leyendaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.leyendaColor {
+  display: inline-block;
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ---- SLIDER ---- */
+
+.sliderGroup {
+  margin-bottom: 1rem;
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.rangeInput {
+  width: 100%;
+  accent-color: #2E86AB;
+  cursor: pointer;
+  height: 6px;
+}
+
+/* ---- NOTA TEXTO ---- */
+
+.notaTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 1rem 0 0;
+  padding: 0.9rem;
+  background: rgba(46, 134, 171, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #2E86AB;
+}
+
+/* ---- ESTRATEGIAS OLIGOPOLIO ---- */
+
+.estrategiasRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.estrategiaGrupo {
+  flex: 1;
+  min-width: 200px;
+}
+
+.estrategiaLabel {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.estrategiaBtns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.btnEstrategia {
+  padding: 0.5rem 0.85rem;
+  border: 2px solid #d0d0d0;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.btnEstrategia:hover {
+  border-color: #2E86AB;
+  color: #2E86AB;
+}
+
+.btnEstrategia:focus-visible {
+  outline: 2px solid #2E86AB;
+  outline-offset: 2px;
+}
+
+.btnEstrategiaActivo {
+  border-color: #2E86AB;
+  background: #2E86AB;
+  color: #ffffff;
+}
+
+/* ---- MATRIZ DE PAGOS ---- */
+
+.matrizWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.matrizPagos {
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 340px;
+}
+
+.matrizPagos th {
+  padding: 0.6rem 1rem;
+  background: #2E86AB;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+}
+
+.matrizPagos th:first-child {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.matrizPagos td {
+  padding: 0.7rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-width: 130px;
+}
+
+.celda00 {
+  background: rgba(72, 169, 166, 0.18);
+  color: #1a6a68;
+}
+
+.celda01 {
+  background: rgba(232, 63, 111, 0.12);
+  color: #a02050;
+}
+
+.celda10 {
+  background: rgba(232, 63, 111, 0.12);
+  color: #a02050;
+}
+
+.celda11 {
+  background: rgba(180, 130, 60, 0.15);
+  color: #7a5a10;
+}
+
+.celdaSeleccionada {
+  box-shadow: 0 0 0 3px #2E86AB inset;
+  transform: scale(1.02);
+}
+
+/* ---- RESULTADO NASH ---- */
+
+.resultadoNash {
+  padding: 0.85rem 1.1rem;
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.valorDestacado {
+  color: #2E86AB;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.nashLabel {
+  color: #E83F6F;
+  font-weight: 600;
+}
+
+.optimalLabel {
+  color: #48A9A6;
+  font-weight: 600;
+}
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .sectionCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .tabBtn {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabBtn:hover {
+  border-color: #7FB3D3;
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .tabBtnActivo {
+  border-color: #2E86AB;
+  background: #2E86AB;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .btnEstructura {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnEstructura:hover {
+  border-color: #48A9A6;
+  color: #48A9A6;
+}
+
+[data-theme='dark'] .btnEstructuraActivo {
+  border-color: #48A9A6;
+  background: #48A9A6;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .filaActiva {
+  background: rgba(72, 169, 166, 0.18) !important;
+}
+
+[data-theme='dark'] .svgWrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .badgeInfo {
+  background: rgba(127, 179, 211, 0.12);
+  color: #7FB3D3;
+  border-color: rgba(127, 179, 211, 0.3);
+}
+
+[data-theme='dark'] .badgePrecio {
+  background: rgba(232, 63, 111, 0.1);
+  color: #f06090;
+  border-color: rgba(232, 63, 111, 0.3);
+}
+
+[data-theme='dark'] .badgeCantidad {
+  background: rgba(72, 169, 166, 0.12);
+  color: #48A9A6;
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+[data-theme='dark'] .notaTexto {
+  background: rgba(46, 134, 171, 0.08);
+  border-left-color: #7FB3D3;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnEstrategia {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnEstrategia:hover {
+  border-color: #7FB3D3;
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .btnEstrategiaActivo {
+  border-color: #2E86AB;
+  background: #2E86AB;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .matrizPagos th:first-child {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .matrizPagos td {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .celda00 {
+  background: rgba(72, 169, 166, 0.14);
+  color: #48A9A6;
+}
+
+[data-theme='dark'] .celda01 {
+  background: rgba(232, 63, 111, 0.1);
+  color: #f06090;
+}
+
+[data-theme='dark'] .celda10 {
+  background: rgba(232, 63, 111, 0.1);
+  color: #f06090;
+}
+
+[data-theme='dark'] .celda11 {
+  background: rgba(200, 160, 80, 0.12);
+  color: #c8a050;
+}
+
+[data-theme='dark'] .resultadoNash {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .leyendaItem {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: #7FB3D3;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1.25rem 1.75rem;
+  }
+
+  .main {
+    padding: 1.5rem 1rem;
+  }
+
+  .tabNav {
+    gap: 0.4rem;
+  }
+
+  .tabBtn {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.8rem;
+  }
+
+  .sectionCard {
+    padding: 1.25rem 1rem;
+  }
+
+  .estrategiasRow {
+    flex-direction: column;
+  }
+
+  .estrategiaGrupo {
+    min-width: unset;
+  }
+
+  .btnEstrategia {
+    font-size: 0.78rem;
+  }
+
+  .svgWrapper {
+    padding: 0.25rem;
+  }
+
+  .badgeRow {
+    gap: 0.4rem;
+  }
+
+  .badgeInfo,
+  .badgePrecio,
+  .badgeCantidad {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .selectorEstructura {
+    gap: 0.4rem;
+  }
+
+  .btnEstructura {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabContent {
+    animation: none;
+  }
+}
+
+/* ========================================
+   PATRÓN v2.0 — SECCIONES EDUCATIVAS
+   ======================================== */
+
+/* ---- TABLA EDUCATIVA (Sección 1) ---- */
+
+/* .tableWrapper y .comparativaTable ya existen arriba; se reutilizan */
+
+/* ---- ESCENARIOS / CASOS DE USO (Sección 2) ---- */
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.18);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: box-shadow 0.18s;
+}
+
+.escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.escenarioCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2E86AB;
+  margin: 0;
+}
+
+.escenarioCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* ---- FAQ (Sección 3) ---- */
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+}
+
+.faqItem dt {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.faqItem dd {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.faqTip {
+  display: block;
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 3px solid #48A9A6;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+  color: #2e8a87;
+  font-style: italic;
+}
+
+/* ---- GUÍA PASO A PASO (Sección 4) ---- */
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: #2E86AB;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.88rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.stepContent p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ---- TIPS / MEJORES PRÁCTICAS (Sección 5) ---- */
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tipCard p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* ---- WARNING BOX (Sección 6 — OBLIGATORIO v2.0) ---- */
+
+.warningBox {
+  background: #fffbea;
+  border: 1px solid #f0d060;
+  border-left: 4px solid #e0a800;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.warningBox h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #7a5a00;
+  margin: 0 0 0.85rem;
+}
+
+.warningBox ul {
+  padding-left: 1.2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningBox li {
+  font-size: 0.88rem;
+  color: #5c4200;
+  line-height: 1.6;
+}
+
+/* ---- DARK MODE v2.0 ---- */
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: rgba(127, 179, 211, 0.15);
+}
+
+[data-theme='dark'] .escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .escenarioCard h3 {
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .faqItem dt {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.08);
+  border-left-color: #48A9A6;
+  color: #48A9A6;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2200;
+  border-color: #6a4e00;
+  border-left-color: #c89000;
+}
+
+[data-theme='dark'] .warningBox h3 {
+  color: #f0c040;
+}
+
+[data-theme='dark'] .warningBox li {
+  color: #d0a830;
+}
+
+/* ---- RESPONSIVE v2.0 ---- */
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    padding: 0.85rem 1rem;
+  }
+
+  .stepNumber {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    font-size: 0.8rem;
+  }
+
+  .escenarioCard {
+    padding: 1rem;
+  }
+
+  .faqItem {
+    padding: 0.9rem 1rem;
+  }
+
+  .tipCard {
+    padding: 0.9rem;
+  }
+
+  .warningBox {
+    padding: 1rem 1.1rem;
+  }
+
+  .warningBox ul {
+    padding-left: 1rem;
+  }
+}

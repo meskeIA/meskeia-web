@@ -754,6 +754,14 @@ export const implementedAppsUrls = [
   "/visualizador-teoria-informacion/",    // Entropía Shannon sliders, Huffman animado, Shannon-Hartley, compresión formatos
   "/visualizador-redes-computadoras/",    // TCP/IP encapsulamiento, DNS resolución paso a paso, routing BGP, CDN latencia
   "/visualizador-sistemas-operativos/",   // Estados proceso SVG, Gantt scheduling, paginación page faults, sistema ficheros
+  // EJE F — Sociedad, economía y cultura (Roadmap v4, 2026-04-30)
+  "/visualizador-estructuras-mercado/",   // Competencia perfecta, monopolio, oligopolio, colusión, pérdida de bienestar
+  "/visualizador-seguros-riesgo/",        // Tipos de seguro, cálculo prima actuarial, pool de riesgo, mutualización
+  "/visualizador-historia-epidemias/",    // 10 epidemias históricas, cronología SVG, mortalidad comparativa, patógenos
+  "/visualizador-urbanismo/",             // Modelos urbanos Burgess/Hoyt, densidad ciudades, movilidad, ciudad sostenible
+  "/visualizador-estratificacion-social/", // Pirámide/diamante/7 clases, Gini/Lorenz, movilidad intergeneracional, teorías
+  "/visualizador-ciclo-nitrogeno/",       // Ciclo completo SVG, microorganismos clave, Haber-Bosch, ciclos biogeoquímicos
+  "/visualizador-arte-movimientos/",      // 15 movimientos artísticos, timeline scrollable, contexto histórico paralelo
 ];
 
 /**

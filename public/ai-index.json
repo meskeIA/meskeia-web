@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 683,
+  "total_tools": 690,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2221,6 +2221,48 @@
           "slug": "visualizador-sistemas-operativos",
           "url": "https://meskeia.com/visualizador-sistemas-operativos/",
           "description": "Estados de proceso SVG (nuevo/listo/ejecución/bloqueado/terminado), Gantt animado para FIFO/Round Robin/SJF/Prioridad con métricas, tabla de páginas con curva de page faults y árbol Unix clicable con inodos y journaling"
+        },
+        {
+          "name": "Estructuras de Mercado: Monopolio, Oligopolio y Competencia",
+          "slug": "visualizador-estructuras-mercado",
+          "url": "https://meskeia.com/visualizador-estructuras-mercado/",
+          "description": "Tabla comparativa de 5 estructuras de mercado, SVG de curvas oferta/demanda con excedentes del consumidor y productor, comparativa monopolio vs competencia con área de pérdida de bienestar DWL y matriz de pagos del dilema del prisionero en oligopolio con equilibrio de Nash"
+        },
+        {
+          "name": "Seguros y Riesgo: Prima Actuarial, Pool de Riesgo y Mutualización",
+          "slug": "visualizador-seguros-riesgo",
+          "url": "https://meskeia.com/visualizador-seguros-riesgo/",
+          "description": "6 tipos de seguro con panel de detalle, cálculo de prima actuarial con 4 sliders y desglose SVG, curva normal del pool de riesgo que se estrecha al aumentar asegurados (Ley de los Grandes Números) y 8 conceptos clave expandibles"
+        },
+        {
+          "name": "Historia de las Epidemias: Cronología, Mortalidad y Legado Médico",
+          "slug": "visualizador-historia-epidemias",
+          "url": "https://meskeia.com/visualizador-historia-epidemias/",
+          "description": "Cronología SVG de 10 epidemias desde la Plaga de Atenas (-430) hasta COVID-19, barras de mortalidad comparativa, panel de factores (R0, CFR, respuesta social, legado médico) y tarjetas de los 4 tipos de patógenos (bacteria, virus, parásito, prion)"
+        },
+        {
+          "name": "Urbanismo: Modelos Urbanos, Densidad, Movilidad y Sostenibilidad",
+          "slug": "visualizador-urbanismo",
+          "url": "https://meskeia.com/visualizador-urbanismo/",
+          "description": "Modelos SVG de estructura urbana (Burgess, Hoyt, Harris-Ullman) con zonas clicables, comparativa de densidad de 10 ciudades mundiales, análisis de 5 modos de movilidad con radar SVG e indicadores de ciudad sostenible con spider chart hexagonal"
+        },
+        {
+          "name": "Estratificación Social: Clases, Gini, Movilidad y Teorías Sociológicas",
+          "slug": "visualizador-estratificacion-social",
+          "url": "https://meskeia.com/visualizador-estratificacion-social/",
+          "description": "Modelos de clase (pirámide, diamante, 7 clases GBCS) con SVG interactivos, curva de Lorenz dinámica con slider Gini y 8 países comparados, matriz de movilidad intergeneracional con Sankey SVG y teorías de Marx, Weber, Bourdieu y Parsons"
+        },
+        {
+          "name": "Ciclo del Nitrógeno: Fijación, Nitrificación y Ciclos Biogeoquímicos",
+          "slug": "visualizador-ciclo-nitrogeno",
+          "url": "https://meskeia.com/visualizador-ciclo-nitrogeno/",
+          "description": "SVG completo del ciclo con 8 procesos clicables (fijación biológica, Haber-Bosch, rayos, asimilación, nitrificación, desnitrificación, amonificación), 5 microorganismos clave, impacto humano con slider temporal 1900-2025 y tabla comparativa de los 4 ciclos biogeoquímicos (N, C, P, S)"
+        },
+        {
+          "name": "Movimientos Artísticos: Historia del Arte desde el Románico hasta el Arte Digital",
+          "slug": "visualizador-arte-movimientos",
+          "url": "https://meskeia.com/visualizador-arte-movimientos/",
+          "description": "Timeline SVG scrollable de 15 movimientos artísticos (Románico al Arte Digital), panel de detalle con artistas y obras icónicas, tabla filtrable por categoría con buscador y timeline doble con contexto histórico paralelo (Revolución Francesa, WWI, WWII...)"
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

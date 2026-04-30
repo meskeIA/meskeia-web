@@ -1,0 +1,1061 @@
+/* ============================================
+   Visualizador Estratificación Social
+   meskeIA — paleta oficial #2E86AB / #48A9A6
+   ============================================ */
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ── Main ── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/* ── Tab Nav ── */
+.tabNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 2px solid var(--bg-card);
+  padding-bottom: 0.75rem;
+}
+
+.tabBtn {
+  padding: 0.55rem 1.1rem;
+  border: 1.5px solid var(--primary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tabBtn:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.tabBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── Tab Content ── */
+.tabContent {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section Card ── */
+.sectionCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionDesc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+/* ── Botones de modelo ── */
+.modelosBtns,
+.escenarioBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.modeloBtn {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--secondary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.modeloBtn:hover {
+  background: rgba(72, 169, 166, 0.08);
+}
+
+.modeloBtnActivo {
+  background: var(--secondary);
+  color: #fff;
+}
+
+/* ── Pirámide SVG ── */
+.piramideSvgWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.piramideSvg {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+}
+
+/* ── Panel de detalle (pirámide / gbcs) ── */
+.detallePanel {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(46, 134, 171, 0.06);
+  border: 1.5px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem;
+  animation: fadeIn 0.18s ease;
+}
+
+.detalleTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.detalleDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+  line-height: 1.55;
+}
+
+.detalleGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.detalleEtiq {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-right: 0.4rem;
+}
+
+/* ── Diamante nota ── */
+.diamanteNota {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  max-width: 480px;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── GBCS (Great British Class Survey) ── */
+.gbcsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gbcsClase {
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.02);
+  transition: border-color 0.2s ease, background 0.2s ease;
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gbcsClase:hover {
+  border-color: var(--secondary);
+  background: rgba(72, 169, 166, 0.04);
+}
+
+.gbcsClaseActiva {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+  grid-template-columns: 100px 1fr auto;
+  grid-template-rows: auto auto;
+}
+
+.gbcsBar {
+  height: 22px;
+  border-radius: 4px;
+  min-width: 20px;
+  max-width: 100%;
+}
+
+.gbcsNombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gbcsPct {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+.gbcsDetalle {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+  margin-top: 0.25rem;
+  animation: fadeIn 0.18s ease;
+}
+
+/* ── Curva de Lorenz ── */
+.lorenzWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.lorenzSvg {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+}
+
+.giniBadgeWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.giniBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  transition: background-color 0.35s ease;
+}
+
+.giniEtiqueta {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ── Slider ── */
+.sliderWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sliderLabel {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.sliderInput {
+  width: 100%;
+  max-width: 400px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.sliderMarks {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── Países grid ── */
+.paisesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+
+.paisBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1.5px solid rgba(46, 134, 171, 0.2);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.paisBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.paisBtnActivo {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.paisNombre {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.paisGiniVal {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+/* ── Ascensor social ── */
+.ascensorWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.ascensorLabel {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.ascensorBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ascensor_grande {
+  background: #27ae60;
+}
+
+.ascensor_moderado {
+  background: #2E86AB;
+}
+
+.ascensor_limitado {
+  background: #e07b39;
+}
+
+.ascensor_bloqueado {
+  background: #c0392b;
+}
+
+/* ── Tabla de movilidad ── */
+.movilidadTablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.75rem;
+}
+
+.movilidadTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 420px;
+}
+
+.tablaCaption {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: left;
+  margin-bottom: 0.5rem;
+  caption-side: bottom;
+  padding-top: 0.5rem;
+}
+
+.movilidadTabla th,
+.movilidadTabla td {
+  padding: 0.6rem 0.75rem;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.movilidadTabla thead th {
+  background: rgba(46, 134, 171, 0.08);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.thEsquina {
+  text-align: left !important;
+  font-size: 0.8rem;
+  color: var(--text-muted) !important;
+}
+
+.thFila {
+  text-align: left !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  background: rgba(72, 169, 166, 0.06) !important;
+  white-space: nowrap;
+}
+
+.celdaMobility {
+  font-weight: 700;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+/* ── Sankey ── */
+.sankeyWrapper {
+  margin-top: 0.5rem;
+}
+
+.sankeyTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.sankeySvg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ── Teorías ── */
+.teoriasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.teoriaCard {
+  background: var(--bg-primary);
+  border: 1.5px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.teoriaCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.teoriaIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.teoriaNombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.teoriaAnio {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.teoriaClave,
+.teoriaCritica,
+.teoriaVigencia {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.teoriaClave p,
+.teoriaCritica p,
+.teoriaVigencia p {
+  margin: 0.25rem 0 0;
+}
+
+.teoriaEtiq {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary);
+  margin-bottom: 0.2rem;
+}
+
+.teoriaCritica .teoriaEtiq {
+  color: #c0392b;
+}
+
+.teoriaVigencia .teoriaEtiq {
+  color: #27ae60;
+}
+
+/* ══════════════════════════════════════
+   CLASES v2.0 — Bloque educativo profesionalizado
+   ══════════════════════════════════════ */
+
+/* ── Tabla comparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+  min-width: 560px;
+}
+
+.comparativaTable thead tr {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.comparativaTable th {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tbody tr:nth-child(odd) {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+/* ── Escenarios Grid (Casos de Uso) ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1.5px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.escenarioCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(46, 134, 171, 0.1);
+}
+
+.escenarioCard strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.escenarioCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+/* ── FAQ ── */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1.5px solid rgba(46, 134, 171, 0.12);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.faqItem strong {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.faqItem p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.faqTip {
+  display: inline-block;
+  font-size: 0.82rem;
+  color: var(--secondary);
+  font-style: italic;
+  padding: 0.3rem 0.6rem;
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 5px;
+  margin-top: 0.25rem;
+}
+
+/* ── Guía paso a paso ── */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  counter-reset: none;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1.5px solid rgba(46, 134, 171, 0.12);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stepContent strong {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Tips Grid ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1.5px solid rgba(72, 169, 166, 0.18);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* ── Warning Box (v2.0 profesionalización) ── */
+.warningBox {
+  background: rgba(224, 123, 57, 0.08);
+  border: 1.5px solid rgba(224, 123, 57, 0.3);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════
+   DARK MODE
+   ══════════════════════════════════════ */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .sectionCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .tabBtn {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .tabBtnActivo {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .modeloBtn {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+[data-theme='dark'] .modeloBtnActivo {
+  background: var(--secondary);
+  color: #fff;
+}
+
+[data-theme='dark'] .detallePanel {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .gbcsClase {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme='dark'] .gbcsClase:hover {
+  background: rgba(72, 169, 166, 0.08);
+}
+
+[data-theme='dark'] .gbcsClaseActiva {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .gbcsDetalle {
+  border-top-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .paisBtn {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .paisBtn:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .paisBtnActivo {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .movilidadTabla th,
+[data-theme='dark'] .movilidadTabla td {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .movilidadTabla thead th {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .thFila {
+  background: rgba(72, 169, 166, 0.1) !important;
+}
+
+[data-theme='dark'] .teoriaCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .teoriaCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 123, 57, 0.12);
+  border-color: rgba(224, 123, 57, 0.35);
+}
+
+/* ── Dark mode: v2.0 clases educativas ── */
+[data-theme='dark'] .tableWrapper {
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .comparativaTable thead tr {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  border-bottom-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(odd) {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .escenarioCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .faqItem {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .step {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(72, 169, 166, 0.22);
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem 2rem;
+  }
+
+  .heroTitle {
+    font-size: 1.6rem;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+  }
+
+  .main {
+    padding: 1.25rem 0.9rem 2rem;
+  }
+
+  .tabNav {
+    gap: 0.4rem;
+  }
+
+  .tabBtn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .sectionCard {
+    padding: 1.25rem 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
+
+  .teoriasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .paisesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lorenzSvg {
+    max-width: 260px;
+  }
+
+  .sankeySvg {
+    max-width: 100%;
+  }
+
+  .gbcsClase {
+    grid-template-columns: 70px 1fr auto;
+  }
+
+  /* v2.0 responsive */
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    padding: 0.85rem 1rem;
+  }
+
+  .stepNumber {
+    min-width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+
+  .faqItem {
+    padding: 0.85rem 1rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabNav {
+    flex-direction: column;
+  }
+
+  .modelosBtns,
+  .escenarioBtns {
+    flex-direction: column;
+  }
+
+  .gbcsClase {
+    grid-template-columns: 50px 1fr auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabContent {
+    animation: none;
+  }
+
+  .tabBtn,
+  .modeloBtn,
+  .teoriaCard,
+  .paisBtn,
+  .gbcsClase {
+    transition: none;
+  }
+}
