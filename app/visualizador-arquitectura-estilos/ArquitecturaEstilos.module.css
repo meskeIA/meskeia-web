@@ -1021,3 +1021,105 @@
     padding: 0.85rem 1rem;
   }
 }
+
+/* ─────────────────────────────────────────────
+   Tab 4: Contexto Histórico — vista por eras
+───────────────────────────────────────────── */
+
+.erasGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.eraCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1.25rem;
+  border-left: 4px solid var(--primary);
+}
+
+.eraHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.eraIcono {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.eraNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.15rem;
+}
+
+.eraRango {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.eraEstilos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.eraEstiloBadge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.eraEventos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eraEvento {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.eraEventoAnio {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 70px;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+}
+
+.eraEventoTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+[data-theme='dark'] .eraCard {
+  background: #1a2633;
+}
+
+@media (max-width: 768px) {
+  .eraCard {
+    padding: 1rem;
+  }
+  .eraIcono {
+    font-size: 1.25rem;
+  }
+}

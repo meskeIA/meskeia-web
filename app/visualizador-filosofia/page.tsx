@@ -606,81 +606,81 @@ function TabComparativa() {
 }
 
 // ─────────────────────────────────────────────
-// Tab 4: Contexto Histórico
+// Tab 4: Contexto Histórico — vista por eras
 // ─────────────────────────────────────────────
 
+interface Era {
+  nombre: string;
+  desde: number;
+  hasta: number;
+  icono: string;
+}
+
+const ERAS: Era[] = [
+  { nombre: 'Filosofía Antigua', desde: -620, hasta: 1, icono: '🏛️' },
+  { nombre: 'Helenismo y Roma', desde: 1, hasta: 500, icono: '🦅' },
+  { nombre: 'Filosofía Medieval', desde: 500, hasta: 1400, icono: '✝️' },
+  { nombre: 'Humanismo y Racionalismo', desde: 1400, hasta: 1700, icono: '🔭' },
+  { nombre: 'Ilustración e Idealismo', desde: 1700, hasta: 1840, icono: '💡' },
+  { nombre: 'Filosofía Contemporánea', desde: 1840, hasta: 9999, icono: '🧠' },
+];
+
 function TabContexto() {
-  const AÑO_MIN_CTX = -620;
-  const AÑO_MAX_CTX = 2024;
-  const ALTURA_TOTAL = 1000; // px fijos — garantiza posicionamiento correcto
-
-  function anioAY(anio: number): number {
-    return ((anio - AÑO_MIN_CTX) / (AÑO_MAX_CTX - AÑO_MIN_CTX)) * ALTURA_TOTAL;
-  }
-
-  const siglosTimeline: number[] = [-500, -300, -100, 200, 500, 800, 1100, 1400, 1700, 2000];
-
   return (
     <div className={styles.sectionCard}>
       <h2 className={styles.sectionTitle}>Contexto Histórico</h2>
-      <p className={styles.sectionDesc}>Corrientes filosóficas y eventos históricos en paralelo. Desplázate para ver toda la línea temporal.</p>
+      <p className={styles.sectionDesc}>
+        Corrientes filosóficas y eventos históricos organizados por eras.
+      </p>
 
-      <div className={styles.timelineDobleWrapper}>
-        {/* Columna izquierda: eventos históricos */}
-        <div className={styles.columnaEventos}>
-          <h3 className={styles.columnaHeader}>Eventos históricos</h3>
-          <div className={styles.columnaContenido} style={{ height: `${ALTURA_TOTAL}px` }}>
-            {EVENTOS_HISTORICOS.map((ev) => (
-              <div
-                key={ev.anio}
-                className={styles.eventoHistorico}
-                style={{ top: `${anioAY(ev.anio)}px` }}
-              >
-                <span className={styles.eventoAnio}>{formatAnio(ev.anio)}</span>
-                <span className={styles.eventoTexto}>{ev.evento}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className={styles.erasGrid}>
+        {ERAS.map((era) => {
+          const corrientesEra = CORRIENTES.filter(
+            (c) => c.anioInicio < era.hasta && (c.anioFin === 9999 || c.anioFin > era.desde)
+          );
+          const eventosEra = EVENTOS_HISTORICOS.filter(
+            (ev) => ev.anio >= era.desde && (era.hasta === 9999 ? true : ev.anio < era.hasta)
+          );
 
-        {/* Columna central: eje de años */}
-        <div className={styles.columnaCentro}>
-          <div className={styles.ejeVertical} style={{ height: `${ALTURA_TOTAL}px` }}>
-            {siglosTimeline.map((s) => (
-              <div key={s} className={styles.marcadorSiglo} style={{ top: `${anioAY(s)}px` }}>
-                <span>{formatAnio(s)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Columna derecha: corrientes filosóficas */}
-        <div className={styles.columnaMovimientos}>
-          <h3 className={styles.columnaHeader}>Corrientes filosóficas</h3>
-          <div className={styles.columnaContenido} style={{ height: `${ALTURA_TOTAL}px` }}>
-            {CORRIENTES.map((cor) => {
-              const anioFin = cor.anioFin === 9999 ? AÑO_MAX_CTX : cor.anioFin;
-              const topPx = anioAY(cor.anioInicio);
-              const altoPx = anioAY(anioFin) - topPx;
-              return (
-                <div
-                  key={cor.id}
-                  className={styles.movimientoTimeline}
-                  style={{
-                    top: `${topPx}px`,
-                    height: `${Math.max(altoPx, 22)}px`,
-                    borderLeftColor: cor.color,
-                    background: `${cor.color}22`,
-                  }}
-                >
-                  <span className={styles.movimientoTimelineNombre} style={{ color: cor.color }}>
-                    {cor.nombre}
+          return (
+            <div key={era.nombre} className={styles.eraCard}>
+              <div className={styles.eraHeader}>
+                <span className={styles.eraIcono} aria-hidden="true">{era.icono}</span>
+                <div>
+                  <h3 className={styles.eraNombre}>{era.nombre}</h3>
+                  <span className={styles.eraRango}>
+                    {formatAnio(era.desde)} – {era.hasta === 9999 ? 'hoy' : formatAnio(era.hasta)}
                   </span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </div>
+
+              {corrientesEra.length > 0 && (
+                <div className={styles.eraEstilos}>
+                  {corrientesEra.map((c) => (
+                    <span
+                      key={c.id}
+                      className={styles.eraEstiloBadge}
+                      style={{ background: `${c.color}1A`, color: c.color, borderColor: `${c.color}55` }}
+                    >
+                      {c.nombre}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {eventosEra.length > 0 && (
+                <ul className={styles.eraEventos}>
+                  {eventosEra.map((ev) => (
+                    <li key={ev.anio} className={styles.eraEvento}>
+                      <span className={styles.eraEventoAnio}>{formatAnio(ev.anio)}</span>
+                      <span className={styles.eraEventoTexto}>{ev.evento}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -587,82 +587,81 @@ function TabComparativa() {
 }
 
 // ─────────────────────────────────────────────
-// Tab 4: Contexto Histórico
+// Tab 4: Contexto Histórico — vista por eras
 // ─────────────────────────────────────────────
 
+interface Era {
+  nombre: string;
+  desde: number;
+  hasta: number;
+  icono: string;
+}
+
+const ERAS: Era[] = [
+  { nombre: 'Edad Media', desde: 850, hasta: 1400, icono: '⛪' },
+  { nombre: 'Renacimiento', desde: 1400, hasta: 1600, icono: '🎭' },
+  { nombre: 'Barroco y Clasicismo', desde: 1600, hasta: 1820, icono: '🎻' },
+  { nombre: 'Romanticismo e Impresionismo', desde: 1820, hasta: 1900, icono: '🎹' },
+  { nombre: 'Primera mitad del siglo XX', desde: 1900, hasta: 1960, icono: '🎷' },
+  { nombre: 'Música contemporánea', desde: 1960, hasta: 9999, icono: '🎛️' },
+];
+
 function TabContexto() {
-  const AÑO_MIN = 850;
-  const AÑO_MAX = 2024;
-  const ALTURA_TOTAL = 1000; // px fijos — garantiza posicionamiento correcto
-
-  function anioAY(anio: number): number {
-    return ((anio - AÑO_MIN) / (AÑO_MAX - AÑO_MIN)) * ALTURA_TOTAL;
-  }
-
-  const siglosTimeline: number[] = [];
-  for (let s = 900; s <= 2000; s += 100) siglosTimeline.push(s);
-
   return (
     <div className={styles.sectionCard}>
       <h2 className={styles.sectionTitle}>Contexto Histórico</h2>
-      <p className={styles.sectionDesc}>Movimientos musicales y eventos históricos en paralelo. Desplázate para ver toda la línea temporal.</p>
+      <p className={styles.sectionDesc}>
+        Movimientos musicales y eventos históricos organizados por eras.
+      </p>
 
-      <div className={styles.timelineDobleWrapper}>
-        {/* Columna izquierda: eventos históricos */}
-        <div className={styles.columnaEventos}>
-          <h3 className={styles.columnaHeader}>Eventos históricos</h3>
-          <div className={styles.columnaContenido} style={{ height: `${ALTURA_TOTAL}px` }}>
-            {EVENTOS_HISTORICOS.map((ev) => (
-              <div
-                key={ev.anio}
-                className={styles.eventoHistorico}
-                style={{ top: `${anioAY(ev.anio)}px` }}
-              >
-                <span className={styles.eventoAnio}>{ev.anio}</span>
-                <span className={styles.eventoTexto}>{ev.evento}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className={styles.erasGrid}>
+        {ERAS.map((era) => {
+          const movimientosEra = MOVIMIENTOS.filter(
+            (m) => m.anioInicio < era.hasta && (m.anioFin === 9999 || m.anioFin > era.desde)
+          );
+          const eventosEra = EVENTOS_HISTORICOS.filter(
+            (ev) => ev.anio >= era.desde && (era.hasta === 9999 ? true : ev.anio < era.hasta)
+          );
 
-        {/* Columna central: eje de años */}
-        <div className={styles.columnaCentro}>
-          <div className={styles.ejeVertical} style={{ height: `${ALTURA_TOTAL}px` }}>
-            {siglosTimeline.map((s) => (
-              <div key={s} className={styles.marcadorSiglo} style={{ top: `${anioAY(s)}px` }}>
-                <span>{s}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Columna derecha: movimientos musicales */}
-        <div className={styles.columnaMovimientos}>
-          <h3 className={styles.columnaHeader}>Movimientos musicales</h3>
-          <div className={styles.columnaContenido} style={{ height: `${ALTURA_TOTAL}px` }}>
-            {MOVIMIENTOS.map((mov) => {
-              const anioFin = mov.anioFin === 9999 ? AÑO_MAX : mov.anioFin;
-              const topPx = anioAY(mov.anioInicio);
-              const altoPx = anioAY(anioFin) - topPx;
-              return (
-                <div
-                  key={mov.id}
-                  className={styles.movimientoTimeline}
-                  style={{
-                    top: `${topPx}px`,
-                    height: `${Math.max(altoPx, 22)}px`,
-                    borderLeftColor: mov.color,
-                    background: `${mov.color}22`,
-                  }}
-                >
-                  <span className={styles.movimientoTimelineNombre} style={{ color: mov.color }}>
-                    {mov.nombre}
+          return (
+            <div key={era.nombre} className={styles.eraCard}>
+              <div className={styles.eraHeader}>
+                <span className={styles.eraIcono} aria-hidden="true">{era.icono}</span>
+                <div>
+                  <h3 className={styles.eraNombre}>{era.nombre}</h3>
+                  <span className={styles.eraRango}>
+                    {era.desde} – {era.hasta === 9999 ? 'hoy' : era.hasta}
                   </span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </div>
+
+              {movimientosEra.length > 0 && (
+                <div className={styles.eraEstilos}>
+                  {movimientosEra.map((m) => (
+                    <span
+                      key={m.id}
+                      className={styles.eraEstiloBadge}
+                      style={{ background: `${m.color}1A`, color: m.color, borderColor: `${m.color}55` }}
+                    >
+                      {m.nombre}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {eventosEra.length > 0 && (
+                <ul className={styles.eraEventos}>
+                  {eventosEra.map((ev) => (
+                    <li key={ev.anio} className={styles.eraEvento}>
+                      <span className={styles.eraEventoAnio}>{ev.anio}</span>
+                      <span className={styles.eraEventoTexto}>{ev.evento}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
