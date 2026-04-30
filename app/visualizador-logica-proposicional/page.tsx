@@ -255,18 +255,14 @@ function TabEvaluador({
   setValorP: () => void; setValorQ: () => void; setValorR: () => void;
 }) {
   const [formula, setFormula] = useState('P AND Q OR NOT R');
-  const [error, setError] = useState('');
 
-  const tabla = (() => {
-    try {
-      const filas = generarTabla(formula, TODAS_KOMBINACIONES_PQR());
-      setError('');
-      return filas;
-    } catch {
-      setError('Fórmula inválida');
-      return [];
-    }
-  })();
+  let tabla: FilaTruth[] = [];
+  let error = '';
+  try {
+    tabla = generarTabla(formula, TODAS_KOMBINACIONES_PQR());
+  } catch {
+    error = 'Fórmula inválida';
+  }
 
   const resultadoActual = (() => {
     try {
