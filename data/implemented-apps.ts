@@ -721,6 +721,11 @@ export const implementedAppsUrls = [
   "/visualizador-combinatoria/",            // Permutaciones, triángulo de Pascal, binomio de Newton, principio multiplicación
   "/visualizador-ecuaciones-diferenciales/", // Campo de direcciones, Lotka-Volterra, enfriamiento Newton, circuito RC
   "/visualizador-series-convergencia/",     // Taylor/Maclaurin, criterios convergencia, π con Leibniz/Nilakantha/Wallis
+  // EJE B — Física: óptica ondulatoria y electrónica (Roadmap v4, 2026-04-30)
+  "/visualizador-mecanica-fluidos/",        // Reynolds laminar/turbulento, Magnus, Bernoulli correcto, Mach, cavitación
+  "/visualizador-optica-ondulatoria/",      // Doble rendija Young, difracción sinc², polarización Malus, coherencia láser
+  "/visualizador-circuitos-electronicos/",  // R/L/C impedancia, RC carga/descarga, transistor BJT, puertas lógicas, chip
+  "/visualizador-particulas-subatomicas/",  // Modelo Estándar 17 partículas, Feynman, Higgs, LHC, materia-antimateria
   "/visualizador-cosmologia/",              // Tarta SVG universo, timeline Big Bang, curva a(t), geometría, 4 destinos
   "/visualizador-agujeros-negros/",         // Anatomía SVG clicable, calc. Schwarzschild, espaguetización, Hawking
   "/visualizador-exoplanetas/",             // Tránsito animado + curva luz, wobble, zona Goldilocks, scatter 5500+

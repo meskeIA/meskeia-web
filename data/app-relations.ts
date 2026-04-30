@@ -3274,6 +3274,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'La identidad de Euler e^(iπ)+1=0 emerge de las series de Taylor de eˣ, sin(x) y cos(x)' },
   ],
 
+  // EJE B — Física: óptica ondulatoria y electrónica (Roadmap v4, 2026-04-30)
+  'visualizador-mecanica-fluidos': [
+    { url: '/visualizador-leyes-newton/', icon: '⚙️', name: 'Leyes de Newton', description: 'La mecánica de fluidos es una extensión de la dinámica de Newton a medios continuos' },
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'La presión, densidad y temperatura de los fluidos se gobiernan por las leyes termodinámicas' },
+    { url: '/visualizador-ecuaciones-diferenciales/', icon: '📈', name: 'Ecuaciones Diferenciales', description: 'Las ecuaciones de Navier-Stokes son EDPs (ecuaciones en derivadas parciales) de fluidos' },
+    { url: '/visualizador-vuelo-avion/', icon: '✈️', name: 'Vuelo del Avión', description: 'La sustentación del avión combina Bernoulli, circulación y ángulo de ataque' },
+  ],
+  'visualizador-optica-ondulatoria': [
+    { url: '/visualizador-optica/', icon: '🔭', name: 'Óptica Geométrica', description: 'La óptica geométrica (rayos, lentes) es el límite cuando λ ≪ obstáculos — sin difracción' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'El experimento de Young con fotones individuales revela la naturaleza cuántica de la luz' },
+    { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'El análisis de Fourier describe la descomposición de la luz en frecuencias (colores)' },
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Las ondas sinusoidales y la trigonometría son la base del análisis de la interferencia' },
+  ],
+  'visualizador-circuitos-electronicos': [
+    { url: '/visualizador-electricidad-domestica/', icon: '🏠', name: 'Electricidad Doméstica', description: 'Los circuitos domésticos aplican los mismos principios R/L/C a escala de instalación' },
+    { url: '/visualizador-ecuaciones-diferenciales/', icon: '📈', name: 'Ecuaciones Diferenciales', description: 'Los circuitos RC/RL se modelan con EDO de primer orden — matemáticamente idénticos a otros sistemas físicos' },
+    { url: '/visualizador-logica-computadoras/', icon: '🖥️', name: 'Lógica de Computadoras', description: 'Las puertas lógicas son los bloques de construcción del procesador' },
+    { url: '/visualizador-computacion-cuantica/', icon: '⚛️', name: 'Computación Cuántica', description: 'El qubit cuántico reemplaza el transistor clásico en la computación del futuro' },
+  ],
+  'visualizador-particulas-subatomicas': [
+    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los quarks forman protones y neutrones, que a su vez forman el núcleo atómico' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '🌊', name: 'Mecánica Cuántica', description: 'Las partículas subatómicas obedecen la mecánica cuántica: superposición, entrelazamiento, incertidumbre' },
+    { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'La fisión y fusión nucleares liberan la energía de los quarks (fuerza nuclear fuerte)' },
+    { url: '/visualizador-cosmologia/', icon: '🌌', name: 'Cosmología', description: 'En el Big Bang, las condiciones generaron las partículas del Modelo Estándar' },
+  ],
+
   // EJE C — Química avanzada (2026-04-28)
   'visualizador-termodinamica-quimica': [
     { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'La termodinámica dice si una reacción puede ocurrir; la cinética dice a qué velocidad ocurrirá' },

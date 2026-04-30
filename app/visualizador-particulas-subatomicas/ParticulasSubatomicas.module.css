@@ -1,0 +1,1327 @@
+/* ─── Container ─────────────────────────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ─── Tabs ───────────────────────────────────────────────────────────────────── */
+.tabsWrapper {
+  background: var(--bg-card);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tabs {
+  display: flex;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow-x: auto;
+  gap: 0;
+}
+
+.tabBtn {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.9rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.tabBtnActivo {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.tabBtnActivo:focus-visible,
+.tabBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* ─── Secciones ──────────────────────────────────────────────────────────────── */
+.section {
+  padding: 2.5rem 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.sectionInner {
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+/* ─── Toggle antipartículas ──────────────────────────────────────────────────── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 2rem;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.toggleBtnActivo {
+  background: #E84A5F;
+  border-color: #E84A5F;
+  color: #fff;
+}
+
+.toggleBtnActivo:hover {
+  background: #c73950;
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.antiNote {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  max-width: 400px;
+}
+
+/* ─── Leyenda ─────────────────────────────────────────────────────────────────── */
+.leyenda {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.leyendaDot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dotQuark { background: #2E86AB; }
+.dotLeptón { background: #48A9A6; }
+.dotBosón { background: #E8A838; }
+.dotHiggs { background: #E84A5F; }
+
+.leyendaLabel {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
+}
+
+/* ─── Tabla Modelo Estándar ──────────────────────────────────────────────────── */
+.tablaModelo {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .tablaModelo {
+    grid-template-columns: 1fr;
+  }
+}
+
+.columnaParticulas {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+}
+
+.columnaTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.columnaTitleQuark { color: #2E86AB; }
+.columnaTitleLeptón { color: #48A9A6; }
+.columnaTitleBosón { color: #E8A838; }
+
+.columnaBadge {
+  font-size: 0.7rem;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  padding: 0.1rem 0.4rem;
+  color: var(--text-secondary);
+}
+
+.columnaDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.generacionFila {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.genLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 20px;
+}
+
+.parFila {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.bosonesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+}
+
+/* ─── Partícula (botón) ──────────────────────────────────────────────────────── */
+.particula {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.2rem;
+  background: transparent;
+}
+
+.particulaQuark {
+  border-color: rgba(46, 134, 171, 0.4);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.particulaQuark:hover {
+  border-color: #2E86AB;
+  background: rgba(46, 134, 171, 0.18);
+}
+
+.particulaLeptón {
+  border-color: rgba(72, 169, 166, 0.4);
+  background: rgba(72, 169, 166, 0.08);
+}
+
+.particulaLeptón:hover {
+  border-color: #48A9A6;
+  background: rgba(72, 169, 166, 0.18);
+}
+
+.particulaBosón {
+  border-color: rgba(232, 168, 56, 0.4);
+  background: rgba(232, 168, 56, 0.08);
+}
+
+.particulaBosón:hover {
+  border-color: #E8A838;
+  background: rgba(232, 168, 56, 0.18);
+}
+
+.particulaHiggs {
+  border-color: rgba(232, 74, 95, 0.5);
+  background: rgba(232, 74, 95, 0.1);
+}
+
+.particulaHiggs:hover {
+  border-color: #E84A5F;
+  background: rgba(232, 74, 95, 0.2);
+}
+
+.particulaSeleccionada {
+  border-width: 2.5px;
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.3);
+  transform: scale(1.05);
+}
+
+.particula:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.particulaSimbolo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.particulaMasa {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.1;
+  max-width: 48px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nobelBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.antiBadge {
+  font-size: 0.45rem;
+  color: #E84A5F;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ─── Panel de detalles ──────────────────────────────────────────────────────── */
+.panelDetalle {
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+  border-left: 4px solid var(--primary);
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.colorQuark { border-left-color: #2E86AB; }
+.colorLeptón { border-left-color: #48A9A6; }
+.colorBosón { border-left-color: #E8A838; }
+.colorHiggs { border-left-color: #E84A5F; }
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.panelTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem;
+}
+
+.panelTipo {
+  display: inline-block;
+  font-size: 0.75rem;
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+  border-radius: 10px;
+  padding: 0.15rem 0.5rem;
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+.panelNobel {
+  display: inline-block;
+  font-size: 0.75rem;
+  background: rgba(232, 168, 56, 0.15);
+  color: #b8870d;
+  border-radius: 10px;
+  padding: 0.15rem 0.5rem;
+  font-weight: 600;
+}
+
+.panelCerrar {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.panelCerrar:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+.panelCerrar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.panelDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+
+.panelPropiedades {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.panelProp {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.panelPropFull {
+  grid-column: 1 / -1;
+}
+
+.propLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.propValor {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ─── Fuerzas fundamentales ──────────────────────────────────────────────────── */
+.fuerzasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.fuerzaCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.fuerzaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid;
+  gap: 0.5rem;
+}
+
+.fuerzaNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.fuerzaPortador {
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.fuerzaPortadorLabel {
+  color: var(--text-muted);
+}
+
+.fuerzaPortadorValor {
+  font-weight: 700;
+}
+
+.fuerzaDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.fuerzaPropGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.fuerzaProp {
+  background: var(--bg-primary);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.fuerzaPropLabel {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.fuerzaPropValor {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.intensidadBarraWrapper {
+  margin-top: 0.5rem;
+}
+
+.intensidadBarraLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.intensidadBarra {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.intensidadBarraFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* ─── Tabla comparativa ──────────────────────────────────────────────────────── */
+.tablaComparativa {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+
+.tablaComparativaTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tabla th {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+}
+
+.tabla td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-secondary);
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* ─── Campo de Higgs ─────────────────────────────────────────────────────────── */
+.campoHiggsWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+
+.campoTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.campoSvg {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+/* ─── Slider Higgs ───────────────────────────────────────────────────────────── */
+.sliderWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+
+.sliderTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.sliderEtiqueta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.slider {
+  flex: 1;
+  accent-color: var(--primary);
+  height: 6px;
+  cursor: pointer;
+}
+
+.sliderInfo {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.sliderParticulaNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.sliderMasa {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.sliderDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Timeline Higgs ─────────────────────────────────────────────────────────── */
+.timelineWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+
+.timelineTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(46, 134, 171, 0.2);
+}
+
+.timelineItem {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+  position: relative;
+}
+
+.timelinePunto {
+  position: absolute;
+  left: -1.5rem;
+  font-size: 0.8rem;
+  background: var(--bg-card);
+  z-index: 1;
+  width: 18px;
+  text-align: center;
+}
+
+.timelinePuntoNobel {
+  color: #E8A838;
+}
+
+.timelineContenido {
+  flex: 1;
+}
+
+.timelineAnio {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  margin-bottom: 0.15rem;
+}
+
+.timelineEvento {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.timelineDesc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Stats Higgs ────────────────────────────────────────────────────────────── */
+.higgsStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.higgsStat {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  border-top: 3px solid #E84A5F;
+}
+
+.higgsStatValor {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #E84A5F;
+  margin-bottom: 0.3rem;
+}
+
+.higgsStatLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ─── LHC ────────────────────────────────────────────────────────────────────── */
+.lhcWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+
+.lhcSvg {
+  width: 100%;
+  max-width: 450px;
+  display: block;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+.lhcStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.lhcStat {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  border-top: 3px solid var(--primary);
+}
+
+.lhcStatValor {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+
+.lhcStatLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ─── Detector ───────────────────────────────────────────────────────────────── */
+.detectorWrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+}
+
+.detectorTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.detectorSvg {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+/* ─── Antimateria panel ──────────────────────────────────────────────────────── */
+.antimateriaPanel {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05) 0%, rgba(72, 169, 166, 0.05) 100%);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.antimateriaTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.antimateriaContenido p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+}
+
+.antimateriaFactores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 580px) {
+  .antimateriaFactores {
+    grid-template-columns: 1fr;
+  }
+}
+
+.antimateriaFactor {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.antimateriaFactor strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.antimateriaFactor ol,
+.antimateriaFactor ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  line-height: 1.7;
+}
+
+/* ─── Warning Box ────────────────────────────────────────────────────────────── */
+.warningBox {
+  background: rgba(232, 168, 56, 0.1);
+  border-left: 4px solid #E8A838;
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.warningBox strong {
+  color: #b8870d;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* ─── Sección educativa ──────────────────────────────────────────────────────── */
+.eduGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.eduCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.eduCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.eduCard p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ─── Dark Mode ──────────────────────────────────────────────────────────────── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .tabsWrapper {
+  background: var(--bg-card);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .columnaParticulas,
+[data-theme='dark'] .fuerzaCard,
+[data-theme='dark'] .campoHiggsWrapper,
+[data-theme='dark'] .sliderWrapper,
+[data-theme='dark'] .timelineWrapper,
+[data-theme='dark'] .higgsStat,
+[data-theme='dark'] .lhcWrapper,
+[data-theme='dark'] .lhcStat,
+[data-theme='dark'] .detectorWrapper,
+[data-theme='dark'] .tablaComparativa,
+[data-theme='dark'] .panelDetalle {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .columnaBadge {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .panelProp,
+[data-theme='dark'] .fuerzaProp,
+[data-theme='dark'] .sliderInfo,
+[data-theme='dark'] .eduCard,
+[data-theme='dark'] .antimateriaFactor {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .particulaQuark {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: rgba(46, 134, 171, 0.5);
+}
+
+[data-theme='dark'] .particulaLeptón {
+  background: rgba(72, 169, 166, 0.15);
+  border-color: rgba(72, 169, 166, 0.5);
+}
+
+[data-theme='dark'] .particulaBosón {
+  background: rgba(232, 168, 56, 0.15);
+  border-color: rgba(232, 168, 56, 0.5);
+}
+
+[data-theme='dark'] .particulaHiggs {
+  background: rgba(232, 74, 95, 0.15);
+  border-color: rgba(232, 74, 95, 0.5);
+}
+
+[data-theme='dark'] .tabla th {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .tabla tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .intensidadBarra {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .timeline::before {
+  background: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .timelinePunto {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .antimateriaPanel {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08) 0%, rgba(72, 169, 166, 0.08) 100%);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .campoSvg,
+[data-theme='dark'] .lhcSvg,
+[data-theme='dark'] .detectorSvg {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(232, 168, 56, 0.15);
+}
+
+/* ─── Accesibilidad ──────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .particulaSeleccionada {
+    transform: none;
+  }
+  .intensidadBarraFill {
+    transition: none;
+  }
+}
+
+/* ─── Sección educativa v2.0 ─────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.comparativaTable tr:nth-child(even) {
+  background: #f5f5f5;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) {
+  background: #333;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #444;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #444;
+  background: #2a2a2a;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+}
+
+[data-theme='dark'] .faqItem {
+  background: #2a2a2a;
+}
+
+.faqTip {
+  background: #e8f4f8;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+[data-theme='dark'] .faqTip {
+  background: #1e3a4a;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #444;
+  background: #2a2a2a;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warningBoxEdu {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+}
+
+[data-theme='dark'] .warningBoxEdu {
+  background: #2d2400;
+  border-color: #b45309;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.25rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  padding: 0.5rem 0.75rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+[data-theme='dark'] .warningList li {
+  background: rgba(180, 83, 9, 0.15);
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+}

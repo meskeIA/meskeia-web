@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 666,
+  "total_tools": 670,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2119,6 +2119,30 @@
           "slug": "visualizador-series-convergencia",
           "url": "https://meskeia.com/visualizador-series-convergencia/",
           "description": "Series de Taylor/Maclaurin para sin/cos/eˣ/ln con slider de N términos y gráfica de aproximación, criterios de convergencia con sumas parciales SVG (razón, comparación, Leibniz), y 3 series para calcular π (Leibniz, Nilakantha, Wallis) con comparativa de velocidad"
+        },
+        {
+          "name": "Mecánica de Fluidos: Reynolds, Magnus y Bernoulli",
+          "slug": "visualizador-mecanica-fluidos",
+          "url": "https://meskeia.com/visualizador-mecanica-fluidos/",
+          "description": "Número de Reynolds interactivo con simulación de régimen laminar/turbulento, efecto Magnus SVG animado con trayectoria de pelota con efecto, diagrama de Bernoulli con flujo acelerado en tobera, y cavitación con burbujas SVG; 4 tabs de física de fluidos"
+        },
+        {
+          "name": "Óptica Ondulatoria: Young, Difracción y Polarización",
+          "slug": "visualizador-optica-ondulatoria",
+          "url": "https://meskeia.com/visualizador-optica-ondulatoria/",
+          "description": "Experimento de Young SVG con franjas de interferencia y longitud de onda seleccionable, patrón de difracción de rendija simple, polarización de la luz con filtros y ley de Malus, y coherencia temporal/espacial; 4 tabs de óptica ondulatoria"
+        },
+        {
+          "name": "Circuitos Electrónicos: Ohm, Transistor y Puertas Lógicas",
+          "slug": "visualizador-circuitos-electronicos",
+          "url": "https://meskeia.com/visualizador-circuitos-electronicos/",
+          "description": "Circuito RLC con impedancia y resonancia animada, transistor BJT con curvas I-V y zonas de operación, puertas lógicas interactivas (AND/OR/NOT/NAND/NOR/XOR) con tabla de verdad, y jerarquía del chip desde átomo hasta procesador; 4 tabs de electrónica"
+        },
+        {
+          "name": "Partículas Subatómicas: Modelo Estándar y Fuerzas Fundamentales",
+          "slug": "visualizador-particulas-subatomicas",
+          "url": "https://meskeia.com/visualizador-particulas-subatomicas/",
+          "description": "Tabla del Modelo Estándar interactiva (6 quarks, 6 leptones, bosones gauge y Higgs), diagramas de Feynman animados para las 4 fuerzas fundamentales, mecanismo de Higgs y adquisición de masa, y datos del LHC con energías de colisión y descubrimientos; 4 tabs de física de partículas"
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",
