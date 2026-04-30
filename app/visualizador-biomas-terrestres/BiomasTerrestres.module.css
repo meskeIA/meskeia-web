@@ -1,0 +1,1086 @@
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --text-muted: #888888;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcono {
+  font-size: 3.5rem;
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+.titulo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+  line-height: 1.2;
+}
+
+.subtitulo {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 620px;
+  margin: 0 auto var(--spacing-sm);
+  line-height: 1.55;
+}
+
+.heroNota {
+  font-size: 0.85rem;
+  opacity: 0.78;
+  margin: 0;
+}
+
+/* ── Pestañas ── */
+.tabBar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  border-radius: 4px 4px 0 0;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+.tabActivo {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ── Secciones ── */
+.seccion {
+  margin-bottom: calc(var(--spacing-xl) * 1.5);
+}
+
+.seccionTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seccionSubtitulo {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.subseccionTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: var(--spacing-xl) 0 var(--spacing-md);
+}
+
+/* ── Grid de biomas ── */
+.biomasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.biomaCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.biomaCard:hover {
+  border-color: var(--bioma-color, var(--primary));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.biomaCardActivo {
+  border-color: var(--bioma-color, var(--primary));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(
+    135deg,
+    rgba(46, 134, 171, 0.06) 0%,
+    rgba(72, 169, 166, 0.06) 100%
+  );
+}
+
+.biomaIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+.biomaNombre {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.biomaLatitud {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ── Panel de detalle ── */
+.biomaDetalle {
+  background: var(--bg-card);
+  border: 2px solid var(--bioma-color, var(--primary));
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.biomaDetalleHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--spacing-md);
+}
+
+.biomaDetalleIcono {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.biomaDetalleNombre {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem;
+}
+
+.biomaDetalleUbicacion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.biomaDetalleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.biomaDetalleCelda {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: 0.75rem var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.biomaDetalleLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.biomaDetalleValor {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.biomaDetalleSuelo,
+.biomaDetalleBiodiversidad {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.55;
+}
+
+.biomaDetalleListasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.biomaDetalleListaTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.biomaDetalleList {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.biomaDetalleMinimo {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-md);
+}
+
+/* ── Selector horizontal de biomas (tab clima) ── */
+.biomasSelectorHorizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.biomaChip {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+
+.biomaChip:hover {
+  border-color: var(--bioma-color, var(--primary));
+  color: var(--text-primary);
+}
+
+.biomaChipActivo {
+  border-color: var(--bioma-color, var(--primary));
+  background: var(--bioma-color, var(--primary));
+  color: white;
+}
+
+/* ── Climograma ── */
+.climogramaBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.climogramaMetadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.climogramaSvg {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.climogramaSvg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 280px;
+}
+
+.climaInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.climaInfoCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.climaInfoLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.climaInfoValor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Mapa / diagrama latitudes ── */
+.mapaBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.mapaDescripcion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.latitudDiagrama {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: stretch;
+  margin-bottom: var(--spacing-lg);
+}
+
+.latitudEjeY {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: var(--spacing-sm) 0;
+  width: 50px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.latitudFranjas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.latitudFranja {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 0.5rem var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+.latitudLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.latitudBiomasRow {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.latitudBiomaBtn {
+  background: var(--bioma-color, var(--primary));
+  border: none;
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  opacity: 0.75;
+}
+
+.latitudBiomaBtn:hover {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+
+.latitudBiomaBtnActivo {
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.04);
+}
+
+.latitudZona {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 160px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.leyendaMap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: var(--spacing-md);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.leyendaItem:hover {
+  border-color: var(--bioma-color, var(--primary));
+}
+
+.leyendaItemActivo {
+  border-color: var(--bioma-color, var(--primary));
+  background: var(--hover);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.leyendaColor {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Amenazas ── */
+.amenazasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.amenazaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+}
+
+.amenazaHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.amenazaIcono {
+  font-size: 1.8rem;
+}
+
+.amenazaTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.severidadContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.severidadBar {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.severidadRelleno {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.severidadValor {
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 48px;
+  text-align: right;
+}
+
+.amenazaTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Tabla de protección ── */
+.proteccionTableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.proteccionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+}
+
+.proteccionTable th {
+  background: var(--hover);
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 0.75rem var(--spacing-md);
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.proteccionTable td {
+  padding: 0.75rem var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.proteccionTable tr:last-child td {
+  border-bottom: none;
+}
+
+.proteccionTable tr:hover td {
+  background: var(--hover);
+}
+
+.barraCell {
+  min-width: 120px;
+}
+
+.barraFondo {
+  height: 10px;
+  background: var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.barraRelleno {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.tablaNota {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--secondary);
+}
+
+/* ── Indicador v2.0 ── */
+.warningBox {
+  background: #FFF8E1;
+  border: 1px solid #FFD54F;
+  border-radius: var(--radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.85rem;
+  color: #795548;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2A2400;
+  border-color: #695500;
+  color: #E0C840;
+}
+
+/* ── Sección educativa v2.0 ── */
+
+.eduSubtitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 2rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--border);
+}
+
+[data-theme='dark'] .eduSubtitulo {
+  color: var(--text-primary);
+  border-bottom-color: var(--border);
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  background: var(--bg-card);
+  min-width: 620px;
+}
+
+.comparativaTable th {
+  background: var(--hover);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+  line-height: 1.45;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:hover td {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #333333;
+  color: var(--text-secondary);
+  border-bottom-color: var(--border);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .comparativaTable tr:hover td {
+  background: var(--hover);
+}
+
+/* Escenarios / casos de uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  transition: box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.escenarioCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.4rem 0 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.escenarioIcono {
+  font-size: 1.8rem;
+  display: block;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .escenarioCard h4 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .escenarioCard p {
+  color: var(--text-secondary);
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+
+.faqItem h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.4rem;
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqTip {
+  font-size: 0.82rem;
+  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  margin-top: 0.4rem;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: var(--border);
+  border-left-color: var(--primary);
+}
+
+[data-theme='dark'] .faqItem h4 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.12);
+  color: #7ecfcc;
+}
+
+/* Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .stepContent h4 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stepContent p {
+  color: var(--text-secondary);
+}
+
+/* Tips / mejores prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.tipCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.tipCard h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.4rem 0 0.5rem;
+}
+
+.tipCard p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tipIcon {
+  font-size: 1.7rem;
+  display: block;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .tipCard h4 {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tipCard p {
+  color: var(--text-secondary);
+}
+
+/* Warning box educativa (v2.0) — usa warningBoxEdu para no colisionar con warningBox */
+.warningBoxEdu {
+  background: #FFF8E1;
+  border: 1px solid #FFD54F;
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  color: #5D4037;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.86rem;
+  color: #6D4C41;
+  line-height: 1.65;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBoxEdu {
+  background: #2A2000;
+  border-color: #5A4A00;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #E0C840;
+}
+
+[data-theme='dark'] .warningList {
+  color: #D4B800;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .titulo {
+    font-size: 1.7rem;
+  }
+
+  .biomasGrid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .biomaDetalleGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .biomaDetalleListasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .latitudDiagrama {
+    flex-direction: column;
+  }
+
+  .latitudEjeY {
+    flex-direction: row;
+    width: auto;
+    height: auto;
+  }
+
+  .latitudZona {
+    display: none;
+  }
+
+  .amenazasGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .biomaCard,
+  .biomaChip,
+  .latitudBiomaBtn,
+  .severidadRelleno,
+  .barraRelleno {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

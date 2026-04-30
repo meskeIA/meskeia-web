@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 673,
+  "total_tools": 679,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2161,6 +2161,42 @@
           "slug": "visualizador-polimeros-materiales",
           "url": "https://meskeia.com/visualizador-polimeros-materiales/",
           "description": "Polimerización por adición (PE, PVC, PS con slider grado de polimerización) vs condensación (nylon, PET con animación liberación H₂O), propiedades Tm/Tg/densidad de 6 polímeros con barras comparativas, árbol de clasificación termoplásticos/termoestables/elastómeros, 7 códigos de reciclaje y sostenibilidad con barras logarítmicas de biodegradación"
+        },
+        {
+          "name": "Reino Animal: Vertebrados, Invertebrados y Árbol Filogenético",
+          "slug": "visualizador-reino-animal",
+          "url": "https://meskeia.com/visualizador-reino-animal/",
+          "description": "Árbol filogenético clicable del reino animal, 5 clases de vertebrados con SVG del corazón por cámaras (pez 2, anfibio 3, reptil 3-4, ave 4, mamífero 4), 7 phyla de invertebrados con estructuras representativas, y tabla comparativa de sistemas biológicos"
+        },
+        {
+          "name": "Embriogénesis: Fecundación, Segmentación y Organogénesis",
+          "slug": "visualizador-embriogenesis",
+          "url": "https://meskeia.com/visualizador-embriogenesis/",
+          "description": "Desarrollo embrionario humano interactivo: fecundación animada con slider 5 pasos, segmentación día 1-14 con estadios SVG, gastrulación con 3 capas germinales coloreadas y organogénesis con morfógenos y somitas"
+        },
+        {
+          "name": "Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida",
+          "slug": "visualizador-microbiologia",
+          "url": "https://meskeia.com/visualizador-microbiologia/",
+          "description": "Morfologías bacterianas SVG clicables con estructura interna, curva de crecimiento logístico con sliders, Gram+/Gram- con sección transversal SVG y tabla de antibióticos, árbol de los 3 dominios de la vida con endosimbiosis"
+        },
+        {
+          "name": "Cronobiología: Relojes Circadianos, Cronotipos y Cronofarmacología",
+          "slug": "visualizador-cronobiologia",
+          "url": "https://meskeia.com/visualizador-cronobiologia/",
+          "description": "Reloj molecular CLOCK/BMAL1/PER/CRY con SVG circular interactivo y slider hora, 5 Zeitgebers sincronizadores, cronotipos alondra/colibrí/búho con curvas SVG y base genética PER3, y tabla de cronofarmacología"
+        },
+        {
+          "name": "CRISPR-Cas9: Mecanismo, Edición Genómica y Bioética",
+          "slug": "visualizador-crispr-cas9",
+          "url": "https://meskeia.com/visualizador-crispr-cas9/",
+          "description": "Mecanismo CRISPR en 6 pasos con SVG animado, comparativa NHEJ vs HDR, 6 enfermedades terapéuticas (Casgevy aprobado 2023) con estado de desarrollo, y debate bioético sobre edición de embriones"
+        },
+        {
+          "name": "Biomas Terrestres: Clima, Fauna y Conservación",
+          "slug": "visualizador-biomas-terrestres",
+          "url": "https://meskeia.com/visualizador-biomas-terrestres/",
+          "description": "Selector de 7 biomas con datos completos, climograma Walter-Lieth interactivo, diagrama de distribución latitudinal y estado de conservación con amenazas y porcentaje de área protegida"
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

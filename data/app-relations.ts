@@ -1047,7 +1047,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
     { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Ciclo hidrológico' },
     { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
-    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
+    { url: '/visualizador-biomas-terrestres/', icon: '🌿', name: 'Biomas Terrestres', description: 'Cada bioma es un ecosistema a escala global — mismas reglas tróficas, distintos climas y latitudes' },
   ],
   'visualizador-fosiles-tiempo-geologico': [
     { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'Del suelo al núcleo' },
@@ -1215,7 +1215,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Donde vive el ADN' },
     { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Ácidos nucleicos y proteínas' },
     { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'Cómo se copia el ADN' },
-    { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'La evolución depende del ADN' },
+    { url: '/visualizador-crispr-cas9/', icon: '✂️', name: 'CRISPR-Cas9', description: 'CRISPR edita directamente el código genético — sin entender el ADN, no hay edición posible' },
   ],
   'visualizador-fenomenos-meteorologicos': [
     { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'Atmósfera y calentamiento' },
@@ -1539,7 +1539,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cortisol/', icon: '⚡', name: 'Cortisol', description: 'El yin y yang del ritmo circadiano' },
     { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'Melatonina y arquitectura del sueño' },
     { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'La melatonina en el contexto hormonal' },
-    { url: '/visualizador-neurociencia-aprendizaje/', icon: '🧠', name: 'Neurociencia del Aprendizaje', description: 'El sueño y la consolidación de memoria' },
+    { url: '/visualizador-cronobiologia/', icon: '🕐', name: 'Cronobiología', description: 'La melatonina es la señal de salida del reloj circadiano — el puente entre el reloj molecular y el cuerpo' },
   ],
   'visualizador-endorfinas': [
     { url: '/visualizador-dopamina/', icon: '⚡', name: 'Dopamina', description: 'El otro sistema del placer y la recompensa' },
@@ -3458,6 +3458,44 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'ITER usa superconductores de NbTi para los imanes toroidales del reactor de fusión' },
     { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'Los qubits superconductores operan cerca del cero absoluto, igual que los superconductores clásicos' },
     { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La teoría BCS de superconductividad es un triunfo de la mecánica cuántica aplicada' },
+  ],
+
+  // EJE D — Biología: reino animal, embriogénesis, microbiología, cronobiología, CRISPR, biomas (Roadmap v4, 2026-04-30)
+  'visualizador-reino-animal': [
+    { url: '/visualizador-seleccion-natural/', icon: '🌱', name: 'Selección Natural', description: 'La diversidad del reino animal es el resultado de millones de años de selección natural y especiación' },
+    { url: '/visualizador-ecosistema/', icon: '🌿', name: 'Ecosistema', description: 'Los animales son actores clave en las pirámides tróficas y los ciclos biogeoquímicos del ecosistema' },
+    { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'Los humanos somos mamíferos: el árbol filogenético del reino animal conecta con nuestra propia evolución' },
+    { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'La reproducción sexual (meiosis) es uno de los rasgos que une a casi todos los animales del reino' },
+  ],
+  'visualizador-embriogenesis': [
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'La embriogénesis comienza en una sola célula: el cigoto que contiene todo el programa de desarrollo' },
+    { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'La segmentación es mitosis acelerada sin crecimiento celular — el mismo proceso a ritmo embrionario' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'Los genes Hox y morfógenos son el código genético que dirige el plan corporal durante la organogénesis' },
+    { url: '/visualizador-epigenetica/', icon: '🧬', name: 'Epigenética', description: 'La diferenciación celular es epigenética: todas las células tienen el mismo ADN pero genes distintos activados' },
+  ],
+  'visualizador-microbiologia': [
+    { url: '/visualizador-antibioticos/', icon: '💊', name: 'Antibióticos', description: 'Los mecanismos de acción antibiótica se dirigen a estructuras bacterianas únicas: pared, ribosomas, ADN' },
+    { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'El sistema inmune distingue entre bacterias patógenas y comensales — clave para entender la microbiota' },
+    { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'El microbioma intestinal son bacterias conviviendo bajo las mismas reglas de crecimiento que aprendes aquí' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'La conjugación bacteriana y la transferencia horizontal de genes depende del ADN plasmídico' },
+  ],
+  'visualizador-cronobiologia': [
+    { url: '/visualizador-melatonina/', icon: '🌙', name: 'Melatonina', description: 'La melatonina es el principal mediador del ritmo circadiano: su curva de secreción es la salida del reloj biológico' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'El núcleo supraquiasmático del hipotálamo es el marcapasos central del ritmo circadiano en mamíferos' },
+    { url: '/visualizador-ciclos-sueno/', icon: '😴', name: 'Ciclos del Sueño', description: 'La arquitectura del sueño (NREM/REM) está regulada por el reloj circadiano y la presión homeostática' },
+    { url: '/visualizador-seleccion-natural/', icon: '🌱', name: 'Selección Natural', description: 'Los ritmos circadianos están altamente conservados evolutivamente: incluso las cianobacterias tienen reloj' },
+  ],
+  'visualizador-crispr-cas9': [
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'CRISPR es cirugía molecular en el ADN: sin entender la doble hélice y las bases, no hay edición posible' },
+    { url: '/visualizador-epigenetica/', icon: '🧬', name: 'Epigenética', description: 'Los sistemas CRISPR-dCas9 permiten editar el epigenoma (sin cortar el ADN) para activar o silenciar genes' },
+    { url: '/visualizador-evolucion-molecular/', icon: '🌿', name: 'Evolución Molecular', description: 'CRISPR-Cas9 es un sistema inmune adaptativo bacteriano — un producto de la evolución molecular acelerada' },
+    { url: '/visualizador-cancer/', icon: '🔬', name: 'Cáncer', description: 'La oncología es uno de los campos más activos de CRISPR: editar oncogenes y potenciar células CAR-T' },
+  ],
+  'visualizador-biomas-terrestres': [
+    { url: '/visualizador-ecosistema/', icon: '🌿', name: 'Ecosistema', description: 'Cada bioma es un tipo de ecosistema a escala global: mismas reglas tróficas, distintas condiciones climáticas' },
+    { url: '/visualizador-ciclo-carbono-completo/', icon: '♻️', name: 'Ciclo del Carbono', description: 'Los biomas son los grandes reservorios de carbono terrestre — la deforestación altera el ciclo global' },
+    { url: '/visualizador-viaje-basura/', icon: '♻️', name: 'Viaje de la Basura', description: 'Los residuos plásticos llegan a todos los biomas: desde la tundra ártica hasta los arrecifes de coral' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'El clima es el factor determinante de qué bioma existe en cada latitud — temperatura y precipitación anuales' },
   ],
 };
 

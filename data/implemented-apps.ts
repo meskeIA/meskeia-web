@@ -742,6 +742,13 @@ export const implementedAppsUrls = [
   "/visualizador-geopolitica-energetica/",  // Flujos UE SVG, mix mundial 2010-2023, infraestructuras, renovables
   "/visualizador-cadenas-suministro/",      // Smartphone 40 países, JIT vs JIC, 5 disrupciones, reshoring
   "/visualizador-regimenes-politicos/",     // Matriz 8×6, espectro 2 ejes, evolución siglos, 5 transiciones
+  // EJE D — Biología: reino animal, embriogénesis, microbiología, cronobiología, CRISPR, biomas (Roadmap v4, 2026-04-30)
+  "/visualizador-reino-animal/",          // Vertebrados 5 clases SVG, invertebrados 7 phyla, comparativa sistemas, filogenético
+  "/visualizador-embriogenesis/",         // Fecundación slider 5 pasos, segmentación día 1-14, gastrulación 3 capas, organogénesis
+  "/visualizador-microbiologia/",         // Morfologías SVG clicables, curva logística, Gram+/Gram-, 3 dominios vida
+  "/visualizador-cronobiologia/",         // Reloj CLOCK/BMAL1 SVG, Zeitgebers, cronotipos alondra/búho, cronofarmacología
+  "/visualizador-crispr-cas9/",           // Mecanismo slider 6 pasos SVG, NHEJ vs HDR, 6 enfermedades, bioética He Jiankui
+  "/visualizador-biomas-terrestres/",     // 7 biomas selector, climograma Walter-Lieth, latitudinal, conservación
 ];
 
 /**
