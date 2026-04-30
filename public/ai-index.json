@@ -4,8 +4,8 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 660,
-  "updated": "2026-04-28",
+  "total_tools": 666,
+  "updated": "2026-04-30",
   "features": {
     "all_free": true,
     "no_registration_required": true,
@@ -2083,6 +2083,42 @@
           "slug": "visualizador-estadistica-inferencial",
           "url": "https://meskeia.com/visualizador-estadistica-inferencial/",
           "description": "Distribución bajo H₀ con p-valor calculado en tiempo real, errores tipo I/II con distribuciones solapadas y sliders, simulación de 100 intervalos de confianza, potencia estadística y la explicación correcta de qué es (y no es) el p-valor"
+        },
+        {
+          "name": "Trigonometría: Círculo Unitario y Funciones",
+          "slug": "visualizador-trigonometria",
+          "url": "https://meskeia.com/visualizador-trigonometria/",
+          "description": "Círculo unitario animado con proyecciones de seno, coseno y tangente en tiempo real, gráficas interactivas con sliders de amplitud/frecuencia/fase, tabla de valores exactos en ángulos notables (0° a 180°) e identidades pitagóricas visualizadas"
+        },
+        {
+          "name": "Geometría Analítica: Cónicas e Hipérbolas",
+          "slug": "visualizador-geometria-analitica",
+          "url": "https://meskeia.com/visualizador-geometria-analitica/",
+          "description": "Cónicas SVG interactivas (circunferencia, elipse, parábola, hipérbola) con sliders de parámetros, ecuaciones canónicas actualizadas en tiempo real, focos y directrices marcados, y tab de coordenadas polares con rosa de pétalos, espiral de Arquímedes y cardioide"
+        },
+        {
+          "name": "Álgebra Lineal: Vectores, Transformaciones y Eigenvalores",
+          "slug": "visualizador-algebra-lineal",
+          "url": "https://meskeia.com/visualizador-algebra-lineal/",
+          "description": "4 tabs: vectores 2D con producto escalar y regla del paralelogramo, transformaciones lineales con cuadrícula animada al estilo 3Blue1Brown (rotación/escala/cizalla/reflexión), determinante como área del paralelogramo, eigenvalores/eigenvectores como ejes invariantes"
+        },
+        {
+          "name": "Combinatoria: Permutaciones, Pascal y Binomio de Newton",
+          "slug": "visualizador-combinatoria",
+          "url": "https://meskeia.com/visualizador-combinatoria/",
+          "description": "Permutaciones P(n,k) y combinaciones C(n,k) con árbol SVG animado, triángulo de Pascal hasta 12 filas con 5 patrones de color (Fibonacci, Sierpinski, potencias de 2, números triangulares), principio de multiplicación y binomio de Newton con expansión completa"
+        },
+        {
+          "name": "Ecuaciones Diferenciales: Campos de Dirección y Lotka-Volterra",
+          "slug": "visualizador-ecuaciones-diferenciales",
+          "url": "https://meskeia.com/visualizador-ecuaciones-diferenciales/",
+          "description": "Campo de direcciones SVG con curva solución trazada por método de Euler, sistema predador-presa Lotka-Volterra animado con series temporales y diagrama de fase, ley de enfriamiento de Newton y circuito RC como ecuaciones diferenciales aplicadas"
+        },
+        {
+          "name": "Series y Convergencia: Taylor, Criterios y π",
+          "slug": "visualizador-series-convergencia",
+          "url": "https://meskeia.com/visualizador-series-convergencia/",
+          "description": "Series de Taylor/Maclaurin para sin/cos/eˣ/ln con slider de N términos y gráfica de aproximación, criterios de convergencia con sumas parciales SVG (razón, comparación, Leibniz), y 3 series para calcular π (Leibniz, Nilakantha, Wallis) con comparativa de velocidad"
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

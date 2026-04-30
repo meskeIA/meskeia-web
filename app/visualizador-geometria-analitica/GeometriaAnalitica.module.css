@@ -1,0 +1,497 @@
+/* GeometriaAnalitica.module.css — meskeIA */
+
+/* ─────────────────────────────────────────────
+   Contenedor principal
+───────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Hero
+───────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcono {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.heroTitulo {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitulo {
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  opacity: 0.92;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   Navegación de tabs
+───────────────────────────────────────────── */
+.tabsNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 1.5rem 1rem 0.75rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-width: 110px;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.tabActivo {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.tabActivo:hover {
+  color: #ffffff;
+}
+
+.tabIcono {
+  font-size: 1.4rem;
+}
+
+.tabNombre {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.tabSub {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  text-align: center;
+  font-family: monospace;
+}
+
+[data-theme='dark'] .tab {
+  border-color: #444;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .tabActivo {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────
+   Herramienta principal
+───────────────────────────────────────────── */
+.herramienta {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+}
+
+/* ─────────────────────────────────────────────
+   Visor wrapper
+───────────────────────────────────────────── */
+.visorWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ─────────────────────────────────────────────
+   Canvas SVG
+───────────────────────────────────────────── */
+.svgCanvas {
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  background: #ffffff;
+  display: block;
+  max-width: 100%;
+}
+
+[data-theme='dark'] .svgCanvas {
+  border-color: #444;
+  background: #1e2a35;
+}
+
+/* ─────────────────────────────────────────────
+   Panel de ecuación
+───────────────────────────────────────────── */
+.panelEcuacion {
+  width: 100%;
+  max-width: 500px;
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .panelEcuacion {
+  background: var(--bg-card);
+  border-color: var(--primary);
+}
+
+.ecuacionTitulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+.ecuacion {
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: clamp(0.82rem, 2.2vw, 1rem);
+  color: var(--text-primary);
+  background: #f5f8fb;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .ecuacion {
+  background: #1a2533;
+  color: var(--text-primary);
+}
+
+.infoNotables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+}
+
+.infoNotables span {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: #f0f4f8;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+}
+
+[data-theme='dark'] .infoNotables span {
+  background: #252f3a;
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Sliders
+───────────────────────────────────────────── */
+.sliders {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sliderLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.sliderLabel input[type='range'] {
+  width: 100%;
+  accent-color: var(--primary);
+  height: 6px;
+  cursor: pointer;
+}
+
+.sliderLabel input[type='range']:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+[data-theme='dark'] .sliderLabel {
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   Orientación parábola
+───────────────────────────────────────────── */
+.orientacionGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.orientacionLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.orientacionBtn {
+  padding: 0.35rem 0.9rem;
+  border: 2px solid #d0d8e0;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.orientacionBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.orientacionActivo {
+  border-color: var(--secondary);
+  background: var(--secondary);
+  color: #ffffff;
+}
+
+.orientacionActivo:hover {
+  color: #ffffff;
+}
+
+.orientacionBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .orientacionBtn {
+  border-color: #444;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .orientacionActivo {
+  background: var(--secondary);
+  color: #ffffff;
+  border-color: var(--secondary);
+}
+
+/* ─────────────────────────────────────────────
+   Tabs coordenadas polares
+───────────────────────────────────────────── */
+.tabsPolares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.tabPolar {
+  padding: 0.4rem 0.9rem;
+  border: 2px solid #d0d8e0;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabPolar:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.tabPolarActivo {
+  border-color: var(--secondary);
+  background: var(--secondary);
+  color: #ffffff;
+}
+
+.tabPolarActivo:hover {
+  color: #ffffff;
+}
+
+.tabPolar:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .tabPolar {
+  border-color: #444;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabPolarActivo {
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: #ffffff;
+}
+
+/* ─────────────────────────────────────────────
+   Indicador de caja de advertencia (patrón v2.0)
+───────────────────────────────────────────── */
+.warningBox {
+  background: #fff8e1;
+  border: 1.5px solid #f6c90e;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: #6b4f00;
+  margin: 0.5rem 0;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2200;
+  border-color: #f6c90e;
+  color: #f6c90e;
+}
+
+/* ─── Patrón v2.0 Profesionalización ─── */
+.tableWrapper { overflow-x: auto; margin: 1.5rem 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.comparativaTable th { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; }
+.comparativaTable td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color, #e5e7eb); color: var(--text-secondary); }
+.comparativaTable tbody tr:hover { background: rgba(46,134,171,0.05); }
+[data-theme='dark'] .comparativaTable td { border-bottom-color: #333; }
+
+.escenariosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0; }
+.escenarioCard { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 1.25rem; transition: transform 0.2s, box-shadow 0.2s; }
+.escenarioCard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,134,171,0.15); }
+.escenarioHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.escenarioIcon { font-size: 1.75rem; line-height: 1; }
+.escenarioHeader h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+.escenarioTip { font-size: 0.875rem; color: var(--secondary); margin-top: 0.5rem; }
+[data-theme='dark'] .escenarioCard { border-color: #333; }
+
+.faqList { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.faqItem { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-left: 3px solid var(--primary); border-radius: 8px; padding: 1.25rem; }
+.faqItem h4 { color: var(--primary); font-size: 0.95rem; margin: 0 0 0.5rem; }
+.faqItem p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; margin: 0 0 0.5rem; }
+.faqTip { font-size: 0.8rem; color: var(--secondary); background: rgba(72,169,166,0.08); border-radius: 6px; padding: 0.5rem 0.75rem; }
+[data-theme='dark'] .faqItem { border-color: #333; border-left-color: var(--primary); }
+
+.stepGuide { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.step { display: flex; gap: 1rem; align-items: flex-start; }
+.stepNumber { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.stepContent { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; }
+.stepContent h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem; }
+.stepContent p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+[data-theme='dark'] .stepContent { border-color: #333; }
+
+.tipsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+.tipCard { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; text-align: center; }
+.tipIcon { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+.tipCard h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.35rem; }
+.tipCard p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+[data-theme='dark'] .tipCard { border-color: #333; }
+
+.warningHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.warningIcon { font-size: 1.5rem; }
+.warningHeader h3 { font-size: 1rem; font-weight: 600; color: inherit; margin: 0; }
+.warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.warningList li { font-size: 0.875rem; line-height: 1.5; padding-left: 0.5rem; }
+
+/* ─────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .tabsNav {
+    gap: 0.35rem;
+    padding: 1rem 0.75rem 0.5rem;
+  }
+
+  .tab {
+    min-width: 80px;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .tabNombre {
+    font-size: 0.7rem;
+  }
+
+  .tabSub {
+    display: none;
+  }
+
+  .herramienta {
+    padding: 0.75rem 0.75rem 1.5rem;
+  }
+
+  .sliders {
+    max-width: 100%;
+  }
+
+  .panelEcuacion {
+    max-width: 100%;
+  }
+}
+
+/* Preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .orientacionBtn,
+  .tabPolar,
+  .escenarioCard {
+    transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: repeat(2, 1fr); }
+}

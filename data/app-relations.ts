@@ -3236,6 +3236,44 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-desinformacion/', icon: '📰', name: 'Desinformación', description: 'La libertad de prensa y el pluralismo informativo son características estructurales de algunos regímenes' },
   ],
 
+  // EJE A — Matemáticas fundamentos visuales (Roadmap v4, 2026-04-30)
+  'visualizador-trigonometria': [
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'Las funciones trigonométricas son la base del cálculo: derivadas, integrales de seno y coseno' },
+    { url: '/visualizador-series-convergencia/', icon: '♾️', name: 'Series y Convergencia', description: 'Las series de Taylor aproximan seno y coseno con polinomios' },
+    { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'La Transformada de Fourier descompone señales en suma de senos y cosenos' },
+    { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las cónicas se describen con funciones trigonométricas en coordenadas polares' },
+  ],
+  'visualizador-geometria-analitica': [
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Las coordenadas polares y las cónicas usan seno y coseno como base' },
+    { url: '/visualizador-algebra-lineal/', icon: '🔢', name: 'Álgebra Lineal', description: 'Las transformaciones lineales cambian la forma de las cónicas en el plano' },
+    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Geometría Fractal', description: 'Las cónicas son formas euclidianas; los fractales exploran geometrías más complejas' },
+    { url: '/visualizador-topologia/', icon: '🍩', name: 'Topología', description: 'La topología generaliza la geometría: ¿qué propiedades se conservan bajo deformación continua?' },
+  ],
+  'visualizador-algebra-lineal': [
+    { url: '/visualizador-matrices/', icon: '📊', name: 'Matrices y Transformaciones', description: 'Las matrices son la representación algebraica de las transformaciones lineales' },
+    { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las transformaciones lineales actúan sobre las cónicas y las curvas del plano' },
+    { url: '/visualizador-estadistica-inferencial/', icon: '📈', name: 'Estadística Inferencial', description: 'PCA (Análisis de Componentes Principales) es álgebra lineal aplicada a datos' },
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'La diferencial es una transformación lineal — el cálculo y el álgebra lineal convergen aquí' },
+  ],
+  'visualizador-combinatoria': [
+    { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad', description: 'La combinatoria es la base del cálculo de probabilidades: C(n,k) aparece en la distribución binomial' },
+    { url: '/visualizador-estadistica-inferencial/', icon: '📊', name: 'Estadística Inferencial', description: 'Los tests estadísticos usan combinatoria para calcular distribuciones discretas (binomial, hipergeométrica)' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'RSA y los sistemas de clave pública se basan en la dificultad computacional de problemas combinatorios' },
+    { url: '/visualizador-teoria-grafos/', icon: '🕸️', name: 'Teoría de Grafos', description: 'Contar caminos, árboles de expansión y coloraciones son problemas combinatorios sobre grafos' },
+  ],
+  'visualizador-ecuaciones-diferenciales': [
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'Las EDO se derivan e integran: el cálculo es la herramienta fundamental para resolverlas' },
+    { url: '/visualizador-algebra-lineal/', icon: '🔢', name: 'Álgebra Lineal', description: 'Los sistemas de EDO lineales se resuelven con eigenvalores y matrices de la transformación' },
+    { url: '/visualizador-modelos-epidemiologicos/', icon: '🦠', name: 'Modelos Epidemiológicos', description: 'Los modelos SIR/SEIR son sistemas de ecuaciones diferenciales aplicados a epidemias' },
+    { url: '/visualizador-series-convergencia/', icon: '♾️', name: 'Series y Convergencia', description: 'Las series de Taylor se usan para aproximar soluciones de EDO cuando no hay forma cerrada' },
+  ],
+  'visualizador-series-convergencia': [
+    { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'Las series de Taylor son una de las aplicaciones más bellas del cálculo diferencial e integral' },
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Las series de Maclaurin de seno y coseno revelan su naturaleza algebraica profunda' },
+    { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'La Transformada de Fourier es una generalización de las series de Fourier al dominio continuo' },
+    { url: '/visualizador-numeros-complejos/', icon: '𝕚', name: 'Números Complejos', description: 'La identidad de Euler e^(iπ)+1=0 emerge de las series de Taylor de eˣ, sin(x) y cos(x)' },
+  ],
+
   // EJE C — Química avanzada (2026-04-28)
   'visualizador-termodinamica-quimica': [
     { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'La termodinámica dice si una reacción puede ocurrir; la cinética dice a qué velocidad ocurrirá' },

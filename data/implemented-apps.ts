@@ -714,6 +714,13 @@ export const implementedAppsUrls = [
   "/visualizador-teoria-grafos/",         // Dijkstra animado, Königsberg SVG, detector propiedades, 4 grafos predefinidos
   "/visualizador-topologia/",             // 5 superficies SVG, genus selector, nudos topológicos, tabla Euler
   "/visualizador-estadistica-inferencial/", // p-valor SVG, errores tipo I/II, 100 IC simulados, potencia estadística
+  // EJE A — Matemáticas fundamentos visuales (Roadmap v4, 2026-04-30)
+  "/visualizador-trigonometria/",           // Círculo unitario animado, gráficas con sliders, tabla ángulos notables, identidades
+  "/visualizador-geometria-analitica/",     // Cónicas SVG (elipse/parábola/hipérbola/circunferencia), ecuaciones canónicas, polares
+  "/visualizador-algebra-lineal/",          // Vectores 2D, transformaciones lineales, determinante como área, eigenvalores
+  "/visualizador-combinatoria/",            // Permutaciones, triángulo de Pascal, binomio de Newton, principio multiplicación
+  "/visualizador-ecuaciones-diferenciales/", // Campo de direcciones, Lotka-Volterra, enfriamiento Newton, circuito RC
+  "/visualizador-series-convergencia/",     // Taylor/Maclaurin, criterios convergencia, π con Leibniz/Nilakantha/Wallis
   "/visualizador-cosmologia/",              // Tarta SVG universo, timeline Big Bang, curva a(t), geometría, 4 destinos
   "/visualizador-agujeros-negros/",         // Anatomía SVG clicable, calc. Schwarzschild, espaguetización, Hawking
   "/visualizador-exoplanetas/",             // Tránsito animado + curva luz, wobble, zona Goldilocks, scatter 5500+

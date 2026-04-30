@@ -1,0 +1,646 @@
+/* SeriesConvergencia.module.css */
+
+/* ── Contenedor principal ──────────────────── */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+/* ── Hero ──────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 48px 32px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Sección herramienta ───────────────────── */
+
+.herramienta {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+/* ── Tabs ──────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.tabActive {
+  background: var(--primary);
+  color: white;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Contenido de tab ──────────────────────── */
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Controles ─────────────────────────────── */
+
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.controlRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.label strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ── Chips de función ──────────────────────── */
+
+.chipGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--secondary);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.18s ease;
+}
+
+.chip:hover {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+.chipActive {
+  background: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* ── Fórmula ───────────────────────────────── */
+
+.formulaBox {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 16px;
+}
+
+.formulaText {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* ── SVG gráfica ───────────────────────────── */
+
+.svgWrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  background: var(--bg-card);
+}
+
+.grafica {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Error residual ────────────────────────── */
+
+.errorSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.errorHeader {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.errorVal {
+  color: var(--primary);
+  font-family: monospace;
+}
+
+/* ── Barra de progreso ─────────────────────── */
+
+.progressBar {
+  height: 8px;
+  background: rgba(46, 134, 171, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ── Términos numéricos ────────────────────── */
+
+.terminosSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.terminosTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.terminosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.terminoCard {
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.terminoN {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.terminoLabel {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.terminoValor {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--primary);
+  font-family: monospace;
+}
+
+/* ── Cards de convergencia ─────────────────── */
+
+.convCard {
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.convConverge {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1.5px solid rgba(72, 169, 166, 0.4);
+}
+
+.convDiverge {
+  background: rgba(232, 74, 95, 0.07);
+  border: 1.5px solid rgba(232, 74, 95, 0.35);
+}
+
+.convBadge {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.convConverge .convBadge {
+  color: #48A9A6;
+}
+
+.convDiverge .convBadge {
+  color: #E84A5F;
+}
+
+.convLimite {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: monospace;
+}
+
+.convCriterio {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.convRazon {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Pi series ─────────────────────────────── */
+
+.piReal {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.piSeries {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.piCard {
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.piCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.piNombre {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.piDec {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: rgba(46, 134, 171, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.piFormula {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.piValor {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: monospace;
+}
+
+/* ── Tabla comparativa ─────────────────────── */
+
+.tablaSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tablaTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 320px;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.tabla th:first-child {
+  text-align: left;
+  border-radius: 8px 0 0 0;
+}
+
+.tabla th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.tabla td {
+  padding: 9px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+}
+
+.tabla td:first-child {
+  text-align: left;
+}
+
+.tabla tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* ── Warning box (EducationalSection) ──────── */
+
+.warningBox {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* ─────────────────────────────────────────────
+   DARK MODE
+   ───────────────────────────────────────────── */
+
+[data-theme='dark'] .herramienta {
+  background: var(--bg-card);
+  border-color: rgba(72, 169, 166, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .formulaBox {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+[data-theme='dark'] .svgWrapper {
+  background: #1e1e1e;
+  border-color: rgba(72, 169, 166, 0.2);
+}
+
+[data-theme='dark'] .terminoCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .convConverge {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: rgba(72, 169, 166, 0.35);
+}
+
+[data-theme='dark'] .convDiverge {
+  background: rgba(232, 74, 95, 0.1);
+  border-color: rgba(232, 74, 95, 0.35);
+}
+
+[data-theme='dark'] .piCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .piDec {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .progressBar {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .tabla th {
+  background: #2E86AB;
+}
+
+[data-theme='dark'] .tabla td {
+  border-color: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .tabla tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(72, 169, 166, 0.1);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+[data-theme='dark'] .tab {
+  border-color: var(--primary);
+  color: #7FB3D3;
+}
+
+[data-theme='dark'] .tabActive {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .chip {
+  border-color: #48A9A6;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .chipActive {
+  background: var(--secondary);
+  color: white;
+}
+
+/* ── Responsive ────────────────────────────── */
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 32px 20px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .herramienta {
+    padding: 16px;
+  }
+
+  .controlRow {
+    grid-template-columns: 1fr;
+  }
+
+  .terminosGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .piCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .tabs {
+    gap: 6px;
+  }
+
+  .tab {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+}
+
+/* ── Reducción de movimiento ───────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .progressFill,
+  .tab,
+  .chip {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Patrón v2.0 Profesionalización ─── */
+.tableWrapper { overflow-x: auto; margin: 1.5rem 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.comparativaTable th { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; }
+.comparativaTable td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color, #e5e7eb); color: var(--text-secondary); }
+.comparativaTable tbody tr:hover { background: rgba(46,134,171,0.05); }
+[data-theme='dark'] .comparativaTable td { border-bottom-color: #333; }
+
+.escenariosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0; }
+.escenarioCard { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 1.25rem; transition: transform 0.2s, box-shadow 0.2s; }
+.escenarioCard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,134,171,0.15); }
+.escenarioHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.escenarioIcon { font-size: 1.75rem; line-height: 1; }
+.escenarioHeader h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+.escenarioTip { font-size: 0.875rem; color: var(--secondary); margin-top: 0.5rem; }
+[data-theme='dark'] .escenarioCard { border-color: #333; }
+
+.faqList { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.faqItem { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-left: 3px solid var(--primary); border-radius: 8px; padding: 1.25rem; }
+.faqItem h4 { color: var(--primary); font-size: 0.95rem; margin: 0 0 0.5rem; }
+.faqItem p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; margin: 0 0 0.5rem; }
+.faqTip { font-size: 0.8rem; color: var(--secondary); background: rgba(72,169,166,0.08); border-radius: 6px; padding: 0.5rem 0.75rem; }
+[data-theme='dark'] .faqItem { border-color: #333; border-left-color: var(--primary); }
+
+.stepGuide { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.step { display: flex; gap: 1rem; align-items: flex-start; }
+.stepNumber { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.stepContent { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; }
+.stepContent h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem; }
+.stepContent p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+[data-theme='dark'] .stepContent { border-color: #333; }
+
+.tipsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+.tipCard { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; text-align: center; }
+.tipIcon { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+.tipCard h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.35rem; }
+.tipCard p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+[data-theme='dark'] .tipCard { border-color: #333; }
+
+.warningHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.warningIcon { font-size: 1.5rem; }
+.warningHeader h3 { font-size: 1rem; font-weight: 600; color: inherit; margin: 0; }
+.warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.warningList li { font-size: 0.875rem; line-height: 1.5; padding-left: 0.5rem; }
+
+@media (max-width: 768px) {
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: repeat(2, 1fr); }
+}

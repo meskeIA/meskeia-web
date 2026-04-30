@@ -1,0 +1,759 @@
+/* ================================================
+   Combinatoria.module.css — meskeIA
+   Visualizador de Combinatoria
+   ================================================ */
+
+/* -------- LAYOUT PRINCIPAL -------- */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* -------- HERO -------- */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: #ffffff;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* -------- TABS -------- */
+.tabsWrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tab:hover {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+}
+
+.tabActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tabActive:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tabPanel {
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -------- SLIDERS -------- */
+.sliderGroup {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sliderLabel {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.sliderLabel strong {
+  color: var(--primary);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* -------- RESULTADOS -------- */
+.resultsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 560px) {
+  .resultsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resultCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid var(--primary);
+}
+
+.resultCardSecondary {
+  border-left-color: var(--secondary);
+}
+
+.resultLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.resultFormula {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.resultValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.resultCardSecondary .resultValue {
+  color: var(--secondary);
+}
+
+.resultDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* -------- RATIO BOX -------- */
+.ratioBox {
+  background: rgba(46, 134, 171, 0.08);
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-family: 'Courier New', monospace;
+}
+
+.ratioLabel {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* -------- ÁRBOL SVG -------- */
+.treeSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.treeSectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.treeDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.selectedBadge {
+  background: var(--primary);
+  color: white;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.svgWrapper {
+  overflow-x: auto;
+}
+
+.treeSvg {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.treeHint {
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* -------- PASCAL -------- */
+.patternButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.patternBtn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+  border: 2px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.patternBtn:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.patternBtnActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.patternDesc {
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.pascalWrapper {
+  overflow-x: auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1rem;
+}
+
+.pascalSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cellInfo {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+/* Tabla de sumas de fila */
+.rowSumsTable {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.rowSumsTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.rowSumsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.rowSumItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.87rem;
+}
+
+.rowSumLabel {
+  width: 60px;
+  color: var(--text-muted);
+}
+
+.rowSumValue {
+  font-weight: 700;
+  color: var(--primary);
+  width: 80px;
+}
+
+.rowSumPow {
+  color: var(--secondary);
+  font-family: 'Courier New', monospace;
+}
+
+/* -------- SECCIÓN BLOQUES (TAB 3) -------- */
+.sectionBlock {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.sectionDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+/* Pasos de multiplicación */
+.multiplySteps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.multiplyStep {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stepLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.stepInput {
+  width: 60px;
+  padding: 0.35rem 0.5rem;
+  border: 1.5px solid rgba(46, 134, 171, 0.4);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.stepInput:focus {
+  border-color: var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.stepUnit {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.stepOp {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 0 0.25rem;
+}
+
+.multiplyActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.btnSecondary {
+  padding: 0.45rem 0.9rem;
+  border: 2px solid var(--secondary);
+  background: transparent;
+  color: var(--secondary);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: var(--secondary);
+  color: #ffffff;
+}
+
+.btnSecondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.multiplyResult {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 10px;
+}
+
+.multiplyFormula {
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.multiplyTotal {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.multiplySubtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Controles Newton */
+.newtonControls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 560px) {
+  .newtonControls {
+    grid-template-columns: 1fr;
+  }
+}
+
+.newtonSlider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.newtonHeader {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  font-family: 'Courier New', monospace;
+}
+
+.newtonPascalNote {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 6px 6px 0;
+  background: rgba(72, 169, 166, 0.08);
+}
+
+.newtonTerms {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.newtonTerm {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.newtonCoef {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 0.2em 0.6em;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+.newtonTermBody {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+}
+
+.newtonPlus {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-left: auto;
+}
+
+/* -------- EDUCATIVO -------- */
+.eduContent {
+  padding: 0.25rem 0;
+}
+
+.eduHeading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1rem 0 0.4rem;
+}
+
+.eduHeading:first-child {
+  margin-top: 0;
+}
+
+.eduContent p {
+  font-size: 0.93rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* -------- WARNING BOX (requerido para v2.0) -------- */
+.warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+/* ================================================
+   DARK MODE
+   ================================================ */
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, #1A5F7A 0%, #2E7A78 100%);
+}
+
+[data-theme='dark'] .sliderGroup,
+[data-theme='dark'] .resultCard,
+[data-theme='dark'] .treeSection,
+[data-theme='dark'] .pascalWrapper,
+[data-theme='dark'] .rowSumsTable,
+[data-theme='dark'] .sectionBlock {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .tab {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tab:hover {
+  background: rgba(46, 134, 171, 0.18);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .tabActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .patternBtn {
+  border-color: var(--primary);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .patternBtnActive {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .ratioBox {
+  background: rgba(46, 134, 171, 0.12);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .multiplyResult {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .newtonHeader {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .newtonPascalNote {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .patternDesc {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .stepInput {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: rgba(46, 134, 171, 0.5);
+}
+
+[data-theme='dark'] .treeHint {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .cellInfo {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme='dark'] .btnSecondary {
+  color: var(--secondary);
+  border-color: var(--secondary);
+}
+
+[data-theme='dark'] .btnSecondary:hover:not(:disabled) {
+  background: var(--secondary);
+  color: #ffffff;
+}
+
+/* Animación reducida */
+@media (prefers-reduced-motion: reduce) {
+  .tabPanel {
+    animation: none;
+  }
+}
+
+/* Focus visible */
+.tab:focus-visible,
+.patternBtn:focus-visible,
+.btnSecondary:focus-visible,
+.stepInput:focus-visible,
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Patrón v2.0 Profesionalización ─── */
+.tableWrapper { overflow-x: auto; margin: 1.5rem 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.comparativaTable th { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; }
+.comparativaTable td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color, #e5e7eb); color: var(--text-secondary); }
+.comparativaTable tbody tr:hover { background: rgba(46,134,171,0.05); }
+[data-theme='dark'] .comparativaTable td { border-bottom-color: #333; }
+
+.escenariosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0; }
+.escenarioCard { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 1.25rem; transition: transform 0.2s, box-shadow 0.2s; }
+.escenarioCard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,134,171,0.15); }
+.escenarioHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.escenarioIcon { font-size: 1.75rem; line-height: 1; }
+.escenarioHeader h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+.escenarioTip { font-size: 0.875rem; color: var(--secondary); margin-top: 0.5rem; }
+[data-theme='dark'] .escenarioCard { border-color: #333; }
+
+.faqList { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.faqItem { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-left: 3px solid var(--primary); border-radius: 8px; padding: 1.25rem; }
+.faqItem h4 { color: var(--primary); font-size: 0.95rem; margin: 0 0 0.5rem; }
+.faqItem p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; margin: 0 0 0.5rem; }
+.faqTip { font-size: 0.8rem; color: var(--secondary); background: rgba(72,169,166,0.08); border-radius: 6px; padding: 0.5rem 0.75rem; }
+[data-theme='dark'] .faqItem { border-color: #333; border-left-color: var(--primary); }
+
+.stepGuide { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
+.step { display: flex; gap: 1rem; align-items: flex-start; }
+.stepNumber { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.stepContent { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; }
+.stepContent h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem; }
+.stepContent p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+[data-theme='dark'] .stepContent { border-color: #333; }
+
+.tipsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+.tipCard { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; text-align: center; }
+.tipIcon { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+.tipCard h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.35rem; }
+.tipCard p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+[data-theme='dark'] .tipCard { border-color: #333; }
+
+.warningHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.warningIcon { font-size: 1.5rem; }
+.warningHeader h3 { font-size: 1rem; font-weight: 600; color: inherit; margin: 0; }
+.warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.warningList li { font-size: 0.875rem; line-height: 1.5; padding-left: 0.5rem; }
+
+@media (max-width: 768px) {
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: repeat(2, 1fr); }
+}

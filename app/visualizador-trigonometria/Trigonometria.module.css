@@ -1,0 +1,1004 @@
+/* ======================================================
+   Trigonometria.module.css — Visualizador Trigonometría
+   Paleta: meskeIA (#2E86AB azul, #48A9A6 teal)
+   ====================================================== */
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--text-muted);
+  justify-content: center;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--text-muted);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tabActiva {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tabActiva:hover {
+  color: #ffffff;
+}
+
+/* ── Sección general ── */
+.seccion {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.seccionTitulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  border-left: 4px solid var(--primary);
+  padding-left: 0.75rem;
+}
+
+/* ── Círculo: layout ── */
+.circuloLayout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.circuloPanel {
+  flex: 0 0 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.svgCirculo {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--text-muted);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  display: block;
+  margin: 0 auto;
+}
+
+/* ── Panel de valores ── */
+.valoresPanel {
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.valoresTitulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.valoresGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.valorCard {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.valorNombre {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.valorNumero {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Cuadrante y notables ── */
+.cuadranteInfo {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--text-muted);
+}
+
+.cuadranteLabel {
+  color: var(--text-secondary);
+}
+
+.notablesInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notablesLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.notablesBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.notableBtn {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  border: 1px solid var(--text-muted);
+  border-radius: 5px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.notableBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.notableBtnActivo {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* ── Sliders ── */
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sliderLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.radLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  height: 4px;
+  cursor: pointer;
+}
+
+.sliderMarks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.15rem;
+}
+
+.markBtn {
+  font-size: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+  transition: color 0.15s;
+}
+
+.markBtn:hover {
+  color: var(--primary);
+}
+
+/* ── Botón animación ── */
+.btnAnimacion {
+  padding: 0.6rem 1.5rem;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.btnAnimacion:hover {
+  background: var(--secondary);
+}
+
+.btnAnimacion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Gráfica: layout ── */
+.graficaLayout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.graficaPanel {
+  flex: 1 1 400px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.svgGrafica {
+  width: 100%;
+  height: auto;
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--text-muted);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.slidersPanel {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Selector de función ── */
+.funcionSelector {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.radioText {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Fórmula ── */
+.formulaBox {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--primary);
+  text-align: center;
+}
+
+.formulaText {
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Tabla ── */
+.tablaDesc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--text-muted);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background: var(--bg-card);
+}
+
+.tabla thead {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+}
+
+.tabla th {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.87rem;
+}
+
+.tabla td {
+  padding: 0.6rem 1rem;
+  text-align: center;
+  border-top: 1px solid var(--text-muted);
+  color: var(--text-primary);
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.tdDestacado {
+  font-weight: 700;
+  color: var(--primary) !important;
+}
+
+.tdSin {
+  color: #2E86AB;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.tdCos {
+  color: #48A9A6;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.tdTan {
+  color: #E8A838;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.tablaLeyenda {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── Identidades: layout ── */
+.identidadesLayout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.identidadesCirculo {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.identidadesPanel {
+  flex: 1 1 300px;
+}
+
+.identidadesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Tarjeta de identidad ── */
+.identidadCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid var(--text-muted);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.identidadTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.identidadFormula {
+  font-family: 'Courier New', monospace;
+  font-size: 1.15rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.identidadCalculo {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Barra de identidad */
+.identidadBarra {
+  height: 18px;
+  background: var(--bg-primary);
+  border-radius: 9px;
+  display: flex;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--text-muted);
+}
+
+.barraSin {
+  background: #2E86AB;
+  transition: width 0.2s ease;
+  border-radius: 9px 0 0 9px;
+}
+
+.barraCos {
+  background: #48A9A6;
+  transition: width 0.2s ease;
+  border-radius: 0 9px 9px 0;
+}
+
+.identidadLeyenda {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ── Lista de identidades ── */
+.identidadLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.identidadItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.identidadLabel {
+  font-family: 'Courier New', monospace;
+  color: var(--text-secondary);
+}
+
+.identidadValor {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Rectángulo identidad en SVG */
+.identityRect {
+  transition: all 0.2s;
+}
+
+/* ── Dots de leyenda ── */
+.dotSin {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2E86AB;
+  margin-right: 4px;
+}
+
+.dotCos {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #48A9A6;
+  margin-right: 4px;
+}
+
+.dotTan {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E8A838;
+  margin-right: 4px;
+}
+
+.valSin {
+  color: #2E86AB;
+  font-weight: 600;
+}
+
+.valCos {
+  color: #48A9A6;
+  font-weight: 600;
+}
+
+/* ── Clase warningBox (indicador v2.0 completo — requerida por CLAUDE.md) ── */
+.warningBox {
+  background: rgba(232, 168, 56, 0.1);
+  border: 1px solid #E8A838;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 1.5rem 0;
+}
+
+/* ─── Patrón v2.0 Profesionalización ─── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-secondary);
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #333;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46,134,171,0.15);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.escenarioHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioTip {
+  font-size: 0.875rem;
+  color: var(--secondary);
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #333;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.faqItem h4 {
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.faqTip {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  background: rgba(72,169,166,0.08);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: #333;
+  border-left-color: var(--primary);
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.stepContent {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .stepContent {
+  border-color: #333;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.tipCard p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #333;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.warningHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: inherit;
+  margin: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  padding-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ======================================================
+   DARK MODE
+   ====================================================== */
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tabs {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .tab {
+  border-color: #555;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .tabActiva {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .svgCirculo {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .svgGrafica {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .valorCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .cuadranteInfo {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .notableBtn {
+  background: var(--bg-card);
+  border-color: #555;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .notableBtnActivo {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .tablaWrapper {
+  border-color: #444;
+}
+
+[data-theme='dark'] .tabla {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabla td {
+  border-color: #444;
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .identidadCard {
+  background: var(--bg-card);
+  border-color: #444;
+}
+
+[data-theme='dark'] .identidadBarra {
+  background: #333;
+  border-color: #555;
+}
+
+[data-theme='dark'] .identidadItem {
+  border-color: #444;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: var(--bg-card);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(232, 168, 56, 0.08);
+  border-color: #E8A838;
+}
+
+/* ── Animaciones con preferencia de movimiento reducido ── */
+@media (prefers-reduced-motion: reduce) {
+  .barraSin,
+  .barraCos,
+  .identityRect,
+  .btnAnimacion,
+  .tab,
+  .notableBtn {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .circuloLayout,
+  .graficaLayout,
+  .identidadesLayout {
+    flex-direction: column;
+  }
+
+  .circuloPanel,
+  .identidadesCirculo {
+    flex: 1 1 auto;
+  }
+
+  .valoresGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .slidersPanel {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .tabs {
+    gap: 0.4rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .tab {
+    font-size: 0.82rem;
+    padding: 0.4rem 0.7rem;
+  }
+}
