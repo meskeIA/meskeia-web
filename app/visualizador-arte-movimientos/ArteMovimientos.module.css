@@ -504,6 +504,12 @@
   gap: 0;
   position: relative;
   margin-top: 1rem;
+  overflow-y: auto;
+  max-height: 660px;
+  border: 1px solid var(--bg-primary);
+  border-radius: 8px;
+  padding: 0 0.5rem 1rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .columnaEventos,

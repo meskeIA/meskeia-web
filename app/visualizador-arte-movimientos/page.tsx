@@ -449,33 +449,30 @@ function TabComparativa() {
 function TabContexto() {
   const AÑO_MIN = 1000;
   const AÑO_MAX = 2025;
-  const ALTURA_POR_AÑO = 0.18; // px por año
+  const ALTURA_TOTAL = 1000; // px fijos — garantiza posicionamiento correcto
 
   function anioAY(anio: number): number {
-    return ((anio - AÑO_MIN) / (AÑO_MAX - AÑO_MIN)) * 100;
+    return ((anio - AÑO_MIN) / (AÑO_MAX - AÑO_MIN)) * ALTURA_TOTAL;
   }
 
   const siglosTimeline: number[] = [];
   for (let s = 1000; s <= 2000; s += 100) siglosTimeline.push(s);
 
-  // Calcular altura total estimada
-  const alturaTotal = Math.max(600, (AÑO_MAX - AÑO_MIN) * ALTURA_POR_AÑO + 80);
-
   return (
     <div className={styles.sectionCard}>
       <h2 className={styles.sectionTitle}>Contexto Histórico</h2>
-      <p className={styles.sectionDesc}>Movimientos artísticos y eventos históricos en paralelo.</p>
+      <p className={styles.sectionDesc}>Movimientos artísticos y eventos históricos en paralelo. Desplázate para ver toda la línea temporal.</p>
 
-      <div className={styles.timelineDobleWrapper} style={{ minHeight: `${alturaTotal}px` }}>
+      <div className={styles.timelineDobleWrapper}>
         {/* Columna izquierda: eventos históricos */}
         <div className={styles.columnaEventos}>
           <h3 className={styles.columnaHeader}>Eventos históricos</h3>
-          <div className={styles.columnaContenido}>
+          <div className={styles.columnaContenido} style={{ height: `${ALTURA_TOTAL}px` }}>
             {EVENTOS_HISTORICOS.map((ev) => (
               <div
                 key={ev.anio}
                 className={styles.eventoHistorico}
-                style={{ top: `${anioAY(ev.anio)}%` }}
+                style={{ top: `${anioAY(ev.anio)}px` }}
               >
                 <span className={styles.eventoAnio}>{ev.anio}</span>
                 <span className={styles.eventoTexto}>{ev.evento}</span>
@@ -486,9 +483,9 @@ function TabContexto() {
 
         {/* Columna central: eje de años */}
         <div className={styles.columnaCentro}>
-          <div className={styles.ejeVertical}>
+          <div className={styles.ejeVertical} style={{ height: `${ALTURA_TOTAL}px` }}>
             {siglosTimeline.map((s) => (
-              <div key={s} className={styles.marcadorSiglo} style={{ top: `${anioAY(s)}%` }}>
+              <div key={s} className={styles.marcadorSiglo} style={{ top: `${anioAY(s)}px` }}>
                 <span>{s}</span>
               </div>
             ))}
@@ -498,18 +495,18 @@ function TabContexto() {
         {/* Columna derecha: movimientos artísticos */}
         <div className={styles.columnaMovimientos}>
           <h3 className={styles.columnaHeader}>Movimientos artísticos</h3>
-          <div className={styles.columnaContenido}>
+          <div className={styles.columnaContenido} style={{ height: `${ALTURA_TOTAL}px` }}>
             {MOVIMIENTOS.map((mov) => {
               const anioFin = mov.anioFin === 9999 ? AÑO_MAX : mov.anioFin;
-              const topPct = anioAY(mov.anioInicio);
-              const altoPct = anioAY(anioFin) - topPct;
+              const topPx = anioAY(mov.anioInicio);
+              const altoPx = anioAY(anioFin) - topPx;
               return (
                 <div
                   key={mov.id}
                   className={styles.movimientoTimeline}
                   style={{
-                    top: `${topPct}%`,
-                    height: `${Math.max(altoPct, 3)}%`,
+                    top: `${topPx}px`,
+                    height: `${Math.max(altoPx, 22)}px`,
                     borderLeftColor: mov.color,
                     background: `${mov.color}22`,
                   }}
