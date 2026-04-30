@@ -3562,10 +3562,40 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-biomas-terrestres/', icon: '🌍', name: 'Biomas Terrestres', description: 'La disponibilidad de nitrógeno es uno de los factores que limita la productividad de cada bioma' },
   ],
   'visualizador-arte-movimientos': [
-    { url: '/visualizador-regimenes-politicos/', icon: '🏛️', name: 'Regímenes Políticos', description: 'El arte siempre refleja el sistema político de su época: el realismo socialista, el arte oficial de los totalitarismos' },
+    { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Movimientos Musicales', description: 'Arte y música comparten períodos: el Barroco de Bach y el de Velázquez son el mismo mundo' },
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'Cada estilo artístico tiene su equivalente arquitectónico: Gótico, Barroco, Neoclásico, Bauhaus' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'Las vanguardias literarias y artísticas nacieron juntas: cubismo, surrealismo, dadaísmo' },
     { url: '/visualizador-historia-epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'La Muerte Negra transformó la iconografía medieval; el COVID aceleró el arte digital y los NFT' },
-    { url: '/visualizador-estratificacion-social/', icon: '📊', name: 'Estratificación Social', description: 'El arte y el mercado del arte son a la vez reflejo y agente de la estratificación social y el capital cultural' },
-    { url: '/visualizador-historia-civilizaciones/', icon: '🏛️', name: 'Historia de las Civilizaciones', description: 'Cada civilización produce el arte que la define: de las pirámides a las vanguardias del siglo XX' },
+  ],
+
+  // ─── Cronologías culturales (2026-04-30) ───────────────────────────────────
+
+  'visualizador-musica-movimientos': [
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Arte y música comparten períodos históricos: el Barroco pictórico y el musical son inseparables' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Romanticismo, Ilustración y Posmodernismo definen tanto la música como el pensamiento de cada época' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'El Romanticismo de Schubert y el de Byron son el mismo impulso expresado en diferentes medios' },
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'La música de Bach y las iglesias barrocas de Bernini comparten el mismo lenguaje ornamental' },
+  ],
+
+  'visualizador-filosofia': [
+    { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Movimientos Musicales', description: 'Nietzsche escribió sobre Wagner; Adorno sobre jazz y Beethoven; filosofía y música son inseparables' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'El existencialismo de Sartre es también el de Camus y Kafka: filosofía y literatura en diálogo permanente' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El surrealismo bebió del psicoanálisis de Freud; el Arte Conceptual es filosofía materializada' },
+    { url: '/visualizador-historia-epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'La Peste Negra generó el existencialismo medieval; el SIDA redefinió la ética filosófica contemporánea' },
+  ],
+
+  'visualizador-literatura-movimientos': [
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Sartre escribía novelas y obras de teatro; Camus recibió el Nobel; filosofía y literatura son una misma pregunta' },
+    { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Movimientos Musicales', description: 'El Romanticismo literario y el musical son el mismo movimiento: Goethe, Schubert y Byron comparten época' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Las vanguardias del siglo XX fueron simultáneas: el dadaísmo literario y el pictórico nacieron juntos' },
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'Renacimiento, Barroco y Neoclásico son períodos compartidos por literatura y arquitectura' },
+  ],
+
+  'visualizador-arquitectura-estilos': [
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Románico, Gótico, Renacimiento y Barroco son períodos compartidos por arquitectura y artes visuales' },
+    { url: '/visualizador-urbanismo/', icon: '🏙️', name: 'Urbanismo', description: 'Los estilos arquitectónicos dan forma a la ciudad: el urbanismo es arquitectura a escala urbana' },
+    { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Movimientos Musicales', description: 'La Bauhaus diseñó para el mundo moderno; la música de ese período también rompía moldes académicos' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'El Renacimiento arquitectónico de Brunelleschi es contemporáneo del humanismo literario de Petrarca' },
   ],
 };
 

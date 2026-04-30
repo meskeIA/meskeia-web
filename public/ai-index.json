@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 690,
+  "total_tools": 694,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2263,6 +2263,30 @@
           "slug": "visualizador-arte-movimientos",
           "url": "https://meskeia.com/visualizador-arte-movimientos/",
           "description": "Timeline SVG scrollable de 15 movimientos artísticos (Románico al Arte Digital), panel de detalle con artistas y obras icónicas, tabla filtrable por categoría con buscador y timeline doble con contexto histórico paralelo (Revolución Francesa, WWI, WWII...)"
+        },
+        {
+          "name": "Movimientos Musicales: Cronología del Gregoriano a la Música Electrónica",
+          "slug": "visualizador-musica-movimientos",
+          "url": "https://meskeia.com/visualizador-musica-movimientos/",
+          "description": "Visualizador interactivo de 14 movimientos musicales desde el Canto Gregoriano (850) hasta la música electrónica y dance. Timeline SVG scrollable, panel de detalle con compositores y obras icónicas, tabla filtrable por categoría (medieval, barroco, clásico, romántico, moderno, contemporáneo) y timeline doble vertical con posicionamiento en píxeles."
+        },
+        {
+          "name": "Historia de la Filosofía: Corrientes desde los Presocráticos al Posmodernismo",
+          "slug": "visualizador-filosofia",
+          "url": "https://meskeia.com/visualizador-filosofia/",
+          "description": "Visualizador interactivo de 16 corrientes filosóficas desde los presocráticos (-620 a.C.) hasta el posmodernismo. Timeline con soporte para años a.C., panel de detalle con filósofos, conceptos clave y pregunta central de cada corriente, tabla filtrable (antigua, helenística, medieval, moderna, contemporánea) y timeline doble con eventos históricos paralelos."
+        },
+        {
+          "name": "Movimientos Literarios: Cronología de la Épica Griega al Posmodernismo",
+          "slug": "visualizador-literatura-movimientos",
+          "url": "https://meskeia.com/visualizador-literatura-movimientos/",
+          "description": "Visualizador interactivo de 15 movimientos literarios desde la épica griega (-800 a.C.) hasta el posmodernismo literario. Timeline con soporte para años a.C., panel de detalle con autores, géneros literarios y obras icónicas, tabla filtrable (antigua, medieval, renacimiento, barroco, ilustración, romántico, realismo, vanguardia, contemporáneo) y timeline doble."
+        },
+        {
+          "name": "Estilos Arquitectónicos: Cronología del Griego Clásico a la Arquitectura Sostenible",
+          "slug": "visualizador-arquitectura-estilos",
+          "url": "https://meskeia.com/visualizador-arquitectura-estilos/",
+          "description": "Visualizador interactivo de 16 estilos arquitectónicos desde la arquitectura griega clásica (-700 a.C.) hasta la arquitectura sostenible y paramétrica. Arquitectos clave, edificios icónicos, materiales y contexto histórico. Timeline SVG scrollable con soporte para años a.C., tabla comparativa filtrable y timeline doble vertical con eventos históricos paralelos."
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

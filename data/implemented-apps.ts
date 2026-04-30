@@ -762,6 +762,11 @@ export const implementedAppsUrls = [
   "/visualizador-estratificacion-social/", // Pirámide/diamante/7 clases, Gini/Lorenz, movilidad intergeneracional, teorías
   "/visualizador-ciclo-nitrogeno/",       // Ciclo completo SVG, microorganismos clave, Haber-Bosch, ciclos biogeoquímicos
   "/visualizador-arte-movimientos/",      // 15 movimientos artísticos, timeline scrollable, contexto histórico paralelo
+  // Cronologías culturales (2026-04-30)
+  "/visualizador-musica-movimientos/",    // 14 movimientos musicales, gregoriano→electrónica, compositores, obras icónicas
+  "/visualizador-filosofia/",             // 16 corrientes filosóficas, años a.C., filósofos, conceptos, pregunta central
+  "/visualizador-literatura-movimientos/", // 15 movimientos literarios, épica griega→posmodernismo, autores, géneros
+  "/visualizador-arquitectura-estilos/",  // 16 estilos arquitectónicos, griego clásico→sostenible, edificios icónicos
 ];
 
 /**
