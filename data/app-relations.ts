@@ -931,7 +931,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-como-funciona-wifi': [
     { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de tus datos' },
     { url: '/visualizador-gps/', icon: '📡', name: 'Cómo Funciona el GPS', description: 'Satélites y trilateración' },
-    { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
+    { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'WiFi es la capa física — TCP/IP, DNS y routing son las capas superiores que completan la red' },
     { url: '/visualizador-anatomia-smartphone/', icon: '📱', name: 'Anatomía de un Smartphone', description: 'Lo que hay dentro' },
   ],
   'visualizador-matrices': [
@@ -1388,8 +1388,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-criptografia': [
     { url: '/visualizador-blockchain/', icon: '⛓️', name: 'Blockchain', description: 'La criptografía que protege la cadena de bloques' },
     { url: '/visualizador-ia-redes-neuronales/', icon: '🤖', name: 'IA y Redes Neuronales', description: 'Otra revolución tecnológica paralela' },
-    { url: '/visualizador-internet-funcionamiento/', icon: '🌐', name: 'Cómo Funciona Internet', description: 'TLS y HTTPS en acción' },
-    { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Mecánica cuántica y criptografía cuántica' },
+    { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'TLS/HTTPS protege cada conexión TCP/IP — la criptografía es la capa de seguridad de la red' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'El álgebra booleana es la base matemática de los circuitos de cifrado y las operaciones XOR' },
   ],
   'visualizador-tipos-interes-bce': [
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo reaccionan bonos y bolsa a los tipos' },
@@ -3290,7 +3290,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-circuitos-electronicos': [
     { url: '/visualizador-electricidad-domestica/', icon: '🏠', name: 'Electricidad Doméstica', description: 'Los circuitos domésticos aplican los mismos principios R/L/C a escala de instalación' },
     { url: '/visualizador-ecuaciones-diferenciales/', icon: '📈', name: 'Ecuaciones Diferenciales', description: 'Los circuitos RC/RL se modelan con EDO de primer orden — matemáticamente idénticos a otros sistemas físicos' },
-    { url: '/visualizador-logica-computadoras/', icon: '🖥️', name: 'Lógica de Computadoras', description: 'Las puertas lógicas son los bloques de construcción del procesador' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Las puertas AND/OR/NOT son la implementación física de los conectores lógicos proposicionales' },
     { url: '/visualizador-computacion-cuantica/', icon: '⚛️', name: 'Computación Cuántica', description: 'El qubit cuántico reemplaza el transistor clásico en la computación del futuro' },
   ],
   'visualizador-particulas-subatomicas': [
@@ -3458,6 +3458,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'ITER usa superconductores de NbTi para los imanes toroidales del reactor de fusión' },
     { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'Los qubits superconductores operan cerca del cero absoluto, igual que los superconductores clásicos' },
     { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La teoría BCS de superconductividad es un triunfo de la mecánica cuántica aplicada' },
+  ],
+
+  // EJE E — Tecnología y computación (Roadmap v4, 2026-04-30)
+  'visualizador-logica-proposicional': [
+    { url: '/visualizador-circuitos-electronicos/', icon: '⚡', name: 'Circuitos Electrónicos', description: 'Las puertas AND/OR/NOT físicas son la implementación hardware de los conectores lógicos proposicionales' },
+    { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'La lógica formal (tablas de verdad) vs la lógica informal (falacias): dos caras del razonamiento correcto' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'AES, RSA y SHA-256 usan álgebra booleana — la operación XOR es el corazón del cifrado simétrico' },
+    { url: '/visualizador-algoritmos-ordenacion/', icon: '⚙️', name: 'Algoritmos de Ordenación', description: 'El problema SAT es NP-completo — el nexo entre lógica proposicional y la teoría de la complejidad computacional' },
+  ],
+  'visualizador-teoria-informacion': [
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'La entropía de Shannon mide la aleatoriedad: un buen cifrado maximiza la entropía de la salida' },
+    { url: '/visualizador-algoritmos-ordenacion/', icon: '⚙️', name: 'Algoritmos de Ordenación', description: 'La complejidad de los algoritmos de compresión (Huffman es O(n log n)) conecta con el análisis Big O' },
+    { url: '/visualizador-circuitos-electronicos/', icon: '⚡', name: 'Circuitos Electrónicos', description: 'Las señales digitales son bits — y la capacidad del canal determina cuántos bits por segundo puede transmitir el hardware' },
+    { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'Shannon-Hartley calcula el límite teórico de velocidad de cualquier red: WiFi, fibra o 5G' },
+  ],
+  'visualizador-redes-computadoras': [
+    { url: '/visualizador-como-funciona-wifi/', icon: '📶', name: 'Cómo Funciona el WiFi', description: 'WiFi es la capa física e inalámbrica — TCP/IP, DNS y routing son las capas superiores de la red' },
+    { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de un paquete HTTP desde el navegador hasta el servidor: DNS, TCP, IP y Ethernet en acción' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'TLS 1.3 protege cada conexión TCP: sin la capa de criptografía, las redes serían completamente inseguras' },
+    { url: '/visualizador-sistemas-operativos/', icon: '🖥️', name: 'Sistemas Operativos', description: 'El SO gestiona la pila TCP/IP mediante syscalls y sockets — la red es un recurso más que administra el kernel' },
+  ],
+  'visualizador-sistemas-operativos': [
+    { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'El SO implementa la pila TCP/IP: los sockets y syscalls son el puente entre las apps y la red física' },
+    { url: '/visualizador-circuitos-electronicos/', icon: '⚡', name: 'Circuitos Electrónicos', description: 'El SO coordina el hardware: desde interrupciones del timer hasta el DMA — todo comienza en los transistores' },
+    { url: '/visualizador-estructuras-datos/', icon: '🌳', name: 'Estructuras de Datos', description: 'El scheduler usa colas de prioridad, el sistema de ficheros usa árboles B, el SO usa todas las estructuras de datos' },
+    { url: '/visualizador-computacion-cuantica/', icon: '⚛️', name: 'Computación Cuántica', description: 'Los SO cuánticos son el siguiente reto: gestionar qubits, coherencia y corrección de errores a nivel de kernel' },
   ],
 
   // EJE D — Biología: reino animal, embriogénesis, microbiología, cronobiología, CRISPR, biomas (Roadmap v4, 2026-04-30)

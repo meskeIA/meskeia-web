@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 679,
+  "total_tools": 683,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2197,6 +2197,30 @@
           "slug": "visualizador-biomas-terrestres",
           "url": "https://meskeia.com/visualizador-biomas-terrestres/",
           "description": "Selector de 7 biomas con datos completos, climograma Walter-Lieth interactivo, diagrama de distribución latitudinal y estado de conservación con amenazas y porcentaje de área protegida"
+        },
+        {
+          "name": "Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales",
+          "slug": "visualizador-logica-proposicional",
+          "url": "https://meskeia.com/visualizador-logica-proposicional/",
+          "description": "Tablas de verdad interactivas para los 6 conectores lógicos (AND/OR/NOT/XOR/IMPL/EQUIV), evaluador de fórmulas con 3 variables y clasificación tautología/contradicción/contingencia, mapa de Karnaugh SVG clicable con simplificación SOP y formas normales FNC/FND"
+        },
+        {
+          "name": "Teoría de la Información: Entropía de Shannon, Huffman y Compresión",
+          "slug": "visualizador-teoria-informacion",
+          "url": "https://meskeia.com/visualizador-teoria-informacion/",
+          "description": "Entropía de Shannon H=-Σp·log₂(p) con sliders de probabilidad y gráfica en tiempo real, árbol de Huffman SVG animado, capacidad del canal Shannon-Hartley con curvas B vs C y comparativa de compresión WAV/MP3 y BMP/PNG/JPEG"
+        },
+        {
+          "name": "Redes de Computadoras: TCP/IP, DNS, Routing y CDN",
+          "slug": "visualizador-redes-computadoras",
+          "url": "https://meskeia.com/visualizador-redes-computadoras/",
+          "description": "Modelo TCP/IP de 4 capas con encapsulamiento animado, resolución DNS iterativa en 6 pasos con tipos de registros, routing BGP con red SVG de 5 routers y tabla de enrutamiento, y simulación CDN vs latencia por regiones"
+        },
+        {
+          "name": "Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros",
+          "slug": "visualizador-sistemas-operativos",
+          "url": "https://meskeia.com/visualizador-sistemas-operativos/",
+          "description": "Estados de proceso SVG (nuevo/listo/ejecución/bloqueado/terminado), Gantt animado para FIFO/Round Robin/SJF/Prioridad con métricas, tabla de páginas con curva de page faults y árbol Unix clicable con inodos y journaling"
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",

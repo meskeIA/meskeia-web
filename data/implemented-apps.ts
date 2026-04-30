@@ -749,6 +749,11 @@ export const implementedAppsUrls = [
   "/visualizador-cronobiologia/",         // Reloj CLOCK/BMAL1 SVG, Zeitgebers, cronotipos alondra/búho, cronofarmacología
   "/visualizador-crispr-cas9/",           // Mecanismo slider 6 pasos SVG, NHEJ vs HDR, 6 enfermedades, bioética He Jiankui
   "/visualizador-biomas-terrestres/",     // 7 biomas selector, climograma Walter-Lieth, latitudinal, conservación
+  // EJE E — Tecnología y computación (Roadmap v4, 2026-04-30)
+  "/visualizador-logica-proposicional/",  // Tablas de verdad AND/OR/NOT/XOR, evaluador fórmulas, Karnaugh SVG, FNC/FND
+  "/visualizador-teoria-informacion/",    // Entropía Shannon sliders, Huffman animado, Shannon-Hartley, compresión formatos
+  "/visualizador-redes-computadoras/",    // TCP/IP encapsulamiento, DNS resolución paso a paso, routing BGP, CDN latencia
+  "/visualizador-sistemas-operativos/",   // Estados proceso SVG, Gantt scheduling, paginación page faults, sistema ficheros
 ];
 
 /**

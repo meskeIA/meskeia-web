@@ -1,0 +1,1256 @@
+/* ════════════════════════════════════════════════
+   Visualizador de Lógica Proposicional — meskeIA
+   Paleta: #2E86AB (primary) · #48A9A6 (secondary)
+   ════════════════════════════════════════════════ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* ─── Hero ─────────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  opacity: 0.9;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ─── Main ──────────────────────────────────────── */
+
+.main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ─── Tabs ──────────────────────────────────────── */
+
+.tabNav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+
+.tabBtn {
+  padding: 0.6rem 1.1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 4px 4px 0 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tabBtn:hover {
+  color: var(--primary);
+}
+
+.tabBtnActivo {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+/* ─── Tab Content ────────────────────────────────── */
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ─── Section Card ───────────────────────────────── */
+
+.sectionCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* ─── Conectores ─────────────────────────────────── */
+
+.conectoresBtns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.conectorBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  min-width: 70px;
+}
+
+.conectorBtn:hover {
+  border-color: var(--primary);
+}
+
+.conectorBtnActivo {
+  border-color: var(--primary);
+  background: #e8f4f9;
+}
+
+.conectorSimbolo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.conectorNombre {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.formulaVis {
+  background: #f0f7fb;
+  border: 1px solid #cce5f5;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* ─── Toggles ────────────────────────────────────── */
+
+.togglesRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+  min-width: 60px;
+}
+
+.toggleOn {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.toggleOff {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.toggleLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.toggleValor {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.operadorDisplay {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 0 0.25rem;
+}
+
+/* ─── Resultado grande ───────────────────────────── */
+
+.resultadoGrande {
+  font-size: 2rem;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 0.3rem 0.8rem;
+}
+
+.resultadoV {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.resultadoF {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.resultadoBox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.resultadoLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Tabla de verdad ────────────────────────────── */
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.truthTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.truthTable th {
+  background: #f3f4f6;
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+}
+
+.truthTable td {
+  padding: 0.4rem 0.75rem;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.filaActiva {
+  background: #eff6ff !important;
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* ─── Badges V/F ─────────────────────────────────── */
+
+.badgeVerdadero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 4px;
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.badgeFalso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 4px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ─── Notas y leyendas ───────────────────────────── */
+
+.notaTexto {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.leyenda {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.filaActivaLeyenda {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.tipoBadge {
+  background: #f0f7fb;
+  border: 1px solid #cce5f5;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+/* ─── Evaluador ──────────────────────────────────── */
+
+.formulaInput {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.formulaInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.errorMsg {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.ejemplosBtns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ejemploBtn {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ejemploBtn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─── Karnaugh ───────────────────────────────────── */
+
+.karnaughWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.karnaughTable {
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 0 auto;
+}
+
+.karnaughCorner {
+  background: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.karnaughHeader {
+  background: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.karnaughRowHeader {
+  background: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.karnaughCelda {
+  width: 70px;
+  height: 70px;
+  border: 2px solid #d1d5db;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  vertical-align: middle;
+}
+
+.karnaughCelda:hover {
+  background: #f0f7fb;
+}
+
+.karnaughCeldaActiva {
+  background: #dbeafe;
+  border-color: var(--primary);
+}
+
+.karnaughMinterm {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.karnaughVal {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.mintermsList {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.gruposInfo {
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: #78350f;
+}
+
+.gruposInfo ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.parrafoExpl {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ─── Botones genéricos ──────────────────────────── */
+
+.btnSecundario {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btnSecundario:hover {
+  background: #f3f4f6;
+  color: var(--text-primary);
+}
+
+/* ─── Formas Normales ────────────────────────────── */
+
+.salidaBtn {
+  border: 2px solid;
+  border-radius: 6px;
+  width: 2rem;
+  height: 2rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.salidaBtnV {
+  border-color: #16a34a;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.salidaBtnF {
+  border-color: #dc2626;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.formaToggle {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.formaBtn {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.formaBtnActivo {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #e8f4f9;
+}
+
+.formaNormal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formaNormalTitulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.formaNormalExpr {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.infoBox {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: #0c4a6e;
+  line-height: 1.5;
+}
+
+/* ─── Indicador de versión v2.0 ──────────────────── */
+
+.warningBox {
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #78350f;
+}
+
+/* ════════════════════════════════════════════════
+   SECCIÓN EDUCATIVA v2.0
+   ════════════════════════════════════════════════ */
+
+/* Título de subsección educativa */
+.eduSectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.75rem 0 0.85rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* ── Tabla comparativa de conectores ── */
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+  min-width: 560px;
+}
+
+.comparativaTable th {
+  background: #f0f7fb;
+  color: var(--primary);
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #cce5f5;
+}
+
+.comparativaTable td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.comparativaTable tbody tr:nth-child(even) {
+  background: #f8fbfd;
+}
+
+.simboloCell {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Escenarios / casos de uso ── */
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.escenarioCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.escenarioCard strong {
+  color: var(--text-primary);
+  font-size: 0.93rem;
+}
+
+.escenarioIcon {
+  font-size: 1.6rem;
+}
+
+/* ── FAQ ── */
+
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  margin: 0 0 0.35rem;
+  color: var(--text-secondary);
+}
+
+.faqItem code {
+  background: #f0f7fb;
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+  color: var(--primary);
+}
+
+.faqTip {
+  background: #f0f7fb;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 0.35rem;
+}
+
+/* ── Guía paso a paso ── */
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  counter-reset: none;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent {
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.stepContent strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  margin-bottom: 0.3rem;
+}
+
+.stepContent p {
+  margin: 0;
+}
+
+/* ── Tips / mejores prácticas ── */
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-top: 3px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+/* ── Warning box educativo ── */
+
+.warningBoxEdu {
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  font-size: 0.87rem;
+  color: #78350f;
+  line-height: 1.55;
+  margin-top: 0.5rem;
+}
+
+.warningBoxEdu strong {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.92rem;
+  color: #92400e;
+}
+
+.warningBoxEdu ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningBoxEdu li {
+  line-height: 1.5;
+}
+
+/* ════════════════════════════════════════════════
+   DARK MODE
+   ════════════════════════════════════════════════ */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .sectionCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tabNav {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tabBtn {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tabBtn:hover {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .tabBtnActivo {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .conectorBtn {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .conectorBtnActivo {
+  border-color: var(--accent);
+  background: #1a3a4a;
+}
+
+[data-theme='dark'] .conectorSimbolo {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .formulaVis {
+  background: #1a2a35;
+  border-color: #2a4a5a;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .toggleOn {
+  border-color: #22c55e;
+  background: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .toggleOff {
+  border-color: #ef4444;
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .resultadoV {
+  background: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .resultadoF {
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .badgeVerdadero {
+  background: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .badgeFalso {
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .truthTable th {
+  background: #2a2a2a;
+  color: var(--text-primary);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .truthTable td {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .filaActiva {
+  background: #1a2a3a !important;
+  outline-color: var(--accent);
+}
+
+[data-theme='dark'] .tipoBadge {
+  background: #1a2a35;
+  border-color: #2a4a5a;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .formulaInput {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .formulaInput:focus {
+  border-color: var(--accent);
+}
+
+[data-theme='dark'] .ejemploBtn {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .ejemploBtn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+[data-theme='dark'] .karnaughCorner,
+[data-theme='dark'] .karnaughHeader,
+[data-theme='dark'] .karnaughRowHeader {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .karnaughCelda {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .karnaughCelda:hover {
+  background: #1a2a35;
+}
+
+[data-theme='dark'] .karnaughCeldaActiva {
+  background: #1a2a4a;
+  border-color: var(--accent);
+}
+
+[data-theme='dark'] .karnaughVal {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .gruposInfo {
+  background: #2a1e0a;
+  border-color: #6b4c0a;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .btnSecundario {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnSecundario:hover {
+  background: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .salidaBtnV {
+  border-color: #22c55e;
+  background: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .salidaBtnF {
+  border-color: #ef4444;
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .formaBtn {
+  background: #2a2a2a;
+  border-color: #3a3a3a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .formaBtnActivo {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: #1a2a35;
+}
+
+[data-theme='dark'] .formaNormalExpr {
+  background: #1a2020;
+  border-color: #3a3a3a;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .infoBox {
+  background: #0a1a25;
+  border-color: #1a3a5a;
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1e0a;
+  border-color: #6b4c0a;
+  color: #fde68a;
+}
+
+/* ════════════════════════════════════════════════
+   DARK MODE — SECCIÓN EDUCATIVA v2.0
+   ════════════════════════════════════════════════ */
+
+[data-theme='dark'] .eduSectionTitle {
+  color: var(--accent);
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #1a2a35;
+  border-color: #2a4a5a;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #3a3a3a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
+  background: #232323;
+}
+
+[data-theme='dark'] .simboloCell {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .escenarioCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+  border-left-color: var(--accent);
+}
+
+[data-theme='dark'] .faqItem strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem code {
+  background: #1a2a35;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .faqTip {
+  background: #1a2a35;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .step {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .stepNumber {
+  background: var(--accent);
+}
+
+[data-theme='dark'] .stepContent strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+  border-top-color: var(--secondary);
+}
+
+[data-theme='dark'] .tipCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .warningBoxEdu {
+  background: #2a1e0a;
+  border-color: #6b4c0a;
+  border-left-color: #d97706;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .warningBoxEdu strong {
+  color: #fbbf24;
+}
+
+/* ─── Responsive ─────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .main {
+    padding: 1.25rem 0.75rem 2rem;
+  }
+
+  .sectionCard {
+    padding: 1rem;
+  }
+
+  .tabBtn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .conectorBtn {
+    min-width: 58px;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .togglesRow {
+    gap: 0.5rem;
+  }
+
+  .karnaughCelda {
+    width: 55px;
+    height: 55px;
+  }
+
+  .karnaughVal {
+    font-size: 1.1rem;
+  }
+
+  /* Educativa v2.0 — responsive */
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .comparativaTable {
+    font-size: 0.78rem;
+    min-width: 480px;
+  }
+
+  .faqItem {
+    padding: 0.85rem 0.9rem;
+  }
+}
+
+/* ─── Animaciones accesibles ─────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .conectorBtn,
+  .tabBtn,
+  .karnaughCelda,
+  .formulaInput,
+  .ejemploBtn,
+  .formaBtn,
+  .btnSecundario {
+    transition: none;
+  }
+}
