@@ -772,6 +772,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia-internet/",     // 14 hitos, ARPANET 1969→IA generativa, 6 eras digitales
   "/visualizador-derechos-humanos/",      // 13 movimientos, Magna Carta 1215→derechos digitales, 6 eras
   "/visualizador-revoluciones-industriales/", // 13 fases, preindustrial 1400→Industria 5.0 IA
+  // Cronologías Ciencia — Grupo 3 (2026-05-01)
+  "/visualizador-historia-fisica/",          // 14 períodos, griegos→física de cuerdas, años a.C.
+  "/visualizador-historia-quimica/",         // 14 períodos, alquimia→química computacional, años a.C.
+  "/visualizador-historia-matematicas/",     // 14 períodos, Babilonia→IA matemática, años a.C.
+  "/visualizador-historia-astronomia/",      // 14 períodos, Stonehenge→James Webb, años a.C.
 ];
 
 /**

@@ -3627,6 +3627,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-derechos-humanos/', icon: '⚖️', name: 'Derechos Humanos', description: 'Los derechos laborales, la jornada de 8 horas y la abolición del trabajo infantil son conquistas de la era industrial' },
     { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'El hierro, el acero y el hormigón de la Revolución Industrial hicieron posibles el modernismo y el rascacielos' },
   ],
+
+  // Cronologías Ciencia — Grupo 3 (2026-05-01)
+  'visualizador-historia-fisica': [
+    { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'El cálculo de Newton y Leibniz, las ecuaciones de Maxwell y la mecánica cuántica son física y matemáticas inseparables' },
+    { url: '/visualizador-historia-quimica/', icon: '🧪', name: 'Historia de la Química', description: 'La mecánica cuántica explica el enlace químico; la termodinámica une física y química' },
+    { url: '/visualizador-historia-astronomia/', icon: '🔭', name: 'Historia de la Astronomía', description: 'La relatividad general y las ondas gravitacionales son física aplicada al cosmos' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La mecánica cuántica desafió el determinismo; Einstein y Bohr debatieron sobre la realidad misma' },
+  ],
+  'visualizador-historia-quimica': [
+    { url: '/visualizador-historia-fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'La mecánica cuántica explica el enlace covalente; termodinámica y electroquímica son física y química a la vez' },
+    { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'La tabla periódica es matemática; la química computacional resuelve ecuaciones cuánticas con álgebra lineal' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Pasteur, la penicilina y el ADN son hitos compartidos por química y medicina' },
+    { url: '/visualizador-historia-astronomia/', icon: '🔭', name: 'Historia de la Astronomía', description: 'La espectroscopía nació para estudiar el Sol; reveló de qué están hechas las estrellas' },
+  ],
+  'visualizador-historia-matematicas': [
+    { url: '/visualizador-historia-fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'Newton inventó el cálculo para describir el movimiento; las ecuaciones de Maxwell y la cuántica son matemáticas puras aplicadas' },
+    { url: '/visualizador-historia-astronomia/', icon: '🔭', name: 'Historia de la Astronomía', description: 'La geometría esférica, la trigonometría y los sistemas de coordenadas nacieron para navegar el cielo' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Platón consideraba las matemáticas la forma más alta de conocimiento; Gödel sacudió los fundamentos del racionalismo' },
+    { url: '/visualizador-historia-quimica/', icon: '🧪', name: 'Historia de la Química', description: 'La química cuántica resuelve ecuaciones diferenciales; la DFT y AlphaFold son matemáticas aplicadas a la materia' },
+  ],
+  'visualizador-historia-astronomia': [
+    { url: '/visualizador-historia-fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'La relatividad general, las ondas gravitacionales y la cosmología cuántica son física del cosmos' },
+    { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'Desde Eratóstenes midiendo la Tierra hasta Hubble aplicando geometría diferencial al universo' },
+    { url: '/visualizador-historia-quimica/', icon: '🧪', name: 'Historia de la Química', description: 'La espectroscopía reveló la composición química de las estrellas; el Big Bang produjo los primeros átomos' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La revolución copernicana cambió nuestra cosmovisión; el Big Bang replantea preguntas sobre origen y fin' },
+  ],
 };
 
 /**

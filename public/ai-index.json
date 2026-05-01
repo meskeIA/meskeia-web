@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 698,
+  "total_tools": 702,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2311,6 +2311,30 @@
           "slug": "visualizador-revoluciones-industriales",
           "url": "https://meskeia.com/visualizador-revoluciones-industriales/",
           "description": "Visualizador interactivo de las revoluciones industriales. 13 fases desde la manufactura preindustrial (1400) hasta la IA industrial. Timeline SVG, tabla comparativa de tecnologías motrices y 6 eras industriales (Preindustrial, 1ª Rev., 2ª Rev., 3ª Rev., Industria 4.0, Industria 5.0 e IA)."
+        },
+        {
+          "name": "Historia de la Física: De los Griegos a la Física de Cuerdas",
+          "slug": "visualizador-historia-fisica",
+          "url": "https://meskeia.com/visualizador-historia-fisica/",
+          "description": "Cronología interactiva de la física con 14 períodos desde la física griega (-600 a.C.) hasta la teoría de cuerdas y las ondas gravitacionales. Timeline SVG con años a.C., experimentos clave, tabla comparativa y 6 eras (Antigua, Medieval/Renacentista, Mecánica Clásica, Termodinámica y EM, Relatividad y Cuántica, Partículas y Cuerdas)."
+        },
+        {
+          "name": "Historia de la Química: De la Alquimia a la Química Computacional",
+          "slug": "visualizador-historia-quimica",
+          "url": "https://meskeia.com/visualizador-historia-quimica/",
+          "description": "Cronología interactiva de la química con 14 períodos desde la alquimia árabe (-400 a.C.) hasta la química computacional y AlphaFold. Timeline SVG con años a.C., descubrimientos clave, tabla comparativa y 6 eras (Alquimia, Neumática, Moderna, Orgánica, Industrial, Molecular y Computacional)."
+        },
+        {
+          "name": "Historia de las Matemáticas: De Babilonia a la IA Matemática",
+          "slug": "visualizador-historia-matematicas",
+          "url": "https://meskeia.com/visualizador-historia-matematicas/",
+          "description": "Cronología interactiva de las matemáticas con 14 períodos desde las tablillas babilónicas (-3000 a.C.) hasta AlphaProof y la IA matemática. Timeline SVG con años a.C., teoremas clave, tabla comparativa y 6 eras (Antiguas, Grecia y Helenismo, Medievales, Revolución Científica, Análisis Moderno, Contemporáneas)."
+        },
+        {
+          "name": "Historia de la Astronomía: De Stonehenge al Telescopio James Webb",
+          "slug": "visualizador-historia-astronomia",
+          "url": "https://meskeia.com/visualizador-historia-astronomia/",
+          "description": "Cronología interactiva de la astronomía con 14 períodos desde Stonehenge (-3000 a.C.) hasta el JWST y las ondas gravitacionales. Timeline SVG con años a.C., descubrimientos clave, tabla comparativa y 6 eras (Antigua, Modelos Geocéntricos, Revolución Copernicana, Telescópica, Astrofísica Moderna, Cosmología y Era Espacial)."
         },
         {
           "name": "Cosmología: Composición del Universo y su Destino",
