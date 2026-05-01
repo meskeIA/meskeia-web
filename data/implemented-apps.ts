@@ -777,6 +777,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia-quimica/",         // 14 períodos, alquimia→química computacional, años a.C.
   "/visualizador-historia-matematicas/",     // 14 períodos, Babilonia→IA matemática, años a.C.
   "/visualizador-historia-astronomia/",      // 14 períodos, Stonehenge→James Webb, años a.C.
+  // Cronologías Cultura Popular — Grupo 4 (2026-05-01)
+  "/visualizador-historia-cine/",           // 14 períodos, Lumière→streaming e IA generativa
+  "/visualizador-historia-videojuegos/",    // 14 períodos, Pong→IA generativa en juegos
+  "/visualizador-historia-moda/",           // 14 períodos, Edad Media→moda sostenible
+  "/visualizador-historia-exploracion/",    // 14 períodos, fenicios→exploración espacial, años a.C.
 ];
 
 /**

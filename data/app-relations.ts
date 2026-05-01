@@ -3652,6 +3652,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'Desde Eratóstenes midiendo la Tierra hasta Hubble aplicando geometría diferencial al universo' },
     { url: '/visualizador-historia-quimica/', icon: '🧪', name: 'Historia de la Química', description: 'La espectroscopía reveló la composición química de las estrellas; el Big Bang produjo los primeros átomos' },
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La revolución copernicana cambió nuestra cosmovisión; el Big Bang replantea preguntas sobre origen y fin' },
+    { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La astronomía guió a navegantes fenicios, vikingos y a los astronautas del Apollo' },
+  ],
+  // Cronologías Cultura Popular — Grupo 4
+  'visualizador-historia-cine': [
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Cine y videojuegos comparten efectos especiales, narrativa y revoluciones digitales paralelas' },
+    { url: '/visualizador-historia-moda/', icon: '👗', name: 'Historia de la Moda', description: 'El cine ha dictado tendencias de moda desde el Hollywood dorado hasta hoy' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'El streaming cambió el consumo de cine igual que internet transformó la comunicación' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El expresionismo, surrealismo y pop art influyeron directamente en el lenguaje cinematográfico' },
+  ],
+  'visualizador-historia-videojuegos': [
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'Videojuegos y cine comparten motores gráficos, narrativa y distribución digital' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'El juego online y los esports son imposibles sin la evolución de internet' },
+    { url: '/visualizador-historia-moda/', icon: '👗', name: 'Historia de la Moda', description: 'Los skins y la moda virtual en videojuegos han creado una industria millonaria' },
+    { url: '/visualizador-historia-fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'Los motores gráficos aplican física de colisiones, luz y fluidos en tiempo real' },
+  ],
+  'visualizador-historia-moda': [
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'Hollywood y la moda han sido inseparables desde los años 30: los trajes de película definen tendencias' },
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'La moda virtual y los skins han creado un mercado de miles de millones en videojuegos' },
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'Moda y arquitectura comparten los mismos movimientos estéticos: Art Nouveau, Bauhaus, posmodernismo' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'Romanticismo, modernismo y posmodernismo se expresan igual en literatura que en moda' },
+  ],
+  'visualizador-historia-exploracion': [
+    { url: '/visualizador-historia-astronomia/', icon: '🔭', name: 'Historia de la Astronomía', description: 'La astronomía fue la guía de exploradores: desde fenicios que navegaban por estrellas hasta el Apollo XI' },
+    { url: '/visualizador-historia-fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'Los cohetes de la era espacial aplican la mecánica newtoniana y la termodinámica de propulsión' },
+    { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'La cartografía, la navegación y los cálculos orbitales son matemáticas aplicadas a la exploración' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Las expediciones llevaron enfermedades y también avances médicos: la exploración y la medicina evolucionaron juntas' },
   ],
 };
 
