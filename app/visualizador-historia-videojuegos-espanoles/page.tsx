@@ -384,10 +384,29 @@ const ERAS: Era[] = [
 
 const ANIO_MIN = 1983;
 const ANIO_MAX = 2025;
-const SVG_PADDING_LEFT = 60;
-const SVG_PADDING_RIGHT = 40;
-const SVG_ANCHO_POR_PERIODO = 120;
-const SVG_ALTO = 220;
+const SVG_ANCHO = 1680;
+const MARGEN_IZQ = 60;
+const MARGEN_DER = 60;
+const AREA_ANCHO_VJ = SVG_ANCHO - MARGEN_IZQ - MARGEN_DER;
+const FILA_ALTO_VJ = 36;
+const FILA_GAP_VJ = 8;
+const FILA_OFFSET_VJ = 14;
+
+function anioAX(anio: number): number {
+  return MARGEN_IZQ + ((anio - ANIO_MIN) / (ANIO_MAX - ANIO_MIN)) * AREA_ANCHO_VJ;
+}
+
+const SVG_FILAS: PeriodoVideojuegosEs[][] = [];
+for (const p of PERIODOS) {
+  const xIni = anioAX(p.anio);
+  let fila = SVG_FILAS.find(f => {
+    const ultimo = f[f.length - 1];
+    return anioAX(ultimo.anioFin) + 4 < xIni;
+  });
+  if (!fila) { fila = []; SVG_FILAS.push(fila); }
+  fila.push(p);
+}
+const SVG_ALTO_TOTAL = FILA_OFFSET_VJ + SVG_FILAS.length * (FILA_ALTO_VJ + FILA_GAP_VJ) + 30;
 
 // ─────────────────────────────────────────────
 // Componente principal
@@ -396,15 +415,6 @@ const SVG_ALTO = 220;
 export default function HistoriaVideojuegosEspanoles() {
   const [tabActiva, setTabActiva] = useState<TabActiva>('timeline');
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState<PeriodoVideojuegosEs | null>(null);
-
-  const svgAncho = PERIODOS.length * SVG_ANCHO_POR_PERIODO + SVG_PADDING_LEFT + SVG_PADDING_RIGHT;
-
-  const lineaY = SVG_ALTO / 2;
-
-  function xParaAnio(anio: number): number {
-    const rango = ANIO_MAX - ANIO_MIN;
-    return SVG_PADDING_LEFT + ((anio - ANIO_MIN) / rango) * (svgAncho - SVG_PADDING_LEFT - SVG_PADDING_RIGHT);
-  }
 
   function handlePeriodoClick(p: PeriodoVideojuegosEs) {
     setPeriodoSeleccionado(p);
@@ -451,103 +461,63 @@ export default function HistoriaVideojuegosEspanoles() {
       {/* ── Tab 1: Timeline SVG ── */}
       {tabActiva === 'timeline' && (
         <section className={styles.timelineContainer} aria-label="Línea temporal">
-          <div className={styles.timelineWrapper}>
+          <h2 className={styles.sectionTitle}>Línea del Tiempo</h2>
+          <p className={styles.sectionSubtitle}>
+            Haz clic en un período para ver sus detalles. La línea abarca desde 1983 hasta la actualidad.
+          </p>
+          <div className={styles.timelineScrollWrapper}>
             <svg
               className={styles.timelineSvg}
-              width={svgAncho}
-              height={SVG_ALTO}
-              viewBox={`0 0 ${svgAncho} ${SVG_ALTO}`}
+              width={SVG_ANCHO}
+              height={SVG_ALTO_TOTAL}
+              viewBox={`0 0 ${SVG_ANCHO} ${SVG_ALTO_TOTAL}`}
               aria-label="Cronología de los videojuegos españoles"
             >
               {/* Línea base */}
               <line
-                x1={SVG_PADDING_LEFT}
-                y1={lineaY}
-                x2={svgAncho - SVG_PADDING_RIGHT}
-                y2={lineaY}
-                stroke="#ccc"
-                strokeWidth={2}
+                x1={MARGEN_IZQ}
+                y1={SVG_ALTO_TOTAL - 16}
+                x2={SVG_ANCHO - MARGEN_DER}
+                y2={SVG_ALTO_TOTAL - 16}
+                stroke="var(--text-muted)"
+                strokeWidth={1}
               />
 
               {/* Marcas de años */}
-              {[1983, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025].map((anio) => {
-                const x = xParaAnio(anio);
-                return (
-                  <g key={anio}>
-                    <line x1={x} y1={lineaY - 6} x2={x} y2={lineaY + 6} stroke="#999" strokeWidth={1} />
-                    <text
-                      x={x}
-                      y={lineaY + 22}
-                      textAnchor="middle"
-                      fontSize={10}
-                      fill="#999"
-                    >
-                      {anio}
-                    </text>
-                  </g>
-                );
-              })}
+              {[1983, 1987, 1992, 1995, 1999, 2005, 2010, 2015, 2019, 2023, 2025].map((m) => (
+                <g key={m}>
+                  <line x1={anioAX(m)} y1={SVG_ALTO_TOTAL - 22} x2={anioAX(m)} y2={SVG_ALTO_TOTAL - 10} stroke="var(--text-muted)" strokeWidth={1} />
+                  <text x={anioAX(m)} y={SVG_ALTO_TOTAL - 4} fontSize={10} fill="var(--text-muted)" textAnchor="middle">{m}</text>
+                </g>
+              ))}
 
-              {/* Períodos */}
-              {PERIODOS.map((p, idx) => {
-                const xCentro = xParaAnio(p.anio + (p.anioFin - p.anio) / 2);
-                const arriba = idx % 2 === 0;
-                const circleY = lineaY;
-                const textoY = arriba ? lineaY - 50 : lineaY + 55;
-                const lineaTextoY1 = arriba ? lineaY - 12 : lineaY + 12;
-                const lineaTextoY2 = arriba ? lineaY - 40 : lineaY + 45;
-                const color = COLORES_CATEGORIA[p.categoria];
-
-                return (
-                  <g
-                    key={p.id}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handlePeriodoClick(p)}
-                    role="button"
-                    aria-label={`${p.titulo} (${p.periodo})`}
-                  >
-                    {/* Línea al texto */}
-                    <line
-                      x1={xCentro}
-                      y1={lineaTextoY1}
-                      x2={xCentro}
-                      y2={lineaTextoY2}
-                      stroke={color}
-                      strokeWidth={1.5}
-                      strokeDasharray="3,2"
-                    />
-                    {/* Círculo */}
-                    <circle
-                      cx={xCentro}
-                      cy={circleY}
-                      r={9}
-                      fill={color}
-                      stroke="#fff"
-                      strokeWidth={2}
-                    />
-                    {/* Etiqueta */}
-                    <text
-                      x={xCentro}
-                      y={textoY}
-                      textAnchor="middle"
-                      fontSize={9}
-                      fill={color}
-                      fontWeight="600"
+              {/* Rectángulos distribuidos en filas */}
+              {SVG_FILAS.map((fila, fi) =>
+                fila.map((p) => {
+                  const x = anioAX(p.anio) + 1;
+                  const w = Math.max(anioAX(p.anioFin) - anioAX(p.anio) - 2, 24);
+                  const y = FILA_OFFSET_VJ + fi * (FILA_ALTO_VJ + FILA_GAP_VJ);
+                  const color = COLORES_CATEGORIA[p.categoria];
+                  const label = p.titulo.length > 18 ? p.titulo.slice(0, 16) + '…' : p.titulo;
+                  const sel = periodoSeleccionado?.id === p.id;
+                  return (
+                    <g
+                      key={p.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handlePeriodoClick(p)}
+                      role="button"
+                      aria-label={`${p.titulo} (${p.periodo})`}
                     >
-                      {p.anio}
-                    </text>
-                    <text
-                      x={xCentro}
-                      y={textoY + 12}
-                      textAnchor="middle"
-                      fontSize={8}
-                      fill="#666"
-                    >
-                      {p.titulo.split(' ').slice(0, 3).join(' ')}
-                    </text>
-                  </g>
-                );
-              })}
+                      <rect x={x} y={y} width={w} height={FILA_ALTO_VJ} rx={4} fill={color} opacity={sel ? 1 : 0.83} stroke={sel ? '#fff' : 'none'} strokeWidth={sel ? 2 : 0} />
+                      {w > 50 && (
+                        <text x={x + w / 2} y={y + FILA_ALTO_VJ / 2 + 4} textAnchor="middle" fontSize={9} fill="#fff" fontWeight="600" style={{ pointerEvents: 'none' }}>
+                          {label}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })
+              )}
             </svg>
           </div>
 
@@ -556,11 +526,7 @@ export default function HistoriaVideojuegosEspanoles() {
             {(Object.entries(COLORES_CATEGORIA) as [PeriodoVideojuegosEs['categoria'], string][]).map(
               ([cat, color]) => (
                 <div key={cat} className={styles.leyendaItem} role="listitem">
-                  <span
-                    className={styles.leyendaDot}
-                    style={{ background: color }}
-                    aria-hidden="true"
-                  />
+                  <span className={styles.leyendaDot} style={{ background: color }} aria-hidden="true" />
                   {ETIQUETAS_CATEGORIA[cat]}
                 </div>
               )

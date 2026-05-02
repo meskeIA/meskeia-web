@@ -54,30 +54,36 @@
 }
 
 .tab {
-  padding: 0.5rem 1.1rem;
-  border: 2px solid var(--primary);
-  border-radius: 24px;
-  background: transparent;
-  color: var(--primary);
-  font-size: 0.88rem;
-  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .tab:hover {
-  background: var(--primary);
-  color: #fff;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .tabActive {
   background: var(--primary);
   color: #fff;
+  border-color: var(--primary);
+  font-weight: 700;
+}
+
+.tabActive:hover {
+  color: #fff;
 }
 
 [data-theme='dark'] .tab {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--bg-card);
+  color: var(--text-secondary);
 }
 
 [data-theme='dark'] .tab:hover,
@@ -89,9 +95,38 @@
 
 /* ─── Timeline ─── */
 .timelineContainer {
-  max-width: 900px;
+  max-width: 960px;
   margin: 1.5rem auto;
   padding: 0 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+[data-theme='dark'] .sectionTitle { color: var(--text-primary); }
+[data-theme='dark'] .sectionSubtitle { color: var(--text-secondary); }
+
+.timelineScrollWrapper {
+  overflow-x: auto;
+  padding: 1rem 0 1rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .timelineScrollWrapper {
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 .timelineWrapper {
