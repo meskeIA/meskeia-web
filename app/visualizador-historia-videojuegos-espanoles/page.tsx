@@ -417,8 +417,7 @@ export default function HistoriaVideojuegosEspanoles() {
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState<PeriodoVideojuegosEs | null>(null);
 
   function handlePeriodoClick(p: PeriodoVideojuegosEs) {
-    setPeriodoSeleccionado(p);
-    setTabActiva('detalle');
+    setPeriodoSeleccionado(prev => prev?.id === p.id ? null : p);
   }
 
   return (
@@ -521,6 +520,46 @@ export default function HistoriaVideojuegosEspanoles() {
             </svg>
           </div>
 
+          {/* Panel de detalle inline */}
+          {periodoSeleccionado && (
+            <div className={styles.detalleCard} style={{ marginTop: '1.5rem' }}>
+              <div className={styles.detalleHeader}>
+                <span
+                  className={styles.detalleBadge}
+                  style={{ background: COLORES_CATEGORIA[periodoSeleccionado.categoria] }}
+                >
+                  {ETIQUETAS_CATEGORIA[periodoSeleccionado.categoria]}
+                </span>
+                <div>
+                  <h2 className={styles.detalleTitulo}>{periodoSeleccionado.titulo}</h2>
+                  <p className={styles.detalleAnios}>{periodoSeleccionado.periodo}</p>
+                </div>
+              </div>
+              <div className={styles.detalleGrid}>
+                <div className={styles.detalleItem}>
+                  <p className={styles.detalleItemLabel}>Estudio clave</p>
+                  <p className={styles.detalleItemValue}>{periodoSeleccionado.estudio}</p>
+                </div>
+                <div className={styles.detalleItem}>
+                  <p className={styles.detalleItemLabel}>Juego emblemático</p>
+                  <p className={styles.detalleItemValue}>{periodoSeleccionado.juego}</p>
+                </div>
+                <div className={styles.detalleItem}>
+                  <p className={styles.detalleItemLabel}>Impacto</p>
+                  <p className={styles.detalleItemValue}>{periodoSeleccionado.impacto}</p>
+                </div>
+                <div className={styles.detalleItem}>
+                  <p className={styles.detalleItemLabel}>Datos</p>
+                  <p className={styles.detalleItemValue}>{periodoSeleccionado.datos}</p>
+                </div>
+              </div>
+              <p className={styles.detalleDescripcion}>{periodoSeleccionado.descripcion}</p>
+              <div className={styles.detalleHito}>
+                <strong>Hito:</strong> {periodoSeleccionado.hito}
+              </div>
+            </div>
+          )}
+
           {/* Leyenda */}
           <div className={styles.timelineLeyenda} role="list" aria-label="Leyenda de categorías">
             {(Object.entries(COLORES_CATEGORIA) as [PeriodoVideojuegosEs['categoria'], string][]).map(
@@ -533,7 +572,7 @@ export default function HistoriaVideojuegosEspanoles() {
             )}
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-            Haz clic en cualquier período para ver el detalle completo.
+            Haz clic en un período para ver su detalle aquí abajo. Vuelve a hacer clic para cerrar.
           </p>
         </section>
       )}
