@@ -3730,6 +3730,31 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'La cartografía, la navegación y los cálculos orbitales son matemáticas aplicadas a la exploración' },
     { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Las expediciones llevaron enfermedades y también avances médicos: la exploración y la medicina evolucionaron juntas' },
   ],
+  // Cronologías Tendencias España — Roadmap v7 EJE A (2026-05-02)
+  'visualizador-historia-energia': [
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'El carbón y el vapor son el punto de inflexión: la energía fósil creó la primera revolución industrial' },
+    { url: '/visualizador-historia-clima/', icon: '🌡️', name: 'Historia del Clima', description: 'Las emisiones energéticas son el motor del cambio climático: energía y clima son inseparables' },
+    { url: '/visualizador-geopolitica-energetica/', icon: '🌍', name: 'Geopolítica Energética', description: 'Petróleo, gas y renovables como vectores de poder global: la geopolítica sigue la energía' },
+    { url: '/visualizador-historia-quimica/', icon: '🧪', name: 'Historia de la Química', description: 'El proceso Haber-Bosch, los plásticos del petróleo y las celdas solares son química energética' },
+  ],
+  'visualizador-historia-clima': [
+    { url: '/visualizador-historia-energia/', icon: '⚡', name: 'Historia de la Energía', description: 'Las emisiones de combustibles fósiles son la causa del calentamiento global desde la Revolución Industrial' },
+    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'El mecanismo físico que conecta el CO₂ con el calentamiento: base científica del cambio climático' },
+    { url: '/visualizador-historia-epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'El cambio climático amplifica vectores de enfermedades: el clima y la salud global están ligados' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Las pandemias y el clima han moldeado la historia de la humanidad como fuerzas paralelas' },
+  ],
+  'visualizador-historia-aviacion': [
+    { url: '/visualizador-historia-energia/', icon: '⚡', name: 'Historia de la Energía', description: 'El queroseno y el SAF son combustibles de aviación: la historia energética determina el futuro del vuelo' },
+    { url: '/visualizador-historia-fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'Aerodinámica, propulsión a chorro y mecánica de fluidos: la física es el fundamento de volar' },
+    { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La aviación aceleró la exploración: de los vuelos de Lindbergh a las misiones espaciales' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'El motor de reacción y la industria aeronáutica son productos de la segunda y tercera revolución industrial' },
+  ],
+  'visualizador-historia-comics': [
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'El MCU y las adaptaciones de cómic han redefinido el cine del siglo XXI' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'La novela gráfica es literatura: Maus ganó el Pulitzer y Fun Home llegó a Broadway' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Pop Art, expresionismo y surrealismo influyeron directamente en el lenguaje visual del cómic' },
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Videojuegos y cómics comparten universos, personajes y fans: de Batman al Arkham de Rocksteady' },
+  ],
 };
 
 /**

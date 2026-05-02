@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 714,
+  "total_tools": 718,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2383,6 +2383,30 @@
           "slug": "visualizador-historia-danza",
           "url": "https://meskeia.com/visualizador-historia-danza/",
           "description": "Cronología interactiva de la danza con 14 períodos desde la danza ritual egipcia (-3000 a.C.) hasta el breaking olímpico y la danza digital. Ballet clásico, danza moderna, Pina Bausch, hip-hop y videodanza. 6 eras históricas."
+        },
+        {
+          "name": "Historia de la Energía: Del Fuego Prehistórico a la Fusión Nuclear",
+          "slug": "visualizador-historia-energia",
+          "url": "https://meskeia.com/visualizador-historia-energia/",
+          "description": "Cronología interactiva de 17.000 años de historia energética: de la biomasa prehistórica al carbón, petróleo, electricidad, nuclear, renovables e hidrógeno. 14 períodos con inventores clave (Watt, Edison, Tesla), hitos energéticos y 6 eras desde la biomasa animal hasta la transición energética y fusión nuclear."
+        },
+        {
+          "name": "Historia del Clima: De la Última Glaciación a la Emergencia Climática",
+          "slug": "visualizador-historia-clima",
+          "url": "https://meskeia.com/visualizador-historia-clima/",
+          "description": "Cronología interactiva de 17.000 años de historia climática: de la última glaciación al cambio climático actual. Glaciaciones, Sahara verde, Pequeña Edad de Hielo, Revolución Industrial y emergencia climática en 14 períodos con datos paleoclimáticos, puntos de no retorno y 6 eras históricas."
+        },
+        {
+          "name": "Historia de la Aviación: De los Hermanos Wright a la Aviación Eléctrica",
+          "slug": "visualizador-historia-aviacion",
+          "url": "https://meskeia.com/visualizador-historia-aviacion/",
+          "description": "Cronología interactiva de 125 años de historia de la aviación: de los hermanos Wright (1903) al Concorde, Boeing 747, low cost, drones y aviación eléctrica. 14 períodos con pioneros, hitos tecnológicos y 6 eras: Pioneros, Gran Guerra, Edad de Oro, Jet y Jumbo, Low Cost y Digital, Aviación Sostenible y Supersónica."
+        },
+        {
+          "name": "Historia del Cómic: De Töpffer a la IA Generativa",
+          "slug": "visualizador-historia-comics",
+          "url": "https://meskeia.com/visualizador-historia-comics/",
+          "description": "Cronología interactiva de 200 años de historia del cómic: de las historietas de Töpffer (1827) a Superman, Tintín, manga, Watchmen, Maus y el cómic con IA. 14 períodos con autores, obras icónicas y 6 eras: Prensa y Precursores, Superhéroes y Censura, Bande Dessinée y Alternativo, Novela Gráfica y Manga, Cine y Webcómic, IA y Futuro."
         },
         {
           "name": "Historia del Cine: De los Hermanos Lumière al Streaming y la IA",

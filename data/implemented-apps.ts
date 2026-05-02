@@ -793,6 +793,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia-fotografia/",    // 14 períodos, daguerrotipo 1826→IA generativa imagen
   "/visualizador-historia-teatro/",        // 14 períodos, teatro griego→teatro digital e inmersivo, años a.C.
   "/visualizador-historia-danza/",         // 14 períodos, danza ritual -3000→breaking olímpico y danza digital, años a.C.
+  // Cronologías Tendencias España — Roadmap v7 EJE A (2026-05-02)
+  "/visualizador-historia-energia/",       // 14 períodos, biomasa prehistórica -15000→fusión nuclear, 9 categorías energéticas
+  "/visualizador-historia-clima/",         // 14 períodos, última glaciación -15000→emergencia climática, paleoclimatología
+  "/visualizador-historia-aviacion/",      // 14 períodos, Wright 1900→aviación eléctrica e IA, 10 categorías
+  "/visualizador-historia-comics/",        // 14 períodos, Töpffer 1827→IA generativa en cómics, 14 estilos
 ];
 
 /**
