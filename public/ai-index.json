@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 713,
+  "total_tools": 714,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2335,6 +2335,12 @@
           "slug": "visualizador-historia-astronomia",
           "url": "https://meskeia.com/visualizador-historia-astronomia/",
           "description": "Cronología interactiva de la astronomía con 14 períodos desde Stonehenge (-3000 a.C.) hasta el JWST y las ondas gravitacionales. Timeline SVG con años a.C., descubrimientos clave, tabla comparativa y 6 eras (Antigua, Modelos Geocéntricos, Revolución Copernicana, Telescópica, Astrofísica Moderna, Cosmología y Era Espacial)."
+        },
+        {
+          "name": "Comparador de IAs 2026: ChatGPT vs Claude vs Gemini y más",
+          "slug": "visualizador-comparador-ia",
+          "url": "https://meskeia.com/visualizador-comparador-ia/",
+          "description": "Guía interactiva para comparar 9 IAs principales: ChatGPT, Claude, Gemini, Copilot, Mistral, Perplexity, Llama, Grok y DeepSeek. Tabla filtrable por precio y privacidad, recomendaciones por caso de uso (redacción, código, búsqueda, empresa) y por perfil de usuario. Glosario de 10 términos clave (token, contexto, RAG, alucinación, RGPD). Datos verificados mayo 2026."
         },
         {
           "name": "Historia Económica de España: Del Imperio Colonial a Europa",

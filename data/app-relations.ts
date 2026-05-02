@@ -3654,6 +3654,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La revolución copernicana cambió nuestra cosmovisión; el Big Bang replantea preguntas sobre origen y fin' },
     { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La astronomía guió a navegantes fenicios, vikingos y a los astronautas del Apollo' },
   ],
+  // Herramientas de Referencia
+  'visualizador-comparador-ia': [
+    { url: '/visualizador-impacto-ia-sectores/', icon: '🏭', name: 'Impacto de la IA en los Sectores', description: 'Qué empleos están en riesgo y cuáles emergen con la automatización: el contexto laboral de estas IAs' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Las IAs generativas son el último capítulo de la evolución de internet que empezó con ARPANET en 1969' },
+    { url: '/visualizador-historia-informatica/', icon: '💾', name: 'Historia de la Informática', description: 'Los LLMs son la culminación de décadas de investigación en computación, redes neuronales e inteligencia artificial' },
+    { url: '/visualizador-historia-matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'El álgebra lineal, la estadística bayesiana y el cálculo son los pilares matemáticos de los modelos de IA' },
+  ],
   // Cronologías Sociedad y Cultura — Grupo 6
   'visualizador-historia-economia-espana': [
     { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'La industrialización española trajo hospitales modernos; la sanidad pública nació con el Estado del Bienestar' },

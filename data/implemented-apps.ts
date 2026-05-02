@@ -782,6 +782,8 @@ export const implementedAppsUrls = [
   "/visualizador-historia-videojuegos/",    // 14 períodos, Pong→IA generativa en juegos
   "/visualizador-historia-moda/",           // 14 períodos, Edad Media→moda sostenible
   "/visualizador-historia-exploracion/",    // 14 períodos, fenicios→exploración espacial, años a.C.
+  // Herramientas de Referencia (2026-05-02)
+  "/visualizador-comparador-ia/",           // Guía comparativa: ChatGPT, Claude, Gemini, Copilot, Mistral, Perplexity
   // Cronologías Sociedad y Cultura — Grupo 6 (2026-05-02)
   "/visualizador-historia-economia-espana/", // 14 períodos, economía medieval→Next Generation EU
   "/visualizador-historia-gastronomia/",     // 14 períodos, neolítico -10000→IA culinaria, años a.C.
