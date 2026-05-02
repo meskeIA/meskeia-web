@@ -782,6 +782,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia-videojuegos/",    // 14 períodos, Pong→IA generativa en juegos
   "/visualizador-historia-moda/",           // 14 períodos, Edad Media→moda sostenible
   "/visualizador-historia-exploracion/",    // 14 períodos, fenicios→exploración espacial, años a.C.
+  // Cronologías Sociedad y Cultura — Grupo 6 (2026-05-02)
+  "/visualizador-historia-economia-espana/", // 14 períodos, economía medieval→Next Generation EU
+  "/visualizador-historia-gastronomia/",     // 14 períodos, neolítico -10000→IA culinaria, años a.C.
+  "/visualizador-historia-deporte/",         // 14 períodos, Olimpia -776→eSports e IA deportiva, años a.C.
   // Cronologías Artes y Mente — Grupo 5 (2026-05-02)
   "/visualizador-historia-psicologia/",    // 14 períodos, filosofía griega→neurociencia e IA clínica, años a.C.
   "/visualizador-historia-fotografia/",    // 14 períodos, daguerrotipo 1826→IA generativa imagen

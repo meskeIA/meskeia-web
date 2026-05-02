@@ -3654,6 +3654,25 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La revolución copernicana cambió nuestra cosmovisión; el Big Bang replantea preguntas sobre origen y fin' },
     { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La astronomía guió a navegantes fenicios, vikingos y a los astronautas del Apollo' },
   ],
+  // Cronologías Sociedad y Cultura — Grupo 6
+  'visualizador-historia-economia-espana': [
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'La industrialización española trajo hospitales modernos; la sanidad pública nació con el Estado del Bienestar' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'La economía digital y los fondos Next Generation EU están transformando el modelo económico español' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '⚙️', name: 'Revoluciones Industriales', description: 'España siguió con retraso las revoluciones industriales; entender por qué es clave para su historia económica' },
+    { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'El Imperio colonial español fue la base de la economía de metales preciosos que marcó tres siglos de historia' },
+  ],
+  'visualizador-historia-gastronomia': [
+    { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'Los viajes de Colón y Magallanes trajeron el tomate, la patata, el chocolate y el maíz a Europa' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Gastronomía y medicina comparten historia: Hipócrates dijo que la alimentación es la primera medicina' },
+    { url: '/visualizador-historia-quimica/', icon: '🧪', name: 'Historia de la Química', description: 'La pasteurización, la fermentación y la cocina molecular son química aplicada a los alimentos' },
+    { url: '/visualizador-historia-danza/', icon: '💃', name: 'Historia de la Danza', description: 'Gastronomía y danza son las artes más universales: presentes en todas las culturas como celebración y rito' },
+  ],
+  'visualizador-historia-deporte': [
+    { url: '/visualizador-historia-danza/', icon: '💃', name: 'Historia de la Danza', description: 'Danza y deporte comparten la expresión corporal como lenguaje; el breaking olímpico une ambos mundos' },
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Los eSports son el resultado de videojuegos y deporte convergiendo en un mismo espectáculo de masas' },
+    { url: '/visualizador-historia-psicologia/', icon: '🧠', name: 'Historia de la Psicología', description: 'La psicología del deporte es una disciplina clave: rendimiento, motivación, presión y salud mental atlética' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Medicina y deporte han evolucionado juntos: biomecánica, nutrición deportiva, cirugía y antidopaje' },
+  ],
   // Cronologías Artes y Mente — Grupo 5
   'visualizador-historia-psicologia': [
     { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Psicología y medicina comparten historia: de Hipócrates a la neurociencia, el estudio de la mente y el cuerpo siempre fue inseparable' },
