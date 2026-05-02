@@ -54,7 +54,7 @@ Clasificación **NO excluyente**: una app puede pertenecer a múltiples suites.
 | `data/applications.ts` | Base de datos de apps |
 | `data/implemented-apps.ts` | URLs de apps implementadas |
 | `data/app-relations.ts` | Cross-linking entre apps |
-| `public/ai-index.json` | Índice para indexación por IAs |
+| `public/ai-index.json` | **Auto-generado en build** desde applications.ts — no editar manualmente |
 | `data/fiscal/` | **Datos normativos centralizados** (ver tabla abajo) |
 
 ### Módulos de datos fiscales (`data/fiscal/`)
@@ -182,9 +182,8 @@ Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no op
 [ ] 2. Añadir entrada en data/applications.ts (suites + contexts)
 [ ] 3. Añadir URL en data/implemented-apps.ts
 [ ] 4. Añadir relaciones en data/app-relations.ts
-[ ] 5. Actualizar public/ai-index.json
-[ ] 6. Incluir <EducationalSection> con bloque educativo básico en page.tsx
-[ ] 7. Ejecutar npm run build (exit code 0)
+[ ] 5. Incluir <EducationalSection> con bloque educativo básico en page.tsx
+[ ] 6. Ejecutar npm run build (exit code 0) — genera ai-index.json automáticamente
 ```
 
 **Fase 2 — Profesionalización v2.0** (inmediatamente después del build):
@@ -218,7 +217,7 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 - ✅ Crea SOLO los 3 archivos de tu app (metadata.ts, page.tsx, .module.css)
 - ✅ Puedes ejecutar `npx tsc --noEmit` UNA SOLA VEZ para verificar
 - ❌ PROHIBIDO: ejecutar `npm run build` (conflicto de lock entre agentes)
-- ❌ PROHIBIDO: modificar archivos compartidos (applications.ts, implemented-apps.ts, app-relations.ts, ai-index.json)
+- ❌ PROHIBIDO: modificar archivos compartidos (applications.ts, implemented-apps.ts, app-relations.ts)
 - ❌ PROHIBIDO: ejecutar `npx tsc --noEmit` más de una vez
 - ❌ PROHIBIDO: reintentar comandos fallidos en bucle (sleep + retry)
 - ❌ PROHIBIDO: ejecutar comandos en background (run_in_background)
@@ -232,8 +231,7 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 1. Actualizar data/applications.ts (añadir todas las apps nuevas)
 2. Actualizar data/implemented-apps.ts (añadir URLs)
 3. Actualizar data/app-relations.ts (añadir relaciones)
-4. Actualizar public/ai-index.json (incrementar total, añadir entradas)
-5. npm run build (una sola vez, verificar 0 errores)
+4. npm run build (una sola vez, verificar 0 errores) — genera ai-index.json automáticamente
 6. Corregir errores si los hay (CSS: no usar `*` puro, TS: no usar JSX.Element)
 7. Commit + push
 ```
@@ -424,7 +422,7 @@ git push origin main
 - `data/applications.ts` - Añadir app con suites + contexts
 - `data/implemented-apps.ts` - Añadir URL
 - `data/app-relations.ts` - Añadir relaciones
-- `public/ai-index.json` - Incrementar total, añadir entrada
+- `public/ai-index.json` - **Auto-generado** por `npm run build`, no editar
 
 ---
 

@@ -2,6 +2,7 @@
 
 # Archivos generados en build (no necesitan estar en git, Vercel los regenera)
 /public/llm-index.json
+/public/ai-index.json
 
 # dependencies
 /node_modules

@@ -256,11 +256,16 @@ const generateLLMIndex = () => {
     },
   };
 
-  // Escribir archivo
+  // Escribir archivos
   const outputPath = path.join(__dirname, '../public/llm-index.json');
-  fs.writeFileSync(outputPath, JSON.stringify(llmIndex, null, 2), 'utf-8');
+  const aiIndexPath = path.join(__dirname, '../public/ai-index.json');
+  const jsonContent = JSON.stringify(llmIndex, null, 2);
+
+  fs.writeFileSync(outputPath, jsonContent, 'utf-8');
+  fs.writeFileSync(aiIndexPath, jsonContent, 'utf-8');
 
   console.log(`   ✅ Generado: public/llm-index.json`);
+  console.log(`   ✅ Generado: public/ai-index.json (sincronizado)`);
   console.log(`   📦 Tamaño: ${(fs.statSync(outputPath).size / 1024).toFixed(1)} KB`);
 };
 
