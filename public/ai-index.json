@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 718,
+  "total_tools": 723,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2407,6 +2407,36 @@
           "slug": "visualizador-historia-comics",
           "url": "https://meskeia.com/visualizador-historia-comics/",
           "description": "Cronología interactiva de 200 años de historia del cómic: de las historietas de Töpffer (1827) a Superman, Tintín, manga, Watchmen, Maus y el cómic con IA. 14 períodos con autores, obras icónicas y 6 eras: Prensa y Precursores, Superhéroes y Censura, Bande Dessinée y Alternativo, Novela Gráfica y Manga, Cine y Webcómic, IA y Futuro."
+        },
+        {
+          "name": "Historia de la Radio: De Marconi al Podcast con IA",
+          "slug": "visualizador-historia-radio",
+          "url": "https://meskeia.com/visualizador-historia-radio/",
+          "description": "Cronología interactiva de 130 años de historia de la radio: de las ondas hertzianas de Marconi (1895) a la BBC, el transistor, la FM contracultura, la radio privada española (23-F), el podcast (Joe Rogan, Serial) y la IA generativa de audio. 14 períodos con inventores, programas icónicos y 6 eras."
+        },
+        {
+          "name": "Historia de la Televisión: De Baird a la TV con IA",
+          "slug": "visualizador-historia-television",
+          "url": "https://meskeia.com/visualizador-historia-television/",
+          "description": "Cronología interactiva de 100 años de historia de la televisión: de Baird/Farnsworth (1926) a TVE bajo Franco, la TV en color, Antena 3 y Telecinco, el TDT, Netflix y las series de oro (Breaking Bad, La Casa de Papel) hasta la TV interactiva con IA. 14 períodos con hitos y 6 eras."
+        },
+        {
+          "name": "Historia de la Robótica: De Čapek a la IA Encarnada",
+          "slug": "visualizador-historia-robotica",
+          "url": "https://meskeia.com/visualizador-historia-robotica/",
+          "description": "Cronología interactiva de 100 años de historia de la robótica: desde que Čapek acuñó 'robot' (1920) hasta Unimate, Shakey, el Da Vinci quirúrgico, ASIMO, Boston Dynamics Atlas, Tesla Optimus y Figure AI. 14 períodos con inventores, hitos tecnológicos y 6 eras desde el concepto hasta la AGI encarnada."
+        },
+        {
+          "name": "Historia de la Publicidad: De Gutenberg a la IA Generativa",
+          "slug": "visualizador-historia-publicidad",
+          "url": "https://meskeia.com/visualizador-historia-publicidad/",
+          "description": "Cronología interactiva de 575 años de historia de la publicidad: de los primeros carteles impresos (1450) a los carteles de Toulouse-Lautrec, el spot de TV, la revolución creativa Mad Men, el banner digital (1994), Google AdWords, Facebook Ads y la IA generativa (DALL-E, influencers sintéticos). 14 períodos y 6 eras."
+        },
+        {
+          "name": "Historia de los Videojuegos Españoles: De la Edad de Oro a Metroid Dread",
+          "slug": "visualizador-historia-videojuegos-espanoles",
+          "url": "https://meskeia.com/visualizador-historia-videojuegos-espanoles/",
+          "description": "Cronología interactiva de los videojuegos españoles desde 1983: Dinamic Software (Abu Simbel), Opera Soft (La Abadía del Crimen), Pyro Studios (Commandos), MercurySteam (Metroid Dread), The Game Kitchen (Blasphemous) y el sector actual (450M€). 14 períodos desde la Edad de Oro del Spectrum hasta la madurez global."
         },
         {
           "name": "Historia del Cine: De los Hermanos Lumière al Streaming y la IA",

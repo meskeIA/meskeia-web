@@ -1,0 +1,673 @@
+/* HistoriaVideojuegosEs.module.css */
+
+/* ─── Layout base ─── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ─── Hero ─── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  opacity: 0.9;
+  margin: 0;
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+/* ─── Legal wrapper ─── */
+.legalWrapper {
+  padding: 0 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ─── Tabs ─── */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.5rem 1.5rem 0;
+  max-width: 900px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid var(--primary);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tab:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.tabActive {
+  background: var(--primary);
+  color: #fff;
+}
+
+[data-theme='dark'] .tab {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .tab:hover,
+[data-theme='dark'] .tabActive {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ─── Timeline ─── */
+.timelineContainer {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.timelineWrapper {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  border-radius: 12px;
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .timelineWrapper {
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.timelineSvg {
+  display: block;
+  min-width: 100%;
+}
+
+.timelineLeyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  padding: 1rem 0 0;
+}
+
+.leyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.leyendaDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+[data-theme='dark'] .leyendaItem {
+  color: var(--text-secondary);
+}
+
+/* ─── Detalle ─── */
+.detalleContainer {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.detalleVacio {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+  font-size: 0.95rem;
+}
+
+.detalleCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  border-top: 5px solid var(--primary);
+}
+
+[data-theme='dark'] .detalleCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+
+.detalleHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.detalleBadge {
+  padding: 0.3rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.detalleTitulo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .detalleTitulo {
+  color: var(--text-primary);
+}
+
+.detalleAnios {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.detalleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .detalleGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detalleItem {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+[data-theme='dark'] .detalleItem {
+  background: #333;
+}
+
+.detalleItemLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.detalleItemValue {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .detalleItemValue {
+  color: var(--text-primary);
+}
+
+.detalleDescripcion {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+[data-theme='dark'] .detalleDescripcion {
+  color: var(--text-secondary);
+}
+
+.detalleHito {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, #e8f4fd, #d0ecf8);
+  border-radius: 10px;
+  border-left: 4px solid var(--primary);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .detalleHito {
+  background: linear-gradient(135deg, #1a2d3d, #0f2233);
+  color: var(--text-primary);
+}
+
+/* ─── Comparativa ─── */
+.comparativaContainer {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.comparativaCard {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  border-top: 4px solid var(--primary);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.comparativaCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'] .comparativaCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .comparativaCard:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.comparativaNombre {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.comparativaAnios {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.comparativaJuego {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.comparativaEstudio {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .comparativaEstudio {
+  color: var(--accent);
+}
+
+.comparativaImpacto {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+  line-height: 1.5;
+}
+
+/* ─── Eras (Tab 4) ─── */
+.erasContainer {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.erasIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .erasIntro {
+  color: var(--text-secondary);
+}
+
+.erasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.eraCard {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid var(--primary);
+}
+
+[data-theme='dark'] .eraCard {
+  background: var(--bg-card);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.eraNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+
+[data-theme='dark'] .eraNombre {
+  color: var(--accent);
+}
+
+.eraAnios {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+  font-weight: 600;
+}
+
+.eraDescripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.85rem;
+}
+
+[data-theme='dark'] .eraDescripcion {
+  color: var(--text-secondary);
+}
+
+.eraHitos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.eraHito {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.eraHitoDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--secondary);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+[data-theme='dark'] .eraHito {
+  color: var(--text-secondary);
+}
+
+/* ─── Educational wrapper ─── */
+.educationalWrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── Warning box (v2.0 obligatorio) ─── */
+.warningBox {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  color: #856404;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #332700;
+  border-color: #ffc107;
+  color: #ffd700;
+}
+
+/* ─── Tabla educativa ─── */
+.tablaWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: 10px;
+}
+
+.tablaComparativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.tablaComparativa th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tablaComparativa td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tablaComparativa tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .tablaComparativa td {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tablaComparativa tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* ─── Escenarios ─── */
+.escenarioGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border-top: 4px solid var(--secondary);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.escenarioTitulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: 0.45rem;
+}
+
+[data-theme='dark'] .escenarioTitulo {
+  color: var(--accent);
+}
+
+.escenarioTexto {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .escenarioTexto {
+  color: var(--text-secondary);
+}
+
+/* ─── FAQ ─── */
+.faqLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .faqItem {
+  background: #333;
+}
+
+.faqPregunta {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+}
+
+[data-theme='dark'] .faqPregunta {
+  color: var(--accent);
+}
+
+.faqRespuesta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+[data-theme='dark'] .faqRespuesta {
+  color: var(--text-secondary);
+}
+
+/* ─── Guía pasos ─── */
+.guiaPasos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.guiaPaso {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .guiaPaso {
+  background: #333;
+}
+
+.guiaPasoNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.guiaPasoTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .guiaPasoTexto {
+  color: var(--text-secondary);
+}
+
+/* ─── Tips ─── */
+.tipsLista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+
+.tipItem {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.08));
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--primary);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+[data-theme='dark'] .tipItem {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.15), rgba(72, 169, 166, 0.15));
+  color: var(--text-secondary);
+}
+
+/* ─── Sección educativa heading ─── */
+.sectionHeading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .sectionHeading {
+  color: var(--accent);
+  border-bottom-color: rgba(127, 179, 211, 0.2);
+}

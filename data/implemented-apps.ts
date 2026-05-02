@@ -798,6 +798,13 @@ export const implementedAppsUrls = [
   "/visualizador-historia-clima/",         // 14 períodos, última glaciación -15000→emergencia climática, paleoclimatología
   "/visualizador-historia-aviacion/",      // 14 períodos, Wright 1900→aviación eléctrica e IA, 10 categorías
   "/visualizador-historia-comics/",        // 14 períodos, Töpffer 1827→IA generativa en cómics, 14 estilos
+
+  // Cronologías Tendencias España — Roadmap v8 EJE A (2026-05-02)
+  "/visualizador-historia-radio/",               // 14 períodos, Marconi 1895→Radio IA y podcasting, 10 categorías
+  "/visualizador-historia-television/",          // 14 períodos, Baird 1926→TV interactiva con IA, 10 categorías
+  "/visualizador-historia-robotica/",            // 14 períodos, Čapek 1920→AGI encarnada, 10 categorías
+  "/visualizador-historia-publicidad/",          // 14 períodos, Gutenberg 1450→IA generativa publicitaria, 10 categorías
+  "/visualizador-historia-videojuegos-espanoles/", // 14 períodos, Edad de Oro 1983→Metroid Dread y Blasphemous
 ];
 
 /**

@@ -3755,6 +3755,38 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Pop Art, expresionismo y surrealismo influyeron directamente en el lenguaje visual del cómic' },
     { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Videojuegos y cómics comparten universos, personajes y fans: de Batman al Arkham de Rocksteady' },
   ],
+
+  // Cronologías Tendencias España — Roadmap v8 EJE A (2026-05-02)
+  'visualizador-historia-radio': [
+    { url: '/visualizador-historia-television/', icon: '📺', name: 'Historia de la Televisión', description: 'Radio y TV nacieron juntas: muchos formatos (soap operas, debates políticos) migraron de un medio a otro' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet transformó la radio: el podcast es la radio del siglo XXI, bajo demanda y global' },
+    { url: '/visualizador-historia-musica-movimientos/', icon: '🎵', name: 'Historia de la Música', description: 'La radio fue el gran difusor de la música popular: de la big band al rock, del pop al hip-hop' },
+    { url: '/visualizador-historia-publicidad/', icon: '📢', name: 'Historia de la Publicidad', description: 'La radio comercial inventó el modelo publicitario que luego adoptaría la televisión e internet' },
+  ],
+  'visualizador-historia-television': [
+    { url: '/visualizador-historia-radio/', icon: '📻', name: 'Historia de la Radio', description: 'Radio y televisión comparten historia: formatos, modelos de negocio y cultura mediática' },
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'Cine y TV: competencia, hibridación y convergencia en el streaming del siglo XXI' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'El streaming nació cuando internet alcanzó la velocidad suficiente para sustituir a la TV convencional' },
+    { url: '/visualizador-historia-publicidad/', icon: '📢', name: 'Historia de la Publicidad', description: 'La TV definió la publicidad masiva del siglo XX: el spot de 30 segundos fue el formato dominante' },
+  ],
+  'visualizador-historia-robotica': [
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'La conectividad permitió robots en red, cloud robotics y actualizaciones OTA como Tesla Optimus' },
+    { url: '/visualizador-historia-energia/', icon: '⚡', name: 'Historia de la Energía', description: 'Los robots requieren energía: baterías de litio, motores eléctricos eficientes y gestión energética' },
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Los videojuegos entrenan a los robots: simulación, reinforcement learning y motores físicos compartidos' },
+    { url: '/visualizador-historia-aviacion/', icon: '✈️', name: 'Historia de la Aviación', description: 'Drones y robótica aérea: de los aviones no tripulados militares a los robots voladores de logística' },
+  ],
+  'visualizador-historia-publicidad': [
+    { url: '/visualizador-historia-television/', icon: '📺', name: 'Historia de la Televisión', description: 'La televisión fue el gran medio publicitario del siglo XX: el spot de 30s definió una era' },
+    { url: '/visualizador-historia-radio/', icon: '📻', name: 'Historia de la Radio', description: 'La radio comercial inventó la publicidad de masas: los soap operas financiados por Procter & Gamble' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet transformó la publicidad: del banner (1994) al targeting comportamental y la IA generativa' },
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'El product placement y la publicidad cinematográfica son tan antiguos como Hollywood' },
+  ],
+  'visualizador-historia-videojuegos-espanoles': [
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia Global de los Videojuegos', description: 'El contexto internacional: de Atari y Nintendo a Steam y los esports, en paralelo a la Edad de Oro española' },
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'Videojuegos y cine comparten narrativa: adaptaciones, transmedia y las series de Hollywood basadas en juegos' },
+    { url: '/visualizador-historia-comics/', icon: '💬', name: 'Historia del Cómic', description: 'Batman, Spider-Man y los superhéroes de cómic pueblan los videojuegos españoles: de Amstrad a PS5' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet democratizó la distribución: Steam y itch.io permitieron que el indie español llegara a todo el mundo' },
+  ],
 };
 
 /**
