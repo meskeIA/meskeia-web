@@ -805,6 +805,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia-robotica/",            // 14 períodos, Čapek 1920→AGI encarnada, 10 categorías
   "/visualizador-historia-publicidad/",          // 14 períodos, Gutenberg 1450→IA generativa publicitaria, 10 categorías
   "/visualizador-historia-videojuegos-espanoles/", // 14 períodos, Edad de Oro 1983→Metroid Dread y Blasphemous
+
+  // Cronologías Tendencias España — Roadmap v8 EJE B (2026-05-02)
+  "/visualizador-historia-ordenadores/",         // 14 períodos, Babbage 1820→IA generativa y computación cuántica
+  "/visualizador-historia-tren/",                // 14 períodos, Trevithick 1804→AVE, Maglev e hidrógeno
+  "/visualizador-historia-viajes-espaciales/",   // 14 períodos, Tsiolkovski 1903→Starship y Artemis
 ];
 
 /**

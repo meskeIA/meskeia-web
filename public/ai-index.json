@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 723,
+  "total_tools": 726,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2437,6 +2437,24 @@
           "slug": "visualizador-historia-videojuegos-espanoles",
           "url": "https://meskeia.com/visualizador-historia-videojuegos-espanoles/",
           "description": "Cronología interactiva de los videojuegos españoles desde 1983: Dinamic Software (Abu Simbel), Opera Soft (La Abadía del Crimen), Pyro Studios (Commandos), MercurySteam (Metroid Dread), The Game Kitchen (Blasphemous) y el sector actual (450M€). 14 períodos desde la Edad de Oro del Spectrum hasta la madurez global."
+        },
+        {
+          "name": "Historia de los Ordenadores: De Babbage a la IA Cuántica",
+          "slug": "visualizador-historia-ordenadores",
+          "url": "https://meskeia.com/visualizador-historia-ordenadores/",
+          "description": "Cronología interactiva de 200 años de historia de la informática: de Babbage y Ada Lovelace (1820) a ENIAC, el IBM PC, el Macintosh, Internet, el iPhone, ChatGPT y la computación cuántica. 14 períodos con inventores, máquinas icónicas y 6 eras: mecánica, válvulas, transistores, microprocesador, Internet e IA."
+        },
+        {
+          "name": "Historia del Tren: Del Vapor al AVE y el Maglev",
+          "slug": "visualizador-historia-tren",
+          "url": "https://meskeia.com/visualizador-historia-tren/",
+          "description": "Cronología interactiva de 220 años de historia ferroviaria: de Trevithick (1804) y Stephenson al Shinkansen (1964), TGV (1981), AVE Madrid-Sevilla (1992) y los trenes de hidrógeno y Maglev. 14 períodos con líneas icónicas, velocidades récord y 6 eras del ferrocarril mundial."
+        },
+        {
+          "name": "Historia de los Viajes Espaciales: De Gagarin a Starship",
+          "slug": "visualizador-historia-viajes-espaciales",
+          "url": "https://meskeia.com/visualizador-historia-viajes-espaciales/",
+          "description": "Cronología interactiva de la exploración espacial: de Tsiolkovski y Goddard (1903) a Gagarin, Apollo 11, la ISS, SpaceX y el programa Artemis. 14 períodos con misiones emblemáticas y 6 eras: pioneros, Sputnik, carrera lunar, transbordador, era privada y New Space."
         },
         {
           "name": "Historia del Cine: De los Hermanos Lumière al Streaming y la IA",

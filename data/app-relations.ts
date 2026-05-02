@@ -3787,6 +3787,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia-comics/', icon: '💬', name: 'Historia del Cómic', description: 'Batman, Spider-Man y los superhéroes de cómic pueblan los videojuegos españoles: de Amstrad a PS5' },
     { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet democratizó la distribución: Steam y itch.io permitieron que el indie español llegara a todo el mundo' },
   ],
+
+  // Cronologías Tendencias España — Roadmap v8 EJE B (2026-05-02)
+  'visualizador-historia-ordenadores': [
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet y los ordenadores son inseparables: la WWW nació en un ordenador del CERN y transformó la historia de la informática' },
+    { url: '/visualizador-historia-robotica/', icon: '🤖', name: 'Historia de la Robótica', description: 'Los ordenadores son el cerebro de los robots: sin microprocesadores ni IA, la robótica moderna sería imposible' },
+    { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Los videojuegos impulsaron la GPU y la potencia gráfica que hoy entrena los modelos de IA más avanzados' },
+    { url: '/visualizador-historia-television/', icon: '📺', name: 'Historia de la Televisión', description: 'La convergencia digital fusionó TV y ordenador: Netflix, streaming y las plataformas nacen de esa unión' },
+  ],
+  'visualizador-historia-tren': [
+    { url: '/visualizador-historia-aviacion/', icon: '✈️', name: 'Historia de la Aviación', description: 'Tren y avión compiten y se complementan: el AVE supera al avión en rutas de menos de 600 km puerta a puerta' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'El ferrocarril fue el motor de la Primera Revolución Industrial: unió mercados, movió carbón y creó la clase obrera moderna' },
+    { url: '/visualizador-historia-energia/', icon: '⚡', name: 'Historia de la Energía', description: 'Del vapor al eléctrico y al hidrógeno: la historia del tren es también la historia de las fuentes de energía' },
+    { url: '/visualizador-historia-ordenadores/', icon: '💻', name: 'Historia de los Ordenadores', description: 'La IA gestiona el tráfico ferroviario, el mantenimiento predictivo y la venta de billetes: tecnología e infraestructura convergen' },
+  ],
+  'visualizador-historia-viajes-espaciales': [
+    { url: '/visualizador-historia-aviacion/', icon: '✈️', name: 'Historia de la Aviación', description: 'La aviación precedió al espacio: los pilotos de prueba de los 50 se convirtieron en los primeros astronautas del programa Mercury' },
+    { url: '/visualizador-historia-ordenadores/', icon: '💻', name: 'Historia de los Ordenadores', description: 'El Apollo Guidance Computer (4KB RAM) llevó al hombre a la Luna: la informática y el espacio crecieron juntos' },
+    { url: '/visualizador-cosmologia/', icon: '🌌', name: 'Cosmología y el Universo', description: 'Los viajes espaciales nos han dado las mejores imágenes del cosmos: Hubble, JWST y las sondas Voyager más allá del sistema solar' },
+    { url: '/visualizador-historia-robotica/', icon: '🤖', name: 'Historia de la Robótica', description: 'Robots y espacio van de la mano: Opportunity, Curiosity, Perseverance e Ingenuity son los exploradores robóticos de Marte' },
+  ],
 };
 
 /**
