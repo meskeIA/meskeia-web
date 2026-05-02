@@ -3654,6 +3654,31 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La revolución copernicana cambió nuestra cosmovisión; el Big Bang replantea preguntas sobre origen y fin' },
     { url: '/visualizador-historia-exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La astronomía guió a navegantes fenicios, vikingos y a los astronautas del Apollo' },
   ],
+  // Cronologías Artes y Mente — Grupo 5
+  'visualizador-historia-psicologia': [
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Psicología y medicina comparten historia: de Hipócrates a la neurociencia, el estudio de la mente y el cuerpo siempre fue inseparable' },
+    { url: '/visualizador-historia-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La filosofía griega es el origen de la psicología: Platón, Aristóteles y el problema mente-cuerpo siguen en el centro de la neurociencia' },
+    { url: '/visualizador-historia-danza/', icon: '💃', name: 'Historia de la Danza', description: 'La psicología del movimiento y la expresión corporal conectan danza y psicología: el cuerpo como lenguaje emocional' },
+    { url: '/visualizador-historia-teatro/', icon: '🎭', name: 'Historia del Teatro', description: 'Stanislavski y el método de actuación aplican psicología; Freud usó el drama griego (Edipo) para construir su teoría' },
+  ],
+  'visualizador-historia-fotografia': [
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'La cronofotografía de Muybridge y Marey fue el paso previo al cine; ambos medios comparten soportes, técnica y revolución digital' },
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet transformó la fotografía: JPEG, compartición digital, Instagram y la IA generativa son imposibles sin la red' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La fotografía inspiró y fue inspirada por el impresionismo, el surrealismo y el pop art; Warhol usó la serigrafía fotográfica' },
+    { url: '/visualizador-historia-moda/', icon: '👗', name: 'Historia de la Moda', description: 'La fotografía de moda transformó cómo se percibe la moda: de los retratos de Worth a las campañas de Instagram' },
+  ],
+  'visualizador-historia-teatro': [
+    { url: '/visualizador-historia-danza/', icon: '💃', name: 'Historia de la Danza', description: 'Teatro y danza han estado unidos desde los coros griegos: el Tanztheater de Pina Bausch y el teatro-danza son inseparables' },
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'El cine nació del teatro y sigue debiéndole el guión, la dirección de actores y los géneros dramáticos' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Aristóteles teorizó el teatro en la Poética; Brecht aplicó filosofía marxista; Beckett expresó el existencialismo en escena' },
+    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'Teatro y literatura son inseparables: Shakespeare, Ibsen, Chéjov y Beckett son tanto dramaturgos como escritores' },
+  ],
+  'visualizador-historia-danza': [
+    { url: '/visualizador-historia-teatro/', icon: '🎭', name: 'Historia del Teatro', description: 'Danza y teatro comparten escena desde los coros griegos; el Tanztheater de Pina Bausch los fusiona definitivamente' },
+    { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Historia de la Música', description: 'Sin música no hay danza: de los ritmos tribales a Tchaikovsky, Stravinski y el hip-hop, música y danza evolucionan juntas' },
+    { url: '/visualizador-historia-psicologia/', icon: '🧠', name: 'Historia de la Psicología', description: 'La danza terapia aplica psicología; Laban analizó el movimiento como expresión psicológica; el cuerpo es lenguaje emocional' },
+    { url: '/visualizador-historia-cine/', icon: '🎬', name: 'Historia del Cine', description: 'Musicals de Hollywood, Bollywood y el videoclip llevan la danza al cine; la videodanza es un género propio' },
+  ],
   // Cronologías Cultura Popular — Grupo 4
   'visualizador-historia-cine': [
     { url: '/visualizador-historia-videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Cine y videojuegos comparten efectos especiales, narrativa y revoluciones digitales paralelas' },

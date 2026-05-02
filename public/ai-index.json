@@ -4,7 +4,7 @@
   "description": "Biblioteca gratuita de 500+ aplicaciones web educativas organizadas en 13 Suites Temáticas: Estudiantes, Cultura General, Productividad, Finanzas e Inversión, Herramientas Técnicas, Diseño y Desarrollo, Salud y Bienestar, Marketing y Contenido, Inmobiliaria y Hogar, Juegos y Ocio, Viajes y Turismo, Freelance y Autónomo, y Legal-Fiscal. Todas las apps funcionan 100% en el navegador sin registro ni instalación.",
   "language": "es",
   "country": "ES",
-  "total_tools": 706,
+  "total_tools": 710,
   "updated": "2026-04-30",
   "features": {
     "all_free": true,
@@ -2335,6 +2335,30 @@
           "slug": "visualizador-historia-astronomia",
           "url": "https://meskeia.com/visualizador-historia-astronomia/",
           "description": "Cronología interactiva de la astronomía con 14 períodos desde Stonehenge (-3000 a.C.) hasta el JWST y las ondas gravitacionales. Timeline SVG con años a.C., descubrimientos clave, tabla comparativa y 6 eras (Antigua, Modelos Geocéntricos, Revolución Copernicana, Telescópica, Astrofísica Moderna, Cosmología y Era Espacial)."
+        },
+        {
+          "name": "Historia de la Psicología: De Platón a la IA Terapéutica",
+          "slug": "visualizador-historia-psicologia",
+          "url": "https://meskeia.com/visualizador-historia-psicologia/",
+          "description": "Cronología interactiva de la psicología con 14 períodos desde la filosofía griega (-400 a.C.) hasta la neurociencia e IA clínica. De Platón y Aristóteles a Freud, el conductismo, la cognitiva y los chatbots terapéuticos. 6 eras: Filosofía y Alma, Empirismo y Fisiología, Psicología Científica, Grandes Escuelas, Revolución Cognitiva, Neurociencia y Era Digital."
+        },
+        {
+          "name": "Historia de la Fotografía: Del Daguerrotipo a la IA Generativa",
+          "slug": "visualizador-historia-fotografia",
+          "url": "https://meskeia.com/visualizador-historia-fotografia/",
+          "description": "Cronología interactiva de la fotografía con 14 períodos desde el daguerrotipo (1826) hasta la IA generativa. De Niépce a Midjourney: daguerrotipo, fotografía popular Kodak, documentalismo, color, revolución digital, Instagram y fotografía computacional. 6 eras históricas."
+        },
+        {
+          "name": "Historia del Teatro: Del Teatro Griego al Teatro Digital",
+          "slug": "visualizador-historia-teatro",
+          "url": "https://meskeia.com/visualizador-historia-teatro/",
+          "description": "Cronología interactiva del teatro con 14 períodos desde el teatro griego (534 a.C.) hasta el teatro digital e inmersivo. De Esquilo y Shakespeare a Brecht, Beckett y Punchdrunk. 6 eras: Antigüedad Clásica, Edad Media, Renacimiento y Barroco, Ilustración, Teatro Moderno, Teatro Contemporáneo y Digital."
+        },
+        {
+          "name": "Historia de la Danza: De los Rituales Egipcios al Breaking Olímpico",
+          "slug": "visualizador-historia-danza",
+          "url": "https://meskeia.com/visualizador-historia-danza/",
+          "description": "Cronología interactiva de la danza con 14 períodos desde la danza ritual egipcia (-3000 a.C.) hasta el breaking olímpico y la danza digital. Ballet clásico, danza moderna, Pina Bausch, hip-hop y videodanza. 6 eras históricas."
         },
         {
           "name": "Historia del Cine: De los Hermanos Lumière al Streaming y la IA",
