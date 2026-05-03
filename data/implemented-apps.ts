@@ -836,6 +836,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia/segunda-guerra-mundial/", // Segunda Guerra Mundial 1939→1945, 10 hitos, 6 eras
   "/visualizador-historia/civilizaciones-precolombinas/", // Civilizaciones Precolombinas 250→1532, 10 hitos, 6 eras
   "/visualizador-historia/espana-medieval/",     // España Medieval 409→1492, 10 hitos, 6 eras
+  "/visualizador-historia/edad-media-europea/",  // Edad Media Europea 476→1453, 10 hitos, 6 eras
+  "/visualizador-historia/renacimiento/",         // El Renacimiento 1397→1600, 10 hitos, 6 eras
+  "/visualizador-historia/la-reforma/",           // La Reforma Protestante 1517→1648, 10 hitos, 6 eras
+  "/visualizador-historia/las-cruzadas/",         // Las Cruzadas 1095→1291, 10 hitos, 6 eras
+  "/visualizador-historia/ilustracion/",          // La Ilustración 1687→1789, 10 hitos, 6 eras
 
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos

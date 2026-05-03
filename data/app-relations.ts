@@ -3938,6 +3938,36 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'Al-Ándalus y el Imperio Otomano son los dos grandes proyectos de civilización islámica en Europa: contemporáneos y complementarios, con el Imperio Otomano tomando el relevo cultural cuando Al-Ándalus cae' },
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Averroes (Córdoba, 1126) y Maimónides (Córdoba, 1138) nacieron en Al-Ándalus: sin la España medieval islámica, la filosofía griega no habría llegado a la Europa cristiana medieval' },
   ],
+  'visualizador-historia-edad-media-europea': [
+    { url: '/visualizador-historia/renacimiento/', icon: '🎨', name: 'El Renacimiento', description: 'El Renacimiento es exactamente la salida de la Edad Media: las ciudades italianas del siglo XV se construyeron sobre los pilares feudales y eclesiásticos medievales que ahora cuestionaban' },
+    { url: '/visualizador-historia/las-cruzadas/', icon: '⚔️', name: 'Las Cruzadas', description: 'Las Cruzadas son el fenómeno más característico de la Alta Edad Media: la movilización religiosa masiva que muestra el poder de la Iglesia y los límites del feudalismo europeo' },
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'La España Medieval', description: 'La Edad Media española tiene sus propias particularidades: tres culturas conviviendo en Al-Ándalus mientras el resto de Europa era homogéneamente cristiana' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'La Edad Media comienza exactamente donde termina Roma: el 476 d.C. es la bisagra entre dos mundos, y entender Roma es entender qué heredó y qué perdió la Europa medieval' },
+  ],
+  'visualizador-historia-renacimiento': [
+    { url: '/visualizador-historia/edad-media-europea/', icon: '🏰', name: 'La Edad Media Europea', description: 'El Renacimiento no surgió de la nada: los avances medievales en universidades, teología y arte son el sustrato sobre el que florecen los humanistas del siglo XV' },
+    { url: '/visualizador-historia/ilustracion/', icon: '💡', name: 'La Ilustración', description: 'La Ilustración del siglo XVIII es el heredero directo del Renacimiento: la fe en la razón humana que Erasmo y Montaigne sembraron florece plenamente con Voltaire y Rousseau' },
+    { url: '/visualizador-historia/la-reforma/', icon: '✝️', name: 'La Reforma Protestante', description: 'Erasmo de Rotterdam fue el gran humanista del Renacimiento nórdico y el maestro intelectual de Lutero: el Renacimiento y la Reforma son dos caras del mismo giro cultural del siglo XVI' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El Renacimiento es el período más estudiado en la historia del arte: Leonardo, Miguel Ángel y Rafael definen el ideal de artista que persiguieron todos los movimientos posteriores' },
+  ],
+  'visualizador-historia-la-reforma': [
+    { url: '/visualizador-historia/renacimiento/', icon: '🎨', name: 'El Renacimiento', description: 'El humanismo renacentista proporcionó las herramientas intelectuales de la Reforma: el retorno a las fuentes (Lutero vuelve al griego del Nuevo Testamento gracias a Erasmo)' },
+    { url: '/visualizador-historia/ilustracion/', icon: '💡', name: 'La Ilustración', description: 'La Paz de Westfalia (1648) no solo cierra las guerras de religión: establece la soberanía territorial y la tolerancia religiosa que son el preludio del pensamiento ilustrado' },
+    { url: '/visualizador-historia/edad-media-europea/', icon: '🏰', name: 'La Edad Media Europea', description: 'La Reforma es la ruptura definitiva con el modelo eclesiástico medieval: Lutero cuestiona exactamente la estructura de poder que la Iglesia había construido durante mil años' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Calvino y Lutero son también filósofos: sus concepciones de la fe, la gracia y el libre albedrío conectan directamente con los debates de la filosofía moderna sobre autonomía y razón' },
+  ],
+  'visualizador-historia-las-cruzadas': [
+    { url: '/visualizador-historia/edad-media-europea/', icon: '🏰', name: 'La Edad Media Europea', description: 'Las Cruzadas son el fenómeno europeo medieval por excelencia: solo se entienden en el contexto del feudalismo, el poder de la Iglesia y la amenaza exterior que estructuró la identidad medieval' },
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'El Imperio Otomano hereda los territorios que las Cruzadas intentaron controlar: la caída de Constantinopla en 1453 es, en cierto modo, la respuesta final al proyecto cruzado' },
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'La España Medieval', description: 'El proyecto de avance cristiano en la Península Ibérica fue llamado por los papas "cruzada": la misma lógica religiosa que movilizó a Europa hacia Oriente operó en el Mediterráneo occidental' },
+    { url: '/visualizador-historia/grecia/', icon: '🏛️', name: 'Historia de la Antigua Grecia', description: 'Los cruzados llamaban a Bizancio "la ciudad griega": el Imperio Romano de Oriente era el guardián del legado clásico griego, y su debilitamiento por la Cuarta Cruzada fue una pérdida cultural irreparable' },
+  ],
+  'visualizador-historia-ilustracion': [
+    { url: '/visualizador-historia/renacimiento/', icon: '🎨', name: 'El Renacimiento', description: 'La Ilustración es el hijo del Renacimiento: la fe humanista en la capacidad humana de conocer y transformar el mundo, que el siglo XVIII lleva a sus consecuencias políticas y sociales' },
+    { url: '/visualizador-historia/la-reforma/', icon: '✝️', name: 'La Reforma Protestante', description: 'La Reforma sembró el pluralismo que hizo posible la Ilustración: sin la ruptura de la autoridad única de Roma, la libertad de pensamiento ilustrada hubiera sido imposible' },
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '🗽', name: 'La Revolución Francesa', description: 'La Revolución Francesa es la Ilustración hecha política: los conceptos de Rousseau, Voltaire y Montesquieu se convierten en la Declaración de Derechos del Hombre y el Ciudadano' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Kant, Hume, Locke y Rousseau son simultáneamente filósofos e ilustrados: la Ilustración es el momento en que la filosofía moderna alcanza su madurez y mayor influencia social' },
+  ],
 
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [

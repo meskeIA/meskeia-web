@@ -13,6 +13,11 @@ import { primeraGuerraMundial } from './primera-guerra-mundial';
 import { segundaGuerraMundial } from './segunda-guerra-mundial';
 import { civilizacionesPrecolombinas } from './civilizaciones-precolombinas';
 import { espanaMedieval } from './espana-medieval';
+import { edadMediaEuropea } from './edad-media-europea';
+import { renacimiento } from './renacimiento';
+import { laReforma } from './la-reforma';
+import { lasCruzadas } from './las-cruzadas';
+import { ilustracion } from './ilustracion';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -29,6 +34,11 @@ const registry: Record<string, HistoriaData> = {
   'segunda-guerra-mundial': segundaGuerraMundial,
   'civilizaciones-precolombinas': civilizacionesPrecolombinas,
   'espana-medieval': espanaMedieval,
+  'edad-media-europea': edadMediaEuropea,
+  renacimiento,
+  'la-reforma': laReforma,
+  'las-cruzadas': lasCruzadas,
+  ilustracion,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
