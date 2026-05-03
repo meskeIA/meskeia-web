@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const astronomia: HistoriaData = {
+  slug: 'astronomia',
+  titulo: 'Historia de la Astronomía: De Stonehenge al Telescopio James Webb',
+  subtitulo: 'De las primeras observaciones prehistóricas a la astronomía del siglo XXI — 10 períodos con los descubrimientos que revelaron el cosmos',
+  descripcionSEO: 'Cronología interactiva de la historia de la astronomía: de Stonehenge y Babilonia al Telescopio James Webb y las ondas gravitacionales. Astronomía griega, revolución copernicana, Galileo, Newton, astrofísica moderna y cosmología en 10 hitos y 6 eras.',
+  keywords: [
+    'historia de la astronomía cronología',
+    'revolución copernicana heliocentrismo',
+    'galileo galilei telescopio lunas júpiter',
+    'kepler órbitas elípticas leyes',
+    'newton gravitación cometa halley',
+    'espectroscopía fraunhofer leavitt cefeidas',
+    'hubble expansión universo big bang',
+    'telescopio james webb ondas gravitacionales LIGO',
+  ],
+  anioInicio: -3000,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'astronomia-antigua',
+      nombre: 'Astronomía Prehistórica y Mesopotámica',
+      anioInicio: -3000,
+      anioFin: -200,
+      color: '#8B4513',
+      categoria: 'antigua',
+      descripcion: 'Antes de la escritura, los humanos cartografiaron el cielo. Stonehenge (c. 2500 a.C.) está alineado al amanecer del solsticio de verano. Los astrónomos babilónicos crearon las primeras efeméridas (tablas predictivas) y calcularon el ciclo de Saros para predecir eclipses. El zodíaco de 12 signos que hoy usamos nació aquí como división matemática de la eclíptica. Los caldeos predecían eclipses con series numéricas y calcularon el año venusiano con error de 14 segundos.',
+      obraIconica: 'Stonehenge (c. 2500 a.C.) — alineado al solsticio de verano; ciclo de Saros babilónico — predicción de eclipses con 18,6 años de periodicidad',
+      paises: ['Reino Unido', 'Babilonia (actual Iraq)', 'Mesoamérica'],
+    },
+    {
+      id: 'astronomia-griega',
+      nombre: 'Astronomía Griega',
+      anioInicio: -600,
+      anioFin: 100,
+      color: '#DAA520',
+      categoria: 'clasica',
+      descripcion: 'Aristarco de Samos propuso el heliocentrismo en el 270 a.C. —18 siglos antes de Copérnico— y fue ignorado. Eratóstenes midió la circunferencia de la Tierra con sombras y geometría. Hiparco elaboró el primer catálogo de 850 estrellas y midió la distancia Tierra-Luna. Ptolomeo sistematizó el geocentrismo en el Almagesto con epiciclos que predecían los planetas con precisión aceptable durante siglos.',
+      obraIconica: 'Almagesto de Ptolomeo (c. 150 d.C.) — la biblia astronómica del mundo antiguo, con el sistema geocéntrico que dominó durante 1400 años',
+      paises: ['Grecia', 'Egipto (Alejandría)', 'Roma'],
+    },
+    {
+      id: 'astronomia-medieval',
+      nombre: 'Astronomía Islámica y Medieval',
+      anioInicio: 750,
+      anioFin: 1543,
+      color: '#2E8B57',
+      categoria: 'medieval',
+      descripcion: 'Los astrónomos islámicos preservaron y mejoraron la astronomía griega. Al-Battani calculó la longitud del año solar con error de 2 minutos. Las Tablas de Toledo de Al-Zarqali fueron el estándar europeo durante siglos. En Europa, Alfonso X el Sabio financió las Tablas Alfonsíes (1252–1270), el estándar de efeméridas durante 200 años. Regiomontano publicó el primer libro de astronomía impreso en Europa. La imprenta fue tan revolucionaria para la astronomía como el telescopio.',
+      obraIconica: 'Tablas Alfonsíes (Alfonso X, 1252–1270) — el estándar europeo de efeméridas durante dos siglos; correcciones de Al-Battani al Almagesto',
+      paises: ['Califato Abbásida', 'Al-Ándalus', 'España', 'Alemania'],
+    },
+    {
+      id: 'revolucion-copernicana',
+      nombre: 'Revolución Copernicana',
+      anioInicio: 1543,
+      anioFin: 1610,
+      color: '#4169E1',
+      categoria: 'moderna',
+      descripcion: 'Copérnico dedicó 30 años a desarrollar el heliocentrismo y lo publicó en su lecho de muerte. Tycho Brahe realizó las observaciones más precisas del cielo pretelescópico durante 20 años en su isla-observatorio Uraniborg, sin aceptar nunca el heliocentrismo. Sus datos permitirían a Kepler descubrir las órbitas elípticas. El De revolutionibus de Copérnico inició la revolución científica más importante de la historia occidental.',
+      obraIconica: 'De revolutionibus orbium coelestium — Nicolás Copérnico (1543, en su lecho de muerte) — la Tierra orbita el Sol',
+      paises: ['Polonia', 'Dinamarca', 'Sacro Imperio Romano'],
+    },
+    {
+      id: 'kepler-galileo',
+      nombre: 'Kepler y Galileo',
+      anioInicio: 1609,
+      anioFin: 1650,
+      color: '#FF6347',
+      categoria: 'moderna',
+      descripcion: 'Kepler usó los datos de Tycho para descubrir que las órbitas son elipses —derrumbando 2000 años de geometría circular perfecta. Galileo apuntó el telescopio al cielo y vio que la Luna tiene montañas, Júpiter tiene lunas y Venus tiene fases, confirmando el heliocentrismo. Su apoyo al heliocentrismo le costó el arresto domiciliario. Las tres leyes de Kepler y el telescopio de Galileo transformaron para siempre la astronomía.',
+      obraIconica: 'Galileo apunta el telescopio (1609) — descubre lunas de Júpiter, fases de Venus, manchas solares; Tres leyes de Kepler (1609–1619)',
+      paises: ['Italia', 'Alemania', 'Sacro Imperio Romano'],
+    },
+    {
+      id: 'astronomia-newtoniana',
+      nombre: 'Astronomía Newtoniana',
+      anioInicio: 1668,
+      anioFin: 1820,
+      color: '#1E90FF',
+      categoria: 'moderna',
+      descripcion: 'Newton diseñó el telescopio reflector (1668) y publicó la ley de gravitación universal en los Principia (1687). Halley usó la gravitación newtoniana para calcular que el cometa de 1682 había aparecido en 1531 y 1607 —y volvería en 1758. Se cumplió 16 años después de su muerte. William Herschel descubrió Urano en 1781, el primer planeta descubierto con telescopio, y catalogó 2500 nebulosas con su hermana Caroline.',
+      obraIconica: 'Principia Mathematica — Isaac Newton (1687) — la ley de gravitación universal; predicción del cometa de Halley (regresa en 1758, cumplida)',
+      paises: ['Reino Unido', 'Francia', 'Alemania'],
+    },
+    {
+      id: 'espectroscopia-astrofisica',
+      nombre: 'Espectroscopía y Astrofísica',
+      anioInicio: 1814,
+      anioFin: 1920,
+      color: '#9932CC',
+      categoria: 'moderna',
+      descripcion: 'Fraunhofer descubrió las líneas oscuras del espectro solar —huellas de elementos químicos. Las "computers" de Harvard (mujeres astrónomas sin crédito adecuado) clasificaron 400.000 estrellas con el sistema OBAFGKM. Henrietta Swan Leavitt descubrió la relación período-luminosidad de las cefeidas (1912), convirtiéndolas en la regla con que medir el universo. Sin este descubrimiento, Hubble no habría podido demostrar la expansión del universo.',
+      obraIconica: 'Relación período-luminosidad de las cefeidas — Henrietta Swan Leavitt (1912) — la regla para medir el universo',
+      paises: ['Alemania', 'EE.UU.', 'Italia'],
+    },
+    {
+      id: 'relatividad-era-espacial',
+      nombre: 'Relatividad, Big Bang y Era Espacial',
+      anioInicio: 1915,
+      anioFin: 1990,
+      color: '#191970',
+      categoria: 'contemporanea',
+      descripcion: 'Einstein publicó la Relatividad General (1915). Hubble demostró en 1924 que Andrómeda era una galaxia externa —el universo era 100.000 veces mayor de lo creído. Lemaître propuso el "átomo primitivo" (Big Bang) en 1927. El Sputnik (1957) inició la era espacial; el Apollo 11 llevó humanos a la Luna (1969). Jocelyn Bell descubrió los pulsares (1967). Vera Rubin demostró que las galaxias contienen materia oscura (27% del universo).',
+      obraIconica: 'Hubble demuestra que Andrómeda es una galaxia (1924); Vera Rubin detecta materia oscura (1970s); Apollo 11 en la Luna (1969)',
+      paises: ['EE.UU.', 'Alemania', 'Bélgica', 'URSS'],
+    },
+    {
+      id: 'cosmologia-moderna',
+      nombre: 'Cosmología Moderna y Grandes Telescopios',
+      anioInicio: 1965,
+      anioFin: 9999,
+      color: '#4B0082',
+      categoria: 'contemporanea',
+      descripcion: 'Penzias y Wilson descubrieron accidentalmente el fondo cósmico de microondas (1965) —el eco del Big Bang, Premio Nobel 1978. Guth propuso la inflación cósmica (1981). En 1998, dos equipos independientes descubrieron que la expansión se acelera —energía oscura, Premio Nobel 2011. El Telescopio Hubble (1990) revolucionó la astronomía. Ghez y Genzel (Nobel 2020) confirmaron el agujero negro supermasivo en el centro de la Vía Láctea. El EHT fotografió la sombra de M87* en 2019.',
+      obraIconica: 'Fondo cósmico de microondas — Penzias y Wilson (1965); primera imagen de agujero negro M87* — EHT (2019)',
+      paises: ['EE.UU.', 'Alemania', 'Global'],
+    },
+    {
+      id: 'james-webb-siglo-xxi',
+      nombre: 'James Webb y Astronomía del Siglo XXI',
+      anioInicio: 2015,
+      anioFin: 9999,
+      color: '#2E86AB',
+      categoria: 'contemporanea',
+      descripcion: 'LIGO detectó ondas gravitacionales en 2015 —predichas por Einstein un siglo antes— abriendo una nueva ventana al universo. El JWST (2022) observa en infrarrojo y ve galaxias formadas 300 millones de años tras el Big Bang. La astronomía multimensajero (ondas gravitacionales, luz, neutrinos) es el nuevo paradigma. La búsqueda de biofirmas en exoplanetas como TRAPPIST-1 es el mayor proyecto de exploración de la historia.',
+      obraIconica: 'LIGO detecta ondas gravitacionales (2015); JWST envía primeras imágenes de galaxias primitivas (2022)',
+      paises: ['EE.UU.', 'Global', 'ESA'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Astronomía Antigua',
+      desde: -3000,
+      hasta: -200,
+      icono: '🌙',
+      hitosDestacados: ['Astronomía Prehistórica y Mesopotámica'],
+      eventos: [
+        '3000 a.C. — Stonehenge: primera estructura conocida orientada astronómicamente',
+        '2500 a.C. — Alineación del solsticio de verano en Stonehenge con precisión de minutos',
+        '800 a.C. — Babilonios calculan el ciclo de Saros (18,6 años) para predecir eclipses',
+        '240 a.C. — Eratóstenes mide la circunferencia de la Tierra usando sombras y geometría',
+        '270 a.C. — Aristarco propone el heliocentrismo — ignorado durante 18 siglos',
+      ],
+    },
+    {
+      nombre: 'Modelos Clásicos y Geocentrismo',
+      desde: -200,
+      hasta: 1543,
+      icono: '🌍',
+      hitosDestacados: ['Astronomía Griega', 'Astronomía Islámica y Medieval'],
+      eventos: [
+        '150 d.C. — Ptolomeo sistematiza el geocentrismo en el Almagesto con epiciclos',
+        '820 d.C. — Al-Battani corrige el Almagesto con siglos de nuevas observaciones',
+        '1000 d.C. — Las Tablas de Toledo de Al-Zarqali se convierten en estándar europeo',
+        '1252 — Alfonso X financia las Tablas Alfonsíes — estándar de efeméridas dos siglos',
+        '1471 — Regiomontano publica el primer libro de astronomía impreso en Europa',
+      ],
+    },
+    {
+      nombre: 'Revolución Copernicana',
+      desde: 1543,
+      hasta: 1700,
+      icono: '🌞',
+      hitosDestacados: ['Revolución Copernicana', 'Kepler y Galileo'],
+      eventos: [
+        '1543 — Copérnico publica el heliocentrismo moderno en De revolutionibus',
+        '1572 — Tycho Brahe observa una supernova — el cielo no es inmutable',
+        '1609 — Galileo apunta el telescopio: lunas de Júpiter, fases de Venus',
+        '1619 — Kepler publica su tercera ley: las órbitas son elipses perfectas',
+        '1632 — Galileo publica el Diálogo — es condenado y arrestado por la Inquisición',
+      ],
+    },
+    {
+      nombre: 'Astronomía Telescópica',
+      desde: 1700,
+      hasta: 1920,
+      icono: '🔭',
+      hitosDestacados: ['Astronomía Newtoniana', 'Espectroscopía y Astrofísica'],
+      eventos: [
+        '1687 — Newton publica los Principia: gravitación universal',
+        '1758 — El cometa de Halley regresa como predijo — 16 años tras su muerte',
+        '1781 — Herschel descubre Urano: primer planeta descubierto con telescopio',
+        '1814 — Fraunhofer descubre las líneas espectrales del Sol',
+        '1912 — Leavitt descubre la relación período-luminosidad de las cefeidas',
+      ],
+    },
+    {
+      nombre: 'Astrofísica y Cosmología',
+      desde: 1920,
+      hasta: 1990,
+      icono: '⭐',
+      hitosDestacados: ['Relatividad, Big Bang y Era Espacial'],
+      eventos: [
+        '1924 — Hubble demuestra que Andrómeda es una galaxia fuera de la Vía Láctea',
+        '1927 — Lemaître propone el Big Bang (átomo primitivo)',
+        '1957 — Sputnik: inicio de la era espacial',
+        '1969 — Apollo 11: humanos en la Luna',
+        '1970s — Vera Rubin demuestra la existencia de materia oscura',
+      ],
+    },
+    {
+      nombre: 'Cosmología y Era Digital',
+      desde: 1990,
+      hasta: 9999,
+      icono: '🚀',
+      hitosDestacados: ['Cosmología Moderna y Grandes Telescopios', 'James Webb y Astronomía del Siglo XXI'],
+      eventos: [
+        '1990 — Lanzamiento del Telescopio Hubble: astronomía desde fuera de la atmósfera',
+        '1998 — Descubrimiento de la expansión acelerada del universo — energía oscura',
+        '2015 — LIGO detecta ondas gravitacionales: nueva ventana al universo',
+        '2019 — EHT fotografía por primera vez la sombra de un agujero negro (M87*)',
+        '2022 — JWST envía primeras imágenes: galaxias de hace 13.000 millones de años',
+      ],
+    },
+  ],
+
+  categorias: {
+    antigua: 'Antigua',
+    clasica: 'Clásica',
+    medieval: 'Medieval',
+    moderna: 'Moderna',
+    contemporanea: 'Contemporánea',
+  },
+
+  colores: {
+    antigua: '#8B4513',
+    clasica: '#DAA520',
+    medieval: '#2E8B57',
+    moderna: '#1E90FF',
+    contemporanea: '#4B0082',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La astronomía es la más antigua de las ciencias y la que más ha cambiado nuestra visión de nosotros mismos. En 5000 años pasó de la observación desnuda del cielo a telescopios espaciales que ven el universo primitivo y detectores de ondas gravitacionales. Cada período está ligado a una herramienta: el ojo desnudo, el cálculo matemático, el telescopio, la espectroscopía, los satélites y el infrarrojo.',
+
+    tablaComparativa: [
+      { hito: 'Astronomía Griega', periodo: '600 a.C.–100 d.C.', categoria: 'Clásica', personaje: 'Aristarco de Samos', aportacion: 'Heliocentrismo propuesto 18 siglos antes de Copérnico' },
+      { hito: 'Revolución Copernicana', periodo: '1543–1610', categoria: 'Moderna', personaje: 'Nicolás Copérnico', aportacion: 'La Tierra orbita el Sol — inicio de la revolución científica' },
+      { hito: 'Kepler y Galileo', periodo: '1609–1650', categoria: 'Moderna', personaje: 'Galileo Galilei', aportacion: 'Telescopio + órbitas elípticas derrumban el modelo circular' },
+      { hito: 'Espectroscopía y Astrofísica', periodo: '1814–1920', categoria: 'Moderna', personaje: 'Henrietta Swan Leavitt', aportacion: 'Cefeidas como regla para medir el universo' },
+      { hito: 'Relatividad, Big Bang y Era Espacial', periodo: '1915–1990', categoria: 'Contemporánea', personaje: 'Edwin Hubble', aportacion: 'El universo se expande desde un Big Bang' },
+      { hito: 'James Webb y Astronomía del Siglo XXI', periodo: '2015–actualidad', categoria: 'Contemporánea', personaje: 'Equipo LIGO/JWST', aportacion: 'Ondas gravitacionales y galaxias del universo primitivo' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de bachillerato',
+        perfil: 'Preparando Física de 2.º de Bachillerato',
+        texto: 'Obtén contexto completo para el tema de astronomía y universo con la cronología de descubrimientos que explica cómo llegamos al modelo cosmológico actual: del geocentrismo ptolemaico al Big Bang y la energía oscura.',
+      },
+      {
+        icono: '🔭',
+        titulo: 'Aficionado a la astronomía',
+        perfil: 'Observador con telescopio amateur',
+        texto: 'Descubre la historia de lo que observas: quién descubrió Urano, cómo Halley predijo el regreso del cometa, por qué el telescopio reflector de Newton fue un avance decisivo y qué diferencia hay entre el Hubble y el James Webb.',
+      },
+      {
+        icono: '📺',
+        titulo: 'Fan de la divulgación científica',
+        perfil: 'Sigue Cosmos, NDT o Brian Cox',
+        texto: 'Si disfrutas con Cosmos de Carl Sagan, las charlas de Neil deGrasse Tyson o los documentales de Brian Cox, este visualizador te da el mapa histórico que conecta todos esos descubrimientos en orden cronológico.',
+      },
+      {
+        icono: '🔍',
+        titulo: 'Curioso sobre la carrera espacial',
+        perfil: 'Interesado en exploración espacial',
+        texto: 'Explora cómo el Sputnik, el Apollo 11 y el JWST son parte de un continuo que va desde Stonehenge hasta la búsqueda de biofirmas en exoplanetas —el mayor proyecto de exploración de la historia humana.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué tardó tanto la humanidad en aceptar el heliocentrismo?',
+        respuesta: 'Aristarco propuso el heliocentrismo en el 270 a.C., pero fue rechazado por razones filosóficas, religiosas y prácticas: el modelo geocéntrico de Ptolomeo funcionaba suficientemente bien para navegar y fijar calendarios. Copérnico tardó 30 años en publicarlo. Galileo fue condenado por defenderlo. El heliocentrismo no se impuso por ser más "obvio", sino porque predecía los fenómenos con más precisión y con menos correcciones ad hoc (epiciclos).',
+        tip: 'El propio Copérnico usó epiciclos en su modelo heliocéntrico — fue Kepler quien los eliminó con las órbitas elípticas.',
+      },
+      {
+        pregunta: '¿Qué es exactamente la materia oscura y por qué no podemos verla?',
+        respuesta: 'La materia oscura es masa que no emite, absorbe ni refleja luz electromagnética. Vera Rubin la detectó indirectamente en los años 70 midiendo que las galaxias rotan demasiado rápido para la masa visible que contienen. Sin materia oscura extra, las galaxias se desintegrarían. Hoy sabemos que compone el 27% del universo, pero desconocemos su naturaleza: podría ser WIMPs, axiones u algo completamente desconocido.',
+        tip: 'La energía oscura (68% del universo) es diferente: es lo que causa la expansión acelerada del universo — aún más misteriosa que la materia oscura.',
+      },
+      {
+        pregunta: '¿Cómo sabemos la edad del universo?',
+        respuesta: 'La edad del universo (13.800 millones de años) se calcula a partir de tres métodos independientes: la ley de Hubble (velocidad de expansión), la temperatura del fondo cósmico de microondas (medido con precisión milimétrica por WMAP y Planck), y las estrellas más antiguas conocidas. Los tres métodos convergen en torno a 13,8 Ga, con incertidumbre menor al 1%.',
+        tip: 'La tensión de Hubble: los dos métodos principales dan valores ligeramente distintos para la constante de Hubble — uno de los misterios abiertos más activos de la cosmología actual.',
+      },
+      {
+        pregunta: '¿Qué ve el Telescopio James Webb que no podía ver el Hubble?',
+        respuesta: 'El JWST observa en infrarrojo, lo que le permite ver galaxias formadas 300–500 millones de años después del Big Bang. El espejo del JWST es 6,25 veces mayor en superficie, con 6 veces más sensibilidad. Puede analizar la atmósfera de exoplanetas buscando biofirmas: agua, metano, CO₂. El Hubble observa principalmente en visible y ultravioleta y no detecta esa luz tan desplazada hacia el rojo.',
+        tip: 'El JWST orbita el punto L2 Sol-Tierra, a 1,5 millones de km de la Tierra — demasiado lejos para reparaciones como las que se hicieron al Hubble.',
+      },
+      {
+        pregunta: '¿Qué son las ondas gravitacionales y por qué son importantes?',
+        respuesta: 'Las ondas gravitacionales son perturbaciones en la curvatura del espacio-tiempo predichas por Einstein en 1916 y detectadas por primera vez por LIGO en 2015, un siglo después. Fueron producidas por la fusión de dos agujeros negros a 1.300 millones de años luz. Abren una nueva "ventana" al universo: podemos detectar objetos que no emiten luz (agujeros negros, estrellas de neutrones) a través de las vibraciones que producen en el espacio-tiempo.',
+        tip: 'La sensibilidad de LIGO es asombrosa: detecta variaciones de distancia 1000 veces menores que el diámetro de un protón en un detector de 4 km de largo.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Identifica el instrumento o tecnología que hizo posible el período',
+        cuerpo: 'Cada período astronómico está ligado a una herramienta: el ojo desnudo (Stonehenge, babilonios), el cálculo matemático (Aristarco, Ptolomeo), el telescopio refractor (Galileo), el reflector (Newton), la espectroscopía (Fraunhofer), los satélites (Hubble, JWST), los detectores de ondas (LIGO). La astronomía avanza en saltos tecnológicos.',
+      },
+      {
+        titulo: 'Comprende el modelo del universo vigente antes del descubrimiento',
+        cuerpo: 'Los descubrimientos astronómicos son revoluciones de paradigma. Para entender por qué importó que Hubble demostrara que Andrómeda es una galaxia, necesitas saber que antes se creía que la Vía Láctea era todo el universo. El contraste entre el antes y el después es lo que da dimensión al hallazgo.',
+      },
+      {
+        titulo: 'Aprende quién hizo el descubrimiento y en qué contexto social',
+        cuerpo: 'La astronomía tiene una historia de invisibilización: Jocelyn Bell descubrió los pulsares y no recibió el Nobel; las "computers" de Harvard clasificaron 400.000 estrellas sin crédito; Vera Rubin esperó décadas para que su trabajo sobre materia oscura fuera reconocido. La historia de la ciencia incluye también sus sesgos.',
+      },
+      {
+        titulo: 'Conecta el descubrimiento con sus consecuencias filosóficas',
+        cuerpo: 'La astronomía es la ciencia que más ha sacudido el ego humano: la Tierra no es el centro, el Sol es una estrella mediocre, la Vía Láctea es una de 400.000 millones de galaxias, y el universo tiene 13.800 millones de años. Cada período astronómico reubica nuestra posición en el cosmos.',
+      },
+      {
+        titulo: 'Busca el misterio abierto que deja el período',
+        cuerpo: 'Ningún período cierra todas las preguntas — siempre abre nuevas. Newton explicó la gravedad pero no su causa. Einstein reconcilió gravedad y geometría pero no con la mecánica cuántica. El JWST resuelve preguntas sobre el universo primitivo y abre la cuestión de las biofirmas. Estudiar el misterio pendiente te da la dirección de la ciencia siguiente.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📐',
+        texto: 'La astronomía es la más antigua de las ciencias y la que más ha cambiado nuestra visión de nosotros mismos. Estudiarla cronológicamente revela cómo las ideas cambian cuando cambian los instrumentos.',
+      },
+      {
+        icono: '🔢',
+        texto: 'Los períodos se solapan: Newton publicó sus Principia en 1687 mientras Herschel aún no había nacido. La astronomía no es una cadena de relevos, sino una conversación continua donde varios proyectos coexisten.',
+      },
+      {
+        icono: '🗺️',
+        texto: 'Aprende primero los grandes saltos: heliocentrismo (Copérnico), telescopio (Galileo), gravitación (Newton), expansión del universo (Hubble), Big Bang (Lemaître/Penzias). El resto son elaboraciones de esos pilares.',
+      },
+      {
+        icono: '✅',
+        texto: 'Usa la cronología para entender qué datos tenía disponibles cada astrónomo. Copérnico no sabía que las órbitas eran elípticas; Einstein no sabía que la expansión era acelerada. El contexto histórico explica las limitaciones de cada modelo.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Confundir astrología con astronomía',
+        cuerpo: 'La astrología es una práctica cultural sin base científica; la astronomía es la ciencia que estudia los cuerpos celestes. El zodíaco babilónico es un artefacto matemático de división de la eclíptica, no una descripción de influencias sobre la personalidad. Nacieron juntas como tradición, pero se separaron definitivamente con la revolución científica.',
+      },
+      {
+        titulo: 'Creer que Galileo inventó el telescopio',
+        cuerpo: 'Galileo mejoró el telescopio y fue el primero en apuntarlo sistemáticamente al cielo para hacer ciencia, pero el instrumento fue inventado por Hans Lippershey en los Países Bajos en 1608. Galileo construyó su propio telescopio con 20x de aumento al año siguiente y lo documentó meticulosamente.',
+      },
+      {
+        titulo: 'Pensar que el Big Bang fue una explosión en el espacio vacío',
+        cuerpo: 'El Big Bang fue la expansión del espacio mismo desde un estado de densidad y temperatura extremas. No ocurrió en un punto del espacio preexistente — el espacio se creó con el Big Bang. No tiene sentido preguntar "¿dónde ocurrió?" ni "¿qué había antes?": esas preguntas no tienen respuesta en la física actual.',
+      },
+      {
+        titulo: 'Asumir que Copérnico resolvió el problema del movimiento planetario',
+        cuerpo: 'El modelo heliocéntrico de Copérnico seguía usando círculos perfectos y epiciclos. Fue Kepler quien, 60 años después, descubrió que las órbitas son elipses y eliminó los epiciclos — haciendo el modelo heliocéntrico más simple y preciso que el ptolemaico. Copérnico dio el marco; Kepler lo corrigió con datos reales.',
+      },
+    ],
+  },
+};

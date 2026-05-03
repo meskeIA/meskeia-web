@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const psicologia: HistoriaData = {
+  slug: 'psicologia',
+  titulo: 'Historia de la Psicología: De Platón a la IA Terapéutica',
+  subtitulo: 'De la filosofía griega a los chatbots terapéuticos — 10 períodos con corrientes, figuras clave y contexto histórico de 2.400 años de estudio de la mente',
+  descripcionSEO: 'Cronología interactiva de la historia de la psicología: de Platón y Aristóteles al psicoanálisis de Freud, el conductismo de Watson, la revolución cognitiva y la neurociencia con IA. 10 períodos clave y 6 eras históricas.',
+  keywords: [
+    'historia de la psicología cronología',
+    'psicoanálisis freud jung inconsciente',
+    'conductismo watson pavlov skinner condicionamiento',
+    'psicología cognitiva miller neisser procesamiento información',
+    'psicología humanista maslow rogers autorrealización',
+    'neurociencia cognitiva fMRI cerebro emociones',
+    'psicología positiva seligman bienestar resiliencia',
+    'terapia digital chatbot IA woebot salud mental',
+  ],
+  anioInicio: -400,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'raices-filosoficas',
+      nombre: 'Raíces Filosóficas Antiguas',
+      anioInicio: -400,
+      anioFin: 1600,
+      color: '#7986CB',
+      categoria: 'filosofica',
+      descripcion: 'Platón y Aristóteles sientan las bases conceptuales: el alma tripartita, la memoria, los sueños y la percepción como objeto de estudio filosófico. Más tarde, Avicena describe estados emocionales en el Canon de Medicina y los escolásticos medievales debaten sobre el alma y la cognición.',
+      obraIconica: 'De Anima — Aristóteles (c. 350 a.C.) — primer tratado sistemático sobre el alma, la percepción y las facultades mentales',
+      paises: ['Grecia', 'Roma', 'Persia', 'Europa Medieval'],
+    },
+    {
+      id: 'empirismo-asociacionismo',
+      nombre: 'Empirismo y Asociacionismo',
+      anioInicio: 1600,
+      anioFin: 1800,
+      color: '#AB47BC',
+      categoria: 'filosofica',
+      descripcion: 'Locke, Hume y Hartley proponen que la mente se forma por asociación de experiencias sensoriales, sentando las bases del empirismo psicológico. La idea de que la mente es una "tabula rasa" al nacer dominará el pensamiento previo a la psicología experimental.',
+      obraIconica: 'Ensayo sobre el entendimiento humano — John Locke (1689) — la mente como tabula rasa: todo conocimiento viene de la experiencia sensorial',
+      paises: ['Inglaterra', 'Escocia', 'Francia'],
+    },
+    {
+      id: 'psicofisica-experimental',
+      nombre: 'Psicofísica y Psicología Experimental',
+      anioInicio: 1800,
+      anioFin: 1900,
+      color: '#EF5350',
+      categoria: 'experimental',
+      descripcion: 'Fechner establece la psicofísica midiendo la relación entre estímulo físico y percepción. Helmholtz mide la velocidad del impulso nervioso. Wundt funda el primer laboratorio de psicología en Leipzig (1879) y William James describe la corriente de conciencia. Nace la psicología como ciencia independiente.',
+      obraIconica: 'Principios de Psicología — William James (1890) — la corriente de conciencia y la psicología funcionalista americana',
+      paises: ['Alemania', 'EE.UU.'],
+    },
+    {
+      id: 'psicoanalisis',
+      nombre: 'Psicoanálisis',
+      anioInicio: 1895,
+      anioFin: 1945,
+      color: '#FF7043',
+      categoria: 'clinica',
+      descripcion: 'Freud desarrolla el psicoanálisis: inconsciente, mecanismos de defensa, interpretación de sueños y asociación libre. Jung, Adler y Klein amplían y divergen de la teoría freudiana. La psicología pasa de los laboratorios al diván y a la consulta clínica.',
+      obraIconica: 'La interpretación de los sueños — Sigmund Freud (1899) — el inconsciente como territorio a explorar mediante el análisis de los sueños',
+      paises: ['Austria', 'Alemania', 'Reino Unido'],
+    },
+    {
+      id: 'conductismo',
+      nombre: 'Conductismo',
+      anioInicio: 1913,
+      anioFin: 1960,
+      color: '#FFA726',
+      categoria: 'experimental',
+      descripcion: 'Watson proclama que la psicología debe estudiar solo conductas observables. Pavlov descubre el condicionamiento clásico. Skinner desarrolla el condicionamiento operante y la caja de Skinner. El conductismo domina la psicología académica durante décadas y redefine el aprendizaje.',
+      obraIconica: 'Conducta de los organismos — B.F. Skinner (1938) — el condicionamiento operante como mecanismo universal del aprendizaje',
+      paises: ['EE.UU.', 'Rusia'],
+    },
+    {
+      id: 'psicologia-humanista',
+      nombre: 'Psicología Humanista',
+      anioInicio: 1940,
+      anioFin: 1975,
+      color: '#FFCA28',
+      categoria: 'clinica',
+      descripcion: 'Maslow propone la jerarquía de necesidades y el concepto de autorrealización. Rogers desarrolla la terapia centrada en el cliente. La psicología humanista rechaza el determinismo conductista y psicoanalítico, poniendo el foco en el potencial humano y el crecimiento personal.',
+      obraIconica: 'Motivación y personalidad — Abraham Maslow (1954) — la pirámide de necesidades como modelo del desarrollo humano',
+      paises: ['EE.UU.'],
+    },
+    {
+      id: 'revolucion-cognitiva',
+      nombre: 'Revolución Cognitiva',
+      anioInicio: 1956,
+      anioFin: 1985,
+      color: '#66BB6A',
+      categoria: 'cognitiva',
+      descripcion: 'Miller publica "El mágico número 7". Neisser acuña "psicología cognitiva". El ordenador se convierte en metáfora de la mente: memoria, atención, lenguaje y resolución de problemas son los nuevos objetos de estudio. Chomsky demuestra que el lenguaje no puede explicarse solo por condicionamiento.',
+      obraIconica: 'Psicología cognitiva — Ulric Neisser (1967) — primer manual que unifica los procesos mentales bajo el modelo del procesamiento de información',
+      paises: ['EE.UU.', 'Reino Unido'],
+    },
+    {
+      id: 'psicologia-social-clinica',
+      nombre: 'Psicología Social y Clínica Moderna',
+      anioInicio: 1960,
+      anioFin: 1995,
+      color: '#26A69A',
+      categoria: 'clinica',
+      descripcion: 'Milgram estudia la obediencia a la autoridad. Zimbardo conduce el experimento de la prisión de Stanford. Beck desarrolla la terapia cognitiva para la depresión, dando lugar a la TCC. Bandura introduce el aprendizaje observacional y el concepto de autoeficacia.',
+      obraIconica: 'Terapia cognitiva de la depresión — Aaron Beck (1979) — base de la terapia cognitivo-conductual, el tratamiento psicológico más validado empíricamente',
+      paises: ['EE.UU.', 'Reino Unido'],
+    },
+    {
+      id: 'neurociencia-cognitiva',
+      nombre: 'Neurociencia Cognitiva',
+      anioInicio: 1980,
+      anioFin: 2015,
+      color: '#29B6F6',
+      categoria: 'neurociencia',
+      descripcion: 'La fMRI permite visualizar el cerebro en acción. Se identifican regiones para memoria (hipocampo), emociones (amígdala) y decisiones (corteza prefrontal). Damasio demuestra que las emociones son esenciales para la toma de decisiones. La psicología positiva de Seligman inaugura el estudio científico del bienestar.',
+      obraIconica: 'El error de Descartes — Antonio Damasio (1994) — las emociones son necesarias para la razón: el cuerpo y la mente no son separables',
+      paises: ['EE.UU.', 'Portugal', 'Reino Unido'],
+    },
+    {
+      id: 'neurociencia-ia-aplicada',
+      nombre: 'Neurociencia e IA Aplicada',
+      anioInicio: 2015,
+      anioFin: 9999,
+      color: '#78909C',
+      categoria: 'neurociencia',
+      descripcion: 'Chatbots terapéuticos (Woebot), estimulación cerebral no invasiva, análisis de lenguaje para diagnóstico de depresión. La IA comienza a asistir en evaluación psicológica. Los modelos computacionales de la mente y la psicología evolucionista explican mecanismos cognitivos con precisión sin precedentes.',
+      obraIconica: 'Woebot (2017) — primer chatbot terapéutico basado en TCC con IA; ensayos clínicos muestran reducción de síntomas de ansiedad y depresión en 2 semanas',
+      paises: ['EE.UU.', 'Global'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Filosofía y Alma',
+      desde: -400,
+      hasta: 1800,
+      icono: '🦉',
+      hitosDestacados: ['Raíces Filosóficas Antiguas', 'Empirismo y Asociacionismo'],
+      eventos: [
+        '-387 — Platón funda la Academia: el alma como objeto de estudio filosófico',
+        '350 a.C. — Aristóteles escribe De Anima, primer tratado sistemático sobre la mente',
+        '1025 — Avicena publica el Canon de Medicina, describiendo estados emocionales y trastornos mentales',
+        '1689 — Locke propone la mente como tabula rasa en el Ensayo sobre el entendimiento humano',
+        '1748 — Hume publica Investigación sobre el entendimiento humano, consolidando el empirismo',
+      ],
+    },
+    {
+      nombre: 'Empirismo y Fisiología',
+      desde: 1800,
+      hasta: 1879,
+      icono: '🔬',
+      hitosDestacados: ['Psicofísica y Psicología Experimental'],
+      eventos: [
+        '1838 — Weber establece la ley de la diferencia apenas perceptible entre estímulos',
+        '1850 — Helmholtz mide la velocidad del impulso nervioso: la mente tiene física',
+        '1860 — Fechner publica Elementos de psicofísica: nace la medición de la percepción',
+        '1870 — Broca y Wernicke localizan áreas del lenguaje en el cerebro',
+        '1874 — Wundt publica Principios de psicología fisiológica, preparando el primer laboratorio',
+      ],
+    },
+    {
+      nombre: 'Psicología Científica',
+      desde: 1879,
+      hasta: 1920,
+      icono: '🧪',
+      hitosDestacados: ['Psicofísica y Psicología Experimental', 'Psicoanálisis'],
+      eventos: [
+        '1879 — Wundt funda el primer laboratorio de psicología experimental en Leipzig',
+        '1885 — Ebbinghaus publica su estudio sobre la memoria y la curva del olvido',
+        '1890 — William James publica los Principios de Psicología, fundando el funcionalismo',
+        '1895 — Freud y Breuer publican Estudios sobre la histeria, origen del psicoanálisis',
+        '1899 — Freud publica La interpretación de los sueños',
+      ],
+    },
+    {
+      nombre: 'Grandes Escuelas',
+      desde: 1920,
+      hasta: 1960,
+      icono: '🛋️',
+      hitosDestacados: ['Conductismo', 'Psicología Humanista'],
+      eventos: [
+        '1913 — Watson proclama el manifiesto conductista: solo conductas observables',
+        '1920 — Pavlov recibe el Nobel por sus estudios del condicionamiento clásico',
+        '1938 — Skinner publica La conducta de los organismos: condicionamiento operante',
+        '1943 — Maslow publica Una teoría de la motivación humana con la jerarquía de necesidades',
+        '1951 — Rogers publica Terapia centrada en el cliente, fundando la psicología humanista',
+      ],
+    },
+    {
+      nombre: 'Revolución Cognitiva',
+      desde: 1960,
+      hasta: 2000,
+      icono: '🧠',
+      hitosDestacados: ['Revolución Cognitiva', 'Psicología Social y Clínica Moderna'],
+      eventos: [
+        '1956 — Miller publica El mágico número 7: nace oficialmente la psicología cognitiva',
+        '1961 — Milgram realiza el experimento de obediencia a la autoridad',
+        '1967 — Neisser publica Psicología cognitiva, el primer manual de la disciplina',
+        '1979 — Beck publica Terapia cognitiva de la depresión: nace la TCC',
+        '1998 — Seligman inaugura la psicología positiva en su discurso presidencial APA',
+      ],
+    },
+    {
+      nombre: 'Neurociencia y Era Digital',
+      desde: 2000,
+      hasta: 9999,
+      icono: '💻',
+      hitosDestacados: ['Neurociencia Cognitiva', 'Neurociencia e IA Aplicada'],
+      eventos: [
+        '1994 — Damasio publica El error de Descartes: emociones y razón son inseparables',
+        '2000 — Kandel recibe el Nobel por sus investigaciones sobre la memoria a nivel celular',
+        '2008 — La neurociencia cognitiva incorpora la psicología evolucionista al modelo computacional',
+        '2017 — Woebot lanza el primer chatbot terapéutico basado en TCC con IA',
+        '2023 — Los LLMs (GPT-4, Claude) se integran en plataformas de salud mental digital',
+      ],
+    },
+  ],
+
+  categorias: {
+    filosofica: 'Filosófica',
+    experimental: 'Experimental',
+    clinica: 'Clínica',
+    cognitiva: 'Cognitiva',
+    neurociencia: 'Neurociencia',
+  },
+
+  colores: {
+    filosofica: '#7986CB',
+    experimental: '#EF5350',
+    clinica: '#66BB6A',
+    cognitiva: '#29B6F6',
+    neurociencia: '#78909C',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La psicología como ciencia independiente tiene apenas 145 años, pero sus raíces se hunden en los 2.400 años de reflexión filosófica sobre el alma, la mente y la conducta humana. Cuando Wilhelm Wundt fundó el primer laboratorio de psicología experimental en Leipzig en 1879, estaba formalizando una disciplina que Platón y Aristóteles habían anticipado. El siglo XX fue escenario de una batalla intelectual entre el psicoanálisis, el conductismo, el humanismo y la revolución cognitiva. Hoy, la neurociencia y la inteligencia artificial redefinen tanto los modelos teóricos de la mente como las herramientas terapéuticas disponibles.',
+
+    tablaComparativa: [
+      { hito: 'Psicofísica y Psicología Experimental', periodo: '1800–1900', categoria: 'Experimental', personaje: 'Wilhelm Wundt', aportacion: 'Fundación del primer laboratorio: la psicología se separa de la filosofía' },
+      { hito: 'Psicoanálisis', periodo: '1895–1945', categoria: 'Clínica', personaje: 'Sigmund Freud', aportacion: 'El inconsciente como motor de la conducta; nace la psicoterapia moderna' },
+      { hito: 'Conductismo', periodo: '1913–1960', categoria: 'Experimental', personaje: 'B.F. Skinner', aportacion: 'Condicionamiento operante: el aprendizaje como moldeamiento de conductas' },
+      { hito: 'Psicología Humanista', periodo: '1940–1975', categoria: 'Clínica', personaje: 'Abraham Maslow', aportacion: 'Autorrealización y potencial humano frente al determinismo' },
+      { hito: 'Revolución Cognitiva', periodo: '1956–1985', categoria: 'Cognitiva', personaje: 'Ulric Neisser', aportacion: 'El ordenador como metáfora: memoria, atención y lenguaje como procesos' },
+      { hito: 'Neurociencia e IA Aplicada', periodo: '2015–actualidad', categoria: 'Neurociencia', personaje: 'Karl Deisseroth', aportacion: 'Optogenética, neuroimagen y chatbots terapéuticos con IA' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de psicología o humanidades',
+        perfil: 'Preparando exámenes de historia de la psicología',
+        texto: 'Repasa la evolución de las corrientes psicológicas con la cronología visual. Entiende por qué el conductismo y el psicoanálisis eran incompatibles, qué aportó la revolución cognitiva y cómo surgió la neurociencia cognitiva para preparar trabajos y exámenes.',
+      },
+      {
+        icono: '🧠',
+        titulo: 'Curioso sobre la mente humana',
+        perfil: 'Interesado en psicología pero sin formación formal',
+        texto: 'Quiere entender el origen de conceptos que usa a diario: el inconsciente, el condicionamiento, la autorrealización, el flow. Esta cronología sitúa cada idea en su contexto histórico e intelectual para que cobren su verdadero sentido.',
+      },
+      {
+        icono: '🌱',
+        titulo: 'Profesional que aplica psicología',
+        perfil: 'Coach, educador, recursos humanos, terapeuta',
+        texto: 'Necesita conocer las tradiciones que fundamentan las herramientas que usa: la TCC viene de Beck y la revolución cognitiva, el coaching ejecutivo bebe del humanismo de Maslow, la psicología positiva en organizaciones viene de Seligman. Las raíces explican las limitaciones y alcances.',
+      },
+      {
+        icono: '💬',
+        titulo: 'Interesado en salud mental digital',
+        perfil: 'Usa apps de mindfulness o terapia online',
+        texto: 'Quiere entender qué hay detrás de Headspace, Woebot o la terapia cognitivo-conductual online. La cronología conecta las apps actuales con sus fundamentos teóricos y muestra por qué algunas técnicas digitales funcionan y otras son simplemente marketing.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Freud sigue siendo válido científicamente?',
+        respuesta: 'Muchos conceptos freudianos han sido abandonados por la psicología científica por no ser falsables. Sin embargo, su influencia cultural es enorme y algunos mecanismos como la represión o la proyección han encontrado respaldo parcial en la investigación cognitiva moderna. La neuropsicoanálisis intenta tender puentes entre ambos mundos.',
+        tip: 'Distingue entre el psicoanálisis como práctica clínica y como teoría científica — son debates separados y con respuestas distintas.',
+      },
+      {
+        pregunta: '¿Qué es exactamente la psicología positiva?',
+        respuesta: 'La psicología positiva, inaugurada por Martin Seligman en 1998, estudia científicamente el bienestar, las fortalezas de carácter, el flow, la resiliencia y el florecimiento humano. No es autoayuda ni pensamiento positivo: usa metodología experimental rigurosa. Su modelo PERMA describe los cinco pilares del bienestar: emociones positivas, engagement, relaciones, sentido y logro.',
+        tip: 'El libro La auténtica felicidad de Seligman es un buen punto de entrada, pero los desarrollos posteriores (Flourish, 2011) son más rigurosos.',
+      },
+      {
+        pregunta: '¿Puede la IA hacer terapia psicológica?',
+        respuesta: 'La IA actual puede guiar técnicas de TCC estructuradas con cierta eficacia para síntomas leves de ansiedad y depresión (Woebot ha mostrado resultados prometedores en ensayos controlados). Sin embargo, no puede reemplazar la relación terapéutica humana, el diagnóstico clínico, las crisis de salud mental graves ni la adaptación flexible a cada caso.',
+        tip: 'La ética de la IA en salud mental es uno de los debates más activos de la psicología clínica actual. Es una herramienta complementaria, no sustituta.',
+      },
+      {
+        pregunta: '¿Qué diferencia a un psicólogo de un psiquiatra?',
+        respuesta: 'El psiquiatra es médico especializado: puede prescribir medicación y trata trastornos mentales desde un modelo biomédico. El psicólogo clínico es licenciado en psicología con formación especializada: usa psicoterapia y evaluación psicológica. En España, el psicólogo clínico requiere el título de Especialista en Psicología Clínica (PIR). Ambos pueden colaborar en el tratamiento de un mismo paciente.',
+        tip: 'Para trastornos moderados-graves, el abordaje combinado (medicación + psicoterapia) suele ser más eficaz que cualquiera por separado.',
+      },
+      {
+        pregunta: '¿Cómo ha cambiado el tratamiento de la depresión a lo largo de la historia?',
+        respuesta: 'En el psicoanálisis, la depresión se entendía como agresión vuelta hacia uno mismo y se trataba con años de terapia. Con el conductismo, se identificó el papel del refuerzo y la indefensión aprendida. Beck desarrolló la terapia cognitiva en los 70 demostrando que los pensamientos negativos automáticos son el mecanismo central. Hoy la TCC tiene protocolos de 12-20 sesiones con eficacia comparable a los antidepresivos para depresión moderada.',
+        tip: 'La psicología positiva añade una dimensión: no solo reducir síntomas, sino construir bienestar activamente con el modelo PERMA.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por la Línea del Tiempo',
+        cuerpo: 'Visualiza los 10 períodos en perspectiva temporal. Observa las superposiciones: el conductismo y el psicoanálisis coexistieron décadas con visiones radicalmente opuestas de la mente. La cronología muestra que ninguna escuela se entiende sin las demás.',
+      },
+      {
+        titulo: 'Explora las corrientes que más te interesen',
+        cuerpo: 'En "Período en Detalle" puedes navegar uno a uno por los 10 períodos con sus figuras clave, corriente principal y descripción completa. Úsalo para estudiar o refrescar conocimientos sobre cada escuela psicológica.',
+      },
+      {
+        titulo: 'Compara escuelas con el filtro de categorías',
+        cuerpo: 'En "Comparativa" puedes filtrar por categoría (filosófica, experimental, clínica, cognitiva, neurociencia) para ver qué corrientes pertenecen a cada tradición y compararlas entre sí en la misma pantalla.',
+      },
+      {
+        titulo: 'Ubica los hitos en su contexto histórico',
+        cuerpo: 'El Tab "Contexto Histórico" organiza los períodos y eventos por eras. Observa cómo el nacimiento de la psicología científica en 1879 coincide con la era del positivismo y la industrialización, y cómo cada era moldea los problemas que la psicología intenta resolver.',
+      },
+      {
+        titulo: 'Conecta la psicología con otras disciplinas',
+        cuerpo: 'La psicología cognitiva nació del encuentro con la lingüística (Chomsky) y la informática. La neurociencia cognitiva debe todo a la física y la medicina. La psicología positiva bebe de la filosofía aristotélica de la eudaimonia. Ninguna escuela psicológica se entiende en aislamiento.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🔄',
+        texto: 'La historia de la psicología es una cadena de reacciones: el conductismo rechazó el psicoanálisis, el humanismo rechazó el conductismo, la cognitiva reaccionó contra el conductismo. Entender cada escuela requiere entender contra qué reaccionaba.',
+      },
+      {
+        icono: '🌍',
+        texto: 'Las escuelas psicológicas tienen geografía: el psicoanálisis nació en Viena, el conductismo en EE.UU., la psicología humanista en California. El contexto cultural explica muchas de sus diferencias de énfasis y sus puntos ciegos.',
+      },
+      {
+        icono: '📊',
+        texto: 'La psicología moderna no elige entre escuelas: integra lo que funciona. Un buen psicólogo clínico conoce el apego (psicoanalítico), la TCC (cognitivo-conductual) y las intervenciones basadas en mindfulness (contemplativo-cognitivo).',
+      },
+      {
+        icono: '💡',
+        texto: 'Muchos conceptos de uso cotidiano provienen directamente de estas escuelas: el "inconsciente" (Freud), el "condicionamiento" (Pavlov), la "autorrealización" (Maslow), el "flow" (Csikszentmihalyi). La psicología ha moldeado el lenguaje de la cultura popular.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Confundir psicología con autoayuda',
+        cuerpo: 'La psicología científica usa metodología experimental rigurosa con hipótesis falsables y datos replicables. La autoayuda populariza ideas psicológicas a veces con fundamento y a veces sin él. Un libro de autoayuda basado en psicología positiva puede ser valioso, pero no es lo mismo que un estudio controlado publicado en una revista revisada por pares.',
+      },
+      {
+        titulo: 'Creer que el psicoanálisis y la psicología cognitiva son incompatibles',
+        cuerpo: 'La neuropsicoanálisis (Solms, Kahneman) busca puentes entre la teoría psicoanalítica y la neurociencia cognitiva. Algunos mecanismos freudianos como la represión o el procesamiento inconsciente tienen ahora correlatos en la investigación cognitiva. La integración teórica es la tendencia dominante en la psicología clínica contemporánea.',
+      },
+      {
+        titulo: 'Pensar que la terapia cognitivo-conductual es la única opción válida',
+        cuerpo: 'La TCC tiene la base de evidencia más sólida para muchos trastornos, pero no es universalmente superior. Para trastornos de personalidad, trauma complejo o patología grave, las terapias psicodinámicas y los tratamientos de tercera generación (ACT, DBT, EMDR) tienen evidencia específica comparable o superior.',
+      },
+      {
+        titulo: 'Reducir la historia de la psicología a Freud y Skinner',
+        cuerpo: 'La psicología tiene raíces filosóficas de 2.400 años, múltiples escuelas del siglo XX y desarrollos recientes en neurociencia y computación que han transformado completamente el campo. Freud y Skinner son dos momentos importantes, no la totalidad de la disciplina.',
+      },
+    ],
+  },
+};

@@ -19,6 +19,41 @@ import { laReforma } from './la-reforma';
 import { lasCruzadas } from './las-cruzadas';
 import { ilustracion } from './ilustracion';
 import { cine } from './cine';
+import { astronomia } from './astronomia';
+import { automocion } from './automocion';
+import { aviacion } from './aviacion';
+import { banca } from './banca';
+import { clima } from './clima';
+import { comics } from './comics';
+import { danza } from './danza';
+import { deporte } from './deporte';
+import { economiaEspana } from './economia-espana';
+import { energia } from './energia';
+import { epidemias } from './epidemias';
+import { exploracion } from './exploracion';
+import { fisica } from './fisica';
+import { fotografia } from './fotografia';
+import { gastronomia } from './gastronomia';
+import { internet } from './internet';
+import { matematicas } from './matematicas';
+import { medicina } from './medicina';
+import { moda } from './moda';
+import { modaEspanola } from './moda-espanola';
+import { ordenadores } from './ordenadores';
+import { prensa } from './prensa';
+import { psicologia } from './psicologia';
+import { publicidad } from './publicidad';
+import { quimica } from './quimica';
+import { radio } from './radio';
+import { robotica } from './robotica';
+import { teatro } from './teatro';
+import { telefono } from './telefono';
+import { television } from './television';
+import { tren } from './tren';
+import { viajesEspaciales } from './viajes-espaciales';
+import { videojuegos } from './videojuegos';
+import { videojuegosEspanoles } from './videojuegos-espanoles';
+import { arquitecturaEspanola } from './arquitectura-espanola';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -41,6 +76,41 @@ const registry: Record<string, HistoriaData> = {
   'las-cruzadas': lasCruzadas,
   ilustracion,
   cine,
+  astronomia,
+  automocion,
+  aviacion,
+  banca,
+  clima,
+  comics,
+  danza,
+  deporte,
+  'economia-espana': economiaEspana,
+  energia,
+  epidemias,
+  exploracion,
+  fisica,
+  fotografia,
+  gastronomia,
+  internet,
+  matematicas,
+  medicina,
+  moda,
+  'moda-espanola': modaEspanola,
+  ordenadores,
+  prensa,
+  psicologia,
+  publicidad,
+  quimica,
+  radio,
+  robotica,
+  teatro,
+  telefono,
+  television,
+  tren,
+  'viajes-espaciales': viajesEspaciales,
+  videojuegos,
+  'videojuegos-espanoles': videojuegosEspanoles,
+  'arquitectura-espanola': arquitecturaEspanola,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

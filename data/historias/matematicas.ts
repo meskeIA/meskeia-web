@@ -1,0 +1,368 @@
+import type { HistoriaData } from './types';
+
+export const matematicas: HistoriaData = {
+  slug: 'matematicas',
+  titulo: 'Historia de las Matemáticas: De Babilonia a la Inteligencia Artificial',
+  subtitulo: 'De las tablillas babilónicas a la demostración asistida por IA — 10 períodos con los teoremas y matemáticos que transformaron el pensamiento humano',
+  descripcionSEO: 'Cronología interactiva de la historia de las matemáticas: de Babilonia (3000 a.C.) a la inteligencia artificial (2024). Matemáticas antiguas, griegas, islámicas, cálculo, álgebra abstracta, lógica de Gödel, teoría de la computación y matemáticas e IA en 10 hitos y 6 eras.',
+  keywords: [
+    'historia de las matemáticas cronología',
+    'matemáticas babilónicas egipcias tablillas',
+    'euclides elementos pitágoras matemáticas griegas',
+    'al-juarismi álgebra fibonacci números arábigos',
+    'newton leibniz cálculo infinitesimal',
+    'euler análisis matemático serie fourier',
+    'galois noether álgebra abstracta teoría de grupos',
+    'gödel incompletitud lógica matemática cantor',
+    'turing computación probabilidad kolmogórov',
+    'inteligencia artificial matemáticas alphaproof deepmind',
+  ],
+  anioInicio: -3000,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'matematicas-antiguas',
+      nombre: 'Matemáticas Babilónicas y Egipcias',
+      anioInicio: -3000,
+      anioFin: -500,
+      color: '#8B4513',
+      categoria: 'antigua',
+      descripcion: 'Los babilonios desarrollaron un sistema posicional en base 60 (sexagesimal) con el que resolvían ecuaciones de segundo grado 1500 años antes que los griegos. La tablilla YBC 7289 (c. 1800 a.C.) calcula √2 con 6 decimales de precisión. El papiro de Rhind egipcio (c. 1650 a.C.) muestra operaciones con fracciones unitarias de asombrosa sofisticación. Su sistema sexagesimal aún usamos en horas, minutos y grados.',
+      obraIconica: 'Tablilla YBC 7289 (c. 1800 a.C.) — √2 calculada con 6 decimales de precisión; sistema sexagesimal babilónico',
+      paises: ['Mesopotamia', 'Egipto'],
+    },
+    {
+      id: 'matematicas-griegas',
+      nombre: 'Matemáticas Griegas y Helenísticas',
+      anioInicio: -600,
+      anioFin: 400,
+      color: '#DAA520',
+      categoria: 'clasica',
+      descripcion: 'Los griegos inventaron la demostración matemática. Euclides sistematizó la geometría en Los Elementos (c. 300 a.C.) — 465 proposiciones deducidas de 5 axiomas, el libro más leído después de la Biblia. Arquímedes calculó π entre 3⅓ y 3⅐ anticipando el cálculo integral. Eratóstenes midió la circunferencia de la Tierra con error menor del 2%. Diofanto inventó la notación algebraica proto-simbólica. Hipatia, primera matemática documentada de la historia, fue asesinada en el año 415 en Alejandría.',
+      obraIconica: 'Los Elementos — Euclides (c. 300 a.C.) — 465 proposiciones deducidas de 5 axiomas; fundamento de la geometría durante 2000 años',
+      paises: ['Grecia', 'Egipto (Alejandría)', 'Siracusa'],
+    },
+    {
+      id: 'matematicas-islamicas',
+      nombre: 'Matemáticas Islámicas y Medievales',
+      anioInicio: 800,
+      anioFin: 1400,
+      color: '#2E8B57',
+      categoria: 'medieval',
+      descripcion: 'Al-Juarismi (cuyo nombre dio "algoritmo") formalizó el álgebra en su Kitab al-mukhtasar (c. 830): resolver ecuaciones lineales y cuadráticas de forma sistemática. Fibonacci introdujo los números indo-arábigos en Europa con el Liber Abaci (1202). Omar Jayyam resolvió ecuaciones cúbicas geométricamente. Al-Battani perfeccionó las tablas trigonométricas. La palabra "álgebra" viene del árabe al-jabr, del título del libro de Al-Juarismi.',
+      obraIconica: 'Kitab al-mukhtasar fi hisab al-jabr — Al-Juarismi (c. 830) — funda el álgebra como disciplina autónoma; su nombre dio "algoritmo"',
+      paises: ['Bagdad (Califato Abásida)', 'Persia', 'Al-Ándalus', 'Italia'],
+    },
+    {
+      id: 'revolucion-cientifica',
+      nombre: 'Revolución Científica Matemática',
+      anioInicio: 1545,
+      anioFin: 1637,
+      color: '#9370DB',
+      categoria: 'moderna',
+      descripcion: 'Tartaglia y Cardano resolvieron la ecuación cúbica, encontrando por primera vez los números imaginarios. Viète introdujo la álgebra simbólica moderna con letras para incógnitas y coeficientes. Stevin popularizó los decimales. Descartes (el del "Cogito ergo sum") inventó el plano cartesiano: traducir curvas a ecuaciones y viceversa. Esta geometría analítica hizo posible el cálculo de Newton y Leibniz.',
+      obraIconica: 'La Geometría — René Descartes (1637) — unifica álgebra y geometría con coordenadas (x, y); invención del plano cartesiano',
+      paises: ['Italia', 'Francia', 'Países Bajos'],
+    },
+    {
+      id: 'calculo-infinitesimal',
+      nombre: 'Cálculo Infinitesimal',
+      anioInicio: 1665,
+      anioFin: 1700,
+      color: '#1E90FF',
+      categoria: 'moderna',
+      descripcion: 'Newton inventó el cálculo (fluxiones) para describir el movimiento de los planetas; Leibniz lo publicó primero con la notación dy/dx e ∫ que usamos hoy. La disputa de prioridad dividió matemáticos británicos y continentales durante un siglo. Los hermanos Bernoulli aplicaron el cálculo a docenas de problemas físicos. El Teorema Fundamental del Cálculo demuestra que derivación e integración son operaciones inversas.',
+      obraIconica: 'Principia Mathematica — Isaac Newton (1687) — usa el cálculo para demostrar la ley de gravitación universal y las tres leyes del movimiento',
+      paises: ['Inglaterra', 'Alemania', 'Suiza'],
+    },
+    {
+      id: 'analisis-matematico',
+      nombre: 'Análisis Matemático',
+      anioInicio: 1700,
+      anioFin: 1870,
+      color: '#4169E1',
+      categoria: 'moderna',
+      descripcion: 'Euler fue el matemático más prolífico de la historia: introdujo e, i, π, f(x), Σ y demostró la identidad e^iπ + 1 = 0 (1748). Fourier mostró que cualquier función periódica puede descomponerse en senos y cosenos — fundamento del análisis de señales. Cauchy rigorizó el límite, la continuidad y la derivada con la definición ε-δ. Riemann reimaginó la geometría no-euclidiana y la integral. Weierstrass demostró funciones continuas no derivables en ningún punto.',
+      obraIconica: 'Identidad de Euler e^iπ + 1 = 0 (1748) — conecta las 5 constantes más importantes de las matemáticas; "la ecuación más bella"',
+      paises: ['Suiza', 'Francia', 'Alemania'],
+    },
+    {
+      id: 'algebra-abstracta',
+      nombre: 'Álgebra Abstracta y Teoría de Grupos',
+      anioInicio: 1830,
+      anioFin: 1920,
+      color: '#DC143C',
+      categoria: 'moderna',
+      descripcion: 'Galois murió a los 20 años en un duelo, habiendo fundado la teoría de grupos la noche anterior — demostró que no existe fórmula general para el polinomio de grado 5. Abel probó la imposibilidad de la quíntica por radicales. Cayley formalizó los grupos abstractos. Emmy Noether (1918) demostró que cada simetría física corresponde a una ley de conservación — base teórica de toda la física moderna. Lie desarrolló la teoría de grupos continuos que Einstein usaría en relatividad.',
+      obraIconica: 'Teorema de Noether (1918) — cada simetría corresponde a una ley de conservación; base matemática de toda la física moderna',
+      paises: ['Francia', 'Noruega', 'Gran Bretaña', 'Alemania'],
+    },
+    {
+      id: 'logica-fundamentos',
+      nombre: 'Lógica Matemática y Fundamentos',
+      anioInicio: 1879,
+      anioFin: 1931,
+      color: '#8B008B',
+      categoria: 'contemporanea',
+      descripcion: 'Cantor inventó el infinito matemático y demostró que hay infinitos más grandes que otros. Russell encontró la paradoja que demolió el logicismo de Frege. Hilbert quiso formalizar toda la matemática. Gödel demostró en 1931 que ese programa era imposible: en cualquier sistema formal suficientemente rico hay proposiciones verdaderas que no pueden demostrarse desde dentro del sistema. Tenía 25 años cuando publicó estos teoremas.',
+      obraIconica: 'Teoremas de incompletitud de Gödel (1931) — toda matemática suficientemente rica tiene verdades indemostrables; el mayor shock lógico del siglo XX',
+      paises: ['Alemania', 'Austria', 'Gran Bretaña'],
+    },
+    {
+      id: 'probabilidad-topologia',
+      nombre: 'Probabilidad, Estadística y Topología',
+      anioInicio: 1654,
+      anioFin: 9999,
+      color: '#FF6347',
+      categoria: 'contemporanea',
+      descripcion: 'Pascal y Fermat inventaron la probabilidad en 1654 para un problema de dados. Bayes formuló el teorema de actualización de creencias. Gauss y la distribución normal dominaron la estadística del siglo XIX. Kolmogórov axiomatizó la probabilidad en 1933 con tres axiomas. En topología, Euler inventó la teoría de grafos (puentes de Königsberg, 1736). Poincaré fundó la topología algebraica. Perelman demostró la conjetura de Poincaré en 2003 — el único Problema del Milenio resuelto — y rechazó el premio de 1 millón de dólares.',
+      obraIconica: 'Demostración de la conjetura de Poincaré — Grigori Perelman (2003) — único Problema del Milenio resuelto; Perelman rechazó el millón de dólares',
+      paises: ['Francia', 'Alemania', 'Gran Bretaña', 'Rusia', 'EE.UU.'],
+    },
+    {
+      id: 'matematicas-computacion-ia',
+      nombre: 'Matemáticas Computacionales e Inteligencia Artificial',
+      anioInicio: 1936,
+      anioFin: 9999,
+      color: '#2E86AB',
+      categoria: 'contemporanea',
+      descripcion: 'Turing inventó la máquina abstracta que modela todo ordenador (1936) y demostró la indecidibilidad del problema de la parada. Shannon fundó la teoría de la información con 1 artículo en 1948. Nash estableció el equilibrio que gobierna la economía moderna. Mandelbrot inventó los fractales. Lorenz descubrió el caos. Wiles demostró el Último Teorema de Fermat en 1994 — abierto 358 años. AlphaProof de DeepMind (2024) resolvió 4 problemas de la Olimpiada Internacional de Matemáticas, abriendo la era de la demostración asistida por IA.',
+      obraIconica: 'AlphaProof (DeepMind, 2024) — resuelve 4 de 6 problemas olímpicos; Wiles demuestra el Último Teorema de Fermat (1994) — 358 años abierto',
+      paises: ['Gran Bretaña', 'EE.UU.', 'Francia', 'Rusia', 'Global'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Matemáticas Antiguas',
+      desde: -3000,
+      hasta: -500,
+      icono: '📜',
+      hitosDestacados: ['Matemáticas Babilónicas y Egipcias'],
+      eventos: [
+        '3000 a.C. — Tablillas babilónicas: primeros registros matemáticos sistemáticos de la historia',
+        '1800 a.C. — Tablilla YBC 7289: √2 calculada con 6 decimales de precisión',
+        '1650 a.C. — Papiro de Rhind egipcio: fracciones unitarias y aritmética avanzada',
+        '600 a.C. — Tales de Mileto: primeras demostraciones geométricas conocidas en Grecia',
+      ],
+    },
+    {
+      nombre: 'Grecia y Helenismo',
+      desde: -500,
+      hasta: 500,
+      icono: '🏛️',
+      hitosDestacados: ['Matemáticas Griegas y Helenísticas'],
+      eventos: [
+        '490 a.C. — Pitágoras formaliza el teorema que lleva su nombre (conocido antes en Babilonia)',
+        '300 a.C. — Euclides publica Los Elementos — 2300 años de texto matemático de referencia',
+        '240 a.C. — Eratóstenes mide la circunferencia terrestre con error menor del 2%',
+        '212 a.C. — Muerte de Arquímedes en el asedio de Siracusa; había anticipado el cálculo integral',
+        '415 d.C. — Hipatia de Alejandría, primera matemática documentada de la historia, es asesinada',
+      ],
+    },
+    {
+      nombre: 'Matemáticas Medievales e Islámicas',
+      desde: 500,
+      hasta: 1500,
+      icono: '✍️',
+      hitosDestacados: ['Matemáticas Islámicas y Medievales'],
+      eventos: [
+        '628 — Brahmagupta (India) formaliza las reglas del cero y los números negativos',
+        '830 — Al-Juarismi funda el álgebra; su nombre da origen a la palabra "algoritmo"',
+        '1202 — Fibonacci introduce los números indo-arábigos en Europa con el Liber Abaci',
+        '1070 — Omar Jayyam resuelve ecuaciones cúbicas mediante intersección de cónicas',
+        '1450 — Nicolás de Cusa y otros escolásticos preparan el terreno para la revolución científica',
+      ],
+    },
+    {
+      nombre: 'Revolución Científica',
+      desde: 1500,
+      hasta: 1700,
+      icono: '🔭',
+      hitosDestacados: ['Revolución Científica Matemática', 'Cálculo Infinitesimal'],
+      eventos: [
+        '1545 — Cardano publica la solución de la cúbica y cuártica en Ars Magna',
+        '1614 — Napier inventa los logaritmos, acelerando el cálculo astronómico',
+        '1637 — Descartes publica La Geometría: álgebra y geometría unificadas en coordenadas',
+        '1665 — Newton desarrolla el cálculo (fluxiones) para describir el movimiento planetario',
+        '1687 — Newton publica Principia Mathematica usando el cálculo que inventó 20 años antes',
+      ],
+    },
+    {
+      nombre: 'Análisis Moderno',
+      desde: 1700,
+      hasta: 1900,
+      icono: '📊',
+      hitosDestacados: ['Análisis Matemático', 'Álgebra Abstracta y Teoría de Grupos', 'Probabilidad, Estadística y Topología'],
+      eventos: [
+        '1748 — Euler demuestra la identidad e^iπ + 1 = 0 y sistematiza el análisis',
+        '1822 — Fourier demuestra que cualquier función periódica es suma de senos y cosenos',
+        '1832 — Galois, 20 años, funda la teoría de grupos la noche antes de morir en un duelo',
+        '1854 — Riemann imagina geometrías no-euclidianas que Einstein usará en relatividad',
+        '1895 — Poincaré publica el Analysis Situs, fundando la topología algebraica',
+      ],
+    },
+    {
+      nombre: 'Matemáticas Contemporáneas',
+      desde: 1900,
+      hasta: 9999,
+      icono: '🧠',
+      hitosDestacados: ['Lógica Matemática y Fundamentos', 'Matemáticas Computacionales e Inteligencia Artificial'],
+      eventos: [
+        '1931 — Gödel demuestra la incompletitud: toda matemática suficientemente rica tiene verdades indemostrables',
+        '1936 — Turing define la máquina abstracta que modela todo ordenador; demuestra la indecidibilidad',
+        '1948 — Shannon funda la teoría de la información: bits y entropía en 1 artículo',
+        '2000 — Instituto Clay publica los 7 Problemas del Milenio con 1M$ cada uno',
+        '2024 — AlphaProof (DeepMind) resuelve 4 de 6 problemas olímpicos: la IA entra en la investigación matemática',
+      ],
+    },
+  ],
+
+  categorias: {
+    antigua: 'Antigua',
+    clasica: 'Clásica',
+    medieval: 'Medieval',
+    moderna: 'Moderna',
+    contemporanea: 'Contemporánea',
+  },
+
+  colores: {
+    antigua: '#8B4513',
+    clasica: '#DAA520',
+    medieval: '#2E8B57',
+    moderna: '#1E90FF',
+    contemporanea: '#DC143C',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Las matemáticas son el lenguaje universal del universo y la herramienta que ha hecho posible toda la ciencia y la tecnología modernas. En 5000 años pasaron de tablillas de arcilla con multiplicaciones comerciales a sistemas de inteligencia artificial capaces de demostrar teoremas olímpicos. Cada período nace de una pregunta concreta: ¿cómo medir la Tierra? ¿cómo describir el movimiento? ¿qué es el infinito? ¿qué puede computarse?',
+
+    tablaComparativa: [
+      { hito: 'Matemáticas Griegas y Helenísticas', periodo: '600 a.C.–400 d.C.', categoria: 'Clásica', personaje: 'Euclides', aportacion: 'Demostración axiomática y deductiva como método matemático universal' },
+      { hito: 'Matemáticas Islámicas y Medievales', periodo: '800–1400', categoria: 'Medieval', personaje: 'Al-Juarismi', aportacion: 'Álgebra como disciplina autónoma para resolver ecuaciones sistemáticamente' },
+      { hito: 'Cálculo Infinitesimal', periodo: '1665–1700', categoria: 'Moderna', personaje: 'Newton / Leibniz', aportacion: 'Derivada e integral: herramienta matemática de la revolución científica' },
+      { hito: 'Álgebra Abstracta y Teoría de Grupos', periodo: '1830–1920', categoria: 'Moderna', personaje: 'Galois / Noether', aportacion: 'Estructuras algebraicas abstractas; simetría como principio unificador' },
+      { hito: 'Lógica Matemática y Fundamentos', periodo: '1879–1931', categoria: 'Contemporánea', personaje: 'Gödel', aportacion: 'Incompletitud: ningún sistema formal captura toda la verdad matemática' },
+      { hito: 'Matemáticas Computacionales e IA', periodo: '1936–presente', categoria: 'Contemporánea', personaje: 'Alan Turing', aportacion: 'Máquina de Turing: fundamento teórico de toda la computación moderna' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de bachillerato o universidad',
+        perfil: 'Estudia matemáticas sin entender su historia',
+        texto: 'Entiende por qué estudias lo que estudias: el álgebra que inventó Al-Juarismi, el cálculo que desarrolló Newton, la geometría analítica de Descartes. La historia da sentido a cada tema del temario y convierte conceptos abstractos en resultados de preguntas concretas.',
+      },
+      {
+        icono: '📚',
+        titulo: 'Lector de divulgación matemática',
+        perfil: 'Lee a Simon Singh, Marcus du Sautoy o Ian Stewart',
+        texto: 'Quieres situar en la cronología los teoremas, las crisis y los personajes que estos autores narran. ¿Cuándo vivió Ramanujan respecto a Euler? ¿Qué pasó entre Galois y Gödel? El visualizador te da el mapa completo para contextualizar cada lectura.',
+      },
+      {
+        icono: '💻',
+        titulo: 'Programador curioso sobre los fundamentos',
+        perfil: 'Quiere entender de dónde viene la computación',
+        texto: 'Turing, Boole, Shannon, Dijkstra: los fundamentos de la computación son matemáticas. Este visualizador conecta el código que escribes con los teoremas de lógica, grafos y teoría de la información que lo hacen posible. La máquina de Turing es matemáticamente anterior al primer ordenador.',
+      },
+      {
+        icono: '🔍',
+        titulo: 'Curioso sobre las matemáticas puras',
+        perfil: 'Siempre se preguntó para qué sirven',
+        texto: 'Siempre te preguntaste para qué sirve un teorema sin aplicación. Gödel, Ramanujan, Perelman: este visualizador muestra que las matemáticas puras son la exploración intelectual más ambiciosa de la humanidad — y que las matemáticas "inútiles" de hoy suelen ser la tecnología de mañana.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Para qué sirve una matemática que no tiene aplicación práctica?',
+        respuesta: 'La historia demuestra que las matemáticas "inútiles" de hoy son la tecnología de mañana. La teoría de números de Gauss era considerada el colmo de la abstracción inútil; hoy es la base de la criptografía que protege contraseñas y transacciones bancarias. La geometría no-euclidiana de Riemann fue una curiosidad abstracta durante 50 años; Einstein la usó para la relatividad general. El tiempo que tarda una matemática pura en volverse aplicada es impredecible, pero históricamente siempre ocurre.',
+        tip: 'La próxima vez que uses GPS, recuerda que funciona gracias a la relatividad de Einstein, que a su vez depende de la geometría riemanniana de 1854.',
+      },
+      {
+        pregunta: '¿Qué demostraron realmente los teoremas de incompletitud de Gödel?',
+        respuesta: 'En 1931, Gödel demostró dos resultados que sacudieron los cimientos de las matemáticas: primero, que en cualquier sistema formal suficientemente rico hay proposiciones verdaderas que no pueden demostrarse desde dentro del sistema. Segundo, que el sistema no puede demostrar su propia consistencia. Esto demolió el programa de David Hilbert de formalizar todas las matemáticas de forma completa y consistente. No significa que las matemáticas sean inútiles: significa que ningún sistema axiomático finito puede capturar toda la verdad matemática.',
+        tip: 'Gödel tenía 25 años cuando publicó estos teoremas. Muchos matemáticos tardaron años en aceptar lo que realmente demostraban.',
+      },
+      {
+        pregunta: '¿Qué son los Problemas del Milenio y cuántos quedan por resolver?',
+        respuesta: 'En el año 2000, el Instituto Clay ofreció 1 millón de dólares por resolver cada uno de 7 problemas matemáticos: la Hipótesis de Riemann, P vs NP, ecuaciones de Navier-Stokes, conjetura de Birch y Swinnerton-Dyer, conjetura de Hodge, ecuaciones de Yang-Mills y conjetura de Poincaré. Solo esta última ha sido resuelta, por Grigori Perelman en 2003 — que rechazó el millón de dólares y la Medalla Fields.',
+        tip: 'P vs NP es el más conocido: si P=NP, casi todos los problemas de seguridad informática colapsarían. La mayoría de matemáticos cree que P≠NP, pero nadie lo ha demostrado.',
+      },
+      {
+        pregunta: '¿Por qué los matemáticos dicen que la identidad de Euler es "bella"?',
+        respuesta: 'La identidad e^iπ + 1 = 0 conecta en una sola ecuación las cinco constantes más importantes de las matemáticas: e (base de los logaritmos naturales), i (unidad imaginaria), π (razón perímetro/diámetro), 1 (unidad multiplicativa) y 0 (unidad aditiva). Cada una viene de un campo completamente diferente: análisis, álgebra, geometría. Que una ecuación tan simple las unifique con total exactitud es lo que los matemáticos llaman "bello": economía máxima, profundidad máxima.',
+        tip: 'En encuestas a matemáticos, esta ecuación ha sido elegida repetidamente como "la más bella de las matemáticas" — por delante del teorema de Pitágoras o la fórmula cuadrática.',
+      },
+      {
+        pregunta: '¿Puede la inteligencia artificial hacer matemáticas de verdad?',
+        respuesta: 'En 2024, AlphaProof de DeepMind resolvió 4 de los 6 problemas de la Olimpiada Internacional de Matemáticas, incluyendo uno que los mejores matemáticos humanos tardaron horas en resolver. Sin embargo, proponer conjeturas nuevas, identificar qué preguntas vale la pena hacer y construir teorías conceptualmente coherentes sigue siendo territorio exclusivamente humano. Los sistemas de IA actuales son asistentes de demostración extraordinariamente potentes, pero no matemáticos en el sentido creativo del término.',
+        tip: 'Terence Tao, el matemático vivo más influyente, dice que la IA ya le es útil para verificar pasos de demostraciones, pero que la intuición creativa sigue siendo humana.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Identifica el problema que motivó el período',
+        cuerpo: 'Las matemáticas no surgen en el vacío: responden a problemas concretos. El cálculo nació para describir el movimiento de los planetas. El álgebra abstracta, para entender por qué la ecuación de quinto grado no tiene solución general. La lógica matemática, para fundamentar el edificio matemático completo. Pregúntate: ¿qué pregunta estaba intentando responder este período?',
+      },
+      {
+        titulo: 'Localiza el teorema o resultado central',
+        cuerpo: 'Cada período tiene un resultado que lo define: Los Elementos de Euclides, el Teorema Fundamental del Cálculo, los teoremas de incompletitud de Gödel. Entender ese resultado central es entender el período. No hace falta seguir la demostración línea a línea — basta con entender qué afirma y por qué es sorprendente.',
+      },
+      {
+        titulo: 'Conoce al matemático protagonista y su historia personal',
+        cuerpo: 'Detrás de cada período hay personas con historias extraordinarias: Galois muerto a los 20 años la noche anterior a un duelo, Ramanujan autodidacta sin formación formal que enviaba teoremas por carta desde Madrás, Noether expulsada de la universidad por ser mujer y judía. La historia humana de las matemáticas hace los conceptos más memorables y significativos.',
+      },
+      {
+        titulo: 'Traza las conexiones con los períodos anteriores y posteriores',
+        cuerpo: 'Las matemáticas son un edificio acumulativo: cada período se apoya en el anterior y abre el camino al siguiente. Descartes necesitó a Euclides; Newton necesitó a Descartes; Cauchy necesitó a Newton; Turing necesitó a Gödel. Ver estas conexiones convierte la historia de las matemáticas en una narrativa coherente, no en una colección de datos aislados.',
+      },
+      {
+        titulo: 'Busca una aplicación actual del concepto',
+        cuerpo: 'Casi todos los conceptos matemáticos históricos tienen aplicaciones tecnológicas actuales: la geometría euclidiana en CAD, el cálculo en simulación física, la teoría de grupos en criptografía, la probabilidad en machine learning, la teoría de la información en compresión de datos. Ver la aplicación concreta ayuda a consolidar la comprensión abstracta.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📐',
+        texto: 'Las matemáticas no se "descubren" ni se "inventan" — los matemáticos debaten esto desde siempre. Pero sí son acumulativas: una vez que Euclides demostró algo, nadie necesita volver a demostrarlo. Esto las hace únicas entre las disciplinas humanas: sus resultados no caducan.',
+      },
+      {
+        icono: '🔢',
+        texto: 'La notación importa más de lo que parece. Los números romanos hacían casi imposible la multiplicación larga. Los números indo-arábigos y el cero babilónico desataron siglos de desarrollo algebraico. La notación dy/dx de Leibniz permitió manipular el cálculo de formas que la notación de Newton (el punto) no facilitaba.',
+      },
+      {
+        icono: '🗺️',
+        texto: 'Los "errores" de la historia matemática son tan informativos como los éxitos. La crisis de los irracionales en Grecia antigua, la paradoja de Russell, la disputa Newton-Leibniz: estas rupturas revelan los supuestos implícitos que cada época daba por obvios y que el siguiente período tuvo que cuestionar.',
+      },
+      {
+        icono: '✅',
+        texto: 'Las matemáticas contemporáneas son más activas que nunca: se publican más artículos matemáticos hoy que en toda la historia anterior combinada. Hay más de 6 Problemas del Milenio abiertos, más conjeturas sin resolver que antes y la IA está abriendo posibilidades de exploración completamente nuevas.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que las matemáticas empezaron con los griegos',
+        cuerpo: 'Los babilonios y egipcios tenían sistemas matemáticos sofisticados 2000 años antes de Pitágoras. Los griegos inventaron la demostración formal, no las matemáticas. La tablilla YBC 7289 calcula √2 con 6 decimales de precisión en el año 1800 a.C. — Pitágoras no nació hasta el 570 a.C.',
+      },
+      {
+        titulo: 'Asumir que Newton y Leibniz son lo mismo',
+        cuerpo: 'Ambos inventaron el cálculo de forma independiente, pero con enfoques filosóficos distintos. Leibniz usó la notación dy/dx e ∫ que usamos hoy; Newton usó la notación de punto sobre la variable (ẋ). La disputa de prioridad dañó las matemáticas británicas durante un siglo: se negaron a usar la notación de Leibniz y quedaron rezagados.',
+      },
+      {
+        titulo: 'Pensar que los teoremas de Gödel invalidan las matemáticas',
+        cuerpo: 'Los teoremas de incompletitud demuestran que ningún sistema formal captura toda la verdad matemática, pero no que las matemáticas sean arbitrarias o inútiles. Las matemáticas que usamos en física, ingeniería y computación no se ven afectadas en la práctica. Lo que demuestran es un límite fundamental de la formalización, no un defecto de las matemáticas.',
+      },
+      {
+        titulo: 'Confundir Al-Juarismi con el álgebra elemental de la ESO',
+        cuerpo: 'Al-Juarismi fundó el álgebra como disciplina que resuelve ecuaciones sistemáticamente — un cambio conceptual revolucionario para su época. No inventó "manipular letras" (eso lo hizo Viète en el siglo XVI); inventó el procedimiento sistemático de resolver clases de ecuaciones, con nombres y reglas propias, antes de que existiera la notación simbólica.',
+      },
+    ],
+  },
+};

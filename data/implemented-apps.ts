@@ -757,7 +757,7 @@ export const implementedAppsUrls = [
   // EJE F — Sociedad, economía y cultura (Roadmap v4, 2026-04-30)
   "/visualizador-estructuras-mercado/",   // Competencia perfecta, monopolio, oligopolio, colusión, pérdida de bienestar
   "/visualizador-seguros-riesgo/",        // Tipos de seguro, cálculo prima actuarial, pool de riesgo, mutualización
-  "/visualizador-historia-epidemias/",    // 10 epidemias históricas, cronología SVG, mortalidad comparativa, patógenos
+  "/visualizador-historia/epidemias/",    // 10 epidemias históricas, cronología SVG, mortalidad comparativa, patógenos
   "/visualizador-urbanismo/",             // Modelos urbanos Burgess/Hoyt, densidad ciudades, movilidad, ciudad sostenible
   "/visualizador-estratificacion-social/", // Pirámide/diamante/7 clases, Gini/Lorenz, movilidad intergeneracional, teorías
   "/visualizador-ciclo-nitrogeno/",       // Ciclo completo SVG, microorganismos clave, Haber-Bosch, ciclos biogeoquímicos
@@ -768,58 +768,58 @@ export const implementedAppsUrls = [
   "/visualizador-literatura-movimientos/", // 15 movimientos literarios, épica griega→posmodernismo, autores, géneros
   "/visualizador-arquitectura-estilos/",  // 16 estilos arquitectónicos, griego clásico→sostenible, edificios icónicos
   // Cronologías culturales Grupo 2 (2026-04-30)
-  "/visualizador-historia-medicina/",     // 14 períodos médicos, Hipócrates→medicina precisión IA, años a.C.
-  "/visualizador-historia-internet/",     // 14 hitos, ARPANET 1969→IA generativa, 6 eras digitales
+  "/visualizador-historia/medicina/",     // 14 períodos médicos, Hipócrates→medicina precisión IA, años a.C.
+  "/visualizador-historia/internet/",     // 14 hitos, ARPANET 1969→IA generativa, 6 eras digitales
   "/visualizador-derechos-humanos/",      // 13 movimientos, Magna Carta 1215→derechos digitales, 6 eras
   "/visualizador-revoluciones-industriales/", // 13 fases, preindustrial 1400→Industria 5.0 IA
   // Cronologías Ciencia — Grupo 3 (2026-05-01)
-  "/visualizador-historia-fisica/",          // 14 períodos, griegos→física de cuerdas, años a.C.
-  "/visualizador-historia-quimica/",         // 14 períodos, alquimia→química computacional, años a.C.
-  "/visualizador-historia-matematicas/",     // 14 períodos, Babilonia→IA matemática, años a.C.
-  "/visualizador-historia-astronomia/",      // 14 períodos, Stonehenge→James Webb, años a.C.
+  "/visualizador-historia/fisica/",          // 14 períodos, griegos→física de cuerdas, años a.C.
+  "/visualizador-historia/quimica/",         // 14 períodos, alquimia→química computacional, años a.C.
+  "/visualizador-historia/matematicas/",     // 14 períodos, Babilonia→IA matemática, años a.C.
+  "/visualizador-historia/astronomia/",      // 14 períodos, Stonehenge→James Webb, años a.C.
   // Cronologías Cultura Popular — Grupo 4 (2026-05-01)
   // MIGRADO a /visualizador-historia/cine/ — ver sección de historias dinámicas
-  "/visualizador-historia-videojuegos/",    // 14 períodos, Pong→IA generativa en juegos
-  "/visualizador-historia-moda/",           // 14 períodos, Edad Media→moda sostenible
-  "/visualizador-historia-exploracion/",    // 14 períodos, fenicios→exploración espacial, años a.C.
+  "/visualizador-historia/videojuegos/",    // 14 períodos, Pong→IA generativa en juegos
+  "/visualizador-historia/moda/",           // 14 períodos, Edad Media→moda sostenible
+  "/visualizador-historia/exploracion/",    // 14 períodos, fenicios→exploración espacial, años a.C.
   // Herramientas de Referencia (2026-05-02)
   "/visualizador-comparador-ia/",           // Guía comparativa: ChatGPT, Claude, Gemini, Copilot, Mistral, Perplexity
   // Cronologías Sociedad y Cultura — Grupo 6 (2026-05-02)
-  "/visualizador-historia-economia-espana/", // 14 períodos, economía medieval→Next Generation EU
-  "/visualizador-historia-gastronomia/",     // 14 períodos, neolítico -10000→IA culinaria, años a.C.
-  "/visualizador-historia-deporte/",         // 14 períodos, Olimpia -776→eSports e IA deportiva, años a.C.
+  "/visualizador-historia/economia-espana/", // 14 períodos, economía medieval→Next Generation EU
+  "/visualizador-historia/gastronomia/",     // 14 períodos, neolítico -10000→IA culinaria, años a.C.
+  "/visualizador-historia/deporte/",         // 14 períodos, Olimpia -776→eSports e IA deportiva, años a.C.
   // Cronologías Artes y Mente — Grupo 5 (2026-05-02)
-  "/visualizador-historia-psicologia/",    // 14 períodos, filosofía griega→neurociencia e IA clínica, años a.C.
-  "/visualizador-historia-fotografia/",    // 14 períodos, daguerrotipo 1826→IA generativa imagen
-  "/visualizador-historia-teatro/",        // 14 períodos, teatro griego→teatro digital e inmersivo, años a.C.
-  "/visualizador-historia-danza/",         // 14 períodos, danza ritual -3000→breaking olímpico y danza digital, años a.C.
+  "/visualizador-historia/psicologia/",    // 14 períodos, filosofía griega→neurociencia e IA clínica, años a.C.
+  "/visualizador-historia/fotografia/",    // 14 períodos, daguerrotipo 1826→IA generativa imagen
+  "/visualizador-historia/teatro/",        // 14 períodos, teatro griego→teatro digital e inmersivo, años a.C.
+  "/visualizador-historia/danza/",         // 14 períodos, danza ritual -3000→breaking olímpico y danza digital, años a.C.
   // Cronologías Tendencias España — Roadmap v7 EJE A (2026-05-02)
-  "/visualizador-historia-energia/",       // 14 períodos, biomasa prehistórica -15000→fusión nuclear, 9 categorías energéticas
-  "/visualizador-historia-clima/",         // 14 períodos, última glaciación -15000→emergencia climática, paleoclimatología
-  "/visualizador-historia-aviacion/",      // 14 períodos, Wright 1900→aviación eléctrica e IA, 10 categorías
-  "/visualizador-historia-comics/",        // 14 períodos, Töpffer 1827→IA generativa en cómics, 14 estilos
+  "/visualizador-historia/energia/",       // 14 períodos, biomasa prehistórica -15000→fusión nuclear, 9 categorías energéticas
+  "/visualizador-historia/clima/",         // 14 períodos, última glaciación -15000→emergencia climática, paleoclimatología
+  "/visualizador-historia/aviacion/",      // 14 períodos, Wright 1900→aviación eléctrica e IA, 10 categorías
+  "/visualizador-historia/comics/",        // 14 períodos, Töpffer 1827→IA generativa en cómics, 14 estilos
 
   // Cronologías Tendencias España — Roadmap v8 EJE A (2026-05-02)
-  "/visualizador-historia-radio/",               // 14 períodos, Marconi 1895→Radio IA y podcasting, 10 categorías
-  "/visualizador-historia-television/",          // 14 períodos, Baird 1926→TV interactiva con IA, 10 categorías
-  "/visualizador-historia-robotica/",            // 14 períodos, Čapek 1920→AGI encarnada, 10 categorías
-  "/visualizador-historia-publicidad/",          // 14 períodos, Gutenberg 1450→IA generativa publicitaria, 10 categorías
-  "/visualizador-historia-videojuegos-espanoles/", // 14 períodos, Edad de Oro 1983→Metroid Dread y Blasphemous
+  "/visualizador-historia/radio/",               // 14 períodos, Marconi 1895→Radio IA y podcasting, 10 categorías
+  "/visualizador-historia/television/",          // 14 períodos, Baird 1926→TV interactiva con IA, 10 categorías
+  "/visualizador-historia/robotica/",            // 14 períodos, Čapek 1920→AGI encarnada, 10 categorías
+  "/visualizador-historia/publicidad/",          // 14 períodos, Gutenberg 1450→IA generativa publicitaria, 10 categorías
+  "/visualizador-historia/videojuegos-espanoles/", // 14 períodos, Edad de Oro 1983→Metroid Dread y Blasphemous
 
   // Cronologías Tendencias España — Roadmap v8 EJE B (2026-05-02)
-  "/visualizador-historia-ordenadores/",         // 14 períodos, Babbage 1820→IA generativa y computación cuántica
-  "/visualizador-historia-tren/",                // 14 períodos, Trevithick 1804→AVE, Maglev e hidrógeno
-  "/visualizador-historia-viajes-espaciales/",   // 14 períodos, Tsiolkovski 1903→Starship y Artemis
+  "/visualizador-historia/ordenadores/",         // 14 períodos, Babbage 1820→IA generativa y computación cuántica
+  "/visualizador-historia/tren/",                // 14 períodos, Trevithick 1804→AVE, Maglev e hidrógeno
+  "/visualizador-historia/viajes-espaciales/",   // 14 períodos, Tsiolkovski 1903→Starship y Artemis
 
   // Cronologías Tecnologías del Cotidiano — Roadmap v9 EJE A (2026-05-03)
-  "/visualizador-historia-automocion/",          // 13 períodos, Benz 1885→coche eléctrico autónomo
-  "/visualizador-historia-telefono/",            // 13 períodos, Bell 1876→5G e IA conversacional
-  "/visualizador-historia-prensa/",              // 14 períodos, Gutenberg 1450→periodismo digital e IA
+  "/visualizador-historia/automocion/",          // 13 períodos, Benz 1885→coche eléctrico autónomo
+  "/visualizador-historia/telefono/",            // 13 períodos, Bell 1876→5G e IA conversacional
+  "/visualizador-historia/prensa/",              // 14 períodos, Gutenberg 1450→periodismo digital e IA
 
   // Cronologías Cultura y Estilo — Roadmap v9 EJE B (2026-05-03)
-  "/visualizador-historia-arquitectura-espanola/", // 13 períodos, Románico s.XI→Guggenheim y arquitectura paramétrica
-  "/visualizador-historia-moda-espanola/",         // 13 períodos, Reyes Católicos→Balenciaga, Loewe e Inditex
-  "/visualizador-historia-banca/",                 // 13 períodos, Medici 1397→fintech y criptomonedas
+  "/visualizador-historia/arquitectura-espanola/", // 13 períodos, Románico s.XI→Guggenheim y arquitectura paramétrica
+  "/visualizador-historia/moda-espanola/",         // 13 períodos, Reyes Católicos→Balenciaga, Loewe e Inditex
+  "/visualizador-historia/banca/",                 // 13 períodos, Medici 1397→fintech y criptomonedas
 
   // Sistema dinámico de Historias — Ruta /visualizador-historia/[slug]/ (2026-05-03)
   "/visualizador-historia/grecia/",               // Grecia Clásica -1100→-146 a.C., 12 hitos, 6 eras

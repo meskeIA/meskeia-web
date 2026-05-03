@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const tren: HistoriaData = {
+  slug: 'tren',
+  titulo: 'Historia del Tren: Del Vapor al AVE y el Hidrógeno',
+  subtitulo: 'De la primera locomotora de vapor de 1804 al tren de hidrógeno y el Maglev superconductor — 220 años de ferrocarril en 10 hitos interactivos',
+  descripcionSEO: 'Cronología interactiva de la historia del tren y el ferrocarril: desde la locomotora de Trevithick (1804) y el Shinkansen (1964) hasta el AVE español, el tren de hidrógeno y el Maglev japonés. 10 hitos y 6 eras de revolución ferroviaria.',
+  keywords: [
+    'historia del tren cronología',
+    'ferrocarril locomotora vapor stephenson',
+    'Shinkansen alta velocidad Japón',
+    'TGV Francia alta velocidad ferroviaria',
+    'AVE España Madrid-Sevilla',
+    'Orient Express belle époque ferrocarril',
+    'tren hidrógeno Coradia iLint',
+    'Maglev levitación magnética',
+  ],
+  anioInicio: 1804,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'pioneros-vapor',
+      nombre: 'Los Pioneros del Vapor',
+      anioInicio: 1804,
+      anioFin: 1850,
+      color: '#8B4513',
+      categoria: 'vapor',
+      descripcion: 'Richard Trevithick construye la primera locomotora de vapor (Merthyr Tydfil, Gales, 1804). George Stephenson diseña el Blücher (1814) y funda Robert Stephenson & Company. La locomotora Locomotion No.1 inaugura el ferrocarril Stockton & Darlington (1825): primer ferrocarril público del mundo. Liverpool-Manchester (1830): primera línea interurbana con tracción de vapor exclusivamente. La Rocket de Stephenson ganó las Rainhill Trials (1829) a 47 km/h. Railway Mania en Gran Bretaña (1840s): especulación y construcción masiva. En España: Barcelona-Mataró (1848), primer ferrocarril peninsular.',
+      obraIconica: 'Locomotora Rocket — George Stephenson (1829) — ganó las Rainhill Trials a 47 km/h y convenció a los inversores del futuro del ferrocarril',
+      paises: ['Reino Unido', 'España', 'EE.UU.'],
+    },
+    {
+      id: 'red-continental',
+      nombre: 'La Red Continental',
+      anioInicio: 1850,
+      anioFin: 1885,
+      color: '#A0522D',
+      categoria: 'expansion',
+      descripcion: 'Ferrocarril transcontinental USA (Union Pacific + Central Pacific, 1869): costa a costa en 6 días. Orient Express inaugural (1883, París-Constantinopla, 3.100 km). Expansión ferroviaria india bajo el Imperio Británico. En España: red radial desde Madrid completada. Gran Tunnel du Mont Cenis (1871, primer gran túnel alpino). El ferrocarril unificó mercados nacionales y redujo el tiempo Madrid-Barcelona de 8 días en diligencia a 12 horas.',
+      obraIconica: 'Orient Express (1883) — París a Constantinopla en 81 horas, tren internacional de lujo inmortalizado por Agatha Christie',
+      paises: ['EE.UU.', 'Francia', 'Imperio Otomano', 'España', 'India'],
+    },
+    {
+      id: 'belle-epoque',
+      nombre: 'La Belle Époque Ferroviaria',
+      anioInicio: 1885,
+      anioFin: 1914,
+      color: '#DAA520',
+      categoria: 'belle_epoque',
+      descripcion: 'Orient Express en su apogeo: coche-cama Pullman, restaurante, piano. Grandes estaciones como obras de arte (St Pancras 1868, Grand Central NY 1913, Atocha 1892). Primeras líneas eléctricas metropolitanas (metro de Londres electrificado 1890). Ferrocarriles de montaña suizos. El viaje en tren se convirtió en experiencia cultural. Las grandes estaciones eran los templos del progreso industrial.',
+      obraIconica: 'Grand Central Terminal, Nueva York (1913) — catedral del progreso industrial, 44 andenes y 67 pistas',
+      paises: ['Francia', 'Reino Unido', 'EE.UU.', 'Suiza', 'España'],
+    },
+    {
+      id: 'guerras-renfe',
+      nombre: 'Guerras y la Era RENFE',
+      anioInicio: 1914,
+      anioFin: 1964,
+      color: '#696969',
+      categoria: 'guerras',
+      descripcion: 'Los ferrocarriles son arteria logística esencial en WWI y WWII (transporte de tropas, suministros, evacuaciones). La RENFE fundada (1941) unifica las compañías privadas españolas con ancho ibérico (1.668 mm). El motor diésel empieza a reemplazar el vapor en líneas secundarias. TEE Trans-Europ-Express (1957): primer tren internacional de alta calidad sin frontera. El automóvil y el avión comienzan a competir con el tren. El último vapor en servicio regular en UK fue el 11 de agosto de 1968.',
+      obraIconica: 'RENFE (fundada 1941) — unificación de la red española bajo gestión estatal con el característico ancho ibérico de 1.668 mm',
+      paises: ['España', 'Alemania', 'Francia', 'Reino Unido'],
+    },
+    {
+      id: 'shinkansen',
+      nombre: 'El Shinkansen: Revolución de la Alta Velocidad',
+      anioInicio: 1964,
+      anioFin: 1981,
+      color: '#FF4500',
+      categoria: 'alta_velocidad',
+      descripcion: 'El Shinkansen "bala" inaugurado para los Juegos Olímpicos de Tokio (1 de octubre de 1964): 210 km/h entre Tokio y Osaka (515 km). Revolutiona el concepto de transporte ferroviario. El Shinkansen ha transportado más de 10.000 millones de pasajeros sin un solo muerto en accidente (hasta 2024). La crisis del petróleo (1973) revive el interés europeo por el tren. El TGV francés en desarrollo. Puntualidad media de 0,9 minutos de retraso.',
+      obraIconica: 'Shinkansen Tokaido (Tokio-Osaka, 1964) — 210 km/h, cero muertos en 60 años, puntualidad de 54 segundos de retraso medio anual',
+      paises: ['Japón'],
+    },
+    {
+      id: 'tgv-ice',
+      nombre: 'El TGV Francés y la Alta Velocidad Europea',
+      anioInicio: 1981,
+      anioFin: 1992,
+      color: '#1E90FF',
+      categoria: 'alta_velocidad',
+      descripcion: 'TGV Paris-Lyon inaugurado (1981): 260 km/h en servicio comercial. Record mundial de velocidad: 515,3 km/h (1990). ICE alemán inaugura (1991). Eurostar en construcción (Túnel del Canal, 1994). España decide construir el AVE (1986) con ancho estándar europeo: primera ruptura con el ancho ibérico. El TGV redujo Paris-Lyon de 4 horas a 2. El tren recuperó cuota frente al avión en distancias 200-800 km.',
+      obraIconica: 'TGV Paris-Lyon (1981) — record de 515 km/h en 1990; reducción Paris-Lyon de 4 horas a 2, inicio del renacimiento ferroviario europeo',
+      paises: ['Francia', 'Alemania'],
+    },
+    {
+      id: 'ave-eurotune',
+      nombre: 'El AVE y la Europa de Alta Velocidad',
+      anioInicio: 1992,
+      anioFin: 2010,
+      color: '#CC9900',
+      categoria: 'ave',
+      descripcion: 'AVE Madrid-Sevilla inaugura el 14 de abril de 1992 (Expo Sevilla 92): primer AVE español, 471 km a 270 km/h, 2h45 (antes 6h). Eurostar Paris-Londres por el Eurotúnel (1994): 35 km bajo el Canal de la Mancha. AVE Madrid-Barcelona (2008). Thalys, Lyria y Eurostar conectan Europa. España pasó de 0 a tener la red de alta velocidad más extensa de Europa (3.800 km) en 30 años. Puntualidad AVE 98,7%: devolución de billete si llega con más de 5 minutos de retraso.',
+      obraIconica: 'AVE Madrid-Sevilla (1992) — 471 km en 2h45 frente a las 6 horas del tren convencional; inicio de la mayor red AVE de Europa',
+      paises: ['España', 'Francia', 'Reino Unido', 'Bélgica'],
+    },
+    {
+      id: 'china-alta-velocidad',
+      nombre: 'China Supera a Europa: El Mayor Sistema Mundial',
+      anioInicio: 2008,
+      anioFin: 2018,
+      color: '#B22222',
+      categoria: 'ave',
+      descripcion: 'China construye 40.000 km de alta velocidad en 15 años (2008-2023), más que el resto del mundo junto. CRH (China Railway High-speed) con velocidades de 350 km/h. Maglev Shanghai: único tren comercial de levitación magnética (430 km/h). El CRH Beijing-Shanghai recorrió 1.318 km en 4h18 en 2017. China mueve 3.800 millones de pasajeros en alta velocidad al año (más que todos los vuelos mundiales juntos).',
+      obraIconica: 'CRH Beijing-Shanghai (2011) — 1.318 km en 4h30, 350 km/h; China supera a toda Europa en km de alta velocidad',
+      paises: ['China'],
+    },
+    {
+      id: 'sostenible-nocturno',
+      nombre: 'Sostenibilidad y el Renacimiento del Tren Nocturno',
+      anioInicio: 2018,
+      anioFin: 2022,
+      color: '#228B22',
+      categoria: 'sostenible',
+      descripcion: 'Flygskam ("vergüenza de volar") en Suecia impulsa el "railcation". Night Jet austriaco resucita el tren nocturno europeo (Viena-Amsterdam, Viena-Roma). Alstom lanza el primer tren comercial de hidrógeno (Coradia iLint, Alemania, 2022). Ouigo llega a España (2021) con billetes desde 9€. Las reservas de trenes nocturnos crecieron un 30% en Europa (2021-2023). El tren emite 6 veces menos CO2 que el avión (14g vs 255g CO2/km por pasajero).',
+      obraIconica: 'Alstom Coradia iLint (2022) — primer tren comercial de hidrógeno del mundo, autonomía de 1.000 km, solo emite vapor de agua',
+      paises: ['Austria', 'Alemania', 'Suecia', 'España'],
+    },
+    {
+      id: 'futuro-ia-maglev',
+      nombre: 'El Tren del Futuro: IA, Baterías y Maglev',
+      anioInicio: 2022,
+      anioFin: 9999,
+      color: '#9932CC',
+      categoria: 'sostenible',
+      descripcion: 'AVLO (Renfe low-cost) compite con Ouigo e Iryo en España — la competencia redujo el precio AVE Madrid-Barcelona un 40% en 2 años. Hyperloop One cierra (2023) sin escala comercial. Maglev superconductor japonés (Chuo Shinkansen): 603 km/h en pruebas, previsto para 2027 Tokio-Nagoya en 67 minutos. IA para gestión de tráfico y mantenimiento predictivo. España: más de 4.000 km de alta velocidad, mayor red de Europa. En la ruta Madrid-Barcelona, el tren tiene el 75% de la cuota modal tren+avión.',
+      obraIconica: 'Chuo Shinkansen (previsto 2027) — Maglev superconductor a 603 km/h, Tokio-Nagoya en 40 minutos frente a 90 minutos actuales',
+      paises: ['Japón', 'España', 'China', 'Alemania'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Era del Vapor',
+      desde: 1804,
+      hasta: 1880,
+      icono: '🚂',
+      hitosDestacados: ['Los Pioneros del Vapor', 'La Red Continental'],
+      eventos: [
+        '1804 — Trevithick construye la primera locomotora de vapor en Gales',
+        '1825 — Ferrocarril Stockton & Darlington: primer ferrocarril público del mundo',
+        '1830 — Liverpool-Manchester: primera línea interurbana con vapor exclusivamente',
+        '1848 — Barcelona-Mataró: primer ferrocarril de la península ibérica',
+        '1869 — Ferrocarril transcontinental USA: costa a costa en 6 días',
+      ],
+    },
+    {
+      nombre: 'La Belle Époque Ferroviaria',
+      desde: 1880,
+      hasta: 1914,
+      icono: '🎩',
+      hitosDestacados: ['La Belle Époque Ferroviaria'],
+      eventos: [
+        '1883 — Orient Express inaugural: París a Constantinopla en 81 horas',
+        '1892 — Inauguración de la estación de Atocha, Madrid',
+        '1894 — Apertura del Túnel del Canal de la Mancha (ferroviario, proyecto)',
+        '1913 — Grand Central Terminal de Nueva York: 44 andenes',
+      ],
+    },
+    {
+      nombre: 'Guerras y Modernización',
+      desde: 1914,
+      hasta: 1964,
+      icono: '⚙️',
+      hitosDestacados: ['Guerras y la Era RENFE'],
+      eventos: [
+        '1914 — Los ferrocarriles se convierten en arteria logística esencial de la WWI',
+        '1941 — RENFE fundada: España unifica su red bajo gestión estatal',
+        '1944 — Los ferrocarriles aliados resultan clave en el desembarco de Normandía',
+        '1957 — TEE Trans-Europ-Express: primer tren internacional sin cambio de frontera',
+      ],
+    },
+    {
+      nombre: 'La Revolución de la Alta Velocidad',
+      desde: 1964,
+      hasta: 1992,
+      icono: '🚄',
+      hitosDestacados: ['El Shinkansen: Revolución de la Alta Velocidad', 'El TGV Francés y la Alta Velocidad Europea'],
+      eventos: [
+        '1964 — Shinkansen inaugura en Japón a 210 km/h para los JJ.OO. de Tokio',
+        '1973 — Crisis del petróleo relanza el interés europeo por el tren',
+        '1981 — TGV Paris-Lyon: Europa entra en la alta velocidad a 260 km/h',
+        '1990 — TGV bate el record mundial de velocidad: 515,3 km/h',
+        '1991 — ICE alemán inaugura Frankfurt-Hannover',
+      ],
+    },
+    {
+      nombre: 'La Era del AVE y la Globalización',
+      desde: 1992,
+      hasta: 2020,
+      icono: '🌍',
+      hitosDestacados: ['El AVE y la Europa de Alta Velocidad', 'China Supera a Europa: El Mayor Sistema Mundial'],
+      eventos: [
+        '1992 — AVE Madrid-Sevilla inaugura: España entra en la alta velocidad',
+        '1994 — Eurostar Paris-Londres: 35 km bajo el Canal de la Mancha',
+        '2008 — AVE Madrid-Barcelona y China lanza su primera línea de alta velocidad',
+        '2019 — China supera 35.000 km de alta velocidad, más que el resto del mundo junto',
+      ],
+    },
+    {
+      nombre: 'Sostenibilidad y Futuro',
+      desde: 2020,
+      hasta: 9999,
+      icono: '🌱',
+      hitosDestacados: ['Sostenibilidad y el Renacimiento del Tren Nocturno', 'El Tren del Futuro: IA, Baterías y Maglev'],
+      eventos: [
+        '2021 — Ouigo llega a España: billetes AVE desde 9€, comienza la competencia',
+        '2022 — Coradia iLint: primer tren comercial de hidrógeno en Alemania',
+        '2023 — Hyperloop One cierra sin haber logrado escala comercial',
+        '2024 — España supera 4.000 km de alta velocidad, mayor red de Europa',
+      ],
+    },
+  ],
+
+  categorias: {
+    vapor: 'Vapor Pionero',
+    expansion: 'Red Continental',
+    belle_epoque: 'Belle Époque',
+    guerras: 'Guerras y RENFE',
+    alta_velocidad: 'Alta Velocidad',
+    ave: 'AVE / Global',
+    sostenible: 'Sostenible',
+  },
+
+  colores: {
+    vapor: '#8B4513',
+    expansion: '#A0522D',
+    belle_epoque: '#DAA520',
+    guerras: '#696969',
+    alta_velocidad: '#FF4500',
+    ave: '#1E90FF',
+    sostenible: '#228B22',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El ferrocarril es la infraestructura que definió el mundo moderno. En 220 años pasó de demostración científica curiosa a columna vertebral de la economía global, herramienta de guerra, símbolo de progreso, y hoy la alternativa sostenible al avión. Cada período nace de una tecnología nueva (vapor, diésel, eléctrico, alta velocidad, hidrógeno) y de un contexto histórico: la revolución industrial, las guerras mundiales, la crisis del petróleo, el cambio climático.',
+
+    tablaComparativa: [
+      { hito: 'Los Pioneros del Vapor', periodo: '1804–1850', categoria: 'Vapor', personaje: 'George Stephenson', aportacion: 'Primera locomotora pública y red ferroviaria nacional' },
+      { hito: 'La Red Continental', periodo: '1850–1885', categoria: 'Expansión', personaje: 'Leland Stanford (Union Pacific)', aportacion: 'Transcontinental USA y Orient Express unen continentes' },
+      { hito: 'La Belle Époque Ferroviaria', periodo: '1885–1914', categoria: 'Belle Époque', personaje: 'Georges Nagelmackers (Wagons-Lits)', aportacion: 'Tren de lujo y grandes terminales como templos del progreso' },
+      { hito: 'El Shinkansen: Revolución de la Alta Velocidad', periodo: '1964–1981', categoria: 'Alta Velocidad', personaje: 'Hideo Shima (ingeniero jefe)', aportacion: 'Alta velocidad ferroviaria y puntualidad extrema como estándar' },
+      { hito: 'El TGV Francés y la Alta Velocidad Europea', periodo: '1981–1992', categoria: 'TGV / ICE', personaje: 'Ingenieros SNCF', aportacion: 'Europa adopta la alta velocidad; el tren compite con el avión' },
+      { hito: 'Sostenibilidad y el Renacimiento del Tren Nocturno', periodo: '2018–actualidad', categoria: 'Sostenible', personaje: 'Andreas Matthä (ÖBB CEO)', aportacion: 'Tren nocturno y de hidrógeno como respuesta al cambio climático' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de historia o geografía',
+        perfil: 'Preparando exámenes sobre Revolución Industrial o España contemporánea',
+        texto: 'El ferrocarril es el hilo conductor de la industrialización: la Revolución Industrial no viajó sola, viajó en tren. Entiende por qué España adoptó el ancho ibérico, qué fue la Railway Mania, o cómo el Shinkansen reflejó el renacimiento económico japonés de posguerra.',
+      },
+      {
+        icono: '🌍',
+        titulo: 'Viajero que quiere hacer railtripping',
+        perfil: 'Planifica recorridos por Europa o Japón en tren',
+        texto: 'Conocer la historia del ferrocarril te ayuda a entender qué líneas son históricas (Orient Express, Night Jet), cómo funciona el sistema de pases Interrail, por qué el AVE tiene garantía de puntualidad, y cómo la competencia (Ouigo, Iryo) está bajando los precios en España.',
+      },
+      {
+        icono: '🌿',
+        titulo: 'Persona concienciada con el cambio climático',
+        perfil: 'Quiere reducir su huella de carbono en los viajes',
+        texto: 'El tren eléctrico emite 14g de CO2/km por pasajero frente a 255g del avión. Cada viaje Madrid-Barcelona en AVE en lugar de avión ahorra 50 kg de CO2. Aprende qué es el flygskam, el tren de hidrógeno y por qué el Night Jet puede sustituir al avión nocturno de bajo coste.',
+      },
+      {
+        icono: '📊',
+        titulo: 'Profesional de transporte o urbanismo',
+        perfil: 'Trabaja en planificación de infraestructuras',
+        texto: 'La historia del ferrocarril es un manual sobre cómo las decisiones de infraestructura crean o destruyen ciudades. El diseño radial de RENFE, el ancho ibérico, la decisión del AVE en 1986 con fondos europeos, o cómo China invirtió 500.000 millones en alta velocidad en 15 años: lecciones de política ferroviaria.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué España tiene la red de AVE más extensa de Europa?',
+        respuesta: 'En 1986, el gobierno español decidió construir la nueva red en ancho estándar europeo (1.435 mm), rompiendo con el ancho ibérico heredado del siglo XIX. Esta decisión estratégica, tomada al ingresar en la CEE, permitió financiar la red con fondos europeos de cohesión. En 30 años, España pasó de 0 a más de 4.000 km de alta velocidad.',
+        tip: 'Paradoja: España tiene la mayor red de AVE de Europa en proporción al PIB, pero RENFE tiene un presupuesto de mantenimiento convencional inferior a Alemania o Francia.',
+      },
+      {
+        pregunta: '¿Qué es el ancho ibérico y por qué aísla a España de Europa?',
+        respuesta: 'El ancho de vía es la distancia entre los dos raíles. España y Portugal adoptaron el ancho ibérico (1.668 mm) en el siglo XIX, frente al estándar europeo de 1.435 mm. Esto significa que un tren convencional español no puede circular por Francia sin cambiar los bogies. El AVE sí usa el ancho europeo, por lo que puede conectar con la red europea cuando la infraestructura fronteriza esté lista.',
+        tip: 'El TALGO tiene un sistema de rodadura variable que le permite cambiar el ancho de vía en marcha, resolviendo parcialmente el problema fronterizo sin detenerse.',
+      },
+      {
+        pregunta: '¿Qué es el Maglev y por qué no está en todas partes?',
+        respuesta: 'El Maglev (levitación magnética) usa campos electromagnéticos para levantar el tren sobre la vía, eliminando la fricción mecánica. El Maglev Shanghai opera a 430 km/h comercialmente desde 2004. El Chuo Shinkansen japonés ha alcanzado 603 km/h en pruebas. El problema es el coste: construir vía Maglev cuesta 10 veces más que vía convencional de alta velocidad.',
+        tip: 'El Maglev Shanghai recorre los 30 km del aeropuerto al centro en 7 minutos. Pero la línea solo tiene 30 km porque construir más resultaba prohibitivo.',
+      },
+      {
+        pregunta: '¿Por qué fracasó Hyperloop?',
+        respuesta: 'Hyperloop One prometía trenes en tubos a vacío a 1.000 km/h. Cerró en 2023 tras gastar cientos de millones. Los problemas fueron estructurales: mantener el vacío en tubos de miles de km es técnicamente brutal, el coste de infraestructura era astronómico, la seguridad era incierta y el regulatorio de transporte público no estaba preparado para ese modelo.',
+        tip: 'La velocidad no es el cuello de botella del transporte ferroviario: los 350 km/h del AVE ya superan al avión en viajes puerta a puerta hasta 800 km. El problema real es la frecuencia y el precio.',
+      },
+      {
+        pregunta: '¿Qué es el tren de hidrógeno y cuándo llegará a España?',
+        respuesta: 'El tren de hidrógeno (como el Alstom Coradia iLint) usa celdas de combustible de hidrógeno para generar electricidad, emitiendo solo vapor de agua. Es ideal para líneas no electrificadas donde el coste de instalar catenaria no se justifica. En España, RENFE ha iniciado pruebas y podría tener trenes de hidrógeno en servicio en líneas rurales hacia 2027-2030.',
+        tip: 'El Coradia iLint alemán llevó pasajeros de pago por primera vez en agosto de 2022 en Baja Sajonia. Tiene una autonomía de 1.000 km con depósito lleno.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Planifica con antelación y compara operadores',
+        cuerpo: 'En España, compara RENFE (avlo.com para low-cost), Ouigo e Iryo para la misma ruta. Los precios del AVE pueden bajar un 70% con 30-60 días de antelación. Para viajes internacionales, usa Trainline o Rail Europe para encontrar combinaciones con TGV, Eurostar o ICE.',
+      },
+      {
+        titulo: 'Considera el pase Interrail para múltiples países',
+        cuerpo: 'El Interrail Global Pass permite viajar por 33 países europeos durante un período fijo (7, 15 días o 1-3 meses). Es más económico que comprar billete a billete si haces más de 3-4 trayectos largos. Para menores de 28 años, existe el Interrail Youth con descuento del 35%.',
+      },
+      {
+        titulo: 'Reserva el Night Jet para distancias largas nocturnas',
+        cuerpo: 'Los trenes nocturnos de ÖBB (Night Jet) conectan Viena con Ámsterdam, Roma, Múnich, Hamburgo y Bruselas. Un billete en litera puede costar menos que un hotel más tren diurno. Reserva con 60 o más días de antelación para mejores precios.',
+      },
+      {
+        titulo: 'Llega pronto a la estación, pero no tanto como al aeropuerto',
+        cuerpo: 'El control de seguridad en el AVE es similar al aeropuerto (escáner de equipaje), pero más ágil. RENFE recomienda llegar 20 minutos antes en alta velocidad. En el Eurostar (Londres) necesitas 30-45 minutos por el control aduanero británico.',
+      },
+      {
+        titulo: 'Aprovecha la garantía de puntualidad del AVE',
+        cuerpo: 'Si tu AVE llega con más de 5 minutos de retraso sobre el horario oficial, tienes derecho a la devolución del 50% del billete. Si llega con más de 15 minutos, el 100%. En RENFE, la puntualidad AVE supera el 98%. En el Shinkansen japonés, el retraso medio anual es de 54 segundos.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🗺️',
+        texto: 'El tren no solo conecta ciudades: define cuáles existen. Las ciudades sin estación ferroviaria en el siglo XIX perdieron población y relevancia económica durante décadas. La historia del tren es también la historia de qué lugares prosperaron y cuáles no.',
+      },
+      {
+        icono: '⚡',
+        texto: 'La alta velocidad no trata de ir más rápido: trata de competir con el avión. El TGV no superó al avión en velocidad punta, pero sí en el tiempo total puerta a puerta para distancias de 200-800 km, donde la ciudad y el aeropuerto añaden 2-3 horas.',
+      },
+      {
+        icono: '🌍',
+        texto: 'Los países que más han invertido en ferrocarril son los que tienen menor huella de CO2 en transporte. Japón, Suiza y Francia tienen emisiones por pasajero-km muy inferiores a países dependientes del coche como EE.UU. o Australia.',
+      },
+      {
+        icono: '📅',
+        texto: 'Los períodos ferroviarios se solapan: el Orient Express de vapor coexistió con los primeros metros eléctricos. Hoy, trenes diésel de los años 70 circulan por líneas rurales mientras el Maglev prueba a 600 km/h. La historia del tren es un continuo, no épocas separadas.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que el AVE español es caro comparado con Europa',
+        cuerpo: 'Antes de 2021, el AVE era caro. La entrada de Ouigo e Iryo ha creado competencia real: el precio Madrid-Barcelona bajó un 40% en dos años. Hoy hay billetes desde 9€ en Ouigo, y el tren tiene el 75% de la cuota modal tren+avión en esa ruta, un récord europeo.',
+      },
+      {
+        titulo: 'Pensar que el ancho ibérico es solo un problema técnico menor',
+        cuerpo: 'El ancho ibérico (1.668 mm vs 1.435 mm europeo) ha costado a España miles de millones en cambios de bogies, infraestructura doble en fronteras y aislamiento de la red convencional de Europa durante 150 años. El AVE resuelve el problema solo en las líneas nuevas.',
+      },
+      {
+        titulo: 'Confundir velocidad máxima con velocidad comercial',
+        cuerpo: 'El Maglev japonés alcanza 603 km/h en pruebas, pero el Shinkansen comercial va a 320 km/h. El TGV tiene el record de 515 km/h pero opera a 320 km/h. La velocidad máxima es un hito de ingeniería; la velocidad comercial depende de la seguridad, los costes de energía y la infraestructura real.',
+      },
+      {
+        titulo: 'Asumir que el tren nocturno es anticuado',
+        cuerpo: 'El tren nocturno resurgió con fuerza desde 2019. Night Jet, Snälltåget y Nightjet conectan más de 25 ciudades europeas. Una litera en tren nocturno puede sustituir hotel más tren diurno más avión, con menor huella de carbono y sin tiempo de aeropuerto.',
+      },
+    ],
+  },
+};

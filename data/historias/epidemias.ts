@@ -1,0 +1,368 @@
+import type { HistoriaData } from './types';
+
+export const epidemias: HistoriaData = {
+  slug: 'epidemias',
+  titulo: 'Historia de las Epidemias: De la Plaga de Atenas al COVID-19',
+  subtitulo: 'De la primera descripción clínica de Tucídides a las vacunas ARNm — 10 pandemias con su patógeno, mortalidad y legado médico',
+  descripcionSEO: 'Cronología interactiva de las grandes epidemias históricas: Muerte Negra, Gripe Española, VIH/SIDA y COVID-19. Comparativa de mortalidad, R0, CFR y legado médico en 10 hitos y 6 eras.',
+  keywords: [
+    'historia de las epidemias cronología',
+    'muerte negra peste bubónica yersinia pestis',
+    'gripe española 1918 pandemia h1n1',
+    'viruela america conquista indigenas',
+    'colera asiático john snow epidemiología',
+    'vih sida pandemia antiretrovirales',
+    'covid-19 sars-cov-2 vacunas arnm',
+    'plaga justiniano bizancio pandemia',
+  ],
+  anioInicio: -430,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'plaga-atenas',
+      nombre: 'Plaga de Atenas',
+      anioInicio: -430,
+      anioFin: -426,
+      color: '#8B7355',
+      categoria: 'bacteriana',
+      descripcion: 'Pandemia durante la guerra del Peloponeso que mató a ~75.000 atenienses incluyendo a Pericles. Tucídides la describió con detalle clínico sin precedentes. El patógeno exacto sigue debatido: fiebre tifoidea, ébola o una combinación de enfermedades son las hipótesis principales.',
+      obraIconica: 'Historia de la Guerra del Peloponeso — Tucídides (430 a.C.) — primera descripción clínica sistemática de una epidemia en la historia occidental',
+      paises: ['Grecia', 'Mediterráneo Oriental'],
+    },
+    {
+      id: 'plaga-antonina',
+      nombre: 'Plaga Antonina',
+      anioInicio: 165,
+      anioFin: 180,
+      color: '#A0522D',
+      categoria: 'virica',
+      descripcion: 'Pandemia (posiblemente viruela) traída por tropas romanas desde el frente parto que devastó el Imperio Romano. Mató a varios emperadores y a entre 5 y 10 millones de personas. Galeno documentó síntomas y tratamientos, sentando las bases de la medicina occidental medieval.',
+      obraIconica: 'Sobre el método terapéutico — Galeno de Pérgamo (180 d.C.) — documentación médica de síntomas; primer uso de cuarentena militar en el ejército romano',
+      paises: ['Imperio Romano', 'Oriente Próximo'],
+    },
+    {
+      id: 'peste-justiniano',
+      nombre: 'Peste de Justiniano',
+      anioInicio: 541,
+      anioFin: 750,
+      color: '#6B2D6B',
+      categoria: 'bacteriana',
+      descripcion: 'Primera gran pandemia de Yersinia pestis. Llegó a matar 5.000 personas al día en Constantinopla. En su punto álgido eliminó entre el 25 y el 50% de la población del Mediterráneo oriental, contribuyendo al colapso del Imperio Bizantino.',
+      obraIconica: 'Procopio de Cesarea, Historia de las Guerras (542 d.C.) — primera pandemia de peste bubónica documentada; identificación de bubones como signo diagnóstico',
+      paises: ['Imperio Bizantino', 'Mediterráneo', 'Oriente Próximo'],
+    },
+    {
+      id: 'muerte-negra',
+      nombre: 'Muerte Negra',
+      anioInicio: 1347,
+      anioFin: 1353,
+      color: '#1A1A2E',
+      categoria: 'bacteriana',
+      descripcion: 'La mayor pandemia de la historia. Mató entre un tercio y la mitad de la población europea. Causada por Yersinia pestis. Venecia impuso la primera cuarentena formal de la historia (quarantina: 40 días de aislamiento) que se convirtió en el modelo sanitario de la medicina moderna.',
+      obraIconica: 'Quarantina veneciana (1347) — invención de la cuarentena moderna; primeras autopsias para identificar causas de muerte; colapso del orden feudal europeo',
+      paises: ['Europa', 'Asia Central', 'Oriente Próximo'],
+    },
+    {
+      id: 'viruela-america',
+      nombre: 'Viruela en América',
+      anioInicio: 1519,
+      anioFin: 1580,
+      color: '#8B0000',
+      categoria: 'virica',
+      descripcion: 'La viruela y otras enfermedades europeas diezmaron hasta el 90% de la población indígena americana, con aproximadamente 56 millones de muertos. Sin inmunidad previa contra los patógenos del Viejo Mundo, civilizaciones enteras como los aztecas y los incas colapsaron antes de la conquista militar.',
+      obraIconica: 'Vacuna de Jenner (1796) — el devastador impacto de la viruela en América impulsó indirectamente la búsqueda de inmunización; primera vacuna de la historia',
+      paises: ['América Central', 'América del Sur', 'América del Norte'],
+    },
+    {
+      id: 'colera-1831',
+      nombre: 'Cólera Asiático',
+      anioInicio: 1831,
+      anioFin: 1851,
+      color: '#2E7D32',
+      categoria: 'bacteriana',
+      descripcion: 'Primera pandemia de cólera que llegó a Europa desde la India. Causó reformas sanitarias masivas en ciudades industriales. John Snow mapeó el brote de Londres en 1854 sobre la bomba de agua de Broad Street, fundando la epidemiología moderna como disciplina científica.',
+      obraIconica: 'Mapa del cólera de Broad Street — John Snow (1854) — fundación de la epidemiología moderna; reforma sanitaria urbana; germ theory de Pasteur y Koch',
+      paises: ['Europa', 'India', 'América del Norte', 'Rusia'],
+    },
+    {
+      id: 'gripe-espaniola',
+      nombre: 'Gripe Española',
+      anioInicio: 1918,
+      anioFin: 1920,
+      color: '#C62828',
+      categoria: 'virica',
+      descripcion: 'La pandemia de gripe más letal de la historia moderna, con 50 millones de muertos. Mató más personas que la Primera Guerra Mundial. Afectó mortalmente a jóvenes de 20 a 40 años mediante tormenta de citocinas, un patrón inverso al de la gripe estacional.',
+      obraIconica: 'Creación de la OMS (1948) — la Gripe Española impulsó la vigilancia epidemiológica global; primer uso masivo de mascarillas y cierre de espacios públicos como medida de salud pública',
+      paises: ['Global', 'Europa', 'América del Norte', 'Asia'],
+    },
+    {
+      id: 'polio',
+      nombre: 'Epidemias de Polio',
+      anioInicio: 1916,
+      anioFin: 1955,
+      color: '#E65100',
+      categoria: 'virica',
+      descripcion: 'Epidemias recurrentes de poliomielitis en EE.UU. y Europa durante la primera mitad del siglo XX. Paralizó a millones, incluido el presidente Franklin D. Roosevelt. El terror al contagio veraniego —con cierre de piscinas y parques— movilizó la mayor campaña científica hasta entonces para desarrollar una vacuna.',
+      obraIconica: 'Vacuna Salk (1955) y Sabin (1961) — modelo de ensayo clínico masivo (650.000 niños) y campaña de vacunación global; creación del concepto de inmunidad de rebaño aplicada',
+      paises: ['EE.UU.', 'Europa', 'América del Norte'],
+    },
+    {
+      id: 'vih-sida',
+      nombre: 'VIH/SIDA',
+      anioInicio: 1981,
+      anioFin: 9999,
+      color: '#880E4F',
+      categoria: 'virica',
+      descripcion: 'Pandemia en curso causada por el VIH. Ha matado a más de 40 millones de personas. Los antiretrovirales modernos (desde 1996) permiten una vida normal pero no hay cura. El VIH integra su genoma en el ADN del huésped, creando reservorios latentes que hacen imposible la erradicación con las terapias actuales.',
+      obraIconica: 'Terapia antiretroviral de alta actividad — HAART (1996) — revolución en antivirales; concepto de carga viral; medicina de enfermedades infecciosas crónicas como disciplina consolidada',
+      paises: ['Global', 'África Subsahariana', 'América del Norte'],
+    },
+    {
+      id: 'covid19',
+      nombre: 'COVID-19',
+      anioInicio: 2019,
+      anioFin: 9999,
+      color: '#1565C0',
+      categoria: 'virica',
+      descripcion: 'Pandemia causada por SARS-CoV-2. Primera pandemia gestionada con vacunas desarrolladas en menos de un año gracias a las plataformas ARNm. Con más de 7 millones de muertes directas confirmadas, aceleró la vigilancia genómica global, la telemedicina y el debate sobre soberanía sanitaria internacional.',
+      obraIconica: 'Vacunas ARNm Pfizer-BioNTech y Moderna (2020) — tiempo récord de desarrollo (<1 año); secuenciación genómica masiva; Reglamento Sanitario Internacional puesto a prueba',
+      paises: ['Global'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Antigüedad y Roma',
+      desde: -430,
+      hasta: 600,
+      icono: '🏛️',
+      hitosDestacados: ['Plaga de Atenas', 'Plaga Antonina'],
+      eventos: [
+        '430 a.C. — Tucídides describe la Plaga de Atenas: primera epidemiología clínica de la historia',
+        '165 d.C. — La Plaga Antonina llega a Roma con las tropas del frente parto',
+        '180 d.C. — Galeno documenta síntomas y tratamientos; base de la medicina medieval',
+        '251 d.C. — Plaga de Cipriano: ~5.000 muertos/día en Roma en su peor momento',
+        '541 d.C. — Inicio de la Peste de Justiniano en Constantinopla',
+      ],
+    },
+    {
+      nombre: 'Edad Media y Peste Negra',
+      desde: 600,
+      hasta: 1500,
+      icono: '☠️',
+      hitosDestacados: ['Peste de Justiniano', 'Muerte Negra'],
+      eventos: [
+        '600–750 d.C. — Oleadas sucesivas de la Peste de Justiniano devastan el Mediterráneo',
+        '1347 — La Muerte Negra llega a Sicilia desde Crimea en barcos genoveses',
+        '1347 — Venecia impone la primera quarantina: 40 días de aislamiento de barcos',
+        '1349 — La Muerte Negra alcanza su pico en Europa Central; mata al 30–60% de infectados',
+        '1353 — Fin del brote principal; Europa ha perdido entre 1/3 y 1/2 de su población',
+      ],
+    },
+    {
+      nombre: 'Era Colonial y Conquista',
+      desde: 1500,
+      hasta: 1800,
+      icono: '⛵',
+      hitosDestacados: ['Viruela en América'],
+      eventos: [
+        '1519 — La viruela llega a México con Hernán Cortés; colapso azteca',
+        '1527 — Epidemias europeas diezman el Imperio Inca antes de la llegada de Pizarro',
+        '1546 — Girolamo Fracastoro propone la teoría del contagio (germen de la germ theory)',
+        '1796 — Edward Jenner desarrolla la vacuna de la viruela — primera vacuna de la historia',
+        '1798 — Jenner publica An Inquiry Into the Causes and Effects of the Variolae Vaccinae',
+      ],
+    },
+    {
+      nombre: 'Industrialización y Bacteriología',
+      desde: 1800,
+      hasta: 1918,
+      icono: '🔬',
+      hitosDestacados: ['Cólera Asiático', 'Epidemias de Polio'],
+      eventos: [
+        '1831 — Primera pandemia de cólera llega a Europa desde la India',
+        '1854 — John Snow mapea el brote de cólera de Broad Street: nace la epidemiología',
+        '1876 — Robert Koch identifica el bacilo del ántrax; funda la bacteriología moderna',
+        '1882 — Koch descubre el bacilo de la tuberculosis; postulados de Koch',
+        '1916 — Primera gran epidemia de polio en Nueva York: 27.000 casos, 6.000 muertos',
+      ],
+    },
+    {
+      nombre: 'Siglo XX: Gripe, Polio y SIDA',
+      desde: 1918,
+      hasta: 2000,
+      icono: '💉',
+      hitosDestacados: ['Gripe Española', 'Epidemias de Polio', 'VIH/SIDA'],
+      eventos: [
+        '1918 — Gripe Española: 50 millones de muertos; primera pandemia con respuesta global',
+        '1948 — Creación de la Organización Mundial de la Salud (OMS)',
+        '1955 — Vacuna Salk contra la polio; ensayo clínico masivo con 650.000 niños',
+        '1980 — OMS certifica la erradicación global de la viruela — primera y única',
+        '1981 — Primeros casos de SIDA en Los Ángeles; inicio de la pandemia de VIH',
+        '1996 — HAART: terapia antiretroviral transforma el SIDA de mortal a crónico',
+      ],
+    },
+    {
+      nombre: 'Era Global y Pandemia Digital',
+      desde: 2000,
+      hasta: 9999,
+      icono: '🌍',
+      hitosDestacados: ['VIH/SIDA', 'COVID-19'],
+      eventos: [
+        '2003 — SARS-CoV-1: primera epidemia por coronavirus con alerta global OMS',
+        '2009 — Gripe A (H1N1): primera pandemia declarada por OMS en 40 años',
+        '2014 — Ébola en África Occidental: 11.000 muertos; debilidades del sistema internacional',
+        '2019 — COVID-19: primer caso en Wuhan; pandemia declarada el 11 de marzo de 2020',
+        '2020 — Vacunas ARNm aprobadas en <1 año; hito de la biología molecular aplicada',
+      ],
+    },
+  ],
+
+  categorias: {
+    bacteriana: 'Bacteriana',
+    virica: 'Vírica',
+    parasitaria: 'Parasitaria',
+    cuarentena: 'Medidas de Control',
+    vacunacion: 'Era Vacunas',
+    moderna: 'Epidemiología Moderna',
+  },
+
+  colores: {
+    bacteriana: '#8B4513',
+    virica: '#C62828',
+    parasitaria: '#2E7D32',
+    cuarentena: '#1A237E',
+    vacunacion: '#E65100',
+    moderna: '#1565C0',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Las epidemias no son accidentes de la historia: son el motor oculto que derrumbó imperios, reformó el orden social y aceleró la ciencia médica. Desde Tucídides hasta la secuenciación genómica del SARS-CoV-2, cada pandemia dejó un legado doble: devastación y conocimiento. La cuarentena, la epidemiología, la vacunación y los antivirales son hijos directos de las grandes epidemias.',
+
+    tablaComparativa: [
+      { hito: 'Muerte Negra', periodo: '1347–1353', categoria: 'Bacteriana', personaje: 'Médicos de Venecia', aportacion: 'Invención de la cuarentena formal (quarantina, 40 días)' },
+      { hito: 'Viruela en América', periodo: '1519–1580', categoria: 'Vírica', personaje: 'Edward Jenner (1796)', aportacion: 'Desencadenó el desarrollo de la primera vacuna de la historia' },
+      { hito: 'Cólera Asiático', periodo: '1831–1851', categoria: 'Bacteriana', personaje: 'John Snow', aportacion: 'Fundación de la epidemiología moderna y la germ theory' },
+      { hito: 'Gripe Española', periodo: '1918–1920', categoria: 'Vírica', personaje: 'Creadores OMS', aportacion: 'Creación de la OMS y sistemas de vigilancia epidemiológica global' },
+      { hito: 'Epidemias de Polio', periodo: '1916–1955', categoria: 'Vírica', personaje: 'Jonas Salk', aportacion: 'Modelo de ensayo clínico masivo y campaña de vacunación global' },
+      { hito: 'COVID-19', periodo: '2019–presente', categoria: 'Vírica', personaje: 'Equipos ARNm BioNTech/Moderna', aportacion: 'Vacunas ARNm en tiempo récord; secuenciación genómica global' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de medicina',
+        perfil: 'Preparando fundamentos de epidemiología',
+        texto: 'Usa la cronología para contextualizar el desarrollo de la epidemiología como disciplina, conectando cada pandemia con los avances diagnósticos y terapéuticos que originó. Entiende por qué John Snow es el padre de la epidemiología sin conocer los gérmenes.',
+      },
+      {
+        icono: '🦠',
+        titulo: 'Epidemiólogo en formación',
+        perfil: 'Aprendiendo modelos matemáticos SIR',
+        texto: 'Compara el R0 y el CFR de distintas epidemias para calibrar modelos matemáticos y entender cómo las condiciones sociales —hacinamiento, desnutrición, acceso sanitario— modulan la transmisibilidad real de un mismo patógeno.',
+      },
+      {
+        icono: '📰',
+        titulo: 'Periodista de salud',
+        perfil: 'Cubriendo brotes emergentes',
+        texto: 'Busca contexto histórico para informar sobre brotes actuales sin alarmar innecesariamente, poniendo los datos en perspectiva. La Muerte Negra mató al 50% de los infectados; el COVID-19 al 1–3%. El contexto transforma la percepción del riesgo.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Gestor de salud pública',
+        perfil: 'Preparando planes de contingencia',
+        texto: 'Extrae lecciones de la respuesta social a cada epidemia: qué medidas funcionaron y cuáles fracasaron. La cuarentena veneciana, el mapa de Snow, la vacunación de Salk y el confinamiento COVID son casos de estudio en gestión proporcional de riesgos sanitarios.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué la Gripe Española mató a jóvenes sanos y no solo a ancianos?',
+        respuesta: 'La hipótesis más aceptada es la del «imprinting inmunológico»: los adultos mayores habían sido expuestos a cepas similares en su infancia y tenían cierta inmunidad cruzada. Los jóvenes de 20 a 40 años sufrieron una respuesta inmune hiperactiva —tormenta de citocinas— que dañaba sus propios pulmones, causando la alta mortalidad en ese grupo.',
+        tip: 'El 99% de las muertes por Gripe Española ocurrió en menores de 65 años, un patrón completamente inverso al de la gripe estacional actual.',
+      },
+      {
+        pregunta: '¿Qué es el R0 y por qué el SARS-CoV-2 se propagó tan rápido?',
+        respuesta: 'El R0 indica cuántas personas contagia de media cada infectado en una población sin inmunidad. El SARS-CoV-2 original tenía un R0 de ~3,3, que con Ómicron alcanzó 8–15. El período preinfeccioso de 2–3 días —contagio antes de síntomas— hizo imposible el aislamiento antes de que los sistemas sanitarios reaccionaran.',
+        tip: 'El sarampión tiene el R0 más alto conocido (~15–18), pero existen vacunas muy eficaces que lo controlan eficazmente.',
+      },
+      {
+        pregunta: '¿Por qué la viruela se erradicó pero no el VIH?',
+        respuesta: 'La viruela tenía reservorio exclusivamente humano y la vacuna de Jenner generaba inmunidad esterilizante. La OMS coordinó vacunación anillo global hasta erradicarla en 1980. El VIH integra su genoma en el ADN del huésped creando reservorios latentes, muta constantemente, y no existe vacuna eficaz ni terapia que elimine completamente el reservorio viral.',
+      },
+      {
+        pregunta: '¿Las epidemias influyeron en la historia política?',
+        respuesta: 'De forma decisiva. La Muerte Negra aceleró el fin del feudalismo: al morir tantos siervos, la mano de obra escaseó y los supervivientes negociaron mejores condiciones. La Gripe Española ocultada por censura bélica minó la confianza en los gobiernos. El SIDA cambió la política de ensayos clínicos. El COVID-19 abrió debates sobre soberanía sanitaria y geopolítica de vacunas.',
+      },
+      {
+        pregunta: '¿Estamos más preparados hoy para una pandemia que en 1918?',
+        respuesta: 'En herramientas científicas, sí: secuenciación genómica en horas, plataformas ARNm en meses, vigilancia epidemiológica global (GOARN-OMS). En coordinación política, menos de lo que parece: el COVID-19 mostró fallos en stocks de EPI, comunicación de riesgos y cooperación internacional. El Reglamento Sanitario Internacional (RSI 2005) exige notificar brotes en 24–48h, pero el cumplimiento es desigual.',
+        tip: 'El sistema de alerta GOARN de la OMS fue creado directamente como respuesta a las lecciones aprendidas de la Gripe Española de 1918.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Identifica el agente causal y su modo de transmisión',
+        cuerpo: 'Determina si es bacteria, virus o parásito, y si se transmite por vía aérea, fecal-oral, contacto directo o vector. La vía aérea con aerosoles es la más difícil de controlar y la que genera pandemias más rápidas. La Muerte Negra (pulgas) y la Gripe Española (aerosoles) requirieron respuestas completamente distintas.',
+      },
+      {
+        titulo: 'Estima el R0 inicial a partir de los primeros datos de contagio',
+        cuerpo: 'Observa el tiempo de duplicación de casos en los primeros 14–21 días. Un tiempo de duplicación de 3–4 días indica un R0 muy alto (>3). Si los casos se duplican cada 7 o más días, el brote es más manejable. La Muerte Negra tardó semanas en cruzar regiones; el COVID-19 cruzó continentes en días.',
+      },
+      {
+        titulo: 'Calcula el CFR inicial con cautela: siempre estará sesgado hacia arriba',
+        cuerpo: 'Los primeros casos confirmados son los más graves; los leves no se detectan. El CFR real suele ser 5–20 veces menor que el inicial. El COVID-19 parecía matar al 3–4% al inicio; estudios de seroprevalencia lo situaron en 0,5–1%. Espera datos de anticuerpos antes de concluir.',
+      },
+      {
+        titulo: 'Evalúa la capacidad de respuesta sanitaria del país afectado',
+        cuerpo: 'UCI por 100.000 hab., disponibilidad de antivirales o vacunas, robustez del sistema de trazabilidad de contactos y capacidad de diagnóstico rápido. La misma epidemia de cólera mató al 50% en ciudades sin saneamiento y al 1% en ciudades con agua potable.',
+      },
+      {
+        titulo: 'Aplica medidas proporcionales al riesgo real, no al miedo percibido',
+        cuerpo: 'No todas las epidemias requieren confinamiento global. La respuesta debe escalar desde vigilancia activa → cuarentena de contactos → restricciones focalizadas → medidas masivas, solo cuando los datos lo justifican. La sobrerreacción también tiene costes sanitarios y sociales medibles.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📐',
+        texto: 'Distingue entre epidemia, endemia y pandemia. Epidemia: brote localizado que supera la incidencia esperada. Endemia: presencia permanente en una zona geográfica (malaria en zonas tropicales). Pandemia: propagación geográfica global que afecta a múltiples continentes simultáneamente.',
+      },
+      {
+        icono: '🔢',
+        texto: 'El CFR inicial siempre sobrestima la mortalidad real. Al inicio de un brote solo se detectan los casos que llegan al hospital. Los estudios de seroprevalencia revelan que la mortalidad real puede ser 10–50 veces menor que la inicial. Nunca uses el CFR de los primeros días para tomar conclusiones.',
+      },
+      {
+        icono: '🗺️',
+        texto: 'La mortalidad no depende solo del patógeno. Las condiciones sanitarias previas, la desnutrición, el hacinamiento y el acceso a atención médica importan tanto como la virulencia del agente. La Muerte Negra mató más en ciudades hacinadas que en zonas rurales con menos densidad.',
+      },
+      {
+        icono: '✅',
+        texto: 'Las vacunas reducen el R0 efectivo por debajo de 1 — la clave del control. No eliminan el riesgo individual (breakthrough infections), pero bajan la transmisión a nivel poblacional. Cuando el R0 efectivo cae por debajo de 1, el brote se extingue naturalmente aunque haya casos individuales.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Confundir mortalidad con CFR',
+        cuerpo: 'Mortalidad es el porcentaje de muertos sobre la población total; CFR (Case Fatality Rate) es el porcentaje de muertos sobre los casos confirmados. Son métricas muy distintas: la Muerte Negra tenía un CFR del 30–60% pero una mortalidad poblacional del 30–50% europeo en ese período.',
+      },
+      {
+        titulo: 'Usar el R0 como predictor absoluto',
+        cuerpo: 'El R0 depende del comportamiento social, la densidad poblacional y las medidas adoptadas, no solo de la biología del virus. El mismo patógeno puede tener R0 muy distintos en diferentes contextos. El SARS-CoV-2 Ómicron tenía R0=15 en poblaciones sin inmunidad previa y R0~1 con alta cobertura vacunal.',
+      },
+      {
+        titulo: 'Ignorar las muertes indirectas de las epidemias',
+        cuerpo: 'En las grandes epidemias, el colapso sanitario —pacientes cardíacos o quirúrgicos sin atención— puede generar tanta o más mortalidad que el patógeno directo. El COVID-19 generó un exceso de mortalidad por otras causas de un 20–30% en los picos de saturación hospitalaria.',
+      },
+      {
+        titulo: 'Asumir que los antibióticos funcionan contra los virus',
+        cuerpo: 'La Gripe Española, el COVID-19 y el VIH son enfermedades víricas. Los antibióticos no tienen efecto sobre ellas, solo sobre sobreinfecciones bacterianas secundarias. Este error histórico provocó el uso masivo e ineficaz de antibióticos durante la Gripe Española, acelerando la resistencia antimicrobiana.',
+      },
+    ],
+  },
+};

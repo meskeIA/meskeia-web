@@ -1,0 +1,362 @@
+import type { HistoriaData } from './types';
+
+export const radio: HistoriaData = {
+  slug: 'radio',
+  titulo: 'Historia de la Radio: De Marconi al Podcast con IA',
+  subtitulo: 'De las primeras ondas hertzianas al audio generativo con IA — 10 períodos con los inventores, hitos y formatos que transformaron el audio en 130 años de historia',
+  descripcionSEO: 'Cronología interactiva de la historia de la radio: de Marconi y Hertz (1895) al podcast con inteligencia artificial. Radio comercial AM, edad de oro, FM contracultura, radio privada en España, era digital, podcast y IA generativa de audio en 10 hitos y 6 eras.',
+  keywords: [
+    'historia de la radio cronología',
+    'marconi tesla hertz radio ondas electromagnéticas',
+    'radio comercial KDKA edad de oro',
+    'BBC radio pública servicio público',
+    'FM contracultura rock radio underground',
+    'radio española 23-F SER COPE transición',
+    'podcast serial adam curry dave winer',
+    'inteligencia artificial radio IA notebooklm elevenlabs',
+  ],
+  anioInicio: 1895,
+  anioFin: 9999,
+
+  hitos: [
+    {
+      id: 'pioneros-ondas',
+      nombre: 'Los Pioneros de las Ondas',
+      anioInicio: 1895,
+      anioFin: 1920,
+      color: '#8B4513',
+      categoria: 'pioneros',
+      descripcion: 'Heinrich Hertz demostró en 1887 que las ondas electromagnéticas existían tal como predijo Maxwell. Marconi fue el primero en patentar un sistema de radio en 1896 y cruzar el Atlántico en 1901. Fessenden logró la primera transmisión de voz humana en 1906, cantando "Oh Holy Night" a marineros en el Atlántico. Lee de Forest inventó el triodo (1906), haciendo posible amplificar señales. Edwin Armstrong desarrolló el circuito superheterodino en 1918, base de todos los receptores modernos. Tesla disputó la paternidad: el Tribunal Supremo de EE.UU. le reconoció algunas patentes en 1943.',
+      obraIconica: 'La transmisión transatlántica de Marconi desde Poldhu (Cornualles) a Terranova — 3.500 km de señal (1901)',
+      paises: ['Reino Unido', 'Italia', 'EE.UU.', 'Canadá', 'Francia'],
+    },
+    {
+      id: 'radio-comercial',
+      nombre: 'Nacimiento de la Radio Comercial',
+      anioInicio: 1920,
+      anioFin: 1935,
+      color: '#C8A000',
+      categoria: 'comercial',
+      descripcion: 'El 2 de noviembre de 1920, KDKA de Pittsburgh transmitió los resultados electorales de Harding vs Cox ante millones de oyentes: nació la radio comercial. La BBC nació en 1922 con el modelo de servicio público. En España, Radio España abrió en 1924, seguida de Unión Radio en 1925 (hoy SER). El primer spot publicitario fue emitido por WEAF de Nueva York en 1922: 10 minutos por 50 dólares. La RCA y NBC crearon la primera red radiofónica en 1926.',
+      obraIconica: 'KDKA Pittsburgh — primera emisora comercial del mundo, transmitió los resultados de las elecciones presidenciales americanas el 2 de noviembre de 1920',
+      paises: ['EE.UU.', 'Reino Unido', 'España'],
+    },
+    {
+      id: 'edad-dorada-radio',
+      nombre: 'La Edad de Oro de la Radio',
+      anioInicio: 1930,
+      anioFin: 1950,
+      color: '#DAA520',
+      categoria: 'comercial',
+      descripcion: 'Roosevelt pronunció 30 "Fireside Chats" por radio entre 1933 y 1944, reconectando con una nación en crisis. La guerra de los mundos de Orson Welles (1938) demostró el poder hipnótico de la radio: 6 millones de oyentes creyeron una invasión alienígena real. En la España de Franco, RNE (fundada en 1937 en Salamanca) fue herramienta de propaganda. La BBC World Service emitía en 40 idiomas hacia Europa ocupada durante la WWII. Radio Londres transmitía mensajes cifrados a los resistentes franceses: "El tío tiene bigote largo" podía significar un sabotaje.',
+      obraIconica: 'La guerra de los mundos — Orson Welles (30/10/1938) — 6 millones de oyentes creyeron una invasión alienígena real',
+      paises: ['EE.UU.', 'Reino Unido', 'España', 'Alemania', 'Francia'],
+    },
+    {
+      id: 'rock-radio-am',
+      nombre: 'Radio, Rock y Cultura Popular',
+      anioInicio: 1948,
+      anioFin: 1965,
+      color: '#FF4500',
+      categoria: 'musica',
+      descripcion: 'La llegada de la TV en los años 50 parecía condenar a la radio. Pero el formato Top 40 (McLendon, 1953) reinventó la radio como vehículo del rock and roll. Alan Freed acuñó el término "rock and roll" en WJMO Cleveland en 1951. Radio Luxemburgo y Radio Caroline emitían desde barcos en el Mar del Norte para eludir las restricciones europeas. La radio se volvió íntima, personal, el acompañante del adolescente rebelde. El disc jockey se convirtió en estrella del medio.',
+      obraIconica: 'Radio Luxemburgo — la emisora pirata más escuchada de Europa, transmitiendo rock desde el Gran Ducado (1933-1991)',
+      paises: ['EE.UU.', 'Luxemburgo', 'Reino Unido', 'Europa'],
+    },
+    {
+      id: 'transistor-fm-contracultura',
+      nombre: 'Transistor, FM y Contracultura',
+      anioInicio: 1954,
+      anioFin: 1980,
+      color: '#9400D3',
+      categoria: 'transistor',
+      descripcion: 'Edwin Armstrong inventó la FM en los años 30 pero RCA —que tenía invertidos millones en AM— la bloqueó durante décadas. La FM resucitó en los años 60 cuando los jóvenes quisieron escuchar álbumes completos, no singles. KMPX San Francisco (1967) emitía rock psicodélico sin interrupciones. La FM se convirtió en el hogar de la contracultura: emisoras que hablaban de Vietnam, drogas y política mientras la AM convencional callaba. El transistor portátil (1954) hizo la radio personal e individual.',
+      obraIconica: 'KMPX San Francisco (1967) — primera emisora FM underground de EE.UU., emitía álbumes completos de rock psicodélico sin cortar',
+      paises: ['EE.UU.', 'España', 'Europa'],
+    },
+    {
+      id: 'radio-privada-espana',
+      nombre: 'Radio Privada y Democracia en España',
+      anioInicio: 1977,
+      anioFin: 1995,
+      color: '#2E86AB',
+      categoria: 'privada',
+      descripcion: 'Durante el intento de golpe de estado del 23-F de 1981, TVE emitió carta de ajuste mientras la radio informaba en directo. Luis del Olmo, Iñaki Gabilondo y José María García mantuvieron a los españoles pegados a sus transistores. La SER y la COPE se convirtieron en actores políticos de primer orden. Onda Cero fue fundada en 1990. Los 40 Principales (lanzados en FM en 1966) dominaron la música. La radio española vivió su mejor momento de audiencia en los 80.',
+      obraIconica: 'La noche del 23-F (23/02/1981) — la radio española informó en tiempo real del golpe de Estado mientras la TV callaba',
+      paises: ['España'],
+    },
+    {
+      id: 'radio-digital-satelital',
+      nombre: 'Radio Digital y Satelital',
+      anioInicio: 1990,
+      anioFin: 2010,
+      color: '#1E90FF',
+      categoria: 'digital',
+      descripcion: 'El estándar DAB de radio digital prometió calidad de CD sin interferencias, pero la transición fue lenta y cara. Sirius XM en EE.UU. demostró que la suscripción funcionaba para radio: 150 canales sin anuncios (2001). El verdadero cambio llegó por internet: ya en 1993, WXYC Chapel Hill retransmitía en línea. El RDS permitió mostrar el nombre del tema en el transistor. España fue reacia al DAB: miles de emisoras comunitarias no podían costearse la transición.',
+      obraIconica: 'Sirius XM Satellite Radio (2001) — 150 canales sin anuncios por suscripción, revolucionó el modelo de negocio radiofónico',
+      paises: ['EE.UU.', 'Reino Unido', 'Europa', 'España'],
+    },
+    {
+      id: 'podcast-revolucion',
+      nombre: 'La Revolución del Podcast',
+      anioInicio: 2004,
+      anioFin: 2020,
+      color: '#8B008B',
+      categoria: 'podcast',
+      descripcion: 'Adam Curry (ex-VJ de MTV) y Dave Winer inventaron en 2004 un sistema de distribución RSS para audio: nació el podcasting. Apple integró podcasts en iTunes en 2005. Serial (2014) demostró que el periodismo narrativo largo funcionaba en audio: 40 millones de descargas en el primer mes. En España, iVoox (2008) y Podium Podcast de Prisa (2015) impulsaron el sector. Spotify compró Gimlet Media, Anchor y Parcast por 1.000 millones para convertirse en el Netflix del audio. Joe Rogan firmó con Spotify por 100 millones en 2020.',
+      obraIconica: 'Serial (2014) — el podcast de Sarah Koenig sobre un asesinato de 1999 que descargaron 40 millones de personas en el primer mes',
+      paises: ['EE.UU.', 'España', 'Global'],
+    },
+    {
+      id: 'audio-social-ia',
+      nombre: 'Audio Social y Radio con IA',
+      anioInicio: 2020,
+      anioFin: 9999,
+      color: '#FF0080',
+      categoria: 'ia',
+      descripcion: 'Clubhouse nació en abril de 2020, en pleno confinamiento global: 10 millones de usuarios en 2 meses. Twitter respondió con Spaces, Discord con Stage Channels. Pero Clubhouse perdió el 95% de tráfico en 6 meses cuando acabó el confinamiento. ElevenLabs (2022) demostró que clonar una voz humana con 3 minutos de audio era posible. Google NotebookLM (2024) genera podcasts conversacionales entre dos locutores IA. OpenAI Whisper transcribe audio con precisión superior a humanos. Algunas emisoras locales ya usan locutores virtuales para franjas de madrugada.',
+      obraIconica: 'Google NotebookLM (2024) — genera podcasts conversacionales entre dos locutores IA a partir de cualquier documento',
+      paises: ['EE.UU.', 'Global'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Ondas y Pioneros',
+      desde: 1895,
+      hasta: 1920,
+      icono: '📡',
+      hitosDestacados: ['Los Pioneros de las Ondas'],
+      eventos: [
+        '1887 — Hertz demuestra experimentalmente las ondas electromagnéticas predichas por Maxwell',
+        '1896 — Marconi patenta su sistema de radio y lleva los experimentos a Inglaterra',
+        '1901 — Primera transmisión transatlántica de radio: Marconi cruza el Atlántico con una señal',
+        '1906 — Fessenden realiza la primera transmisión de voz humana por radio',
+        '1906 — Lee de Forest inventa el triodo, haciendo posible amplificar señales de radio',
+      ],
+    },
+    {
+      nombre: 'Edad de Oro AM',
+      desde: 1920,
+      hasta: 1955,
+      icono: '📻',
+      hitosDestacados: ['Nacimiento de la Radio Comercial', 'La Edad de Oro de la Radio'],
+      eventos: [
+        '1920 — KDKA Pittsburgh emite los resultados electorales: nace la radio comercial',
+        '1922 — La BBC fundada en Reino Unido como modelo de servicio público',
+        '1933 — Roosevelt comienza los Fireside Chats: la radio como vínculo entre gobierno y ciudadanos',
+        '1938 — La guerra de los mundos de Orson Welles: 6 millones de oyentes creen en invasión alienígena',
+        '1940-44 — Radio Londres transmite mensajes cifrados a la Resistencia francesa',
+      ],
+    },
+    {
+      nombre: 'FM y Contracultura',
+      desde: 1955,
+      hasta: 1980,
+      icono: '🎵',
+      hitosDestacados: ['Radio, Rock y Cultura Popular', 'Transistor, FM y Contracultura'],
+      eventos: [
+        '1951 — Alan Freed acuña el término "rock and roll" en WJMO Cleveland',
+        '1953 — Formato Top 40 de McLendon convierte la radio en el hogar del rock',
+        '1954 — El transistor portátil hace la radio personal e individual',
+        '1961 — FM estéreo aprobada en EE.UU., comienza su lenta expansión',
+        '1967 — KMPX San Francisco: primera emisora FM underground, álbumes completos sin cortar',
+      ],
+    },
+    {
+      nombre: 'Radio Privada y Democracia',
+      desde: 1980,
+      hasta: 2000,
+      icono: '🗣️',
+      hitosDestacados: ['Radio Privada y Democracia en España'],
+      eventos: [
+        '1981 — El 23-F: la radio española informa en directo del golpe mientras la TV calla',
+        '1985 — Los 40 Principales dominan la FM española con el pop y el rock nacional',
+        '1989 — Caída del muro de Berlín: la radio libre de Europa del Este emerge',
+        '1990 — Onda Cero fundada en España, ampliando el dial comercial',
+        '1993 — WXYC Chapel Hill comienza a retransmitir por internet: nace la radio online',
+      ],
+    },
+    {
+      nombre: 'Digital y Podcast',
+      desde: 2000,
+      hasta: 2020,
+      icono: '💻',
+      hitosDestacados: ['Radio Digital y Satelital', 'La Revolución del Podcast'],
+      eventos: [
+        '2001 — Sirius XM lanza la radio satelital de pago con 150 canales sin anuncios',
+        '2004 — Adam Curry y Dave Winer inventan el podcasting con RSS de audio',
+        '2005 — Apple integra podcasts en iTunes: el formato llega a millones de usuarios',
+        '2014 — Serial: 40 millones de descargas en el primer mes, el podcast como fenómeno global',
+        '2020 — Spotify invierte 1.000 millones en podcasting; Joe Rogan firma por 100 millones',
+      ],
+    },
+    {
+      nombre: 'Audio Social e IA',
+      desde: 2020,
+      hasta: 9999,
+      icono: '🎙️',
+      hitosDestacados: ['Audio Social y Radio con IA'],
+      eventos: [
+        '2020 — Clubhouse alcanza 10 millones de usuarios en 2 meses durante el confinamiento',
+        '2021 — Twitter Spaces y Discord Stage Channels: el audio social se integra en plataformas',
+        '2022 — ElevenLabs demuestra la clonación de voz humana con 3 minutos de audio',
+        '2024 — Google NotebookLM genera podcasts conversacionales con locutores IA',
+        '2024 — Emisoras locales adoptan locutores virtuales para franjas nocturnas',
+      ],
+    },
+  ],
+
+  categorias: {
+    pioneros: 'Pioneros',
+    comercial: 'Comercial',
+    musica: 'Música',
+    transistor: 'Transistor/FM',
+    privada: 'Radio Privada',
+    digital: 'Digital',
+    podcast: 'Podcast',
+    ia: 'IA',
+  },
+
+  colores: {
+    pioneros: '#8B4513',
+    comercial: '#C8A000',
+    musica: '#FF4500',
+    transistor: '#9400D3',
+    privada: '#2E86AB',
+    digital: '#1E90FF',
+    podcast: '#8B008B',
+    ia: '#FF0080',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La radio es el primer medio de comunicación de masas: antes del cine sonoro, la televisión e internet, la radio unió continentes con la voz humana. En 130 años pasó de experimento científico a herramienta de propaganda, vehículo del rock and roll, actor político en la Transición española y plataforma de podcasts escuchados por millones. Cada era radiofónica nace de una tecnología y de un contexto histórico que transforma quién habla, a quién escucha y para qué.',
+
+    tablaComparativa: [
+      { hito: 'Los Pioneros de las Ondas', periodo: '1895–1920', categoria: 'Pioneros', personaje: 'Guglielmo Marconi', aportacion: 'Primera comunicación inalámbrica transatlántica y patente de la radio' },
+      { hito: 'La Edad de Oro de la Radio', periodo: '1930–1950', categoria: 'Comercial', personaje: 'Orson Welles', aportacion: 'Demostró el poder hipnótico de la radio como medio narrativo' },
+      { hito: 'Radio, Rock y Cultura Popular', periodo: '1948–1965', categoria: 'Música', personaje: 'Alan Freed', aportacion: 'Convirtió la radio AM en el hogar del rock and roll' },
+      { hito: 'Transistor, FM y Contracultura', periodo: '1954–1980', categoria: 'Transistor/FM', personaje: 'Edwin Armstrong', aportacion: 'FM estéreo como espacio de la contracultura y el rock alternativo' },
+      { hito: 'Radio Privada y Democracia en España', periodo: '1977–1995', categoria: 'Radio Privada', personaje: 'Iñaki Gabilondo', aportacion: 'La radio española como actor político clave en la Transición' },
+      { hito: 'La Revolución del Podcast', periodo: '2004–2020', categoria: 'Podcast', personaje: 'Sarah Koenig', aportacion: 'Serial demostró que el audio narrativo largo podía ser fenómeno global' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de periodismo o comunicación',
+        perfil: 'Preparando trabajos sobre historia de los medios',
+        texto: 'Comprende cómo la radio transformó la comunicación política (Roosevelt, BBC en la WWII, 23-F en España), los modelos de negocio (publicidad AM, servicio público BBC, suscripción Sirius XM, podcast on demand) y cómo cada tecnología nueva no mató a la radio sino que la reinventó.',
+      },
+      {
+        icono: '🎙️',
+        titulo: 'Periodista o locutor de radio',
+        perfil: 'Profesional del audio que quiere contexto histórico',
+        texto: 'Entiende la tradición que hereda: los Fireside Chats de Roosevelt, la radio de resistencia en la WWII, el papel del disc jockey en el rock, la radio española durante el 23-F. Conocer la historia del medio enriquece el oficio y explica por qué la voz humana sigue siendo insustituible.',
+      },
+      {
+        icono: '🎧',
+        titulo: 'Oyente apasionado de podcasts',
+        perfil: 'Escucha horas de audio a la semana',
+        texto: 'Quiere entender de dónde viene el formato que consume: cómo Adam Curry y Dave Winer inventaron el RSS de audio en 2004, por qué Serial fue un hito, y qué diferencia a un podcast de una radio convencional. El pasado del audio ilumina el presente del podcasting.',
+      },
+      {
+        icono: '🤖',
+        titulo: 'Interesado en IA y medios de comunicación',
+        perfil: 'Sigue las tendencias de tecnología y medios',
+        texto: 'La IA de audio no es una ruptura radical: cada década la radio absorbió una nueva tecnología (válvula, transistor, FM, MP3, RSS, LLMs) y sobrevivió. ElevenLabs, NotebookLM y los locutores virtuales son el último capítulo de una historia de adaptación continua.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Quién inventó realmente la radio: Marconi, Tesla o Fessenden?',
+        respuesta: 'La respuesta honesta es que no hay un único inventor. Marconi fue el primero en patentar un sistema de radio funcional (1896) y el primero en cruzar el Atlántico con una señal (1901). Tesla desarrolló ideas similares antes pero no llegó a construir un sistema completo y operativo a tiempo. El Tribunal Supremo de EE.UU. reconoció en 1943 algunas patentes de Tesla, tras su muerte, por razones que incluían invalidar las de Marconi. Fessenden realizó la primera transmisión de voz humana en 1906. La "invención" de la radio fue un proceso colectivo.',
+        tip: 'La disputa sobre la invención de la radio refleja un patrón común: las grandes tecnologías emergen de docenas de contribuciones simultáneas, y la historia premia al que llega primero con la patente o el inversor adecuado.',
+      },
+      {
+        pregunta: '¿Por qué la radio sobrevivió a la televisión y a internet?',
+        respuesta: 'La radio sobrevivió a la televisión porque ofrece algo que la TV no puede: compañía en movimiento. Puedes escuchar radio conduciendo, cocinando o haciendo deporte. Sobrevivió a internet porque el audio es el único formato que no requiere atención visual. El podcast es la radio adaptada a internet: mismo principio (voz + historia), nueva distribución. La radio ha sobrevivido reinventándose tres veces en 100 años.',
+        tip: 'La radio AM nunca desapareció del todo: en muchos países rurales y en situaciones de emergencia sigue siendo el medio más fiable, con emisoras que llevan décadas en frecuencias que no requieren internet.',
+      },
+      {
+        pregunta: '¿Qué papel jugó la radio española durante la Transición y el 23-F?',
+        respuesta: 'La radio española vivió su momento de mayor impacto político entre 1977 y 1982. El 23 de febrero de 1981, cuando Tejero irrumpió en el Congreso, TVE emitió carta de ajuste. Fue la radio —la SER, la COPE, la Cadena Rato— la que informó en directo durante horas, convirtiéndose en el único lazo de comunicación entre el gobierno democrático y los ciudadanos. Luis del Olmo, Iñaki Gabilondo y José María García son los nombres de esa noche histórica.',
+        tip: 'El papel de la radio en el 23-F es un caso de estudio en escuelas de periodismo: demuestra que el medio más "primitivo" puede ser el más resistente en una crisis institucional.',
+      },
+      {
+        pregunta: '¿Es el podcast realmente diferente de la radio convencional?',
+        respuesta: 'Sí, en aspectos cruciales. La radio convencional es lineal (todos escuchan lo mismo al mismo tiempo), efímera y generalista. El podcast es asíncrono (cada oyente elige cuándo), permanente (queda archivado) y de nicho (puede dirigirse a 10.000 personas apasionadas). El modelo de negocio también es distinto: la radio vende publicidad masiva, el podcast vende acceso a audiencias específicas y comprometidas.',
+        tip: 'Serial (2014) demostró que el audio puede sustentar periodismo narrativo de profundidad — el tipo de reportaje que en los 90 solo cabía en libros o revistas especializadas.',
+      },
+      {
+        pregunta: '¿Pueden los locutores de IA sustituir a los presentadores humanos de radio?',
+        respuesta: 'Para franjas de madrugada y contenido repetitivo, ya lo están haciendo. Algunas emisoras locales en EE.UU. y Europa usan locutores virtuales fuera del horario prime. Pero la radio en directo — con sus errores, reacciones en tiempo real y conexión humana — sigue siendo irreplicable por la IA actual. El presentador de radio da sentido a lo que ocurre en el momento; la IA puede simularlo, pero no vivir el directo con el mismo riesgo y autenticidad.',
+        tip: 'Google NotebookLM genera podcasts convincentes entre dos locutores IA, pero el oyente sabe que no hay nadie ahí. La autenticidad de la voz humana en directo tiene un valor que la IA, por ahora, no puede replicar completamente.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Identifica la tecnología que cambió las posibilidades del medio',
+        cuerpo: 'Cada era radiofónica está marcada por una tecnología: la válvula de vacío (1906), el transistor (1954), la FM estéreo (1961), el MP3/RSS (2001), los modelos de lenguaje grande (2022). Pregúntate: ¿qué nuevo poder dio esta tecnología al emisor o al oyente? La respuesta explica casi todo lo demás.',
+      },
+      {
+        titulo: 'Escucha al menos un archivo sonoro de cada era',
+        cuerpo: 'Ningún texto describe la radio mejor que escuchar la radio. Los archivos sonoros de la BBC están disponibles online: los Fireside Chats de Roosevelt, Radio Londres durante la WWII, el pánico de La guerra de los mundos. Para el podcast, escucha el primer episodio de Serial. La experiencia auditiva es insustituible.',
+      },
+      {
+        titulo: 'Conecta el modelo de negocio con el tipo de contenido',
+        cuerpo: 'La radio de servicio público (BBC, RNE) produce contenido que el mercado no financia. La radio comercial AM produce entretenimiento masivo. El podcast de nicho sobrevive porque 10.000 oyentes muy comprometidos valen más publicitariamente que 1 millón de oyentes distraídos. El modelo económico determina qué voces se escuchan y cuáles no.',
+      },
+      {
+        titulo: 'Estudia cómo cada era reaccionó a la anterior',
+        cuerpo: 'La FM underground (1967) fue una reacción al conservadurismo de la AM. El podcast (2004) fue una reacción a la radio corporativa que nunca emitía lo que los oyentes querían escuchar. Clubhouse (2020) fue una reacción al podcasting grabado y editado — quería recuperar la espontaneidad del directo. Cada innovación radiofónica es también un manifiesto contra lo que existía antes.',
+      },
+      {
+        titulo: 'Observa el papel político y social de la radio en cada período',
+        cuerpo: 'Roosevelt usó la radio para reconstruir la confianza en el gobierno. Goebbels la usó para la propaganda totalitaria. La BBC resistió la ocupación nazi. La radio española sostuvo la Transición democrática. El podcast amplifica voces marginadas que la radio comercial ignoraba. El audio siempre ha sido un espacio de poder — quien controla las frecuencias controla el relato.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📡',
+        texto: 'Cuando escuches radio AM o FM convencional, pregúntate quién posee esa emisora y qué intereses tiene. La concentración mediática ha reducido dramáticamente la diversidad de voces en el dial. Lo que parece "radio local" puede ser una cadena nacional con locutores grabados.',
+      },
+      {
+        icono: '🎙️',
+        texto: 'En el podcast, distingue entre periodismo (verificado, con fuentes, responsable) y opinión o entretenimiento. La ausencia de filtros editoriales es la fortaleza del podcast — y también su riesgo. El "true crime" puede ser periodismo riguroso o explotar tragedias reales sin rigor.',
+      },
+      {
+        icono: '🤖',
+        texto: 'Con la llegada de la IA, verifica la fuente del audio que escuchas. Los deepfakes de voz son ya indistinguibles para el oído humano. Cuando un "personaje conocido" diga algo sorprendente en audio, busca la fuente original antes de compartirlo.',
+      },
+      {
+        icono: '🌍',
+        texto: 'La radio de servicio público (BBC, Radio Nacional de España, France Inter, Deutsche Welle) sigue siendo uno de los sistemas de información más fiables del mundo. Su financiación pública les permite cubrir noticias que no tienen valor comercial inmediato.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que Marconi inventó la radio en solitario',
+        cuerpo: 'Marconi fue el primero en patentar y comercializar la radio (1896) y en cruzar el Atlántico (1901), pero sobre los hombros de Hertz (ondas electromagnéticas, 1887), Tesla (circuitos resonantes) y Fessenden (primera transmisión de voz, 1906). La invención de la radio fue un proceso colectivo de décadas, no un momento de inspiración individual.',
+      },
+      {
+        titulo: 'Pensar que la televisión mató a la radio en los años 50',
+        cuerpo: 'La televisión desplazó a la radio del salón familiar, pero la radio no murió: se reinventó como medio personal e íntimo. El transistor portátil, el disco jockey y el rock and roll convirtieron la radio en el compañero del adolescente. La FM underground de los 60 y 70 fue la respuesta cultural más vibrante de la época al mundo conservador de la AM.',
+      },
+      {
+        titulo: 'Confundir podcast con radio convencional grabada',
+        cuerpo: 'El podcast es asíncrono, permanente, de nicho y con modelo de negocio propio. La radio convencional es lineal, efímera y generalista. Serial (2014) no podría haber existido en la radio AM de los 50: su audiencia de 40 millones no coincide en tiempo ni espacio. El podcasting es un modelo de distribución completamente distinto.',
+      },
+      {
+        titulo: 'Subestimar el papel político de la radio en España',
+        cuerpo: 'En España, la radio no fue solo entretenimiento: fue actor político decisivo. Durante la Transición fue el espacio de debate que la TV estatal censuraba. En el 23-F fue el único lazo entre el gobierno democrático y los ciudadanos. La SER y la COPE fueron protagonistas de la vida política española durante dos décadas. No hay equivalente en ningún otro país europeo.',
+      },
+    ],
+  },
+};
