@@ -3807,6 +3807,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cosmologia/', icon: '🌌', name: 'Cosmología y el Universo', description: 'Los viajes espaciales nos han dado las mejores imágenes del cosmos: Hubble, JWST y las sondas Voyager más allá del sistema solar' },
     { url: '/visualizador-historia-robotica/', icon: '🤖', name: 'Historia de la Robótica', description: 'Robots y espacio van de la mano: Opportunity, Curiosity, Perseverance e Ingenuity son los exploradores robóticos de Marte' },
   ],
+
+  // Cronologías Tecnologías del Cotidiano — Roadmap v9 EJE A (2026-05-03)
+  'visualizador-historia-automocion': [
+    { url: '/visualizador-historia-tren/', icon: '🚄', name: 'Historia del Tren', description: 'Tren y automóvil compiten y se complementan: la crisis del petróleo (1973) revitalizó el ferrocarril cuando el coche dominaba' },
+    { url: '/visualizador-historia-energia/', icon: '⚡', name: 'Historia de la Energía', description: 'Del motor de explosión al eléctrico: la historia del automóvil refleja cada transición energética del último siglo' },
+    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'La cadena de montaje de Ford fue el símbolo de la Segunda Revolución Industrial y cambió para siempre la producción en masa' },
+    { url: '/visualizador-historia-robotica/', icon: '🤖', name: 'Historia de la Robótica', description: 'Las fábricas de coches fueron las primeras en adoptar brazos robóticos industriales: el automóvil impulsó la robótica moderna' },
+  ],
+  'visualizador-historia-telefono': [
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'El smartphone fusionó el teléfono con Internet: la web móvil y las apps han redefinido cómo usamos la red' },
+    { url: '/visualizador-historia-radio/', icon: '📻', name: 'Historia de la Radio', description: 'Radio y teléfono comparten raíces en las ondas electromagnéticas: Marconi y Bell son contemporáneos que cambiaron la comunicación' },
+    { url: '/visualizador-historia-ordenadores/', icon: '💻', name: 'Historia de los Ordenadores', description: 'El smartphone es el ordenador más usado del mundo: la convergencia entre teléfono y computadora culminó con el iPhone' },
+    { url: '/visualizador-historia-television/', icon: '📺', name: 'Historia de la Televisión', description: 'El móvil ha superado a la TV como pantalla principal: streaming y redes sociales consumen hoy más tiempo que la televisión convencional' },
+  ],
+  'visualizador-historia-prensa': [
+    { url: '/visualizador-historia-internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet destruyó el modelo de negocio de la prensa tradicional: la web democratizó la publicación pero también la desinformación' },
+    { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'Historia de la Escritura', description: 'La imprenta de Gutenberg presupone la escritura alfabética: 3.000 años de escritura hicieron posible la revolución tipográfica de 1450' },
+    { url: '/visualizador-historia-radio/', icon: '📻', name: 'Historia de la Radio', description: 'La radio fue el primer gran competidor de la prensa escrita: las noticias de última hora dejaron de necesitar papel' },
+    { url: '/visualizador-desinformacion/', icon: '🔍', name: 'Desinformación y Pensamiento Crítico', description: 'La crisis actual del periodismo y las fake news tienen raíces históricas: el periodismo amarillo del s.XIX anticipó los problemas actuales' },
+  ],
 };
 
 /**

@@ -810,6 +810,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia-ordenadores/",         // 14 períodos, Babbage 1820→IA generativa y computación cuántica
   "/visualizador-historia-tren/",                // 14 períodos, Trevithick 1804→AVE, Maglev e hidrógeno
   "/visualizador-historia-viajes-espaciales/",   // 14 períodos, Tsiolkovski 1903→Starship y Artemis
+
+  // Cronologías Tecnologías del Cotidiano — Roadmap v9 EJE A (2026-05-03)
+  "/visualizador-historia-automocion/",          // 13 períodos, Benz 1885→coche eléctrico autónomo
+  "/visualizador-historia-telefono/",            // 13 períodos, Bell 1876→5G e IA conversacional
+  "/visualizador-historia-prensa/",              // 14 períodos, Gutenberg 1450→periodismo digital e IA
 ];
 
 /**
