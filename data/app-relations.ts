@@ -3887,8 +3887,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-historia-mongol': [
     { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'Tamerlán, heredero del legado mongol, humilló al Imperio Otomano en Ankara (1402): el mayor choque entre los dos grandes imperios euroasiáticos' },
     { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Los mongoles de Hulagu destruyeron Bagdad en 1258, poniendo fin al Califato Abásida y a la Edad de Oro islámica nacida en la cuna mesopotámica' },
-    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'El Imperio Mongol y el Romano son los dos grandes imperios que conectaron y transformaron el mundo euroasiático en sus respectivas épocas' },
+    { url: '/visualizador-historia/china-dinastias/', icon: '🐉', name: 'Las Grandes Dinastías Chinas', description: 'Kublai Kan fundó la dinastía Yuan en China (1271): los mongoles gobernaron el país más poblado del mundo durante casi un siglo' },
     { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'La Pax Mongolica reactivó la Ruta de la Seda: el comercio seguro de Asia a Europa en el siglo XIII fue el precursor del sistema financiero europeo moderno' },
+  ],
+  'visualizador-historia-revolucion-francesa': [
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'La República romana fue el modelo que los revolucionarios franceses quisieron resucitar: "ciudadanos", "repúblicas" y "senados" son conceptos romanos que reaparecen en 1789' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Rousseau, Voltaire y Montesquieu son la base intelectual de la Revolución: la Ilustración francesa es inseparable del estallido de 1789' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El Neoclasicismo y el Romanticismo son la respuesta artística a la Revolución: David pintó a Napoleón, Delacroix a la Libertad guiando al pueblo' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'La quiebra financiera del Antiguo Régimen desencadenó la Revolución: la deuda de las guerras americanas y la bancarrota del Estado son la causa económica de 1789' },
+  ],
+  'visualizador-historia-imperio-persa': [
+    { url: '/visualizador-historia/grecia/', icon: '🏛️', name: 'Historia de la Antigua Grecia', description: 'Las Guerras Médicas —Maratón, Termópilas, Salamina— son el eje del conflicto entre Persia y Grecia: sin Persia, no hay narrativa griega del siglo V a.C.' },
+    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Ciro el Grande conquistó Babilonia sin batalla (539 a.C.) y liberó a los judíos: Persia heredó el legado mesopotámico y lo administró durante dos siglos' },
+    { url: '/visualizador-historia/egipto/', icon: '🏺', name: 'Historia del Antiguo Egipto', description: 'Cambises II conquistó Egipto en el 525 a.C.: los persas gobernaron el Nilo durante 120 años y fueron los últimos faraones extranjeros antes de Alejandro' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El zoroastrismo persa —dualismo bien/mal, juicio final, resurrección— influyó en el judaísmo tardío, el cristianismo y el islam: la filosofía moral persa cambió el mundo' },
+  ],
+  'visualizador-historia-japon': [
+    { url: '/visualizador-historia/china-dinastias/', icon: '🐉', name: 'Las Grandes Dinastías Chinas', description: 'El Japón clásico tomó prestado de China su escritura, budismo, derecho y arquitectura: la cultura Tang fue el modelo que Nara y Heian adaptaron a la identidad japonesa' },
+    { url: '/visualizador-historia/mongol/', icon: '🐴', name: 'Historia del Imperio Mongol', description: 'Kublai Kan intentó dos veces conquistar Japón (1274 y 1281): los kamikaze —vientos divinos— salvaron a Japón del único intento de invasión exterior de su historia' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El ukiyo-e japonés —Hokusai, Hiroshige— fascinó a los impresionistas europeos del siglo XIX: el japonismo transformó el arte occidental moderno' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El budismo zen, el shintoísmo y el bushido son sistemas filosóficos-espirituales japoneses que han influido en la meditación, el management y la cultura occidental contemporánea' },
+  ],
+  'visualizador-historia-china-dinastias': [
+    { url: '/visualizador-historia/japon/', icon: '⛩️', name: 'Historia de Japón', description: 'China fue el modelo cultural de Japón durante siglos: escritura, budismo, administración y arte chino llegaron a Japón a través del mar del Japón y transformaron su civilización' },
+    { url: '/visualizador-historia/mongol/', icon: '🐴', name: 'Historia del Imperio Mongol', description: 'Los mongoles de Kublai Kan conquistaron China y fundaron la dinastía Yuan (1271): el mayor Imperio terrestre gobernó el mayor país del mundo durante casi un siglo' },
+    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'China y Mesopotamia son las dos grandes civilizaciones contemporáneas que inventaron la escritura de forma independiente: dos soluciones distintas al mismo problema humano' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'China inventó el papel moneda durante la dinastía Song (siglo X): el primer sistema de dinero fiduciario de la historia, 700 años antes de que Europa lo adoptara' },
   ],
 
   // Apps de referencia específica (2026-05-03)
