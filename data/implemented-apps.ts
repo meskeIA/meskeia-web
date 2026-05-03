@@ -825,6 +825,7 @@ export const implementedAppsUrls = [
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
   "/guia-infusiones/",                             // Directorio 55 plantas para infusión: usos tradicionales, preparación, contraindicaciones
+  "/guia-cafe/",                                   // Directorio 38 orígenes de café: especie, altitud, notas de sabor, procesado, cosecha y preparación
 ];
 
 /**

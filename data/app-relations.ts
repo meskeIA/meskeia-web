@@ -3862,15 +3862,21 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'guia-especias': [
     { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
+    { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
     { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de las especias: cómo cambiaron el mundo' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
-    { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos de tu dieta' },
   ],
   'guia-infusiones': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias' },
+    { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
     { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de especias e infusiones que cambiaron el mundo' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
-    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tu bienestar integral: alimentación, hidratación y descanso' },
+  ],
+  'guia-cafe': [
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
+    { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de especias que cambiaron el mundo' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
 };
 
