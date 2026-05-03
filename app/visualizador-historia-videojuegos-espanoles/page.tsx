@@ -580,9 +580,43 @@ export default function HistoriaVideojuegosEspanoles() {
       {/* ── Tab 2: Detalle ── */}
       {tabActiva === 'detalle' && (
         <section className={styles.detalleContainer} aria-label="Detalle del período">
+          {/* Selector de períodos — siempre arriba */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+              Selecciona un período:
+            </p>
+            <div
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}
+              role="list"
+            >
+              {PERIODOS.map((p) => (
+                <button
+                  key={p.id}
+                  role="listitem"
+                  onClick={() => setPeriodoSeleccionado(p)}
+                  style={{
+                    padding: '0.35rem 0.85rem',
+                    borderRadius: '20px',
+                    border: `2px solid ${COLORES_CATEGORIA[p.categoria]}`,
+                    background:
+                      periodoSeleccionado?.id === p.id ? COLORES_CATEGORIA[p.categoria] : 'transparent',
+                    color:
+                      periodoSeleccionado?.id === p.id ? '#fff' : COLORES_CATEGORIA[p.categoria],
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {p.anio}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Detalle del período seleccionado */}
           {!periodoSeleccionado ? (
             <p className={styles.detalleVacio}>
-              Selecciona un período en la línea temporal para ver su detalle.
+              Selecciona un período en la lista de arriba para ver su detalle.
             </p>
           ) : (
             <div className={styles.detalleCard}>
@@ -625,39 +659,6 @@ export default function HistoriaVideojuegosEspanoles() {
               </div>
             </div>
           )}
-
-          {/* Lista de períodos seleccionables */}
-          <div style={{ marginTop: '1.5rem' }}>
-            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-              Selecciona otro período:
-            </p>
-            <div
-              style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}
-              role="list"
-            >
-              {PERIODOS.map((p) => (
-                <button
-                  key={p.id}
-                  role="listitem"
-                  onClick={() => setPeriodoSeleccionado(p)}
-                  style={{
-                    padding: '0.35rem 0.85rem',
-                    borderRadius: '20px',
-                    border: `2px solid ${COLORES_CATEGORIA[p.categoria]}`,
-                    background:
-                      periodoSeleccionado?.id === p.id ? COLORES_CATEGORIA[p.categoria] : 'transparent',
-                    color:
-                      periodoSeleccionado?.id === p.id ? '#fff' : COLORES_CATEGORIA[p.categoria],
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {p.anio}
-                </button>
-              ))}
-            </div>
-          </div>
         </section>
       )}
 
