@@ -134,6 +134,8 @@ const nextConfig: NextConfig = {
       { source: '/calculadora-gastos-comunidad/', destination: '/estimador-gastos-comunidad/', permanent: true },
       { source: '/calculadora-coste-plazos/', destination: '/estimador-coste-plazos/', permanent: true },
       { source: '/simulador-jet-lag/', destination: '/orientador-jet-lag/', permanent: true },
+      // Migración a sistema dinámico /visualizador-historia/[slug]/ (2026-05-03)
+      { source: '/visualizador-historia-cine/', destination: '/visualizador-historia/cine/', permanent: true },
     ];
   },
 

@@ -18,6 +18,7 @@ import { renacimiento } from './renacimiento';
 import { laReforma } from './la-reforma';
 import { lasCruzadas } from './las-cruzadas';
 import { ilustracion } from './ilustracion';
+import { cine } from './cine';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -39,6 +40,7 @@ const registry: Record<string, HistoriaData> = {
   'la-reforma': laReforma,
   'las-cruzadas': lasCruzadas,
   ilustracion,
+  cine,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

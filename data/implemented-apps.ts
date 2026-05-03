@@ -778,7 +778,7 @@ export const implementedAppsUrls = [
   "/visualizador-historia-matematicas/",     // 14 períodos, Babilonia→IA matemática, años a.C.
   "/visualizador-historia-astronomia/",      // 14 períodos, Stonehenge→James Webb, años a.C.
   // Cronologías Cultura Popular — Grupo 4 (2026-05-01)
-  "/visualizador-historia-cine/",           // 14 períodos, Lumière→streaming e IA generativa
+  // MIGRADO a /visualizador-historia/cine/ — ver sección de historias dinámicas
   "/visualizador-historia-videojuegos/",    // 14 períodos, Pong→IA generativa en juegos
   "/visualizador-historia-moda/",           // 14 períodos, Edad Media→moda sostenible
   "/visualizador-historia-exploracion/",    // 14 períodos, fenicios→exploración espacial, años a.C.
@@ -841,6 +841,7 @@ export const implementedAppsUrls = [
   "/visualizador-historia/la-reforma/",           // La Reforma Protestante 1517→1648, 10 hitos, 6 eras
   "/visualizador-historia/las-cruzadas/",         // Las Cruzadas 1095→1291, 10 hitos, 6 eras
   "/visualizador-historia/ilustracion/",          // La Ilustración 1687→1789, 10 hitos, 6 eras
+  "/visualizador-historia/cine/",                 // Historia del Cine 1895→presente, 10 hitos, 6 eras (migrado)
 
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
