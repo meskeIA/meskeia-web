@@ -3853,6 +3853,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-blockchain/', icon: '🔗', name: 'Blockchain y Criptografía', description: 'Bitcoin y las criptomonedas son la respuesta tecnológica a la crisis bancaria de 2008: Satoshi Nakamoto publicó el whitepaper el mismo año que cayó Lehman' },
   ],
 
+  // Sistema dinámico de Historias — Ruta /visualizador-historia/[slug]/ (2026-05-03)
+  'visualizador-historia-grecia': [
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Sócrates, Platón y Aristóteles son griegos: la filosofía occidental nació en Atenas en el siglo V a.C.' },
+    { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'Historia de la Escritura', description: 'El alfabeto griego es el origen del latino y el cirílico: cada letra del abecedario occidental tiene raíces griegas' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El arte clásico griego —Partenón, Discóbolo, cerámica de figuras rojas— es el fundamento del arte occidental' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Hipócrates es el padre de la medicina occidental: el juramento hipocrático nació en la Grecia del siglo V a.C.' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

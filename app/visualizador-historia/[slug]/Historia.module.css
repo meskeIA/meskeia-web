@@ -1,0 +1,774 @@
+/* ─────────────────────────────────────────────
+   Template: Visualizador de Historia
+   Ruta: /visualizador-historia/[slug]/
+   ───────────────────────────────────────────── */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ── Hero ─────────────────────────────────── */
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #fff;
+}
+
+.heroTitle {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #fff;
+}
+
+.heroSubtitle {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  margin: 0 0 1rem;
+}
+
+.heroBadge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 20px;
+  padding: 0.3rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ── Tabs ─────────────────────────────────── */
+
+.tabsContainer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.tabBtn {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.tabBtn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.tabBtnActive {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ── Tab Content ──────────────────────────── */
+
+.tabContent {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.tabHint {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+/* ── SVG Timeline ─────────────────────────── */
+
+.svgWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  padding: 0.5rem 0;
+}
+
+.svgTimeline {
+  width: 100%;
+  min-width: 600px;
+  display: block;
+}
+
+/* ── Tab Detalle ──────────────────────────── */
+
+.detalleSelector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.navBtn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background 0.2s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.hitoSelect {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.detalleCard {
+  border-left: 5px solid var(--primary);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.detalleHeader {
+  padding: 1.25rem 1.5rem;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.detalleNombre {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.detallePeriodo {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.detalleBody {
+  padding: 1.5rem;
+  background: var(--bg-card);
+}
+
+.detalleDescripcion {
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 0 1.5rem;
+  color: var(--text-primary);
+}
+
+.detalleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.detalleMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.detalleMetaLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detalleMetaValor {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Tab Comparativa ──────────────────────── */
+
+.filterRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.searchInput,
+.categoryFilter {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 160px;
+}
+
+.categoryFilter {
+  min-width: 180px;
+}
+
+.comparativaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.comparativaCard {
+  border-top: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border-left: 1px solid rgba(0,0,0,0.05);
+  border-right: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.comparativaCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.compCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.compCardNombre {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.compCardPeriodo {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.compCardDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+.compCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.compCat {
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.compPaises {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.sinResultados {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+/* ── Tab Contexto / Eras ──────────────────── */
+
+.erasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.eraCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1.25rem;
+  border: 1px solid rgba(0,0,0,0.07);
+}
+
+.eraHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.eraIcono {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.eraNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+  color: var(--text-primary);
+}
+
+.eraPeriodo {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.eraHitos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.eraHitoBadge {
+  font-size: 0.75rem;
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary);
+  border-radius: 10px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 500;
+}
+
+.eraEventos {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.eraEventos li {
+  margin-bottom: 0.2rem;
+}
+
+/* ── Sección Educativa ────────────────────── */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 0.5rem 0 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.07);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(0,0,0,0.02);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid rgba(0,0,0,0.07);
+}
+
+.escenarioIcono {
+  font-size: 1.8rem;
+}
+
+.escenarioCard strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.escenarioCard em {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.escenarioCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+.faqItem {
+  padding: 1.1rem 1.25rem;
+  border-left: 3px solid var(--primary);
+  margin-bottom: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: 0 8px 8px 0;
+}
+
+.faqItem strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.faqItem p {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.faqTip {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--secondary);
+  font-style: italic;
+  padding: 0.4rem 0.75rem;
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: 6px;
+}
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  counter-reset: none;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-primary);
+  border-radius: 10px;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid rgba(0,0,0,0.07);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.warningBox {
+  background: rgba(183, 28, 28, 0.06);
+  border: 1px solid rgba(183, 28, 28, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.warningList li {
+  margin-bottom: 0.5rem;
+}
+
+.warningList strong {
+  color: var(--text-primary);
+}
+
+/* ── Dark Mode ────────────────────────────── */
+
+[data-theme='dark'] .tabContent {
+  background: var(--bg-card);
+  border-color: rgba(255,255,255,0.08);
+}
+
+[data-theme='dark'] .tabBtn {
+  background: var(--bg-card);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .navBtn,
+[data-theme='dark'] .hitoSelect,
+[data-theme='dark'] .searchInput,
+[data-theme='dark'] .categoryFilter {
+  background: var(--bg-card);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .detalleCard {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .detalleBody,
+[data-theme='dark'] .detalleMetaItem,
+[data-theme='dark'] .comparativaCard,
+[data-theme='dark'] .eraCard,
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .step,
+[data-theme='dark'] .tipCard {
+  background: #1e1e1e;
+  border-color: rgba(255,255,255,0.07);
+}
+
+[data-theme='dark'] .svgWrapper {
+  background: #1e1e1e;
+}
+
+[data-theme='dark'] .comparativaCard {
+  border-left-color: rgba(255,255,255,0.05);
+  border-right-color: rgba(255,255,255,0.05);
+  border-bottom-color: rgba(255,255,255,0.05);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: rgba(255,255,255,0.08);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255,255,255,0.06);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(255,255,255,0.03);
+}
+
+[data-theme='dark'] .eraHitoBadge {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(183, 28, 28, 0.1);
+  border-color: rgba(183, 28, 28, 0.3);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+/* ── Responsive ───────────────────────────── */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .tabsContainer {
+    gap: 0.4rem;
+  }
+
+  .tabBtn {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.8rem;
+  }
+
+  .tabContent {
+    padding: 1rem;
+  }
+
+  .detalleHeader {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .detalleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .erasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterRow {
+    flex-direction: column;
+  }
+
+  .searchInput,
+  .categoryFilter {
+    width: 100%;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .detalleSelector {
+    gap: 0.5rem;
+  }
+
+  .step {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comparativaCard,
+  .tabBtn {
+    transition: none;
+  }
+}

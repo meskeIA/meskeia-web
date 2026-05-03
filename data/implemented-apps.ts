@@ -821,6 +821,9 @@ export const implementedAppsUrls = [
   "/visualizador-historia-moda-espanola/",         // 13 períodos, Reyes Católicos→Balenciaga, Loewe e Inditex
   "/visualizador-historia-banca/",                 // 13 períodos, Medici 1397→fintech y criptomonedas
 
+  // Sistema dinámico de Historias — Ruta /visualizador-historia/[slug]/ (2026-05-03)
+  "/visualizador-historia/grecia/",               // Grecia Clásica -1100→-146 a.C., 12 hitos, 6 eras
+
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
