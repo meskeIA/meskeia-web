@@ -94,18 +94,29 @@ Cuando los datos no existan aún, **crear el módulo correspondiente** en `data/
 
 Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/historias/[slug].ts` + registro en `data/historias/index.ts`.
 
-### Añadir una nueva historia (4 pasos)
+### Slugs activos (2026-05-03)
 
+`grecia`, `roma`, `egipto`, `mesopotamia`, `otomano`, `mongol`
+
+### Workflow óptimo: crear múltiples historias en paralelo
+
+**Fase paralela** (N agentes, uno por historia — no tocan archivos compartidos):
+- Cada agente crea SOLO `data/historias/[slug].ts`
+- Verifica con `npx tsc --noEmit` una vez y termina
+- PROHIBIDO en agentes: `npm run build`, modificar index.ts, applications.ts, etc.
+
+**Fase secuencial** (director de proyecto después de que todos los agentes terminan):
 ```
-1. Crear data/historias/[slug].ts  — implementar HistoriaData completa
-2. Añadir en data/historias/index.ts:  import { [slug] } from './[slug]';  +  [slug] en registry
-3. Registrar en applications.ts, implemented-apps.ts, app-relations.ts (url: "/visualizador-historia/[slug]/")
-4. npm run build  — generateStaticParams() prerenderiza la página automáticamente
+1. data/historias/index.ts  — añadir imports + entradas en registry
+2. data/applications.ts     — añadir entradas con suites + contexts
+3. data/implemented-apps.ts — añadir URLs
+4. data/app-relations.ts    — añadir bloques appKey + cross-links mutuos
+5. npm run build            — generateStaticParams() prerenderiza todo automáticamente
 ```
 
 ### Reglas de UX obligatorias (NO modificar)
 
-Estas reglas se verificaron con el usuario y deben mantenerse en todas las historias:
+Verificadas con el usuario y validadas en producción (2026-05-03):
 
 | Tab | Comportamiento correcto |
 |-----|------------------------|
@@ -116,12 +127,21 @@ Estas reglas se verificaron con el usuario y deben mantenerse en todas las histo
 
 ### Estructura de datos (HistoriaData)
 
-- `hitos[]`: 10-14 períodos con `id, nombre, anioInicio, anioFin, color, categoria, descripcion, obraIconica, paises[]`
-- `eras[]`: exactamente 6 eras con `nombre, desde, hasta, icono, hitosDestacados[], eventos[]`
-- `categorias`: mapa `id → etiqueta` (6-8 categorías)
-- `colores`: mapa `id → color hex` (mismo conjunto que categorías)
+- `hitos[]`: **10 períodos** con `id, nombre, anioInicio, anioFin, color, categoria, descripcion, obraIconica, paises[]`
+- `eras[]`: **exactamente 6 eras** con `nombre, desde, hasta, icono, hitosDestacados[], eventos[]`
+- `categorias`: mapa `id → etiqueta` (**6-8 categorías**)
+- `colores`: mapa `id → color hex` — **mismas claves exactas** que `categorias`, ni una más ni una menos
 - `disclaimer: 'exempt'` para historia (educativo puro)
-- `educativo`: `intro, tablaComparativa[], escenarios[], faq[], pasos[], tips[], errores[]`
+- `educativo` v2.0 con tamaños fijos: `intro` + `tablaComparativa[6]` + `escenarios[4]` + `faq[5]` + `pasos[5]` + `tips[4]` + `errores[4]`
+
+### Restricciones críticas (errores frecuentes)
+
+1. **`hitosDestacados` en eras**: usar el **`nombre`** exacto del hito, no el `id`. El template busca `data.hitos.find(h => h.nombre === nombre)`.
+2. **Eras continuas**: el rango `desde/hasta` de las 6 eras debe cubrir `anioInicio→anioFin` sin huecos ni solapamientos.
+3. **IDs de hitos**: kebab-case sin acentos ni caracteres especiales (`'reino-antiguo'`, `'conquista-constantinopla'`).
+4. **Años negativos**: `anioInicio: -3100` = 3100 a.C. El template convierte automáticamente para mostrar.
+5. **Suites y contexts estándar** para apps de historia: `suites: ["cultura", "estudiantes"]`, `contexts: ["estudio", "curiosidad"]`.
+6. **Archivo de referencia**: `data/historias/roma.ts` — el más completo y correcto para copiar la estructura.
 
 ### appKey en app-relations.ts
 
