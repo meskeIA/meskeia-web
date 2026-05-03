@@ -28,12 +28,12 @@ function formatAnio(anio: number): string {
 // SVG config
 // ─────────────────────────────────────────
 
-const SVG_ANCHO = 900;
-const MARGEN_IZQ = 90;
+const SVG_ANCHO = 1100;
+const MARGEN_IZQ = 40;
 const MARGEN_DER = 20;
 const AREA_ANCHO = SVG_ANCHO - MARGEN_IZQ - MARGEN_DER;
-const FILA_ALTO = 46;
-const FILA_PADDING = 6;
+const FILA_ALTO = 36;
+const FILA_OFFSET_Y = 24;
 
 interface HitoEnFila extends HitoHistoria {
   fila: number;
@@ -45,12 +45,68 @@ interface HitoEnFila extends HitoHistoria {
 type Tab = 'timeline' | 'detalle' | 'comparativa' | 'contexto';
 
 // ─────────────────────────────────────────
+// PanelDetalle — panel inline bajo el SVG
+// ─────────────────────────────────────────
+
+function PanelDetalle({
+  hito,
+  categorias,
+  colores,
+}: {
+  hito: HitoHistoria;
+  categorias: Record<string, string>;
+  colores: Record<string, string>;
+}) {
+  const color = colores[hito.categoria] ?? hito.color;
+  const catLabel = categorias[hito.categoria] ?? hito.categoria;
+
+  return (
+    <div className={styles.detallePanel} style={{ borderLeftColor: color }}>
+      <h3 className={styles.detalleTitulo} style={{ color }}>
+        {hito.nombre}
+      </h3>
+      <p className={styles.detallePeriodo}>
+        {formatAnio(hito.anioInicio)} – {formatAnio(hito.anioFin)}
+      </p>
+      <span className={styles.detalleCategoria} style={{ background: color }}>
+        {catLabel}
+      </span>
+
+      <div className={styles.detalleGrid}>
+        <div>
+          <h4 className={styles.detalleSubtitulo}>Obra icónica</h4>
+          <ul className={styles.datosList}>
+            {hito.obraIconica.split(', ').map(item => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h4 className={styles.detalleSubtitulo}>Ámbito geográfico</h4>
+          <ul className={styles.infoList}>
+            {hito.paises.map(p => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className={styles.contextoBox}>
+        <span className={styles.contextoLabel}>Descripción completa</span>
+        <p style={{ fontStyle: 'normal' }}>{hito.descripcion}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────
 
 export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
   const [tab, setTab] = useState<Tab>('timeline');
-  const [hitoIdx, setHitoIdx] = useState(0);
+  const [seleccionado, setSeleccionado] = useState<HitoHistoria | null>(null);
+  const [detalleIdx, setDetalleIdx] = useState(0);
   const [catFiltro, setCatFiltro] = useState('todas');
   const [busqueda, setBusqueda] = useState('');
 
@@ -66,10 +122,11 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
         const xI = calcX(h.anioInicio);
         const xF = calcX(Math.min(h.anioFin >= 9999 ? data.anioFin : h.anioFin, data.anioFin));
         let fila = 0;
-        while (finFila[fila] !== undefined && finFila[fila] > xI + 2) fila++;
+        while (finFila[fila] !== undefined && finFila[fila] > xI + 4) fila++;
         finFila[fila] = xF;
         return { ...h, fila, xI, xF };
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const numFilas = useMemo(
@@ -77,21 +134,21 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
     [hitosEnFila]
   );
 
-  const SVG_ALTO = 50 + numFilas * FILA_ALTO + 44;
+  const svgAlto = FILA_OFFSET_Y + numFilas * (FILA_ALTO + 8) + 30;
 
-  const ticks = useMemo(() => {
+  const marcadores = useMemo(() => {
     const rango = data.anioFin - data.anioInicio;
     const step = rango <= 300 ? 25 : rango <= 600 ? 50 : rango <= 1500 ? 100 : 200;
-    const ticks: number[] = [];
+    const result: number[] = [];
     let t = Math.ceil(data.anioInicio / step) * step;
     while (t <= data.anioFin) {
-      ticks.push(t);
+      result.push(t);
       t += step;
     }
-    return ticks;
+    return result;
   }, [data]);
 
-  const hitoActual = data.hitos[hitoIdx];
+  const hitoDetalle = data.hitos[detalleIdx];
 
   const hitosFiltrados = useMemo(
     () =>
@@ -107,7 +164,12 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
 
   const appKey = `visualizador-historia-${data.slug}`;
 
-  // ─── Render ─────────────────────────────
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'timeline', label: 'Línea del Tiempo' },
+    { id: 'detalle', label: 'Período en Detalle' },
+    { id: 'comparativa', label: 'Comparativa' },
+    { id: 'contexto', label: 'Contexto Histórico' },
+  ];
 
   return (
     <div className={styles.container}>
@@ -123,389 +185,506 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
 
       <LegalNotice />
 
-      {/* Tabs */}
-      <div className={styles.tabsContainer} role="tablist" aria-label="Secciones de la cronología">
-        {(['timeline', 'detalle', 'comparativa', 'contexto'] as Tab[]).map(t => (
-          <button
-            key={t}
-            role="tab"
-            aria-selected={tab === t}
-            className={`${styles.tabBtn} ${tab === t ? styles.tabBtnActive : ''}`}
-            onClick={() => setTab(t)}
-          >
-            {t === 'timeline' && '📅 Línea del Tiempo'}
-            {t === 'detalle' && '🔍 Detalle'}
-            {t === 'comparativa' && '📊 Comparativa'}
-            {t === 'contexto' && '🏛️ Contexto'}
-          </button>
-        ))}
-      </div>
+      <div className={styles.main}>
 
-      {/* ── TAB: TIMELINE ── */}
-      {tab === 'timeline' && (
-        <div className={styles.tabContent}>
-          <p className={styles.tabHint}>
-            Haz clic en un período para ver su detalle ·{' '}
-            <strong>{data.hitos.length} períodos</strong> ·{' '}
-            {Math.abs(data.anioFin - data.anioInicio)} años
-          </p>
-          <div className={styles.svgWrapper}>
-            <svg
-              viewBox={`0 0 ${SVG_ANCHO} ${SVG_ALTO}`}
-              className={styles.svgTimeline}
-              aria-label={`Línea del tiempo: ${data.titulo}`}
-              role="img"
+        {/* ── Tabs nav ── */}
+        <div className={styles.tabNav} role="tablist" aria-label="Secciones de la cronología">
+          {tabs.map(t => (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={tab === t.id}
+              className={`${styles.tabBtn} ${tab === t.id ? styles.tabBtnActivo : ''}`}
+              onClick={() => setTab(t.id)}
             >
-              {/* Eje X */}
-              <line
-                x1={MARGEN_IZQ} y1={SVG_ALTO - 32}
-                x2={SVG_ANCHO - MARGEN_DER} y2={SVG_ALTO - 32}
-                stroke="var(--text-muted)" strokeWidth="1"
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ──────────────────────────────────────
+            TAB 1: Línea del Tiempo
+        ────────────────────────────────────── */}
+        {tab === 'timeline' && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}>Línea del Tiempo</h2>
+              <p className={styles.sectionDesc}>
+                Haz clic en un período para ver sus detalles. La línea abarca de{' '}
+                {formatAnio(data.anioInicio)} a {formatAnio(data.anioFin)}.
+              </p>
+
+              <div className={styles.timelineScrollWrapper}>
+                <svg
+                  className={styles.timelineSvg}
+                  width={SVG_ANCHO}
+                  height={svgAlto}
+                  role="img"
+                  aria-label={`Línea del tiempo: ${data.titulo}`}
+                >
+                  {/* Eje horizontal */}
+                  <line
+                    x1={MARGEN_IZQ} y1={svgAlto - 16}
+                    x2={SVG_ANCHO - MARGEN_DER} y2={svgAlto - 16}
+                    stroke="var(--text-muted)" strokeWidth={1}
+                  />
+
+                  {/* Marcadores de años */}
+                  {marcadores.map(m => (
+                    <g key={m}>
+                      <line
+                        x1={calcX(m)} y1={FILA_OFFSET_Y}
+                        x2={calcX(m)} y2={svgAlto - 16}
+                        stroke="var(--text-muted)" strokeWidth={0.5} strokeDasharray="3,4"
+                      />
+                      <text
+                        x={calcX(m)} y={svgAlto - 4}
+                        fontSize={10} fill="var(--text-muted)" textAnchor="middle"
+                      >
+                        {formatAnio(m)}
+                      </text>
+                    </g>
+                  ))}
+
+                  {/* Rectángulos de períodos */}
+                  {hitosEnFila.map(h => {
+                    const y = FILA_OFFSET_Y + h.fila * (FILA_ALTO + 8);
+                    const w = Math.max(h.xF - h.xI, 10);
+                    const esSeleccionado = seleccionado?.id === h.id;
+                    const color = data.colores[h.categoria] ?? h.color;
+                    return (
+                      <g
+                        key={h.id}
+                        onClick={() =>
+                          setSeleccionado(esSeleccionado ? null : data.hitos[h.idxOriginal])
+                        }
+                        style={{ cursor: 'pointer' }}
+                        role="button"
+                        aria-label={`Ver detalle: ${h.nombre}`}
+                      >
+                        <rect
+                          x={h.xI} y={y}
+                          width={w} height={FILA_ALTO}
+                          rx={4}
+                          fill={color}
+                          opacity={esSeleccionado ? 1 : 0.8}
+                          stroke={esSeleccionado ? '#fff' : 'none'}
+                          strokeWidth={2}
+                        />
+                        {w > 50 && (
+                          <text
+                            x={h.xI + w / 2} y={y + FILA_ALTO / 2 + 4}
+                            fontSize={9} fill="#fff" textAnchor="middle" fontWeight={600}
+                            style={{ pointerEvents: 'none' }}
+                          >
+                            {h.nombre.length > 20 ? h.nombre.substring(0, 18) + '…' : h.nombre}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+
+              {/* Leyenda de categorías */}
+              <div className={styles.leyendaCategorias}>
+                {Object.entries(data.categorias).map(([id, label]) => (
+                  <span key={id} className={styles.leyendaItem}>
+                    <span
+                      className={styles.leyendaColor}
+                      style={{ background: data.colores[id] ?? 'var(--primary)' }}
+                      aria-hidden="true"
+                    />
+                    {label}
+                  </span>
+                ))}
+              </div>
+
+              {/* Panel inline al hacer clic */}
+              {seleccionado && (
+                <PanelDetalle
+                  hito={seleccionado}
+                  categorias={data.categorias}
+                  colores={data.colores}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ──────────────────────────────────────
+            TAB 2: Período en Detalle
+        ────────────────────────────────────── */}
+        {tab === 'detalle' && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}>Período en Detalle</h2>
+
+              <div className={styles.periodoSelector}>
+                {data.hitos.map((h, i) => (
+                  <button
+                    key={h.id}
+                    className={`${styles.periodoBtn} ${i === detalleIdx ? styles.periodoBtnActivo : ''}`}
+                    onClick={() => setDetalleIdx(i)}
+                    style={
+                      i === detalleIdx
+                        ? {
+                            background: data.colores[h.categoria] ?? h.color,
+                            borderColor: data.colores[h.categoria] ?? h.color,
+                          }
+                        : {}
+                    }
+                    aria-label={h.nombre}
+                  >
+                    {formatAnio(h.anioInicio)}
+                  </button>
+                ))}
+              </div>
+
+              {hitoDetalle && (
+                <div
+                  className={styles.detalleTarjeta}
+                  style={{ borderTopColor: data.colores[hitoDetalle.categoria] ?? hitoDetalle.color }}
+                >
+                  <div
+                    className={styles.detalleTarjetaHeader}
+                    style={{ background: data.colores[hitoDetalle.categoria] ?? hitoDetalle.color }}
+                  >
+                    <h3>{hitoDetalle.nombre}</h3>
+                    <p>
+                      {formatAnio(hitoDetalle.anioInicio)} –{' '}
+                      {formatAnio(hitoDetalle.anioFin >= 9999 ? data.anioFin : hitoDetalle.anioFin)}
+                    </p>
+                    <span>{data.categorias[hitoDetalle.categoria] ?? hitoDetalle.categoria}</span>
+                  </div>
+
+                  <div className={styles.detalleTarjetaBody}>
+                    <div className={styles.statsRow}>
+                      <div className={styles.statBox}>
+                        <span className={styles.statLabel}>Obra icónica</span>
+                        <span className={styles.statValue}>
+                          {hitoDetalle.obraIconica.split(',')[0].trim()}
+                        </span>
+                      </div>
+                      <div className={styles.statBox}>
+                        <span className={styles.statLabel}>Ámbito</span>
+                        <span className={styles.statValue}>{hitoDetalle.paises[0]}</span>
+                      </div>
+                      <div className={styles.statBox}>
+                        <span className={styles.statLabel}>Categoría</span>
+                        <span className={styles.statValue}>
+                          {data.categorias[hitoDetalle.categoria] ?? hitoDetalle.categoria}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.contextoBox}>
+                      <span className={styles.contextoLabel}>Descripción del período</span>
+                      <p style={{ fontStyle: 'normal' }}>{hitoDetalle.descripcion}</p>
+                    </div>
+
+                    <div className={styles.lineaIconica}>
+                      <span className={styles.lineaIconicaLabel}>Hito o obra icónica</span>
+                      <p>{hitoDetalle.obraIconica}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.navBtns}>
+                <button
+                  className={styles.btnAnterior}
+                  onClick={() => setDetalleIdx(i => Math.max(0, i - 1))}
+                  disabled={detalleIdx === 0}
+                  aria-label="Período anterior"
+                >
+                  ← Anterior
+                </button>
+                <span className={styles.navCounter}>{detalleIdx + 1} / {data.hitos.length}</span>
+                <button
+                  className={styles.btnSiguiente}
+                  onClick={() => setDetalleIdx(i => Math.min(data.hitos.length - 1, i + 1))}
+                  disabled={detalleIdx === data.hitos.length - 1}
+                  aria-label="Período siguiente"
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ──────────────────────────────────────
+            TAB 3: Comparativa
+        ────────────────────────────────────── */}
+        {tab === 'comparativa' && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}>Comparativa</h2>
+
+              <div className={styles.filtroCategoria}>
+                <button
+                  className={`${styles.filtroCatBtn} ${catFiltro === 'todas' ? styles.filtroCatBtnActivo : ''}`}
+                  onClick={() => setCatFiltro('todas')}
+                  style={
+                    catFiltro === 'todas'
+                      ? { background: 'var(--primary)', borderColor: 'var(--primary)', color: '#fff' }
+                      : {}
+                  }
+                >
+                  Todos
+                </button>
+                {Object.entries(data.categorias).map(([id, label]) => (
+                  <button
+                    key={id}
+                    className={`${styles.filtroCatBtn} ${catFiltro === id ? styles.filtroCatBtnActivo : ''}`}
+                    onClick={() => setCatFiltro(id)}
+                    style={
+                      catFiltro === id
+                        ? {
+                            background: data.colores[id] ?? 'var(--primary)',
+                            borderColor: data.colores[id] ?? 'var(--primary)',
+                            color: '#fff',
+                          }
+                        : {}
+                    }
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <input
+                type="search"
+                className={styles.buscadorInput}
+                placeholder="Buscar por período, obra icónica o descripción..."
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
+                aria-label={`Buscar en ${data.titulo}`}
               />
 
-              {/* Ticks */}
-              {ticks.map(anio => {
-                const x = calcX(anio);
-                return (
-                  <g key={anio}>
-                    <line
-                      x1={x} y1={SVG_ALTO - 37}
-                      x2={x} y2={SVG_ALTO - 27}
-                      stroke="var(--text-muted)" strokeWidth="1"
-                    />
-                    <text
-                      x={x} y={SVG_ALTO - 12}
-                      textAnchor="middle" fontSize="10" fill="var(--text-muted)"
-                    >
-                      {formatAnio(anio)}
-                    </text>
-                  </g>
-                );
-              })}
-
-              {/* Hitos */}
-              {hitosEnFila.map(h => {
-                const y = 20 + h.fila * FILA_ALTO;
-                const ancho = Math.max(h.xF - h.xI, 8);
-                const seleccionado = h.idxOriginal === hitoIdx;
-                return (
-                  <g
-                    key={h.id}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => { setHitoIdx(h.idxOriginal); setTab('detalle'); }}
-                    role="button"
-                    aria-label={`Ver detalle: ${h.nombre}`}
-                  >
-                    <rect
-                      x={h.xI}
-                      y={y}
-                      width={ancho}
-                      height={FILA_ALTO - FILA_PADDING * 2}
-                      rx={4}
-                      fill={h.color}
-                      opacity={seleccionado ? 1 : 0.82}
-                      stroke={seleccionado ? '#ffffff' : 'transparent'}
-                      strokeWidth={seleccionado ? 2 : 0}
-                    />
-                    {ancho > 55 && (
-                      <text
-                        x={h.xI + ancho / 2}
-                        y={y + (FILA_ALTO - FILA_PADDING * 2) / 2 + 4}
-                        textAnchor="middle"
-                        fontSize="10"
-                        fill="#ffffff"
-                        style={{ pointerEvents: 'none', userSelect: 'none' }}
-                      >
-                        {h.nombre.length > 20 ? h.nombre.substring(0, 18) + '…' : h.nombre}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-        </div>
-      )}
-
-      {/* ── TAB: DETALLE ── */}
-      {tab === 'detalle' && (
-        <div className={styles.tabContent}>
-          <div className={styles.detalleSelector}>
-            <button
-              className={styles.navBtn}
-              onClick={() => setHitoIdx(i => Math.max(0, i - 1))}
-              disabled={hitoIdx === 0}
-              aria-label="Período anterior"
-            >
-              ←
-            </button>
-            <select
-              value={hitoIdx}
-              onChange={e => setHitoIdx(Number(e.target.value))}
-              className={styles.hitoSelect}
-              aria-label="Seleccionar período"
-            >
-              {data.hitos.map((h, i) => (
-                <option key={h.id} value={i}>
-                  {formatAnio(h.anioInicio)} · {h.nombre}
-                </option>
-              ))}
-            </select>
-            <button
-              className={styles.navBtn}
-              onClick={() => setHitoIdx(i => Math.min(data.hitos.length - 1, i + 1))}
-              disabled={hitoIdx === data.hitos.length - 1}
-              aria-label="Período siguiente"
-            >
-              →
-            </button>
-          </div>
-
-          {hitoActual && (
-            <div className={styles.detalleCard} style={{ borderLeftColor: hitoActual.color }}>
-              <div className={styles.detalleHeader} style={{ backgroundColor: hitoActual.color }}>
-                <h2 className={styles.detalleNombre}>{hitoActual.nombre}</h2>
-                <span className={styles.detallePeriodo}>
-                  {formatAnio(hitoActual.anioInicio)} —{' '}
-                  {formatAnio(hitoActual.anioFin >= 9999 ? data.anioFin : hitoActual.anioFin)}
-                </span>
-              </div>
-              <div className={styles.detalleBody}>
-                <p className={styles.detalleDescripcion}>{hitoActual.descripcion}</p>
-                <div className={styles.detalleGrid}>
-                  <div className={styles.detalleMetaItem}>
-                    <span className={styles.detalleMetaLabel}>🏆 Hito o obra icónica</span>
-                    <span className={styles.detalleMetaValor}>{hitoActual.obraIconica}</span>
-                  </div>
-                  <div className={styles.detalleMetaItem}>
-                    <span className={styles.detalleMetaLabel}>🌍 Ámbito geográfico</span>
-                    <span className={styles.detalleMetaValor}>{hitoActual.paises.join(', ')}</span>
-                  </div>
-                  <div className={styles.detalleMetaItem}>
-                    <span className={styles.detalleMetaLabel}>📂 Categoría</span>
-                    <span
-                      className={styles.detalleMetaValor}
-                      style={{ color: data.colores[hitoActual.categoria] ?? hitoActual.color }}
-                    >
-                      {data.categorias[hitoActual.categoria] ?? hitoActual.categoria}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── TAB: COMPARATIVA ── */}
-      {tab === 'comparativa' && (
-        <div className={styles.tabContent}>
-          <div className={styles.filterRow}>
-            <input
-              type="search"
-              placeholder="Buscar período…"
-              value={busqueda}
-              onChange={e => setBusqueda(e.target.value)}
-              className={styles.searchInput}
-              aria-label="Buscar períodos históricos"
-            />
-            <select
-              value={catFiltro}
-              onChange={e => setCatFiltro(e.target.value)}
-              className={styles.categoryFilter}
-              aria-label="Filtrar por categoría"
-            >
-              <option value="todas">Todas las categorías</option>
-              {Object.entries(data.categorias).map(([id, label]) => (
-                <option key={id} value={id}>{label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.comparativaGrid}>
-            {hitosFiltrados.map(h => (
-              <div
-                key={h.id}
-                className={styles.comparativaCard}
-                style={{ borderTopColor: h.color }}
-                onClick={() => {
-                  setHitoIdx(data.hitos.findIndex(x => x.id === h.id));
-                  setTab('detalle');
-                }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    setHitoIdx(data.hitos.findIndex(x => x.id === h.id));
-                    setTab('detalle');
-                  }
-                }}
-              >
-                <div className={styles.compCardHeader}>
-                  <span className={styles.compCardNombre}>{h.nombre}</span>
-                  <span className={styles.compCardPeriodo}>
-                    {formatAnio(h.anioInicio)} — {formatAnio(h.anioFin >= 9999 ? data.anioFin : h.anioFin)}
-                  </span>
-                </div>
-                <p className={styles.compCardDesc}>
-                  {h.descripcion.length > 130 ? h.descripcion.substring(0, 128) + '…' : h.descripcion}
-                </p>
-                <div className={styles.compCardMeta}>
-                  <span
-                    className={styles.compCat}
-                    style={{
-                      backgroundColor: (data.colores[h.categoria] ?? h.color) + '22',
-                      color: data.colores[h.categoria] ?? h.color,
-                    }}
-                  >
-                    {data.categorias[h.categoria] ?? h.categoria}
-                  </span>
-                  <span className={styles.compPaises}>{h.paises.slice(0, 2).join(', ')}</span>
-                </div>
-              </div>
-            ))}
-            {hitosFiltrados.length === 0 && (
-              <p className={styles.sinResultados}>No hay períodos que coincidan con la búsqueda.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── TAB: CONTEXTO ── */}
-      {tab === 'contexto' && (
-        <div className={styles.tabContent}>
-          <div className={styles.erasGrid}>
-            {data.eras.map((era, i) => (
-              <div key={i} className={styles.eraCard}>
-                <div className={styles.eraHeader}>
-                  <span className={styles.eraIcono} aria-hidden="true">{era.icono}</span>
-                  <div>
-                    <h3 className={styles.eraNombre}>{era.nombre}</h3>
-                    <span className={styles.eraPeriodo}>
-                      {formatAnio(era.desde)} — {formatAnio(era.hasta)}
-                    </span>
-                  </div>
-                </div>
-                {era.hitosDestacados.length > 0 && (
-                  <div className={styles.eraHitos}>
-                    {era.hitosDestacados.map((nombre, j) => (
-                      <span key={j} className={styles.eraHitoBadge}>{nombre}</span>
-                    ))}
-                  </div>
-                )}
-                {era.eventos.length > 0 && (
-                  <ul className={styles.eraEventos}>
-                    {era.eventos.map((ev, j) => <li key={j}>{ev}</li>)}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── SECCIÓN EDUCATIVA ── */}
-      <EducationalSection title={`Guía completa: ${data.titulo}`} subtitle={data.subtitulo}>
-        <p>{data.educativo.intro}</p>
-
-        {data.educativo.tablaComparativa.length > 0 && (
-          <>
-            <h3>Períodos clave en perspectiva</h3>
-            <div className={styles.tableWrapper}>
-              <table className={styles.comparativaTable}>
-                <thead>
-                  <tr>
-                    <th>Período</th>
-                    <th>Fecha</th>
-                    <th>Categoría</th>
-                    <th>Figura clave</th>
-                    <th>Aportación principal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.educativo.tablaComparativa.map((row, i) => (
-                    <tr key={i}>
-                      <td><strong>{row.hito}</strong></td>
-                      <td>{row.periodo}</td>
-                      <td>{row.categoria}</td>
-                      <td>{row.personaje}</td>
-                      <td>{row.aportacion}</td>
+              <div className={styles.tableWrapper}>
+                <table className={styles.comparativaTable}>
+                  <thead>
+                    <tr>
+                      <th>Período</th>
+                      <th>Rango</th>
+                      <th>Categoría</th>
+                      <th>Obra icónica</th>
+                      <th>Ámbito</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-
-        {data.educativo.escenarios.length > 0 && (
-          <>
-            <h3>¿Para quién es útil esta cronología?</h3>
-            <div className={styles.escenariosGrid}>
-              {data.educativo.escenarios.map((esc, i) => (
-                <div key={i} className={styles.escenarioCard}>
-                  <span className={styles.escenarioIcono} aria-hidden="true">{esc.icono}</span>
-                  <strong>{esc.titulo}</strong>
-                  <em>{esc.perfil}</em>
-                  <p>{esc.texto}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        <h3>Preguntas frecuentes</h3>
-        <ul className={styles.faqList}>
-          {data.educativo.faq.map((item, i) => (
-            <li key={i} className={styles.faqItem}>
-              <strong>{item.pregunta}</strong>
-              <p>{item.respuesta}</p>
-              {item.tip && <span className={styles.faqTip}>{item.tip}</span>}
-            </li>
-          ))}
-        </ul>
-
-        <h3>Cómo explorar esta cronología paso a paso</h3>
-        <ol className={styles.stepGuide}>
-          {data.educativo.pasos.map((paso, i) => (
-            <li key={i} className={styles.step}>
-              <span className={styles.stepNumber}>{i + 1}</span>
-              <div className={styles.stepContent}>
-                <strong>{paso.titulo}</strong>
-                <p>{paso.cuerpo}</p>
+                  </thead>
+                  <tbody>
+                    {hitosFiltrados.map((h, i) => (
+                      <tr
+                        key={h.id}
+                        style={i % 2 === 0 ? { background: `${data.colores[h.categoria] ?? h.color}18` } : {}}
+                      >
+                        <td>
+                          <strong style={{ color: data.colores[h.categoria] ?? h.color }}>
+                            {h.nombre}
+                          </strong>
+                        </td>
+                        <td>
+                          {formatAnio(h.anioInicio)} — {formatAnio(h.anioFin >= 9999 ? data.anioFin : h.anioFin)}
+                        </td>
+                        <td>
+                          <span
+                            className={styles.badgeCategoria}
+                            style={{
+                              background: `${data.colores[h.categoria] ?? h.color}22`,
+                              color: data.colores[h.categoria] ?? h.color,
+                            }}
+                          >
+                            {data.categorias[h.categoria] ?? h.categoria}
+                          </span>
+                        </td>
+                        <td>{h.obraIconica.split(',')[0].trim()}</td>
+                        <td>{h.paises.join(', ')}</td>
+                      </tr>
+                    ))}
+                    {hitosFiltrados.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className={styles.sinResultados}>
+                          Sin resultados para la búsqueda actual.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            </li>
-          ))}
-        </ol>
-
-        <h3>Consejos para sacar más partido a la cronología</h3>
-        <div className={styles.tipsGrid}>
-          {data.educativo.tips.map((tip, i) => (
-            <div key={i} className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">{tip.icono}</span>
-              <p>{tip.texto}</p>
             </div>
-          ))}
-        </div>
-
-        <div className={styles.warningBox}>
-          <div className={styles.warningHeader}>
-            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
-            <strong>Errores comunes al entender {data.titulo}</strong>
           </div>
-          <ul className={styles.warningList}>
-            {data.educativo.errores.map((err, i) => (
-              <li key={i}>
-                <strong>{err.titulo}</strong> — {err.cuerpo}
+        )}
+
+        {/* ──────────────────────────────────────
+            TAB 4: Contexto Histórico
+        ────────────────────────────────────── */}
+        {tab === 'contexto' && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}>Contexto Histórico</h2>
+              <p className={styles.sectionDesc}>
+                Períodos e hitos organizados en {data.eras.length} grandes eras históricas.
+              </p>
+
+              <div className={styles.erasGrid}>
+                {data.eras.map((era, i) => {
+                  const hitosEra = era.hitosDestacados
+                    .map(nombre => data.hitos.find(h => h.nombre === nombre))
+                    .filter(Boolean) as HitoHistoria[];
+
+                  return (
+                    <div key={i} className={styles.eraCard}>
+                      <div className={styles.eraHeader}>
+                        <span className={styles.eraIcono} aria-hidden="true">{era.icono}</span>
+                        <div>
+                          <h3 className={styles.eraNombre}>{era.nombre}</h3>
+                          <span className={styles.eraRango}>
+                            {formatAnio(era.desde)} – {era.hasta === 9999 ? 'hoy' : formatAnio(era.hasta)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {hitosEra.length > 0 && (
+                        <div className={styles.eraEstilos}>
+                          {hitosEra.map(h => (
+                            <span
+                              key={h.id}
+                              className={styles.eraEstiloBadge}
+                              style={{
+                                background: `${data.colores[h.categoria] ?? h.color}1A`,
+                                color: data.colores[h.categoria] ?? h.color,
+                                borderColor: `${data.colores[h.categoria] ?? h.color}55`,
+                              }}
+                            >
+                              {h.nombre}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {era.eventos.length > 0 && (
+                        <ul className={styles.eraEventos}>
+                          {era.eventos.map((ev, j) => (
+                            <li key={j} className={styles.eraEvento}>
+                              <span className={styles.eraEventoTexto}>{ev}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Sección educativa ── */}
+        <EducationalSection title={`Guía completa: ${data.titulo}`} subtitle={data.subtitulo}>
+          <p>{data.educativo.intro}</p>
+
+          {data.educativo.tablaComparativa.length > 0 && (
+            <>
+              <h3>Períodos clave en perspectiva</h3>
+              <div className={styles.tableWrapper}>
+                <table className={styles.comparativaTable}>
+                  <thead>
+                    <tr>
+                      <th>Período</th>
+                      <th>Fecha</th>
+                      <th>Categoría</th>
+                      <th>Figura clave</th>
+                      <th>Aportación principal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.educativo.tablaComparativa.map((row, i) => (
+                      <tr key={i}>
+                        <td><strong>{row.hito}</strong></td>
+                        <td>{row.periodo}</td>
+                        <td>{row.categoria}</td>
+                        <td>{row.personaje}</td>
+                        <td>{row.aportacion}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {data.educativo.escenarios.length > 0 && (
+            <>
+              <h3>¿Para quién es útil esta cronología?</h3>
+              <div className={styles.escenariosGrid}>
+                {data.educativo.escenarios.map((esc, i) => (
+                  <div key={i} className={styles.escenarioCard}>
+                    <span className={styles.escenarioIcon} aria-hidden="true">{esc.icono}</span>
+                    <div>
+                      <strong>{esc.titulo}</strong>
+                      <em style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        {esc.perfil}
+                      </em>
+                      <p>{esc.texto}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          <h3>Preguntas frecuentes</h3>
+          <ul className={styles.faqList}>
+            {data.educativo.faq.map((item, i) => (
+              <li key={i} className={styles.faqItem}>
+                <strong>{item.pregunta}</strong>
+                <p>{item.respuesta}</p>
+                {item.tip && <span className={styles.faqTip}>{item.tip}</span>}
               </li>
             ))}
           </ul>
-        </div>
-      </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps(appKey)} />
-      <ShareCard appName={appKey} />
-      <Footer appName={appKey} />
+          <h3>Cómo explorar esta cronología paso a paso</h3>
+          <ol className={styles.stepGuide}>
+            {data.educativo.pasos.map((paso, i) => (
+              <li key={i} className={styles.step}>
+                <span className={styles.stepNumber}>{i + 1}</span>
+                <div className={styles.stepContent}>
+                  <strong>{paso.titulo}</strong>
+                  <p>{paso.cuerpo}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <h3>Consejos para sacar más partido a la cronología</h3>
+          <div className={styles.tipsGrid}>
+            {data.educativo.tips.map((tip, i) => (
+              <div key={i} className={styles.tipCard}>
+                <span className={styles.tipIcon} aria-hidden="true">{tip.icono}</span>
+                <p>{tip.texto}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.warningBox}>
+            <strong>⚠️ Errores comunes al entender {data.titulo}</strong>
+            <ul>
+              {data.educativo.errores.map((err, i) => (
+                <li key={i}>
+                  <strong>{err.titulo}</strong> — {err.cuerpo}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </EducationalSection>
+
+        <RelatedApps apps={getRelatedApps(appKey)} />
+        <ShareCard appName={appKey} />
+        <Footer appName={appKey} />
+      </div>
     </div>
   );
 }
