@@ -90,6 +90,45 @@ Cuando los datos no existan aún, **crear el módulo correspondiente** en `data/
 
 ---
 
+## Template visualizador-historia/[slug]
+
+Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/historias/[slug].ts` + registro en `data/historias/index.ts`.
+
+### Añadir una nueva historia (4 pasos)
+
+```
+1. Crear data/historias/[slug].ts  — implementar HistoriaData completa
+2. Añadir en data/historias/index.ts:  import { [slug] } from './[slug]';  +  [slug] en registry
+3. Registrar en applications.ts, implemented-apps.ts, app-relations.ts (url: "/visualizador-historia/[slug]/")
+4. npm run build  — generateStaticParams() prerenderiza la página automáticamente
+```
+
+### Reglas de UX obligatorias (NO modificar)
+
+Estas reglas se verificaron con el usuario y deben mantenerse en todas las historias:
+
+| Tab | Comportamiento correcto |
+|-----|------------------------|
+| **Tab 1 — Línea del Tiempo** | Clic en período = toggle de panel **inline** debajo del SVG. **Nunca** navegar a otro tab. |
+| **Tab 2 — Período en Detalle** | Botones fecha en flex-wrap + tarjeta grande con header coloreado + botones `← Anterior / Siguiente →` debajo con contador. |
+| **Tab 3 — Comparativa** | **Tabla HTML** con 5 columnas (Período, Rango, Categoría, Obra icónica, Ámbito) + filtros por botones de categoría + buscador arriba. |
+| **Tab 4 — Contexto Histórico** | Eras apiladas en **flex-column** (una sola columna), `border-left: 4px solid` por era, badges de hitos con color de categoría. |
+
+### Estructura de datos (HistoriaData)
+
+- `hitos[]`: 10-14 períodos con `id, nombre, anioInicio, anioFin, color, categoria, descripcion, obraIconica, paises[]`
+- `eras[]`: exactamente 6 eras con `nombre, desde, hasta, icono, hitosDestacados[], eventos[]`
+- `categorias`: mapa `id → etiqueta` (6-8 categorías)
+- `colores`: mapa `id → color hex` (mismo conjunto que categorías)
+- `disclaimer: 'exempt'` para historia (educativo puro)
+- `educativo`: `intro, tablaComparativa[], escenarios[], faq[], pasos[], tips[], errores[]`
+
+### appKey en app-relations.ts
+
+El appKey sigue el patrón `visualizador-historia-[slug]` (con guión, sin slash).
+
+---
+
 ## Sección Guías
 
 Las Guías son **landing pages** que agrupan herramientas para un **proceso de decisión a corto-medio plazo** con implicaciones económicas/legales en España.

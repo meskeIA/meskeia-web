@@ -823,6 +823,7 @@ export const implementedAppsUrls = [
 
   // Sistema dinámico de Historias — Ruta /visualizador-historia/[slug]/ (2026-05-03)
   "/visualizador-historia/grecia/",               // Grecia Clásica -1100→-146 a.C., 12 hitos, 6 eras
+  "/visualizador-historia/roma/",                 // Antigua Roma -753→476 d.C., 10 hitos, 6 eras
 
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos

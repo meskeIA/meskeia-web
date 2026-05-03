@@ -3855,10 +3855,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // Sistema dinámico de Historias — Ruta /visualizador-historia/[slug]/ (2026-05-03)
   'visualizador-historia-grecia': [
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'Roma conquistó Grecia en el 146 a.C. pero fue conquistada culturalmente por ella: el helenismo impregnó toda la civilización romana' },
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Sócrates, Platón y Aristóteles son griegos: la filosofía occidental nació en Atenas en el siglo V a.C.' },
-    { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'Historia de la Escritura', description: 'El alfabeto griego es el origen del latino y el cirílico: cada letra del abecedario occidental tiene raíces griegas' },
     { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El arte clásico griego —Partenón, Discóbolo, cerámica de figuras rojas— es el fundamento del arte occidental' },
     { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Hipócrates es el padre de la medicina occidental: el juramento hipocrático nació en la Grecia del siglo V a.C.' },
+  ],
+  'visualizador-historia-roma': [
+    { url: '/visualizador-historia/grecia/', icon: '🏛️', name: 'Historia de la Antigua Grecia', description: 'Grecia fue la madre cultural de Roma: la mitología, la filosofía, el arte y la arquitectura romana son deudoras directas de la civilización griega' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El estoicismo romano —Marco Aurelio, Séneca, Epicteto— es la filosofía práctica del Imperio: cómo vivir y gobernar con virtud' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'El denario romano y el sistema financiero del Imperio son el origen de muchos conceptos bancarios modernos: capital, interés, crédito público' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La arquitectura romana —arco, bóveda, cúpula, acueducto— es el origen directo del Renacimiento y el Clasicismo europeo' },
   ],
 
   // Apps de referencia específica (2026-05-03)
