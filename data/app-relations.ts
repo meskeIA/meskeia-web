@@ -649,7 +649,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-huella-alimentos': [
     { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos' },
     { url: '/calculadora-huella-carbono/', icon: '🌱', name: 'Huella de Carbono', description: 'Tu huella personal completa' },
-    { url: '/visualizador-envejecimiento-cuerpo/', icon: '🧬', name: 'Cómo Envejece tu Cuerpo', description: 'Salud por décadas' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué son los códigos E de las etiquetas alimentarias' },
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
   ],
   'visualizador-sesgos-cognitivos': [
@@ -1700,7 +1700,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-indice-glucemico': [
     { url: '/visualizador-insulina-glucosa/', icon: '💉', name: 'Insulina y Glucosa', description: 'La respuesta de insulina al IG: el eje del proceso glucémico' },
     { url: '/visualizador-ayuno-intermitente/', icon: '⏳', name: 'Ayuno Intermitente', description: 'Cómo el ayuno restablece la sensibilidad a la insulina' },
-    { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias intestinales modulan la respuesta glucémica' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de los alimentos procesados' },
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'El proceso de digestión y absorción de carbohidratos' },
   ],
   'visualizador-toma-decisiones': [
@@ -1932,7 +1932,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-porciones': [...cocinaApps.filter(a => a.url !== '/calculadora-porciones/').slice(0, 2), ...saludApps.slice(0, 2)],
   'vitaminas-minerales': saludApps.filter(a => a.url !== '/vitaminas-minerales/'),
   'seguimiento-habitos': saludHabitosApps.filter(a => a.url !== '/seguimiento-habitos/'),
-  'test-habitos-saludables': saludHabitosApps.filter(a => a.url !== '/test-habitos-saludables/'),
+  'test-habitos-saludables': [
+    { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento Hábitos', description: 'Construye rutinas saludables' },
+    { url: '/calculadora-sueno/', icon: '😴', name: 'Calculadora Sueño', description: 'Ciclos de sueño óptimos' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de los alimentos' },
+    { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica de productividad' },
+  ],
   'calculadora-sueno': saludHabitosApps.filter(a => a.url !== '/calculadora-sueno/'),
   'test-burnout-laboral': [
     { url: '/test-habitos-saludables/', icon: '🌟', name: 'Test de Hábitos Saludables', description: 'Evalúa tu bienestar integral' },
@@ -3846,6 +3851,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-burbuja-especulativa/', icon: '📈', name: 'Burbujas Especulativas', description: 'Las crisis bancarias producen burbujas: el South Sea Bubble (1720), el Crash del 29 y la crisis de 2008 siguen el mismo patrón histórico' },
     { url: '/visualizador-historia-economia-espana/', icon: '📊', name: 'Historia de la Economía Española', description: 'La banca española —Santander, BBVA, Banco de España— es inseparable de la historia económica del país desde el s.XIX' },
     { url: '/visualizador-blockchain/', icon: '🔗', name: 'Blockchain y Criptografía', description: 'Bitcoin y las criptomonedas son la respuesta tecnológica a la crisis bancaria de 2008: Satoshi Nakamoto publicó el whitepaper el mismo año que cayó Lehman' },
+  ],
+
+  // Apps de referencia específica (2026-05-03)
+  'aditivos-e-alimentarios': [
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental de cada alimento: CO₂, agua y tierra consumidos. Complementa la lectura de etiquetas con el impacto ecológico.' },
+    { url: '/visualizador-indice-glucemico/', icon: '📊', name: 'Índice Glucémico', description: 'Cómo los alimentos afectan tu glucemia: el IG y la carga glucémica de 26 alimentos comunes, incluidos muchos que contienen aditivos.' },
+    { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos y sus aditivos: absorción, metabolismo y paso por el organismo.' },
+    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tu bienestar integral: alimentación, hidratación, actividad y descanso.' },
   ],
 };
 

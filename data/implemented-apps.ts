@@ -820,6 +820,9 @@ export const implementedAppsUrls = [
   "/visualizador-historia-arquitectura-espanola/", // 13 períodos, Románico s.XI→Guggenheim y arquitectura paramétrica
   "/visualizador-historia-moda-espanola/",         // 13 períodos, Reyes Católicos→Balenciaga, Loewe e Inditex
   "/visualizador-historia-banca/",                 // 13 períodos, Medici 1397→fintech y criptomonedas
+
+  // Apps específicas de referencia (2026-05-03)
+  "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
 ];
 
 /**
