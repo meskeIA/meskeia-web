@@ -857,10 +857,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas' },
   ],
   'visualizador-mapa-especias': [
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias' },
     { url: '/visualizador-historia-dinero/', icon: '🪙', name: 'La Evolución del Dinero', description: 'Del trueque al bitcoin' },
     { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'De dónde Viene tu Camiseta', description: 'Cadena global' },
     { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'Evolución de la Escritura', description: '5.000 años de escritura' },
-    { url: '/visualizador-idiomas-mundo/', icon: '🗣️', name: 'El Mapa de los Idiomas', description: 'Familias lingüísticas' },
   ],
   'visualizador-clima': [
     { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Cuánta Agua Gastas sin Saberlo', description: 'Huella hídrica' },
@@ -3855,10 +3855,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },
     { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental de cada alimento: CO₂, agua y tierra consumidos. Complementa la lectura de etiquetas con el impacto ecológico.' },
     { url: '/visualizador-indice-glucemico/', icon: '📊', name: 'Índice Glucémico', description: 'Cómo los alimentos afectan tu glucemia: el IG y la carga glucémica de 26 alimentos comunes, incluidos muchos que contienen aditivos.' },
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos y sus aditivos: absorción, metabolismo y paso por el organismo.' },
-    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tu bienestar integral: alimentación, hidratación, actividad y descanso.' },
+  ],
+  'guia-especias': [
+    { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de las especias: cómo cambiaron el mundo' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
+    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental de cada alimento: CO₂, agua y tierra consumidos' },
+    { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos de tu dieta' },
   ],
 };
 
