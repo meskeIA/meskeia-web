@@ -3862,9 +3862,33 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-historia-roma': [
     { url: '/visualizador-historia/grecia/', icon: '🏛️', name: 'Historia de la Antigua Grecia', description: 'Grecia fue la madre cultural de Roma: la mitología, la filosofía, el arte y la arquitectura romana son deudoras directas de la civilización griega' },
+    { url: '/visualizador-historia/egipto/', icon: '🏺', name: 'Historia del Antiguo Egipto', description: 'Egipto fue la última gran civilización que Roma conquistó: Cleopatra VII y la batalla de Actium pusieron fin a 3.000 años de historia faraónica' },
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El estoicismo romano —Marco Aurelio, Séneca, Epicteto— es la filosofía práctica del Imperio: cómo vivir y gobernar con virtud' },
-    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'El denario romano y el sistema financiero del Imperio son el origen de muchos conceptos bancarios modernos: capital, interés, crédito público' },
     { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La arquitectura romana —arco, bóveda, cúpula, acueducto— es el origen directo del Renacimiento y el Clasicismo europeo' },
+  ],
+  'visualizador-historia-egipto': [
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'Roma conquistó Egipto en el 30 a.C. con la derrota de Cleopatra VII en Actium: fin de 3.000 años de civilización faraónica' },
+    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Egipto y Mesopotamia son las dos cunas de la civilización: comerciaron, compitieron y se influyeron mutuamente durante milenios' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El arte egipcio —pirámides, estatuaria, pintura funeraria— influyó en el arte greco-romano y fascina a la humanidad desde el Renacimiento' },
+    { url: '/visualizador-historia-medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'El papiro Ebers (1550 a.C.) es el documento médico más antiguo completo: los egipcios tenían medicina organizada 1.500 años antes de Hipócrates' },
+  ],
+  'visualizador-historia-mesopotamia': [
+    { url: '/visualizador-historia/egipto/', icon: '🏺', name: 'Historia del Antiguo Egipto', description: 'Egipto y Mesopotamia son las dos primeras civilizaciones escritas de la humanidad, separadas por el desierto pero conectadas por el comercio milenario' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'Mesopotamia fue la cuna de las leyes: el Código de Hammurabi (1754 a.C.) inspira conceptos jurídicos que Roma convirtió en derecho universal' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La cosmología babilónica y la astronomía mesopotámica precedieron al pensamiento griego: los primeros sistemas de predicción astronómica nacieron en Babilonia' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'El primer sistema de crédito y los primeros contratos comerciales escritos nacieron en Mesopotamia: el templo-banco sumerio es el origen de la banca moderna' },
+  ],
+  'visualizador-historia-otomano': [
+    { url: '/visualizador-historia/mongol/', icon: '🐴', name: 'Historia del Imperio Mongol', description: 'Tamerlán, heredero del legado mongol, destruyó el ejército otomano en Ankara (1402) y capturó a Beyazid I: el Imperio Mongol marcó el destino otomano' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'Los otomanos conquistaron Constantinopla (1453), capital del Imperio Romano de Oriente: Mehmed II se proclamó heredero de los Césares romanos' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La arquitectura otomana —Mezquita Azul, Topkapi, Sinan— es una de las cumbres del arte islámico y dejó su huella en tres continentes' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'El control otomano de las rutas comerciales forzó a los europeos a buscar rutas marítimas: el origen indirecto de la globalización bancaria moderna' },
+  ],
+  'visualizador-historia-mongol': [
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'Tamerlán, heredero del legado mongol, humilló al Imperio Otomano en Ankara (1402): el mayor choque entre los dos grandes imperios euroasiáticos' },
+    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Los mongoles de Hulagu destruyeron Bagdad en 1258, poniendo fin al Califato Abásida y a la Edad de Oro islámica nacida en la cuna mesopotámica' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'El Imperio Mongol y el Romano son los dos grandes imperios que conectaron y transformaron el mundo euroasiático en sus respectivas épocas' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'La Pax Mongolica reactivó la Ruta de la Seda: el comercio seguro de Asia a Europa en el siglo XIII fue el precursor del sistema financiero europeo moderno' },
   ],
 
   // Apps de referencia específica (2026-05-03)

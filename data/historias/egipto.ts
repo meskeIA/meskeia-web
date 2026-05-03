@@ -1,0 +1,362 @@
+import type { HistoriaData } from './types';
+
+export const egipto: HistoriaData = {
+  slug: 'egipto',
+  titulo: 'Historia del Antiguo Egipto: De la Unificación a Cleopatra',
+  subtitulo: 'Tres milenios de civilización a orillas del Nilo: pirámides, faraones y el legado eterno del Antiguo Egipto',
+  descripcionSEO: 'Cronología interactiva del Antiguo Egipto: desde la unificación del Alto y Bajo Egipto (3100 a.C.) hasta la conquista romana bajo Cleopatra VII (30 a.C.). Reino Antiguo y las pirámides, Reino Medio, apogeo del Reino Nuevo con Ramsés II, período ptolemaico y el fin de la civilización faraónica en 10 hitos y 6 eras.',
+  keywords: [
+    'historia antiguo egipto cronología',
+    'faraones pirámides reino antiguo keops',
+    'ramsés II tutankamón reino nuevo apogeo',
+    'cleopatra vii período ptolemaico conquista romana',
+    'hicsos segundo período intermedio egipto',
+    'unificación egipto narmer menes 3100 ac',
+  ],
+  anioInicio: -3100,
+  anioFin: -30,
+
+  hitos: [
+    {
+      id: 'reino-arcaico',
+      nombre: 'Reino Arcaico',
+      anioInicio: -3100,
+      anioFin: -2686,
+      color: '#C19A6B',
+      categoria: 'arcaico',
+      descripcion: 'El rey Narmer (identificado con el legendario Menes) unificó el Alto y el Bajo Egipto alrededor del 3100 a.C., fundando la primera dinastía y estableciendo Menfis como capital. La Paleta de Narmer, uno de los documentos históricos más antiguos conocidos, conmemora esta unificación mostrando al rey con la doble corona. Durante las dos primeras dinastías se consolidaron las estructuras del Estado faraónico: la escritura jeroglífica, la burocracia centralizada, las mastabas funerarias y la figura del faraón como dios viviente que mediaba entre el orden cósmico y el mundo humano.',
+      obraIconica: 'Paleta de Narmer (ca. 3100 a.C.): primer documento de unificación de Egipto',
+      paises: ['Egipto', 'Delta del Nilo', 'Alto Egipto', 'Bajo Egipto'],
+    },
+    {
+      id: 'reino-antiguo',
+      nombre: 'Reino Antiguo: La Edad de las Pirámides',
+      anioInicio: -2686,
+      anioFin: -2181,
+      color: '#D4A017',
+      categoria: 'piramides',
+      descripcion: 'El período de mayor monumentalidad en la historia egipcia. La III Dinastía inauguró la arquitectura en piedra: Imhotep diseñó la Pirámide Escalonada de Zoser en Saqqara (ca. 2650 a.C.). La IV Dinastía alcanzó la cima: Keops construyó la Gran Pirámide de Guiza (ca. 2560 a.C.), la única maravilla del mundo antiguo en pie, con 138 metros de altura original. Su hijo Kefrén añadió la Gran Esfinge, símbolo eterno de Egipto. La V y VI Dinastía introdujeron los Textos de las Pirámides, el corpus religioso funerario más antiguo conservado. El colapso de la VI Dinastía sumió al país en el primer período de fragmentación.',
+      obraIconica: 'Gran Pirámide de Keops en Guiza (ca. 2560 a.C.): la única maravilla antigua que permanece en pie',
+      paises: ['Egipto', 'Menfis', 'Guiza', 'Saqqara', 'Nubia septentrional'],
+    },
+    {
+      id: 'primer-periodo-intermedio',
+      nombre: 'Primer Período Intermedio',
+      anioInicio: -2181,
+      anioFin: -2055,
+      color: '#8B7355',
+      categoria: 'crisis',
+      descripcion: 'El colapso del poder central de la VI Dinastía fragmentó Egipto en provincias (nomos) gobernadas por nomarcas semiindependientes. El período estuvo marcado por la sequía, el hambre y los conflictos civiles entre las casas de Heracleópolis (norte) y Tebas (sur). A pesar de la inestabilidad política, floreció una cultura literaria notable: los Textos de los Ataúdes democratizaron el acceso a los ritos funerarios antes reservados a la realeza. El nomarca tebano Mentuhotep II unificó finalmente el país alrededor del 2055 a.C., iniciando el Reino Medio.',
+      obraIconica: 'Textos de los Ataúdes: democratización del ritual funerario egipcio',
+      paises: ['Egipto fragmentado', 'Heracleópolis', 'Tebas', 'Alto Egipto', 'Delta'],
+    },
+    {
+      id: 'reino-medio',
+      nombre: 'Reino Medio: Reunificación y Esplendor',
+      anioInicio: -2055,
+      anioFin: -1650,
+      color: '#4682B4',
+      categoria: 'reunificacion',
+      descripcion: 'Mentuhotep II reunificó Egipto con capital en Tebas, inaugurando un período de estabilidad, prosperidad y expansión territorial. La XII Dinastía representó el apogeo: Senusert III y Amenemhat III impulsaron grandes obras de irrigación en el Fayum, expandieron el comercio hacia Punt y el Levante, y consolidaron el poder del Estado frente a los nomarcas. La literatura floreció: el Cuento de Sinuhé y la Instrucción de Amenemhat son joyas de la prosa egipcia. Egipto incorporó Nubia (Kush) hasta la Segunda Catarata, construyendo una red de imponentes fortalezas fluviales. El fin de la XII Dinastía y la debilidad de la XIII abrieron paso a la invasión de los hicsos.',
+      obraIconica: 'Cuento de Sinuhé y fortalezas nubias de Buhen y Semna (ca. 1900 a.C.)',
+      paises: ['Egipto', 'Nubia', 'Kush', 'Levante', 'Sinai'],
+    },
+    {
+      id: 'segundo-periodo-intermedio',
+      nombre: 'Segundo Período Intermedio: Los Hicsos',
+      anioInicio: -1650,
+      anioFin: -1550,
+      color: '#8B4513',
+      categoria: 'crisis',
+      descripcion: 'Los hicsos, pueblo semita procedente del Levante, aprovecharon la debilidad de la XIII Dinastía para penetrar en el Delta y establecer la XV Dinastía con capital en Avaris. Introdujeron tecnologías revolucionarias: el carro de guerra, el arco compuesto, las espadas de bronce y nuevas técnicas agrícolas. Este período supuso un traumatismo identitario para los egipcios, que por primera vez veían a extranjeros gobernar parte de su territorio. Los faraones de Tebas (XVII Dinastía) iniciaron la guerra de liberación: Sekenenra Taa y sus hijos Kamose y Ahmose I expulsaron finalmente a los hicsos, fundando la XVIII Dinastía y el glorioso Reino Nuevo.',
+      obraIconica: 'Papiro Rhind: tratado matemático de los hicsos, el más completo de la antigüedad',
+      paises: ['Egipto dividido', 'Avaris', 'Delta del Nilo', 'Tebas', 'Levante'],
+    },
+    {
+      id: 'reino-nuevo-apogeo',
+      nombre: 'Reino Nuevo: Apogeo Imperial',
+      anioInicio: -1550,
+      anioFin: -1069,
+      color: '#B8860B',
+      categoria: 'apogeo',
+      descripcion: 'El período más brillante de la historia egipcia. La XVIII Dinastía alcanzó una expansión sin precedentes: Tutmosis III, el "Napoleón del Antiguo Egipto", ganó la batalla de Meguido (1457 a.C.) y extendió el Imperio hasta el río Éufrates. La reina-faraón Hatshepsut impulsó el comercio con Punt. La Revolución Amarniana de Akenatón intentó reemplazar el politeísmo por el culto único al disco solar Atón. Tutankamón restauró la religión tradicional. La XIX Dinastía vivió el reinado de Ramsés II el Grande, que ganó —o empató, según se mire— la batalla de Qadesh contra los hititas (1274 a.C.) y firmó el primer tratado de paz de la historia. El Valle de los Reyes acogió las tumbas de los faraones. El reinado de Ramsés III fue el último gran esplendor antes del declive.',
+      obraIconica: 'Templos de Abu Simbel y Tratado de Qadesh de Ramsés II (1274 a.C.)',
+      paises: ['Egipto', 'Nubia', 'Siria', 'Palestina', 'Líbano', 'Chipre', 'Éufrates'],
+    },
+    {
+      id: 'tercer-periodo-intermedio',
+      nombre: 'Tercer Período Intermedio y Período Tardío',
+      anioInicio: -1069,
+      anioFin: -332,
+      color: '#708090',
+      categoria: 'crisis',
+      descripcion: 'El Tercer Período Intermedio (1069-664 a.C.) fue una nueva era de fragmentación: sacerdotes de Amón gobernaban el sur desde Tebas mientras el norte se dividía entre faraones libios (Dinastía XXII) y otros rivales. Los asirios de Asurbanipal saquearon Tebas en el 663 a.C. Los faraones de la XXVI Dinastía (Saíta) protagonizaron el último renacimiento nativo del arte y la cultura egipcia, consciente de su grandeza pasada. La invasión del Imperio Aqueménida persa bajo Cambises II en el 525 a.C. convirtió a Egipto en una satrapia persa. Los períodos de dominio persa (Primero y Segundo) alternaron con breves revueltas de independencia. El Período Tardío terminó con la conquista de Alejandro Magno en el 332 a.C.',
+      obraIconica: 'Estela de Nectanebo I: último apogeo del arte faraónico nativo (380-362 a.C.)',
+      paises: ['Egipto', 'Tebas', 'Libia', 'Nubia', 'Palestina', 'Asiria', 'Persia'],
+    },
+    {
+      id: 'periodo-ptolemaico',
+      nombre: 'Período Ptolemaico: Egipto Helenístico',
+      anioInicio: -332,
+      anioFin: -30,
+      color: '#4B0082',
+      categoria: 'helenismo',
+      descripcion: 'Alejandro Magno conquistó Egipto en el 332 a.C. sin resistencia —los egipcios lo recibieron como liberador del yugo persa— y fue proclamado faraón en Menfis. Fundó Alejandría en el 331 a.C., destinada a ser la capital cultural y científica del Mediterráneo. Tras su muerte, su general Ptolomeo tomó el control e inauguró la última dinastía faraónica. Los Ptolomeos adoptaron la titulatura faraónica pero gobernaron en griego: el resultado fue una fascinante fusión cultural. La Biblioteca de Alejandría reunió el mayor depósito de conocimiento del mundo antiguo. El Faro de Alejandría fue una de las Siete Maravillas. La Piedra de Rosetta (196 a.C.) fue el instrumento de esta dinastía para legitimarse ante los egipcios. Cleopatra VII fue la única Ptolomeo que aprendió el egipcio.',
+      obraIconica: 'Biblioteca de Alejandría y Faro de Alejandría (ca. 280 a.C.)',
+      paises: ['Egipto', 'Alejandría', 'Cirenaica', 'Chipre', 'Palestina', 'Siria'],
+    },
+    {
+      id: 'conquista-romana',
+      nombre: 'Conquista Romana: Fin de los Faraones',
+      anioInicio: -51,
+      anioFin: -30,
+      color: '#800020',
+      categoria: 'helenismo',
+      descripcion: 'Cleopatra VII Filopátor, la última faraona, gobernó Egipto con una habilidad política excepcional en un mundo dominado por Roma. Su alianza con Julio César —con quien tuvo a Cesarión— le permitió mantener el trono frente a su hermano Ptolomeo XIII. Tras el asesinato de César, se alió con Marco Antonio, con quien tuvo tres hijos y planeó crear un Imperio oriental que rivalizara con Roma. Octavio (futuro Augusto) les declaró la guerra y los venció en la batalla de Actium (31 a.C.). Marco Antonio se suicidó. Cleopatra, incapaz de repetir su éxito seductor con Octavio y negándose a desfilar en el triunfo romano, se suicidó con el veneno de un áspid el 12 de agosto del 30 a.C. Egipto se convirtió en una provincia imperial romana: tres mil años de historia faraónica habían llegado a su fin.',
+      obraIconica: 'Suicidio de Cleopatra VII (30 a.C.): fin de la civilización faraónica',
+      paises: ['Egipto', 'Alejandría', 'Roma', 'Oriente Mediterráneo'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Época Arcaica y Formativa',
+      desde: -3100,
+      hasta: -2181,
+      icono: '🦅',
+      hitosDestacados: ['Reino Arcaico', 'Reino Antiguo: La Edad de las Pirámides'],
+      eventos: [
+        'Narmer unifica el Alto y Bajo Egipto: primera nación-estado de la historia (ca. 3100 a.C.)',
+        'Fundación de Menfis como primera capital del Egipto unificado',
+        'Invención de la escritura jeroglífica y consolidación de la burocracia estatal',
+        'Imhotep diseña la Pirámide Escalonada de Zoser: primer gran edificio de piedra (ca. 2650 a.C.)',
+        'Keops construye la Gran Pirámide de Guiza, la única maravilla antigua en pie (ca. 2560 a.C.)',
+        'Textos de las Pirámides: el corpus religioso funerario más antiguo conocido',
+      ],
+    },
+    {
+      nombre: 'Primer Período Intermedio y Reino Medio',
+      desde: -2181,
+      hasta: -1650,
+      icono: '🌊',
+      hitosDestacados: ['Primer Período Intermedio', 'Reino Medio: Reunificación y Esplendor'],
+      eventos: [
+        'Colapso de la VI Dinastía: fragmentación política y sequías devastadoras (ca. 2181 a.C.)',
+        'Textos de los Ataúdes: democratización del ritual funerario (ca. 2100 a.C.)',
+        'Mentuhotep II reúne Egipto bajo Tebas: inicio del Reino Medio (ca. 2055 a.C.)',
+        'XII Dinastía: obras hidráulicas en el Fayum, expansión comercial al Levante y Punt',
+        'Conquista y colonización de Nubia hasta la Segunda Catarata',
+        'Cuento de Sinuhé: cumbre de la literatura egipcia clásica (ca. 1900 a.C.)',
+      ],
+    },
+    {
+      nombre: 'Segundo Período Intermedio: La Amenaza Exterior',
+      desde: -1650,
+      hasta: -1550,
+      icono: '⚔️',
+      hitosDestacados: ['Segundo Período Intermedio: Los Hicsos'],
+      eventos: [
+        'Los hicsos se instalan en el Delta y fundan la XV Dinastía con capital en Avaris (ca. 1650 a.C.)',
+        'Introducción del carro de guerra y el arco compuesto: revolución militar egipcia',
+        'Papiro Rhind: el tratado matemático más completo de la Antigüedad',
+        'Sekenenra Taa inicia la guerra de liberación contra los hicsos (ca. 1560 a.C.)',
+        'Ahmose I expulsa a los hicsos y funda la XVIII Dinastía (ca. 1550 a.C.)',
+      ],
+    },
+    {
+      nombre: 'Reino Nuevo: El Gran Imperio Egipcio',
+      desde: -1550,
+      hasta: -1069,
+      icono: '☀️',
+      hitosDestacados: ['Reino Nuevo: Apogeo Imperial'],
+      eventos: [
+        'Hatshepsut: reina-faraón que impulsa el comercio con Punt y los grandes templos (ca. 1478 a.C.)',
+        'Tutmosis III vence en Meguido y extiende Egipto hasta el Éufrates (1457 a.C.)',
+        'Revolución Amarniana: Akenatón instaura el culto único al dios Atón (ca. 1353 a.C.)',
+        'Tutankamón restaura el politeísmo tradicional y se convierte en símbolo eterno (ca. 1332 a.C.)',
+        'Batalla de Qadesh: Ramsés II contra los hititas, primer tratado de paz de la historia (1274 a.C.)',
+        'Templos de Abu Simbel: cumbre de la arquitectura imperial de Ramsés II (ca. 1264 a.C.)',
+      ],
+    },
+    {
+      nombre: 'Período de Fragmentación y Dominio Extranjero',
+      desde: -1069,
+      hasta: -332,
+      icono: '🌙',
+      hitosDestacados: ['Tercer Período Intermedio y Período Tardío'],
+      eventos: [
+        'Sacerdotes de Amón gobiernan Tebas: división religiosa y política (ca. 1069 a.C.)',
+        'Faraones libios de la XXII Dinastía toman el norte de Egipto (ca. 945 a.C.)',
+        'Asirios de Asurbanipal saquean Tebas: humillación sin precedentes (663 a.C.)',
+        'XXVI Dinastía Saíta: último renacimiento nativo del arte y la cultura faraónica (664-525 a.C.)',
+        'Cambises II de Persia conquista Egipto: primera satrapía persa (525 a.C.)',
+        'Nectanebo II, último faraón nativo, huye ante la segunda conquista persa (343 a.C.)',
+      ],
+    },
+    {
+      nombre: 'Egipto Helenístico y Conquista Romana',
+      desde: -332,
+      hasta: -30,
+      icono: '🌟',
+      hitosDestacados: ['Período Ptolemaico: Egipto Helenístico', 'Conquista Romana: Fin de los Faraones'],
+      eventos: [
+        'Alejandro Magno es proclamado faraón en Menfis: Egipto acoge su liberador (332 a.C.)',
+        'Fundación de Alejandría: futura capital cultural y científica del Mediterráneo (331 a.C.)',
+        'Ptolomeo I funda la última dinastía faraónica con base griega (305 a.C.)',
+        'Faro y Biblioteca de Alejandría: las dos maravillas del saber antiguo (ca. 280 a.C.)',
+        'Piedra de Rosetta: decreto ptolemaico en tres escrituras que permitió descifrar los jeroglíficos (196 a.C.)',
+        'Cleopatra VII y Marco Antonio derrotados en Actium por Octavio (31 a.C.)',
+        'Suicidio de Cleopatra VII: fin de tres milenios de civilización faraónica (30 a.C.)',
+      ],
+    },
+  ],
+
+  categorias: {
+    arcaico: 'Período Arcaico',
+    piramides: 'Edad de las Pirámides',
+    reunificacion: 'Reunificación',
+    apogeo: 'Apogeo Imperial',
+    crisis: 'Crisis y Fragmentación',
+    helenismo: 'Helenismo',
+  },
+
+  colores: {
+    arcaico: '#C19A6B',
+    piramides: '#D4A017',
+    reunificacion: '#4682B4',
+    apogeo: '#B8860B',
+    crisis: '#8B7355',
+    helenismo: '#4B0082',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El Antiguo Egipto es la civilización más longeva de la historia: tres mil años ininterrumpidos de cultura, lengua, religión y organización estatal a orillas del Nilo. Desde la unificación de Narmer alrededor del 3100 a.C. hasta el suicidio de Cleopatra VII en el 30 a.C., Egipto fue escenario de las primeras pirámides, los primeros tratados de paz internacionales, las primeras grandes bibliotecas y los primeros intentos de monoteísmo. Su legado pervive en el calendario, en la escritura —el alfabeto fenicio, origen del griego y el latino, fue influido por los jeroglíficos—, en la arquitectura monumental y en el imaginario cultural de todo Occidente.',
+
+    tablaComparativa: [
+      { hito: 'Reino Arcaico', periodo: '3100-2686 a.C.', categoria: 'Período Arcaico', personaje: 'Narmer / Menes', aportacion: 'Unificación del Alto y Bajo Egipto, escritura jeroglífica, fundación de Menfis' },
+      { hito: 'Reino Antiguo: La Edad de las Pirámides', periodo: '2686-2181 a.C.', categoria: 'Edad de las Pirámides', personaje: 'Keops / Imhotep', aportacion: 'Gran Pirámide de Guiza, Gran Esfinge, Textos de las Pirámides' },
+      { hito: 'Reino Medio: Reunificación y Esplendor', periodo: '2055-1650 a.C.', categoria: 'Reunificación', personaje: 'Mentuhotep II / Senusert III', aportacion: 'Reunificación, expansión nubia, literatura clásica, obras hidráulicas del Fayum' },
+      { hito: 'Reino Nuevo: Apogeo Imperial', periodo: '1550-1069 a.C.', categoria: 'Apogeo Imperial', personaje: 'Ramsés II / Tutmosis III', aportacion: 'Máxima expansión territorial, tratado de Qadesh, Abu Simbel, Valle de los Reyes' },
+      { hito: 'Período Ptolemaico: Egipto Helenístico', periodo: '332-30 a.C.', categoria: 'Helenismo', personaje: 'Ptolomeo I / Cleopatra VII', aportacion: 'Alejandría, Biblioteca, Faro, fusión grecoegipia, Piedra de Rosetta' },
+      { hito: 'Conquista Romana: Fin de los Faraones', periodo: '51-30 a.C.', categoria: 'Helenismo', personaje: 'Cleopatra VII / Octavio Augusto', aportacion: 'Fin de la última dinastía faraónica, Egipto convertido en provincia romana' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiantes de Historia Antigua',
+        perfil: 'ESO, Bachillerato, Grado universitario',
+        texto: 'El Antiguo Egipto ocupa un lugar central en los currículos de Historia: desde la prehistoria y las primeras civilizaciones hasta el mundo helenístico y la expansión romana. Esta cronología permite contextualizar rápidamente cada período, identificar los hitos clave y relacionarlos con otras civilizaciones contemporáneas como Mesopotamia, Grecia o Roma.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Viajeros y amantes del arte',
+        perfil: 'Personas que visitan museos o preparan un viaje a Egipto',
+        texto: 'Ver las pirámides, el templo de Karnak o el Museo Egipcio del Cairo cobra un significado completamente diferente cuando sabes en qué período histórico fueron construidos, para qué faraón y con qué propósito religioso. Esta cronología es la guía de contexto que ninguna audioguía te da de forma tan clara y visual.',
+      },
+      {
+        icono: '🔬',
+        titulo: 'Curiosos de la arqueología',
+        perfil: 'Interesados en descubrimientos arqueológicos y egiptología',
+        texto: 'Desde Howard Carter y la tumba de Tutankamón hasta el descifrado de la Piedra de Rosetta por Champollion, los grandes hallazgos de la arqueología egipcia adquieren su pleno sentido histórico cuando se sitúan dentro de los períodos correctos. Esta cronología es el marco cronológico de referencia para entender cada descubrimiento.',
+      },
+      {
+        icono: '📖',
+        titulo: 'Lectores de historia popular y ficción histórica',
+        perfil: 'Lectores de novela histórica ambientada en Egipto',
+        texto: 'Novelas como las de Christian Jacq sobre Ramsés el Grande, o series televisivas sobre Cleopatra, ganan enormemente cuando el lector conoce el contexto histórico real. ¿En qué período ocurre la historia? ¿Qué pasaba realmente en ese momento? Esta cronología aclara el fondo histórico detrás de cada narración.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué duró tanto el Antiguo Egipto como civilización?',
+        respuesta: 'Tres factores clave: la geografía (el Nilo actuaba como autopista comercial y los desiertos como fronteras naturales protectoras), la religión (la figura del faraón como dios mediador entre el cosmos y la humanidad legitimaba el poder y daba cohesión social) y el pragmatismo (Egipto asimiló y adaptó influencias externas —hicsos, griegos, persas— sin perder su identidad esencial). El concepto de Maat (el orden cósmico justo) fue el eje ideológico que mantuvo unida a la civilización durante tres milenios.',
+        tip: 'La civilización egipcia duró más que el intervalo que separa a Julio César de hoy en día.',
+      },
+      {
+        pregunta: '¿Cómo se construyeron realmente las pirámides?',
+        respuesta: 'Los estudios arqueológicos actuales descartan las teorías de esclavitud masiva: los constructores eran trabajadores estatales pagados, bien alimentados y con atención médica, como demuestran los cementerios excavados cerca de Guiza. Se usaron trineos, agua para reducir la fricción en la arena, rampas de construcción (cuyo tipo exacto sigue debatiéndose) y una organización logística estatal extraordinaria. La Gran Pirámide de Keops contiene unos 2,3 millones de bloques de piedra caliza de entre 2 y 15 toneladas cada uno.',
+        tip: 'El papiro de Merer (ca. 2560 a.C.), descubierto en 2013, describe en primera persona la logística de transporte de bloques para la Gran Pirámide: es el registro escrito más antiguo relacionado con ella.',
+      },
+      {
+        pregunta: '¿Qué fue la revolución religiosa de Akenatón?',
+        respuesta: 'Akenatón (ca. 1353-1336 a.C.) intentó sustituir el politeísmo egipcio —con Amón-Ra a la cabeza— por el culto único al disco solar Atón. Trasladó la capital a Amarna, cerró los templos tradicionales y persiguió el culto a otros dioses. Fue el primer experimento documentado de monoteísmo —o más precisamente, de henoteísmo— en la historia. Tras su muerte, el sacerdocio de Amón borró su nombre de los monumentos y restauró la religión tradicional. Tutankamón (su probable hijo) fue el instrumento de esa restauración.',
+        tip: 'Algunos historiadores han especulado con la influencia de Akenatón en el monoteísmo hebreo, aunque la conexión directa es muy debatida.',
+      },
+      {
+        pregunta: '¿Fue Cleopatra VII egipcia?',
+        respuesta: 'Étnicamente, no: Cleopatra VII era de la dinastía Ptolemaica, de origen macedonio-griego. Pero fue la única faraona de su dinastía que aprendió el idioma egipcio (y otros seis idiomas más). Se presentó como encarnación de la diosa Isis, adoptó la titulatura faraónica y fue venerada como diosa por los egipcios. En términos culturales e identitarios, se egipcianizó más que ningún otro Ptolomeo. Su imagen popular como seductora exótica debe mucho a la propaganda de Octavio Augusto, su enemigo político.',
+        tip: 'La imagen occidental de Cleopatra como mujer de belleza extraordinaria fue creada principalmente por Roma para justificar la guerra. Las monedas de la época la muestran con rasgos mucho más normales.',
+      },
+      {
+        pregunta: '¿Qué dejó el Antiguo Egipto al mundo moderno?',
+        respuesta: 'El calendario solar de 365 días (base del calendario juliano y gregoriano), los primeros conocimientos sistematizados de medicina, matemáticas y astronomía, el concepto de Estado centralizado con burocracia especializada, la arquitectura monumental en piedra, el papiro como soporte de escritura (precursor del libro), y el obelisco (decenas se encuentran en plazas de Roma, París, Londres y Nueva York). La influencia egipcia en la religión, el arte y la filosofía griega fue enorme, y a través de Grecia y Roma llegó al Occidente moderno.',
+        tip: 'El obelisco de la Plaza del Popolo en Roma fue construido bajo Ramsés II: lleva 3.200 años en pie y ha estado en Roma más tiempo del que tardó Egipto en construirlo.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Identifica los tres grandes reinos en la Línea del Tiempo',
+        cuerpo: 'Antes de leer nada, observa la Línea del Tiempo y busca los bloques dorados (Reino Antiguo), azul (Reino Medio) y ámbar (Reino Nuevo). Son las tres cimas de la civilización faraónica. Los bloques grises y marrones entre ellos son los Períodos Intermedios: las fases de fragmentación y crisis. Este patrón cíclico —esplendor, crisis, reunificación— se repite tres veces en la historia egipcia.',
+      },
+      {
+        titulo: 'Compara las duraciones de cada período',
+        cuerpo: 'Haz clic en "Reino Antiguo: La Edad de las Pirámides" y en "Conquista Romana: Fin de los Faraones". El primero duró 500 años; el segundo apenas 21. Luego observa el "Tercer Período Intermedio y Período Tardío": duró 737 años, más que todos los períodos de apogeo juntos. La historia egipcia es mucho más compleja que las imágenes de pirámides y Cleopatra que dominan el imaginario popular.',
+      },
+      {
+        titulo: 'Sigue el hilo de las invasiones extranjeras',
+        cuerpo: 'Usa la tabla Comparativa y filtra por "Crisis y Fragmentación". Observa cómo cada crisis tuvo causas distintas: sequías internas (Primer Período Intermedio), invasión exterior semita (Hicsos), presión asiria y persa (Período Tardío). Cada vez que Egipto superó una invasión, reemergió renovado con nuevas tecnologías y conocimientos absorbidos del invasor.',
+      },
+      {
+        titulo: 'Explora el Tab de Contexto Histórico para ver las 6 eras',
+        cuerpo: 'Las seis eras del Contexto Histórico muestran la gran división de la historia egipcia. Presta especial atención a la era "Período de Fragmentación y Dominio Extranjero": duró más de 700 años y en ella gobernaron libios, asirios, persas y griegos. Que los egipcios mantuvieran su identidad cultural a través de todo ese período es uno de los fenómenos más extraordinarios de la historia universal.',
+      },
+      {
+        titulo: 'Termina explorando el período ptolemaico y la fusión grecoegipcio',
+        cuerpo: 'Haz clic en "Período Ptolemaico: Egipto Helenístico" y reflexiona sobre esta paradoja: los Ptolomeos eran griegos que gobernaron como faraones y construyeron el mayor centro intelectual del mundo antiguo (la Biblioteca de Alejandría) al tiempo que honraban a Isis y Osiris. Fue la última y más fértil fusión cultural de la historia faraónica, que terminó cuando Roma convirtió Egipto en granero del Imperio.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'Los años del Antiguo Egipto se escriben como números negativos: -3100 equivale a 3100 a.C. Cuanto más grande es el número negativo, más antiguo es el evento. La Gran Pirámide de Guiza (-2560) es más antigua que la batalla de Maratón (-490), que la Acrópolis de Atenas (-447) y que la fundación de Roma (-753): fue construida antes de que existieran Grecia ni Roma como civilizaciones.',
+      },
+      {
+        icono: '🌊',
+        texto: 'El Nilo fue el motor de la civilización egipcia: su inundación anual (de julio a octubre) depositaba el limo fértil que permitía las cosechas. Los egipcios dividían el año en tres estaciones: Akhet (inundación), Peret (crecimiento) y Shemu (cosecha). Toda la organización estatal, la fiscalidad y los ciclos religiosos estaban sincronizados con el Nilo. Sin el Nilo, el Antiguo Egipto es simplemente impensable.',
+      },
+      {
+        icono: '🔺',
+        texto: 'Las pirámides no son solo tumbas: son máquinas de resurrección. Su forma triangular apunta al sol naciente y encarna la colina primordial de la creación (el Benben). Los textos grabados en sus paredes interiores son guías de viaje para que el alma del faraón alcance la vida eterna. Cada detalle arquitectónico —orientación, ángulo, cámara funeraria— responde a una precisa cosmología religiosa.',
+      },
+      {
+        icono: '📜',
+        texto: 'La Piedra de Rosetta (196 a.C.), conservada en el Museo Británico desde 1802, es el artefacto que permitió a Jean-François Champollion descifrar los jeroglíficos en 1822, abriendo las puertas a toda la literatura, historia y religión egipcias. Contiene el mismo decreto ptolemaico en tres escrituras: jeroglífico, demótico y griego. Sin ella, el Antiguo Egipto seguiría siendo mudo para la arqueología moderna.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que las pirámides fueron construidas por esclavos',
+        cuerpo: 'Los descubrimientos arqueológicos de las últimas décadas han demolido este mito. Los constructores de las pirámides eran trabajadores del Estado egipcio, organizados en equipos con nombres propios ("Los Amigos de Keops"), bien alimentados con carne, cerveza y pan, y con acceso a atención médica documentada. Los cementerios excavados junto a Guiza muestran signos de cirugía exitosa. La esclavitud masiva en las obras faraónicas es una imagen popular que no tiene sustento arqueológico.',
+      },
+      {
+        titulo: 'Pensar que el Antiguo Egipto fue siempre un Estado unificado y estable',
+        cuerpo: 'Los tres Períodos Intermedios (fragmentación, crisis civil, dominio extranjero) suman más de mil años en total. Durante la mayor parte del Segundo Milenio a.C., Egipto estuvo dividido, invadido o bajo dominación extranjera. La imagen de un Egipto eterno y monolítico es una construcción del propio arte oficial faraónico, que deliberadamente omitía los períodos de crisis en sus monumentos.',
+      },
+      {
+        titulo: 'Confundir el Reino Nuevo con el Antiguo',
+        cuerpo: 'El error más frecuente: las pirámides pertenecen al Reino Antiguo (2686-2181 a.C.), mientras que Ramsés II, Tutankamón y Nefertiti son del Reino Nuevo (1550-1069 a.C.), más de mil años después. Los egipcios del Reino Nuevo visitaban las pirámides como turistas y las veían como reliquias antiquísimas de una edad heroica. Usar ambos como si fueran contemporáneos es como confundir a Julio César con Napoleón.',
+      },
+      {
+        titulo: 'Ignorar que los Ptolomeos fueron faraones plenamente legítimos',
+        cuerpo: 'A menudo se presenta a los Ptolomeos como una "ocupación extranjera" que marca el declive de Egipto. En realidad, desde Ptolomeo I hasta Cleopatra VII, la dinastía gobernó durante 275 años construyendo templos faraónicos, adoptando la titulatura y la religión egipcias, y siendo reconocida como legítima por el sacerdocio. Alejandría fue la ciudad más cosmopolita y culta del mundo mediterráneo. El fin llegó con Roma, no con los griegos.',
+      },
+    ],
+  },
+};
