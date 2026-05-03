@@ -3861,10 +3861,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos y sus aditivos: absorción, metabolismo y paso por el organismo.' },
   ],
   'guia-especias': [
+    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
     { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de las especias: cómo cambiaron el mundo' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
-    { url: '/visualizador-huella-alimentos/', icon: '🌍', name: 'Huella de lo que Comes', description: 'Impacto ambiental de cada alimento: CO₂, agua y tierra consumidos' },
     { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora Macros', description: 'Proteínas, grasas y carbohidratos de tu dieta' },
+  ],
+  'guia-infusiones': [
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias' },
+    { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de especias e infusiones que cambiaron el mundo' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
+    { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tu bienestar integral: alimentación, hidratación y descanso' },
   ],
 };
 

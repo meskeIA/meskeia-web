@@ -1,0 +1,780 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ── CONTROLES ─────────────────────────────────────────────────────────────── */
+.main {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.controles {
+  margin-bottom: 2rem;
+}
+
+.buscador {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.buscador:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.filtroBtn {
+  padding: 0.4rem 0.85rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.contador {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── GRID ──────────────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+/* ── CARD ──────────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* ── FAMILIA BADGE ─────────────────────────────────────────────────────────── */
+.familiaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.familiaDigestiva {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.familiaRelajante {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.familiaEstimulante {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.familiaDepurativa {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.familiaRespiratoria {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.familiaAntiinflamatoria {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.familiaAntioxidante {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.familiaAdaptogena {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.partePlanta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 0.2rem 0.6rem;
+}
+
+/* ── TEXTOS CARD ───────────────────────────────────────────────────────────── */
+.nombre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.nombreCientifico {
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: -0.5rem 0 0;
+}
+
+.descripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── USOS TRADICIONALES ────────────────────────────────────────────────────── */
+.usosSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sectionLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.usosTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.usoTag {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 12px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+/* ── PREPARACIÓN ───────────────────────────────────────────────────────────── */
+.preparacionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.prepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.15rem;
+}
+
+.prepIcon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.prepLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.prepValor {
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* ── CONTRAINDICACIONES ────────────────────────────────────────────────────── */
+.contraindicaciones {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+}
+
+.contraindicacionesLabel {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 0.4rem;
+}
+
+.contraindicacionesList {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.contraindicacionesList li {
+  font-size: 0.78rem;
+  color: #78350f;
+  line-height: 1.4;
+}
+
+/* ── COMBINACIONES ─────────────────────────────────────────────────────────── */
+.combinaciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.combinaLabel {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.combinaTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.combinaTag {
+  background: #f0fdfa;
+  color: #0f766e;
+  border-radius: 12px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.sinResultados {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 3rem;
+  font-size: 1rem;
+}
+
+/* ── EDUCATIONAL v2.0 ──────────────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.escenarioCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.escenarioCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.faqItem strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.faqTip {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--primary);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.stepNumber {
+  min-width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.stepContent p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.3rem;
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.warningBox {
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  border-radius: 12px;
+  padding: 1.2rem 1.3rem;
+  margin: 1.5rem 0 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningHeader strong {
+  font-size: 0.95rem;
+  color: #c2410c;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: #7c2d12;
+  padding-left: 1rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.warningList li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: #ea580c;
+  font-weight: 700;
+}
+
+/* ── DARK MODE ─────────────────────────────────────────────────────────────── */
+[data-theme='dark'] .card {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .buscador {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+[data-theme='dark'] .filtroBtn {
+  border-color: #374151;
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .filtroActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .familiaDigestiva {
+  background: #14532d;
+  color: #86efac;
+}
+
+[data-theme='dark'] .familiaRelajante {
+  background: #4c1d95;
+  color: #c4b5fd;
+}
+
+[data-theme='dark'] .familiaEstimulante {
+  background: #78350f;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .familiaDepurativa {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .familiaRespiratoria {
+  background: #0c4a6e;
+  color: #7dd3fc;
+}
+
+[data-theme='dark'] .familiaAntiinflamatoria {
+  background: #7c2d12;
+  color: #fdba74;
+}
+
+[data-theme='dark'] .familiaAntioxidante {
+  background: #831843;
+  color: #fbcfe8;
+}
+
+[data-theme='dark'] .familiaAdaptogena {
+  background: #134e4a;
+  color: #5eead4;
+}
+
+[data-theme='dark'] .partePlanta {
+  background: #374151;
+}
+
+[data-theme='dark'] .preparacionGrid {
+  background: #1f2937;
+}
+
+[data-theme='dark'] .usoTag {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .contraindicaciones {
+  background: #451a03;
+  border-color: #92400e;
+}
+
+[data-theme='dark'] .contraindicacionesLabel {
+  color: #fde68a;
+}
+
+[data-theme='dark'] .contraindicacionesList li {
+  color: #fef3c7;
+}
+
+[data-theme='dark'] .combinaTag {
+  background: #134e4a;
+  color: #5eead4;
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #374151;
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #1f2937;
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .step,
+[data-theme='dark'] .tipCard {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #431407;
+  border-color: #9a3412;
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #fb923c;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fed7aa;
+}
+
+[data-theme='dark'] .warningList li::before {
+  color: #f97316;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .preparacionGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+    padding: 0.6rem;
+  }
+
+  .prepValor {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .card {
+    padding: 1.1rem;
+  }
+
+  .preparacionGrid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .prepItem {
+    flex-direction: row;
+    text-align: left;
+    gap: 0.5rem;
+  }
+
+  .prepLabel {
+    min-width: 80px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}
