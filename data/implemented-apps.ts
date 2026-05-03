@@ -832,6 +832,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia/imperio-persa/",       // Imperio Persa Aqueménida -550→-330, 10 hitos, 6 eras
   "/visualizador-historia/japon/",               // Historia de Japón 710→1868, 10 hitos, 6 eras
   "/visualizador-historia/china-dinastias/",     // Grandes Dinastías Chinas -221→1912, 10 hitos, 6 eras
+  "/visualizador-historia/primera-guerra-mundial/", // Primera Guerra Mundial 1914→1919, 10 hitos, 6 eras
+  "/visualizador-historia/segunda-guerra-mundial/", // Segunda Guerra Mundial 1939→1945, 10 hitos, 6 eras
+  "/visualizador-historia/civilizaciones-precolombinas/", // Civilizaciones Precolombinas 250→1532, 10 hitos, 6 eras
+  "/visualizador-historia/espana-medieval/",     // España Medieval 409→1492, 10 hitos, 6 eras
 
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos

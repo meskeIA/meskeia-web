@@ -1,0 +1,445 @@
+import type { HistoriaData } from './types';
+
+export const espanaMedieval: HistoriaData = {
+  slug: 'espana-medieval',
+  titulo: 'La España Medieval: De los Visigodos a los Reyes Católicos',
+  subtitulo: 'Mil años de historia ibérica: visigodos, Al-Ándalus, el florecimiento de Córdoba, los reinos medievales y la unificación de 1492',
+  descripcionSEO: 'Cronología interactiva de la España medieval: desde las invasiones bárbaras del 409 hasta la unificación de 1492. Visigodos, Al-Ándalus, califato de Córdoba, reinos de taifas, expansión cristiana y los Reyes Católicos.',
+  keywords: [
+    'españa medieval', 'historia medieval hispania', 'al-andalus', 'califato cordoba',
+    'visigodos', 'reyes católicos', 'reconquista', 'reino taifas', 'fernando e isabel',
+    'conquista granada', 'almanzor', 'averroes', 'maimónides', 'camino santiago',
+    'batalla navas tolosa', 'toledo', 'córdoba medieval',
+  ],
+  anioInicio: 409,
+  anioFin: 1492,
+
+  disclaimer: 'exempt',
+
+  categorias: {
+    visigodo:         'Reino Visigodo',
+    islamico:         'Al-Ándalus',
+    convivencia:      'Florecimiento Cultural',
+    expansion:        'Expansión Cristiana',
+    gotico:           'Gótico y Universidades',
+    'reyes-catolicos': 'Reyes Católicos',
+  },
+
+  colores: {
+    visigodo:         '#8B4513',
+    islamico:         '#2E8B57',
+    convivencia:      '#DAA520',
+    expansion:        '#1E90FF',
+    gotico:           '#9370DB',
+    'reyes-catolicos': '#DC143C',
+  },
+
+  hitos: [
+    {
+      id: 'visigodos-hispania',
+      nombre: 'El Fin de Hispania Romana y los Visigodos',
+      anioInicio: 409,
+      anioFin: 711,
+      color: '#8B4513',
+      categoria: 'visigodo',
+      descripcion: 'En el año 409, las tribus de suevos, vándalos y alanos cruzan los Pirineos y se asientan en Hispania, poniendo fin de facto al control romano. Los visigodos, como federados del Imperio, entran en la península a lo largo del siglo V y consolidan su dominio sobre los demás pueblos bárbaros. Toledo se convierte en su capital. El III Concilio de Toledo (589) marca un hito decisivo: el rey Recaredo abandona el arrianismo y convierte al catolicismo a toda la élite visigoda, unificando religiosamente el reino. San Isidoro de Sevilla compila en las Etimologías el saber de la Antigüedad, convirtiéndose en la gran enciclopedia del mundo occidental. El Fuero Juzgo (Liber Iudiciorum, c. 654) unifica la legislación para visigodos e hispanorromanos.',
+      obraIconica: 'Etimologías de San Isidoro de Sevilla (c. 615–636)',
+      paises: ['Hispania', 'Portugal', 'Sur de Francia'],
+    },
+    {
+      id: 'conquista-islamica',
+      nombre: 'La Conquista Islámica y la Formación de Al-Ándalus',
+      anioInicio: 711,
+      anioFin: 756,
+      color: '#2E8B57',
+      categoria: 'islamico',
+      descripcion: 'En julio de 711, el general bereber Tariq ibn Ziyad cruza el Estrecho de Gibraltar con unos 7.000 hombres. En la batalla del Guadalete derrota y da muerte al rey visigodo Rodrigo. En apenas tres años, las fuerzas islámicas controlaban la práctica totalidad de la península. Solo el norte montañoso —Asturias, los valles cántabros y los Pirineos— permanece fuera de su alcance. En 718 o 722, Pelayo vence en Covadonga, inicio simbólico de la resistencia asturiana. La expansión islámica en Europa se frena definitivamente en la batalla de Poitiers/Tours (732), donde Carlos Martel derrota al gobernador de Al-Ándalus. La nueva entidad política se organiza como emirato dependiente del califato omeya de Damasco.',
+      obraIconica: 'Batalla del Guadalete y conquista de Hispania (711–714)',
+      paises: ['Al-Ándalus', 'Hispania', 'Norte de África'],
+    },
+    {
+      id: 'emirato-cordoba',
+      nombre: 'El Emirato de Córdoba: La Convivencia',
+      anioInicio: 756,
+      anioFin: 929,
+      color: '#DAA520',
+      categoria: 'convivencia',
+      descripcion: 'Abd al-Rahman I, único superviviente de la familia omeya tras la matanza abbasí, llega a Al-Ándalus en 756 y establece un emirato independiente de Damasco. Córdoba se convierte en la mayor ciudad de Europa occidental, con una población estimada de 200.000 habitantes, decenas de mezquitas, biblioteca, hospitales y mercados. Florece la "convivencia" —término moderno— entre musulmanes, judíos y mozárabes (cristianos bajo dominio islámico): traductores judíos vierten al árabe los clásicos griegos; filósofos, médicos y matemáticos de las tres tradiciones colaboran en la misma ciudad. La Mezquita de Córdoba se amplía sucesivas veces. Este período sienta las bases del posterior califato y constituye uno de los episodios de mayor efervescencia intelectual del Occidente medieval.',
+      obraIconica: 'Mezquita de Córdoba (ampliaciones del siglo VIII–X)',
+      paises: ['Al-Ándalus', 'Emirato de Córdoba'],
+    },
+    {
+      id: 'califato-cordoba',
+      nombre: 'El Califato de Córdoba: La Cima de Al-Ándalus',
+      anioInicio: 929,
+      anioFin: 1031,
+      color: '#DAA520',
+      categoria: 'convivencia',
+      descripcion: 'En 929, Abd al-Rahman III se proclama califa, asumiendo así el título máximo del islam y rompiendo con los abasíes de Bagdad. Al-Ándalus alcanza su apogeo político, económico y cultural. La ciudad-palacio de Medina Azahara, construida a pocos kilómetros de Córdoba, simboliza la magnificencia del califato. El hayib (chambelán) Almanzor asume el poder real desde 978 y lanza exitosas campañas militares, llegando a saquear Santiago de Compostela (997). Sin embargo, tras su muerte (1002), el califato entra en una espiral de guerra civil (la "fitna") y se fragmenta. Este período alberga las raíces intelectuales de Averroes (1126–1198) y Maimónides (1138–1204), que bebieron de la tradición filosófica cordobesa. Al-Ándalus era entonces el principal centro del saber en Occidente.',
+      obraIconica: 'Medina Azahara, ciudad-palacio califal (c. 936–1010)',
+      paises: ['Califato de Córdoba', 'Al-Ándalus'],
+    },
+    {
+      id: 'taifas-reinos-norte',
+      nombre: 'Los Reinos de Taifas y los Reinos Cristianos del Norte',
+      anioInicio: 1031,
+      anioFin: 1150,
+      color: '#1E90FF',
+      categoria: 'expansion',
+      descripcion: 'La desintegración del califato da lugar a unos 26 reinos de taifas (del árabe tā\'ifa, facción), pequeños estados independientes que rivalizan entre sí. Su debilidad permite a los reinos cristianos del norte —León, Castilla, Navarra, Aragón, condados catalanes— avanzar hacia el sur. Alfonso VI de Castilla y León toma Toledo en 1085, primera gran ciudad islámica recuperada, que se convierte en ciudad pluricultural con comunidades de las tres religiones. El mercenario Rodrigo Díaz de Vivar, "El Cid" (1043–1099), ejemplifica la complejidad del período: combatió tanto para reyes cristianos como para taifas islámicas. Ante el avance cristiano, las taifas llaman a los almorávides del Magreb, que cruzan el estrecho en 1086 y derrotan a Alfonso VI en Sagrajas, frenando temporalmente la expansión.',
+      obraIconica: 'Cantar de Mio Cid (c. 1200, aunque los hechos son de c. 1090–1099)',
+      paises: ['Reinos taifas', 'Castilla y León', 'Aragón', 'Navarra'],
+    },
+    {
+      id: 'romanico-camino-santiago',
+      nombre: 'El Románico y la Expansión de los Reinos Cristianos',
+      anioInicio: 1050,
+      anioFin: 1212,
+      color: '#1E90FF',
+      categoria: 'expansion',
+      descripcion: 'El arte románico florece en la península ligado al Camino de Santiago, que conecta la Iberia cristiana con Europa. Se construyen catedrales y monasterios de estilo románico en Santiago de Compostela, Jaca, Zamora, Ávila y Soria. La Universidad de Salamanca (fundada c. 1218, aunque con antecedentes desde 1130) emerge como uno de los primeros centros universitarios del mundo. Los almorávides son sustituidos por los almohades (1147), otro movimiento islámico norteafricano, más rigorista. La tensión entre los reinos peninsulares se mantiene. La batalla de las Navas de Tolosa (1212), en la que una coalición castellana, aragonesa, navarra y portuguesa derrota al califa almohade al-Nasir, supone un punto de inflexión irreversible en el equilibrio de poder peninsular.',
+      obraIconica: 'Catedral de Santiago de Compostela (consagrada 1211)',
+      paises: ['Castilla', 'Aragón', 'Navarra', 'Portugal', 'Al-Ándalus almohade'],
+    },
+    {
+      id: 'navas-tolosa-siglo-xiii',
+      nombre: 'Las Navas de Tolosa y el Gran Siglo XIII',
+      anioInicio: 1212,
+      anioFin: 1300,
+      color: '#1E90FF',
+      categoria: 'expansion',
+      descripcion: 'Tras las Navas de Tolosa (16 de julio de 1212), el poder almohade se desmorona. Fernando III el Santo, rey de Castilla y León, lidera la expansión más espectacular de los reinos cristianos: toma Córdoba (1236) y Sevilla (1248), las dos grandes capitales andalusíes. Simultáneamente, Jaime I de Aragón conquista Mallorca (1229) y Valencia (1238). El islam peninsular queda reducido al reino nazarí de Granada, que sobrevivirá como estado tributario hasta 1492. Portugal alcanza su forma territorial definitiva en 1249. Se construyen las grandes catedrales góticas de Burgos (1221), León (1205) y Toledo (1226). Alfonso X el Sabio (1252–1284) impulsa las Cantigas de Santa María y la prosa en castellano, convirtiendo este idioma en lengua de cultura.',
+      obraIconica: 'Cantigas de Santa María de Alfonso X el Sabio (c. 1270–1284)',
+      paises: ['Castilla y León', 'Aragón', 'Portugal', 'Reino de Granada'],
+    },
+    {
+      id: 'gotico-universidades-crisis',
+      nombre: 'El Gótico, las Universidades y la Crisis del XIV',
+      anioInicio: 1250,
+      anioFin: 1400,
+      color: '#9370DB',
+      categoria: 'gotico',
+      descripcion: 'Las catedrales góticas de Burgos, León, Toledo y la Catedral de Barcelona muestran el apogeo artístico del siglo XIII y XIV. La Universidad de Salamanca, confirmada por Alfonso IX en 1218 y refrendada por el Papa en 1255, se convierte en uno de los cuatro grandes studia generalia de Europa. La Escuela de Traductores de Toledo difunde el saber árabe y clásico griego al latín y al romance castellano. Pero el siglo XIV trae catástrofes: la Peste Negra (1348) mata entre el 30 y el 60% de la población peninsular; las guerras civiles en Castilla (Pedro I el Cruel contra su hermanastro Enrique de Trastámara, apoyado por Francia) desestabilizan el reino; los pogroms contra las aljamas judías (1391) destruyen comunidades enteras. La corona de Aragón se extiende hacia el Mediterráneo (Sicilia, Cerdeña, Nápoles).',
+      obraIconica: 'Libro de Buen Amor del Arcipreste de Hita (c. 1330–1343)',
+      paises: ['Castilla', 'Aragón', 'Navarra', 'Portugal', 'Corona de Aragón'],
+    },
+    {
+      id: 'reinos-siglo-xv',
+      nombre: 'Los Reinos Peninsulares en el Siglo XV',
+      anioInicio: 1400,
+      anioFin: 1469,
+      color: '#9370DB',
+      categoria: 'gotico',
+      descripcion: 'El siglo XV es un período de consolidación y crisis simultánea. Castilla, Aragón, Portugal y Navarra se afianzan como entidades políticas diferenciadas. La guerra civil castellana entre Juan II y los infantes de Aragón fractura el reino durante décadas. La literatura en lengua romance alcanza una nueva madurez: Jorge Manrique escribe las Coplas por la muerte de su padre (1476), y el Marqués de Santillana introduce el soneto italiano. El reino nazarí de Granada, culto y próspero, mantiene su independencia apoyándose en la diplomacia y en las rivalidades entre los reinos cristianos. En 1469, el matrimonio entre Fernando de Aragón (n. 1452) e Isabel de Castilla (n. 1451) abre una nueva etapa: la unión dinástica de las dos coronas más poderosas de la península.',
+      obraIconica: 'Coplas por la muerte de su padre de Jorge Manrique (1476)',
+      paises: ['Castilla', 'Aragón', 'Portugal', 'Navarra', 'Reino de Granada'],
+    },
+    {
+      id: 'reyes-catolicos-1492',
+      nombre: 'Los Reyes Católicos y el Fin de la Edad Media',
+      anioInicio: 1469,
+      anioFin: 1492,
+      color: '#DC143C',
+      categoria: 'reyes-catolicos',
+      descripcion: 'Fernando e Isabel, los "Reyes Católicos" (título otorgado por el Papa Alejandro VI en 1496), unen bajo una misma corona Castilla y Aragón —no fusionan los reinos, sino que los gobiernan conjuntamente—. En 1478 establecen la Inquisición española para controlar la ortodoxia religiosa, especialmente de los conversos. Tras diez años de guerra, el 2 de enero de 1492 el rey nazarí Boabdil entrega las llaves de Granada: cae el último estado islámico de la península. Solo tres meses después, el 31 de marzo, se promulga el Edicto de Granada ordenando la expulsión de los judíos (entre 100.000 y 200.000 personas según estimaciones). El 12 de octubre de 1492, la expedición de Cristóbal Colón financiada por Castilla llega a América. Tres acontecimientos en un mismo año cierran la Edad Media ibérica y abren la Modernidad.',
+      obraIconica: 'Capitulaciones de Santa Fe y llegada de Colón a América (1492)',
+      paises: ['Corona de Castilla', 'Corona de Aragón', 'Granada', 'América'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Hispania Visigoda: El Puente entre Roma y el Islam',
+      desde: 409,
+      hasta: 711,
+      icono: '⚔️',
+      hitosDestacados: [
+        'El Fin de Hispania Romana y los Visigodos',
+      ],
+      eventos: [
+        'Invasión de suevos, vándalos y alanos (409)',
+        'Los visigodos dominan la península como federados romanos (s. V)',
+        'III Concilio de Toledo: conversión al catolicismo (589)',
+        'San Isidoro de Sevilla escribe las Etimologías (c. 615–636)',
+        'Fuero Juzgo: código legal unificado para visigodos e hispanorromanos (c. 654)',
+        'Toledo consolida su papel como capital del reino visigodo',
+        'Debilitamiento interno: conspiraciones nobiliarias y crisis dinástica (s. VII)',
+      ],
+    },
+    {
+      nombre: 'Al-Ándalus: La Civilización Islámica en Occidente',
+      desde: 711,
+      hasta: 1031,
+      icono: '🕌',
+      hitosDestacados: [
+        'La Conquista Islámica y la Formación de Al-Ándalus',
+        'El Emirato de Córdoba: La Convivencia',
+        'El Califato de Córdoba: La Cima de Al-Ándalus',
+      ],
+      eventos: [
+        'Tariq ibn Ziyad cruza el Estrecho y vence en el Guadalete (711)',
+        'Conquista de casi toda la península en menos de tres años',
+        'Derrota en Poitiers/Tours: fin de la expansión en Europa (732)',
+        'Pelayo vence en Covadonga: resistencia asturiana (718–722)',
+        'Abd al-Rahman I funda el emirato independiente de Damasco (756)',
+        'Córdoba supera los 200.000 habitantes: mayor ciudad de Europa occidental',
+        'Abd al-Rahman III proclama el califato (929)',
+        'Almanzor saquea Santiago de Compostela (997)',
+        'Construcción y sucesivas ampliaciones de la Mezquita de Córdoba',
+        'Medina Azahara: ciudad-palacio califal (936–1010)',
+        'Guerra civil (fitna) y fragmentación del califato (1009–1031)',
+      ],
+    },
+    {
+      nombre: 'El Equilibrio Roto: Taifas y Avance Cristiano',
+      desde: 1031,
+      hasta: 1212,
+      icono: '🏰',
+      hitosDestacados: [
+        'Los Reinos de Taifas y los Reinos Cristianos del Norte',
+        'El Románico y la Expansión de los Reinos Cristianos',
+      ],
+      eventos: [
+        'Desintegración del califato en ~26 reinos de taifas (1031)',
+        'Alfonso VI toma Toledo (1085): primera gran ciudad reconquistada',
+        'Los almorávides cruzan el Estrecho y frenan el avance cristiano (1086)',
+        'El Cid Campeador: de Burgos a Valencia (1043–1099)',
+        'El Cid conquista Valencia y la gobierna hasta su muerte (1094–1099)',
+        'Los almohades sustituyen a los almorávides (1147)',
+        'Florecimiento del arte románico: Santiago, Jaca, Zamora, Soria',
+        'El Camino de Santiago conecta la Iberia cristiana con Europa',
+        'Formación del reino de Portugal (1139)',
+        'Batalla de las Navas de Tolosa: derrota definitiva del poder almohade (1212)',
+      ],
+    },
+    {
+      nombre: 'El Gran Siglo XIII: Las Conquistas Decisivas',
+      desde: 1212,
+      hasta: 1350,
+      icono: '🦁',
+      hitosDestacados: [
+        'Las Navas de Tolosa y el Gran Siglo XIII',
+      ],
+      eventos: [
+        'Fernando III conquista Córdoba (1236) y Sevilla (1248)',
+        'Jaime I conquista Mallorca (1229) y Valencia (1238)',
+        'El reino nazarí de Granada queda como último estado islámico peninsular',
+        'Portugal alcanza sus fronteras definitivas (1249)',
+        'Construcción de catedrales góticas: Burgos (1221), León (1205), Toledo (1226)',
+        'Alfonso X el Sabio promueve la cultura y la lengua castellana',
+        'Cantigas de Santa María y prosa histórica alfonsí',
+        'Escuela de Traductores de Toledo en plena actividad',
+        'Las Siete Partidas: gran código jurídico alfonsí (c. 1265)',
+        'La corona de Aragón se expande por el Mediterráneo (Sicilia, 1282)',
+      ],
+    },
+    {
+      nombre: 'La Crisis y la Madurez del Medievo',
+      desde: 1350,
+      hasta: 1469,
+      icono: '🏛️',
+      hitosDestacados: [
+        'El Gótico, las Universidades y la Crisis del XIV',
+        'Los Reinos Peninsulares en el Siglo XV',
+      ],
+      eventos: [
+        'La Peste Negra mata entre el 30 y el 60% de la población peninsular (1348)',
+        'Guerra civil castellana: Pedro I contra Enrique de Trastámara (1350–1369)',
+        'Enrique de Trastámara, apoyado por Francia, derrota y mata a Pedro I (1369)',
+        'Pogroms contra las aljamas judías en toda la península (1391)',
+        'La corona de Aragón incorpora Nápoles (1443)',
+        'Creación de la Generalitat de Cataluña como institución permanente',
+        'Coplas por la muerte de su padre de Jorge Manrique (1476)',
+        'El Marqués de Santillana introduce el soneto italianizante en castellano',
+        'El reino nazarí de Granada, culto y refinado, sobrevive gracias a la diplomacia',
+        'Matrimonio de Fernando e Isabel (1469): inicio de la unión dinástica',
+      ],
+    },
+    {
+      nombre: 'Los Reyes Católicos: El Cierre de una Era',
+      desde: 1469,
+      hasta: 1492,
+      icono: '👑',
+      hitosDestacados: [
+        'Los Reyes Católicos y el Fin de la Edad Media',
+      ],
+      eventos: [
+        'Unión dinástica de Castilla y Aragón bajo Fernando e Isabel',
+        'Establecimiento de la Inquisición española (1478)',
+        'Guerra de Granada: diez años de campaña militar (1482–1492)',
+        'Caída de Granada: Boabdil entrega las llaves el 2 de enero de 1492',
+        'Edicto de Granada: expulsión de los judíos (31 de marzo de 1492)',
+        'Cristóbal Colón zarpa de Palos: llega a América el 12 de octubre de 1492',
+        'Publicación de la Gramática castellana de Antonio de Nebrija (1492)',
+        'Fin de la Edad Media ibérica: apertura de la era moderna y colonial',
+      ],
+    },
+  ],
+
+  educativo: {
+    intro: `La Península Ibérica vivió entre los siglos V y XV uno de los períodos más ricos y complejos de la historia europea. En este milenio coexistieron y se sucedieron civilizaciones radicalmente distintas: el reino visigodo heredero del mundo romano, el esplendor islámico de Al-Ándalus —que convirtió Córdoba en la mayor ciudad de Occidente y un faro del saber universal—, los reinos cristianos del norte que fueron expandiendo su influencia hacia el sur, y finalmente la unificación dinástica de 1492 que cerró la Edad Media e inauguró la Edad Moderna.
+
+Comprender este período exige abandonar relatos simplificados. Al-Ándalus no fue una ocupación uniforme ni una civilización homogénea: tuvo emiratos y califatos, períodos de "convivencia" entre credos y períodos de intolerancia. Los reinos cristianos tampoco fueron un bloque uniforme: guerrearon entre sí tanto como contra sus vecinos del sur, y a menudo pactaron con taifas contra otros reinos cristianos. El año 1492 —caída de Granada, expulsión de los judíos, llegada de Colón a América— sintetiza en doce meses la magnitud del cambio.
+
+Este visualizador recorre los diez grandes momentos de ese milenio, desde las invasiones bárbaras que pusieron fin a la Hispania romana hasta los tres sucesos de 1492 que cerraron una era y abrieron otra.`,
+
+    tablaComparativa: [
+      {
+        hito: 'El Fin de Hispania Romana y los Visigodos',
+        periodo: '409–711',
+        categoria: 'Reino Visigodo',
+        personaje: 'San Isidoro de Sevilla (c. 560–636)',
+        aportacion: 'Compila las Etimologías, gran enciclopedia que preserva el saber clásico para la Edad Media',
+      },
+      {
+        hito: 'La Conquista Islámica y la Formación de Al-Ándalus',
+        periodo: '711–756',
+        categoria: 'Al-Ándalus',
+        personaje: 'Tariq ibn Ziyad (¿?–720)',
+        aportacion: 'Lidera la conquista islámica de Hispania en menos de tres años; da nombre al Peñón de Gibraltar (Yabal al-Tariq)',
+      },
+      {
+        hito: 'El Califato de Córdoba: La Cima de Al-Ándalus',
+        periodo: '929–1031',
+        categoria: 'Florecimiento Cultural',
+        personaje: 'Abd al-Rahman III (891–961)',
+        aportacion: 'Proclama el califato independiente; convierte Córdoba en el mayor centro cultural del Occidente medieval',
+      },
+      {
+        hito: 'Las Navas de Tolosa y el Gran Siglo XIII',
+        periodo: '1212–1300',
+        categoria: 'Expansión Cristiana',
+        personaje: 'Fernando III el Santo (1199–1252)',
+        aportacion: 'Conquista Córdoba y Sevilla; une definitivamente Castilla y León; es canonizado en 1671',
+      },
+      {
+        hito: 'El Gótico, las Universidades y la Crisis del XIV',
+        periodo: '1250–1400',
+        categoria: 'Gótico y Universidades',
+        personaje: 'Alfonso X el Sabio (1221–1284)',
+        aportacion: 'Impulsa la prosa castellana, las Cantigas, las Siete Partidas y la Escuela de Traductores de Toledo',
+      },
+      {
+        hito: 'Los Reyes Católicos y el Fin de la Edad Media',
+        periodo: '1469–1492',
+        categoria: 'Reyes Católicos',
+        personaje: 'Isabel I de Castilla (1451–1504)',
+        aportacion: 'Cofundadora de la unión dinástica; financia la expedición de Colón; promulga el Edicto de Granada',
+      },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'El estudiante de historia',
+        perfil: 'Estudiante de Bachillerato o universitario',
+        texto: 'Necesitas entender la cronología de la España medieval para tu examen. Este visualizador te permite ver de un vistazo los diez grandes períodos, sus fechas, sus personajes clave y cómo se relacionan entre sí. Las eras te dan el marco general; los hitos, el detalle. La tabla comparativa sintetiza cada período con su personaje más representativo y su aportación principal.',
+      },
+      {
+        icono: '✈️',
+        titulo: 'El viajero curioso',
+        perfil: 'Turista que visita Córdoba, Toledo, Granada o el Camino de Santiago',
+        texto: 'Estás frente a la Mezquita de Córdoba, el Alcázar de Toledo o la Alhambra de Granada y quieres entender lo que ves. Este visualizador te ubica temporalmente: en qué período se construyó, quién lo encargó, qué estaba pasando en el resto de la península en ese momento. Los hitos de convivencia y Al-Ándalus son especialmente útiles para los monumentos andalusíes.',
+      },
+      {
+        icono: '📚',
+        titulo: 'El lector de novela histórica',
+        perfil: 'Aficionado a la literatura histórica medieval',
+        texto: 'Acabas de leer El nombre de la rosa, La catedral del mar o Las hijas del Nilo y quieres situar los hechos en su contexto ibérico. Este visualizador te permite ver qué estaba ocurriendo en la península en el mismo período que describe tu novela: qué reinos existían, quiénes gobernaban, cuál era el estado del saber y la cultura.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'El docente o divulgador',
+        perfil: 'Profesor de secundaria o divulgador cultural',
+        texto: 'Buscas una visión panorámica y neutral de la España medieval para presentar a tu alumnado o audiencia. Este visualizador ofrece un enfoque académico equilibrado: Al-Ándalus como la civilización brillante que fue, los reinos cristianos como actores históricos complejos, y los grandes hitos culturales —las Etimologías, las Cantigas, las catedrales góticas— como patrimonio compartido de la humanidad.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué fue exactamente Al-Ándalus?',
+        respuesta: 'Al-Ándalus es el nombre árabe dado a los territorios de la Península Ibérica bajo control islámico entre 711 y 1492. No fue un estado estático: pasó por emirato dependiente de Damasco (714–756), emirato independiente (756–929), califato (929–1031), reinos de taifas (1031–1090), período almorávide (1090–1147), período almohade (1147–1228) y reino nazarí de Granada (1230–1492). En sus momentos de esplendor, especialmente durante el califato de Córdoba, fue el principal centro cultural del Occidente medieval: sus bibliotecas, hospitales, filósofos y matemáticos no tenían parangón en Europa.',
+        tip: 'El término "Al-Ándalus" no deriva de "vándalos" sino probablemente del latín "Vandalitia" o de una palabra bereber; los etimólogos aún debaten su origen exacto.',
+      },
+      {
+        pregunta: '¿Qué fue la "convivencia" y cuáles son sus límites como concepto?',
+        respuesta: 'La "convivencia" es un término académico acuñado en el siglo XX para describir la coexistencia de musulmanes, judíos y cristianos en Al-Ándalus y en la Iberia medieval. Históricamente, hubo períodos de notable tolerancia y colaboración intelectual —la Escuela de Traductores de Toledo, la Córdoba del siglo X— pero también de violencia y persecución: los almohades destruyeron sinagogas e iglesias en el siglo XII, y los pogroms contra los judíos en la España cristiana de 1391 fueron devastadores. El concepto "convivencia" describe una realidad matizada, no un idilio permanente.',
+        tip: 'El filólogo Américo Castro introdujo el término en su obra España en su historia (1948). Su tesis fue contestada por Claudio Sánchez Albornoz en un largo debate historiográfico que aún hoy se prolonga.',
+      },
+      {
+        pregunta: '¿Por qué cae el califato de Córdoba en 1031?',
+        respuesta: 'El califato se desintegra por una combinación de factores. Almanzor, el hayib que ejercía el poder real desde 978, muere en 1002; sus hijos no logran mantener el poder. Estalla una guerra civil (fitna) entre diferentes facciones —omeyas, bereberes, eslavones—. Entre 1009 y 1031 se suceden más de veinte califas. En 1031, una asamblea de notables de Córdoba decide simplemente abolir el califato. El resultado es la fragmentación en ~26 reinos de taifas, algunos tan pequeños como una sola ciudad.',
+      },
+      {
+        pregunta: '¿Qué sucedió exactamente en 1492?',
+        respuesta: 'El año 1492 concentra tres sucesos de enorme trascendencia histórica, todos vinculados a los Reyes Católicos: el 2 de enero, el rey nazarí Boabdil entrega las llaves de Granada, poniendo fin al último estado islámico peninsular; el 31 de marzo, Fernando e Isabel firman el Edicto de Granada ordenando la conversión o expulsión de los judíos (entre 100.000 y 200.000 personas abandonaron sus casas y propiedades); y el 12 de octubre, la expedición de Cristóbal Colón financiada por Castilla llega a las Bahamas. En el mismo año, Antonio de Nebrija publica la primera Gramática castellana. Difícilmente habría un año más denso en la historia de Iberia.',
+        tip: 'La Gramática de Nebrija (1492) es la primera gramática de una lengua vernácea europea. Nebrija la dedicó a Isabel I con la frase "siempre la lengua fue compañera del imperio".',
+      },
+      {
+        pregunta: '¿Qué legado dejó Al-Ándalus a la cultura europea?',
+        respuesta: 'El legado es inmenso y suele subestimarse. A través de Al-Ándalus y la Escuela de Traductores de Toledo, Europa recuperó las obras de Aristóteles, Galeno, Ptolomeo y Euclides —perdidas en su mayor parte en Occidente tras la caída de Roma— en traducciones del árabe al latín. El álgebra (del árabe al-yabr), el algoritmo (latinización del matemático al-Juarismi), los números arábigos que hoy usamos, el cero, la alquimia, la astronomía observacional, la medicina hipocrática y galénica: todo ello llegó a Europa occidental principalmente a través de Al-Ándalus. Palabras castellanas como alcázar, alcalde, almohada, aceite, azúcar o algebra son herencia directa del árabe andalusí.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Comienza con la línea del tiempo general',
+        cuerpo: 'En la pestaña "Línea del Tiempo" verás los diez grandes períodos de la España medieval. Cada bloque tiene un color según su categoría: marrón para el reino visigodo, verde para Al-Ándalus, dorado para los períodos de florecimiento cultural, azul para la expansión cristiana, púrpura para el gótico y las universidades, y rojo para los Reyes Católicos. Haz clic en cualquier período para ver los detalles inline.',
+      },
+      {
+        titulo: 'Explora los períodos con más detalle',
+        cuerpo: 'En la pestaña "Período en Detalle" puedes navegar uno a uno por los diez hitos. Encontrarás la descripción completa, el intervalo de años, la categoría, la obra o evento icónico de cada período y los territorios involucrados. Usa los botones "Anterior" y "Siguiente" para recorrer la cronología en orden.',
+      },
+      {
+        titulo: 'Usa la tabla comparativa para estudiar',
+        cuerpo: 'La pestaña "Comparativa" ofrece una tabla con los seis períodos más representativos, sus personajes clave y su aportación principal. Puedes filtrar por categoría (visigodo, Al-Ándalus, florecimiento cultural, expansión cristiana, gótico, Reyes Católicos) o usar el buscador para encontrar nombres específicos como "Almanzor", "Fernando III" o "Alfonso X".',
+      },
+      {
+        titulo: 'Contextualiza con las eras históricas',
+        cuerpo: 'La pestaña "Contexto Histórico" muestra las seis eras en que se divide el milenio medieval ibérico. Cada era agrupa los hitos que ocurren dentro de su marco temporal y lista los eventos contextuales más relevantes. Es útil para entender no solo qué ocurrió sino cómo se encadena cada período con el siguiente.',
+      },
+      {
+        titulo: 'Lee la sección educativa para profundizar',
+        cuerpo: 'En la sección educativa encontrarás la respuesta a las cinco preguntas más frecuentes sobre la España medieval (¿qué fue Al-Ándalus?, ¿qué fue la "convivencia"?, ¿por qué cae el califato?, ¿qué pasó en 1492?, ¿cuál es el legado de Al-Ándalus?) y cuatro errores comunes que conviene evitar al estudiar este período.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🗺️',
+        texto: 'Al-Ándalus no equivale a "España islámica": fue una civilización con fases muy distintas. El tolerante emirato del siglo IX y los rigoristas almohades del siglo XII son tan diferentes como la República Romana y el Imperio tardío.',
+      },
+      {
+        icono: '📅',
+        texto: 'El año 1492 no es el fin de la Edad Media en toda Europa —los historiadores suelen fijarla en 1453 con la caída de Constantinopla o en 1517 con Lutero— pero sí marca el fin de la Edad Media ibérica de forma especialmente nítida.',
+      },
+      {
+        icono: '🏙️',
+        texto: 'En el año 900, Córdoba tenía ~200.000 habitantes. En comparación, París tenía ~20.000 y Londres unos 10.000. Al visitar la Mezquita de Córdoba, imagina que estás en la capital cultural del mundo occidental.',
+      },
+      {
+        icono: '📖',
+        texto: 'Las palabras castellanas que empiezan por "al-" (alcázar, alcalde, almohada, alfombra, alférez, almacén, alquiler, alcohol, algebra…) son, casi sin excepción, de origen árabe andalusí. Hay unas 4.000 palabras de este origen en español.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la expansión cristiana fue un proceso lineal y unificado',
+        cuerpo: 'Los reinos de Castilla, León, Aragón, Navarra y Portugal guerrearon entre sí casi tanto como con los estados islámicos del sur. Alfonso VI tomó Toledo (1085), pero también pactó con taifas contra sus rivales cristianos. La alianza que venció en las Navas de Tolosa (1212) fue excepcional; la norma era la fragmentación y el oportunismo. No hubo un "proyecto nacional" medieval: la unidad llegó siglos después.',
+      },
+      {
+        titulo: 'Identificar Al-Ándalus con el Islam en general',
+        cuerpo: 'Al-Ándalus fue una civilización específica, con rasgos culturales, filosóficos y artísticos propios que no se pueden generalizar al islam en su conjunto. El córdobés Averroes (1126–1198) fue un racionalista que comentó a Aristóteles y fue condenado por sus correligionarios por herejía. El pensamiento andalusí fue heterodoxo, sincrético y enormemente productivo —precisamente por su distancia de los centros de poder del islam oriental.',
+      },
+      {
+        titulo: 'Pensar que los judíos de 1492 eran una minoría marginal',
+        cuerpo: 'Las aljamas judías medievales ibéricas producían médicos, diplomáticos, traductores, financieros y filósofos de primera fila. Maimónides (1138–1204) nació en Córdoba. Los traductores judíos de la Escuela de Toledo fueron imprescindibles para la transmisión del saber clásico a Europa. La expulsión de 1492 privó a Castilla y Aragón de una de sus comunidades más productivas.',
+      },
+      {
+        titulo: 'Asumir que el "fin de la Edad Media" fue instantáneo',
+        cuerpo: 'El 1492 es una fecha simbólica cómoda, pero los cambios de era histórica son procesos graduales. La imprenta de Gutenberg (1450) ya circulaba en la península; las carabelas portuguesas ya bordeaban África desde 1488. El humanismo renacentista llegó a Castilla y Aragón antes de 1492. El año 1492 condensa y simboliza una transición que llevaba décadas en marcha.',
+      },
+    ],
+  },
+};

@@ -9,6 +9,10 @@ import { revolucionFrancesa } from './revolucion-francesa';
 import { imperioPersa } from './imperio-persa';
 import { japon } from './japon';
 import { chinaDinastias } from './china-dinastias';
+import { primeraGuerraMundial } from './primera-guerra-mundial';
+import { segundaGuerraMundial } from './segunda-guerra-mundial';
+import { civilizacionesPrecolombinas } from './civilizaciones-precolombinas';
+import { espanaMedieval } from './espana-medieval';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -21,6 +25,10 @@ const registry: Record<string, HistoriaData> = {
   'imperio-persa': imperioPersa,
   japon,
   'china-dinastias': chinaDinastias,
+  'primera-guerra-mundial': primeraGuerraMundial,
+  'segunda-guerra-mundial': segundaGuerraMundial,
+  'civilizaciones-precolombinas': civilizacionesPrecolombinas,
+  'espana-medieval': espanaMedieval,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

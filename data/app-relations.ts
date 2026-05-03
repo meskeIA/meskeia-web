@@ -3909,10 +3909,34 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El budismo zen, el shintoísmo y el bushido son sistemas filosóficos-espirituales japoneses que han influido en la meditación, el management y la cultura occidental contemporánea' },
   ],
   'visualizador-historia-china-dinastias': [
-    { url: '/visualizador-historia/japon/', icon: '⛩️', name: 'Historia de Japón', description: 'China fue el modelo cultural de Japón durante siglos: escritura, budismo, administración y arte chino llegaron a Japón a través del mar del Japón y transformaron su civilización' },
+    { url: '/visualizador-historia/japon/', icon: '⛩️', name: 'Historia de Japón', description: 'China fue el modelo cultural de Japón durante siglos: escritura, budismo, administración y arte chino llegaron a Japón y transformaron su civilización' },
     { url: '/visualizador-historia/mongol/', icon: '🐴', name: 'Historia del Imperio Mongol', description: 'Los mongoles de Kublai Kan conquistaron China y fundaron la dinastía Yuan (1271): el mayor Imperio terrestre gobernó el mayor país del mundo durante casi un siglo' },
-    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'China y Mesopotamia son las dos grandes civilizaciones contemporáneas que inventaron la escritura de forma independiente: dos soluciones distintas al mismo problema humano' },
+    { url: '/visualizador-historia/primera-guerra-mundial/', icon: '🪖', name: 'Primera Guerra Mundial', description: 'Las Guerras del Opio y el "siglo de la humillación" chino son el contexto que explica por qué China no jugó un papel protagonista en la Gran Guerra de 1914' },
     { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'China inventó el papel moneda durante la dinastía Song (siglo X): el primer sistema de dinero fiduciario de la historia, 700 años antes de que Europa lo adoptara' },
+  ],
+  'visualizador-historia-primera-guerra-mundial': [
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'Segunda Guerra Mundial', description: 'Versalles sembró las semillas de la Segunda Guerra: la humillación de Alemania, las reparaciones imposibles y el resentimiento de la "puñalada por la espalda" llevaron directamente a Hitler' },
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '🗽', name: 'La Revolución Francesa', description: 'El nacionalismo que desencadenó la I Guerra Mundial tiene sus raíces ideológicas en la Revolución Francesa: el Estado-nación soberano como concepto surgió en 1789' },
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'El Imperio Otomano colapsó en la I Guerra Mundial al aliarse con las Potencias Centrales: la derrota en 1918 puso fin a 600 años de dominio otomano y creó los actuales países de Oriente Medio' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El existencialismo, el nihilismo y la crisis del positivismo europeo son la respuesta filosófica a la carnicería de la Gran Guerra: Kafka, Camus y Sartre nacen de las trincheras' },
+  ],
+  'visualizador-historia-segunda-guerra-mundial': [
+    { url: '/visualizador-historia/primera-guerra-mundial/', icon: '🪖', name: 'Primera Guerra Mundial', description: 'La Segunda Guerra es la secuela directa de la Primera: Versalles, la Gran Depresión y el ascenso de Hitler son consecuencias del tratado de paz de 1919' },
+    { url: '/visualizador-historia/china-dinastias/', icon: '🐉', name: 'Las Grandes Dinastías Chinas', description: 'La Segunda Guerra incluyó el teatro del Pacífico: Japón había estado en guerra con China desde 1937, y la bomba atómica acabó con el último gran conflicto de la era imperial japonesa' },
+    { url: '/visualizador-historia-banca/', icon: '🏦', name: 'Historia de la Banca', description: 'Bretton Woods (1944) y el Plan Marshall (1947) rediseñaron el sistema financiero global: el dólar como moneda de reserva mundial nació directamente de la posguerra de la Segunda Guerra' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'El expresionismo abstracto, el dadaísmo y el arte de posguerra son la respuesta artística al Holocausto y Hiroshima: el arte moderno no puede entenderse sin la Segunda Guerra Mundial' },
+  ],
+  'visualizador-historia-civilizaciones-precolombinas': [
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'La España Medieval', description: 'Los Reyes Católicos que financiaron a Colón llevaban décadas consolidando el reino: la unificación medieval de España es el contexto que hizo posible el "encuentro" de 1492' },
+    { url: '/visualizador-historia/egipto/', icon: '🏺', name: 'Historia del Antiguo Egipto', description: 'Egipto y las civilizaciones mesoamericanas son dos respuestas independientes al mismo desafío: cómo organizar una sociedad compleja sin contacto mutuo, llegando a soluciones sorprendentemente similares' },
+    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Mayas y sumerios inventaron la escritura de forma independiente: el paralelo entre la escritura cuneiforme (-3200 a.C.) y los jeroglíficos mayas muestra la universalidad del pensamiento humano' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La pirámide del Sol en Teotihuacán y el Templo Mayor azteca son arquitectura monumental comparable a las pirámides egipcias: el arte precolombino merece su propio lugar en la historia del arte universal' },
+  ],
+  'visualizador-historia-espana-medieval': [
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Los Reyes Católicos enviaron a Colón justo al cerrar la Edad Media: el mundo precolombino al que llegaron en 1492 era tan complejo y avanzado como la propia Europa medieval' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'La Hispania romana es el punto de partida de la historia medieval española: el latín, el derecho romano y la estructura viaria romana son la herencia sobre la que se construye todo lo demás' },
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'Al-Ándalus y el Imperio Otomano son los dos grandes proyectos de civilización islámica en Europa: contemporáneos y complementarios, con el Imperio Otomano tomando el relevo cultural cuando Al-Ándalus cae' },
+    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Averroes (Córdoba, 1126) y Maimónides (Córdoba, 1138) nacieron en Al-Ándalus: sin la España medieval islámica, la filosofía griega no habría llegado a la Europa cristiana medieval' },
   ],
 
   // Apps de referencia específica (2026-05-03)
