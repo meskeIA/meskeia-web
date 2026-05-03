@@ -815,6 +815,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia-automocion/",          // 13 períodos, Benz 1885→coche eléctrico autónomo
   "/visualizador-historia-telefono/",            // 13 períodos, Bell 1876→5G e IA conversacional
   "/visualizador-historia-prensa/",              // 14 períodos, Gutenberg 1450→periodismo digital e IA
+
+  // Cronologías Cultura y Estilo — Roadmap v9 EJE B (2026-05-03)
+  "/visualizador-historia-arquitectura-espanola/", // 13 períodos, Románico s.XI→Guggenheim y arquitectura paramétrica
+  "/visualizador-historia-moda-espanola/",         // 13 períodos, Reyes Católicos→Balenciaga, Loewe e Inditex
+  "/visualizador-historia-banca/",                 // 13 períodos, Medici 1397→fintech y criptomonedas
 ];
 
 /**

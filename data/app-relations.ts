@@ -3827,6 +3827,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia-radio/', icon: '📻', name: 'Historia de la Radio', description: 'La radio fue el primer gran competidor de la prensa escrita: las noticias de última hora dejaron de necesitar papel' },
     { url: '/visualizador-desinformacion/', icon: '🔍', name: 'Desinformación y Pensamiento Crítico', description: 'La crisis actual del periodismo y las fake news tienen raíces históricas: el periodismo amarillo del s.XIX anticipó los problemas actuales' },
   ],
+
+  // Cronologías Cultura y Estilo — Roadmap v9 EJE B (2026-05-03)
+  'visualizador-historia-arquitectura-espanola': [
+    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos del Mundo', description: 'La arquitectura española es una síntesis única: el románico lombardo, el gótico francés, el mudéjar islámico y el barroco italiano se fusionan en un estilo propio' },
+    { url: '/visualizador-historia-moda-espanola/', icon: '👗', name: 'Historia de la Moda Española', description: 'Arquitectura y moda comparten patrones: las mismas épocas que producen el Barroco churrigueresco producen los trajes de Corte más ornamentados' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La arquitectura española es inseparable del arte: Gaudí es tanto arquitecto como escultor, y el Escorial define una estética que abarca pintura, tapices y orfebrería' },
+    { url: '/visualizador-historia-economia-espana/', icon: '📊', name: 'Historia de la Economía Española', description: 'Las grandes obras arquitectónicas reflejan la economía: las catedrales del s.XIII coinciden con el auge comercial, el Guggenheim con la reindustrialización del País Vasco' },
+  ],
+  'visualizador-historia-moda-espanola': [
+    { url: '/visualizador-historia-arquitectura-espanola/', icon: '🏛️', name: 'Arquitectura Española', description: 'Moda y arquitectura van de la mano: las mismas élites que encargaron el Escorial definieron la moda del negro austero que dominó Europa en el s.XVI' },
+    { url: '/visualizador-historia-moda/', icon: '👘', name: 'Historia de la Moda Mundial', description: 'La moda española influyó en Europa (s.XVI), fue superada por Francia (s.XVII) y hoy vuelve al primer plano con Balenciaga, Loewe e Inditex' },
+    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Goya pintó la moda de su época: las majas y majos son tanto un documento histórico de indumentaria como una obra de arte' },
+    { url: '/visualizador-historia-economia-espana/', icon: '📊', name: 'Historia de la Economía Española', description: 'Inditex es la empresa española con mayor capitalización bursátil: la moda fast fashion es un fenómeno económico, no solo cultural' },
+  ],
+  'visualizador-historia-banca': [
+    { url: '/visualizador-como-funciona-banco/', icon: '🏦', name: 'Cómo Funciona un Banco', description: 'La historia de la banca es el contexto de cómo funciona un banco hoy: reserva fraccionaria, tipos de interés y regulación tienen raíces históricas' },
+    { url: '/visualizador-burbuja-especulativa/', icon: '📈', name: 'Burbujas Especulativas', description: 'Las crisis bancarias producen burbujas: el South Sea Bubble (1720), el Crash del 29 y la crisis de 2008 siguen el mismo patrón histórico' },
+    { url: '/visualizador-historia-economia-espana/', icon: '📊', name: 'Historia de la Economía Española', description: 'La banca española —Santander, BBVA, Banco de España— es inseparable de la historia económica del país desde el s.XIX' },
+    { url: '/visualizador-blockchain/', icon: '🔗', name: 'Blockchain y Criptografía', description: 'Bitcoin y las criptomonedas son la respuesta tecnológica a la crisis bancaria de 2008: Satoshi Nakamoto publicó el whitepaper el mismo año que cayó Lehman' },
+  ],
 };
 
 /**
