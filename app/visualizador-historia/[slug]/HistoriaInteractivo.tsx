@@ -110,8 +110,12 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
   const [catFiltro, setCatFiltro] = useState('todas');
   const [busqueda, setBusqueda] = useState('');
 
+  // Para apps con períodos "hasta el presente" (anioFin = 9999), usar el año actual + 2
+  // como límite visual del SVG, evitando que el eje se estire hasta el año 9999.
+  const anioFinSVG = data.anioFin >= 9999 ? new Date().getFullYear() + 2 : data.anioFin;
+
   const calcX = (anio: number) =>
-    MARGEN_IZQ + ((anio - data.anioInicio) / (data.anioFin - data.anioInicio)) * AREA_ANCHO;
+    MARGEN_IZQ + ((anio - data.anioInicio) / (anioFinSVG - data.anioInicio)) * AREA_ANCHO;
 
   const hitosEnFila: HitoEnFila[] = useMemo(() => {
     const finFila: number[] = [];
@@ -120,7 +124,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
       .sort((a, b) => a.anioInicio - b.anioInicio)
       .map(h => {
         const xI = calcX(h.anioInicio);
-        const xF = calcX(Math.min(h.anioFin >= 9999 ? data.anioFin : h.anioFin, data.anioFin));
+        const xF = calcX(h.anioFin >= 9999 ? anioFinSVG : Math.min(h.anioFin, anioFinSVG));
         let fila = 0;
         while (finFila[fila] !== undefined && finFila[fila] > xI + 4) fila++;
         finFila[fila] = xF;
@@ -137,15 +141,16 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
   const svgAlto = FILA_OFFSET_Y + numFilas * (FILA_ALTO + 8) + 30;
 
   const marcadores = useMemo(() => {
-    const rango = data.anioFin - data.anioInicio;
+    const rango = anioFinSVG - data.anioInicio;
     const step = rango <= 300 ? 25 : rango <= 600 ? 50 : rango <= 1500 ? 100 : 200;
     const result: number[] = [];
     let t = Math.ceil(data.anioInicio / step) * step;
-    while (t <= data.anioFin) {
+    while (t <= anioFinSVG) {
       result.push(t);
       t += step;
     }
     return result;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const hitoDetalle = data.hitos[detalleIdx];
