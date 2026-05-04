@@ -413,7 +413,7 @@ export default function TestToleranciaRiesgoDetallado() {
                 </div>
               ))}
             </div>
-            <button className={styles.startBtn} onClick={() => setFase('test')}>
+            <button className={styles.startBtn} onClick={() => { setFase('test'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
               Comenzar el test →
             </button>
           </div>
