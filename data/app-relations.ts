@@ -3969,6 +3969,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Kant, Hume, Locke y Rousseau son simultáneamente filósofos e ilustrados: la Ilustración es el momento en que la filosofía moderna alcanza su madurez y mayor influencia social' },
   ],
 
+  // Temáticas Adicionales — Roadmap v10 EJE C (2026-05-04)
+  'visualizador-historia-historia-descubrimientos-cientificos': [
+    { url: '/visualizador-historia/historia-ciencia-espanola/', icon: '🔬', name: 'Ciencia Española', description: 'Los descubrimientos científicos globales tienen contribuciones españolas directas: Cajal y la neurona, Severo Ochoa y el ARN mensajero, la participación en el CRISPR y el CERN' },
+    { url: '/visualizador-historia/fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'La física es el eje central de la historia de los descubrimientos científicos: de Newton a Einstein, de la mecánica cuántica a la teoría de cuerdas' },
+    { url: '/visualizador-historia/historia-electricidad/', icon: '⚡', name: 'Historia de la Electricidad', description: 'Faraday, Maxwell y Tesla conectan los descubrimientos científicos con la historia de la electricidad: la teoría electromagnética es simultáneamente física fundamental y revolución tecnológica' },
+    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'La computación, el transistor y la World Wide Web son el capítulo tecnológico de los descubrimientos científicos: de la máquina de Turing al ChatGPT' },
+  ],
+  'visualizador-historia-historia-india': [
+    { url: '/visualizador-historia/historia-descubrimientos-cientificos/', icon: '🔭', name: 'Historia de los Descubrimientos Científicos', description: 'India inventó el cero y el sistema numérico posicional: Aryabhata, Brahmagupta y los matemáticos gupta hicieron contribuciones fundamentales que Europa tardó siglos en igualar' },
+    { url: '/visualizador-historia/mongol/', icon: '🐴', name: 'Historia del Imperio Mongol', description: 'Los mogoles (Mughals) de la India son la rama india de la expansión mongola: Babur, fundador del Imperio Mughal, era descendiente de Timur y de Gengis Kan' },
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'El colonialismo británico en India es el capítulo más determinante de la historia moderna india: la EIC, el Raj, Gandhi y la independencia son inseparables de la historia del Imperio Británico' },
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'India y las civilizaciones precolombinas son los grandes ejemplos de civilizaciones que desarrollaron matemáticas, astronomía y arquitectura monumentales de forma independiente a Europa' },
+  ],
+  'visualizador-historia-historia-bizancio': [
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'El Imperio Otomano y Bizancio son las dos caras de la misma historia: el otomano nació en los territorios que Bizancio iba perdiendo, y la caída de Constantinopla en 1453 fundó definitivamente el Imperio Otomano' },
+    { url: '/visualizador-historia/las-cruzadas/', icon: '⚔️', name: 'Las Cruzadas', description: 'La Cuarta Cruzada y el saqueo de Constantinopla (1204) son el episodio más traumático de la historia de Bizancio: los cruzados aliados debilitaron mortalmente al Imperio que debían defender' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'Bizancio es la continuación directa de Roma: Constantino la fundó como Nueva Roma, sus emperadores se llamaban Romanos hasta 1453, y el Corpus Juris Civilis de Justiniano es la cumbre del derecho romano' },
+    { url: '/visualizador-historia/historia-rusia/', icon: '🏔️', name: 'Historia de Rusia', description: 'La Rus de Kiev adoptó el Ortodoxismo de Bizancio en 988: la cultura, el arte y la religión byzantinos fundaron la identidad rusa. Moscú se proclamó "Tercera Roma" tras la caída de Constantinopla' },
+  ],
+  'visualizador-historia-historia-videojuegos-japoneses': [
+    { url: '/visualizador-historia/videojuegos/', icon: '🕹️', name: 'Historia de los Videojuegos', description: 'La historia global del videojuego y la historia de los videojuegos japoneses son inseparables: Japón dominó la industria durante 30 años y definió sus géneros, mecánicas y estética más influyentes' },
+    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Los videojuegos online, los MMORPGs, los esports y las plataformas de distribución digital (Steam, PlayStation Network) conectan la historia del videojuego japonés con la historia de Internet' },
+    { url: '/visualizador-historia/japon/', icon: '⛩️', name: 'Historia de Japón', description: 'Los videojuegos japoneses son inseparables de la cultura japonesa: el anime, el manga, el espíritu "monozukuri" (artesanía de excelencia) y la cultura otaku forman el ecosistema que los produjo' },
+    { url: '/visualizador-historia/historia-descubrimientos-cientificos/', icon: '🔭', name: 'Descubrimientos Científicos', description: 'Los videojuegos son el mayor acelerador de la computación gráfica y la IA: la GPU fue inventada para videojuegos (NVIDIA, 1999) y hoy alimenta los modelos de IA más avanzados del mundo' },
+  ],
+
   // Períodos y Temas Globales — Roadmap v10 EJE B (2026-05-04)
   'visualizador-historia-historia-guerra-fria': [
     { url: '/visualizador-historia/historia-eeuu/', icon: '🦅', name: 'Historia de EE.UU.', description: 'La Guerra Fría es el eje central de la historia americana de posguerra: de la Doctrina Truman al reaganismo, EE.UU. organizó toda su política exterior y buena parte de la interior en torno a la rivalidad con la URSS' },

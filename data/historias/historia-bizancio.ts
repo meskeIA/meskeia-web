@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const historiaBizancio: HistoriaData = {
+  slug: 'historia-bizancio',
+  titulo: 'Historia de Bizancio: Del Traslado de Roma a la Caída de Constantinopla',
+  subtitulo: 'Once siglos de continuidad romana de Oriente: el Imperio que preservó la cultura clásica y modeló Europa Oriental',
+  descripcionSEO: 'Cronología interactiva del Imperio Bizantino: de la fundación de Constantinopla por Constantino I (330) a la conquista otomana de Mehmed II (1453). Justiniano, Santa Sofía, el Gran Cisma, las Cruzadas y el legado que moldeó Europa Oriental y el mundo ortodoxo en 10 hitos y 6 eras.',
+  keywords: [
+    'historia bizancio cronología imperio romano oriente',
+    'constantinopla justiniano santa sofía corpus juris civilis',
+    'gran cisma 1054 iglesia ortodoxa católica',
+    'cuarta cruzada saqueo constantinopla 1204',
+    'caída constantinopla mehmed ii 1453 otomanos',
+    'legado bizantino renacimiento paleólogo derecho romano',
+  ],
+  anioInicio: 330,
+  anioFin: 1453,
+
+  hitos: [
+    {
+      id: 'fundacion-constantinopla',
+      nombre: 'Fundación de Constantinopla',
+      anioInicio: 330,
+      anioFin: 395,
+      color: '#D97706',
+      categoria: 'fundacion',
+      descripcion: 'El 11 de mayo de 330, el Emperador Constantino I inauguró la nueva capital del Imperio Romano en el emplazamiento de la antigua Bizancio, ciudad griega en el estrecho del Bósforo. Estratégicamente colocada entre Europa y Asia, entre el Mar Negro y el Mediterráneo, Constantinopla ("Ciudad de Constantino") estaba protegida por agua en tres lados. Constantino la diseñó como una "Nueva Roma": foro, hipódromo, palacio imperial y basílicas. El Concilio de Nicea (325) había ya establecido el cristianismo niceno como doctrina oficial. Teodosio I, el último en gobernar un Imperio unido, murió en 395 y lo dividió entre sus hijos: Arcadio en Oriente (Constantinopla) y Honorio en Occidente (Roma).',
+      obraIconica: 'Inauguración de Constantinopla (330 d.C.): la "Nueva Roma" que gobernaría el Mediterráneo oriental',
+      paises: ['Imperio Romano', 'Constantinopla', 'Tracia', 'Asia Menor'],
+    },
+    {
+      id: 'justiniano-apogeo',
+      nombre: 'Justiniano I: El Apogeo Bizantino',
+      anioInicio: 527,
+      anioFin: 565,
+      color: '#1E3A8A',
+      categoria: 'apogeo',
+      descripcion: 'Justiniano I (527-565) fue el más ambicioso de los emperadores bizantinos: intentó reunificar el Imperio Romano. Sus generales Belisario y Narses reconquistaron el norte de África (533), Italia (535-554) y parte de Hispania (554). El Corpus Juris Civilis (529-534), su codificación del derecho romano, es la base del derecho civil europeo y latinoamericano hasta hoy. La Basílica de Santa Sofía (532-537), construida en solo cinco años, fue la mayor iglesia del mundo durante casi mil años y maravilla de ingeniería: su cúpula de 31 metros parecía "suspendida del cielo por una cadena de oro". La Peste de Justiniano (541-549) mató entre 25 y 50 millones de personas, debilitando el Imperio.',
+      obraIconica: 'Basílica de Santa Sofía (537 d.C.): la mayor iglesia del mundo durante 900 años',
+      paises: ['Bizancio', 'Italia', 'Norte de África', 'Hispania'],
+    },
+    {
+      id: 'cisma-islam-amenaza',
+      nombre: 'El Islam, los Árabes y la Contracción',
+      anioInicio: 634,
+      anioFin: 717,
+      color: '#DC2626',
+      categoria: 'crisis',
+      descripcion: 'La expansión islámica fue el mayor choque que sufrió Bizancio. En menos de una generación (634-651), los árabes conquistaron Siria, Palestina, Egipto y Persia —el corazón del Imperio. Bizancio perdió dos tercios de su territorio y riqueza. Constantinopla resistió dos grandes asedios árabes: el primero (674-678) y el segundo (717-718), rechazados en parte gracias al "fuego griego", una sustancia incendiaria cuya fórmula exacta sigue siendo un misterio. El tema (thema) como unidad territorial-militar reorganizó la defensa del Imperio. La iconoclastia (controversia sobre las imágenes religiosas, 726-843) dividió profundamente a la sociedad y a la Iglesia.',
+      obraIconica: 'Fuego griego: el arma secreta que salvó Constantinopla de los asedios árabes (674-718)',
+      paises: ['Bizancio', 'Califato Árabe', 'Asia Menor', 'Siria', 'Egipto'],
+    },
+    {
+      id: 'edad-media-bizancio',
+      nombre: 'La Era Macedonia: Renacimiento Bizantino',
+      anioInicio: 867,
+      anioFin: 1025,
+      color: '#166534',
+      categoria: 'renacimiento',
+      descripcion: 'La dinastía macedónica (867-1056) representa el segundo apogeo bizantino. Basilio I fundó la dinastía; Basilio II "el Bulgaróctono" (el matador de búlgaros) fue el emperador más poderoso del período: derrotó al Imperio Búlgaro y cegó a 15.000 prisioneros búlgaros (dejando a uno tuerto por cada cien para que los guiara), forzando la rendición. El Imperio alcanzó su máxima extensión medieval. La evangelización de los eslavos por Cirilo y Metodio (863), que crearon el alfabeto glagolítico (precursor del cirílico), extendió la cultura y la religión ortodoxa a Rusia, Serbia y Bulgaria. Vladimir I de Kiev adoptó el Ortodoxismo (988), conectando la Rus con Bizancio cultural y religiosamente.',
+      obraIconica: 'Cirilo y Metodio (863): el alfabeto que evangelizó a los eslavos y fundó la cultura ortodoxa',
+      paises: ['Bizancio', 'Bulgaria', 'Rusia', 'Serbia', 'Constantinopla'],
+    },
+    {
+      id: 'cisma-1054',
+      nombre: 'El Gran Cisma de 1054',
+      anioInicio: 1054,
+      anioFin: 1095,
+      color: '#7C2D12',
+      categoria: 'religion',
+      descripcion: 'El 16 de julio de 1054, el cardenal Humberto de Silva Cándida depositó una bula de excomunión sobre el altar de Santa Sofía contra el Patriarca de Constantinopla Miguel Cerulario. El Patriarca respondió excomulgando al legado papal. El Gran Cisma dividió el cristianismo en dos: la Iglesia Católica Romana (Occidente, bajo el Papa) y la Iglesia Ortodoxa Oriental (Oriente, bajo los patriarcados). Las causas fueron teológicas (la cláusula "filioque" sobre la procesión del Espíritu Santo), litúrgicas (pan con o sin levadura en la eucaristía) y políticas (quién tiene autoridad suprema). Esta ruptura, nunca oficialmente sanada, moldeó durante siglos la fractura entre Europa occidental y oriental.',
+      obraIconica: 'El Gran Cisma (1054): la ruptura entre Roma y Constantinopla que divide el cristianismo hasta hoy',
+      paises: ['Bizancio', 'Papado', 'Roma', 'Constantinopla'],
+    },
+    {
+      id: 'cruzadas-saqueo',
+      nombre: 'Las Cruzadas y el Saqueo de Constantinopla',
+      anioInicio: 1095,
+      anioFin: 1261,
+      color: '#B22222',
+      categoria: 'crisis',
+      descripcion: 'Alejandro Comneno I solicitó ayuda occidental contra los turcos selyúcidas, desencadenando las Cruzadas (1095). La Primera Cruzada conquistó Jerusalén (1099), pero las cruzadas posteriores dañaron progresivamente las relaciones. La Cuarta Cruzada (1202-1204) fue la mayor traición: los cruzados, desviados por los venecianos, saquearon y destruyeron Constantinopla —ciudad cristiana— en lugar de combatir a los musulmanes. El saqueo fue catastrófico: bibliotecas quemadas, tesoros robados, reliquias dispersadas por Europa. Se fundó el efímero "Imperio Latino" (1204-1261). El Imperio de Nicea, un Estado sucesor griego, reconquistó Constantinopla en 1261 bajo Miguel VIII Paleólogo.',
+      obraIconica: 'Saqueo de Constantinopla por la Cuarta Cruzada (1204): la traición que destrozó Bizancio',
+      paises: ['Bizancio', 'Cruzados', 'Venecia', 'Constantinopla'],
+    },
+    {
+      id: 'imperio-paleologos',
+      nombre: 'Los Paleólogos: El Último Imperio',
+      anioInicio: 1261,
+      anioFin: 1380,
+      color: '#374151',
+      categoria: 'decadencia',
+      descripcion: 'La restauración del Imperio en 1261 fue una victoria pírrica: el territorio reconquistado era una fracción del Imperio original. Los Paleólogos gobernaron durante casi dos siglos un Estado cada vez más pequeño, acosado por los turcos otomanos al este, los serbios y búlgaros al norte, y la presión económica de las repúblicas italianas. Las guerras civiles internas (Guerras Civiles Bizantinas, 1321-1357) debilitaron aún más el Estado. Paradójicamente, este período produjo el mayor florecimiento cultural del Imperio: el Renacimiento Paleólogo (pintura, teología, filosofía) influyó directamente en el Renacimiento italiano. Pletón y Bessarión llevaron la filosofía griega a Italia, sembrando el humanismo occidental.',
+      obraIconica: 'Renacimiento Paleólogo: los últimos emperadores financian el florecimiento cultural que inspira el Renacimiento',
+      paises: ['Bizancio', 'Imperio Otomano', 'Serbia', 'Bulgaria', 'Venecia'],
+    },
+    {
+      id: 'amenaza-otomana',
+      nombre: 'La Amenaza Otomana y Tamerlán',
+      anioInicio: 1380,
+      anioFin: 1430,
+      color: '#4338CA',
+      categoria: 'decadencia',
+      descripcion: 'Bizancio se redujo prácticamente a Constantinopla y sus alrededores. El sultán otomano Bayaceto I sitió Constantinopla (1394-1402), pero fue salvada providencialmente por la invasión de Tamerlán, que derrotó y capturó a Bayaceto en Ankara (1402). El respiro fue breve: los otomanos se reorganizaron rápidamente. El Concilio de Florencia (1439) intentó unir las Iglesias romana y ortodoxa a cambio de ayuda militar occidental: la unión fue rechazada por el pueblo y el clero de Constantinopla ("preferiría ver el turbante del sultán en nuestra ciudad que la tiara papal"). La Caída de Tesalónica (1430) fue el preludio final.',
+      obraIconica: 'Batalla de Ankara (1402): Tamerlán derrota a Bayaceto y salva temporalmente Bizancio',
+      paises: ['Bizancio', 'Imperio Otomano', 'Timúridas', 'Hungría'],
+    },
+    {
+      id: 'caida-constantinopla',
+      nombre: 'La Caída de Constantinopla',
+      anioInicio: 1453,
+      anioFin: 1453,
+      color: '#DC2626',
+      categoria: 'caida',
+      descripcion: 'El 29 de mayo de 1453, el sultán otomano Mehmed II "el Conquistador", de solo 21 años, tomó Constantinopla tras un asedio de 53 días. El último emperador, Constantino XI Paleólogo, murió combatiendo en las murallas. Mehmed utilizó cañones gigantes —fundidos por el ingeniero húngaro Urbano— que destruyeron las legendarias murallas de Teodosio. La "Gran Cadena" del Cuerno de Oro fue superada arrastrando barcos por tierra. La ciudad fue saqueada durante tres días. Mehmed convirtió Santa Sofía en mezquita. El Imperio Romano de Oriente, heredero directo de la Roma de Augusto y Constantino, dejó de existir después de 1.123 años. El evento marcó, convencionalmente, el fin de la Edad Media.',
+      obraIconica: 'Caída de Constantinopla (29 mayo 1453): el fin de 1.123 años de continuidad romana de Oriente',
+      paises: ['Bizancio', 'Imperio Otomano', 'Constantinopla'],
+    },
+    {
+      id: 'legado-bizancio',
+      nombre: 'El Legado de Bizancio',
+      anioInicio: 1453,
+      anioFin: 1453,
+      color: '#6D28D9',
+      categoria: 'legado',
+      descripcion: 'La caída de Constantinopla dispersó a los académicos griegos por Italia, acelerando el Renacimiento. El derecho justinianeo sobrevivió y se expandió. La Iglesia Ortodoxa continuó sin el Imperio: el Patriarcado de Moscú se proclamó "Tercera Roma". El arte y la arquitectura byzantinos moldearon permanentemente la cultura de Rusia, Serbia, Bulgaria, Rumanía y Grecia. La iconografía ortodoxa, los mosaicos, la música litúrgica y la teología escolástica son herencias directas. Mehmed II se consideró heredero de los emperadores romanos. El Imperio Otomano adoptó muchas instituciones, técnicas y tradiciones bizantinas. El legado jurídico, artístico y religioso de Bizancio persiste en más de 200 millones de ortodoxos hoy.',
+      obraIconica: 'Los académicos griegos en Italia (1453+): el exilio que aceleró el Renacimiento europeo',
+      paises: ['Grecia', 'Rusia', 'Italia', 'Serbia', 'Bulgaria', 'Iglesia Ortodoxa'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Fundación y Apogeo Temprano',
+      desde: 330,
+      hasta: 634,
+      icono: '✝️',
+      hitosDestacados: ['Fundación de Constantinopla', 'Justiniano I: El Apogeo Bizantino'],
+      eventos: [
+        'Inauguración de Constantinopla como nueva capital imperial (330)',
+        'División definitiva del Imperio Romano entre Oriente y Occidente (395)',
+        'Caída del Imperio Romano de Occidente: Bizancio queda como único heredero de Roma (476)',
+        'Corpus Juris Civilis: Justiniano codifica el derecho romano (529-534)',
+        'Construcción de Santa Sofía en solo 5 años (532-537)',
+      ],
+    },
+    {
+      nombre: 'La Crisis Árabe y la Reorganización',
+      desde: 634,
+      hasta: 867,
+      icono: '⚔️',
+      hitosDestacados: ['El Islam, los Árabes y la Contracción'],
+      eventos: [
+        'Conquista árabe de Siria, Palestina, Egipto y Persia (634-651)',
+        'Primer asedio árabe de Constantinopla rechazado con fuego griego (674-678)',
+        'Segundo asedio árabe de Constantinopla rechazado (717-718)',
+        'Controversia iconoclasta: debate sobre las imágenes religiosas (726-843)',
+      ],
+    },
+    {
+      nombre: 'El Renacimiento Macedónico',
+      desde: 867,
+      hasta: 1054,
+      icono: '🏛️',
+      hitosDestacados: ['La Era Macedonia: Renacimiento Bizantino', 'El Gran Cisma de 1054'],
+      eventos: [
+        'Cirilo y Metodio crean el alfabeto glagolítico y evangelizan a los eslavos (863)',
+        'Basilio II derrota al Imperio Búlgaro y ciega a 15.000 prisioneros (1014)',
+        'Vladimir I de Kiev adopta el Ortodoxismo: Rusia entra en la órbita bizantina (988)',
+        'El Gran Cisma: Roma y Constantinopla se excomulgan mutuamente (1054)',
+      ],
+    },
+    {
+      nombre: 'Las Cruzadas y el Saqueo',
+      desde: 1054,
+      hasta: 1261,
+      icono: '🗡️',
+      hitosDestacados: ['Las Cruzadas y el Saqueo de Constantinopla'],
+      eventos: [
+        'Primera Cruzada: caballeros occidentales atraviesan Bizancio hacia Tierra Santa (1096-1099)',
+        'Derrota bizantina en Manzikert: los turcos selyúcidas penetran en Asia Menor (1071)',
+        'Cuarta Cruzada: los cruzados desvían el ataque hacia Constantinopla (1202-1204)',
+        'Saqueo de Constantinopla: la ciudad cristiana arrasada por cruzados (1204)',
+      ],
+    },
+    {
+      nombre: 'Los Paleólogos: El Crepúsculo',
+      desde: 1261,
+      hasta: 1430,
+      icono: '🌅',
+      hitosDestacados: ['Los Paleólogos: El Último Imperio', 'La Amenaza Otomana y Tamerlán'],
+      eventos: [
+        'Miguel VIII Paleólogo reconquista Constantinopla y restaura el Imperio (1261)',
+        'Guerras Civiles Bizantinas: el Imperio se desgarra desde dentro (1321-1357)',
+        'Bayaceto I sitia Constantinopla durante ocho años (1394-1402)',
+        'Tamerlán derrota y captura a Bayaceto en Ankara: respiro providencial (1402)',
+        'Concilio de Florencia: intento fallido de reunificación con Roma (1439)',
+      ],
+    },
+    {
+      nombre: 'La Caída y el Legado',
+      desde: 1430,
+      hasta: 1453,
+      icono: '🌙',
+      hitosDestacados: ['La Caída de Constantinopla', 'El Legado de Bizancio'],
+      eventos: [
+        'Caída de Tesalónica: el último gran territorio fuera de Constantinopla conquista (1430)',
+        'Mehmed II, de 21 años, inicia el asedio final con cañones gigantes (abril 1453)',
+        'Caída de Constantinopla: Constantino XI muere combatiendo en las murallas (29 mayo 1453)',
+        'Los académicos griegos huyen a Italia: semilla del Renacimiento humanista (1453+)',
+      ],
+    },
+  ],
+
+  categorias: {
+    fundacion: 'Fundación',
+    apogeo: 'Apogeo',
+    crisis: 'Crisis y Amenazas',
+    renacimiento: 'Renacimiento Bizantino',
+    religion: 'Conflictos Religiosos',
+    decadencia: 'Decadencia',
+    caida: 'La Caída',
+    legado: 'Legado',
+  },
+
+  colores: {
+    fundacion: '#D97706',
+    apogeo: '#1E3A8A',
+    crisis: '#DC2626',
+    renacimiento: '#166534',
+    religion: '#7C2D12',
+    decadencia: '#374151',
+    caida: '#DC2626',
+    legado: '#6D28D9',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Bizancio no fue el "Imperio Romano que sobrevivió": fue una civilización propia que preservó el derecho romano, la cultura griega y la fe cristiana ortodoxa durante 11 siglos, moldeando permanentemente Europa Oriental y el mundo ortodoxo. Su legado jurídico —el Corpus Juris Civilis de Justiniano— es la base del derecho civil continental. Su legado religioso —la Iglesia Ortodoxa— une hoy a más de 200 millones de fieles. Sus académicos, al huir a Italia tras la caída de 1453, encendieron el Renacimiento. Bizancio no fue un paréntesis de la historia: fue el puente entre la Antigüedad y la Modernidad.',
+
+    tablaComparativa: [
+      { hito: 'Fundación de Constantinopla', periodo: '330-395', categoria: 'Fundación', personaje: 'Constantino I / Teodosio I', aportacion: 'Nueva capital imperial en el Bósforo; fundamento geopolítico del Imperio durante 11 siglos' },
+      { hito: 'Justiniano I: El Apogeo Bizantino', periodo: '527-565', categoria: 'Apogeo', personaje: 'Justiniano I / Belisario / Teodora', aportacion: 'Corpus Juris Civilis, Santa Sofía, reconquista del Mediterráneo occidental' },
+      { hito: 'El Islam, los Árabes y la Contracción', periodo: '634-717', categoria: 'Crisis y Amenazas', personaje: 'León III el Isáurico', aportacion: 'Resistencia a los asedios árabes con fuego griego; reorganización territorial en themas' },
+      { hito: 'La Era Macedonia: Renacimiento Bizantino', periodo: '867-1025', categoria: 'Renacimiento Bizantino', personaje: 'Basilio II / Cirilo y Metodio', aportacion: 'Evangelización eslava, alfabeto cirílico, máxima extensión medieval del Imperio' },
+      { hito: 'Las Cruzadas y el Saqueo de Constantinopla', periodo: '1095-1261', categoria: 'Crisis y Amenazas', personaje: 'Alejo I Comneno / Miguel VIII Paleólogo', aportacion: 'Saqueo de 1204 por la Cuarta Cruzada; fragmentación y posterior restauración del Imperio' },
+      { hito: 'La Caída de Constantinopla', periodo: '1453', categoria: 'La Caída', personaje: 'Constantino XI Paleólogo / Mehmed II', aportacion: 'Fin de 1.123 años de continuidad romana de Oriente; inicio de la era otomana' },
+    ],
+
+    escenarios: [
+      {
+        icono: '⚔️',
+        titulo: '¿Y si la Cuarta Cruzada no hubiera saqueado Constantinopla?',
+        perfil: 'Contrafactual político-militar',
+        texto: 'Sin el saqueo de 1204, Bizancio habría conservado sus riquezas, bibliotecas y poder militar. El Imperio podría haber resistido la presión otomana con un ejército y una economía intactos. El Renacimiento paleólogo habría florecido dentro de la ciudad, no como cultura de exilio. Quizás la caída de 1453 no habría ocurrido —o al menos se habría retrasado décadas.',
+      },
+      {
+        icono: '🗡️',
+        titulo: '¿Y si Tamerlán no hubiera derrotado a Bayaceto en Ankara (1402)?',
+        perfil: 'Contrafactual geopolítico',
+        texto: 'Sin la derrota de Bayaceto, Constantinopla habría caído en 1402 —no en 1453. El Imperio Otomano, sin la crisis sucesoria provocada por Tamerlán, habría completado su conquista con medio siglo de anticipación. Los académicos griegos no habrían podido huir a Italia, retrasando el Renacimiento. La historia de Europa Oriental habría sido radicalmente distinta.',
+      },
+      {
+        icono: '✝️',
+        titulo: '¿Y si el Gran Cisma de 1054 no hubiera ocurrido?',
+        perfil: 'Contrafactual religioso',
+        texto: 'Una Iglesia cristiana unida habría respondido con mayor cohesión a la expansión islámica. Las Cruzadas habrían tenido una dirección más unitaria, sin la tensión entre Roma y Constantinopla. La fractura cultural entre Europa occidental y oriental —aún visible hoy en política, arte y sociedad— quizás no habría sido tan profunda. La historia del siglo XXI sería distinta.',
+      },
+      {
+        icono: '📜',
+        titulo: '¿Y si el Corpus Juris Civilis no hubiera llegado a Occidente?',
+        perfil: 'Contrafactual jurídico-cultural',
+        texto: 'Sin la codificación justinianea, el derecho medieval europeo habría continuado siendo un mosaico fragmentado de costumbres locales. El derecho civil continental —francés, español, italiano, alemán— se construyó sobre Justiniano. Sin esa base, los Estados modernos, los contratos, la propiedad y la herencia tendrían una estructura radicalmente diferente. El legado de Bizancio nos rodea sin que lo sepamos.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué se llama "Bizancio" si el Imperio se llamaba a sí mismo romano?',
+        respuesta: 'Los propios habitantes del Imperio se llamaban "romanos" (Rhomaioi) y su Estado "Imperio Romano". El nombre "Imperio Bizantino" es un término historiográfico moderno, acuñado en el siglo XVI por el humanista Hieronymus Wolf, que tomó el nombre de la antigua ciudad griega Bizancio sobre la que Constantino construyó Constantinopla. En su tiempo, nunca existió un "Imperio Bizantino": solo el Imperio Romano, continuado en Oriente.',
+        tip: 'Usar el término "Imperio Romano de Oriente" es más correcto históricamente que "Imperio Bizantino".',
+      },
+      {
+        pregunta: '¿Cuál es la diferencia entre la Iglesia Católica y la Ortodoxa?',
+        respuesta: 'Las diferencias principales son: la Iglesia Ortodoxa no reconoce la autoridad suprema del Papa (cada iglesia nacional tiene su propio patriarca); difieren en la cláusula "filioque" (si el Espíritu Santo procede del Padre solo o también del Hijo); el clero ortodoxo puede casarse (excepto los obispos); el rito es más antiguo y la liturgia más larga. La ruptura formal fue en 1054, aunque los desacuerdos venían de siglos antes.',
+        tip: 'Las dos iglesias se excomulgaron mutuamente en 1054. Las excomuniones no fueron levantadas hasta 1964, por Pablo VI y el Patriarca Atenágoras.',
+      },
+      {
+        pregunta: '¿Qué fue el "fuego griego" y por qué fue tan decisivo?',
+        respuesta: 'El fuego griego era una sustancia incendiaria líquida que ardía en contacto con el agua y no podía apagarse fácilmente. Fue clave en los dos grandes asedios árabes de Constantinopla (674-678 y 717-718). Los barcos bizantinos lo lanzaban con sifones, quemando las flotas enemigas. La fórmula exacta es uno de los mayores secretos de la historia: los bizantinos la guardaron celosamente y nunca fue descifrada completamente. Su invención posiblemente salvó la existencia del Imperio —y de Europa cristiana.',
+        tip: 'Algunos historiadores consideran que sin el fuego griego, el Islam habría conquistado Europa Occidental en el siglo VII.',
+      },
+      {
+        pregunta: '¿Por qué los cruzados atacaron Constantinopla en la Cuarta Cruzada (1204)?',
+        respuesta: 'La Cuarta Cruzada debía atacar Egipto. Venecia, que transportaba a los cruzados, los desvió primero a Zara (una ciudad rival cristiana) y luego a Constantinopla, en parte para cobrar deudas y en parte por ambición comercial. Los cruzados, endeudados con Venecia y codiciosos ante la riqueza de la ciudad, aprovecharon una disputa sucesoria bizantina para justificar el ataque. El Papa Inocencio III excomulgó a los cruzados por atacar una ciudad cristiana, pero el saqueo ya estaba hecho. Fue la mayor traición de la historia de las Cruzadas.',
+        tip: 'El saqueo de 1204 causó más daño a Bizancio que los otomanos en 1453. El Imperio nunca se recuperó plenamente.',
+      },
+      {
+        pregunta: '¿Cómo influyó la caída de Constantinopla en el Renacimiento europeo?',
+        respuesta: 'Cuando Constantinopla cayó en 1453, miles de académicos griegos huyeron principalmente a Italia (Florencia, Venecia, Roma) llevando consigo manuscritos de filósofos, matemáticos y científicos griegos clásicos —muchos desconocidos en Occidente medieval. Figuras como Jorge Gemisto Pletón y Basilio Bessarión llevaron a Platón, Aristóteles en griego original y la tradición neoplatónica. Esto fertilizó directamente el Humanismo renacentista italiano. La caída de Bizancio aceleró una revolución cultural en Occidente.',
+        tip: 'Sin la diáspora griega de 1453, el Renacimiento italiano habría tenido un desarrollo muy diferente y probablemente más tardío.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa la duración total en la Línea del Tiempo',
+        cuerpo: 'El Imperio Bizantino duró 1.123 años (330-1453): más que cualquier otra entidad política europea. Antes de leer nada, observa la longitud total de la barra y compara los colores: el naranja (fundación), el azul oscuro (apogeo), el rojo (crisis) y el morado (legado). Cada color te dice en qué estado estaba el Imperio en cada momento.',
+      },
+      {
+        titulo: 'Compara el apogeo de Justiniano con la contracción árabe',
+        cuerpo: 'Haz clic en "Justiniano I: El Apogeo Bizantino" y luego en "El Islam, los Árabes y la Contracción". Observa el contraste: Justiniano amplió el Imperio a todo el Mediterráneo occidental; los árabes le arrebataron dos tercios del territorio en una generación. Es uno de los cambios geopolíticos más rápidos y radicales de la historia.',
+      },
+      {
+        titulo: 'Sigue el hilo de las crisis y sus consecuencias',
+        cuerpo: 'Bizancio sufrió tres crisis mayores: la expansión árabe (634-717), el saqueo cruzado (1204) y la presión otomana final (1380-1453). Cada crisis era más severa que la anterior. Identifica en la línea cómo cada crisis redujo el territorio y los recursos del Imperio, haciendo la siguiente crisis más difícil de superar.',
+      },
+      {
+        titulo: 'Usa la Comparativa para entender las fases',
+        cuerpo: 'En la tabla Comparativa, filtra por "Apogeo" y "Renacimiento Bizantino" para ver los momentos de esplendor. Luego filtra por "Crisis y Amenazas" y "Decadencia" para ver los momentos de quiebre. El contraste entre ambos grupos revela el ciclo histórico de Bizancio: un Imperio que renacía de sus crisis... hasta que no pudo más.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras cubren desde la fundación hasta la caída. La era "Los Paleólogos: El Crepúsculo" es la más reveladora: muestra cómo un Imperio reducido a una sola ciudad produjo su mayor florecimiento cultural (el Renacimiento Paleólogo) mientras se aproximaba a su fin. La decadencia política y el esplendor cultural coexistieron paradójicamente en los últimos dos siglos.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🗺️',
+        texto: 'Bizancio en su apogeo bajo Justiniano cubría todo el Mediterráneo: Italia, el norte de África y el sur de la Península Ibérica. En 1453, solo quedaba Constantinopla y sus alrededores. Imagina ese proceso de contracción: una ciudad que fue capital del mundo, reducida a una isla de civilización rodeada de enemigos.',
+      },
+      {
+        icono: '📚',
+        texto: 'El Corpus Juris Civilis de Justiniano (529-534) es uno de los textos más influyentes de la historia de la humanidad. Los códigos civiles de España, Francia, Italia, Alemania y casi toda América Latina se construyeron directamente sobre él. Cuando firmas un contrato, heredas, o compras una propiedad, estás usando conceptos jurídicos inventados en Constantinopla hace 1.500 años.',
+      },
+      {
+        icono: '✝️',
+        texto: 'La Iglesia Ortodoxa tiene hoy más de 200 millones de fieles en Rusia, Grecia, Serbia, Bulgaria, Rumanía, Georgia y el mundo entero. Ese mundo ortodoxo es directamente hijo de la evangelización bizantina. Cirilo y Metodio crearon un alfabeto (el cirílico, derivado del glagolítico) para escribir en eslavo las escrituras, y ese alfabeto todavía usan hoy Rusia, Serbia, Bulgaria y otros países.',
+      },
+      {
+        icono: '🌙',
+        texto: 'Mehmed II, el conquistador de Constantinopla, se consideraba a sí mismo "Kayser-i Rum" (César de Roma): el legítimo heredero del Imperio Romano. El Imperio Otomano adoptó decenas de instituciones, títulos, prácticas administrativas y tradiciones artísticas bizantinas. La conquista no borró Bizancio: lo transformó y continuó en nueva forma durante otros 500 años.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que Bizancio fue solo el "Imperio Romano decadente"',
+        cuerpo: 'Bizancio no fue una degeneración de Roma: fue una civilización original que combinó el derecho romano, la lengua y filosofía griegas y la fe cristiana ortodoxa. Produjo su propio arte (los mosaicos y la iconografía), su propia arquitectura (la cúpula sobre planta cuadrada), su propio sistema jurídico (perfeccionado por Justiniano) y su propio pensamiento teológico. Llamarla "decadente" es un prejuicio occidental que ignora 11 siglos de extraordinaria creatividad.',
+      },
+      {
+        titulo: 'Confundir la caída de Roma occidental (476) con el fin del Imperio Romano',
+        cuerpo: 'Cuando Odoacro depuso al último emperador de Occidente en el 476, el Imperio Romano de Oriente siguió funcionando con total normalidad. Los historiadores medievales no consideraron el 476 como el "fin de Roma": eso es una construcción historiográfica posterior. Bizancio se consideraba —y era— el legítimo continuador del Imperio Romano hasta 1453, casi mil años después.',
+      },
+      {
+        titulo: 'Pensar que las Cruzadas ayudaron a Bizancio',
+        cuerpo: 'Las Cruzadas dañaron más a Bizancio de lo que lo ayudaron. Las tropas cruzadas saquearon ciudades bizantinas en sus travesías, los Estados cruzados en Tierra Santa compitieron con los intereses comerciales del Imperio, y la Cuarta Cruzada destruyó directamente Constantinopla en 1204. El saqueo de 1204 fue el golpe del que Bizancio nunca se recuperó completamente. El Imperio que cayó en 1453 era una sombra del que existía antes de la Cuarta Cruzada.',
+      },
+      {
+        titulo: 'Ignorar el papel del Renacimiento Paleólogo en el Renacimiento italiano',
+        cuerpo: 'El Renacimiento europeo no surgió de la nada en Florencia: tuvo una causa directa en la transmisión del conocimiento griego desde Bizancio. Los académicos que huían de la presión otomana llegaron a Italia con décadas de anticipación a 1453, llevando textos de Platón, Aristóteles y matemáticos griegos. Pletón influyó en Cosme de Médici; Bessarión donó su biblioteca a Venecia. Sin Bizancio, el Renacimiento habría llegado mucho más tarde y de forma muy diferente.',
+      },
+    ],
+  },
+};

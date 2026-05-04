@@ -62,6 +62,10 @@ import { historiaGuerraFria } from './historia-guerra-fria';
 import { historiaAmericaLatina } from './historia-america-latina';
 import { historiaElectricidad } from './historia-electricidad';
 import { historiaCienciaEspanola } from './historia-ciencia-espanola';
+import { historiaDescubrimientosCientificos } from './historia-descubrimientos-cientificos';
+import { historiaIndia } from './historia-india';
+import { historiaBizancio } from './historia-bizancio';
+import { historiaVideojuegosJaponeses } from './historia-videojuegos-japoneses';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -127,6 +131,10 @@ const registry: Record<string, HistoriaData> = {
   'historia-america-latina': historiaAmericaLatina,
   'historia-electricidad': historiaElectricidad,
   'historia-ciencia-espanola': historiaCienciaEspanola,
+  'historia-descubrimientos-cientificos': historiaDescubrimientosCientificos,
+  'historia-india': historiaIndia,
+  'historia-bizancio': historiaBizancio,
+  'historia-videojuegos-japoneses': historiaVideojuegosJaponeses,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
