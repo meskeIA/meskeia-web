@@ -3,6 +3,11 @@
  * Solo modifica la línea background dentro de bloques .hero { }, no afecta a
  * .tabla th, botones, ni ningún otro selector que use el mismo gradiente.
  *
+ * Reconoce tres variantes del gradiente:
+ *   1. linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)
+ *   2. linear-gradient(135deg, var(--primary, #2E86AB) 0%, var(--secondary, #48A9A6) 100%)
+ *   3. linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%)
+ *
  * Uso: node scripts/update-hero-color.mjs
  */
 
@@ -13,8 +18,17 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.join(__dirname, '..', 'app');
 
-const GRADIENT = 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)';
 const NEW_VALUE = 'var(--hero-bg)';
+
+// Patrón que reconoce las tres variantes del gradiente meskeIA en el hero
+const GRADIENT_RE = /linear-gradient\(135deg,\s*(?:var\(--primary(?:,\s*#2E86AB)?\)|#2E86AB)\s+0%,\s*(?:var\(--secondary(?:,\s*#48A9A6)?\)|#48A9A6)\s+100%\)/i;
+
+// Para el pre-filtro rápido (evitar parsear archivos sin ninguna variante)
+// Nota: sin ) para que capture también la forma con fallback var(--primary, #2E86AB)
+const QUICK_MARKERS = [
+  'linear-gradient(135deg, var(--primary',
+  'linear-gradient(135deg, #2E86AB',
+];
 
 // Obtiene todos los *.module.css de forma recursiva
 function getCssFiles(dir) {
@@ -40,7 +54,16 @@ function patchHeroBackground(content) {
   let changed = false;
 
   const patched = lines.map(line => {
-    // Detectar inicio de bloque .hero { (puede tener espacios o no)
+    // Caso especial: .hero { ... } todo en una sola línea
+    if (!insideHero && /^\s*\.hero\s*\{/.test(line) && /\}/.test(line)) {
+      if (GRADIENT_RE.test(line)) {
+        changed = true;
+        return line.replace(GRADIENT_RE, NEW_VALUE);
+      }
+      return line;
+    }
+
+    // Detectar inicio de bloque .hero { multilínea
     if (!insideHero && /^\s*\.hero\s*\{/.test(line)) {
       insideHero = true;
       depth = (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
@@ -57,10 +80,10 @@ function patchHeroBackground(content) {
         return line;
       }
 
-      // Sustituir el gradiente dentro del hero
-      if (line.includes(GRADIENT)) {
+      // Sustituir cualquier variante del gradiente dentro del hero
+      if (GRADIENT_RE.test(line)) {
         changed = true;
-        return line.replace(GRADIENT, NEW_VALUE);
+        return line.replace(GRADIENT_RE, NEW_VALUE);
       }
     }
 
@@ -78,8 +101,8 @@ let skippedCount = 0;
 for (const file of files) {
   const original = readFileSync(file, 'utf-8');
 
-  // Saltar archivos que ni siquiera contienen el gradiente
-  if (!original.includes(GRADIENT)) {
+  // Saltar archivos que no contienen ninguna variante del gradiente
+  if (!QUICK_MARKERS.some(m => original.includes(m))) {
     skippedCount++;
     continue;
   }

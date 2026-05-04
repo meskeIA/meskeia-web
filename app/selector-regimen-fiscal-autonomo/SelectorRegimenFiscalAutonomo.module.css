@@ -22,7 +22,7 @@
   margin-bottom: var(--spacing-xl, 2rem);
   margin-top: 80px;
   padding: var(--spacing-2xl, 3rem) var(--spacing-xl, 2rem);
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: var(--hero-bg);
   border-radius: 16px;
   color: white;
 }

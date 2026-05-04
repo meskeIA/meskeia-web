@@ -1,7 +1,7 @@
 /* ─── Contenedor principal ─────────────────────────────────────── */
 .container { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); }
 
-.hero { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; text-align: center; padding: 3rem 1.5rem 2.5rem; }
+.hero { background: var(--hero-bg); color: #fff; text-align: center; padding: 3rem 1.5rem 2.5rem; }
 .heroTitle { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; margin: 0 0 0.75rem; line-height: 1.2; }
 .heroSubtitle { font-size: clamp(1rem, 2vw, 1.2rem); opacity: 0.9; margin: 0; line-height: 1.5; }
 .heroResultados { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; text-align: center; padding: 2rem 1.5rem 1.75rem; }
