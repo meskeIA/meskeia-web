@@ -4080,6 +4080,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/las-cruzadas/', icon: '⚔️', name: 'Las Cruzadas', description: 'La Guardia Varega de Bizancio, formada por vikingos suecos, defendió el Imperio durante siglos: los mismos guerreros del norte que saqueaban Europa occidental protegían la capital del Imperio Romano de Oriente' },
   ],
 
+  // Naciones Pendientes — Roadmap v11 EJE A (2026-05-04)
+  'visualizador-historia-historia-china-moderna': [
+    { url: '/visualizador-historia/china-dinastias/', icon: '🏯', name: 'China Imperial: Dinastías', description: 'La historia dinástica de China termina donde empieza la China moderna: la caída de la dinastía Qing en 1912 es el momento en que el milenario sistema imperial da paso a la República y luego al comunismo maoísta' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'La China de Mao fue el tercer actor de la Guerra Fría: la ruptura sino-soviética de los años 60, la apertura de Nixon a China en 1972 y la alineación de Pekín con Occidente reequilibraron completamente el bipolarismo' },
+    { url: '/visualizador-historia/historia-japon-moderno/', icon: '⛩️', name: 'Historia del Japón Moderno', description: 'La guerra sino-japonesa (1937-1945) es la experiencia que une y separa a los dos gigantes asiáticos: Japón ocupó China, cometió la Masacre de Nankín y marcó para generaciones la relación bilateral' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'La Revolución Cubana de 1959 y el apoyo de China a los movimientos guerrilleros latinoamericanos conectan la historia de la China maoísta con el turbulento siglo XX latinoamericano' },
+  ],
+  'visualizador-historia-historia-japon-moderno': [
+    { url: '/visualizador-historia/japon/', icon: '🗾', name: 'Historia del Japón Clásico', description: 'El Japón clásico termina en 1868 con la Restauración Meiji: el shogunato Tokugawa que dominó Japón 265 años en aislamiento voluntario dio paso al Japón que en 50 años se convertiría en potencia industrial y militar' },
+    { url: '/visualizador-historia/historia-china-moderna/', icon: '🐉', name: 'Historia de la China Moderna', description: 'La guerra sino-japonesa (1937-1945) y la Masacre de Nankín marcaron para siempre la relación entre Japón y China: la competencia y el recelo mutuo entre las dos mayores economías de Asia tienen raíces en ese período' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'La Segunda Guerra Mundial', description: 'El teatro del Pacífico de la Segunda Guerra Mundial es inseparable de la historia japonesa: Pearl Harbor, Midway, las campañas de las islas y los bombardeos atómicos de Hiroshima y Nagasaki son los hitos más estudiados' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'La ocupación americana de Japón (1945-1952) y la nueva Constitución pacifista transformaron Japón en el aliado estratégico clave de EE.UU. en el Pacífico, base del milagro económico y del sistema de seguridad regional' },
+  ],
+  'visualizador-historia-historia-oriente-medio': [
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'El Imperio Otomano era el poder que controlaba Oriente Medio hasta la Primera Guerra Mundial: el Acuerdo Sykes-Picot que dibujó las fronteras actuales se hizo sobre las ruinas del Imperio Otomano, repartiendo sus territorios árabes' },
+    { url: '/visualizador-historia/primera-guerra-mundial/', icon: '💣', name: 'La Primera Guerra Mundial', description: 'La Primera Guerra Mundial disolvió el Imperio Otomano y creó el Oriente Medio moderno: la Campaña de Arabia, Lawrence de Arabia y la Declaración Balfour son capítulos simultáneos de la misma guerra' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'Oriente Medio fue uno de los principales campos de batalla de la Guerra Fría: la crisis de Suez, la revolución iraní, la invasión soviética de Afganistán y las guerras proxy de EE.UU. y la URSS definieron la región' },
+    { url: '/visualizador-historia/historia-africa/', icon: '🌍', name: 'Historia de África', description: 'El colonialismo europeo que dibujó las fronteras artificiales de África y el Oriente Medio son dos productos del mismo período histórico: el reparto imperialista de finales del siglo XIX y principios del XX' },
+  ],
+  'visualizador-historia-historia-africa': [
+    { url: '/visualizador-historia/historia-oriente-medio/', icon: '🕌', name: 'Historia del Oriente Medio', description: 'El colonialismo europeo que repartió Oriente Medio y África en el siglo XIX y XX es el mismo fenómeno: la Conferencia de Berlín (1884) para África y el Acuerdo Sykes-Picot (1916) para el Oriente Medio son el mismo patrón colonial' },
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Las civilizaciones precolombinas y África precolonial son los dos grandes ejemplos de mundos con civilizaciones avanzadas que el imperialismo europeo disrumpió violentamente en los siglos XV-XIX' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'Las independencias africanas de los años 60 coincidieron con la Guerra Fría: EE.UU. y la URSS compitieron por la influencia en el continente, apoyando a distintos bandos en guerras civiles como la del Congo, Angola y Mozambique' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'El colonialismo, la esclavitud y los procesos de descolonización son experiencias compartidas entre África y América Latina: la diáspora africana es el vínculo demográfico y cultural más profundo entre los dos continentes' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

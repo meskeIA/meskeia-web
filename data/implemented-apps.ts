@@ -866,6 +866,12 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-reino-unido/", // Historia Reino Unido 1066→presente, 10 hitos, 6 eras
   "/visualizador-historia/historia-vikingos/",    // Era Vikinga 793→1100, 10 hitos, 6 eras
 
+  // Naciones Pendientes — Roadmap v11 EJE A (2026-05-04)
+  "/visualizador-historia/historia-china-moderna/",  // China Moderna 1912→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-japon-moderno/",  // Japón Moderno 1868→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-oriente-medio/",  // Oriente Medio 1916→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-africa/",          // África 1884→presente, 10 hitos, 6 eras
+
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
