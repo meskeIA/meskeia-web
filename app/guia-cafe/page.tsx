@@ -40,7 +40,6 @@ const ACIDEZ_NIVEL: Record<Acidez, number> = { Baja: 1, Media: 2, Alta: 3, 'Muy 
 const CUERPO_NIVEL: Record<Cuerpo, number> = { Ligero: 1, Medio: 2, Intenso: 3, 'Muy intenso': 4 };
 
 const CONTINENTES: Continente[] = ['América', 'África', 'Asia / Oceanía'];
-const ESPECIES: Especie[] = ['Arábica', 'Robusta', 'Libérica'];
 
 const ORIGENES: OrigenCafe[] = [
   // ── AMÉRICA ────────────────────────────────────────────────────────────────
@@ -201,7 +200,19 @@ const ORIGENES: OrigenCafe[] = [
     curiosidad: 'Bolivia fue durante siglos uno de los principales productores de coca, y el café es hoy el cultivo de sustitución más exitoso promovido por los sucesivos gobiernos. Las cooperativas cocaleras reconvertidas producen hoy algunos de los mejores cafés de América del Sur.',
   },
   {
-    nombre: 'Panamá / Ecuador Galápagos',
+    nombre: 'Nicaragua Matagalpa',
+    pais: 'Nicaragua', region: 'Matagalpa / Jinotega', continente: 'América', especie: 'Arábica',
+    altitud: '900–1.500 msnm',
+    procesado: ['Lavado'],
+    notasDeSabor: ['Chocolate con leche', 'Caramelo', 'Avellana', 'Fruta tropical'],
+    acidez: 'Media', cuerpo: 'Medio',
+    cosecha: 'Nov–Mar',
+    preparacionIdeal: ['Filtrado', 'Espresso', 'Moka', 'French Press'],
+    descripcion: 'Nicaragua es el mayor productor de café de Centroamérica por extensión cultivada. Las regiones de Matagalpa y Jinotega, en el norte del país, producen los mejores lotes del país: Arábica lavado de altura, perfil equilibrado, con chocolate suave y acidez amable, muy accesible para quienes buscan un café centroamericano de calidad sin perfiles extremos.',
+    curiosidad: 'Nicaragua produce casi exclusivamente café bajo sombra de árboles nativos, una práctica que preserva la biodiversidad y que varias organizaciones internacionales certifican como "bird-friendly". Los cafetales nicaragüenses actúan como corredor de migración para más de 150 especies de aves migratorias norteamericanas, lo que los convierte en un activo ecológico único.',
+  },
+  {
+    nombre: 'Ecuador Galápagos',
     pais: 'Ecuador', region: 'Islas Galápagos', continente: 'América', especie: 'Arábica',
     altitud: '300–600 msnm',
     procesado: ['Natural', 'Lavado'],
@@ -493,6 +504,18 @@ const ORIGENES: OrigenCafe[] = [
     curiosidad: 'Filipinas es el único país del mundo donde se cultivan y consumen comercialmente las cuatro especies de café: Arábica, Robusta, Libérica y Excelsa. El "Barako" (Libérica), casi extinguido, es una rareza mundial muy buscada. Su nombre proviene del término filipino para "toro salvaje".',
   },
   {
+    nombre: 'Filipinas Barako',
+    pais: 'Filipinas', region: 'Batangas / Cavite', continente: 'Asia / Oceanía', especie: 'Libérica',
+    altitud: '100–400 msnm',
+    procesado: ['Natural'],
+    notasDeSabor: ['Floral intenso', 'Ahumado', 'Madera', 'Especias', 'Fruta exótica'],
+    acidez: 'Baja', cuerpo: 'Muy intenso',
+    cosecha: 'Oct–Mar',
+    preparacionIdeal: ['Espresso', 'Moka', 'Café con leche condensada', 'Mezclas'],
+    descripcion: 'El Barako es la variedad de Libérica más conocida del mundo y una rareza en vías de recuperación. Cultivado en las provincias de Batangas y Cavite, produce granos y frutos significativamente más grandes que el Arábica. Su perfil aromático es intenso, peculiar e inconfundible —floral, ahumado y especiado— de una forma que no se parece a ningún otro café del planeta.',
+    curiosidad: 'El nombre "Barako" significa "toro salvaje" en tagalo. En los años 1880 Filipinas fue el cuarto mayor productor mundial de café, hasta que la plaga de roya de 1889 devastó casi toda la producción. El Barako sobrevivió porque la Libérica es más resistente a enfermedades, pero quedó reducido a unas pocas comunidades de Batangas que hoy lo revitalizan como producto de identidad nacional.',
+  },
+  {
     nombre: 'Timor Oriental Ermera',
     pais: 'Timor Oriental', region: 'Ermera', continente: 'Asia / Oceanía', especie: 'Arábica',
     altitud: '1.200–1.800 msnm',
@@ -509,7 +532,6 @@ const ORIGENES: OrigenCafe[] = [
 export default function GuiaCafe() {
   const [busqueda, setBusqueda] = useState('');
   const [continente, setContinente] = useState<Continente | 'Todos'>('Todos');
-  const [especie, setEspecie] = useState<Especie | 'Todas'>('Todas');
   const [mostrarRef, setMostrarRef] = useState(false);
   const [tabRef, setTabRef] = useState<TabRef>('especies');
 
@@ -517,7 +539,6 @@ export default function GuiaCafe() {
     const t = busqueda.toLowerCase().trim();
     return ORIGENES.filter((o) => {
       const matchContinente = continente === 'Todos' || o.continente === continente;
-      const matchEspecie = especie === 'Todas' || o.especie === especie;
       const matchBusqueda =
         !t ||
         o.nombre.toLowerCase().includes(t) ||
@@ -525,9 +546,9 @@ export default function GuiaCafe() {
         o.region.toLowerCase().includes(t) ||
         o.notasDeSabor.some((n) => n.toLowerCase().includes(t)) ||
         o.descripcion.toLowerCase().includes(t);
-      return matchContinente && matchEspecie && matchBusqueda;
+      return matchContinente && matchBusqueda;
     });
-  }, [busqueda, continente, especie]);
+  }, [busqueda, continente]);
 
   function DotIndicador({ nivel, max = 4 }: { nivel: number; max?: number }) {
     return (
@@ -548,7 +569,7 @@ export default function GuiaCafe() {
 
       <header className={styles.hero}>
         <h1>Guía del Café</h1>
-        <p>38 orígenes del mundo: especie, altitud, notas de sabor y preparación ideal</p>
+        <p>40 orígenes del mundo: especie, altitud, notas de sabor y preparación ideal</p>
       </header>
 
       <LegalNotice />
@@ -680,22 +701,6 @@ export default function GuiaCafe() {
                     className={`${styles.filtroBtn} ${continente === c ? styles.filtroActivo : ''}`}
                     onClick={() => setContinente(c)}
                   >{c}</button>
-                ))}
-              </div>
-            </div>
-            <div className={styles.filtroGrupo}>
-              <span className={styles.filtroLabel}>Especie:</span>
-              <div className={styles.filtros} role="group" aria-label="Filtrar por especie">
-                <button
-                  className={`${styles.filtroBtn} ${especie === 'Todas' ? styles.filtroActivo : ''}`}
-                  onClick={() => setEspecie('Todas')}
-                >Todas</button>
-                {ESPECIES.map((e) => (
-                  <button
-                    key={e}
-                    className={`${styles.filtroBtn} ${especie === e ? styles.filtroActivo : ''}`}
-                    onClick={() => setEspecie(e)}
-                  >{e}</button>
                 ))}
               </div>
             </div>
