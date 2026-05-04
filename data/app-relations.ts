@@ -506,7 +506,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // FINANZAS - INVERSIÓN
   'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/estimador-interes-compuesto/'),
   'calculadora-inversiones': finanzasInversionApps.filter(a => a.url !== '/estimador-inversiones/'),
-  'test-perfil-inversor': finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/'),
+  'simulador-sesgos-inversor': [
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Descubre tu perfil de riesgo' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Conceptos Financieros', description: '¿Cuánto sabes de dinero?' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones a largo plazo' },
+  ],
+  'test-perfil-inversor': [
+    { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Detecta tus sesgos cognitivos' },
+    ...finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/').slice(0, 2),
+  ],
   'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/estimador-cartera-inversion/'),
   'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/estimador-tir-van/'),
 

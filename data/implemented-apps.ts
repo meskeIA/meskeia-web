@@ -356,6 +356,7 @@ export const implementedAppsUrls = [
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
   "/playground-sql/",               // Editor SQL interactivo con ejercicios
   "/simulador-puertas-logicas/",    // Puertas lógicas, tablas de verdad, circuitos digitales
+  "/simulador-sesgos-inversor/",    // 8 escenarios para detectar sesgos cognitivos del inversor: aversión pérdidas, manada, confirmación...
   "/glosario-programacion/",        // Diccionario términos programación: 100+ conceptos A-Z
   "/calculadora-sistemas-numericos/", // Binario, octal, decimal, hex + operaciones bit a bit
   "/calculadora-subredes/",         // Subredes IP: CIDR, máscara, broadcast, rango de hosts
