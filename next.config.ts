@@ -83,63 +83,6 @@ const nextConfig: NextConfig = {
   },
 
   // ============================================================================
-  // REDIRECTS 301 - URLs antiguas renombradas (evita 404 en bookmarks y Google)
-  // ============================================================================
-  async redirects() {
-    return [
-      // Apps renombradas en febrero 2026
-      { source: '/simulador-gastos-deducibles/', destination: '/orientador-gastos-deducibles/', permanent: true },
-      { source: '/test-habitos/', destination: '/test-habitos-saludables/', permanent: true },
-      { source: '/conversor-codigo-morse/', destination: '/conversor-morse/', permanent: true },
-      { source: '/calculadora-tamano-cachorro/', destination: '/calculadora-tamano-adulto-perro/', permanent: true },
-      { source: '/calculadora-percentiles-infantiles/', destination: '/orientador-percentiles/', permanent: true },
-      { source: '/entrenador-tablas-multiplicar/', destination: '/tablas-multiplicar/', permanent: true },
-      { source: '/constelaciones-cielo/', destination: '/constelaciones-del-cielo/', permanent: true },
-      { source: '/simulador-genetica-mendeliana/', destination: '/simulador-genetica/', permanent: true },
-      // Selectores renombrados en marzo 2026 (asesor → selector)
-      { source: '/asesor-vehiculo/', destination: '/selector-vehiculo/', permanent: true },
-      { source: '/asesor-smartphone/', destination: '/selector-smartphone/', permanent: true },
-      { source: '/asesor-calefaccion/', destination: '/selector-calefaccion/', permanent: true },
-      { source: '/asesor-portatil/', destination: '/selector-portatil/', permanent: true },
-      { source: '/asesor-mascota/', destination: '/selector-mascota/', permanent: true },
-      { source: '/asesor-seguro-salud/', destination: '/selector-seguro-salud/', permanent: true },
-      // Apps renombradas en marzo 2026 (calculadora/simulador → estimador/orientador)
-      { source: '/simulador-hipoteca/', destination: '/estimador-hipoteca/', permanent: true },
-      { source: '/simulador-prestamos/', destination: '/estimador-prestamos/', permanent: true },
-      { source: '/simulador-cartera-inversion/', destination: '/estimador-cartera-inversion/', permanent: true },
-      { source: '/calculadora-jubilacion/', destination: '/planificador-ahorro-jubilacion/', permanent: true },
-      { source: '/estimador-jubilacion/', destination: '/planificador-ahorro-jubilacion/', permanent: true },
-      { source: '/calculadora-inversiones/', destination: '/estimador-inversiones/', permanent: true },
-      { source: '/calculadora-fire/', destination: '/estimador-fire/', permanent: true },
-      { source: '/calculadora-seguro-vida/', destination: '/orientador-seguro-vida/', permanent: true },
-      { source: '/calculadora-infraseguro/', destination: '/estimador-infraseguro/', permanent: true },
-      { source: '/calculadora-deuda/', destination: '/estimador-deuda/', permanent: true },
-      { source: '/calculadora-tension-arterial/', destination: '/orientador-tension-arterial/', permanent: true },
-      { source: '/calculadora-colesterol/', destination: '/orientador-colesterol/', permanent: true },
-      { source: '/calculadora-medicamentos-mascotas/', destination: '/orientador-medicamentos-mascotas/', permanent: true },
-      { source: '/simulador-compraventa-inmueble/', destination: '/estimador-compraventa-inmueble/', permanent: true },
-      { source: '/calculadora-regla-50-30-20/', destination: '/orientador-regla-50-30-20/', permanent: true },
-      { source: '/calculadora-fondo-emergencia/', destination: '/estimador-fondo-emergencia/', permanent: true },
-      { source: '/calculadora-alquiler-vs-compra/', destination: '/orientador-alquiler-vs-compra/', permanent: true },
-      { source: '/calculadora-tir-van/', destination: '/estimador-tir-van/', permanent: true },
-      { source: '/calculadora-break-even/', destination: '/estimador-break-even/', permanent: true },
-      { source: '/calculadora-roi-marketing/', destination: '/estimador-roi-marketing/', permanent: true },
-      { source: '/calculadora-tarifa-freelance/', destination: '/orientador-tarifa-freelance/', permanent: true },
-      { source: '/calculadora-coste-vivienda/', destination: '/estimador-coste-vivienda/', permanent: true },
-      { source: '/calculadora-reformas-hogar/', destination: '/estimador-reformas-hogar/', permanent: true },
-      { source: '/calculadora-imc/', destination: '/orientador-imc/', permanent: true },
-      { source: '/calculadora-percentiles/', destination: '/orientador-percentiles/', permanent: true },
-      { source: '/interes-compuesto/', destination: '/estimador-interes-compuesto/', permanent: true },
-      { source: '/calculadora-inflacion/', destination: '/estimador-inflacion/', permanent: true },
-      { source: '/calculadora-gastos-comunidad/', destination: '/estimador-gastos-comunidad/', permanent: true },
-      { source: '/calculadora-coste-plazos/', destination: '/estimador-coste-plazos/', permanent: true },
-      { source: '/simulador-jet-lag/', destination: '/orientador-jet-lag/', permanent: true },
-      // Migración a sistema dinámico /visualizador-historia/[slug]/ (2026-05-03)
-      { source: '/visualizador-historia-cine/', destination: '/visualizador-historia/cine/', permanent: true },
-    ];
-  },
-
-  // ============================================================================
   // CABECERAS DE SEGURIDAD - Se aplican a todas las rutas
   // ============================================================================
   async headers() {
