@@ -866,6 +866,12 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-reino-unido/", // Historia Reino Unido 1066→presente, 10 hitos, 6 eras
   "/visualizador-historia/historia-vikingos/",    // Era Vikinga 793→1100, 10 hitos, 6 eras
 
+  // Grandes Temas Siglo XX-XXI — Roadmap v11 EJE B (2026-05-04)
+  "/visualizador-historia/historia-derechos-humanos/",      // Derechos Humanos 1789→presente
+  "/visualizador-historia/historia-medicina-contemporanea/", // Medicina Contemporánea 1865→presente
+  "/visualizador-historia/historia-economia-mundial/",       // Economía Mundial 1929→presente
+  "/visualizador-historia/historia-inteligencia-artificial/", // IA 1950→presente
+
   // Naciones Pendientes — Roadmap v11 EJE A (2026-05-04)
   "/visualizador-historia/historia-china-moderna/",  // China Moderna 1912→presente, 10 hitos, 6 eras
   "/visualizador-historia/historia-japon-moderno/",  // Japón Moderno 1868→presente, 10 hitos, 6 eras

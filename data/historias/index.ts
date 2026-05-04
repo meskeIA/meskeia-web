@@ -70,6 +70,10 @@ import { historiaChinaModerna } from './historia-china-moderna';
 import { historiaJaponModerno } from './historia-japon-moderno';
 import { historiaOrienteMedio } from './historia-oriente-medio';
 import { historiaAfrica } from './historia-africa';
+import { historiaDerechosHumanos } from './historia-derechos-humanos';
+import { historiaMedicinaContemporanea } from './historia-medicina-contemporanea';
+import { historiaEconomiaMundial } from './historia-economia-mundial';
+import { historiaInteligenciaArtificial } from './historia-inteligencia-artificial';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -143,6 +147,10 @@ const registry: Record<string, HistoriaData> = {
   'historia-japon-moderno': historiaJaponModerno,
   'historia-oriente-medio': historiaOrienteMedio,
   'historia-africa': historiaAfrica,
+  'historia-derechos-humanos': historiaDerechosHumanos,
+  'historia-medicina-contemporanea': historiaMedicinaContemporanea,
+  'historia-economia-mundial': historiaEconomiaMundial,
+  'historia-inteligencia-artificial': historiaInteligenciaArtificial,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
