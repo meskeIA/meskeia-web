@@ -52,6 +52,7 @@
     - ✅ Next.js 16.2.2 → 16.2.3, React 19.2.4 → 19.2.5, `@anthropic-ai/sdk` 0.82.0 → 0.88.0, `@tanstack/react-query` 5.96.2 → 5.99.0, `mathjs` 15.1.1 → 15.2.0, `dotenv` 17.4.1 → 17.4.2, `baseline-browser-mapping` 2.10.15 → 2.10.18, `eslint-config-next` + `@next/bundle-analyzer` + `@next/third-parties` → 16.2.3. Build 782 páginas OK. **completado** (2026-04-13).
     - ✅ Next.js 16.2.3 → 16.2.4, `@next/bundle-analyzer` + `@next/third-parties` + `eslint-config-next` → 16.2.4, `@tanstack/react-query` 5.99.0 → 5.99.2, `hls.js` 1.6.15 → 1.6.16, `baseline-browser-mapping` 2.10.18 → 2.10.20, `@axe-core/playwright` 4.11.1 → 4.11.2, `@anthropic-ai/sdk` 0.88.0 → 0.90.0. Build 535 apps OK. **completado** (2026-04-20).
     - ✅ `@anthropic-ai/sdk` 0.90.0 → 0.91.1, `@libsql/client` 0.17.2 → 0.17.3, `@tanstack/react-query` 5.99.2 → 5.100.5, `baseline-browser-mapping` 2.10.20 → 2.10.23. **completado** (2026-04-27).
+    - ✅ `@anthropic-ai/sdk` 0.91.1 → 0.92.0, `@tanstack/react-query` 5.100.5 → 5.100.9, `@trpc/*` 11.16.0 → 11.17.0, `zod` 4.3.6 → 4.4.3, `baseline-browser-mapping` 2.10.23 → 2.10.27, `@axe-core/playwright` 4.11.2 → 4.11.3. Build OK. **completado** (2026-05-04).
     - 🔴 `typescript` 5.9.3 → 6.0.3 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
