@@ -3969,6 +3969,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Kant, Hume, Locke y Rousseau son simultáneamente filósofos e ilustrados: la Ilustración es el momento en que la filosofía moderna alcanza su madurez y mayor influencia social' },
   ],
 
+  // Períodos y Temas Globales — Roadmap v10 EJE B (2026-05-04)
+  'visualizador-historia-historia-guerra-fria': [
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🦅', name: 'Historia de EE.UU.', description: 'La Guerra Fría es el eje central de la historia americana de posguerra: de la Doctrina Truman al reaganismo, EE.UU. organizó toda su política exterior y buena parte de la interior en torno a la rivalidad con la URSS' },
+    { url: '/visualizador-historia/historia-rusia/', icon: '🏔️', name: 'Historia de Rusia', description: 'La URSS es el otro protagonista absoluto: desde Stalin y la victoria en la Segunda Guerra Mundial hasta Gorbachov y el colapso, la historia soviética y la Guerra Fría son inseparables' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'La Segunda Guerra Mundial', description: 'La Guerra Fría nació directamente de la Segunda Guerra Mundial: las tensiones entre los Aliados sobre el reparto de Europa emergieron antes incluso de la derrota de Alemania' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'América Latina fue el campo de batalla más activo de la Guerra Fría fuera de Asia: Cuba, Chile, Nicaragua, Guatemala y decenas de golpes de Estado y guerrillas definidos por la lógica Este-Oeste' },
+  ],
+  'visualizador-historia-historia-america-latina': [
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'América Latina vivió la Guerra Fría de forma brutal: dictaduras apoyadas por EE.UU., guerrillas inspiradas por Cuba, el Operativo Cóndor y revoluciones como la sandinista son la expresión latinoamericana del conflicto global' },
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Las raíces profundas de América Latina: las civilizaciones maya, azteca e inca son el sustrato cultural que sobrevivió a la conquista y sigue presente en la identidad de México, Guatemala, Perú y Bolivia' },
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'La España Medieval', description: 'España colonial heredó las estructuras medievales castellanas: los latifundios, la encomienda, la estructura eclesiástica y el sistema de castas que organizaron América durante tres siglos tienen raíces en la Castilla medieval' },
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '🗽', name: 'La Revolución Francesa', description: 'Los ideales ilustrados franceses inspiraron directamente a los líderes independentistas latinoamericanos: Bolívar, San Martín y los patriotas criollos leyeron a Rousseau, Voltaire y la Declaración de Derechos del Hombre' },
+  ],
+  'visualizador-historia-historia-electricidad': [
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🦅', name: 'Historia de EE.UU.', description: 'EE.UU. fue el laboratorio donde se libró la Guerra de las Corrientes, donde se construyó la primera red eléctrica de Edison y donde Tesla y Westinghouse demostraron el poder de la corriente alterna: la electrificación americana fue el primer modelo global' },
+    { url: '/visualizador-historia/fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'La electricidad y la física son inseparables: de las ecuaciones de Maxwell a la mecánica cuántica que explica los semiconductores, cada avance eléctrico tiene un fundamento físico que esta cronología explora en profundidad' },
+    { url: '/visualizador-historia/historia-ciencia-espanola/', icon: '🔬', name: 'Ciencia Española', description: 'Torres Quevedo (precursor de la automatización) y la participación española en el CERN son el nexo entre la historia de la electricidad y la ciencia española: la ingeniería eléctrica tuvo pioneros notables en España' },
+    { url: '/visualizador-clima/', icon: '🌡️', name: 'Cómo Funciona el Clima', description: 'La transición energética que cierra la historia de la electricidad es la respuesta al cambio climático: entender el calentamiento global da sentido urgente al boom de las renovables y la descarbonización del sector eléctrico' },
+  ],
+  'visualizador-historia-historia-ciencia-espanola': [
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'La España Medieval', description: 'La Escuela de Traductores de Toledo y la ciencia de Al-Ándalus son inseparables de la España Medieval: Averroes, Maimónides y los traductores toledanos operaron en el mismo contexto histórico que Reconquista y convivencia de las tres culturas' },
+    { url: '/visualizador-historia/historia-electricidad/', icon: '⚡', name: 'Historia de la Electricidad', description: 'Torres Quevedo, pionero español de la automatización y la computación, conecta directamente la historia de la ciencia española con la historia de la electricidad y la tecnología: su "Ajedrecista" anticipó la IA décadas antes que Turing' },
+    { url: '/visualizador-historia/renacimiento/', icon: '🎨', name: 'El Renacimiento', description: 'Los científicos españoles del Siglo de Oro (Hernández, Urdaneta, Valverde) operaron en el mismo contexto del Renacimiento europeo: la revolución científica del siglo XVI fue tan española como italiana o alemana' },
+    { url: '/visualizador-historia/ilustracion/', icon: '💡', name: 'La Ilustración', description: 'Las Reales Expediciones Botánicas y la Expedición Balmis son la expresión española de la Ilustración: el afán sistematizador ilustrado aplicado a la naturaleza americana y a la salud pública global' },
+  ],
+
   // Grandes Potencias y Naciones — Roadmap v10 EJE A (2026-05-04)
   'visualizador-historia-historia-eeuu': [
     { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'La relación entre EE.UU. y el Reino Unido es única: colonia que derrota a la metrópoli, aliados en dos guerras mundiales, relación especial que define la política exterior del siglo XX' },

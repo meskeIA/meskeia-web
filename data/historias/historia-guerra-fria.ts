@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const historiaGuerraFria: HistoriaData = {
+  slug: 'historia-guerra-fria',
+  titulo: 'La Guerra Fría: De Yalta a la Caída del Muro (1945-1989)',
+  subtitulo: 'Cuarenta y cuatro años de tensión nuclear, carreras armamentísticas y guerras proxy que dividieron el mundo en dos bloques',
+  descripcionSEO: 'Cronología interactiva de la Guerra Fría: de la Conferencia de Yalta (1945) a la caída del Muro de Berlín (1989). Plan Marshall, OTAN, carrera nuclear, crisis de los misiles de Cuba, carrera espacial, Vietnam, détente y el colapso del bloque soviético en 10 hitos y 6 eras.',
+  keywords: [
+    'guerra fría cronología historia',
+    'URSS EE.UU. bloques carrera nuclear bomba atómica',
+    'plan marshall OTAN pacto varsovia telón de acero',
+    'crisis misiles cuba 1962 kennedy jrushchov',
+    'carrera espacial sputnik apolo 11 luna',
+    'caída muro berlín 1989 gorbachov perestroika glasnost',
+  ],
+  anioInicio: 1945,
+  anioFin: 1989,
+
+  hitos: [
+    {
+      id: 'conferencia-yalta',
+      nombre: 'Conferencia de Yalta y División del Mundo',
+      anioInicio: 1945,
+      anioFin: 1947,
+      color: '#1E3A8A',
+      categoria: 'origenes',
+      descripcion: 'En febrero de 1945, mientras la guerra en Europa aún no había terminado, Roosevelt, Churchill y Stalin se reunieron en Yalta (Crimea) para diseñar el orden de posguerra. Las decisiones tomadas dibujaron la línea divisoria que definiría décadas: Europa Oriental quedó en la órbita soviética, Alemania sería dividida en zonas de ocupación. El discurso del "Telón de Acero" de Churchill en Fulton (marzo 1946) definió el nuevo enfrentamiento. La Doctrina Truman (marzo 1947) prometió apoyo a los países amenazados por el comunismo: el primer acto formal de la Guerra Fría.',
+      obraIconica: 'Conferencia de Yalta (febrero 1945): los Tres Grandes dividen el mundo de posguerra',
+      paises: ['EE.UU.', 'URSS', 'Reino Unido', 'Alemania', 'Europa Oriental'],
+    },
+    {
+      id: 'plan-marshall-otan',
+      nombre: 'Plan Marshall y la OTAN',
+      anioInicio: 1947,
+      anioFin: 1950,
+      color: '#166534',
+      categoria: 'institucional',
+      descripcion: 'El Plan Marshall (1947) canalizó 13.000 millones de dólares para reconstruir Europa Occidental, creando una dependencia económica y política con EE.UU. que fue su objetivo deliberado. La URSS rechazó participar y presionó a sus satélites para que hicieran lo mismo. El golpe comunista en Checoslovaquia (febrero 1948) y el bloqueo soviético de Berlín (junio 1948-mayo 1949) aceleraron la creación de la OTAN (abril 1949), la primera alianza militar permanente de EE.UU. con Europa. La URSS respondió con el Pacto de Varsovia (1955). El mundo quedó definitivamente dividido en dos bloques militares.',
+      obraIconica: 'Puente Aéreo de Berlín (1948-1949): 277.000 vuelos para abastecer la ciudad bloqueada',
+      paises: ['EE.UU.', 'Europa Occidental', 'URSS', 'Berlín', 'Checoslovaquia'],
+    },
+    {
+      id: 'corea-bomba-atomica',
+      nombre: 'Carrera Nuclear y Guerra de Corea',
+      anioInicio: 1949,
+      anioFin: 1953,
+      color: '#DC2626',
+      categoria: 'conflicto_militar',
+      descripcion: 'La primera prueba nuclear soviética (agosto 1949) destruyó el monopolio atómico estadounidense y elevó el terror nuclear a escala global. La Guerra de Corea (1950-1953) fue la primera guerra caliente de la Guerra Fría: EE.UU. y la ONU combatieron a Corea del Norte (apoyada por China y la URSS) en un conflicto que costó 5 millones de vidas y terminó en armisticio sin tratado de paz. La experiencia confirmó la lógica de las "guerras proxy": los bloques se enfrentaban en territorios ajenos para evitar la confrontación directa nuclear. La bomba de hidrógeno (1952/1953) elevó aún más la capacidad destructiva.',
+      obraIconica: 'Primera prueba nuclear soviética (agosto 1949): fin del monopolio atómico de EE.UU.',
+      paises: ['EE.UU.', 'URSS', 'Corea del Norte', 'Corea del Sur', 'China'],
+    },
+    {
+      id: 'descolonizacion-hungria',
+      nombre: 'Descolonización, Hungría y el Deshielo',
+      anioInicio: 1953,
+      anioFin: 1961,
+      color: '#7C2D12',
+      categoria: 'tension',
+      descripcion: 'Tras la muerte de Stalin (1953), Jrushchov inició el "deshielo": condenó el culto a la personalidad, liberó presos políticos y abrió un período de menor represión. La revolución húngara (octubre 1956) creyó que el deshielo permitiría más autonomía: el ejército soviético la aplastó brutalmente, con 2.500 muertos húngaros. La crisis de Suez (1956) humilló a Francia y el Reino Unido, acelerando la descolonización que creó el "Tercer Mundo" como nuevo campo de batalla ideológico. La Revolución Cubana (1959) llevó el frente comunista a 90 millas de Florida. La construcción del Muro de Berlín (agosto 1961) selló la división alemana.',
+      obraIconica: 'Muro de Berlín (agosto 1961): 155 km de hormigón que dividieron una ciudad durante 28 años',
+      paises: ['URSS', 'Hungría', 'Cuba', 'Berlín', 'Suez', 'Tercer Mundo'],
+    },
+    {
+      id: 'carrera-espacial',
+      nombre: 'La Carrera Espacial',
+      anioInicio: 1957,
+      anioFin: 1969,
+      color: '#4338CA',
+      categoria: 'tecnologia',
+      descripcion: 'El Sputnik (4 octubre 1957) fue el mayor shock psicológico de la Guerra Fría: la URSS había puesto el primer satélite en órbita. Yuri Gagarin se convirtió en el primer hombre en el espacio (abril 1961). La NASA respondió con el programa Apolo: Kennedy prometió llegar a la Luna antes del fin de la década. El 20 de julio de 1969, Neil Armstrong pisó la Luna en el Apolo 11. La carrera espacial fue tecnológica pero también ideológica: demostrar cuál sistema político era superior para organizar el progreso humano. Los cohetes desarrollados para satélites podían llevar misiles nucleares a cualquier punto del planeta.',
+      obraIconica: 'Llegada del Apolo 11 a la Luna (20 julio 1969): "Un pequeño paso para el hombre…"',
+      paises: ['EE.UU.', 'URSS'],
+    },
+    {
+      id: 'crisis-misiles-cuba',
+      nombre: 'Crisis de los Misiles de Cuba',
+      anioInicio: 1962,
+      anioFin: 1963,
+      color: '#B22222',
+      categoria: 'crisis_nuclear',
+      descripcion: 'En octubre de 1962, los aviones espía U-2 fotografiaron rampas de misiles soviéticos en Cuba capaces de alcanzar Washington en 13 minutos. Durante 13 días, el mundo estuvo al borde de la guerra nuclear: Kennedy ordenó una cuarentena naval, Jrushchov amenazó con la fuerza. La comunicación secreta entre los líderes —incluyendo un cable crucial de Jrushchov que propuso el intercambio de misiles— evitó la catástrofe. El acuerdo final: la URSS retiró sus misiles de Cuba; EE.UU. se comprometió a no invadir Cuba y retiró secretamente sus misiles de Turquía. Se instaló el "teléfono rojo" Moscú-Washington como lección directa.',
+      obraIconica: 'Crisis de los Misiles de Cuba (octubre 1962): 13 días al borde del apocalipsis nuclear',
+      paises: ['EE.UU.', 'URSS', 'Cuba'],
+    },
+    {
+      id: 'vietnam-movimientos-sociales',
+      nombre: 'Vietnam y los Movimientos Sociales',
+      anioInicio: 1964,
+      anioFin: 1975,
+      color: '#374151',
+      categoria: 'conflicto_militar',
+      descripcion: 'La Guerra de Vietnam (1964-1975) fue la más traumática de EE.UU. en el siglo XX: 58.000 muertos estadounidenses, 3 millones de vietnamitas, y una primera derrota militar que generó una crisis de confianza sin precedentes. Las imágenes de la guerra —retransmitidas en directo por televisión— polarizaron la sociedad: el movimiento antibélico, el feminismo, el Black Power y Mayo del 68 cuestionaron simultáneamente el sistema. El escándalo Watergate (1972-1974) hundió la credibilidad del gobierno. La caída de Saigón (abril 1975) fue la primera victoria comunista visible ante EE.UU. La "Vietnam syndrome" marcó la política exterior americana durante una generación.',
+      obraIconica: 'Caída de Saigón (30 abril 1975): el último helicóptero abandona la embajada de EE.UU.',
+      paises: ['EE.UU.', 'Vietnam del Norte', 'Vietnam del Sur', 'Camboya', 'Laos'],
+    },
+    {
+      id: 'detente-crisis-economica',
+      nombre: 'Distensión y Crisis Económica',
+      anioInicio: 1969,
+      anioFin: 1979,
+      color: '#D97706',
+      categoria: 'diplomacia',
+      descripcion: 'Nixon y Kissinger inauguraron la "détente": apertura diplomática con China (visita de Nixon, febrero 1972), el SALT I con la URSS (1972), el Acuerdo de Helsinki (1975) que reconoció las fronteras europeas de posguerra a cambio de compromisos de derechos humanos. La crisis del petróleo de 1973 (embargo árabe por la guerra de Yom Kippur) y 1979 (Revolución Iraní) golpearon duramente a las economías occidentales con stagflación. La invasión soviética de Afganistán (diciembre 1979) enterró la détente: Carter aplicó sanciones y boicoteó los Juegos Olímpicos de Moscú 1980. Reagan llegó al poder prometiendo confrontar al "Imperio del Mal" soviético.',
+      obraIconica: 'Nixon en China (febrero 1972): la apertura que cambió la geopolítica mundial',
+      paises: ['EE.UU.', 'URSS', 'China', 'Afganistán', 'Oriente Medio'],
+    },
+    {
+      id: 'reagan-guerra-de-las-galaxias',
+      nombre: 'Reagan y la Ofensiva Final',
+      anioInicio: 1980,
+      anioFin: 1985,
+      color: '#6D28D9',
+      categoria: 'tension',
+      descripcion: 'Reagan relanzó la carrera armamentista: el presupuesto militar pasó de 303.000 a 456.000 millones de dólares en cuatro años. La Iniciativa de Defensa Estratégica ("Guerra de las Galaxias", 1983) amenazó con hacer obsoleto el arsenal nuclear soviético. Los euromisiles Pershing II en Europa Occidental y la respuesta soviética SS-20 elevaron la tensión a niveles de la crisis de Cuba. El derribo del avión civil coreano KAL 007 por la URSS (1983) y el ejercicio "Able Archer 83" (que la URSS confundió con un ataque real) llevaron al mundo al borde del conflicto. La presión económica y tecnológica era insoportable para la maltrecha economía soviética.',
+      obraIconica: 'Iniciativa de Defensa Estratégica (1983): Reagan propone "La Guerra de las Galaxias"',
+      paises: ['EE.UU.', 'URSS', 'Europa Occidental', 'Polonia'],
+    },
+    {
+      id: 'gorbachov-caida-muro',
+      nombre: 'Gorbachov y la Caída del Muro',
+      anioInicio: 1985,
+      anioFin: 1989,
+      color: '#059669',
+      categoria: 'final',
+      descripcion: 'Gorbachov llegó al poder en 1985 con la misión de reformar el sistema, no de liquidarlo. La glasnost y la perestroika desataron fuerzas que no podía controlar. El desastre de Chernóbil (1986) expuso la ineficiencia sistémica. En 1989, el Bloque del Este se desmoronó en cascada: Polonia celebró elecciones libres (junio), Hungría abrió su frontera con Austria (mayo), miles de alemanes del Este huyeron por Hungría. El 9 de noviembre de 1989, la RDA anunció la apertura del Muro: multitudes lo demolieron a martillazos. En semanas cayeron los regímenes comunistas de Checoslovaquia, Bulgaria y Rumanía. La Guerra Fría había terminado.',
+      obraIconica: 'Caída del Muro de Berlín (9 noviembre 1989): el símbolo del fin de la Guerra Fría',
+      paises: ['URSS', 'Alemania', 'Polonia', 'Hungría', 'Checoslovaquia', 'Rumanía'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Nacimiento de la Guerra Fría',
+      desde: 1945,
+      hasta: 1950,
+      icono: '🌐',
+      hitosDestacados: ['Conferencia de Yalta y División del Mundo', 'Plan Marshall y la OTAN'],
+      eventos: [
+        'Conferencia de Yalta: Roosevelt, Churchill y Stalin dividen el mundo de posguerra (febrero 1945)',
+        'Discurso del "Telón de Acero" de Churchill en Fulton, Missouri (marzo 1946)',
+        'Doctrina Truman: EE.UU. promete apoyar a los países amenazados por el comunismo (1947)',
+        'Plan Marshall: 13.000 millones de dólares para reconstruir Europa Occidental (1947-1951)',
+      ],
+    },
+    {
+      nombre: 'La Primera Confrontación',
+      desde: 1950,
+      hasta: 1961,
+      icono: '☢️',
+      hitosDestacados: ['Carrera Nuclear y Guerra de Corea', 'Descolonización, Hungría y el Deshielo'],
+      eventos: [
+        'Primera prueba nuclear soviética: fin del monopolio atómico de EE.UU. (agosto 1949)',
+        'Guerra de Corea: primera guerra caliente de la Guerra Fría, 5 millones de muertos (1950-1953)',
+        'Muerte de Stalin e inicio del "deshielo" de Jrushchov (1953)',
+        'Revolución Húngara aplastada por el Ejército Rojo: 2.500 muertos (1956)',
+        'Revolución Cubana: Castro lleva el comunismo a 90 millas de Florida (1959)',
+      ],
+    },
+    {
+      nombre: 'El Pico del Terror Nuclear',
+      desde: 1961,
+      hasta: 1964,
+      icono: '💣',
+      hitosDestacados: ['Crisis de los Misiles de Cuba'],
+      eventos: [
+        'Construcción del Muro de Berlín: 155 km dividen una ciudad en una noche (agosto 1961)',
+        'Crisis de los Misiles de Cuba: 13 días al borde del apocalipsis nuclear (octubre 1962)',
+        'Acuerdo secreto: URSS retira misiles de Cuba; EE.UU. se compromete a no invadir (noviembre 1962)',
+      ],
+    },
+    {
+      nombre: 'La Carrera Espacial y Vietnam',
+      desde: 1964,
+      hasta: 1979,
+      icono: '🚀',
+      hitosDestacados: ['La Carrera Espacial', 'Vietnam y los Movimientos Sociales'],
+      eventos: [
+        'Sputnik (1957) y Yuri Gagarin (1961): la URSS lidera la carrera espacial',
+        'Apolo 11: Neil Armstrong pisa la Luna, EE.UU. gana la carrera espacial (julio 1969)',
+        'Guerra de Vietnam: derrota traumática de EE.UU., 58.000 muertos (1964-1975)',
+        'Mayo del 68: movimientos estudiantiles sacuden Europa y EE.UU. (1968)',
+        'Caída de Saigón: primera victoria comunista visible frente a EE.UU. (abril 1975)',
+      ],
+    },
+    {
+      nombre: 'Distensión y Nueva Tensión',
+      desde: 1979,
+      hasta: 1985,
+      icono: '🤝',
+      hitosDestacados: ['Distensión y Crisis Económica', 'Reagan y la Ofensiva Final'],
+      eventos: [
+        'Apertura diplomática de Nixon con China y SALT I con la URSS (1972)',
+        'Crisis del petróleo de 1973: el embargo árabe golpea las economías occidentales',
+        'Invasión soviética de Afganistán: entierro de la détente (diciembre 1979)',
+        'Reagan: el "Imperio del Mal" y relanzamiento de la carrera armamentista (1981)',
+        'Iniciativa de Defensa Estratégica ("Guerra de las Galaxias"): amenaza al arsenal nuclear soviético (1983)',
+      ],
+    },
+    {
+      nombre: 'El Colapso del Bloque Soviético',
+      desde: 1985,
+      hasta: 1989,
+      icono: '🧱',
+      hitosDestacados: ['Gorbachov y la Caída del Muro'],
+      eventos: [
+        'Gorbachov inicia la glasnost (transparencia) y la perestroika (reestructuración) (1985)',
+        'Desastre de Chernóbil: expone la ineficiencia sistémica del modelo soviético (1986)',
+        'Hungría abre su frontera con Austria: miles de alemanes del Este huyen al Oeste (mayo 1989)',
+        'Caída del Muro de Berlín: multitudes lo demuelen a martillazos (9 noviembre 1989)',
+      ],
+    },
+  ],
+
+  categorias: {
+    origenes: 'Orígenes',
+    institucional: 'Construcción Institucional',
+    conflicto_militar: 'Conflicto Militar',
+    tension: 'Tensión y Crisis',
+    tecnologia: 'Carrera Tecnológica',
+    crisis_nuclear: 'Crisis Nuclear',
+    diplomacia: 'Diplomacia y Distensión',
+    final: 'Fin de la Guerra Fría',
+  },
+
+  colores: {
+    origenes: '#1E3A8A',
+    institucional: '#166534',
+    conflicto_militar: '#DC2626',
+    tension: '#7C2D12',
+    tecnologia: '#4338CA',
+    crisis_nuclear: '#B22222',
+    diplomacia: '#D97706',
+    final: '#059669',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Guerra Fría fue la primera guerra total sin combate directo entre las dos superpotencias: 44 años —de 1945 a 1989— en que EE.UU. y la URSS compitieron en todo excepto en el campo de batalla. La tensión nuclear, la propaganda ideológica, las guerras proxy en Asia, África y América Latina, la carrera espacial y la carrera armamentista moldearon un mundo bipolar del que aún hoy somos herederos. Comprender la Guerra Fría es comprender por qué Europa está dividida como está, por qué existe la OTAN, por qué Corea sigue siendo dos países, y por qué internet —inventado como red de comunicación ante un ataque nuclear— está en nuestros bolsillos.',
+
+    tablaComparativa: [
+      { hito: 'Conferencia de Yalta y División del Mundo', periodo: '1945-1947', categoria: 'Orígenes', personaje: 'Roosevelt / Churchill / Stalin', aportacion: 'Trazado de la línea divisoria entre bloques que definiría 44 años de historia mundial' },
+      { hito: 'Plan Marshall y la OTAN', periodo: '1947-1950', categoria: 'Construcción Institucional', personaje: 'Truman / Bevin / Vandenberg', aportacion: 'Reconstrucción de Europa Occidental y primera alianza militar permanente transatlántica' },
+      { hito: 'Carrera Nuclear y Guerra de Corea', periodo: '1949-1953', categoria: 'Conflicto Militar', personaje: 'MacArthur / Mao / Kim Il-sung', aportacion: 'Establecimiento de la lógica de guerras proxy y el equilibrio del terror nuclear mutual' },
+      { hito: 'Crisis de los Misiles de Cuba', periodo: '1962-1963', categoria: 'Crisis Nuclear', personaje: 'Kennedy / Jrushchov / Castro', aportacion: 'Momento más cercano a la guerra nuclear; origen del teléfono rojo y los tratados de control de armas' },
+      { hito: 'La Carrera Espacial', periodo: '1957-1969', categoria: 'Carrera Tecnológica', personaje: 'Gagarin / Armstrong / Von Braun', aportacion: 'Demostración tecnológica e ideológica: conquista de la Luna como símbolo de la superioridad del sistema capitalista' },
+      { hito: 'Gorbachov y la Caída del Muro', periodo: '1985-1989', categoria: 'Fin de la Guerra Fría', personaje: 'Gorbachov / Reagan / Walesa', aportacion: 'Implosión pacífica del bloque soviético y reunificación del mundo dividido por el Telón de Acero' },
+    ],
+
+    escenarios: [
+      {
+        icono: '💣',
+        titulo: '¿Y si la Crisis de los Misiles de Cuba hubiera escalado?',
+        perfil: 'El contrafactual más temido',
+        texto: 'En octubre de 1962, un submarino soviético B-59, sin comunicación con Moscú y creyendo que la guerra había comenzado, estuvo a punto de lanzar un torpedo nuclear. Solo el voto negativo del segundo oficial, Vasili Arjípov, lo impidió. Si hubiera escalado, los historiadores estiman que el intercambio nuclear habría matado entre 100 y 200 millones de personas en las primeras horas. El "fin del mundo" no era metáfora: era la estimación técnica de los planificadores militares de ambos bandos.',
+      },
+      {
+        icono: '🚀',
+        titulo: '¿Y si la URSS hubiera ganado la carrera espacial?',
+        perfil: 'El mundo sin el Apolo 11',
+        texto: 'La URSS llevaba la delantera hasta 1966: primer satélite (1957), primer hombre en el espacio (1961), primera mujer en el espacio (1963). Si los cohetes N1 soviéticos no hubieran fallado repetidamente y Korolev no hubiera muerto en 1966, la Luna podría haber sido soviética. El impacto en la credibilidad del modelo capitalista habría sido devastador. Las democracias occidentales habrían tenido que explicar por qué el sistema de planificación central podía ganar la mayor carrera tecnológica de la historia.',
+      },
+      {
+        icono: '🧱',
+        titulo: '¿Y si el Muro de Berlín nunca hubiera caído?',
+        perfil: 'La URSS que podría haber sobrevivido',
+        texto: 'En 1989, Gorbachov tomó la decisión crucial de no usar la fuerza militar para sostener a los regímenes del Bloque del Este. En 1956 (Hungría) y 1968 (Checoslovaquia), la URSS sí intervino y aplastó las rebeliones. Si Gorbachov hubiera seguido ese precedente, el muro podría haber resistido décadas más. La URSS no colapsó por debilidad militar: colapsó porque su liderazgo decidió no matar a su propia gente. Esa decisión tiene nombre: Gorbachov.',
+      },
+      {
+        icono: '🌍',
+        titulo: '¿Y si la détente de los años 70 se hubiera consolidado?',
+        perfil: 'El mundo bipolar estable',
+        texto: 'Nixon, Kissinger y Brézhnev construyeron en los años 70 un sistema de coexistencia basado en el SALT I, la apertura a China y el Acuerdo de Helsinki. Si la invasión soviética de Afganistán (1979) no hubiera destruido ese equilibrio, y si Reagan no hubiera relanzado la carrera armamentista, es posible que la Guerra Fría se hubiera institucionalizado en una bipolaridad estable de décadas. El mundo actual podría ser más parecido a la Europa dividida de los 70 que al orden post-1991.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué se llamó "Guerra Fría" si nunca hubo combate directo?',
+        respuesta: 'El término lo popularizó el periodista Walter Lippmann en 1947, acuñado originalmente por el escritor George Orwell. "Fría" porque EE.UU. y la URSS nunca se dispararon directamente entre sí: ambos tenían armas nucleares suficientes para destruirse mutuamente varias veces (la llamada "destrucción mutua asegurada" o MAD). El terror nuclear creó un equilibrio perverso: luchar directamente significaba el apocalipsis, así que el conflicto se desplazó a guerras proxy, propaganda, espionaje y carreras tecnológicas.',
+        tip: 'La "destrucción mutua asegurada" (MAD, por sus siglas en inglés) era literalmente la estrategia oficial de defensa de ambas superpotencias: si me atacas, te destruyo aunque ya esté muerto.',
+      },
+      {
+        pregunta: '¿Quién "ganó" la Guerra Fría?',
+        respuesta: 'EE.UU. y el bloque occidental en términos de resultado: el bloque soviético se disolvió pacíficamente entre 1989 y 1991. Pero la respuesta es más matizada. La URSS se derrumbó por sus propias contradicciones internas —economía ineficiente, incapacidad de competir tecnológicamente, desgaste en Afganistán— tanto como por la presión occidental. Gorbachov no perdió una guerra: decidió reformar un sistema irreformable. Muchos historiadores argumentan que nadie "ganó" la Guerra Fría: simplemente uno de los contendientes colapsó.',
+        tip: 'El PIB de la URSS en 1989 era aproximadamente el de Italia. La mayor potencia militar del mundo tenía la economía de un país mediano europeo.',
+      },
+      {
+        pregunta: '¿Cuál fue el momento más peligroso de la Guerra Fría?',
+        respuesta: 'La Crisis de los Misiles de Cuba (octubre 1962) es el candidato obvio y correcto. Pero documentos desclasificados revelan que el ejercicio "Able Archer 83" de noviembre de 1983 —un simulacro de la OTAN que la URSS interpretó como preparación para un ataque real— pudo ser igual de peligroso. La inteligencia soviética informó que los misiles estaban siendo cargados. Solo la decisión del analista de inteligencia Stanislav Petrov de no informar de una supuesta alerta de misiles (que resultó ser una alarma falsa) evitó potencialmente la guerra en 1983.',
+        tip: 'Stanislav Petrov, el oficial soviético que decidió no comunicar la alerta de misiles en 1983, fue sancionado por su mando por "actuar sin procedimiento". Le llevó décadas recibir reconocimiento internacional.',
+      },
+      {
+        pregunta: '¿Por qué el Muro de Berlín era tan importante simbólicamente?',
+        respuesta: 'Berlín estaba en el corazón de Europa, dividida entre los cuatro vencedores de la Segunda Guerra Mundial. El Muro (construido en una noche el 13 de agosto de 1961) era la prueba física de que el régimen comunista de la RDA solo se sostenía por la fuerza: en los años anteriores, 3,5 millones de alemanes del Este habían huido al Oeste. Kennedy lo resumió en 1963 con su famoso "Ich bin ein Berliner": Berlín era el símbolo de la libertad en el corazón del Telón de Acero. Su caída fue el símbolo del fin de la Guerra Fría.',
+        tip: 'El 9 de noviembre de 1989, el portavoz del gobierno de la RDA anunció accidentalmente que los puntos de control estaban abiertos "de inmediato, sin demora". La gente fue al muro esa misma noche. Nadie había planeado que cayera esa noche.',
+      },
+      {
+        pregunta: '¿Qué herencia dejó la Guerra Fría en el mundo actual?',
+        respuesta: 'La lista es larga: la OTAN (aún activa), las armas nucleares (9 países las poseen hoy), Corea del Norte y Corea del Sur (aún sin tratado de paz), el conflicto cubano (el embargo sigue vigente), el mapa político de África y Oriente Medio (trazado por las guerras proxy), internet (diseñado como red resiliente ante un ataque nuclear), la carrera espacial (GPS, satélites de comunicaciones), y la polarización político-ideológica que aún estructura muchos debates. El mundo actual es, en gran parte, el resultado de 44 años de Guerra Fría.',
+        tip: 'El GPS que usas en el móvil es un sistema militar desarrollado durante la Guerra Fría para guiar misiles. Se abrió al uso civil en los años 80.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por los colores: dos bloques, ocho categorías',
+        cuerpo: 'Antes de leer nada, observa la Línea del Tiempo y fíjate en la distribución de colores. El azul oscuro (orígenes) y el verde (institucional) dominan el inicio; el rojo (conflicto militar y crisis nuclear) el centro; el naranja (diplomacia) y el morado (tensión) los años 70-80; el verde esmeralda (final) cierra el ciclo. La cronología visual ya cuenta la historia: tensión creciente, un pico de peligro, un intento de relajación y un colapso inesperado.',
+      },
+      {
+        titulo: 'Compara los dos grandes conflictos militares',
+        cuerpo: 'Haz clic en "Carrera Nuclear y Guerra de Corea" y luego en "Vietnam y los Movimientos Sociales". Ambos son conflictos militares, pero con lógicas distintas: Corea fue una guerra convencional con límites geográficos claros; Vietnam fue una guerra asimétrica que destruyó la sociedad estadounidense desde dentro. El ejército más poderoso del mundo perdió ambas guerras proxy: esa paradoja explica por qué el conflicto ideológico no se resolvió en el campo de batalla.',
+      },
+      {
+        titulo: 'Localiza la Crisis de los Misiles: el punto de inflexión',
+        cuerpo: 'La Crisis de los Misiles de Cuba (1962-1963) es el hito más corto en tiempo pero el más decisivo: en 13 días se jugó la supervivencia de la civilización. Después de esa crisis, ambas superpotencias instalaron el "teléfono rojo", firmaron el Tratado de Prohibición Parcial de Pruebas Nucleares (1963) y comenzaron a construir mecanismos de control de riesgos. La crisis fue aterradora, pero también marcó el inicio de la gestión racional del conflicto.',
+      },
+      {
+        titulo: 'Usa la Comparativa para entender la lógica del conflicto',
+        cuerpo: 'En la tabla Comparativa, observa la columna "Categoría". Verás que el conflicto no fue solo militar: fue institucional (OTAN), tecnológico (carrera espacial), diplomático (détente) y finalmente político (colapso del bloque). Cada categoría fue un frente de batalla diferente. La Guerra Fría fue simultáneamente una guerra económica, ideológica, científica y cultural. Filtrar por cada categoría muestra qué frentes dominaban en cada época.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran el ritmo de la Guerra Fría: nació de una guerra caliente (1939-1945), tuvo un período de máxima peligrosidad (1961-1964), luego un intento de normalización (1969-1979) y un inesperado colapso (1985-1989). La era "El Colapso del Bloque Soviético" es la más sorprendente: en 1987, ningún analista occidental predecía que el muro caería en dos años. La historia raramente se mueve según los planes de nadie.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🗺️',
+        texto: 'La Guerra Fría no fue solo entre EE.UU. y la URSS: se libró en Corea, Vietnam, Angola, Mozambique, Nicaragua, Afganistán, Cuba y decenas de países más. El "Tercer Mundo" fue el campo de batalla real donde murieron millones de personas. Cuando estudies un conflicto de la segunda mitad del siglo XX, pregúntate siempre: ¿qué papel jugaron EE.UU. y la URSS en él?',
+      },
+      {
+        icono: '☢️',
+        texto: 'En el punto máximo de la Guerra Fría (1986), EE.UU. y la URSS tenían juntos más de 70.000 cabezas nucleares. Hoy quedan unas 12.500 en todo el mundo. La mayor parte de esa reducción se logró mediante tratados negociados durante la propia Guerra Fría: el SALT I (1972), el SALT II (1979), el INF (1987) y el START I (1991) son los documentos diplomáticos más importantes del siglo XX.',
+      },
+      {
+        icono: '📺',
+        texto: 'La televisión cambió la Guerra Fría. Las imágenes de Vietnam en los salones americanos crearon un movimiento antibélico sin precedentes. La retransmisión de la caída del Muro de Berlín en directo aceleró el colapso de los demás regímenes del Bloque del Este: la gente de Checoslovaquia, Bulgaria y Rumanía vio en televisión que era posible y actuó. La información era en sí misma un arma geopolítica.',
+      },
+      {
+        icono: '🔍',
+        texto: 'Muchos documentos de la Guerra Fría siguen clasificados, especialmente los soviéticos. Lo que sabemos sobre los 13 días de la Crisis de los Misiles de Cuba, o sobre cuánto sabía Reagan del estado real de la economía soviética, viene de desclasificaciones graduales de los años 90 y 2000. La historia de la Guerra Fría se sigue reescribiendo a medida que se abren los archivos.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la Guerra Fría fue solo un conflicto militar',
+        cuerpo: 'El conflicto militar (Corea, Vietnam, Afganistán) fue solo uno de los frentes. La Guerra Fría fue simultáneamente una guerra económica (Plan Marshall vs. COMECON), una guerra científica (carrera espacial, bomba de hidrógeno), una guerra cultural (propaganda, cine, deportes olímpicos) y una guerra de espías (CIA vs. KGB). Los Juegos Olímpicos, el festival de jazz, la literatura de ciencia ficción y los programas de ayuda al desarrollo fueron instrumentos de la misma batalla.',
+      },
+      {
+        titulo: 'Pensar que la caída del muro fue planificada o inevitable',
+        cuerpo: 'El 9 de noviembre de 1989, la caída del Muro fue accidental: el portavoz del gobierno de la RDA anunció por error que los puntos de control estaban abiertos "de inmediato". Nadie en Berlín Este lo había planeado. En 1987, la CIA estimaba que la URSS duraría décadas más. La Guerra Fría no terminó por un plan estratégico de EE.UU.: terminó porque el sistema soviético era económicamente insostenible y Gorbachov decidió reformarlo en lugar de reprimirlo.',
+      },
+      {
+        titulo: 'Ignorar las víctimas de las guerras proxy',
+        cuerpo: 'La "guerra fría" fue muy caliente para millones de personas en Corea, Vietnam, Cambodia, Laos, Angola, Mozambique, El Salvador, Nicaragua, Guatemala y Afganistán. Se estima que las guerras proxy de la Guerra Fría causaron entre 20 y 30 millones de muertos. Llamarla "fría" solo tiene sentido desde la perspectiva de las dos superpotencias que nunca se dispararon directamente. Para el resto del mundo, fue una guerra permanente.',
+      },
+      {
+        titulo: 'Confundir la détente con el fin de la Guerra Fría',
+        cuerpo: 'La détente de Nixon-Kissinger (1969-1979) fue un período de gestión del conflicto, no su resolución. EE.UU. y la URSS siguieron compitiendo militarmente, ideológicamente y en el Tercer Mundo durante toda la détente. La invasión soviética de Afganistán (1979) demostró que la détente tenía límites claros. La Guerra Fría solo terminó cuando uno de los bloques colapsó internamente, no cuando los líderes decidieron llevarse bien.',
+      },
+    ],
+  },
+};

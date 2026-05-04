@@ -843,6 +843,12 @@ export const implementedAppsUrls = [
   "/visualizador-historia/ilustracion/",          // La Ilustración 1687→1789, 10 hitos, 6 eras
   "/visualizador-historia/cine/",                 // Historia del Cine 1895→presente, 10 hitos, 6 eras (migrado)
 
+  // Períodos y Temas Globales — Roadmap v10 EJE B (2026-05-04)
+  "/visualizador-historia/historia-guerra-fria/",    // Guerra Fría 1945→1989, 10 hitos, 6 eras
+  "/visualizador-historia/historia-america-latina/", // América Latina 1810→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-electricidad/",   // Historia Electricidad 1831→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-ciencia-espanola/", // Ciencia Española s.X→presente, 10 hitos, 6 eras
+
   // Grandes Potencias y Naciones — Roadmap v10 EJE A (2026-05-04)
   "/visualizador-historia/historia-eeuu/",        // Historia EE.UU. 1607→presente, 10 hitos, 6 eras
   "/visualizador-historia/historia-rusia/",       // Historia Rusia 862→presente, 10 hitos, 6 eras
