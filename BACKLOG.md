@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
 > **Última actualización**: 2026-05-04
-> **Apps totales**: 761 | **Suites**: 13
+> **Apps totales**: 766 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -32,6 +32,13 @@
 > Tareas técnicas que afectan la calidad y seguridad de toda la plataforma.
 
 - [x] **Disclaimers: 5 apps corregidas** — severity/collapsible ajustados según DISCLAIMER-POLICY.md: aditivos-e-alimentarios, guia-especias, guia-infusiones → severity="high" collapsible={false}; checklist-cambio-regimen-autonomo, orientador-contrato-mercantil → severity="critical"→"high". `visualizador-cancer` se mantiene en severity="critical" intencionalmente (decisión del usuario). *(resuelto: 2026-05-04)*
+
+- [x] **5 nuevas apps creadas** — Basadas en analytics de uso real. Con patrón v2.0 completo y build OK. *(2026-05-04)*
+  - `quiz-tabla-periodica` — 40 preguntas en 5 categorías (suites: estudiantes, juegos, cultura)
+  - `simulador-sesgos-inversor` — 8 escenarios de sesgos cognitivos financieros (suite: finanzas)
+  - `simulador-circuitos-electricos` — Serie/paralelo hasta 6R, Ohm, potencia (suites: estudiantes, tecnicas)
+  - `test-tolerancia-riesgo-detallado` — 20 preguntas en 5 dimensiones, 5 perfiles con asignación activos (suite: finanzas)
+  - `simulador-reacciones-quimicas` — Estequiometría + reactivo limitante para 20 reacciones reales (suites: estudiantes, tecnicas)
 
 - [ ] **npm audit: 14 vulnerabilidades** — 10 moderadas + 4 altas. Paquetes afectados: `dompurify` (XSS múltiple, via jspdf), `flatted` (DoS + Prototype Pollution, 4 HIGH), `@hono/node-server` (bypass middleware), `brace-expansion` (DoS), `uuid` via resend/svix. `npm audit fix` disponible pero puede añadir breaking changes. Sesión dedicada.
   - *Detectado*: 2026-05-04
