@@ -843,6 +843,12 @@ export const implementedAppsUrls = [
   "/visualizador-historia/ilustracion/",          // La Ilustración 1687→1789, 10 hitos, 6 eras
   "/visualizador-historia/cine/",                 // Historia del Cine 1895→presente, 10 hitos, 6 eras (migrado)
 
+  // Grandes Potencias y Naciones — Roadmap v10 EJE A (2026-05-04)
+  "/visualizador-historia/historia-eeuu/",        // Historia EE.UU. 1607→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-rusia/",       // Historia Rusia 862→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-reino-unido/", // Historia Reino Unido 1066→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-vikingos/",    // Era Vikinga 793→1100, 10 hitos, 6 eras
+
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación

@@ -3969,6 +3969,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Kant, Hume, Locke y Rousseau son simultáneamente filósofos e ilustrados: la Ilustración es el momento en que la filosofía moderna alcanza su madurez y mayor influencia social' },
   ],
 
+  // Grandes Potencias y Naciones — Roadmap v10 EJE A (2026-05-04)
+  'visualizador-historia-historia-eeuu': [
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'La relación entre EE.UU. y el Reino Unido es única: colonia que derrota a la metrópoli, aliados en dos guerras mundiales, relación especial que define la política exterior del siglo XX' },
+    { url: '/visualizador-historia/historia-rusia/', icon: '🏔️', name: 'Historia de Rusia', description: 'EE.UU. y Rusia definieron el siglo XX: desde la alianza contra Hitler hasta la Guerra Fría, la carrera espacial y el mundo post-1991, son las dos potencias cuya rivalidad estructura la geopolítica moderna' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'La Segunda Guerra Mundial', description: 'EE.UU. transformó su papel en el mundo al entrar en la Segunda Guerra Mundial: de potencia continental aislacionista a garante del orden liberal internacional, un cambio que dura hasta hoy' },
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '🗽', name: 'La Revolución Francesa', description: 'La Revolución Americana (1776) y la Francesa (1789) son las dos caras del mismo movimiento ilustrado: los padres fundadores de EE.UU. influyeron directamente en los revolucionarios franceses' },
+  ],
+  'visualizador-historia-historia-rusia': [
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🦅', name: 'Historia de los EE.UU.', description: 'Las dos superpotencias que definieron el siglo XX: desde la alianza en la Segunda Guerra Mundial hasta la Guerra Fría, la carrera espacial y la geopolítica post-1991' },
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'El Imperio Británico y el Imperio Ruso fueron los grandes rivales del siglo XIX en el "Gran Juego" por Asia Central; en el XX, aliados cruciales contra Alemania en ambas guerras mundiales' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'La Segunda Guerra Mundial', description: 'La URSS soportó el mayor peso de la guerra contra el nazismo: 27 millones de muertos soviéticos, Stalingrado como punto de inflexión, y la victoria que convirtió a la URSS en superpotencia' },
+    { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'Rusia y el Imperio Otomano fueron rivales durante siglos por el Mar Negro y los Balcanes: las guerras Ruso-Turcas del siglo XIX definieron el mapa de Europa Oriental' },
+  ],
+  'visualizador-historia-historia-reino-unido': [
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🦅', name: 'Historia de los EE.UU.', description: 'Las trece colonias británicas que se convirtieron en superpotencia: la relación especial entre Londres y Washington es la alianza más duradera del mundo moderno' },
+    { url: '/visualizador-historia/historia-vikingos/', icon: '🚢', name: 'La Era Vikinga', description: 'Los normandos que conquistaron Inglaterra en 1066 eran descendientes de vikingos: la Conquista Normanda, el hito fundacional de la historia inglesa, es el último capítulo de la expansión vikinga' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '✈️', name: 'La Segunda Guerra Mundial', description: 'La Batalla de Gran Bretaña y el liderazgo de Churchill son uno de los momentos más estudiados del siglo XX: la isla que resistió sola define el carácter nacional británico hasta hoy' },
+    { url: '/visualizador-historia/edad-media-europea/', icon: '🏰', name: 'La Edad Media Europea', description: 'La Magna Carta (1215) y el parlamentarismo inglés son la aportación británica al constitucionalismo europeo: el modelo que influiría en todas las democracias occidentales' },
+  ],
+  'visualizador-historia-historia-vikingos': [
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'La Conquista Normanda de 1066 cierra la Era Vikinga y abre la historia medieval inglesa: los normandos son vikingos romanizados que transformaron para siempre el idioma, la cultura y las instituciones de Inglaterra' },
+    { url: '/visualizador-historia/historia-rusia/', icon: '🏔️', name: 'Historia de Rusia', description: 'Los varegos suecos fundaron la Rus de Kiev y Nóvgorod: los vikingos del este son literalmente los fundadores del Estado ruso, conectando Escandinavia con Bizancio y el mundo islámico a través de los ríos' },
+    { url: '/visualizador-historia/edad-media-europea/', icon: '🏰', name: 'La Edad Media Europea', description: 'Las incursiones vikingas aceleraron la fragmentación carolingia y el nacimiento del feudalismo: la Normandía viking, el Danelaw inglés y la Rus son tres ramas del mismo árbol que remodeló la Europa medieval' },
+    { url: '/visualizador-historia/las-cruzadas/', icon: '⚔️', name: 'Las Cruzadas', description: 'La Guardia Varega de Bizancio, formada por vikingos suecos, defendió el Imperio durante siglos: los mismos guerreros del norte que saqueaban Europa occidental protegían la capital del Imperio Romano de Oriente' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

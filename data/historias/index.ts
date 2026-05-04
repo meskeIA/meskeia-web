@@ -54,6 +54,10 @@ import { viajesEspaciales } from './viajes-espaciales';
 import { videojuegos } from './videojuegos';
 import { videojuegosEspanoles } from './videojuegos-espanoles';
 import { arquitecturaEspanola } from './arquitectura-espanola';
+import { historiaEeuu } from './historia-eeuu';
+import { historiaRusia } from './historia-rusia';
+import { historiaReinoUnido } from './historia-reino-unido';
+import { historiaVikingos } from './historia-vikingos';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -111,6 +115,10 @@ const registry: Record<string, HistoriaData> = {
   videojuegos,
   'videojuegos-espanoles': videojuegosEspanoles,
   'arquitectura-espanola': arquitecturaEspanola,
+  'historia-eeuu': historiaEeuu,
+  'historia-rusia': historiaRusia,
+  'historia-reino-unido': historiaReinoUnido,
+  'historia-vikingos': historiaVikingos,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
