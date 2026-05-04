@@ -9,7 +9,7 @@
 /* ── Hero ───────────────────────────────────────────────────────────────────── */
 
 .hero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   padding: 3rem 1.5rem 2.5rem;
   text-align: center;
 }

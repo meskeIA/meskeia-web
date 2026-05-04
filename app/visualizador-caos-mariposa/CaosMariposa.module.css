@@ -12,7 +12,7 @@
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   color: #ffffff;
   text-align: center;
   padding: 56px 24px 48px;

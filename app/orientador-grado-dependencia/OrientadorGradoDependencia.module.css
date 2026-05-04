@@ -37,7 +37,7 @@
   text-align: center;
   margin: 80px 0 var(--spacing-xl);
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   border-radius: var(--radius-large);
   color: white;
 }

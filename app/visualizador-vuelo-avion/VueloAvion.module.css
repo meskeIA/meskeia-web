@@ -1,7 +1,7 @@
 .container { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); }
 
 .hero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   color: #fff; padding: 3rem 2rem; text-align: center;
 }
 .heroIcon { font-size: 3rem; margin-bottom: 1rem; }

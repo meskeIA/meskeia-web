@@ -18,7 +18,7 @@
 ───────────────────────────────────────────── */
 
 .hero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   border-radius: 16px;
   padding: 48px 32px;
   text-align: center;

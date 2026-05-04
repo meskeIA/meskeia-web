@@ -40,7 +40,9 @@
       "WebFetch",
       "WebSearch",
       "NotebookEdit",
-      "mcp__playwright__*"
+      "mcp__playwright__*",
+      "Skill(nueva-app-meskeia)",
+      "Skill(nueva-app-meskeia:*)"
     ],
     "deny": [],
     "ask": []

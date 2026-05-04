@@ -11,7 +11,7 @@
 .hero {
   text-align: center;
   padding: var(--spacing-2xl) var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--hero-bg);
   border-radius: var(--radius-large);
   margin-top: 80px;
   margin-bottom: var(--spacing-xl);
