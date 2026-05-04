@@ -1,0 +1,828 @@
+/* GuiaPlantasInterior.module.css - meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Main */
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+/* Controles */
+.controles {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buscador {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.buscador:focus {
+  border-color: var(--primary);
+}
+
+.buscador::placeholder {
+  color: var(--text-muted);
+}
+
+.filtrosRow {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.filtroGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.filtroLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filtroBtn {
+  padding: 0.3rem 0.75rem;
+  border: 1.5px solid var(--border, #d1d5db);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.filtroActivo:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.checkboxRow input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.checkboxRow:hover {
+  color: var(--text-primary);
+}
+
+/* Contador */
+.contador {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.contador strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  box-shadow: 0 6px 24px rgba(46, 134, 171, 0.12);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  padding: 1rem 1.1rem 0.75rem;
+  border-bottom: 1px solid var(--border, #e5e5e5);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cardTitulo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.nombreCientifico {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+
+/* Badges de luz */
+.luzBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.luzPlena {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.luzIndirecta {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.luzSemisombra {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.luzSombra {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Badge dificultad */
+.dificultadBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.difMuyFacil {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.difFacil {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.difModerada {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.difDificil {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Badge toxicidad */
+.toxBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.toxNo {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.toxLeve {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.toxModerada {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.toxMuy {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Cuerpo de la card */
+.cardBody {
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.descripcion {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* MetaGrid */
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 0.75rem;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.metaLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.metaValor {
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Beneficios */
+.beneficiosSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.beneficiosTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.beneficiosTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  background: rgba(46, 134, 171, 0.09);
+  color: var(--primary);
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+/* Cuidados */
+.cuidadosBox {
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Curiosidad */
+.curiosidadBox {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.curiosidadIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.curiosidadText {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  font-style: italic;
+}
+
+/* Sin resultados */
+.sinResultados {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+  grid-column: 1 / -1;
+}
+
+.sinResultados p {
+  margin: 0.3rem 0;
+}
+
+/* ==============================
+   SECCIÓN EDUCATIVA v2.0
+   ============================== */
+
+.sectionTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e5e5e5);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 520px;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border, #e5e5e5);
+  color: var(--text-secondary);
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: var(--bg-primary);
+}
+
+/* Escenarios */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.escenarioCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.escenarioCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.faqItem h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.faqTip {
+  display: inline-block;
+  background: rgba(46, 134, 171, 0.09);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  margin-top: 0.4rem;
+}
+
+/* Pasos */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+  padding-top: 0.2rem;
+}
+
+.stepContent h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border, #e5e5e5);
+  border-radius: 10px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.tipCard h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Warning box */
+.warningBox {
+  background: #fff7ed;
+  border: 1.5px solid #f97316;
+  border-radius: 10px;
+  padding: 1.1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #9a3412;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: #7c2d12;
+  line-height: 1.5;
+}
+
+/* Dark mode */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, #1d5a72 0%, #2a706e 100%);
+}
+
+[data-theme='dark'] .controles,
+[data-theme='dark'] .card,
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .buscador {
+  background: #1e1e1e;
+  border-color: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .filtroBtn {
+  background: #1e1e1e;
+  border-color: #3a3a3a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .luzPlena {
+  background: #451a03;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .luzIndirecta {
+  background: #052e16;
+  color: #6ee7b7;
+}
+
+[data-theme='dark'] .luzSemisombra {
+  background: #1e1b4b;
+  color: #a5b4fc;
+}
+
+[data-theme='dark'] .luzSombra {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .difMuyFacil {
+  background: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .difFacil {
+  background: #052e16;
+  color: #6ee7b7;
+}
+
+[data-theme='dark'] .difModerada {
+  background: #422006;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .difDificil {
+  background: #450a0a;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .toxNo {
+  background: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .toxLeve {
+  background: #422006;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .toxModerada {
+  background: #431407;
+  color: #fdba74;
+}
+
+[data-theme='dark'] .toxMuy {
+  background: #450a0a;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .cuidadosBox {
+  background: rgba(72, 169, 166, 0.12);
+}
+
+[data-theme='dark'] .curiosidadBox {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .beneficiosTag {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #1e1e1e;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #431407;
+  border-color: #c2410c;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fed7aa;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fdba74;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .main {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtrosRow {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .metaGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .filtroBtn,
+  .buscador {
+    transition-duration: 0.01ms !important;
+  }
+}

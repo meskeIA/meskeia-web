@@ -4096,6 +4096,30 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
   ],
+  'guia-plantas-interior': [
+    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+  ],
+  'guia-setas': [
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y dificultad de cuidado' },
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
+  ],
+  'guia-superalimentos': [
+    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y dificultad de cuidado' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
+  ],
+  'guia-cortes-carne': [
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+    { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y denominación de origen' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
+  ],
 };
 
 /**

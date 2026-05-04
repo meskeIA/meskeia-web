@@ -870,6 +870,10 @@ export const implementedAppsUrls = [
   "/guia-quesos/",                                 // Directorio 55 quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y D.O.
   "/guia-aceite-oliva/",                           // Directorio 32 variedades de aceite de oliva: país, perfil, intensidad, usos y D.O.
   "/guia-cocteles/",                               // Directorio 45 cócteles clásicos: ingredientes, método, copa, graduación y origen
+  "/guia-plantas-interior/",                       // Directorio 40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados
+  "/guia-setas/",                                  // Directorio 40 setas: comestibilidad, hábitat, temporada, identificación y avisos de seguridad
+  "/guia-superalimentos/",                         // Directorio 40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones
+  "/guia-cortes-carne/",                           // Directorio 45 cortes de carne: animal, terneza, método de cocción y temperatura ideal
 ];
 
 /**
