@@ -370,7 +370,7 @@ export default function OrientadorContratoMercantilPage() {
 
         <DisclaimerCard
           variant="financial"
-          severity="critical"
+          severity="high"
           collapsible={false}
         />
 

@@ -209,10 +209,10 @@ export default function AdditivosEAlimentariosPage() {
         <LegalNotice />
 
         <DisclaimerCard
-          variant="general"
-          severity="low"
+          variant="medical"
+          severity="high"
+          collapsible={false}
           context="aditivos-e-alimentarios"
-          collapsible={true}
         />
 
         {/* Buscador */}

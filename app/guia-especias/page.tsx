@@ -819,10 +819,10 @@ export default function GuiaEspeciasPage() {
         <LegalNotice />
 
         <DisclaimerCard
-          variant="general"
-          severity="low"
+          variant="medical"
+          severity="high"
           context="guia-especias"
-          collapsible={true}
+          collapsible={false}
         />
 
         {/* Buscador */}

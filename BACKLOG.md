@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-04-27
-> **Apps totales**: 638 | **Suites**: 13
+> **Última actualización**: 2026-05-04
+> **Apps totales**: 761 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -30,6 +30,11 @@
 ## 🔴 URGENTE — Mantenimiento Técnico
 
 > Tareas técnicas que afectan la calidad y seguridad de toda la plataforma.
+
+- [x] **Disclaimers: 5 apps corregidas** — severity/collapsible ajustados según DISCLAIMER-POLICY.md: aditivos-e-alimentarios, guia-especias, guia-infusiones → severity="high" collapsible={false}; checklist-cambio-regimen-autonomo, orientador-contrato-mercantil → severity="critical"→"high". `visualizador-cancer` se mantiene en severity="critical" intencionalmente (decisión del usuario). *(resuelto: 2026-05-04)*
+
+- [ ] **npm audit: 14 vulnerabilidades** — 10 moderadas + 4 altas. Paquetes afectados: `dompurify` (XSS múltiple, via jspdf), `flatted` (DoS + Prototype Pollution, 4 HIGH), `@hono/node-server` (bypass middleware), `brace-expansion` (DoS), `uuid` via resend/svix. `npm audit fix` disponible pero puede añadir breaking changes. Sesión dedicada.
+  - *Detectado*: 2026-05-04
 
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura

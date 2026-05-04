@@ -840,7 +840,7 @@ export default function GuiaInfusiones() {
         </div>
       </main>
 
-      <DisclaimerCard variant="medical" severity="medium" collapsible={true} />
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
       <EducationalSection
         title="Todo sobre las infusiones de plantas"

@@ -264,8 +264,7 @@ export default function ChecklistCambioRegimenPage() {
 
         <LegalNotice />
 
-        {/* Disclaimer fiscal crítico */}
-        <DisclaimerCard variant="financial" severity="critical" collapsible={false} />
+        <DisclaimerCard variant="financial" severity="high" collapsible={false} />
 
         {/* ── FASE 1: Orientador ── */}
         <section className={styles.orientadorSection}>
