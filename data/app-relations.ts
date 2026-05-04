@@ -2271,10 +2271,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
     { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Capitales y banderas del mundo' },
   ],
+  'quiz-tabla-periodica': [
+    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Consulta los 118 elementos' },
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tendencias Periódicas', description: 'Mapas de calor y propiedades' },
+  ],
   'quiz-simbolos-quimicos': [
+    { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Grupos, períodos y propiedades' },
     { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos Naturaleza', description: '43 organismos sorprendentes' },
     { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Capitales y banderas del mundo' },
-    { url: '/quiz-figuras-retoricas/', icon: '✍️', name: 'Quiz Figuras Retóricas', description: 'Identifica recursos literarios' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Consulta los 118 elementos' },
   ],
   'juego-memoria': juegosPuzzleApps.filter(a => a.url !== '/juego-memoria/'),
@@ -2377,7 +2382,11 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-movimiento': [{ url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales interactivas' }, ...matematicasAvanzadasApps.slice(0, 2), { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' }],
   'simulador-fisica': [{ url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora Movimiento', description: 'MRU, MRUA, caída libre' }, { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' }, { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm, potencia' }, { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }],
   'calculadora-electricidad': [{ url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' }, ...matematicasAvanzadasApps.slice(0, 2)],
-  'tabla-periodica': [{ url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario', description: 'Términos de física y química' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
+  'tabla-periodica': [
+    { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tu química' },
+    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },
+    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario', description: 'Términos de física y química' },
+  ],
   'glosario-fisica-quimica': [{ url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
 
   // UTILIDADES EXTRA
