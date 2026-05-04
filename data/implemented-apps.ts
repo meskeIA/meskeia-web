@@ -355,6 +355,7 @@ export const implementedAppsUrls = [
   // Informática y Programación (9 implementadas)
   "/visualizador-algoritmos/",      // Visualiza algoritmos de ordenación paso a paso
   "/playground-sql/",               // Editor SQL interactivo con ejercicios
+  "/simulador-circuitos-electricos/", // Serie, paralelo, Ley de Ohm, potencia — hasta 6 resistencias
   "/simulador-puertas-logicas/",    // Puertas lógicas, tablas de verdad, circuitos digitales
   "/simulador-sesgos-inversor/",    // 8 escenarios para detectar sesgos cognitivos del inversor: aversión pérdidas, manada, confirmación...
   "/glosario-programacion/",        // Diccionario términos programación: 100+ conceptos A-Z
