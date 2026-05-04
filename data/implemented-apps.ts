@@ -866,6 +866,10 @@ export const implementedAppsUrls = [
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
   "/guia-infusiones/",                             // Directorio 55 plantas para infusión: usos tradicionales, preparación, contraindicaciones
   "/guia-cafe/",                                   // Directorio 38 orígenes de café: especie, altitud, notas de sabor, procesado, cosecha y preparación
+  "/guia-te/",                                     // Directorio 40 variedades de té: familia, origen, temperatura, tiempo de infusión y nivel de cafeína
+  "/guia-quesos/",                                 // Directorio 55 quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y D.O.
+  "/guia-aceite-oliva/",                           // Directorio 32 variedades de aceite de oliva: país, perfil, intensidad, usos y D.O.
+  "/guia-cocteles/",                               // Directorio 45 cócteles clásicos: ingredientes, método, copa, graduación y origen
 ];
 
 /**

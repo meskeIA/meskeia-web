@@ -1,0 +1,972 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 3rem 2rem;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Controles ── */
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.buscador {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.buscador:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .buscador {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .buscador:focus {
+  border-color: var(--primary);
+}
+
+.filtrosRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filtroGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filtroLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme='dark'] .filtroLabel {
+  color: var(--text-secondary);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filtroBtn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .filtroBtn {
+  border-color: #555;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .filtroActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.contador {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .contador {
+  color: var(--text-muted);
+}
+
+/* ── Grid de tarjetas ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .card {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .card:hover {
+  box-shadow: 0 4px 16px rgba(72, 169, 166, 0.18);
+}
+
+/* ── Card Header ── */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── Badges de Familia (colores vibrantes / festivos) ── */
+.familiaBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.familiaSour {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.familiaHighball {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.familiaMartini {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.familiaTropical {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.familiaSpritz {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.familiaCremoso {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.familiaSinAlcohol {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+[data-theme='dark'] .familiaSour {
+  background: #14532d;
+  color: #86efac;
+}
+
+[data-theme='dark'] .familiaHighball {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .familiaMartini {
+  background: #374151;
+  color: #d1d5db;
+  border-color: #555;
+}
+
+[data-theme='dark'] .familiaTropical {
+  background: #7c2d12;
+  color: #fdba74;
+}
+
+[data-theme='dark'] .familiaSpritz {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .familiaCremoso {
+  background: #713f12;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .familiaSinAlcohol {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+
+/* ── Badges de Graduación ── */
+.graduacionBadge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.gradSinAlcohol {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.gradBaja {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.gradMedia {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.gradAlta {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+[data-theme='dark'] .gradSinAlcohol {
+  background: #052e16;
+  color: #86efac;
+  border-color: #166534;
+}
+
+[data-theme='dark'] .gradBaja {
+  background: #451a03;
+  color: #fde68a;
+  border-color: #92400e;
+}
+
+[data-theme='dark'] .gradMedia {
+  background: #431407;
+  color: #fdba74;
+  border-color: #c2410c;
+}
+
+[data-theme='dark'] .gradAlta {
+  background: #450a0a;
+  color: #fca5a5;
+  border-color: #b91c1c;
+}
+
+/* ── Título de tarjeta ── */
+.cardTitulo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.nombre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .nombre {
+  color: var(--text-primary);
+}
+
+.origenEpoca {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .origenEpoca {
+  color: var(--text-muted);
+}
+
+/* ── Pills de método y copa ── */
+.pillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.metodoPill,
+.copaPill {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .metodoPill,
+[data-theme='dark'] .copaPill {
+  background: rgba(46, 134, 171, 0.15);
+  color: #7fb3d3;
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+/* ── Descripción ── */
+.descripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .descripcion {
+  color: var(--text-secondary);
+}
+
+/* ── Ingredientes ── */
+.ingredientesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.ingredientesList {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ingredientesList li {
+  margin-bottom: 0.15rem;
+}
+
+[data-theme='dark'] .ingredientesList {
+  color: var(--text-secondary);
+}
+
+/* ── Perfil ── */
+.perfilSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.perfilTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.perfilTag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  background: rgba(72, 169, 166, 0.1);
+  color: var(--secondary);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+}
+
+[data-theme='dark'] .perfilTag {
+  background: rgba(72, 169, 166, 0.12);
+  color: #48a9a6;
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+/* ── Etiquetas de sección ── */
+.sectionLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme='dark'] .sectionLabel {
+  color: var(--text-muted);
+}
+
+/* ── Indicador de dulzor ── */
+.dulzorRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.dotFilled {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--secondary);
+  display: inline-block;
+}
+
+.dotEmpty {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: inline-block;
+}
+
+[data-theme='dark'] .dotEmpty {
+  background: #444;
+}
+
+.dulzorLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .dulzorLabel {
+  color: var(--text-secondary);
+}
+
+/* ── Badge de base ── */
+.baseBadgeRow {
+  display: flex;
+}
+
+.baseBadge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: #f9fafb;
+  color: var(--text-secondary);
+  border: 1px solid #e5e7eb;
+}
+
+[data-theme='dark'] .baseBadge {
+  background: #2a2a2a;
+  color: var(--text-secondary);
+  border-color: #3a3a3a;
+}
+
+/* ── Curiosidad ── */
+.curiosidadBox {
+  background: rgba(46, 134, 171, 0.05);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+[data-theme='dark'] .curiosidadBox {
+  background: rgba(46, 134, 171, 0.08);
+  border-left-color: var(--primary);
+}
+
+.curiosidadIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.curiosidadText {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+[data-theme='dark'] .curiosidadText {
+  color: var(--text-secondary);
+}
+
+/* ── Sin resultados ── */
+.sinResultados {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+/* ── EducationalSection: tablaComparativa ── */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #3a3a3a;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable caption {
+  caption-side: top;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+  color: var(--text-primary);
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #2a2a2a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+/* ── EducationalSection: escenarios ── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: rgba(46, 134, 171, 0.05);
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.escenarioCard strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .escenarioCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .escenarioCard p {
+  color: var(--text-secondary);
+}
+
+/* ── EducationalSection: FAQ ── */
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.faqItem p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.faqTip {
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(72, 169, 166, 0.08);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .faqItem strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.1);
+  color: var(--text-secondary);
+}
+
+/* ── EducationalSection: stepGuide ── */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  counter-reset: step-counter;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.stepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+[data-theme='dark'] .stepNumber {
+  background: var(--primary);
+}
+
+[data-theme='dark'] .stepContent strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stepContent p {
+  color: var(--text-secondary);
+}
+
+/* ── EducationalSection: tips ── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tipCard p {
+  color: var(--text-secondary);
+}
+
+/* ── EducationalSection: warningBox ── */
+.warningBox {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #422006;
+  border-color: #92400e;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningHeader strong {
+  font-size: 0.95rem;
+  color: #92400e;
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #fde68a;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+.warningList li strong {
+  color: #92400e;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: #fde68a;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .main {
+    padding: 1.5rem 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .pillsRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero h1 {
+    font-size: 1.4rem;
+  }
+
+  .filtros {
+    gap: 0.35rem;
+  }
+
+  .filtroBtn {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .stepNumber {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .filtroBtn,
+  .buscador {
+    transition-duration: 0.01ms !important;
+  }
+}
