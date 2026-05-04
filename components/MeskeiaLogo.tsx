@@ -27,8 +27,10 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const uid = useId().replace(/:/g, '');
-  const bgId = `meskeia-bg-${uid}`;
-  const coreId = `meskeia-core-${uid}`;
+  const bgId  = `msk-bg-${uid}`;
+  const ray1Id = `msk-r1-${uid}`;
+  const ray2Id = `msk-r2-${uid}`;
+  const ray3Id = `msk-r3-${uid}`;
 
   useEffect(() => {
     setMounted(true);
@@ -37,32 +39,33 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   const logoContent = (
     <>
       <div className={styles.logoIcon}>
-        <svg viewBox="0 0 132 132" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
           <defs>
-            <linearGradient id={bgId} x1="0" y1="0" x2="132" y2="132" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#3A9BC1"/>
-              <stop offset="45%"  stopColor="#2E86AB"/>
-              <stop offset="100%" stopColor="#1F6A8B"/>
+            <linearGradient id={bgId} x1="0" y1="0" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#0f3157"/>
+              <stop offset="100%" stopColor="#081d35"/>
             </linearGradient>
-            <radialGradient id={coreId} cx="50%" cy="45%" r="55%">
-              <stop offset="0%"   stopColor="#FFFFFF"/>
-              <stop offset="60%"  stopColor="#9BDCD8"/>
-              <stop offset="100%" stopColor="#48A9A6"/>
-            </radialGradient>
+            <linearGradient id={ray1Id} x1="80" y1="220" x2="155" y2="55" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#ffffff"/>
+              <stop offset="100%" stopColor="#23d8d0"/>
+            </linearGradient>
+            <linearGradient id={ray2Id} x1="80" y1="220" x2="250" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#ffffff"/>
+              <stop offset="100%" stopColor="#26a9ff"/>
+            </linearGradient>
+            <linearGradient id={ray3Id} x1="80" y1="220" x2="250" y2="225" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#ffffff"/>
+              <stop offset="100%" stopColor="#2fd4d1"/>
+            </linearGradient>
           </defs>
-          <rect width="132" height="132" rx="29" fill={`url(#${bgId})`}/>
-          <circle cx="66" cy="66" r="18" fill={`url(#${coreId})`}/>
-          <circle cx="66" cy="66" r="7"  fill="#1F6A8B"/>
-          <g fill="#FFFFFF">
-            <circle cx="26"  cy="26"  r="4.5"/>
-            <circle cx="106" cy="30"  r="3.5"/>
-            <circle cx="108" cy="104" r="5"/>
-            <circle cx="28"  cy="108" r="3"/>
-            <circle cx="62"  cy="20"  r="2"/>
-            <circle cx="20"  cy="66"  r="2.5"/>
-            <circle cx="112" cy="66"  r="2.5"/>
-            <circle cx="66"  cy="112" r="2"/>
-          </g>
+          <rect width="300" height="300" rx="60" fill={`url(#${bgId})`}/>
+          <line strokeLinecap="round" strokeWidth="20" x1="80" y1="220" x2="155" y2="55"  stroke={`url(#${ray1Id})`}/>
+          <line strokeLinecap="round" strokeWidth="16" x1="80" y1="220" x2="250" y2="120" stroke={`url(#${ray2Id})`}/>
+          <line strokeLinecap="round" strokeWidth="12" x1="80" y1="220" x2="250" y2="225" stroke={`url(#${ray3Id})`}/>
+          <circle cx="80"  cy="220" r="28" fill="#ffffff"/>
+          <circle cx="155" cy="55"  r="19" fill="#27d4cf"/>
+          <circle cx="250" cy="120" r="15" fill="#25a9ff"/>
+          <circle cx="250" cy="225" r="11" fill="#2fd4d1"/>
         </svg>
       </div>
       <div className={styles.logoText}>

@@ -1,0 +1,28 @@
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" width="300" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f3157"/>
+      <stop offset="100%" stop-color="#081d35"/>
+    </linearGradient>
+    <linearGradient id="r1" x1="80" y1="220" x2="155" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#23d8d0"/>
+    </linearGradient>
+    <linearGradient id="r2" x1="80" y1="220" x2="250" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#26a9ff"/>
+    </linearGradient>
+    <linearGradient id="r3" x1="80" y1="220" x2="250" y2="225" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#2fd4d1"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" rx="60" fill="url(#bg)"/>
+  <line stroke-linecap="round" stroke-width="20" x1="80" y1="220" x2="155" y2="55"  stroke="url(#r1)" filter="drop-shadow(0 0 10px rgba(45,220,230,0.5))"/>
+  <line stroke-linecap="round" stroke-width="16" x1="80" y1="220" x2="250" y2="120" stroke="url(#r2)" filter="drop-shadow(0 0 8px rgba(45,170,255,0.45))"/>
+  <line stroke-linecap="round" stroke-width="12" x1="80" y1="220" x2="250" y2="225" stroke="url(#r3)" filter="drop-shadow(0 0 6px rgba(45,220,230,0.35))"/>
+  <circle cx="80"  cy="220" r="28" fill="#ffffff" filter="drop-shadow(0 0 14px rgba(255,255,255,0.75))"/>
+  <circle cx="155" cy="55"  r="19" fill="#27d4cf" filter="drop-shadow(0 0 10px rgba(45,220,230,0.55))"/>
+  <circle cx="250" cy="120" r="15" fill="#25a9ff" filter="drop-shadow(0 0 8px rgba(45,170,255,0.5))"/>
+  <circle cx="250" cy="225" r="11" fill="#2fd4d1" filter="drop-shadow(0 0 6px rgba(45,220,230,0.4))"/>
+</svg>
