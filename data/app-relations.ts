@@ -507,11 +507,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'interes-compuesto': finanzasInversionApps.filter(a => a.url !== '/estimador-interes-compuesto/'),
   'calculadora-inversiones': finanzasInversionApps.filter(a => a.url !== '/estimador-inversiones/'),
   'simulador-sesgos-inversor': [
+    { url: '/test-tolerancia-riesgo-detallado/', icon: '📊', name: 'Test Riesgo Detallado', description: 'Evaluación profunda en 5 dimensiones' },
     { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Descubre tu perfil de riesgo' },
-    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Conceptos Financieros', description: '¿Cuánto sabes de dinero?' },
     { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Crecimiento de inversiones a largo plazo' },
   ],
+  'test-tolerancia-riesgo-detallado': [
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Cuestionario básico de perfil' },
+    { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Detecta tus sesgos cognitivos' },
+    ...finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/').slice(0, 1),
+  ],
   'test-perfil-inversor': [
+    { url: '/test-tolerancia-riesgo-detallado/', icon: '📊', name: 'Test Riesgo Detallado', description: 'Evaluación profunda en 5 dimensiones' },
     { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Detecta tus sesgos cognitivos' },
     ...finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/').slice(0, 2),
   ],

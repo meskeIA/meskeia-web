@@ -106,6 +106,7 @@ export const implementedAppsUrls = [
   "/orientador-justicia-gratuita/",       // Orientador justicia gratuita: requisitos IPREM, prestaciones
   "/estimador-inversiones/",
   "/test-perfil-inversor/",
+  "/test-tolerancia-riesgo-detallado/", // Test 20 preguntas en 5 dimensiones: horizonte, capacidad, emoción, experiencia, objetivos
   "/estimador-cartera-inversion/",    // Monte Carlo, Sharpe, volatilidad
   "/calculadora-suscripciones/",      // Control de suscripciones recurrentes
   "/calculadora-roommates/",          // División gastos piso compartido
