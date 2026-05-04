@@ -1,0 +1,29 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Simulador de Reacciones Químicas | meskeIA',
+  description: 'Calculadora de estequiometría y reactivo limitante para 20 reacciones químicas reales. Dado X gramos o moles de una sustancia, calcula todos los demás. Encuentra el reactivo que agota primero y el rendimiento teórico.',
+  keywords: [
+    'estequiometría química',
+    'reactivo limitante',
+    'cálculo moles gramos',
+    'reacciones químicas calculadora',
+    'rendimiento teórico reacción',
+    'masa molar cálculo',
+    'química bachillerato',
+    'calculadora química',
+    'balanceo estequiometrico',
+    'síntesis combustión descomposición',
+  ],
+  openGraph: {
+    title: 'Simulador de Reacciones Químicas | meskeIA',
+    description: 'Estequiometría y reactivo limitante para 20 reacciones reales. Convierte gramos ↔ moles, calcula cantidades de todos los productos y reactivos.',
+    url: 'https://meskeia.com/simulador-reacciones-quimicas/',
+    siteName: 'meskeIA',
+    locale: 'es_ES',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://meskeia.com/simulador-reacciones-quimicas/',
+  },
+};

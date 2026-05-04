@@ -954,11 +954,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad en la Vida', description: 'Azar y decisiones' },
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
   ],
+  'simulador-reacciones-quimicas': [
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas Visual', description: 'Tipos, balanceo y átomos animados' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Masas atómicas y propiedades' },
+    { url: '/quiz-tabla-periodica/', icon: '🔬', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tu química' },
+  ],
   'visualizador-reacciones-quimicas': [
+    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Calculadora de Reacciones', description: 'Estequiometría y reactivo limitante' },
     { url: '/visualizador-tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Visual', description: 'Elementos interactivos' },
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
-    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
   ],
   'visualizador-celula': [
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
