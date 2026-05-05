@@ -1826,10 +1826,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-suscripciones/', icon: '📱', name: 'Calculadora Suscripciones', description: 'Controla lo que gastas al mes' },
   ],
   'selector-mascota': [
-    { url: '/selector-seguro-salud/', icon: '🏥', name: 'Selector Seguro de Salud', description: '¿Necesitas seguro médico privado?' },
-    { url: '/comparador-tipos-seguros/', icon: '📊', name: 'Comparador Seguros', description: 'Guía de seguros en España' },
-    { url: '/calculadora-gastos-hogar/', icon: '🏠', name: 'Calculadora Gastos Hogar', description: 'Control de tu presupuesto mensual' },
-    { url: '/selector-vehiculo/', icon: '🚗', name: 'Selector de Vehículo', description: '¿Qué tipo de coche te conviene?' },
+    { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: '40 razas: tamaño, energía, temperamento y compatibilidad' },
+    { url: '/guia-razas-gatos/', icon: '🐈', name: 'Guía de Razas de Gatos', description: '35 razas: pelo, energía, temperamento y compatibilidad' },
+    { url: '/guia-cuidado-mascota/', icon: '📚', name: 'Guía Cuidado Mascota', description: 'Todo lo que necesitas saber para cuidar a tu mascota' },
+    { url: '/calculadora-alimentacion-mascotas/', icon: '🍖', name: 'Alimentación Mascotas', description: 'Raciones diarias según peso y edad' },
   ],
   'selector-seguro-salud': [
     { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: '¿Qué animal se adapta a tu vida?' },
@@ -1971,7 +1971,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-medicamentos-mascotas': [...mascotasApps.filter(a => a.url !== '/orientador-medicamentos-mascotas/').slice(0, 3), mascotasExtraApps[1]],
   'calculadora-edad-mascotas': [...mascotasApps.filter(a => a.url !== '/calculadora-edad-mascotas/').slice(0, 3), mascotasExtraApps[0]],
   'calculadora-tamano-adulto-perro': mascotasApps,
-  'guia-cuidado-mascota': mascotasApps,
+  'guia-cuidado-mascota': [
+    { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: '40 razas: tamaño, energía, temperamento y compatibilidad' },
+    { url: '/guia-razas-gatos/', icon: '🐈', name: 'Guía de Razas de Gatos', description: '35 razas: pelo, energía, temperamento y compatibilidad' },
+    { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: 'Test de 10 preguntas: qué mascota se adapta a ti' },
+    { url: '/calculadora-alimentacion-mascotas/', icon: '🍖', name: 'Alimentación Mascotas', description: 'Raciones diarias según peso y edad' },
+  ],
 
   // SEO
   'analizador-titulos-seo': [...seoApps.filter(a => a.url !== '/analizador-titulos-seo/'), seoExtraApps[0]],
@@ -4183,9 +4188,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'guia-plantas-interior': [
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+    { url: '/guia-insectos-jardin/', icon: '🐛', name: 'Guía de Insectos del Jardín', description: '35 insectos: rol beneficioso/perjudicial, identificación y qué hacer' },
     { url: '/guia-aves-comunes/', icon: '🐦', name: 'Guía de Aves Comunes', description: '40 aves de España y Europa: hábitat, canto, presencia y estado de conservación' },
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
-    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
   ],
   'guia-setas': [
     { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y dificultad de cuidado' },
@@ -4272,10 +4277,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
   ],
   'guia-aves-comunes': [
+    { url: '/guia-insectos-jardin/', icon: '🐛', name: 'Guía de Insectos del Jardín', description: '35 insectos: rol beneficioso/perjudicial, identificación y qué hacer' },
     { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
     { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
-    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: '40 frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+  ],
+  'guia-razas-perros': [
+    { url: '/guia-razas-gatos/', icon: '🐈', name: 'Guía de Razas de Gatos', description: '35 razas de gatos: pelo, energía, temperamento y compatibilidad' },
+    { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: 'Test de 10 preguntas: qué mascota se adapta mejor a ti' },
+    { url: '/guia-cuidado-mascota/', icon: '📚', name: 'Guía Cuidado Mascota', description: 'Todo sobre alimentación, salud, parásitos y emergencias' },
+    { url: '/calculadora-alimentacion-mascotas/', icon: '🍖', name: 'Alimentación Mascotas', description: 'Raciones diarias de comida según peso, edad y actividad' },
+  ],
+  'guia-razas-gatos': [
+    { url: '/guia-razas-perros/', icon: '🐕', name: 'Guía de Razas de Perros', description: '40 razas de perros: tamaño, energía, temperamento y compatibilidad' },
+    { url: '/selector-mascota/', icon: '🐾', name: 'Selector de Mascota', description: 'Test de 10 preguntas: qué mascota se adapta mejor a ti' },
+    { url: '/guia-cuidado-mascota/', icon: '📚', name: 'Guía Cuidado Mascota', description: 'Todo sobre alimentación, salud, parásitos y emergencias' },
+    { url: '/calculadora-edad-mascotas/', icon: '🎂', name: 'Edad Mascotas', description: 'Calcula la edad de tu gato o perro en años humanos' },
+  ],
+  'guia-insectos-jardin': [
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
+    { url: '/guia-aves-comunes/', icon: '🐦', name: 'Guía de Aves Comunes', description: '40 aves de España y Europa: hábitat, canto, presencia y estado de conservación' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Plantas aromáticas repelentes de plagas: albahaca, lavanda, menta y más' },
+    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación' },
   ],
 };
 

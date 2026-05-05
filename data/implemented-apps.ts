@@ -903,6 +903,9 @@ export const implementedAppsUrls = [
   "/guia-tejidos-fibras/",                         // Directorio 35 tejidos y fibras: origen, propiedades, cuidados, sostenibilidad y usos
   "/guia-maderas/",                                // Directorio 35 maderas: Janka, densidad, origen, dificultad de trabajo y usos
   "/guia-aves-comunes/",                           // Directorio 40 aves de España y Europa: hábitat, canto, presencia y estado de conservación
+  "/guia-razas-perros/",                           // Directorio 40 razas de perros: tamaño, energía, temperamento, mantenimiento y compatibilidad
+  "/guia-razas-gatos/",                            // Directorio 35 razas de gatos: pelo, energía, temperamento y compatibilidad con niños/perros
+  "/guia-insectos-jardin/",                        // Directorio 35 insectos del jardín: rol, identificación y qué hacer con cada uno
 ];
 
 /**
