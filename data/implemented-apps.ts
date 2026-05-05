@@ -900,6 +900,9 @@ export const implementedAppsUrls = [
   "/guia-frutas-exoticas/",                        // Directorio 40 frutas exóticas: origen, sabor, temporada, nombre científico y cómo consumirlas
   "/guia-frutos-secos/",                           // Directorio 30 frutos secos y semillas: categoría, perfil nutricional, calorías y usos
   "/guia-hierbas-aromaticas/",                     // Directorio de hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios/medicinales
+  "/guia-tejidos-fibras/",                         // Directorio 35 tejidos y fibras: origen, propiedades, cuidados, sostenibilidad y usos
+  "/guia-maderas/",                                // Directorio 35 maderas: Janka, densidad, origen, dificultad de trabajo y usos
+  "/guia-aves-comunes/",                           // Directorio 40 aves de España y Europa: hábitat, canto, presencia y estado de conservación
 ];
 
 /**

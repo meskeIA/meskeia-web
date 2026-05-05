@@ -4183,9 +4183,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'guia-plantas-interior': [
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+    { url: '/guia-aves-comunes/', icon: '🐦', name: 'Guía de Aves Comunes', description: '40 aves de España y Europa: hábitat, canto, presencia y estado de conservación' },
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
     { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
-    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
   ],
   'guia-setas': [
     { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y dificultad de cuidado' },
@@ -4258,6 +4258,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
     { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+  ],
+  'guia-tejidos-fibras': [
+    { url: '/guia-maderas/', icon: '🪵', name: 'Guía de Maderas', description: '35 maderas: Janka, densidad, origen, dificultad de trabajo y usos' },
+    { url: '/visualizador-origen-camiseta/', icon: '👕', name: 'Origen de una Camiseta', description: 'El viaje global de una camiseta: algodón, fabricación, transporte y distribución' },
+    { url: '/visualizador-agua-virtual/', icon: '💧', name: 'Agua Virtual', description: 'El agua oculta en lo que compramos y comemos: huella hídrica de productos cotidianos' },
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
+  ],
+  'guia-maderas': [
+    { url: '/guia-tejidos-fibras/', icon: '🧵', name: 'Guía de Tejidos y Fibras', description: '35 tejidos y fibras: origen, propiedades, cuidados, sostenibilidad y usos' },
+    { url: '/guia-aves-comunes/', icon: '🐦', name: 'Guía de Aves Comunes', description: '40 aves de España y Europa: hábitat, canto, presencia y estado de conservación' },
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
+    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
+  ],
+  'guia-aves-comunes': [
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
+    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: '40 frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
   ],
 };
 
