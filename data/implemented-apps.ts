@@ -891,6 +891,9 @@ export const implementedAppsUrls = [
   "/guia-setas/",                                  // Directorio 40 setas: comestibilidad, hábitat, temporada, identificación y avisos de seguridad
   "/guia-superalimentos/",                         // Directorio 40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones
   "/guia-cortes-carne/",                           // Directorio 45 cortes de carne: animal, terneza, método de cocción y temperatura ideal
+  "/guia-varietales-vino/",                        // Directorio 40 varietales de uva: tipo, cuerpo, taninos, acidez, temperatura de servicio y maridaje
+  "/guia-estilos-cerveza/",                        // Directorio 40 estilos de cerveza: IBU, ABV, color EBC, fermentación, temperatura y maridaje
+  "/guia-tipos-pan/",                              // Directorio 35 tipos de pan del mundo: harina, fermentación, textura, acompañamientos y curiosidades
 ];
 
 /**

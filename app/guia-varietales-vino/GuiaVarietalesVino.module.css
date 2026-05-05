@@ -1,0 +1,723 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: var(--hero-bg);
+  padding: 3rem 2rem;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Controles ── */
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.buscador {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.buscador:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.filtroGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filtroLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filtroBtn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.filtroActivo:hover {
+  background: #256a8a;
+  border-color: #256a8a;
+  color: white;
+}
+
+.contador {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ── Grid de tarjetas ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+  align-items: center;
+}
+
+.nombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.1rem;
+}
+
+.nombreOriginal {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 0.35rem;
+}
+
+/* Badges */
+.tipoBadge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badgeTinto {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badgeBlanco {
+  background: #fef9c3;
+  color: #713f12;
+}
+
+.badgeRosado {
+  background: #fce7f3;
+  color: #831843;
+}
+
+.badgeEspumoso {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.origenPill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.descripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+/* Notas de sabor */
+.notasSection {
+  margin-bottom: 0.75rem;
+}
+
+.sectionLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+.notasTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.notaTag {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  background: rgba(72, 169, 166, 0.1);
+  color: var(--secondary);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+/* Indicadores cuerpo / taninos / acidez */
+.indicadoresGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.indicadorLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Barra de progreso para Cuerpo */
+.barraWrapper {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.barraFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.dotFilled {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.dotEmpty {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.indicadorValor {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Temperatura pill */
+.tempPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Maridaje */
+.maridajeTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.maridajeTag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: rgba(72, 169, 166, 0.08);
+  color: var(--secondary);
+  border-radius: 8px;
+  font-size: 0.76rem;
+}
+
+/* DOs destacadas */
+.dosSection {
+  margin-bottom: 0.75rem;
+}
+
+.dosTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.dosTag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: #f3f4f6;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 0.76rem;
+}
+
+/* Curiosidad */
+.curiosidadBox {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.08), rgba(72, 169, 166, 0.06));
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.curiosidadIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.curiosidadText {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Sin resultados */
+.sinResultados {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+  grid-column: 1 / -1;
+}
+
+/* ── Educational v2.0 ── */
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+/* Escenarios */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.1rem;
+  border-top: 3px solid var(--primary);
+}
+
+.escenarioCard h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.escenarioCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+
+.faqItem h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.faqTip {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+/* Guía paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tipCard {
+  background: rgba(72, 169, 166, 0.06);
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.tipCard h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Warning box — indicador de v2.0 completo */
+.warningBox {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  padding: 1.2rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningHeader h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #9a3412;
+  font-weight: 700;
+}
+
+.warningList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.87rem;
+  color: #7c2d12;
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.warningList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #ea580c;
+  font-weight: 700;
+}
+
+/* ── Dark Mode ── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .buscador {
+  background: var(--bg-card);
+  border-color: #4a4a4a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .filtroBtn {
+  border-color: #4a4a4a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .card {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .dotEmpty {
+  background: #4a4a4a;
+}
+
+[data-theme='dark'] .barraWrapper {
+  background: #4a4a4a;
+}
+
+[data-theme='dark'] .dosTag {
+  background: #3a3a3a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #256a8a;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1a0f;
+  border-color: #7c3a1a;
+}
+
+[data-theme='dark'] .warningHeader h4 {
+  color: #fca97a;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fbd5b5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .indicadoresGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .main {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .indicadoresGrid {
+    grid-template-columns: 1fr;
+  }
+}

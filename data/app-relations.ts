@@ -4176,10 +4176,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
   'guia-cocteles': [
+    { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '40 varietales de uva: cuerpo, taninos, acidez, temperatura y maridaje' },
+    { url: '/guia-estilos-cerveza/', icon: '🍺', name: 'Guía de Estilos de Cerveza', description: '40 estilos de cerveza: IBU, ABV, temperatura y maridaje' },
     { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y denominación de origen' },
-    { url: '/guia-aceite-oliva/', icon: '🫒', name: 'Guía del Aceite de Oliva', description: '32 variedades de AOVE: perfil, intensidad, usos culinarios y denominaciones de origen' },
     { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
-    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
   ],
   'guia-plantas-interior': [
     { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
@@ -4202,8 +4202,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'guia-cortes-carne': [
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
     { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y denominación de origen' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
-    { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
+  ],
+  'guia-varietales-vino': [
+    { url: '/guia-cocteles/', icon: '🍸', name: 'Guía de Cócteles', description: '45 cócteles clásicos: ingredientes, método, copa y maridaje' },
+    { url: '/guia-estilos-cerveza/', icon: '🍺', name: 'Guía de Estilos de Cerveza', description: '40 estilos de cerveza: IBU, ABV, temperatura y maridaje' },
+    { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y denominación de origen' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
+  ],
+  'guia-estilos-cerveza': [
+    { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '40 varietales de uva: cuerpo, taninos, acidez, temperatura y maridaje' },
+    { url: '/guia-cocteles/', icon: '🍸', name: 'Guía de Cócteles', description: '45 cócteles clásicos: ingredientes, método, copa y maridaje' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+  ],
+  'guia-tipos-pan': [
+    { url: '/guia-cortes-carne/', icon: '🥩', name: 'Guía de Cortes de Carne', description: '45 cortes de carne: terneza, cocción, temperatura y consejos' },
+    { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '40 varietales de uva: cuerpo, taninos, acidez, temperatura y maridaje' },
+    { url: '/guia-estilos-cerveza/', icon: '🍺', name: 'Guía de Estilos de Cerveza', description: '40 estilos de cerveza: IBU, ABV, temperatura y maridaje' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
   ],
 };
 
