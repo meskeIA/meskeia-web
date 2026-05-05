@@ -4183,6 +4183,38 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'Alemania es el motor político y económico de la Unión Europea: desde la reconciliación franco-alemana de 1950 hasta el liderazgo de Merkel en la crisis del euro, Alemania y la UE son inseparables.' },
   ],
 
+  // Italia, Francia Contemporánea y Serie España — (2026-05-05)
+  'visualizador-historia-historia-italia': [
+    { url: '/visualizador-historia/primera-guerra-mundial/', icon: '⚔️', name: 'Primera Guerra Mundial', description: 'Italia entró en la guerra en 1915 con la promesa de territorios y salió con la "victoria mutilada": la humillación de Versalles fue el caldo de cultivo directo del fascismo de Mussolini.' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '💥', name: 'Segunda Guerra Mundial', description: 'Italia fue aliada de Hitler hasta 1943, luego cambió de bando: el armisticio, la liberación partisana y la muerte de Mussolini son los capítulos italianos de la guerra más larga de la historia.' },
+    { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'Italia fue uno de los seis países fundadores de la CEE en 1957: De Gasperi fue tan importante como Schuman y Adenauer en la construcción europea. El tratado fundacional se firmó en Roma.' },
+    { url: '/visualizador-historia/historia-alemania/', icon: '🇩🇪', name: 'Historia de Alemania', description: 'Alemania e Italia compartieron el Eje durante la Segunda Guerra Mundial y luego cofundaron la Unión Europea: dos países que pasaron del fascismo a la democracia y la integración europea de forma paralela.' },
+  ],
+  'visualizador-historia-historia-francia-contemporanea': [
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '⚡', name: 'La Revolución Francesa', description: 'La Revolución Francesa (1789-1799) y el período napoleónico son el punto de partida directo de la Francia contemporánea: la Tercera República (1870) hereda los principios de Liberté, Égalité, Fraternité.' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '💥', name: 'Segunda Guerra Mundial', description: 'Vichy y la Resistencia son el capítulo más traumático de la Francia contemporánea: la colaboración con los nazis, la deportación de 75.000 judíos y el mito resistencialista de De Gaulle marcaron décadas de historia.' },
+    { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'Francia fue cofundadora de la CEE junto a Alemania: la reconciliación franco-alemana de Schuman y Adenauer (1950) es el acto fundacional más importante de la integración europea.' },
+    { url: '/visualizador-historia/historia-alemania/', icon: '🇩🇪', name: 'Historia de Alemania', description: 'Francia y Alemania son el eje motor de la integración europea: dos países que fueron enemigos en tres guerras (1870, 1914, 1940) y se convirtieron en el corazón del proyecto europeo.' },
+  ],
+  'visualizador-historia-espana-austrias': [
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'España Medieval', description: 'La España de los Austrias es la continuación directa de la España medieval: la Reconquista concluye en 1492, el mismo año que Colón llega a América, estableciendo el punto de partida del Imperio.' },
+    { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'La Conquista de América', description: 'La conquista de América es inseparable de la España de los Austrias: fue financiada por los Reyes Católicos, ejecutada bajo Carlos I y Felipe II, y su plata financió el Imperio europeo durante dos siglos.' },
+    { url: '/visualizador-historia/espana-borbones/', icon: '🌸', name: 'España de los Borbones', description: 'La España de los Borbones (1700-1808) es la continuación directa de los Austrias: Felipe V hereda el Imperio que Carlos II dejó en crisis y aplica las reformas borbónicas sobre la estructura habsburguesa.' },
+    { url: '/visualizador-historia/renacimiento/', icon: '🎨', name: 'El Renacimiento', description: 'El Siglo de Oro español coincide con el Renacimiento europeo: Cervantes, Lope y Velázquez son contemporáneos de Shakespeare y Rembrandt. España fue el mayor mecenas del arte renacentista fuera de Italia.' },
+  ],
+  'visualizador-historia-espana-borbones': [
+    { url: '/visualizador-historia/espana-austrias/', icon: '⚜️', name: 'España de los Austrias', description: 'La España borbónica (1700-1808) hereda directamente el Imperio decadente de los Austrias: Felipe V llega a un país en crisis y aplica las reformas ilustradas francesas sobre una estructura habsburguesa en ruinas.' },
+    { url: '/visualizador-historia/espana-contemporanea/', icon: '🇪🇸', name: 'España Contemporánea', description: 'Las Abdicaciones de Bayona (1808) marcan el fin de la España borbónica del siglo XVIII y el inicio de la España contemporánea: la Guerra de Independencia y la Constitución de Cádiz nacen del vacío de poder napoleónico.' },
+    { url: '/visualizador-historia/ilustracion/', icon: '💡', name: 'La Ilustración', description: 'La España de Carlos III es el capítulo español de la Ilustración europea: Jovellanos, Campomanes y Olavide son los ilustrados españoles que intentan modernizar el país siguiendo el modelo enciclopedista francés.' },
+    { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'La Conquista de América', description: 'Las reformas borbónicas en América (1765-1808) reorganizan el Imperio colonial creado por los Austrias: las Intendencias, el Libre Comercio y los nuevos virreinatos aceleran paradójicamente las independencias americanas.' },
+  ],
+  'visualizador-historia-espana-contemporanea': [
+    { url: '/visualizador-historia/espana-borbones/', icon: '🌸', name: 'España de los Borbones', description: 'La España contemporánea arranca donde termina la borbónica: las Abdicaciones de Bayona (1808) y la Guerra de Independencia son el punto cero de la España liberal y constitucional.' },
+    { url: '/visualizador-historia/revolucion-francesa/', icon: '⚡', name: 'La Revolución Francesa', description: 'La Revolución Francesa inspira directamente la Constitución de Cádiz (1812) y el liberalismo español: el impacto de 1789 en España fue doble — ideológico (liberalismo) y traumático (invasión napoleónica).' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'El franquismo sobrevivió gracias a la Guerra Fría: EE.UU. firmó los Pactos de Madrid (1953) con Franco a cambio de bases militares, legitimando una dictadura que de otro modo habría quedado aislada.' },
+    { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'La integración europea es el proyecto más transformador de la España democrática: la entrada en la CEE (1986) fue el premio a la Transición y el motor del desarrollo económico de los años 80 y 90.' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

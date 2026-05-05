@@ -81,6 +81,11 @@ import { historiaPrehistoria } from './historia-prehistoria';
 import { historiaUnionEuropea } from './historia-union-europea';
 import { historiaConquistaAmerica } from './historia-conquista-america';
 import { historiaAlemania } from './historia-alemania';
+import { historiaItalia } from './historia-italia';
+import { historiaFranciaContemporanea } from './historia-francia-contemporanea';
+import { espanaAustrias } from './espana-austrias';
+import { espanaBorbones } from './espana-borbones';
+import { espanaContemporanea } from './espana-contemporanea';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -165,6 +170,11 @@ const registry: Record<string, HistoriaData> = {
   'historia-union-europea': historiaUnionEuropea,
   'historia-conquista-america': historiaConquistaAmerica,
   'historia-alemania': historiaAlemania,
+  'historia-italia': historiaItalia,
+  'historia-francia-contemporanea': historiaFranciaContemporanea,
+  'espana-austrias': espanaAustrias,
+  'espana-borbones': espanaBorbones,
+  'espana-contemporanea': espanaContemporanea,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

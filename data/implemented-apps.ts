@@ -889,6 +889,13 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-conquista-america/",    // Conquista de América 1492→1600, 10 hitos, 6 eras
   "/visualizador-historia/historia-alemania/",             // Alemania 1871→presente, 10 hitos, 6 eras
 
+  // Italia, Francia Contemporánea y Serie España — (2026-05-05)
+  "/visualizador-historia/historia-italia/",               // Italia 1861→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-francia-contemporanea/", // Francia Contemporánea 1870→presente, 10 hitos, 6 eras
+  "/visualizador-historia/espana-austrias/",               // España de los Austrias 1516→1700, 10 hitos, 6 eras
+  "/visualizador-historia/espana-borbones/",               // España de los Borbones 1700→1808, 10 hitos, 6 eras
+  "/visualizador-historia/espana-contemporanea/",          // España Contemporánea 1808→presente, 10 hitos, 6 eras
+
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
