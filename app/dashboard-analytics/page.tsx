@@ -129,6 +129,12 @@ export default function DashboardAnalyticsPage() {
     { enabled: true } // Siempre habilitado
   );
 
+  // tRPC: Tendencia de uso últimos 30 días (calculada en DB)
+  const tendencia30Query = trpc.analytics.getTendencia30Dias.useQuery(
+    { excluir_mi_ip: filtroIPActivo },
+    { enabled: true }
+  );
+
   // tRPC: Resumen por origen (nueva pestaña)
   const resumenQuery = trpc.analytics.getResumen.useQuery({});
 
@@ -142,8 +148,8 @@ export default function DashboardAnalyticsPage() {
   const updateIPMutation = trpc.analytics.updateIPFilter.useMutation({
     onSuccess: (data) => {
       alert(`✅ IP guardada: ${data.data.ip_excluida}\n\nTus pruebas ya no se registrarán.`);
-      // Refetch stats con el nuevo filtro
       statsQuery.refetch();
+      tendencia30Query.refetch();
     },
     onError: () => {
       alert('❌ Error al guardar IP');
@@ -152,7 +158,7 @@ export default function DashboardAnalyticsPage() {
 
   // Variables derivadas de los queries
   const datos = statsQuery.data || null;
-  const loading = statsQuery.isLoading || statsQuery.isFetching || resumenQuery.isFetching;
+  const loading = statsQuery.isLoading || statsQuery.isFetching || resumenQuery.isFetching || tendencia30Query.isFetching;
   const error = statsQuery.error?.message || null;
   const ipConfig = ipConfigQuery.data?.data || null;
   const actualizandoIP = updateIPMutation.isPending;
@@ -194,19 +200,6 @@ export default function DashboardAnalyticsPage() {
     }
   }, []);
 
-  // Función helper para parsear timestamp español (DD/MM/YYYY, HH:MM:SS)
-  const parsearTimestamp = (timestamp: string): Date | null => {
-    const fechaMatch = timestamp.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    if (!fechaMatch) return null;
-
-    const [, dia, mes, anio] = fechaMatch;
-    return new Date(
-      parseInt(anio, 10),
-      parseInt(mes, 10) - 1,
-      parseInt(dia, 10)
-    );
-  };
-
   const formatearNumero = (num: number) => {
     return num.toLocaleString('es-ES');
   };
@@ -233,43 +226,17 @@ export default function DashboardAnalyticsPage() {
     return 'Otro';
   };
 
-  // Datos para gráfico de tendencia (últimos 30 días)
+  // Datos para gráfico de tendencia (últimos 30 días) — calculados en DB
   const getTendenciaData = () => {
-    if (!datos?.data) return null;
-
-    const hoy = new Date();
-    const hace30Dias = new Date(hoy);
-    hace30Dias.setDate(hoy.getDate() - 30);
-
-    const usosPorDia: { [key: string]: number } = {};
-
-    datos.data.forEach((registro: any) => {
-      const fechaObj = parsearTimestamp(registro.timestamp || '');
-      if (!fechaObj) return;
-
-      if (fechaObj >= hace30Dias) {
-        const diaKey = fechaObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-        usosPorDia[diaKey] = (usosPorDia[diaKey] || 0) + 1;
-      }
-    });
-
-    // Generar array de últimos 30 días
-    const labels: string[] = [];
-    const valores: number[] = [];
-    for (let i = 29; i >= 0; i--) {
-      const fecha = new Date(hoy);
-      fecha.setDate(hoy.getDate() - i);
-      const dia = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
-      labels.push(dia);
-      valores.push(usosPorDia[dia] || 0);
-    }
+    const dias = tendencia30Query.data?.dias;
+    if (!dias) return null;
 
     return {
-      labels,
+      labels: dias.map((d) => d.fecha),
       datasets: [
         {
           label: 'Usos por Día',
-          data: valores,
+          data: dias.map((d) => d.usos),
           borderColor: '#2E86AB',
           backgroundColor: 'rgba(46, 134, 171, 0.1)',
           borderWidth: 2,

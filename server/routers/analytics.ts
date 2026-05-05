@@ -528,6 +528,75 @@ export const analyticsRouter = router({
     }),
 
   /**
+   * Procedure: getTendencia30Dias
+   * Calcula usos agrupados por día para los últimos 30 días directamente en DB.
+   * Devuelve un array completo de 30 entradas (días sin datos tienen usos=0).
+   */
+  getTendencia30Dias: publicProcedure
+    .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      let ipExcluida = '';
+      if (input.excluir_mi_ip) {
+        try {
+          const cfg = await client.execute({
+            sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+            args: [],
+          });
+          if (cfg.rows.length > 0) ipExcluida = String(cfg.rows[0].valor);
+        } catch { /* ignorar */ }
+      }
+
+      // Fecha de hace 29 días (para incluir hoy = 30 días en total), en formato YYYYMMDD
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const inicio = new Date(hoy);
+      inicio.setDate(hoy.getDate() - 29);
+      const inicioStr = `${inicio.getFullYear()}${String(inicio.getMonth() + 1).padStart(2, '0')}${String(inicio.getDate()).padStart(2, '0')}`;
+
+      // Agrupar por día usando la clave YYYYMMDD (ordena bien entre meses y años)
+      let sql = `
+        SELECT
+          substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) AS fecha_ord,
+          COUNT(*) AS usos
+        FROM uso_aplicaciones
+        WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
+      `;
+      const args: string[] = [inicioStr];
+
+      if (ipExcluida) {
+        sql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        args.push(ipExcluida);
+      }
+
+      sql += ' GROUP BY fecha_ord ORDER BY fecha_ord ASC';
+
+      const result = await client.execute({ sql, args });
+
+      // Mapa YYYYMMDD → usos
+      const mapaUsos: Record<string, number> = {};
+      for (const row of result.rows) {
+        mapaUsos[String(row.fecha_ord)] = Number(row.usos);
+      }
+
+      // Construir array completo de 30 días con ceros para días sin registros
+      const dias: Array<{ fecha: string; usos: number }> = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(hoy);
+        d.setDate(hoy.getDate() - i);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        const ord = `${yyyy}${mm}${dd}`;
+        dias.push({ fecha: `${dd}/${mm}`, usos: mapaUsos[ord] || 0 });
+      }
+
+      return { dias };
+    }),
+
+  /**
    * Procedure: getIPConfig
    * Obtiene configuración de IP excluida
    * Reemplaza: GET /api/analytics/ip-filter
