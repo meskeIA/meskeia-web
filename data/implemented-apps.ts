@@ -894,6 +894,9 @@ export const implementedAppsUrls = [
   "/guia-varietales-vino/",                        // Directorio 40 varietales de uva: tipo, cuerpo, taninos, acidez, temperatura de servicio y maridaje
   "/guia-estilos-cerveza/",                        // Directorio 40 estilos de cerveza: IBU, ABV, color EBC, fermentación, temperatura y maridaje
   "/guia-tipos-pan/",                              // Directorio 35 tipos de pan del mundo: harina, fermentación, textura, acompañamientos y curiosidades
+  "/guia-tipos-pasta/",                            // Directorio 40 tipos de pasta italianos: forma, región, tiempo de cocción y salsa ideal
+  "/guia-tipos-arroz/",                            // Directorio 30 variedades de arroz del mundo: tipo de grano, almidón, región y uso culinario
+  "/guia-vinagres-mundo/",                         // Directorio 25 vinagres del mundo: origen, acidez, intensidad y maridaje
 ];
 
 /**

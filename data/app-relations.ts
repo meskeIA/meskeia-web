@@ -4220,8 +4220,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'guia-tipos-pan': [
     { url: '/guia-cortes-carne/', icon: '🥩', name: 'Guía de Cortes de Carne', description: '45 cortes de carne: terneza, cocción, temperatura y consejos' },
     { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '40 varietales de uva: cuerpo, taninos, acidez, temperatura y maridaje' },
-    { url: '/guia-estilos-cerveza/', icon: '🍺', name: 'Guía de Estilos de Cerveza', description: '40 estilos de cerveza: IBU, ABV, temperatura y maridaje' },
+    { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Guía de Tipos de Pasta', description: '40 pastas italianas: forma, región, cocción y salsa ideal' },
+    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Guía de Tipos de Arroz', description: '30 variedades de arroz: grano, almidón, región y uso culinario' },
+  ],
+  'guia-tipos-pasta': [
+    { url: '/guia-tipos-arroz/', icon: '🍚', name: 'Guía de Tipos de Arroz', description: '30 variedades de arroz: grano, almidón, región y uso culinario' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
+    { url: '/guia-varietales-vino/', icon: '🍷', name: 'Guía de Varietales de Vino', description: '40 varietales de uva: cuerpo, taninos, acidez, temperatura y maridaje' },
+    { url: '/guia-vinagres-mundo/', icon: '🧪', name: 'Guía de Vinagres del Mundo', description: '25 vinagres: origen, acidez, intensidad y maridaje' },
+  ],
+  'guia-tipos-arroz': [
+    { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Guía de Tipos de Pasta', description: '40 pastas italianas: forma, región, cocción y salsa ideal' },
+    { url: '/guia-tipos-pan/', icon: '🍞', name: 'Guía de Tipos de Pan', description: '35 panes del mundo: harina, fermentación, textura y acompañamientos' },
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/guia-cortes-carne/', icon: '🥩', name: 'Guía de Cortes de Carne', description: '45 cortes de carne: terneza, cocción, temperatura y consejos' },
+  ],
+  'guia-vinagres-mundo': [
+    { url: '/guia-aceite-oliva/', icon: '🫒', name: 'Guía del Aceite de Oliva', description: '32 variedades de AOVE: perfil, intensidad, usos culinarios y D.O.' },
+    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Guía de Tipos de Pasta', description: '40 pastas italianas: forma, región, cocción y salsa ideal' },
+    { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y D.O.' },
   ],
 };
 
