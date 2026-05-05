@@ -1,0 +1,398 @@
+import type { HistoriaData } from './types';
+
+export const historiaConquistaAmerica: HistoriaData = {
+  slug: 'historia-conquista-america',
+  titulo: 'La Conquista de América: Choque de Civilizaciones y Nacimiento del Mundo Moderno',
+  subtitulo: 'Un siglo que transformó para siempre a Europa, América y el mundo: el Encuentro que dividió la historia',
+  descripcionSEO: 'Cronología interactiva de la Conquista de América: de Cristóbal Colón (1492) a la consolidación de los virreinatos (1600). Primer viaje, Tratado de Tordesillas, conquista de México y Perú, Potosí, catástrofe demográfica y nacimiento del mestizaje en 10 hitos y 6 eras.',
+  keywords: [
+    'conquista america cronología interactiva',
+    'cristóbal colón primer viaje 1492 bahamas',
+    'hernán cortés tenochtitlán aztecas méxico',
+    'francisco pizarro atahualpa cajamarca incas perú',
+    'potosí plata virreinato nueva españa',
+    'bartolomé de las casas encomiendas demografía',
+  ],
+  anioInicio: 1492,
+  anioFin: 1600,
+
+  hitos: [
+    {
+      id: 'primer-viaje-colon',
+      nombre: 'Primer Viaje de Colón y el Encuentro',
+      anioInicio: 1492,
+      anioFin: 1494,
+      color: '#1565C0',
+      categoria: 'exploracion',
+      descripcion: 'Cristóbal Colón, financiado por los Reyes Católicos, llega a las Bahamas el 12 de octubre de 1492 creyendo haber llegado a Asia. Primer contacto con los taínos. Exploración de Cuba y La Española. Regresa a España con indígenas, oro y papagayos.',
+      obraIconica: 'Diario de Colón — descripción del Nuevo Mundo. La Española fundada en diciembre de 1492',
+      paises: ['España', 'Bahamas', 'Cuba', 'República Dominicana'],
+    },
+    {
+      id: 'tratado-tordesillas',
+      nombre: 'Tratado de Tordesillas y la División del Mundo',
+      anioInicio: 1494,
+      anioFin: 1500,
+      color: '#7B1FA2',
+      categoria: 'politica',
+      descripcion: 'Tratado de Tordesillas (1494): España y Portugal se reparten el mundo. España al oeste del meridiano 370 leguas, Portugal al este. Américo Vespucio reconoce que es un "Nuevo Mundo" (1499). Cabral llega a Brasil para Portugal (1500).',
+      obraIconica: 'Tratado de Tordesillas — 7 junio 1494. La línea que dividió el planeta entre dos potencias',
+      paises: ['España', 'Portugal', 'Brasil'],
+    },
+    {
+      id: 'conquista-caribe',
+      nombre: 'Conquista del Caribe y Encomiendas',
+      anioInicio: 1500,
+      anioFin: 1519,
+      color: '#C62828',
+      categoria: 'conquista',
+      descripcion: 'Colonización sistemática del Caribe. Sistema de encomiendas: indígenas asignados a colonos. Colapso demográfico de los taínos por epidemias, esclavitud y violencia. Fray Bartolomé de las Casas denuncia los abusos. Primera importación de esclavos africanos.',
+      obraIconica: 'Brevísima Relación de la Destrucción de las Indias — Las Casas, 1542. Primer texto de denuncia colonial',
+      paises: ['España', 'Cuba', 'Puerto Rico', 'Jamaica'],
+    },
+    {
+      id: 'conquista-mexico',
+      nombre: 'Conquista de México y Caída de Tenochtitlán',
+      anioInicio: 1519,
+      anioFin: 1521,
+      color: '#D84315',
+      categoria: 'conquista',
+      descripcion: 'Hernán Cortés desembarca con 600 hombres. Alianza con pueblos enemigos de los aztecas (tlaxcaltecas). La Noche Triste (1520). Sitio y caída de Tenochtitlán (13 agosto 1521). Moctezuma muere. El Imperio Azteca de 25 millones de personas cae en dos años.',
+      obraIconica: 'La Noche Triste — 30 junio 1520. Cortés llora bajo un árbol mientras los aztecas atacan',
+      paises: ['España', 'México'],
+    },
+    {
+      id: 'conquista-peru',
+      nombre: 'Conquista del Perú y el Imperio Inca',
+      anioInicio: 1532,
+      anioFin: 1537,
+      color: '#BF360C',
+      categoria: 'conquista',
+      descripcion: 'Francisco Pizarro captura al Inca Atahualpa en Cajamarca con solo 168 hombres. El rescate de oro más grande de la historia no salva a Atahualpa. Cuzco cae en 1533. El Imperio Inca de 12 millones de personas se desmorona en cinco años.',
+      obraIconica: 'Sala del Rescate de Cajamarca — habitación llena de oro prometida por Atahualpa a cambio de su libertad',
+      paises: ['España', 'Perú', 'Ecuador', 'Bolivia'],
+    },
+    {
+      id: 'nuevas-leyes',
+      nombre: 'Nuevas Leyes y Resistencia Indígena',
+      anioInicio: 1537,
+      anioFin: 1550,
+      color: '#2E7D32',
+      categoria: 'politica',
+      descripcion: 'Nuevas Leyes de Indias (1542): abolición teórica de la esclavitud indígena. Debate de Valladolid (1550): Las Casas vs Sepúlveda sobre la humanidad de los indígenas. Resistencia de los encomenderos. El virreinato se consolida.',
+      obraIconica: 'Debate de Valladolid — 1550-1551. Primera discusión filosófica sobre los derechos humanos universales',
+      paises: ['España', 'México', 'Perú'],
+    },
+    {
+      id: 'conquistas-norte-sur',
+      nombre: 'Expansión: Norte, Sur y Filipinas',
+      anioInicio: 1540,
+      anioFin: 1565,
+      color: '#0277BD',
+      categoria: 'exploracion',
+      descripcion: 'Coronado explora el sudoeste de Norteamérica buscando las Siete Ciudades de Cíbola (1540). Valdivia conquista Chile. Orellana navega el Amazonas (1542). Urdaneta descubre la ruta del Pacífico a Filipinas (1565), cerrando la primera red comercial global.',
+      obraIconica: 'Expedición de Orellana — primer descenso del Amazonas completo, 1542. 8 meses desde Los Andes al Atlántico',
+      paises: ['España', 'Chile', 'Argentina', 'Filipinas'],
+    },
+    {
+      id: 'potosi-plata',
+      nombre: 'Potosí: La Plata que Cambió el Mundo',
+      anioInicio: 1545,
+      anioFin: 1600,
+      color: '#F57F17',
+      categoria: 'economia',
+      descripcion: 'Descubrimiento del Cerro Rico de Potosí (1545): la mina de plata más grande del mundo. Mita minera: trabajo forzado indígena. 8 millones de pesos anuales a España. La plata americana dispara la inflación en Europa (Revolución de los Precios) y financia el Imperio Español.',
+      obraIconica: 'Cerro Rico de Potosí — "valía un Potosí". La ciudad más poblada de América en 1600 (160.000 habitantes)',
+      paises: ['Bolivia', 'España', 'Perú'],
+    },
+    {
+      id: 'catastrofe-demografica',
+      nombre: 'Catástrofe Demográfica y Mestizaje',
+      anioInicio: 1520,
+      anioFin: 1580,
+      color: '#6A1B9A',
+      categoria: 'sociedad',
+      descripcion: 'La mayor catástrofe demográfica de la historia: viruela, sarampión, tifus reducen la población indígena de ~60 millones a ~6 millones en un siglo (90% de mortalidad). Inicio de la sociedad mestiza y el sincretismo cultural. Nace el mestizo.',
+      obraIconica: 'Catálogo de epidemias coloniales — viruela 1520, sarampión 1531, tifus 1545. Ondas de muerte sucesivas',
+      paises: ['México', 'Perú', 'Caribe', 'América Central'],
+    },
+    {
+      id: 'consolidacion-virreinos',
+      nombre: 'Consolidación de los Virreinatos',
+      anioInicio: 1565,
+      anioFin: 1600,
+      color: '#1A237E',
+      categoria: 'politica',
+      descripcion: 'Dos virreinatos se consolidan: Nueva España y Perú. Sistema colonial maduro: Consejo de Indias, Casa de Contratación, Flotas de Indias. Evangelización sistemática. Fundación de universidades (México 1551, Lima 1551). Nace una nueva civilización americana.',
+      obraIconica: 'Fundación de la Universidad de México — 1551. Primera universidad del continente americano',
+      paises: ['México', 'Perú', 'España'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'El Encuentro y los Primeros Contactos',
+      desde: 1492,
+      hasta: 1500,
+      icono: '⛵',
+      hitosDestacados: ['Primer Viaje de Colón y el Encuentro', 'Tratado de Tordesillas y la División del Mundo'],
+      eventos: [
+        '12 de octubre 1492: Colón llega a las Bahamas',
+        'Bula Inter Caetera (1493): el Papa concede las tierras americanas a España',
+        'Tratado de Tordesillas (1494): división del mundo entre España y Portugal',
+        'Américo Vespucio reconoce la existencia de un "Nuevo Mundo" (1499)',
+      ],
+    },
+    {
+      nombre: 'Colonización del Caribe',
+      desde: 1500,
+      hasta: 1519,
+      icono: '🏝️',
+      hitosDestacados: ['Conquista del Caribe y Encomiendas'],
+      eventos: [
+        'Cabral llega a Brasil para Portugal (1500)',
+        'Waldseemuller nombra "América" al nuevo continente (1507)',
+        'Balboa cruza el istmo de Panamá y ve el Pacífico (1513)',
+        'Inicio del sistema de encomiendas y primeras denuncias de Las Casas',
+      ],
+    },
+    {
+      nombre: 'Las Grandes Conquistas',
+      desde: 1519,
+      hasta: 1540,
+      icono: '⚔️',
+      hitosDestacados: ['Conquista de México y Caída de Tenochtitlán', 'Conquista del Perú y el Imperio Inca'],
+      eventos: [
+        'Cortés desembarca en Veracruz y quema sus naves (1519)',
+        'La Noche Triste: los aztecas expulsan a Cortés de Tenochtitlán (1520)',
+        'Caída definitiva de Tenochtitlán (13 agosto 1521)',
+        'Pizarro captura a Atahualpa en Cajamarca (1532)',
+        'Cuzco, capital inca, cae en manos españolas (1533)',
+      ],
+    },
+    {
+      nombre: 'Debate Ético y Expansión',
+      desde: 1540,
+      hasta: 1565,
+      icono: '📜',
+      hitosDestacados: ['Nuevas Leyes y Resistencia Indígena', 'Expansión: Norte, Sur y Filipinas'],
+      eventos: [
+        'Nuevas Leyes de Indias: abolición teórica de la esclavitud indígena (1542)',
+        'Orellana navega el Amazonas completo (1542)',
+        'Descubrimiento del Cerro Rico de Potosí (1545)',
+        'Debate de Valladolid: Las Casas vs Sepúlveda (1550-1551)',
+        'Urdaneta abre la ruta transpacífica a Filipinas (1565)',
+      ],
+    },
+    {
+      nombre: 'La Plata y la Catástrofe',
+      desde: 1545,
+      hasta: 1580,
+      icono: '💀',
+      hitosDestacados: ['Potosí: La Plata que Cambió el Mundo', 'Catástrofe Demográfica y Mestizaje'],
+      eventos: [
+        'Potosí: inicio de la extracción masiva de plata (1545)',
+        'La plata americana dispara la inflación en Europa: Revolución de los Precios',
+        'Galeón de Manila: ruta transpacífica comercial regular (1565)',
+        'Pico de la catástrofe demográfica indígena: 90% de mortalidad en zonas conquistadas (1570)',
+        'Consolidación de la sociedad mestiza y el sincretismo cultural',
+      ],
+    },
+    {
+      nombre: 'Consolidación Colonial',
+      desde: 1580,
+      hasta: 1600,
+      icono: '🏛️',
+      hitosDestacados: ['Consolidación de los Virreinatos'],
+      eventos: [
+        'Felipe II une las coronas de España y Portugal (1580)',
+        'La Armada Invencible fracasa contra Inglaterra (1588)',
+        'El sistema colonial americano queda plenamente establecido (1600)',
+        'Potosí alcanza 160.000 habitantes: la ciudad más grande de América',
+      ],
+    },
+  ],
+
+  categorias: {
+    exploracion: 'Exploración y Descubrimiento',
+    conquista: 'Conquista Militar',
+    politica: 'Política e Instituciones',
+    economia: 'Economía y Recursos',
+    sociedad: 'Sociedad y Demografía',
+  },
+
+  colores: {
+    exploracion: '#1565C0',
+    conquista: '#C62828',
+    politica: '#7B1FA2',
+    economia: '#F57F17',
+    sociedad: '#2E7D32',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La Conquista de América es uno de los momentos más complejos y transformadores de la historia universal. En apenas un siglo, el "encuentro" entre dos mundos que no sabían de la existencia del otro desencadenó la mayor catástrofe demográfica conocida, transformó la economía mundial y creó nuevas civilizaciones mestizas. Entenderlo requiere mirar desde ambos lados.',
+
+    tablaComparativa: [
+      {
+        hito: 'El Encuentro y los Primeros Contactos',
+        periodo: '1492-1500',
+        categoria: 'Exploración',
+        personaje: 'Cristóbal Colón / Reyes Católicos',
+        aportacion: 'Primer contacto entre dos mundos; Tratado de Tordesillas divide el planeta',
+      },
+      {
+        hito: 'Colonización del Caribe',
+        periodo: '1500-1519',
+        categoria: 'Conquista',
+        personaje: 'Diego Colón / Las Casas',
+        aportacion: 'Sistema de encomiendas, colapso taíno, primeras denuncias de abusos coloniales',
+      },
+      {
+        hito: 'Las Grandes Conquistas',
+        periodo: '1519-1540',
+        categoria: 'Conquista',
+        personaje: 'Hernán Cortés / Francisco Pizarro',
+        aportacion: 'Caída de los imperios azteca e inca; dominio español en tierra firme',
+      },
+      {
+        hito: 'Debate Ético y Expansión',
+        periodo: '1540-1565',
+        categoria: 'Política',
+        personaje: 'Las Casas / Sepúlveda / Urdaneta',
+        aportacion: 'Nuevas Leyes, Debate de Valladolid, apertura de la ruta transpacífica',
+      },
+      {
+        hito: 'La Plata y la Catástrofe',
+        periodo: '1545-1580',
+        categoria: 'Economía / Sociedad',
+        personaje: 'Mineros de Potosí / poblaciones indígenas',
+        aportacion: 'Potosí financia el Imperio; 90% de mortalidad indígena; nace el mestizaje',
+      },
+      {
+        hito: 'Consolidación Colonial',
+        periodo: '1580-1600',
+        categoria: 'Política',
+        personaje: 'Felipe II / virreyes',
+        aportacion: 'Sistema virreinal maduro, universidades, evangelización sistemática',
+      },
+    ],
+
+    escenarios: [
+      {
+        icono: '🤔',
+        titulo: '¿Fue inevitable la conquista?',
+        perfil: 'Estudiantes de historia, filosofía e historia contrafactual',
+        texto: 'Los aztecas e incas tenían civilizaciones avanzadas con millones de habitantes. Sin las epidemias (viruela, sarampión) que mataron al 50-80% de la población antes de que llegaran los ejércitos, la conquista militar habría sido mucho más difícil. Las alianzas con pueblos enemigos de los aztecas (tlaxcaltecas) fueron decisivas. ¿Habrían podido los españoles conquistar imperios sanos y unidos? La historia contrafactual sugiere que no fue tan inevitable como parece.',
+      },
+      {
+        icono: '💀',
+        titulo: 'El colapso demográfico: ¿genocidio o pandemia?',
+        perfil: 'Debate historiográfico, ciencias sociales',
+        texto: 'La población indígena cayó de ~60 millones a ~6 millones en un siglo. Los historiadores debaten las causas: ¿fue un genocidio planificado, una pandemia accidental o una combinación de ambos? Las epidemias de enfermedades europeas (viruela 1520, sarampión 1531, tifus 1545) son la causa principal cuantitativa. Pero la esclavitud, la violencia y el trabajo forzado amplificaron el colapso. La respuesta honesta es: ambas cosas, en proporciones que varían por región y época.',
+      },
+      {
+        icono: '⚖️',
+        titulo: 'Las Casas y el debate ético: ¿qué salió de Valladolid?',
+        perfil: 'Filosofía del derecho, historia de los derechos humanos',
+        texto: 'El Debate de Valladolid (1550-1551) entre Bartolomé de las Casas y Juan Ginés de Sepúlveda fue el primer debate filosófico formal sobre los derechos de pueblos conquistados. Las Casas defendió la humanidad plena de los indígenas; Sepúlveda argumentó su inferioridad natural. El resultado fue ambiguo: las Nuevas Leyes limitaron los abusos en papel, pero su aplicación fue débil. Sin embargo, plantó una semilla: la idea de que los conquistados tienen derechos.',
+      },
+      {
+        icono: '💰',
+        titulo: 'La plata americana y la inflación europea',
+        perfil: 'Historia económica, estudiantes de economía',
+        texto: 'Entre 1500 y 1650, llegaron a Europa 170 toneladas de oro y 16.000 toneladas de plata americanas. Esto triplicó la masa monetaria europea y disparó la inflación durante un siglo (Revolución de los Precios). España, paradójicamente, no se hizo más rica: usó la plata para financiar guerras y comprar bienes a otras naciones, que sí industrializaron. Es un ejemplo temprano de la "maldición de los recursos": abundancia de materias primas que desincentiva la producción propia.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Cuántos indígenas murieron durante la conquista?',
+        respuesta: 'Las estimaciones varían: la población precolombina de América se calcula entre 50 y 100 millones. Para 1600, había caído a 5-10 millones, una reducción del 80-90%. La viruela fue la causa principal: llegó antes que los propios conquistadores, matando a la mitad de la población en algunas regiones antes del primer contacto bélico. La esclavitud, el trabajo forzado y la violencia directa agravaron el colapso.',
+        tip: 'En México, la población pasó de ~25 millones en 1519 a ~1 millón en 1600. Esta escala no tiene paralelo en la historia conocida.',
+      },
+      {
+        pregunta: '¿Cómo 168 hombres vencieron al Imperio Inca?',
+        respuesta: 'La victoria de Pizarro en Cajamarca (1532) fue posible por varios factores: sorpresa táctica total (los incas nunca habían visto caballos ni armas de fuego), captura del Inca Atahualpa en el primer encuentro, una guerra civil inca previa que debilitó al imperio, y las epidemias que ya habían matado al Inca anterior Huayna Capac. Después de Cajamarca, Pizarro no se enfrentó a un Imperio intacto sino a uno ya fragmentado y debilitado.',
+        tip: 'Atahualpa había ganado una guerra civil contra su hermano Huáscar justo antes de la llegada de Pizarro. El Imperio inca no estaba unido cuando cayó.',
+      },
+      {
+        pregunta: '¿Quién fue Bartolomé de las Casas?',
+        respuesta: 'Bartolomé de las Casas (1484-1566) fue un fraile dominico y primer defensor formal de los derechos indígenas. Inicialmente fue encomendero en Cuba; tras ver los abusos, renunció a sus indígenas y dedicó 50 años a denunciar el sistema colonial. Su obra "Brevísima Relación de la Destrucción de las Indias" (1542) fue el primer texto de denuncia colonial de la historia y tuvo enorme impacto en la "Leyenda Negra" española en Europa.',
+        tip: 'Paradójicamente, Las Casas propuso inicialmente importar esclavos africanos para aliviar el trabajo indígena, propuesta de la que luego se arrepintió públicamente.',
+      },
+      {
+        pregunta: '¿Qué fue la encomienda?',
+        respuesta: 'La encomienda era un sistema por el que la Corona española asignaba un grupo de indígenas a un colono (encomendero) a cambio de su protección y evangelización. En la práctica, equivalía a trabajo forzado: los indígenas debían pagar tributo en trabajo o especie. Las Nuevas Leyes de 1542 intentaron abolirlo, pero los encomenderos resistieron y el sistema persistió en diversas formas hasta el siglo XVIII.',
+        tip: 'La encomienda fue declarada ilegal en teoría en 1542, pero siguió existiendo de facto durante más de dos siglos.',
+      },
+      {
+        pregunta: '¿Cuándo se abolió la esclavitud en América española?',
+        respuesta: 'La esclavitud indígena se prohibió formalmente con las Nuevas Leyes de 1542, aunque con escasa aplicación real. La esclavitud africana en las colonias españolas no se abolió hasta el siglo XIX: Cuba en 1886, Puerto Rico en 1873. La esclavitud en Brasil (colonia portuguesa) duró hasta 1888, siendo el último país americano en abolirla. En total, unos 12 millones de africanos fueron trasladados a América como esclavos entre 1500 y 1900.',
+        tip: 'España fue la primera potencia colonial en promulgar leyes contra la esclavitud indígena (1542), aunque la aplicación fue muy limitada.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Comienza por la Línea del Tiempo para orientarte',
+        cuerpo: 'Observa la distribución de los 10 hitos entre 1492 y 1600. Fíjate cómo las grandes conquistas (México 1519-1521, Perú 1532-1537) ocurren en apenas 20 años. El color rojo domina el período central: la mayoría de las conquistas militares se concentran en solo dos décadas.',
+      },
+      {
+        titulo: 'Explora el período de las Grandes Conquistas con detalle',
+        cuerpo: 'Haz clic en "Conquista de México" y "Conquista del Perú" para comparar las dos grandes campañas. Ambas siguieron patrones similares: alianzas con pueblos locales enemistados con el poder dominante, captura del líder supremo, aprovechamiento de la desorganización provocada por las epidemias. El patrón se repite.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ver el impacto en indígenas y Europa',
+        cuerpo: 'La tabla comparativa muestra las seis eras con sus actores principales y aportes. Observa cómo en las primeras eras los actores son exploradores europeos; en las últimas, el sistema colonial tiene vida propia con virreyes, universidades y una sociedad mestiza. El énfasis se desplaza de la conquista a la administración.',
+      },
+      {
+        titulo: 'Lee los escenarios para entender los debates historiográficos',
+        cuerpo: 'Los cuatro escenarios abordan los debates más importantes: inevitable vs contingente, genocidio vs pandemia, impacto del debate ético, consecuencias económicas de la plata. Estos debates siguen activos en la historiografía contemporánea y son esenciales para un análisis crítico del período.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro global',
+        cuerpo: 'Las 6 eras muestran la evolución desde el encuentro inicial hasta la consolidación colonial. La era más densa es "Las Grandes Conquistas": en solo 20 años cayeron dos imperios de decenas de millones de habitantes. Compara su duración en el gráfico con la lentísima era de consolidación posterior: conquistar fue rápido, administrar fue la tarea de siglos.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🌍',
+        texto: 'La conquista no fue un evento bilateral entre "españoles" e "indígenas": fue un proceso extremadamente complejo con decenas de actores. Los tlaxcaltecas, enemigos de los aztecas, fueron aliados decisivos de Cortés. Sin aliados indígenas locales, la conquista militar habría sido imposible.',
+      },
+      {
+        icono: '🦠',
+        texto: 'Las epidemias llegaron antes que los ejércitos. La viruela mató al Inca Huayna Capac (desencadenando la guerra civil entre sus hijos) antes de que Pizarro desembarcara. En muchas regiones, el 50% de la población había muerto de enfermedades europeas antes del primer contacto bélico.',
+      },
+      {
+        icono: '📚',
+        texto: 'La "Leyenda Negra" (imagen de España como especialmente cruel) fue una campaña de propaganda de potencias rivales (Inglaterra, Holanda) basada en los textos de Las Casas. Las atrocidades fueron reales, pero otras potencias coloniales (Portugal, Inglaterra, Francia) fueron igualmente brutales. La singularidad española es un mito propagandístico.',
+      },
+      {
+        icono: '🏙️',
+        texto: 'Tenochtitlán, la capital azteca destruida en 1521, era una de las ciudades más grandes del mundo: 200.000-300.000 habitantes, más que cualquier ciudad europea de la época. Tenía acueductos, mercados y jardines flotantes. México-Tenochtitlán fue fundada sobre sus ruinas.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la conquista fue solo violencia y destrucción',
+        cuerpo: 'La conquista fue también un proceso de fusión cultural: lenguas (el español integró miles de palabras náhuatl y quechua), gastronomía (tomate, cacao, patata, maíz transformaron la alimentación mundial), religión (sincretismo católico-indígena), arquitectura y arte. La civilización mestiza que emergió no era solo la destrucción de las antiguas, sino algo genuinamente nuevo.',
+      },
+      {
+        titulo: 'Pensar que los indígenas no resistieron',
+        cuerpo: 'La resistencia fue constante y en muchos casos exitosa. Los mapuches nunca fueron completamente sometidos. La rebelión de los incas de Vilcabamba duró hasta 1572. Hubo decenas de rebeliones en todo el continente. La resistencia cultural fue aún más duradera: lenguas, rituales y cosmovisiones indígenas sobrevivieron siglos de presión colonial y llegan hasta hoy.',
+      },
+      {
+        titulo: 'Suponer que España fue la única potencia colonial',
+        cuerpo: 'Portugal colonizó Brasil y tuvo imperios en África y Asia simultáneamente. Inglaterra, Francia y Holanda compitieron por el Caribe y Norteamérica desde el siglo XVI. La colonización fue un fenómeno europeo general, no exclusivamente español. El Tratado de Tordesillas intentó regular, sin éxito, esta competencia entre potencias.',
+      },
+      {
+        titulo: 'Asumir que el mestizaje fue siempre voluntario',
+        cuerpo: 'El mestizaje fue en gran parte el resultado de violencia sexual sistemática contra mujeres indígenas. La "mezcla" de razas que produjo las sociedades latinoamericanas contemporáneas no fue un proceso igualitario: fue el resultado de una asimetría de poder radical. Romantizar el mestizaje como "encuentro de culturas" oculta la violencia estructural que lo hizo posible.',
+      },
+    ],
+  },
+};

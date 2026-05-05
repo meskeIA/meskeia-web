@@ -883,6 +883,12 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-musica-popular/",      // Música Popular 1920→presente, 10 hitos, 6 eras
   "/visualizador-historia/historia-arquitectura-moderna/", // Arquitectura Moderna 1851→presente, 10 hitos, 6 eras
 
+  // Nuevas Historias — Prehistoria, UE, Conquista y Alemania (2026-05-05)
+  "/visualizador-historia/historia-prehistoria/",          // Prehistoria 3M a.C.→3000 a.C., 10 hitos, 6 eras
+  "/visualizador-historia/historia-union-europea/",        // Unión Europea 1951→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-conquista-america/",    // Conquista de América 1492→1600, 10 hitos, 6 eras
+  "/visualizador-historia/historia-alemania/",             // Alemania 1871→presente, 10 hitos, 6 eras
+
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación

@@ -4157,6 +4157,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'El colonialismo, la esclavitud y los procesos de descolonización son experiencias compartidas entre África y América Latina: la diáspora africana es el vínculo demográfico y cultural más profundo entre los dos continentes' },
   ],
 
+  // Nuevas Historias — Prehistoria, UE, Conquista y Alemania (2026-05-05)
+  'visualizador-historia-historia-prehistoria': [
+    { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Mesopotamia', description: 'La prehistoria termina donde empieza Mesopotamia: la escritura cuneiforme de Uruk (~3.200 a.C.) es la frontera entre la prehistoria y la historia. Los primeros sumerios son el siguiente capítulo del relato humano.' },
+    { url: '/visualizador-historia/egipto/', icon: '🏛️', name: 'Antiguo Egipto', description: 'Egipto faraónico comienza justo donde termina el Calcolítico prehistórico: las primeras dinastías egipcias (3.100 a.C.) son el producto directo de la sedentarización y las técnicas neolíticas.' },
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Las primeras civilizaciones americanas (olmecas, mayas, aztecas, incas) surgieron de los mismos procesos neolíticos que en el Viejo Mundo: agricultura, sedentarismo y urbanización, pero milenios después.' },
+    { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'La Conquista de América', description: 'La conquista de América (1492-1600) destruyó en décadas civilizaciones que habían tardado miles de años en desarrollarse desde los primeros pobladores americanos que cruzaron Beringia en la prehistoria.' },
+  ],
+  'visualizador-historia-historia-union-europea': [
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '💥', name: 'Segunda Guerra Mundial', description: 'La Segunda Guerra Mundial fue la razón de ser de la Unión Europea: los padres fundadores como Schuman, Monnet y Adenauer crearon la CECA en 1951 precisamente para hacer imposible otra guerra entre Francia y Alemania.' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'La UE se construyó en el contexto de la Guerra Fría: la división de Europa entre el bloque occidental (CEE) y el bloque soviético (Comecon) fue el telón de fondo de toda la integración europea de 1945 a 1991.' },
+    { url: '/visualizador-historia/historia-alemania/', icon: '🇩🇪', name: 'Historia de Alemania', description: 'Alemania es el actor central de la integración europea: su reconciliación con Francia fue el motor fundacional, su reunificación en 1990 el mayor desafío, y su economía el motor actual de la UE.' },
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '🇬🇧', name: 'Historia del Reino Unido', description: 'El Reino Unido fue miembro de la CEE desde 1973 y abandonó la UE con el Brexit en 2020: su relación con la integración europea ha sido siempre ambivalente, desde el veto de De Gaulle hasta el referéndum de 2016.' },
+  ],
+  'visualizador-historia-historia-conquista-america': [
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Las civilizaciones azteca, inca y maya que Cortés y Pizarro conquistaron son el objeto directo de la conquista: entender el Imperio Azteca y el Inca es entender qué se destruyó y qué se transformó.' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'La conquista de 1492-1600 es el punto de partida de toda la historia latinoamericana: el mestizaje, las instituciones coloniales y el trauma del colapso demográfico son la herencia directa de este período.' },
+    { url: '/visualizador-historia/exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La conquista de América fue el acto central de la gran era de exploraciones europeas: Colón, Vespucio, Magallanes y Elcano son los protagonistas del mismo siglo de descubrimientos geográficos.' },
+    { url: '/visualizador-historia/historia-prehistoria/', icon: '🦴', name: 'Prehistoria', description: 'Los primeros americanos llegaron desde Siberia cruzando Beringia hace ~15.000 años: los pueblos que Colón encontró en 1492 eran los descendientes de esa migración prehistórica que pobló todo el continente.' },
+  ],
+  'visualizador-historia-historia-alemania': [
+    { url: '/visualizador-historia/primera-guerra-mundial/', icon: '⚔️', name: 'Primera Guerra Mundial', description: 'Alemania fue el actor central de la Primera Guerra Mundial: el sistema de alianzas bismarckiano, el Weltpolitik de Guillermo II y el Plan Schlieffen son los factores alemanes que desencadenaron el conflicto.' },
+    { url: '/visualizador-historia/segunda-guerra-mundial/', icon: '💥', name: 'Segunda Guerra Mundial', description: 'Alemania bajo el nazismo fue el iniciador y principal responsable de la Segunda Guerra Mundial y el Holocausto: entender el Tercer Reich es indispensable para entender el mayor conflicto de la historia.' },
+    { url: '/visualizador-historia/historia-guerra-fria/', icon: '☢️', name: 'La Guerra Fría', description: 'Alemania fue literalmente el frente principal de la Guerra Fría: la división en RFA y RDA, el Muro de Berlín y la reunificación de 1990 son los hitos más concretos y visibles de toda la confrontación Este-Oeste.' },
+    { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'Alemania es el motor político y económico de la Unión Europea: desde la reconciliación franco-alemana de 1950 hasta el liderazgo de Merkel en la crisis del euro, Alemania y la UE son inseparables.' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

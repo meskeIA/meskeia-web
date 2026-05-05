@@ -77,6 +77,10 @@ import { historiaInteligenciaArtificial } from './historia-inteligencia-artifici
 import { historiaFutbol } from './historia-futbol';
 import { historiaMusicaPopular } from './historia-musica-popular';
 import { historiaArquitecturaModerna } from './historia-arquitectura-moderna';
+import { historiaPrehistoria } from './historia-prehistoria';
+import { historiaUnionEuropea } from './historia-union-europea';
+import { historiaConquistaAmerica } from './historia-conquista-america';
+import { historiaAlemania } from './historia-alemania';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -157,6 +161,10 @@ const registry: Record<string, HistoriaData> = {
   'historia-futbol': historiaFutbol,
   'historia-musica-popular': historiaMusicaPopular,
   'historia-arquitectura-moderna': historiaArquitecturaModerna,
+  'historia-prehistoria': historiaPrehistoria,
+  'historia-union-europea': historiaUnionEuropea,
+  'historia-conquista-america': historiaConquistaAmerica,
+  'historia-alemania': historiaAlemania,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
