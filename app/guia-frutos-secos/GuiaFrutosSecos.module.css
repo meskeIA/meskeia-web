@@ -1,0 +1,794 @@
+/* ============================================================
+   Guía de Frutos Secos y Semillas - CSS Module meskeIA
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  opacity: 0.92;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Main ── */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/* ── Controles ── */
+.controles {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.buscadorWrap {
+  position: relative;
+}
+
+.buscadorIcon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.buscador {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.4rem;
+  border: 1.5px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.buscador:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.buscador::placeholder {
+  color: var(--text-muted);
+}
+
+.filtroGrupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.filtroLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.filtroBtn {
+  padding: 0.35rem 0.85rem;
+  border: 1.5px solid #d0d5dd;
+  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.filtroBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filtroBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.filtroActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.filtroActivo:hover {
+  background: #256f8a;
+  color: white;
+  border-color: #256f8a;
+}
+
+.contador {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.13);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  padding: 1rem 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cardTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardNombreCientifico {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.categoriaBadge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* Colores por categoría */
+.badgeNuez {
+  background: #fef3e2;
+  color: #b7650a;
+}
+
+.badgeSemilla {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.badgeLegumbre {
+  background: #f5f0ff;
+  color: #5b21b6;
+}
+
+.badgeDrupa {
+  background: #fde8e8;
+  color: #c0392b;
+}
+
+.regionBadge {
+  background: #eef6fb;
+  color: #2563a8;
+  padding: 0.18rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.nivelBadge {
+  padding: 0.18rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nivelModerado {
+  background: #ecfeff;
+  color: #155e75;
+}
+
+.nivelAlto {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.nivelMuyAlto {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.paises {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.paisesLabel {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.cardBody {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.descripcion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Información nutricional ── */
+.nutricionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.7rem 0.5rem;
+}
+
+.nutricionItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.15rem;
+}
+
+.nutricionValor {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.nutricionLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nutricionNota {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: -0.3rem 0 0;
+  font-style: italic;
+}
+
+/* ── Secciones del card ── */
+.seccionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.3rem;
+}
+
+.nutrientesTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.nutrientesTag {
+  background: #eef6fb;
+  color: #2563a8;
+  border-radius: 6px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.77rem;
+  font-weight: 500;
+}
+
+.conservacionBox {
+  background: #f8fafc;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.conservacionLabel {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.usosTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.usosTag {
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 6px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.77rem;
+}
+
+.beneficiosList {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.curiosidadBox {
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.curiosidadIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.curiosidadText {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Sin resultados ── */
+.sinResultados {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.sinResultadosIcon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* ── EducationalSection v2.0 ── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.escenarioTitulo {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.escenarioDesc {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.faqPregunta {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem;
+}
+
+.faqRespuesta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.faqTip {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-style: italic;
+  margin: 0.3rem 0 0;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0.75rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.stepTitulo {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-right: 0.35rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.tipCard {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 0.85rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.tipTexto {
+  font-size: 0.84rem;
+  color: #166534;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.warningBox {
+  background: #fffbeb;
+  border: 1.5px solid #fbbf24;
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  margin: 0.75rem 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.85rem;
+  color: #78350f;
+  line-height: 1.7;
+}
+
+/* ── Dark Mode ── */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .card {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .buscador {
+  background: var(--bg-card);
+  border-color: #4a4a4a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .filtroBtn {
+  background: var(--bg-card);
+  border-color: #4a4a4a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .filtroActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .nutricionGrid {
+  background: #1f2937;
+}
+
+[data-theme='dark'] .nutrientesTag {
+  background: #1a2f42;
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .conservacionBox {
+  background: #1f2937;
+}
+
+[data-theme='dark'] .usosTag {
+  background: #0f2618;
+  color: #6ee7b7;
+}
+
+[data-theme='dark'] .curiosidadBox {
+  background: var(--bg-primary);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tipCard {
+  background: #0f2618;
+  border-color: #1a4a2e;
+}
+
+[data-theme='dark'] .tipTexto {
+  color: #6ee7b7;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2d1f00;
+  border-color: #9b6a10;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fcd68a;
+}
+
+[data-theme='dark'] .warningList {
+  color: #f5c78a;
+}
+
+[data-theme='dark'] .badgeNuez {
+  background: #2d1a00;
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .badgeSemilla {
+  background: #0f2a10;
+  color: #6ee7b7;
+}
+
+[data-theme='dark'] .badgeLegumbre {
+  background: #1e1535;
+  color: #c4b5fd;
+}
+
+[data-theme='dark'] .badgeDrupa {
+  background: #4a1010;
+  color: #f87171;
+}
+
+[data-theme='dark'] .regionBadge {
+  background: #1a2f42;
+  color: #7fb3d3;
+}
+
+[data-theme='dark'] .nivelModerado {
+  background: #062a30;
+  color: #67e8f9;
+}
+
+[data-theme='dark'] .nivelAlto {
+  background: #2d1f00;
+  color: #fcd68a;
+}
+
+[data-theme='dark'] .nivelMuyAlto {
+  background: #3a0a0a;
+  color: #fca5a5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .main {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nutricionGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+    padding: 0.5rem 0.3rem;
+  }
+
+  .nutricionValor {
+    font-size: 0.85rem;
+  }
+
+  .nutricionLabel {
+    font-size: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .filtroBtn {
+    transition: none;
+  }
+
+  .buscador {
+    transition: none;
+  }
+}

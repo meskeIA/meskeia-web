@@ -897,6 +897,9 @@ export const implementedAppsUrls = [
   "/guia-tipos-pasta/",                            // Directorio 40 tipos de pasta italianos: forma, región, tiempo de cocción y salsa ideal
   "/guia-tipos-arroz/",                            // Directorio 30 variedades de arroz del mundo: tipo de grano, almidón, región y uso culinario
   "/guia-vinagres-mundo/",                         // Directorio 25 vinagres del mundo: origen, acidez, intensidad y maridaje
+  "/guia-frutas-exoticas/",                        // Directorio 40 frutas exóticas: origen, sabor, temporada, nombre científico y cómo consumirlas
+  "/guia-frutos-secos/",                           // Directorio 30 frutos secos y semillas: categoría, perfil nutricional, calorías y usos
+  "/guia-hierbas-aromaticas/",                     // Directorio de hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios/medicinales
 ];
 
 /**

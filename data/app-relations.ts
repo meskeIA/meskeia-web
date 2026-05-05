@@ -4140,16 +4140,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sistema-digestivo/', icon: '🍎', name: 'Sistema Digestivo', description: 'Cómo el aparato digestivo procesa los alimentos y sus aditivos: absorción, metabolismo y paso por el organismo.' },
   ],
   'guia-especias': [
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
     { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
     { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
     { url: '/guia-te/', icon: '🍵', name: 'Guía del Té', description: '40 variedades de té: familia, origen, temperatura de infusión y nivel de cafeína' },
-    { url: '/guia-aceite-oliva/', icon: '🫒', name: 'Guía del Aceite de Oliva', description: '32 variedades de AOVE: perfil, intensidad, usos culinarios y denominaciones de origen' },
   ],
   'guia-infusiones': [
-    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias' },
     { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
     { url: '/guia-te/', icon: '🍵', name: 'Guía del Té', description: '40 variedades de té: familia, origen, temperatura de infusión y nivel de cafeína' },
-    { url: '/visualizador-mapa-especias/', icon: '🌶️', name: 'El Mapa de las Especias', description: 'Rutas comerciales históricas de especias e infusiones que cambiaron el mundo' },
   ],
   'guia-cafe': [
     { url: '/guia-te/', icon: '🍵', name: 'Guía del Té', description: '40 variedades de té: familia, origen, temperatura de infusión y nivel de cafeína' },
@@ -4182,10 +4182,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: '38 orígenes de café del mundo: especie, altitud, notas de sabor y preparación ideal' },
   ],
   'guia-plantas-interior': [
-    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
     { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
-    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
   ],
   'guia-setas': [
     { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y dificultad de cuidado' },
@@ -4194,9 +4194,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
   'guia-superalimentos': [
-    { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación con avisos de seguridad' },
-    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y dificultad de cuidado' },
-    { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: '40 frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
   'guia-cortes-carne': [
@@ -4240,6 +4240,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
     { url: '/guia-tipos-pasta/', icon: '🍝', name: 'Guía de Tipos de Pasta', description: '40 pastas italianas: forma, región, cocción y salsa ideal' },
     { url: '/guia-quesos/', icon: '🧀', name: 'Guía de Quesos', description: '55 quesos del mundo: tipo de leche, maduración, maridaje y D.O.' },
+  ],
+  'guia-frutas-exoticas': [
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+    { url: '/guia-frutos-secos/', icon: '🥜', name: 'Guía de Frutos Secos', description: '30 frutos secos y semillas: categoría, perfil nutricional, calorías y usos culinarios' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+  ],
+  'guia-frutos-secos': [
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: '40 frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
+    { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
+    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+  ],
+  'guia-hierbas-aromaticas': [
+    { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
+    { url: '/guia-infusiones/', icon: '🫖', name: 'Guía de Infusiones', description: 'Usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión' },
+    { url: '/guia-plantas-interior/', icon: '🪴', name: 'Guía de Plantas de Interior', description: '40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados' },
+    { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
   ],
 };
 
