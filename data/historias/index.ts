@@ -93,6 +93,10 @@ import { historiaPensamientoPolitico } from './historia-pensamiento-politico';
 import { historiaConstituciones } from './historia-constituciones';
 import { historiaDerecho } from './historia-derecho';
 import { historiaEtica } from './historia-etica';
+import { historiaCapitalismo } from './historia-capitalismo';
+import { historiaComercio } from './historia-comercio';
+import { historiaTrabajo } from './historia-trabajo';
+import { historiaAgricultura } from './historia-agricultura';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -189,6 +193,10 @@ const registry: Record<string, HistoriaData> = {
   'historia-constituciones': historiaConstituciones,
   'historia-derecho': historiaDerecho,
   'historia-etica': historiaEtica,
+  'historia-capitalismo': historiaCapitalismo,
+  'historia-comercio': historiaComercio,
+  'historia-trabajo': historiaTrabajo,
+  'historia-agricultura': historiaAgricultura,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

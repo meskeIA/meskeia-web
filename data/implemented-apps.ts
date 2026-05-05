@@ -931,6 +931,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-constituciones/",       // Constituciones y democracia: de la Magna Carta (1215) al siglo XXI
   "/visualizador-historia/historia-derecho/",              // Historia del derecho: de Hammurabi al RGPD digital
   "/visualizador-historia/historia-etica/",                // Ética: de Sócrates a la ética de la IA
+  "/visualizador-historia/historia-capitalismo/",          // Capitalismo: del mercantilismo al capitalismo de plataformas
+  "/visualizador-historia/historia-comercio/",             // Comercio mundial: de Mesopotamia al e-commerce global
+  "/visualizador-historia/historia-trabajo/",              // Trabajo: de la esclavitud antigua al teletrabajo
+  "/visualizador-historia/historia-agricultura/",          // Agricultura: de la revolución neolítica a la precisión
 ];
 
 /**

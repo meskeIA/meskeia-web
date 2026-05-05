@@ -1,0 +1,366 @@
+import type { HistoriaData } from './types';
+
+export const historiaCapitalismo: HistoriaData = {
+  slug: 'historia-capitalismo',
+  titulo: 'Del Mercantilismo al Capitalismo de Plataformas: Historia del Capitalismo',
+  subtitulo: 'Cuatro siglos de acumulación, crisis y transformación del sistema económico que domina el mundo',
+  descripcionSEO: 'Cronología interactiva de la historia del capitalismo: del mercantilismo y las Compañías de Indias (1600) al capitalismo de plataformas y las Big Tech (2020). Revolución Industrial, Adam Smith, Marx, Gran Depresión, Bretton Woods, neoliberalismo, crisis de 2008 y Piketty en 10 hitos y 6 eras.',
+  keywords: [
+    'historia del capitalismo cronología',
+    'mercantilismo compañías de indias VOC',
+    'revolución industrial adam smith riqueza de las naciones',
+    'marx el capital socialismo crítica capitalismo',
+    'gran depresión 1929 new deal keynes',
+    'bretton woods estado del bienestar neoliberalismo thatcher reagan',
+    'globalización financiarización crisis 2008 capitalismo plataformas',
+  ],
+  anioInicio: 1600,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'mercantilismo',
+      nombre: 'Mercantilismo y Compañías de Indias',
+      anioInicio: 1600,
+      anioFin: 1760,
+      color: '#8B4513',
+      categoria: 'mercantilismo',
+      descripcion: 'El mercantilismo —acumular oro y controlar el comercio exterior— domina la política económica europea. Las Compañías de Indias (VOC holandesa 1602, East India Company inglesa 1600) son las primeras multinacionales de la historia: sociedades por acciones con monopolio estatal sobre el comercio con Asia y América. El sistema colonial extrae materias primas de las colonias y vende manufacturas: un modelo de explotación sistemática que acumula el capital inicial del capitalismo moderno.',
+      obraIconica: 'Compañía Holandesa de las Indias Orientales (VOC, 1602): primera multinacional y primera empresa cotizada de la historia',
+      paises: ['Holanda', 'Inglaterra', 'Francia', 'España', 'Portugal'],
+    },
+    {
+      id: 'revolucion-industrial',
+      nombre: 'Revolución Industrial y Adam Smith',
+      anioInicio: 1760,
+      anioFin: 1820,
+      color: '#1E90FF',
+      categoria: 'industrial',
+      descripcion: 'La Revolución Industrial (Inglaterra, 1760+) transforma la producción: la máquina de vapor de Watt (1769), el telar mecánico, la fábrica como unidad de producción. Adam Smith (La Riqueza de las Naciones, 1776) sienta las bases teóricas: división del trabajo, mercados autorregulados por la "mano invisible", libre comercio. El capitalismo industrial reemplaza el capitalismo mercantil: la riqueza ya no es el oro acumulado sino la producción de bienes.',
+      obraIconica: 'La Riqueza de las Naciones de Adam Smith (1776) y la máquina de vapor de Watt (1769)',
+      paises: ['Reino Unido', 'Inglaterra', 'Europa Occidental'],
+    },
+    {
+      id: 'capitalismo-liberal',
+      nombre: 'Capitalismo Liberal del Siglo XIX',
+      anioInicio: 1820,
+      anioFin: 1848,
+      color: '#1E90FF',
+      categoria: 'industrial',
+      descripcion: 'El capitalismo se expande por Europa y América: ferrocarriles, siderurgia, banca y bolsa. El liberalismo económico clásico (laissez-faire) rechaza la intervención del Estado. Las condiciones de trabajo son brutales: jornadas de 14-16 horas, trabajo infantil, hacinamiento urbano. Ricardo (renta diferencial), Malthus (población) y Mill completan la teoría económica clásica. La acumulación primitiva de capital genera enormes fortunas y miseria simultáneas, preparando el terreno para las respuestas socialistas.',
+      obraIconica: 'Tratado de libre comercio Cobden-Chevalier entre Reino Unido y Francia (1860): apogeo del liberalismo económico',
+      paises: ['Reino Unido', 'Francia', 'Alemania', 'Estados Unidos', 'Europa'],
+    },
+    {
+      id: 'marxismo-respuesta',
+      nombre: 'Marx y el Socialismo como Respuesta',
+      anioInicio: 1848,
+      anioFin: 1917,
+      color: '#DC143C',
+      categoria: 'industrial',
+      descripcion: 'El Manifiesto Comunista (Marx y Engels, 1848) analiza el capitalismo como sistema basado en la explotación del trabajo: la plusvalía. El Capital (1867) desarrolla la crítica económica. La Primera Internacional (1864), la Segunda (1889) y los sindicatos organizan a los trabajadores. El reformismo socialdemócrata (Bernstein) y el anarquismo (Bakunin) ofrecen alternativas al marxismo revolucionario. La Revolución Rusa (1917) crea el primer Estado que intenta superar el capitalismo desde el poder.',
+      obraIconica: 'El Capital de Karl Marx (1867): la crítica más influyente del capitalismo industrial',
+      paises: ['Alemania', 'Europa', 'Rusia', 'Global'],
+    },
+    {
+      id: 'crisis-1929',
+      nombre: 'El Gran Crash de 1929 y la Gran Depresión',
+      anioInicio: 1929,
+      anioFin: 1939,
+      color: '#4B0082',
+      categoria: 'crisis',
+      descripcion: 'El crack de la Bolsa de Nueva York (octubre 1929) desencadena la mayor crisis económica del capitalismo: el 25% de desempleo en EE.UU., quiebra de bancos, deflación, contracción del comercio mundial un 66%. El New Deal de Roosevelt (1933) introduce la intervención estatal masiva y el gasto público como herramienta anticíclica. Keynes (Teoría General, 1936) proporciona el marco teórico: el Estado debe estimular la demanda cuando el mercado falla. La crisis alimenta el fascismo y el nazismo en Europa.',
+      obraIconica: 'Crack de Wall Street (octubre 1929) y Teoría General de Keynes (1936): fin del laissez-faire',
+      paises: ['Estados Unidos', 'Europa', 'Global'],
+    },
+    {
+      id: 'bretton-woods-bienestar',
+      nombre: 'Bretton Woods y el Estado del Bienestar',
+      anioInicio: 1944,
+      anioFin: 1973,
+      color: '#228B22',
+      categoria: 'bienestar',
+      descripcion: 'Los Acuerdos de Bretton Woods (1944) crean el FMI, el Banco Mundial y el dólar como moneda de reserva global: el orden económico de la posguerra. El Estado del bienestar europeo (sanidad, educación, pensiones públicas) y el pleno empleo son el compromiso político del capitalismo con sus ciudadanos. Los "Treinta Gloriosos" (1945-1975): crecimiento sostenido, clase media creciente, reducción de desigualdad. Un capitalismo domesticado por el Estado y amenazado por la URSS.',
+      obraIconica: 'Acuerdos de Bretton Woods (1944): arquitectura del capitalismo occidental de posguerra',
+      paises: ['Estados Unidos', 'Europa Occidental', 'Occidente'],
+    },
+    {
+      id: 'neoliberalismo',
+      nombre: 'El Neoliberalismo: Thatcher y Reagan',
+      anioInicio: 1979,
+      anioFin: 1991,
+      color: '#FF8C00',
+      categoria: 'neoliberal',
+      descripcion: 'El choque del petróleo (1973) y la estanflación ponen en crisis el modelo keynesiano. Hayek y Friedman habían preparado la alternativa teórica desde los años 40. Margaret Thatcher (1979) y Ronald Reagan (1980) aplican el programa neoliberal: privatizaciones, desregulación financiera, reducción de impuestos para rentas altas, debilitamiento de sindicatos. El Consenso de Washington impone estas recetas al Sur global. La caída de la URSS (1991) parece consagrar definitivamente el capitalismo.',
+      obraIconica: 'Elección de Thatcher (1979) y Reagan (1980): inicio de la revolución neoliberal',
+      paises: ['Reino Unido', 'Estados Unidos', 'Occidente', 'Global'],
+    },
+    {
+      id: 'globalizacion-financiera',
+      nombre: 'Globalización y Financiarización',
+      anioInicio: 1991,
+      anioFin: 2008,
+      color: '#FF8C00',
+      categoria: 'neoliberal',
+      descripcion: 'La desregulación financiera, los acuerdos de libre comercio (NAFTA 1994, OMC 1995, China en OMC 2001) y la revolución tecnológica crean el capitalismo globalizado. Los mercados financieros superan en volumen a la economía real: derivados, hedge funds, titulizaciones. Las deslocalizaciones industriales hacia China y el Sur global transforman las economías occidentales en economías de servicios. La desigualdad global se reduce (China sale de la pobreza) pero la desigualdad dentro de los países ricos se dispara.',
+      obraIconica: 'Creación de la OMC (1995) y adhesión de China (2001): globalización comercial plena',
+      paises: ['Global', 'China', 'Estados Unidos', 'Europa'],
+    },
+    {
+      id: 'crisis-2008',
+      nombre: 'La Gran Recesión de 2008',
+      anioInicio: 2008,
+      anioFin: 2015,
+      color: '#4B0082',
+      categoria: 'crisis',
+      descripcion: 'La crisis de las hipotecas subprime en EE.UU. desencadena la mayor crisis financiera desde 1929: quiebra de Lehman Brothers (septiembre 2008), rescates bancarios masivos con dinero público, crisis de deuda soberana en Europa (Grecia, España, Portugal, Irlanda). El capitalismo es salvado por el Estado que supuestamente debía minimizarse. Los rescates generan austeridad para la población y escándalo político. La desigualdad se dispara. El debate sobre la distribución de los costes de la crisis alimenta el populismo.',
+      obraIconica: 'Quiebra de Lehman Brothers (15 de septiembre de 2008): el mayor colapso financiero de la historia',
+      paises: ['Estados Unidos', 'Europa', 'Global'],
+    },
+    {
+      id: 'capitalismo-plataformas',
+      nombre: 'Capitalismo de Plataformas y Siglo XXI',
+      anioInicio: 2010,
+      anioFin: 2020,
+      color: '#696969',
+      categoria: 'digital',
+      descripcion: 'Las Big Tech (Google, Amazon, Apple, Meta, Microsoft) se convierten en las empresas más valiosas de la historia. El capitalismo de plataformas opera con efectos de red, datos como recurso principal y posiciones monopolísticas: un modelo radicalmente diferente del capitalismo industrial. La economía gig (Uber, Airbnb) precariza el trabajo. Piketty (El Capital en el Siglo XXI, 2013) documenta el regreso a desigualdades de la Belle Époque. La IA y la automatización plantean la pregunta de si el capitalismo puede adaptarse al desempleo tecnológico masivo.',
+      obraIconica: 'El Capital en el Siglo XXI de Piketty (2013) y el auge de las Big Tech: los nuevos monopolios',
+      paises: ['Estados Unidos', 'China', 'Global'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Mercantilismo',
+      desde: 1600,
+      hasta: 1760,
+      icono: '⚓',
+      hitosDestacados: ['Mercantilismo y Compañías de Indias'],
+      eventos: [
+        'Fundación de la East India Company inglesa (1600) y la VOC holandesa (1602)',
+        'Primera emisión de acciones de la VOC en el Amsterdam Stock Exchange (1602)',
+        'El sistema colonial triangular (Europa, África, América) consolida la acumulación primitiva',
+        'La doctrina mercantilista: el oro nacional como medida de la riqueza y el poder',
+      ],
+    },
+    {
+      nombre: 'Primera Revolución Industrial',
+      desde: 1760,
+      hasta: 1848,
+      icono: '🏭',
+      hitosDestacados: ['Revolución Industrial y Adam Smith', 'Capitalismo Liberal del Siglo XIX'],
+      eventos: [
+        'Máquina de vapor de James Watt patentada (1769): mecanización de la producción',
+        'Adam Smith publica La Riqueza de las Naciones (1776): fundamentos del liberalismo económico',
+        'Primera línea de ferrocarril pública Liverpool-Manchester (1830): transporte industrial',
+        'Leyes de pobres y trabajo infantil: el coste social de la industrialización',
+        'Tratado de libre comercio Cobden-Chevalier entre UK y Francia (1860): apogeo laissez-faire',
+      ],
+    },
+    {
+      nombre: 'Capitalismo y sus Críticos',
+      desde: 1848,
+      hasta: 1929,
+      icono: '⚙️',
+      hitosDestacados: ['Marx y el Socialismo como Respuesta'],
+      eventos: [
+        'Marx y Engels publican el Manifiesto Comunista (1848): análisis del capitalismo industrial',
+        'Primera Internacional de Trabajadores fundada en Londres (1864)',
+        'Karl Marx publica El Capital, Volumen I (1867): teoría de la plusvalía',
+        'Segunda Internacional Socialista y expansión del movimiento obrero europeo (1889)',
+        'Revolución Rusa de octubre: primer Estado que intenta superar el capitalismo (1917)',
+      ],
+    },
+    {
+      nombre: 'Crisis y Reconstrucción',
+      desde: 1929,
+      hasta: 1973,
+      icono: '💔',
+      hitosDestacados: ['El Gran Crash de 1929 y la Gran Depresión', 'Bretton Woods y el Estado del Bienestar'],
+      eventos: [
+        'Crack de Wall Street: el Dow Jones pierde un 89% desde su máximo (1929-1932)',
+        'New Deal de Roosevelt: intervención estatal masiva para salir de la depresión (1933)',
+        'Keynes publica Teoría General del Empleo, el Interés y el Dinero (1936)',
+        'Acuerdos de Bretton Woods: FMI, Banco Mundial y patrón oro-dólar (1944)',
+        'Los Treinta Gloriosos: crecimiento, clase media y Estado del bienestar europeo (1945-1975)',
+      ],
+    },
+    {
+      nombre: 'Neoliberalismo y Globalización',
+      desde: 1973,
+      hasta: 2008,
+      icono: '📈',
+      hitosDestacados: ['El Neoliberalismo: Thatcher y Reagan', 'Globalización y Financiarización'],
+      eventos: [
+        'Choque del petróleo y estanflación: crisis del modelo keynesiano (1973)',
+        'Margaret Thatcher gana las elecciones en el Reino Unido (1979): privatizaciones y desregulación',
+        'Ronald Reagan presidente de EE.UU.: recortes fiscales y debilitamiento sindical (1980)',
+        'Caída del Muro de Berlín y de la URSS: el capitalismo sin rival (1989-1991)',
+        'Creación de la OMC y acuerdos NAFTA: globalización comercial institucionalizada (1994-1995)',
+      ],
+    },
+    {
+      nombre: 'Capitalismo en Crisis y Mutación',
+      desde: 2008,
+      hasta: 2020,
+      icono: '🤖',
+      hitosDestacados: ['La Gran Recesión de 2008', 'Capitalismo de Plataformas y Siglo XXI'],
+      eventos: [
+        'Quiebra de Lehman Brothers: mayor colapso financiero desde 1929 (septiembre 2008)',
+        'Rescates bancarios con dinero público y austeridad para los ciudadanos (2009-2013)',
+        'Piketty publica El Capital en el Siglo XXI: la desigualdad de regreso a la Belle Époque (2013)',
+        'Las cinco Big Tech superan en capitalización a todos los mercados europeos (2019)',
+      ],
+    },
+  ],
+
+  categorias: {
+    mercantilismo: 'Mercantilismo',
+    industrial: 'Capitalismo Industrial',
+    crisis: 'Crisis',
+    bienestar: 'Estado del Bienestar',
+    neoliberal: 'Neoliberalismo',
+    digital: 'Capitalismo Digital',
+  },
+
+  colores: {
+    mercantilismo: '#8B4513',
+    industrial: '#1E90FF',
+    crisis: '#4B0082',
+    bienestar: '#228B22',
+    neoliberal: '#FF8C00',
+    digital: '#696969',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El capitalismo es el sistema económico dominante del mundo moderno, pero no siempre existió ni tiene por qué ser eterno. Su historia de cuatro siglos —desde el mercantilismo colonial hasta el capitalismo de plataformas— es la historia de cómo las sociedades organizan la producción, la distribución y la acumulación de riqueza. Entender esta evolución es indispensable para comprender los debates económicos actuales: desigualdad, globalización, crisis financieras y el impacto de la tecnología en el trabajo. Cada era del capitalismo generó sus propias tensiones, sus críticos y sus reformas, demostrando que el sistema es mucho más plástico y adaptable —y más frágil— de lo que a menudo se asume.',
+
+    tablaComparativa: [
+      { hito: 'Mercantilismo y Compañías de Indias', periodo: '1600-1760', categoria: 'Mercantilismo', personaje: 'VOC / East India Company', aportacion: 'Primera empresa cotizada, monopolios coloniales y acumulación primitiva del capital moderno' },
+      { hito: 'Revolución Industrial y Adam Smith', periodo: '1760-1820', categoria: 'Capitalismo Industrial', personaje: 'Adam Smith / James Watt', aportacion: 'División del trabajo, mano invisible, libre comercio: fundamentos teóricos y tecnológicos del capitalismo' },
+      { hito: 'Marx y el Socialismo como Respuesta', periodo: '1848-1917', categoria: 'Capitalismo Industrial', personaje: 'Karl Marx / Friedrich Engels', aportacion: 'Teoría de la plusvalía y la explotación del trabajo: la crítica más influyente del capitalismo industrial' },
+      { hito: 'El Gran Crash de 1929 y la Gran Depresión', periodo: '1929-1939', categoria: 'Crisis', personaje: 'John M. Keynes / Franklin D. Roosevelt', aportacion: 'El Estado como actor económico esencial: gasto público anticíclico y regulación financiera' },
+      { hito: 'Bretton Woods y el Estado del Bienestar', periodo: '1944-1973', categoria: 'Estado del Bienestar', personaje: 'Keynes / Plan Marshall', aportacion: 'Arquitectura financiera internacional y compromiso social: el capitalismo más igualitario de la historia' },
+      { hito: 'El Neoliberalismo: Thatcher y Reagan', periodo: '1979-1991', categoria: 'Neoliberalismo', personaje: 'Margaret Thatcher / Ronald Reagan', aportacion: 'Privatizaciones, desregulación y reducción del Estado: la gran reversión del capitalismo de bienestar' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de Economía',
+        perfil: 'Grado, máster o preparando oposiciones de economía',
+        texto: 'Esta cronología contextualiza los grandes paradigmas económicos —mercantilismo, liberalismo clásico, keynesianismo, neoliberalismo— y sus transiciones. Ideal para entender por qué los libros de texto económicos cambian cada pocas décadas y cómo las crisis históricas siempre preceden a los cambios de paradigma.',
+      },
+      {
+        icono: '💼',
+        titulo: 'Empresario o Directivo',
+        perfil: 'Profesional que toma decisiones en el contexto económico actual',
+        texto: 'El capitalismo actual es el resultado de cuatro siglos de mutaciones. Entender cómo surgieron los mercados financieros, la globalización o el capitalismo de plataformas permite anticipar mejor los próximos cambios: regulación de las Big Tech, desglobalización, impacto de la IA en el mercado laboral.',
+      },
+      {
+        icono: '🔧',
+        titulo: 'Trabajador o Sindicalista',
+        perfil: 'Interesado en las relaciones laborales y la historia del movimiento obrero',
+        texto: 'Las conquistas laborales que hoy damos por supuestas —jornada de 8 horas, vacaciones pagadas, seguridad social— fueron el resultado de décadas de conflicto entre el capital y el trabajo. Esta cronología muestra cuándo y cómo se ganaron, y también cómo algunas se han erosionado en la era neoliberal.',
+      },
+      {
+        icono: '🗳️',
+        titulo: 'Ciudadano Informado',
+        perfil: 'Quien quiere entender los debates económicos actuales',
+        texto: 'Desigualdad, crisis financieras, poder de las multinacionales, privatizaciones, austeridad: todos estos debates tienen raíces históricas concretas que esta cronología explica. Entender de dónde venimos es el primer paso para participar con criterio en los debates sobre adónde vamos.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué diferencia hay entre el capitalismo industrial y el capitalismo de plataformas?',
+        respuesta: 'El capitalismo industrial genera riqueza fabricando bienes físicos con trabajo asalariado y capital fijo (máquinas, fábricas). El capitalismo de plataformas genera riqueza intermediando entre usuarios: el activo principal son los datos y los efectos de red, no las fábricas. Amazon no fabrica lo que vende; Uber no posee los coches; Airbnb no tiene hoteles. El trabajo se precariza (economía gig) y la posición monopolística se refuerza sola (quien tiene más usuarios atrae a más usuarios).',
+        tip: 'Las cinco Big Tech tienen una capitalización conjunta mayor que el PIB de Alemania.',
+      },
+      {
+        pregunta: '¿Por qué el capitalismo tiene crisis periódicas?',
+        respuesta: 'La respuesta varía según la escuela: los marxistas hablan de tendencia decreciente de la tasa de ganancia y sobreproducción; los keynesianos de insuficiencia de demanda y exceso de ahorro; los austriacos de distorsiones por el crédito barato. Lo que la historia demuestra empíricamente es que los períodos de fuerte desregulación financiera (años 20, años 90-2000) preceden invariablemente a grandes crisis. La regulación existe porque los mercados sin supervisión generan burbujas.',
+        tip: 'El crack de 1929 y la crisis de 2008 tienen en común la desregulación financiera previa y el apalancamiento excesivo.',
+      },
+      {
+        pregunta: '¿Cuándo surgió el capitalismo exactamente?',
+        respuesta: 'Los historiadores debaten si el capitalismo nació con el mercantilismo del siglo XVII, con la Revolución Industrial del XVIII, o si sus raíces están en el comercio medieval italiano. Esta cronología toma 1600 como punto de partida por la aparición de las primeras empresas por acciones y la articulación del sistema colonial. Pero el capitalismo plenamente industrial —con trabajo asalariado masivo, mercados de bienes y capitales, y producción para el mercado— no llega hasta 1760-1820.',
+        tip: 'La VOC holandesa (1602) es considerada la primera empresa moderna: tenía accionistas, consejo de administración y cotizaba en bolsa.',
+      },
+      {
+        pregunta: '¿El neoliberalismo es lo mismo que el capitalismo?',
+        respuesta: 'No. El neoliberalismo es una forma específica de capitalismo que surgió en los años 70-80, caracterizada por minimizar el Estado, privatizar servicios públicos, desregular mercados financieros y debilitar los sindicatos. Antes del neoliberalismo existió el capitalismo keynesiano (1944-1973), con Estado del bienestar fuerte, pleno empleo y regulación financiera, que también era capitalismo. El capitalismo es el sistema; el neoliberalismo es una política dentro de ese sistema.',
+        tip: 'Los "Treinta Gloriosos" (1945-1975) fueron el período de mayor igualdad en la historia del capitalismo occidental, con un Estado muy activo.',
+      },
+      {
+        pregunta: '¿Cuál ha sido la mayor crisis del capitalismo?',
+        respuesta: 'La Gran Depresión (1929-1939) sigue siendo la peor en términos de desempleo (25% en EE.UU.), caída del PIB y duración. La crisis de 2008 fue más grave en términos de exposición financiera global (derivados por valor de 600 billones de dólares) pero se evitó el colapso total gracias a los rescates públicos y las lecciones de 1929. Paradójicamente, ambas crisis fueron precedidas por períodos de gran prosperidad y euforia especulativa.',
+        tip: 'En 1933, el 25% de los trabajadores estadounidenses estaba desempleado. En 1929, la Bolsa tardó 25 años en recuperar sus máximos previos al crack.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Identifica las olas de expansión en la Línea del Tiempo',
+        cuerpo: 'El marrón (mercantilismo), el azul (capitalismo industrial) y el naranja (neoliberalismo) son olas de expansión capitalista. El índigo (crisis) son las interrupciones. Antes de leer los detalles, observa visualmente el ritmo: fases de expansión seguidas de colapso, seguidas de reforma y nueva expansión.',
+      },
+      {
+        titulo: 'Compara el capitalismo keynesiano con el neoliberal',
+        cuerpo: 'Haz clic en "Bretton Woods y el Estado del Bienestar" y luego en "El Neoliberalismo: Thatcher y Reagan". Son la misma economía de mercado con reglas radicalmente distintas. El primero prioriza el pleno empleo y la igualdad; el segundo, la eficiencia y la libertad de mercado. La pregunta política central del siglo XX fue cuál de los dos era mejor.',
+      },
+      {
+        titulo: 'Sigue la cadena crisis-reforma-nueva crisis',
+        cuerpo: 'Cada gran crisis generó una reforma: la Gran Depresión generó el New Deal y Bretton Woods; la estanflación de los 70 generó el neoliberalismo; la crisis de 2008 generó regulación financiera (Dodd-Frank). Identifica ese patrón en la línea del tiempo: el capitalismo sobrevive adaptándose tras cada colapso.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ver la evolución del poder económico',
+        cuerpo: 'En la tabla Comparativa, compara los protagonistas de cada era: las Compañías de Indias (1600), las fábricas textiles (1800), los bancos de inversión (1990) y las Big Tech (2010). El locus del poder económico cambia completamente en cada era, aunque el sistema se llame igual.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para ver las eras completas',
+        cuerpo: 'Las 6 eras muestran cómo cada período tuvo su propia lógica interna y sus propias contradicciones. La era "Capitalismo en Crisis y Mutación" (2008-2020) es la más abierta: no sabemos todavía qué reforma generará la crisis de 2008, ni cómo la IA transformará el capitalismo de plataformas en la próxima era.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📊',
+        texto: 'La VOC (Compañía Holandesa de las Indias Orientales, 1602) fue la empresa más valiosa de la historia en términos reales: su capitalización equivaldría a 8,2 billones de dólares actuales, más que Apple, Microsoft, Google, Amazon y Tesla juntas.',
+      },
+      {
+        icono: '💰',
+        texto: 'Los "Treinta Gloriosos" (1945-1975) fueron el único período de la historia del capitalismo en que la desigualdad se redujo sistemáticamente en los países occidentales. El tipo marginal máximo del IRPF en EE.UU. era del 91% en 1960. Eisenhower, un republicano conservador, lo aplicó.',
+      },
+      {
+        icono: '📉',
+        texto: 'En octubre de 2008, el mercado de derivados financieros tenía un valor nocional de 684 billones de dólares: diez veces el PIB mundial. Estos instrumentos, creados para gestionar el riesgo, amplificaron la crisis hasta hacerla sistémica. La economía real pagó los platos rotos de la economía financiera.',
+      },
+      {
+        icono: '🏭',
+        texto: 'En 1900, el sector manufacturero representaba el 30% del empleo en los países industrializados. En 2020, apenas el 10%. El capitalismo ha destruido y creado empleos en cada era: los telares mecánicos eliminaron a los artesanos, las cadenas de montaje crearon una clase obrera, la automatización digital está haciendo lo mismo con empleos de oficina.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Confundir capitalismo con libre mercado total',
+        cuerpo: 'El capitalismo real siempre ha convivido con regulación estatal intensa. Las Compañías de Indias tenían monopolios estatales. El capitalismo keynesiano regulaba bancos y comercio exterior. Incluso el neoliberalismo mantuvo el Estado como garante de los contratos, los derechos de propiedad y la estabilidad monetaria. El capitalismo sin Estado es una abstracción teórica, no un sistema real que haya existido nunca.',
+      },
+      {
+        titulo: 'Creer que el capitalismo siempre genera crecimiento y estabilidad',
+        cuerpo: 'El capitalismo histórico alterna períodos de crecimiento extraordinario con crisis devastadoras. La Gran Depresión destruyó un tercio de la producción mundial. La crisis de 2008 borró décadas de ahorro de millones de familias. La estabilidad capitalista es siempre provisional y depende de regulaciones, instituciones y condiciones sociales específicas, no del mercado por sí solo.',
+      },
+      {
+        titulo: 'Pensar que el marxismo y el capitalismo son los únicos modelos posibles',
+        cuerpo: 'La historia del capitalismo muestra una enorme variedad de modelos: el capitalismo renano (Alemania, con cogobierno empresarial y Estado del bienestar fuerte), el capitalismo nórdico (alta igualdad + mercado libre), el capitalismo de Estado chino, el capitalismo anglosajón (financiarización y mínima regulación). El debate no es capitalismo vs. socialismo, sino qué tipo de economía mixta y qué nivel de redistribución.',
+      },
+      {
+        titulo: 'Ignorar el rol de la violencia y el colonialismo en la acumulación original',
+        cuerpo: 'El capitalismo moderno no nació solo del ingenio de los empresarios: se construyó sobre el comercio de esclavos (que financió la Revolución Industrial), el saqueo colonial (materias primas gratis) y el trabajo forzado en las plantaciones americanas. Karl Marx llamó a esto "acumulación primitiva". Ignorar esta base histórica lleva a explicaciones incompletas de por qué el capitalismo se desarrolló primero en Europa y no en otros continentes con recursos equivalentes.',
+      },
+    ],
+  },
+};

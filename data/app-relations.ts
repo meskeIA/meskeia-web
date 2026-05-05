@@ -4261,6 +4261,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-inteligencia-artificial/', icon: '🤖', name: 'Historia de la Inteligencia Artificial', description: 'La ética de la IA es el gran desafío filosófico del siglo XXI: alineación de valores, responsabilidad algorítmica y autonomía de las máquinas replantean preguntas kantianas y utilitaristas en el contexto de los sistemas digitales.' },
   ],
 
+  // EJE B: Capitalismo, Comercio, Trabajo y Agricultura — (2026-05-05)
+  'visualizador-historia-historia-capitalismo': [
+    { url: '/visualizador-historia/historia-comercio/', icon: '🌍', name: 'Historia del Comercio Mundial', description: 'Capitalismo y comercio han sido inseparables desde el mercantilismo: las Compañías de Indias, el libre comercio victoriano y la globalización financiera son tanto historia del capital como del intercambio mundial.' },
+    { url: '/visualizador-historia/historia-trabajo/', icon: '🔨', name: 'Historia del Trabajo', description: 'Trabajo y capital son los dos polos del capitalismo: cada transformación del sistema económico (industrialización, neoliberalismo, gig economy) tiene su contrapartida directa en la historia del trabajo.' },
+    { url: '/visualizador-historia/historia-pensamiento-politico/', icon: '📜', name: 'Historia del Pensamiento Político', description: 'Adam Smith, Marx, Keynes, Hayek y Piketty son también filósofos políticos que debatieron sobre poder, distribución y el papel del Estado: no hay historia del capitalismo sin historia del pensamiento que lo creó o cuestionó.' },
+    { url: '/visualizador-historia/historia-economia-mundial/', icon: '📊', name: 'Historia de la Economía Mundial', description: 'El capitalismo genera la economía mundial: la Revolución Industrial, las crisis de 1929 y 2008 y la globalización son capítulos que se narran desde ambas cronologías y que se explican mejor juntas.' },
+  ],
+  'visualizador-historia-historia-comercio': [
+    { url: '/visualizador-historia/historia-capitalismo/', icon: '📈', name: 'Historia del Capitalismo', description: 'El capitalismo y el comercio han sido inseparables desde el mercantilismo: las Compañías de Indias, el libre comercio victoriano y la globalización son tanto historia del capital como del intercambio mundial.' },
+    { url: '/visualizador-historia/exploracion/', icon: '🧭', name: 'La Era de las Exploraciones', description: 'La Era de las Exploraciones y el comercio mundial son una misma historia: Vasco de Gama, Colón y Magallanes buscaban rutas comerciales, y cada descubrimiento geográfico abría nuevos mercados y flujos de intercambio.' },
+    { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'La Conquista de América', description: 'La conquista de América fue ante todo una empresa comercial: la búsqueda de especias, oro y plata reconfiguró los flujos comerciales mundiales y creó el primer mercado verdaderamente global en el siglo XVI.' },
+    { url: '/visualizador-historia/historia-economia-mundial/', icon: '📊', name: 'Historia de la Economía Mundial', description: 'La historia del comercio es la historia de la economía mundial vista desde los flujos de bienes: la Ruta de la Seda, las Compañías de Indias y la OMC son los pilares del sistema económico global.' },
+  ],
+  'visualizador-historia-historia-trabajo': [
+    { url: '/visualizador-historia/historia-capitalismo/', icon: '📈', name: 'Historia del Capitalismo', description: 'Trabajo y capital son los dos polos del capitalismo: cada transformación del sistema económico —industrialización, neoliberalismo, gig economy— tiene su contrapartida en la historia del trabajo y los derechos laborales.' },
+    { url: '/visualizador-historia/historia-derechos-humanos/', icon: '✊', name: 'Historia de los Derechos Humanos', description: 'Los derechos laborales son una extensión de los derechos humanos: la jornada de 8 horas, la prohibición del trabajo infantil y la libertad sindical son conquistas del mismo impulso emancipador que los derechos civiles y políticos.' },
+    { url: '/visualizador-historia/historia-agricultura/', icon: '🌾', name: 'Historia de la Agricultura', description: 'La agricultura es el primer trabajo humano y el primero en transformarse por la tecnología. El éxodo rural provocado por la mecanización agrícola en los siglos XIX y XX crea la clase obrera industrial.' },
+    { url: '/visualizador-historia/historia-pensamiento-politico/', icon: '📜', name: 'Historia del Pensamiento Político', description: 'Marx, Proudhon y Bakunin son tanto teóricos del trabajo como del poder político: la cuestión obrera es el motor ideológico del siglo XIX y XX, y el pensamiento político moderno no se entiende sin ella.' },
+  ],
+  'visualizador-historia-historia-agricultura': [
+    { url: '/visualizador-historia/historia-comercio/', icon: '🌍', name: 'Historia del Comercio Mundial', description: 'Agricultura y comercio nacieron juntos: los primeros mercados de Mesopotamia intercambiaban excedentes agrícolas. La Ruta de la Seda transportaba especias. El comercio global hoy depende de cadenas agroalimentarias que conectan el campo con supermercados de todo el mundo.' },
+    { url: '/visualizador-historia/historia-trabajo/', icon: '🔨', name: 'Historia del Trabajo', description: 'La agricultura es el primer trabajo humano: de la azada a la cosechadora en 12.000 años. El éxodo rural provocado por la mecanización agrícola es el mayor movimiento de trabajadores de la historia y el origen de la clase obrera industrial.' },
+    { url: '/visualizador-historia/historia-capitalismo/', icon: '📈', name: 'Historia del Capitalismo', description: 'El capitalismo agrario (enclosures, plantaciones coloniales, agroindustria) es una fase específica del capitalismo: la tierra como mercancía y el alimento como producto financiero son la aplicación del capital al campo.' },
+    { url: '/visualizador-historia/historia-economia-mundial/', icon: '📊', name: 'Historia de la Economía Mundial', description: 'La soberanía alimentaria y los precios agrícolas son variables macroeconómicas clave: los alimentos representan el 10% del PIB global y las crisis de precios agrícolas de 1973 y 2008 desencadenaron crisis políticas en todo el mundo.' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

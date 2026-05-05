@@ -1,0 +1,366 @@
+import type { HistoriaData } from './types';
+
+export const historiaTrabajo: HistoriaData = {
+  slug: 'historia-trabajo',
+  titulo: 'Historia del Trabajo: De la Esclavitud Antigua al Teletrabajo del Siglo XXI',
+  subtitulo: 'Cinco mil años de trabajo humano: de la obligación coercitiva al derecho fundamental y la economía gig',
+  descripcionSEO: 'Cronología interactiva de la historia del trabajo: esclavitud antigua, gremios medievales, Revolución Industrial, movimiento obrero, jornada de 8 horas, fordismo, Estado del Bienestar, desindustrialización, automatización y gig economy. 10 hitos y 6 eras desde 3000 a.C. hasta 2020.',
+  keywords: [
+    'historia del trabajo cronología esclavitud antigua gremios medievales',
+    'revolución industrial trabajo infantil jornada laboral factory acts',
+    'movimiento obrero haymarket jornada 8 horas primera internacional',
+    'taylorismo fordismo cadena montaje gestión científica trabajo',
+    'estado del bienestar derechos laborales convenios colectivos sindicatos',
+    'gig economy teletrabajo automatización precariedad trabajo digital uber',
+  ],
+  anioInicio: -3000,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'esclavitud-antigua',
+      nombre: 'Trabajo Esclavo en la Antigüedad',
+      anioInicio: -3000,
+      anioFin: 476,
+      color: '#8B4513',
+      categoria: 'antiguo',
+      descripcion: 'En las civilizaciones antiguas el trabajo coercitivo es la norma: esclavitud en Mesopotamia, Egipto, Grecia y Roma. En Roma, los esclavos llegan al 30-40% de la población. Aristóteles teoriza que la esclavitud es natural. Los esclavos construyen las pirámides, las obras públicas romanas, trabajan en las minas y sirven en los hogares aristocráticos. El trabajo libre (artesanos, comerciantes) coexiste con la esclavitud. Espartaco (73-71 a.C.) lidera la mayor revuelta esclava de la historia con 70.000 hombres. Roma nunca abolió la esclavitud: se transformó gradualmente en servidumbre medieval.',
+      obraIconica: 'Revuelta de Espartaco (73-71 a.C.): la mayor rebelión de esclavos de la historia antigua',
+      paises: ['Roma', 'Grecia', 'Egipto', 'Mediterráneo Antiguo'],
+    },
+    {
+      id: 'gremios-medievales',
+      nombre: 'Gremios Medievales y Trabajo Corporativo',
+      anioInicio: 900,
+      anioFin: 1750,
+      color: '#2E8B57',
+      categoria: 'medieval',
+      descripcion: 'Los gremios (guilds) medievales organizan el trabajo artesanal: regulan el acceso a la profesión (aprendiz, oficial, maestro), los precios, la calidad y las condiciones de trabajo. Controlan los oficios urbanos durante 800 años. El trabajo feudal rural (siervos de la gleba) obliga a los campesinos a trabajar la tierra del señor a cambio de protección. La Iglesia condena la usura pero legitima el trabajo manual como virtud. Los gremios representan el primer sistema de regulación laboral de la historia europea y anticipan los sindicatos modernos.',
+      obraIconica: 'Los gremios medievales (siglos XI-XVIII): primer sistema de regulación del trabajo y la profesión en Europa',
+      paises: ['Europa Medieval', 'Italia', 'Francia', 'Países Bajos', 'Alemania'],
+    },
+    {
+      id: 'revolucion-industrial-trabajo',
+      nombre: 'El Trabajo en la Revolución Industrial',
+      anioInicio: 1760,
+      anioFin: 1830,
+      color: '#DC143C',
+      categoria: 'industrial',
+      descripcion: 'La Revolución Industrial destruye el trabajo artesanal y crea el trabajo fabril: jornadas de 14-16 horas, trabajo infantil desde los 5 años, condiciones insalubres, salarios de subsistencia. Los Factory Acts ingleses (1833, 1844) son las primeras leyes laborales: prohíben el trabajo de niños menores de 9 años y limitan la jornada. Friedrich Engels (La Situación de la Clase Obrera en Inglaterra, 1845) documenta el horror. La fábrica como institución total transforma no solo el trabajo sino la vida cotidiana, la familia y las ciudades.',
+      obraIconica: 'Factory Act inglés (1833) y La Situación de la Clase Obrera de Engels (1845): primeras respuestas al trabajo industrial',
+      paises: ['Reino Unido', 'Inglaterra', 'Europa Industrial'],
+    },
+    {
+      id: 'luddismo-resistencia',
+      nombre: 'Luddismo y Resistencia Obrera',
+      anioInicio: 1811,
+      anioFin: 1848,
+      color: '#DC143C',
+      categoria: 'industrial',
+      descripcion: 'Los luditas (1811-1816) destruyen máquinas en Inglaterra: no son antitecnología sino trabajadores que protestan contra la pérdida de sus oficios y salarios. El cartismo inglés (1838-1857) reclama sufragio universal masculino. Los movimientos obreros se organizan en Europa: huelgas, sindicatos clandestinos, asociaciones mutualistas. El Manifiesto Comunista (Marx y Engels, 1848) aparece en plena oleada revolucionaria europea. La represión es brutal: 17 luditas ejecutados, miles deportados. La resistencia obrera al capitalismo industrial adquiere formas políticas y sindicales.',
+      obraIconica: 'El Manifiesto Comunista (1848) y el movimiento cartista (1838-1857): la política como herramienta obrera',
+      paises: ['Reino Unido', 'Francia', 'Alemania', 'Europa'],
+    },
+    {
+      id: 'internacionales-obreras',
+      nombre: 'Internacionales Obreras y Jornada de 8 Horas',
+      anioInicio: 1864,
+      anioFin: 1919,
+      color: '#4B0082',
+      categoria: 'obrero',
+      descripcion: 'La Primera Internacional (AIT, 1864) reúne a Marx, Bakunin y los sindicatos europeos. La masacre de Haymarket (Chicago, 1886) durante una huelga por las 8 horas da lugar al 1 de Mayo como Día Internacional del Trabajo. La Segunda Internacional (1889) organiza los partidos socialistas europeos. La Revolución Rusa (1917) crea el primer Estado obrero. El Tratado de Versalles (1919) funda la OIT. La jornada de 8 horas se conquista en la mayoría de países industrializados entre 1917 y 1919, 33 años después de Haymarket.',
+      obraIconica: 'Masacre de Haymarket (1886) y OIT (1919): la conquista internacional de la jornada de 8 horas',
+      paises: ['Estados Unidos', 'Europa', 'Rusia', 'Global'],
+    },
+    {
+      id: 'taylorismo-fordismo',
+      nombre: 'Taylorismo, Fordismo y el Trabajo en Cadena',
+      anioInicio: 1911,
+      anioFin: 1945,
+      color: '#4B0082',
+      categoria: 'obrero',
+      descripcion: 'Frederick Taylor (Principios de la Gestión Científica, 1911) aplica la ingeniería al trabajo: medir cada movimiento, eliminar tiempos muertos, máxima eficiencia. Henry Ford (cadena de montaje, 1913) automatiza la producción del Model T: un coche cada 93 minutos. El fordismo añade al taylorismo la idea de que los trabajadores deben ganar suficiente para comprar lo que producen. Chaplin satiriza el sistema en Tiempos Modernos (1936). El trabajo en cadena crea abundancia material pero también alienación: el trabajo se fragmenta en tareas repetitivas que requieren mínima cualificación.',
+      obraIconica: 'Cadena de montaje de Ford (1913) y Tiempos Modernos de Chaplin (1936): el trabajo taylorista en acción',
+      paises: ['Estados Unidos', 'Alemania', 'Europa Industrial'],
+    },
+    {
+      id: 'estado-bienestar-laboral',
+      nombre: 'Estado del Bienestar y Derechos Laborales',
+      anioInicio: 1945,
+      anioFin: 1975,
+      color: '#228B22',
+      categoria: 'bienestar',
+      descripcion: 'La posguerra consolida los derechos laborales en Europa: convenios colectivos, pensiones públicas, seguro de desempleo, sanidad universal, vacaciones pagadas, negociación sindical reconocida. El modelo sueco (cogestión) y el modelo alemán (codeterminación con trabajadores en consejos de administración) representan el pico del poder sindical. El pleno empleo keynesiano como objetivo político explícito. Los "Treinta Gloriosos" (1945-1975) ven el mayor crecimiento de la clase trabajadora y el mayor aumento de salarios reales de la historia industrial.',
+      obraIconica: 'El Estado del Bienestar europeo (1945-1975): el mayor avance en derechos laborales de la historia',
+      paises: ['Europa Occidental', 'Suecia', 'Alemania', 'Francia', 'Reino Unido'],
+    },
+    {
+      id: 'desindustrializacion',
+      nombre: 'Desindustrialización y Precarización',
+      anioInicio: 1975,
+      anioFin: 2000,
+      color: '#FF8C00',
+      categoria: 'contemporaneo',
+      descripcion: 'El choque del petróleo (1973) y el neoliberalismo de Thatcher-Reagan desmantelan el poder sindical: la huelga de los mineros ingleses (1984-85) es el símbolo del colapso sindical occidental. Las deslocalizaciones trasladan la manufactura a Asia: millones de empleos industriales desaparecen en Occidente. El trabajo se fragmenta en servicios, tiempo parcial y contratos temporales. La tasa de sindicalización cae del 45% al 15% en 30 años en países como EE.UU. y el Reino Unido. La seguridad del empleo vitalicio es reemplazada por la "flexibilidad".',
+      obraIconica: 'Huelga de los mineros ingleses (1984-85): el símbolo del colapso del poder sindical en Occidente',
+      paises: ['Reino Unido', 'Estados Unidos', 'Europa Occidental', 'Global'],
+    },
+    {
+      id: 'automatizacion',
+      nombre: 'Automatización y Crisis del Empleo Industrial',
+      anioInicio: 1990,
+      anioFin: 2015,
+      color: '#FF8C00',
+      categoria: 'contemporaneo',
+      descripcion: 'Los robots industriales y la informatización eliminan empleos manufactureros: un robot cuesta menos que un trabajador de por vida. China se convierte en la fábrica del mundo mientras Occidente pierde millones de empleos industriales. El informe de Frey y Osborne (2013) advierte que el 47% de los empleos estadounidenses son susceptibles de automatización en dos décadas. Los empleos de cuello azul y cuello blanco de cualificación media desaparecen: polarización del mercado laboral entre empleos muy cualificados y muy precarios.',
+      obraIconica: 'Informe Frey-Osborne (2013): el 47% de los empleos en riesgo de automatización en 20 años',
+      paises: ['Global', 'China', 'Estados Unidos', 'Europa'],
+    },
+    {
+      id: 'gig-economy-teletrabajo',
+      nombre: 'Gig Economy y Teletrabajo',
+      anioInicio: 2010,
+      anioFin: 2020,
+      color: '#696969',
+      categoria: 'digital',
+      descripcion: 'Uber (2009), Airbnb (2008) y Deliveroo crean la economía gig: trabajadores "autónomos" sin derechos laborales que asumen todos los riesgos. El debate legal sobre si son empleados o autónomos se libra en tribunales de todo el mundo. La pandemia de 2020 generaliza el teletrabajo: 300 millones de personas trabajan desde casa, borrando los límites entre vida y trabajo. El metaverso laboral, la IA que redacta informes y el trabajo de "nómada digital" redefinen el concepto mismo de empleo. La precariedad y la flexibilidad son las dos caras de la misma moneda digital.',
+      obraIconica: 'Uber (2009) y la pandemia de 2020: la gig economy y el teletrabajo como nueva normalidad laboral',
+      paises: ['Global', 'Estados Unidos', 'Europa', 'Internet'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Trabajo en la Antigüedad',
+      desde: -3000,
+      hasta: 900,
+      icono: '⛓️',
+      hitosDestacados: ['Trabajo Esclavo en la Antigüedad'],
+      eventos: [
+        'Esclavitud en Mesopotamia y Egipto: trabajo coercitivo como base económica (3000 a.C.)',
+        'Aristóteles teoriza que la esclavitud es natural e indispensable para la civilización griega (siglo IV a.C.)',
+        'Revuelta de Espartaco: 70.000 esclavos se levantan contra Roma (73-71 a.C.)',
+        'La esclavitud romana se transforma gradualmente en servidumbre feudal con la caída del Imperio (siglo V d.C.)',
+      ],
+    },
+    {
+      nombre: 'Trabajo Medieval y Gremial',
+      desde: 900,
+      hasta: 1760,
+      icono: '🔨',
+      hitosDestacados: ['Gremios Medievales y Trabajo Corporativo'],
+      eventos: [
+        'Los gremios artesanales se consolidan en las ciudades medievales europeas (siglos XI-XII)',
+        'Sistema aprendiz-oficial-maestro: primera estructura de cualificación profesional reglamentada',
+        'La Carta Magna (1215) incluye primeras protecciones para comerciantes frente a la arbitrariedad real',
+        'Las pestes medievales reducen la población y elevan temporalmente los salarios de los trabajadores libres (siglo XIV)',
+      ],
+    },
+    {
+      nombre: 'Revolución Industrial',
+      desde: 1760,
+      hasta: 1864,
+      icono: '🏭',
+      hitosDestacados: ['El Trabajo en la Revolución Industrial', 'Luddismo y Resistencia Obrera'],
+      eventos: [
+        'Primera fábrica textil mecanizada en Manchester: inicio del trabajo industrial masivo (1771)',
+        'Los luditas destruyen máquinas en protesta por la pérdida de empleos artesanales (1811-1816)',
+        'Factory Act inglés: prohíbe el trabajo de niños menores de 9 años en fábricas textiles (1833)',
+        'Engels documenta las condiciones de la clase obrera en Manchester en su obra más influyente (1845)',
+        'El Manifiesto Comunista define al proletariado como sujeto histórico del cambio social (1848)',
+      ],
+    },
+    {
+      nombre: 'Era del Movimiento Obrero',
+      desde: 1864,
+      hasta: 1945,
+      icono: '✊',
+      hitosDestacados: ['Internacionales Obreras y Jornada de 8 Horas', 'Taylorismo, Fordismo y el Trabajo en Cadena'],
+      eventos: [
+        'Primera Internacional (AIT): Marx y Bakunin unen sindicatos europeos bajo una sola organización (1864)',
+        'Masacre de Haymarket en Chicago: la huelga por las 8 horas da origen al 1 de Mayo (1886)',
+        'Taylor publica Principios de la Gestión Científica: el trabajo medido con cronómetro (1911)',
+        'Ford introduce la cadena de montaje en Highland Park: un coche cada 93 minutos (1913)',
+        'Fundación de la OIT en el Tratado de Versalles: primera institución laboral internacional (1919)',
+      ],
+    },
+    {
+      nombre: 'Estado del Bienestar Laboral',
+      desde: 1945,
+      hasta: 1990,
+      icono: '🛡️',
+      hitosDestacados: ['Estado del Bienestar y Derechos Laborales', 'Desindustrialización y Precarización'],
+      eventos: [
+        'Los "Treinta Gloriosos": pleno empleo, convenios colectivos y Estado del Bienestar en Europa (1945-1975)',
+        'Modelo alemán de codeterminación: trabajadores en los consejos de administración de las empresas (1952)',
+        'El choque del petróleo (1973) pone fin al pleno empleo y al crecimiento keynesiano sin interrupciones',
+        'Thatcher destruye el sindicato de mineros en la huelga más larga de la historia británica (1984-85)',
+        'La caída del Muro de Berlín abre el mercado laboral global con mano de obra de bajo coste (1989)',
+      ],
+    },
+    {
+      nombre: 'Trabajo Digital y Gig Economy',
+      desde: 1990,
+      hasta: 2020,
+      icono: '💻',
+      hitosDestacados: ['Automatización y Crisis del Empleo Industrial', 'Gig Economy y Teletrabajo'],
+      eventos: [
+        'China ingresa en la OMC: la manufactura global se traslada a Asia, Occidente pierde empleos industriales (2001)',
+        'Informe Frey-Osborne: el 47% de los empleos en EE.UU. son susceptibles de automatización (2013)',
+        'Uber y la gig economy: trabajadores sin contrato, sin pensión y sin protección social (2009-2015)',
+        'La pandemia de COVID-19 generaliza el teletrabajo para 300 millones de personas en semanas (2020)',
+      ],
+    },
+  ],
+
+  categorias: {
+    antiguo: 'Trabajo en la Antigüedad',
+    medieval: 'Trabajo Medieval',
+    industrial: 'Industrialización',
+    obrero: 'Movimiento Obrero',
+    bienestar: 'Estado del Bienestar',
+    contemporaneo: 'Era Contemporánea',
+    digital: 'Economía Digital',
+  },
+
+  colores: {
+    antiguo: '#8B4513',
+    medieval: '#2E8B57',
+    industrial: '#DC143C',
+    obrero: '#4B0082',
+    bienestar: '#228B22',
+    contemporaneo: '#FF8C00',
+    digital: '#696969',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El trabajo es la actividad humana más universal y, a la vez, la más transformada a lo largo de la historia. En cinco mil años ha pasado de ser una obligación coercitiva —impuesta por la fuerza a esclavos y siervos— a convertirse en un derecho fundamental reconocido internacionalmente. La Revolución Industrial, el movimiento obrero, el Estado del Bienestar y la economía digital son los cuatro grandes actos de esta historia: cada uno reorganizó radicalmente cómo, cuánto, dónde y en qué condiciones trabajan los seres humanos. Entender esta evolución es comprender cómo se distribuye el poder y la riqueza en las sociedades contemporáneas.',
+
+    tablaComparativa: [
+      { hito: 'Esclavitud antigua', periodo: '3000 a.C.-476 d.C.', categoria: 'Trabajo en la Antigüedad', personaje: 'Espartaco / Aristóteles', aportacion: 'El trabajo coercitivo como fundamento económico de la civilización antigua' },
+      { hito: 'Gremios medievales', periodo: '900-1750', categoria: 'Trabajo Medieval', personaje: 'Maestros gremiales', aportacion: 'Primera regulación profesional: aprendiz, oficial, maestro y control de calidad' },
+      { hito: 'Revolución Industrial', periodo: '1760-1830', categoria: 'Industrialización', personaje: 'Friedrich Engels / Robert Owen', aportacion: 'Fábrica, trabajo infantil y primeras leyes laborales protectoras' },
+      { hito: 'Haymarket y la OIT', periodo: '1864-1919', categoria: 'Movimiento Obrero', personaje: 'Marx / Samuel Gompers', aportacion: 'Jornada de 8 horas, 1 de Mayo y organización laboral internacional' },
+      { hito: 'Estado del Bienestar', periodo: '1945-1975', categoria: 'Estado del Bienestar', personaje: 'William Beveridge / Willy Brandt', aportacion: 'Pleno empleo, pensiones, sanidad universal y poder sindical máximo' },
+      { hito: 'Gig Economy', periodo: '2009-2020', categoria: 'Economía Digital', personaje: 'Travis Kalanick (Uber) / Jeff Bezos', aportacion: 'Trabajo sin derechos laborales y teletrabajo como nueva normalidad' },
+    ],
+
+    escenarios: [
+      {
+        icono: '👷',
+        titulo: 'Trabajadores y Sindicalistas',
+        perfil: 'Personas interesadas en sus derechos laborales',
+        texto: 'Comprender cómo se conquistaron los derechos que hoy damos por sentados —la jornada de 8 horas, las vacaciones pagadas, el salario mínimo— ayuda a valorar lo que está en juego cuando se debaten reformas laborales. Esta cronología muestra que ningún derecho laboral fue regalado: todos fueron conquistados a través de décadas de lucha sindical y social.',
+      },
+      {
+        icono: '📊',
+        titulo: 'Estudiantes de RRHH y Relaciones Laborales',
+        perfil: 'Grados en RRHH, Relaciones Laborales, Economía',
+        texto: 'La historia del trabajo es el contexto obligatorio para entender el derecho laboral vigente, la negociación colectiva y la gestión de personas. Desde el taylorismo hasta la gestión ágil, todas las teorías organizativas son respuestas a problemas históricos concretos que esta cronología ayuda a situar.',
+      },
+      {
+        icono: '🏢',
+        titulo: 'Empresarios y Directivos',
+        perfil: 'Fundadores, directores, responsables de equipos',
+        texto: 'Entender la historia del contrato social entre empleadores y empleados —desde la esclavitud hasta la gig economy— es esencial para anticipar las tensiones del futuro laboral. La automatización y el trabajo remoto no son fenómenos nuevos: siguen el mismo patrón de disrupción y resistencia que se repite en cada revolución tecnológica.',
+      },
+      {
+        icono: '🔬',
+        titulo: 'Historiadores y Sociólogos',
+        perfil: 'Investigadores de historia social y economía',
+        texto: 'La historia del trabajo es la historia de las relaciones de poder entre clases sociales. Esta cronología ofrece una visión panorámica que conecta la economía esclavista antigua, el feudalismo, el capitalismo industrial y el capitalismo de plataformas, mostrando las continuidades y rupturas en la explotación del trabajo humano.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Cuándo y cómo se conquistó la jornada de 8 horas?',
+        respuesta: 'La demanda de "8 horas de trabajo, 8 de ocio, 8 de sueño" surgió en el movimiento owenista inglés en 1817. Pero la gran batalla fue en Chicago: la huelga general del 1 de mayo de 1886 y la masacre de Haymarket llevaron a ejecutar a cuatro líderes sindicales. La jornada de 8 horas no se conquistó en la mayoría de países industrializados hasta 1917-1919, treinta años después.',
+        tip: 'Ford fue el primer gran empresario en adoptar la jornada de 8 horas voluntariamente en 1914, argumentando que trabajadores más descansados producían más.',
+      },
+      {
+        pregunta: '¿Qué es exactamente la gig economy y por qué es polémica?',
+        respuesta: 'La gig economy (economía de bolos) describe plataformas como Uber, Deliveroo o Upwork que contratan trabajadores como "autónomos" aunque les dicen cuándo trabajar, dónde ir y cuánto cobrar. El debate es si son empleados con derechos laborales o autónomos independientes. Los tribunales de muchos países —España, Reino Unido, Francia— han fallado que son empleados encubiertos.',
+        tip: 'En España, la "Ley Rider" (2021) obliga a las plataformas a contratar como asalariados a los repartidores, siendo una de las regulaciones más estrictas de Europa.',
+      },
+      {
+        pregunta: '¿Fueron los luditas simplemente antitecnológicos?',
+        respuesta: 'No es tan simple. Los luditas (1811-1816) no destruían máquinas por miedo al progreso, sino porque las máquinas rompían los acuerdos tácitos del oficio y hundían sus salarios. Eran artesanos cualificados que perdían su modo de vida. La historiografía actual los reivindica como una forma legítima de resistencia laboral, no como ignorantes antitecnológicos.',
+        tip: 'El término "ludita" viene del legendario Ned Ludd, un obrero del siglo XVIII que supuestamente destruyó telares. Su existencia real es dudosa, pero su leyenda organizó un movimiento real.',
+      },
+      {
+        pregunta: '¿Qué fue el fordismo y por qué fue revolucionario?',
+        respuesta: 'El fordismo (1913-1970s) combinó tres elementos: cadena de montaje (máxima eficiencia), altos salarios para los trabajadores (que podían comprar lo que producían) y producción en masa de productos estandarizados. Fue revolucionario porque creó simultáneamente la clase obrera industrial y la sociedad de consumo de masas. Sin fordismo no hay clase media del siglo XX.',
+        tip: 'Ford pagó en 1914 el doble del salario medio industrial (5 dólares/día) para reducir la rotación. El resultado fue que sus trabajadores pudieron comprar el Model T que fabricaban.',
+      },
+      {
+        pregunta: '¿Está la automatización destruyendo el empleo como nunca antes?',
+        respuesta: 'La automatización siempre ha destruido empleos específicos y creado otros nuevos. El miedo a que "las máquinas se lleven todos los trabajos" lleva dos siglos sin cumplirse del todo: cada revolución tecnológica elimina oficios y crea otros imprevisibles. Sin embargo, la velocidad y amplitud de la IA actual es sin precedentes: puede sustituir tanto trabajo manual como trabajo cognitivo cualificado al mismo tiempo.',
+        tip: 'El informe Frey-Osborne (2013) que alarmó con el 47% de empleos en riesgo fue muy debatido: otros estudios posteriores sitúan la cifra en el 9-14% de empleos totalmente automatizables.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa la distribución de colores en la Línea del Tiempo',
+        cuerpo: 'El marrón de la Antigüedad ocupa milenios. El rojo de la industrialización, apenas un siglo. El verde del Bienestar, apenas treinta años. La compresión temporal es la primera lección: los cambios se aceleran dramáticamente. Identifica visualmente cuánto duró cada era antes de leer nada más.',
+      },
+      {
+        titulo: 'Compara la Revolución Industrial con el Movimiento Obrero',
+        cuerpo: 'Haz clic en "El Trabajo en la Revolución Industrial" y luego en "Internacionales Obreras y Jornada de 8 Horas". Observa la relación causa-efecto: cada abuso generó su respuesta organizada. La jornada de 8 horas tardó exactamente 70 años en conquistarse desde que se exigió por primera vez.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ver la evolución del poder',
+        cuerpo: 'En la tabla Comparativa, filtra por "Movimiento Obrero" para ver la era de máximo poder sindical. Luego filtra por "Era Contemporánea" para ver la desindustrialización. El contraste entre ambos grupos revela cómo se redistribuye el poder entre capital y trabajo en pocas décadas.',
+      },
+      {
+        titulo: 'Presta atención al solapamiento de los hitos industriales',
+        cuerpo: 'Los hitos "Revolución Industrial" y "Luddismo y Resistencia Obrera" se solapan (1811-1830): son simultáneos. La resistencia no fue posterior a la industrialización, sino inmediata. Este patrón —disrupción + resistencia simultánea— se repite con la automatización y la gig economy en el siglo XXI.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el panorama completo',
+        cuerpo: 'Las 6 eras muestran que la historia del trabajo no es lineal: el Estado del Bienestar (era 5) fue un pico de derechos que luego retrocedió con la desindustrialización. La era 6 plantea la pregunta abierta: ¿la gig economy y la automatización llevan a un nuevo bienestar o a una nueva servidumbre?',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '⏰',
+        texto: 'La jornada laboral media en la primera Revolución Industrial era de 14-16 horas diarias, 6 días a la semana. Eso es el doble de lo que trabaja un empleado actual con contrato de 40 horas semanales. La reducción de la jornada laboral es uno de los mayores avances de bienestar humano del siglo XX, aunque apenas se percibe como tal.',
+      },
+      {
+        icono: '👶',
+        texto: 'En las fábricas textiles inglesas de principios del siglo XIX, niños de 5 años trabajaban 12-14 horas diarias. Los "chimney sweeps" (deshollinadores) podían tener 4 años: su tamaño pequeño era su "cualificación profesional". El primer Factory Act que limitó el trabajo infantil (1833) se aprobó 60 años después del inicio de la industrialización.',
+      },
+      {
+        icono: '🌍',
+        texto: 'El 1 de Mayo como Día Internacional del Trabajo nació en EE.UU., pero los propios Estados Unidos no lo celebran ese día: lo celebran el primer lunes de septiembre (Labor Day) para distanciarse del origen socialista de la fecha. Es uno de los más curiosos divorcios entre un país y su propia historia laboral.',
+      },
+      {
+        icono: '🤖',
+        texto: 'Los primeros robots industriales aparecieron en las fábricas de General Motors en 1961. Hoy hay más de 3,5 millones de robots industriales en funcionamiento en el mundo. Sin embargo, el mayor crecimiento del empleo en las últimas décadas ha sido en servicios —trabajo que los robots aún no pueden hacer bien— lo que sugiere que la automatización crea y destruye empleos simultáneamente.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la esclavitud fue solo un fenómeno del pasado remoto',
+        cuerpo: 'La esclavitud formal no fue abolida en EE.UU. hasta 1865, en Brasil hasta 1888, y la esclavitud en Arabia Saudí hasta 1962. Mauritania no la abolió hasta 1981. La servidumbre feudal en Rusia duró hasta 1861. El "pasado remoto" de la esclavitud, para millones de personas, es el bisabuelo o el abuelo de alguien vivo hoy.',
+      },
+      {
+        titulo: 'Pensar que los derechos laborales son logros naturales e irreversibles',
+        cuerpo: 'Los derechos laborales son conquistas políticas que pueden revertirse. La desindustrialización de los años 80-90 eliminó en dos décadas logros que habían tardado un siglo en conquistarse: poder sindical, empleo estable, salarios reales crecientes. La historia muestra que los derechos laborales requieren defensa activa permanente.',
+      },
+      {
+        titulo: 'Confundir flexibilidad laboral con libertad del trabajador',
+        cuerpo: 'La "flexibilidad" en el discurso empresarial suele significar flexibilidad para el empresario: contratar y despedir fácilmente, ajustar horarios, reducir costes. Para el trabajador, esa flexibilidad suele implicar inseguridad de ingresos, imposibilidad de planificar y ausencia de protección social. La gig economy es el ejemplo más claro de cómo el mismo término tiene significados opuestos según quien lo use.',
+      },
+      {
+        titulo: 'Creer que el taylorismo pertenece al pasado',
+        cuerpo: 'El taylorismo vive en los almacenes de Amazon, donde cada movimiento de los trabajadores es cronometrado por algoritmos. Los call centers miden el tiempo entre llamadas al segundo. Las apps de reparto asignan rutas optimizadas eliminando la autonomía del repartidor. Taylor murió en 1915 pero sus principios gobiernan el trabajo del siglo XXI con más precisión que nunca, ahora ejecutados por software.',
+      },
+    ],
+  },
+};

@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const historiaComercio: HistoriaData = {
+  slug: 'historia-comercio',
+  titulo: 'Historia del Comercio Mundial: De los Mercados de Mesopotamia al E-Commerce Global',
+  subtitulo: 'Cinco mil años de intercambio, rutas y mercados que conectaron civilizaciones y globalizaron el mundo',
+  descripcionSEO: 'Cronología interactiva de la historia del comercio mundial: desde los primeros mercados de Mesopotamia (3000 a.C.) hasta el e-commerce global (2020). Ruta de la Seda, Liga Hanseática, Compañías de Indias, libre comercio, GATT, OMC y revolución digital en 10 hitos y 6 eras.',
+  keywords: [
+    'historia del comercio mundial cronología',
+    'ruta de la seda comercio antiguo mesopotamia fenicios',
+    'liga hanseatica comercio medieval europa',
+    'compañias de indias VOC colonialismo comercio global',
+    'libre comercio adam smith industrialización siglo XIX',
+    'GATT OMC globalización e-commerce amazon alibaba',
+  ],
+  anioInicio: -3000,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'mercados-mesopotamia',
+      nombre: 'Primeros Mercados de Mesopotamia',
+      anioInicio: -3000,
+      anioFin: -500,
+      color: '#8B4513',
+      categoria: 'antiguo',
+      descripcion: 'Los primeros mercados organizados surgen en Mesopotamia (~3000 a.C.): tablillas de arcilla registran transacciones comerciales, préstamos y contratos. Los sumerios inventan el crédito comercial y los primeros sistemas de pesos y medidas. El comercio de lana, cobre, madera y grano conecta Sumeria con el Indo y Egipto. El código de Hammurabi (~1754 a.C.) regula el comercio: precios, salarios y contratos. Mesopotamia y Egipto establecen el modelo de economía palacial donde el templo y el palacio controlan el intercambio.',
+      obraIconica: 'Tablillas cuneiformes de Ur (~2500 a.C.): los primeros registros contables y contratos comerciales de la historia',
+      paises: ['Mesopotamia', 'Sumeria', 'Babilonia', 'Egipto', 'Indo'],
+    },
+    {
+      id: 'fenicios-griegos',
+      nombre: 'Fenicios y el Comercio Mediterráneo',
+      anioInicio: -1200,
+      anioFin: -300,
+      color: '#8B4513',
+      categoria: 'antiguo',
+      descripcion: 'Los fenicios (1200-600 a.C.) crean la primera red comercial mediterránea: su alfabeto facilita los contratos mercantiles; fundan colonias (Cartago, Gadir/Cádiz) como factorías comerciales. Exportan vidrio, púrpura y cedro del Líbano. Los griegos (siglo VII-IV a.C.) establecen colonias comerciales desde el Mar Negro al Mediterráneo Occidental, difunden la moneda acuñada (Lidia, ~640 a.C.) y crean el ágora como espacio comercial y político. El comercio antiguo ya conecta Europa, África y Asia.',
+      obraIconica: 'La moneda de Lidia (~640 a.C.): invento que revolucionará el comercio mundial durante 2.700 años',
+      paises: ['Fenicia', 'Grecia', 'Mediterráneo', 'Cartago'],
+    },
+    {
+      id: 'ruta-seda',
+      nombre: 'La Ruta de la Seda',
+      anioInicio: -130,
+      anioFin: 1453,
+      color: '#DAA520',
+      categoria: 'clasico',
+      descripcion: 'El diplomático Han Zhang Qian abre la Ruta de la Seda (~130 a.C.) conectando China con Centroasia, Persia y Roma. No es una sola ruta sino una red de rutas terrestres y marítimas que transporta seda, especias, porcelana, papel, pólvora y enfermedades (la Peste Negra viajó por ella). El Imperio Romano paga oro por la seda china, generando el primer déficit comercial de la historia occidental. La Ruta de la Seda es también ruta de ideas, religiones (budismo, islam) y tecnologías. Cae con la conquista otomana de Constantinopla (1453).',
+      obraIconica: 'Ruta de la Seda (~130 a.C. - 1453): el primer sistema de comercio global de la historia',
+      paises: ['China', 'Imperio Romano', 'Persia', 'India', 'Centroasia'],
+    },
+    {
+      id: 'liga-hanseatica',
+      nombre: 'Liga Hanseática y Comercio Medieval',
+      anioInicio: 1241,
+      anioFin: 1500,
+      color: '#2E8B57',
+      categoria: 'medieval',
+      descripcion: 'La Liga Hanseática (1241-1669) es la primera organización comercial supranacional: 200 ciudades del norte de Europa (Lübeck, Hamburgo, Bremen, Riga) negocian como bloque, controlan las rutas del Báltico y el Mar del Norte y crean instituciones mercantiles (leyes comerciales comunes, pesos y medidas unificados). Las ferias medievales de Champaña conectan el norte con el Mediterráneo. Los banqueros florentinos (Médici) inventan la letra de cambio y el banco moderno. El comercio medieval crea la burguesía como clase social.',
+      obraIconica: 'Liga Hanseática (1241): primera organización supranacional de libre comercio de la historia',
+      paises: ['Alemania', 'Países Bajos', 'Escandinavia', 'Europa del Norte', 'Báltico'],
+    },
+    {
+      id: 'companias-indias',
+      nombre: 'Compañías de Indias y Comercio Colonial',
+      anioInicio: 1492,
+      anioFin: 1800,
+      color: '#DC143C',
+      categoria: 'colonial',
+      descripcion: 'El "descubrimiento" de América (1492) y la ruta a la India (1498) abren el comercio intercontinental masivo. El galeón de Manila (1565-1815) conecta Asia con América. La VOC holandesa (1602) y la East India Company inglesa (1600) son las primeras multinacionales con accionistas, dividendos y monopolios estatales. El comercio triangular (armas, esclavos, materias primas) financia la acumulación primitiva del capitalismo. El mercantilismo colonial transforma la economía mundial con flujos de plata americana, especias asiáticas y esclavos africanos.',
+      obraIconica: 'VOC holandesa (1602): primera empresa cotizada en bolsa y primera multinacional de la historia moderna',
+      paises: ['Holanda', 'Inglaterra', 'España', 'Portugal', 'Global'],
+    },
+    {
+      id: 'libre-comercio',
+      nombre: 'Libre Comercio e Industrialización',
+      anioInicio: 1776,
+      anioFin: 1870,
+      color: '#1E90FF',
+      categoria: 'industrial',
+      descripcion: 'Adam Smith (La Riqueza de las Naciones, 1776) y David Ricardo (ventaja comparativa, 1817) proporcionan la teoría del libre comercio. La Revolución Industrial inglesa crea productos manufacturados baratos que buscan mercados globales. La abolición de las Corn Laws (1846) convierte al Reino Unido en abanderado del librecambismo. El Tratado Cobden-Chevalier (1860) entre Reino Unido y Francia extiende el libre comercio a Europa. Los ferrocarriles y el vapor marítimo reducen los costes de transporte y aceleran la globalización comercial del siglo XIX.',
+      obraIconica: 'La Riqueza de las Naciones de Adam Smith (1776) y el Tratado Cobden-Chevalier (1860): apogeo del libre comercio',
+      paises: ['Reino Unido', 'Francia', 'Europa Occidental', 'Global'],
+    },
+    {
+      id: 'canales-revolucion',
+      nombre: 'Canales, Ferrocarriles y el Comercio Global',
+      anioInicio: 1869,
+      anioFin: 1945,
+      color: '#1E90FF',
+      categoria: 'industrial',
+      descripcion: 'El Canal de Suez (1869) reduce a la mitad el trayecto Europa-Asia. El Canal de Panamá (1914) conecta Atlántico y Pacífico. Los cables telegráficos submarinos crean en 1866 el primer sistema de información comercial en tiempo real. El patrón oro garantiza tipos de cambio estables. La primera globalización (1870-1914): comercio, migraciones masivas e inversión internacional alcanzan niveles que no se recuperarán hasta los años 1970. La Primera Guerra Mundial rompe este sistema; el proteccionismo de entreguerras hunde el comercio global un 66%.',
+      obraIconica: 'Canal de Suez (1869) y primer cable telegráfico transatlántico (1866): infraestructura del comercio global',
+      paises: ['Egipto', 'Panamá', 'Global', 'Reino Unido'],
+    },
+    {
+      id: 'gatt-posguerra',
+      nombre: 'GATT y el Orden Comercial de Posguerra',
+      anioInicio: 1947,
+      anioFin: 1994,
+      color: '#20B2AA',
+      categoria: 'global',
+      descripcion: 'El GATT (Acuerdo General sobre Aranceles y Comercio, 1947) crea el marco multilateral para reducir barreras comerciales: 8 rondas de negociación en 47 años. La Ronda Kennedy (1964-67) y la Ronda Tokio (1973-79) recortan aranceles industriales a mínimos históricos. El comercio mundial crece un 8% anual durante los Treinta Gloriosos (1945-1973). Los contenedores estandarizados (Malcolm McLean, 1956) revolucionan el transporte marítimo y reducen los costes logísticos un 90%. El comercio internacional como motor del crecimiento económico de posguerra.',
+      obraIconica: 'GATT (1947) y el contenedor de transporte marítimo (1956): arquitectura del comercio multilateral',
+      paises: ['Global', 'Estados Unidos', 'Europa', 'GATT/OMC'],
+    },
+    {
+      id: 'omc-globalizacion',
+      nombre: 'OMC y la Globalización Comercial',
+      anioInicio: 1995,
+      anioFin: 2015,
+      color: '#20B2AA',
+      categoria: 'global',
+      descripcion: 'La OMC (1995) reemplaza el GATT y añade servicios, propiedad intelectual y resolución de disputas. La adhesión de China (2001) integra la mayor fábrica del mundo en el sistema comercial global. Las cadenas de valor globales fragmentan la producción: un iPhone tiene componentes de 200 países. El comercio Sur-Sur crece por primera vez más que el Norte-Norte. Pero la desindustrialización de Occidente y la competencia china generan una reacción proteccionista: Brexit (2016), guerra comercial EE.UU.-China (2018), revisión del NAFTA (2020).',
+      obraIconica: 'Adhesión de China a la OMC (2001): integración de la mayor economía manufacturera en el sistema global',
+      paises: ['Global', 'China', 'Estados Unidos', 'OMC'],
+    },
+    {
+      id: 'ecommerce-digital',
+      nombre: 'E-Commerce y el Comercio Digital',
+      anioInicio: 1995,
+      anioFin: 2020,
+      color: '#696969',
+      categoria: 'digital',
+      descripcion: 'Amazon (1994), eBay (1995) y Alibaba (1999) crean el comercio electrónico. El e-commerce crece un 20% anual durante 25 años hasta superar los 4 billones de dólares globales. Las plataformas digitales eliminan intermediarios y crean mercados globales para productores pequeños. El comercio transfronterizo digital plantea desafíos fiscales (¿dónde tributa Amazon?), logísticos (entrega en 24h) y competitivos (Amazon vs. comercio local). La pandemia de 2020 acelera masivamente la transición al comercio digital. Alibaba/JD en China y Amazon/Walmart en Occidente crean oligopolios comerciales globales.',
+      obraIconica: 'Amazon (1994) y Alibaba (1999): las dos mayores plataformas comerciales de la historia',
+      paises: ['Estados Unidos', 'China', 'Global', 'Internet'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Comercio en la Antigüedad',
+      desde: -3000,
+      hasta: -300,
+      icono: '🏺',
+      hitosDestacados: ['Primeros Mercados de Mesopotamia', 'Fenicios y el Comercio Mediterráneo'],
+      eventos: [
+        'Primeras tablillas cuneiformes con registros de transacciones comerciales en Sumeria (~3000 a.C.)',
+        'El código de Hammurabi regula contratos, precios y préstamos comerciales (~1754 a.C.)',
+        'Los fenicios fundan Cartago y Gadir como factorías comerciales en el Mediterráneo (~800 a.C.)',
+        'Lidia acuña las primeras monedas metálicas estandarizadas, facilitando el intercambio (~640 a.C.)',
+        'Los griegos crean el ágora como espacio comercial y cívico en sus colonias del Mediterráneo (siglo VII a.C.)',
+      ],
+    },
+    {
+      nombre: 'Rutas Clásicas y Medievales',
+      desde: -300,
+      hasta: 1492,
+      icono: '🐪',
+      hitosDestacados: ['La Ruta de la Seda', 'Liga Hanseática y Comercio Medieval'],
+      eventos: [
+        'Zhang Qian abre diplomáticamente la Ruta de la Seda conectando China con Centroasia y Roma (~130 a.C.)',
+        'El Imperio Romano genera el primer gran déficit comercial de Occidente pagando oro por la seda china (siglo I d.C.)',
+        'Las ferias de Champaña conectan el norte de Europa con el Mediterráneo (siglos XII-XIII)',
+        'La Liga Hanseática unifica el comercio del Báltico y el Mar del Norte bajo leyes mercantiles comunes (1241)',
+        'Los banqueros Médici de Florencia inventan la letra de cambio y el banco moderno (siglo XIV)',
+      ],
+    },
+    {
+      nombre: 'Era Colonial y Comercio Global',
+      desde: 1492,
+      hasta: 1776,
+      icono: '⛵',
+      hitosDestacados: ['Compañías de Indias y Comercio Colonial'],
+      eventos: [
+        'Colón llega a América abriendo el comercio intercontinental masivo entre el Viejo y el Nuevo Mundo (1492)',
+        'Vasco de Gama abre la ruta marítima a la India rompiendo el monopolio otomano de las especias (1498)',
+        'La VOC holandesa se convierte en la primera empresa cotizada en bolsa con accionistas y dividendos (1602)',
+        'El galeón de Manila crea la primera ruta comercial directa entre Asia y América (1565-1815)',
+      ],
+    },
+    {
+      nombre: 'Libre Comercio e Industrialización',
+      desde: 1776,
+      hasta: 1929,
+      icono: '🚂',
+      hitosDestacados: ['Libre Comercio e Industrialización', 'Canales, Ferrocarriles y el Comercio Global'],
+      eventos: [
+        'Adam Smith publica La Riqueza de las Naciones, base teórica del libre comercio (1776)',
+        'David Ricardo formula la teoría de la ventaja comparativa: fundamento del comercio internacional moderno (1817)',
+        'El Reino Unido abole las Corn Laws y se convierte en abanderado del librecambismo (1846)',
+        'El Canal de Suez inaugura una nueva era de rutas marítimas globales más cortas (1869)',
+        'La primera globalización (1870-1914): comercio e inversión alcanzan niveles récord hasta la Gran Guerra',
+      ],
+    },
+    {
+      nombre: 'Orden Multilateral y Posguerra',
+      desde: 1929,
+      hasta: 1995,
+      icono: '🌐',
+      hitosDestacados: ['GATT y el Orden Comercial de Posguerra'],
+      eventos: [
+        'La Gran Depresión y el proteccionismo de los años 30 colapsan el comercio mundial un 66% (1929-1933)',
+        'El GATT crea el primer marco multilateral vinculante para reducir aranceles y barreras comerciales (1947)',
+        'Malcolm McLean estandariza el contenedor marítimo, reduciendo los costes logísticos un 90% (1956)',
+        'La Ronda Kennedy recorta aranceles industriales un 35% entre las principales potencias (1964-1967)',
+        'Los Treinta Gloriosos: el comercio mundial crece un 8% anual impulsando el mayor auge económico del siglo XX (1945-1973)',
+      ],
+    },
+    {
+      nombre: 'Globalización y Comercio Digital',
+      desde: 1995,
+      hasta: 2020,
+      icono: '📦',
+      hitosDestacados: ['OMC y la Globalización Comercial', 'E-Commerce y el Comercio Digital'],
+      eventos: [
+        'La OMC reemplaza el GATT añadiendo servicios, propiedad intelectual y resolución de disputas (1995)',
+        'China se adhiere a la OMC integrando la mayor fábrica del mundo en el sistema comercial global (2001)',
+        'Amazon y Alibaba superan el billón de dólares en ventas anuales: el comercio digital domina (2018)',
+        'La pandemia de COVID-19 acelera masivamente la transición al e-commerce en todo el mundo (2020)',
+      ],
+    },
+  ],
+
+  categorias: {
+    antiguo: 'Comercio Antiguo',
+    clasico: 'Rutas Clásicas',
+    medieval: 'Comercio Medieval',
+    colonial: 'Era Colonial',
+    industrial: 'Era Industrial',
+    global: 'Globalización',
+    digital: 'Comercio Digital',
+  },
+
+  colores: {
+    antiguo: '#8B4513',
+    clasico: '#DAA520',
+    medieval: '#2E8B57',
+    colonial: '#DC143C',
+    industrial: '#1E90FF',
+    global: '#20B2AA',
+    digital: '#696969',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El comercio es tan antiguo como la civilización: 5.000 años de intercambio han conectado culturas, difundido ideas y tecnologías, y configurado el mapa político y económico del mundo. Desde las tablillas de arcilla de Ur hasta la compra con un clic en Amazon, el comercio ha sido el motor invisible de la historia humana. Las rutas comerciales no solo transportaron bienes: transportaron religiones, idiomas, epidemias y revoluciones. Entender la historia del comercio es entender cómo el mundo llegó a ser lo que es hoy.',
+
+    tablaComparativa: [
+      { hito: 'Primeros Mercados de Mesopotamia', periodo: '3000-500 a.C.', categoria: 'Comercio Antiguo', personaje: 'Sumerios / Hammurabi', aportacion: 'Crédito comercial, contratos escritos, pesos y medidas estandarizados' },
+      { hito: 'Fenicios y el Comercio Mediterráneo', periodo: '1200-300 a.C.', categoria: 'Comercio Antiguo', personaje: 'Mercaderes fenicios / griegos', aportacion: 'Alfabeto mercantil, colonias-factorías, moneda acuñada estandarizada' },
+      { hito: 'La Ruta de la Seda', periodo: '130 a.C. - 1453', categoria: 'Rutas Clásicas', personaje: 'Zhang Qian / Marco Polo', aportacion: 'Primer sistema de comercio transcontinental: seda, especias, ideas y religiones' },
+      { hito: 'Liga Hanseática y Comercio Medieval', periodo: '1241-1500', categoria: 'Comercio Medieval', personaje: 'Liga Hanseática / Médici', aportacion: 'Primer bloque comercial supranacional, letra de cambio, banco moderno' },
+      { hito: 'Compañías de Indias y Comercio Colonial', periodo: '1492-1800', categoria: 'Era Colonial', personaje: 'VOC / East India Company', aportacion: 'Primera multinacional cotizada, comercio intercontinental masivo, capitalismo accionarial' },
+      { hito: 'OMC y la Globalización Comercial', periodo: '1995-2015', categoria: 'Globalización', personaje: 'OMC / Amazon / Alibaba', aportacion: 'Sistema comercial multilateral, cadenas de valor globales, e-commerce planetario' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de Economía',
+        perfil: 'Grado en Economía, Comercio Internacional, ADE',
+        texto: 'Esta cronología contextualiza los conceptos teóricos del libre comercio (Smith, Ricardo), el proteccionismo de entreguerras, el modelo GATT/OMC y las cadenas de valor globales. Ideal para situar cada teoría económica en su momento histórico y entender por qué surgió.',
+      },
+      {
+        icono: '💼',
+        titulo: 'Empresario y Emprendedor',
+        perfil: 'PYME, importación/exportación, e-commerce',
+        texto: 'El comercio no es solo economía: es historia de instituciones, rutas y riesgos. Entender cómo evolucionaron los mercados, desde las ferias medievales hasta Amazon, ayuda a identificar patrones de disrupciones pasadas aplicables al presente. La VOC fue la primera startup de alto crecimiento de la historia.',
+      },
+      {
+        icono: '🔍',
+        titulo: 'Historiador y Curioso',
+        perfil: 'Historia económica, civilizaciones, geopolítica',
+        texto: 'El comercio como hilo conductor de la historia: ¿por qué Venecia dominó el Mediterráneo? ¿Por qué la hegemonía española cedió a la holandesa y luego a la inglesa? ¿Por qué el libre comercio del siglo XIX se rompió en el XX? Esta cronología responde con datos y contexto.',
+      },
+      {
+        icono: '🛒',
+        titulo: 'Consumidor Digital',
+        perfil: 'Usuario de e-commerce, interesado en economía cotidiana',
+        texto: 'Cada vez que compras en Amazon o Alibaba, estás usando infraestructura comercial con raíces en 5.000 años de historia. Entender de dónde viene el comercio digital —y qué problemas históricos resolvió— da perspectiva sobre su impacto real y sus limitaciones actuales.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué es la ventaja comparativa y por qué cambió el comercio mundial?',
+        respuesta: 'David Ricardo (1817) demostró matemáticamente que dos países se benefician del comercio incluso cuando uno produce todo más eficientemente que el otro. Si Portugal produce vino mejor y Reino Unido produce tejido mejor (en términos relativos), ambos ganan especializándose e intercambiando. Este principio es la justificación teórica del libre comercio y la base del GATT/OMC. Sin embargo, ignora las transiciones dolorosas para los trabajadores desplazados por la competencia exterior.',
+        tip: 'La teoría de Ricardo se formuló cuando Portugal y Reino Unido negociaban el Tratado de Methuen sobre vino y tejidos, el ejemplo que usó no era aleatorio.',
+      },
+      {
+        pregunta: '¿Por qué el libre comercio genera ganadores y perdedores?',
+        respuesta: 'El libre comercio aumenta la riqueza total de un país pero la distribuye de forma desigual. Los consumidores ganan (productos más baratos), los sectores exportadores ganan, pero los sectores que compiten con importaciones pierden empleos. La desindustrialización de regiones enteras de EE.UU. y Europa Occidental tras la adhesión de China a la OMC (2001) generó el "shock chino" que estudió el economista David Autor: millones de trabajadores perdieron su empleo sin reubicación real.',
+        tip: 'El proteccionismo que generó la reacción política (Brexit, Trump, Le Pen) tiene raíces directas en la desindustrialización de los años 2000-2015.',
+      },
+      {
+        pregunta: '¿Fue la Ruta de la Seda solo una ruta comercial?',
+        respuesta: 'No. La Ruta de la Seda fue simultáneamente una ruta de bienes (seda, especias, porcelana, vidrio), de ideas (budismo, islam, cristianismo nestorian), de tecnologías (papel, pólvora, imprenta en China; vidrio, alfombras en Occidente) y de enfermedades (la Peste Negra viajó por ella hacia Europa en el siglo XIV). Marco Polo la recorrió en el siglo XIII y sus relatos cambiaron la percepción europea de Asia. En cierto sentido, internet es su equivalente digital.',
+        tip: 'La Ruta de la Seda no fue una autopista sino una red de rutas que cambiaban según la política. Era más segura cuando un único imperio (mongol) controlaba toda Eurasia: el siglo XIII fue su momento de máximo tránsito.',
+      },
+      {
+        pregunta: '¿Qué fue el mercantilismo y por qué fracasó?',
+        respuesta: 'El mercantilismo (siglos XVI-XVIII) creía que la riqueza de una nación dependía de acumular oro y plata, y que el comercio era un juego de suma cero: lo que gana uno lo pierde otro. Los estados imponían aranceles altos y monopolios coloniales para maximizar exportaciones y minimizar importaciones. Adam Smith (1776) refutó esta visión: el comercio libre crea riqueza para ambas partes. El mercantilismo no "fracasó" completamente: dejó como legado las compañías por acciones, los bancos centrales y el Estado como actor económico.',
+        tip: 'España acumuló enormes cantidades de plata americana y terminó siendo una potencia económica menor que Holanda, que tenía menos plata pero más comercio libre: un caso práctico de los límites del mercantilismo.',
+      },
+      {
+        pregunta: '¿El e-commerce es realmente tan nuevo o tiene precedentes históricos?',
+        respuesta: 'El comercio a distancia tiene 5.000 años: los mercaderes asirios en Anatolia (~2000 a.C.) enviaban cartas de crédito y órdenes de compra por correo. Los Médici gestionaban una red comercial internacional desde Florencia con sucursales en toda Europa usando letras de cambio. La novedad del e-commerce no es la distancia sino la escala (miles de millones de usuarios), la velocidad (entrega en horas) y la eliminación de intermediarios locales. Amazon es estructuralmente similar a los grandes almacenes del siglo XIX, solo que sin edificio.',
+        tip: 'La primera transacción comercial registrada por internet fue una pizza de Pizza Hut en 1994, el mismo año que Bezos fundó Amazon desde un garaje en Seattle.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Comienza por la Línea del Tiempo: identifica las grandes rupturas',
+        cuerpo: 'Antes de leer nada, observa dónde cambian los colores en la barra. Cada cambio marca una ruptura histórica: de la antigüedad al comercio clásico, del medieval al colonial, del industrial al global. Los períodos más cortos (industrialización, e-commerce) concentran las transformaciones más rápidas de la historia comercial.',
+      },
+      {
+        titulo: 'Contrasta la Ruta de la Seda con el e-commerce',
+        cuerpo: 'Haz clic en "La Ruta de la Seda" y luego en "E-Commerce y el Comercio Digital". Ambos son sistemas de intercambio global que van mucho más allá de los bienes: la Ruta de la Seda transportó religiones e ideas; internet transporta cultura y desinformación. La tecnología cambia; la función social del comercio persiste.',
+      },
+      {
+        titulo: 'Usa la Comparativa para identificar los grandes saltos institucionales',
+        cuerpo: 'Filtra la tabla por "Comercio Antiguo" y luego por "Era Colonial". Observa el salto entre el comercio directo de los fenicios y las multinacionales accionariales de la VOC. Cada gran transformación comercial requirió primero una innovación institucional (moneda, letra de cambio, acción cotizada, OMC) antes que una tecnológica.',
+      },
+      {
+        titulo: 'Explora el Contexto Histórico para entender las crisis',
+        cuerpo: 'Las 6 eras muestran que el comercio no ha crecido linealmente: el proteccionismo de entreguerras hundió el comercio global un 66% en solo 5 años. La era "Orden Multilateral y Posguerra" explica cómo el GATT/OMC surgió precisamente para evitar repetir ese colapso después de la Segunda Guerra Mundial.',
+      },
+      {
+        titulo: 'Lee las preguntas frecuentes para los conceptos clave',
+        cuerpo: 'La ventaja comparativa, el mercantilismo, la Ruta de la Seda como ruta de ideas y los límites del libre comercio son conceptos que aparecen en los debates actuales sobre proteccionismo y globalización. La sección FAQ los conecta con el presente para que la historia no sea solo erudición sino herramienta de análisis.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🚢',
+        texto: 'El contenedor de transporte marítimo (inventado por Malcolm McLean en 1956) redujo el coste de cargar un barco un 97%: de 5,83 dólares por tonelada a 0,16 dólares. Esta innovación "aburrida" transformó más el comercio mundial que cualquier acuerdo político de la época. Hoy el 90% del comercio mundial viaja en contenedores.',
+      },
+      {
+        icono: '💰',
+        texto: 'La VOC (Compañía Holandesa de las Indias Orientales, 1602) sigue siendo la empresa más valiosa de la historia ajustada por inflación: su capitalización de mercado equivaldría a 8,28 billones de dólares actuales, más que Apple, Microsoft, Amazon y Google juntas. Inventó el dividendo, el mercado de acciones y la guerra corporativa.',
+      },
+      {
+        icono: '🗺️',
+        texto: 'La Ruta de la Seda no transportó tanto seda como su nombre sugiere: el principal producto fue en realidad el papel (inventado en China), que llegó al mundo árabe y luego a Europa, haciendo posible la Revolución Científica. Sin el papel chino, Gutenberg no habría tenido sentido. El comercio como vector tecnológico invisible.',
+      },
+      {
+        icono: '📊',
+        texto: 'La primera globalización (1870-1914) fue en algunos aspectos más intensa que la actual: el comercio representaba un porcentaje similar del PIB mundial, y las migraciones eran proporcionales a la población global. La Gran Guerra la destruyó en 4 años. Tardó 60 años en recuperar esos niveles: una advertencia sobre la fragilidad de los sistemas comerciales globales.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que el libre comercio siempre beneficia a todos por igual',
+        cuerpo: 'El libre comercio aumenta la riqueza total pero no la distribuye equitativamente. Los consumidores ganan con precios más bajos, pero los trabajadores de sectores que compiten con importaciones pueden perder su empleo sin encontrar alternativa equivalente. El "shock chino" (2001-2015) destruyó millones de empleos industriales en EE.UU. y Europa sin la redistribución prometida por la teoría económica. El comercio libre necesita políticas activas de reconversión para ser políticamente sostenible.',
+      },
+      {
+        titulo: 'Confundir globalización con un fenómeno exclusivamente moderno',
+        cuerpo: 'La Ruta de la Seda conectó China con Roma hace 2.100 años. Las especias de las Molucas llegaban a Europa en el siglo XV. La primera globalización (1870-1914) tenía flujos de comercio e inversión comparables a los actuales en relación al PIB. Lo nuevo del siglo XXI no es la globalización en sí sino su velocidad, escala y la inclusión del sector servicios y datos junto a los bienes físicos.',
+      },
+      {
+        titulo: 'Pensar que el proteccionismo nunca funciona',
+        cuerpo: 'Alemania, EE.UU. y Japón se industrializaron en el siglo XIX usando aranceles proteccionistas, no el libre comercio. Alemania usó la Unión Aduanera (Zollverein) antes de abrirse a la competencia. El economista Friedrich List argumentó que el libre comercio es ideal para países ya desarrollados pero puede ser trampa para los emergentes. China usó una forma de proteccionismo estratégico durante décadas antes de integrarse plenamente en la OMC.',
+      },
+      {
+        titulo: 'Asumir que el e-commerce elimina el comercio físico',
+        cuerpo: 'A pesar de 25 años de crecimiento del e-commerce, el comercio minorista físico sigue siendo el 80-85% del total en la mayoría de economías desarrolladas (2020). El e-commerce crece rápido pero desde una base pequeña. Además, cada compra online genera física: almacenes, furgonetas de reparto, devoluciones. Amazon es la mayor empresa de logística física del mundo, no solo digital. El comercio digital y el físico son complementarios, no sustitutos puros.',
+      },
+    ],
+  },
+};

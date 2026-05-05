@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const historiaAgricultura: HistoriaData = {
+  slug: 'historia-agricultura',
+  titulo: 'Historia de la Agricultura: De la Revolución Neolítica a la Agricultura de Precisión',
+  subtitulo: 'Doce mil años de cultivo humano: la tecnología más antigua y más transformadora de la civilización',
+  descripcionSEO: 'Cronología interactiva de la historia de la agricultura: de la domesticación neolítica de plantas y animales (10000 a.C.) a la agricultura de precisión del siglo XXI. Revolución Verde, transgénicos, mecanización, agroindustria y los retos alimentarios del futuro en 10 hitos y 6 eras.',
+  keywords: [
+    'historia agricultura cronología neolítico domesticación',
+    'revolución verde Norman Borlaug semillas alto rendimiento',
+    'mecanización agrícola éxodo rural tractores McCormick',
+    'transgénicos OGM Monsanto biotecnología agrícola',
+    'agricultura ecológica orgánica soberanía alimentaria',
+    'agricultura de precisión drones GPS inteligencia artificial',
+  ],
+  anioInicio: -10000,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'revolucion-neolitica',
+      nombre: 'La Revolución Neolítica',
+      anioInicio: -10000,
+      anioFin: -5000,
+      color: '#8B4513',
+      categoria: 'neolitico',
+      descripcion: 'La domesticación de plantas y animales (~10000 a.C.) en el Creciente Fértil (trigo, cebada) y en paralelo en China (arroz, mijo), América (maíz, patata), África (sorgo) e India (algodón) es la mayor revolución tecnológica de la historia humana. El paso de cazador-recolector a agricultor sedentario transforma radicalmente la dieta, la demografía (la agricultura alimenta más personas pero con peor salud individual), la sociedad (jerarquías, propiedad privada, guerra) y el ecosistema. El hacha de piedra pulida y el arado primitivo son las primeras herramientas agrícolas.',
+      obraIconica: 'Domesticación del trigo en el Creciente Fértil (~9000 a.C.): el inicio de la civilización agraria',
+      paises: ['Creciente Fértil', 'Anatolia', 'China', 'América', 'África'],
+    },
+    {
+      id: 'agricultura-mesopotamia-egipto',
+      nombre: 'Agricultura en Mesopotamia y Egipto',
+      anioInicio: -5000,
+      anioFin: -500,
+      color: '#DAA520',
+      categoria: 'antiguo',
+      descripcion: 'Los grandes sistemas de irrigación del Nilo (Egipto) y del Tigris-Éufrates (Mesopotamia) permiten agricultura en zonas áridas y excedentes sistemáticos que financian las primeras civilizaciones urbanas. El arado de bueyes, los sistemas de canales y las técnicas de almacenamiento de grano transforman la producción agrícola. El Estado centralizado emerge en parte para gestionar la irrigación y los excedentes. Egipto es "el granero del Mediterráneo" durante 3.000 años. El calendario agrícola estructura el año y las religiones antiguas.',
+      obraIconica: 'Sistemas de irrigación del Nilo y el Tigris-Éufrates (~3000 a.C.): la agricultura que sostuvo las primeras civilizaciones',
+      paises: ['Egipto', 'Mesopotamia', 'Próximo Oriente', 'Mediterráneo'],
+    },
+    {
+      id: 'roma-agraria',
+      nombre: 'Roma Agraria y el Campo Medieval',
+      anioInicio: -500,
+      anioFin: 1200,
+      color: '#DAA520',
+      categoria: 'antiguo',
+      descripcion: 'Roma es una civilización agraria: la villa romana (latifundio con esclavos) es la unidad de producción dominante. Los romanos introducen el arado pesado, la rotación de cultivos, el injerto y el cultivo del olivo y la vid en toda Europa occidental. Con la caída de Roma, el sistema feudal (siglos V-X) reorganiza el campo: el señor feudal, los siervos de la gleba, el sistema de tres campos (barbecho, cereal de invierno, cereal de verano) que domina el campo europeo durante siglos. Los monasterios benedictinos preservan y mejoran técnicas agrícolas.',
+      obraIconica: 'Sistema de los tres campos medieval (siglo VIII): la rotación que alimentó Europa durante 800 años',
+      paises: ['Imperio Romano', 'Europa Medieval', 'Mediterráneo'],
+    },
+    {
+      id: 'enclosures',
+      nombre: 'Enclosures y Capitalismo Agrario',
+      anioInicio: 1450,
+      anioFin: 1760,
+      color: '#2E8B57',
+      categoria: 'moderno',
+      descripcion: 'Los enclosures ingleses (siglos XV-XIX) cercan los campos comunales: los campesinos pierden el acceso a la tierra comunal y son expulsados hacia las ciudades, creando la fuerza de trabajo industrial. Es la "acumulación primitiva" del capitalismo (Marx). En paralelo, la Revolución Agrícola inglesa del siglo XVIII (rotación Norfolk de cuatro campos, selección de semillas y ganado, drenaje) multiplica la productividad. Los Grandes Descubrimientos introducen en Europa el maíz, la patata, el tomate y el chocolate, transformando profundamente la dieta.',
+      obraIconica: 'Enclosures ingleses (siglos XV-XVIII): el cercamiento que transformó el campo en propiedad privada capitalista',
+      paises: ['Inglaterra', 'Reino Unido', 'Europa Occidental'],
+    },
+    {
+      id: 'mecanizacion-agricola',
+      nombre: 'Mecanización Agrícola y Éxodo Rural',
+      anioInicio: 1830,
+      anioFin: 1920,
+      color: '#1E90FF',
+      categoria: 'mecanizacion',
+      descripcion: 'La segadora mecánica de McCormick (1831), la trilladora de vapor y el tractor de combustión interna transforman la agricultura americana y europea. Un agricultor con maquinaria hace el trabajo de 20 a mano. El éxodo rural masivo vacía el campo europeo: entre 1850 y 1950 más de 50 millones de europeos emigran a las ciudades o a América. La agricultura se especializa regionalmente: praderas americanas (trigo), pampa argentina (carne), Java (azúcar). El ferrocarril conecta granjas remotas con mercados globales. Europa pierde su autosuficiencia alimentaria e importa grano americano.',
+      obraIconica: 'Segadora mecánica de McCormick (1831) y el tractor (1900s): el fin del trabajo agrícola manual a gran escala',
+      paises: ['Estados Unidos', 'Europa', 'Argentina', 'Australia'],
+    },
+    {
+      id: 'revolucion-verde',
+      nombre: 'La Revolución Verde',
+      anioInicio: 1943,
+      anioFin: 1970,
+      color: '#228B22',
+      categoria: 'moderno-sigloxx',
+      descripcion: 'Norman Borlaug (Premio Nobel de la Paz 1970) desarrolla variedades de trigo de alto rendimiento que triplican la producción en México, India y Pakistán. La Revolución Verde (1960s-70s) combina semillas mejoradas, fertilizantes sintéticos, pesticidas e irrigación: India pasa de importar grano a exportarlo. Se estima que salvó de la hambruna a mil millones de personas. Pero también tiene costes: dependencia de insumos químicos, pérdida de biodiversidad, contaminación de acuíferos, expulsión de pequeños agricultores por la mecanización intensiva.',
+      obraIconica: 'Norman Borlaug y el trigo de alto rendimiento (1963): la Revolución Verde que alimentó al mundo en desarrollo',
+      paises: ['México', 'India', 'Pakistán', 'Global'],
+    },
+    {
+      id: 'agroindustria',
+      nombre: 'Agroindustria y Globalización Alimentaria',
+      anioInicio: 1970,
+      anioFin: 1995,
+      color: '#228B22',
+      categoria: 'moderno-sigloxx',
+      descripcion: 'La agricultura se industrializa: granjas integradas verticalmente, contratos con supermercados, cadenas de frío globales. Cargill, ADM y Nestlé controlan el comercio agrícola mundial. La PAC (Política Agrícola Común de la UE, 1962) protege a los agricultores europeos con subsidios. Los supermercados concentran el poder de compra y dictan precios y estándares. La dieta globalizada (McDonald\'s abre en Moscú en 1990) homogeneiza el consumo alimentario. La soberanía alimentaria —decidir qué y cómo cultivar— se convierte en reivindicación política del Sur Global.',
+      obraIconica: 'McDonald\'s en Moscú (1990): símbolo de la globalización alimentaria y la agroindustria como sistema',
+      paises: ['Global', 'Estados Unidos', 'Unión Europea', 'Brasil'],
+    },
+    {
+      id: 'transgenicos-biotecnologia',
+      nombre: 'Transgénicos y Biotecnología Agrícola',
+      anioInicio: 1994,
+      anioFin: 2010,
+      color: '#DC143C',
+      categoria: 'digital',
+      descripcion: 'El Flavr Savr (1994) es el primer alimento transgénico comercializado. Monsanto (soja RR resistente a herbicida, 1996) y el maíz Bt impulsan los cultivos OGM: 180 millones de hectáreas en 2015. Los transgénicos dividen la opinión: defensores (mayor rendimiento, menos pesticidas, biofortificación) y críticos (monopolio de semillas, riesgo medioambiental, dependencia del agricultor). La "Golden Rice" (arroz enriquecido con vitamina A) simboliza el debate entre promesa y precaución. La UE adopta el principio de precaución y restringe los OGM; EE.UU. y Brasil los aprueban masivamente.',
+      obraIconica: 'Soja transgénica de Monsanto (1996): el debate global sobre los OGM que divide a científicos, consumidores y reguladores',
+      paises: ['Estados Unidos', 'Brasil', 'Argentina', 'Europa', 'Global'],
+    },
+    {
+      id: 'agricultura-ecologica',
+      nombre: 'Agricultura Ecológica y Soberanía Alimentaria',
+      anioInicio: 1972,
+      anioFin: 2015,
+      color: '#DC143C',
+      categoria: 'digital',
+      descripcion: 'La IFOAM (Federación Internacional de Movimientos de Agricultura Orgánica, 1972) sistematiza la agricultura ecológica como alternativa a la agroindustria química. La Vía Campesina (1993) reivindica la soberanía alimentaria de los pequeños agricultores frente a las multinacionales. El mercado ecológico crece un 10% anual durante 30 años. Los movimientos de slow food, permacultura y agricultura regenerativa proponen alternativas sistémicas. El cambio climático convierte la sostenibilidad agrícola en urgencia política: la agricultura produce el 23% de las emisiones globales de GEI.',
+      obraIconica: 'La Vía Campesina (1993) y el movimiento Slow Food (1989): alternativas a la agroindustria global',
+      paises: ['Global', 'Europa', 'América Latina', 'Sur Global'],
+    },
+    {
+      id: 'agricultura-precision',
+      nombre: 'Agricultura de Precisión y Retos del Siglo XXI',
+      anioInicio: 2000,
+      anioFin: 2020,
+      color: '#696969',
+      categoria: 'precision',
+      descripcion: 'GPS en tractores, drones que monitorizan cultivos, sensores de suelo, inteligencia artificial que predice cosechas y detecta enfermedades: la agricultura de precisión reduce insumos hasta un 30% y optimiza rendimientos campo a campo. Los laboratorios producen carne sin animales (Beyond Meat 2009, carne cultivada en laboratorio 2013). La hidroponía urbana y las granjas verticales producen sin suelo. Pero los retos son inmensos: el 40% del suelo fértil global está degradado, el nivel freático baja en los principales acuíferos y el cambio climático desplaza las zonas de cultivo. La agricultura del siglo XXI debe alimentar a 10.000 millones con la mitad de recursos hídricos.',
+      obraIconica: 'Beyond Meat (2009) y drones agrícolas: la agricultura del siglo XXI entre la tecnología y la sostenibilidad',
+      paises: ['Global', 'Estados Unidos', 'Países Bajos', 'Israel'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Orígenes Neolíticos',
+      desde: -10000,
+      hasta: -3000,
+      icono: '🌾',
+      hitosDestacados: ['La Revolución Neolítica'],
+      eventos: [
+        'Domesticación del trigo y la cebada en el Creciente Fértil (~9000 a.C.)',
+        'Domesticación del arroz y el mijo en China (~7000 a.C.)',
+        'Domesticación del maíz en Mesoamérica (~7000 a.C.) y la patata en los Andes',
+        'Primeras aldeas sedentarias de agricultores: Jericó, Çatalhöyük (~7500-6000 a.C.)',
+      ],
+    },
+    {
+      nombre: 'Civilizaciones Agrarias',
+      desde: -3000,
+      hasta: 476,
+      icono: '🏺',
+      hitosDestacados: ['Agricultura en Mesopotamia y Egipto'],
+      eventos: [
+        'Grandes sistemas de irrigación del Nilo: canales y diques para controlar las inundaciones (~3000 a.C.)',
+        'El Estado sumerio gestiona almacenes de grano y redistribución de excedentes (~2800 a.C.)',
+        'Egipto exporta grano a todo el Mediterráneo: "el granero del mundo antiguo" (~1500-30 a.C.)',
+        'El arado romano de hierro reemplaza al de madera: mayor profundidad de labranza (~200 a.C.)',
+        'Roma introduce el olivo y la vid en la Galia, Hispania y el norte de África (~100 a.C.-200 d.C.)',
+      ],
+    },
+    {
+      nombre: 'Campo Medieval y Feudal',
+      desde: 476,
+      hasta: 1450,
+      icono: '🏰',
+      hitosDestacados: ['Roma Agraria y el Campo Medieval'],
+      eventos: [
+        'Sistema feudal: los siervos de la gleba trabajan la tierra del señor a cambio de protección (siglos V-X)',
+        'Sistema de los tres campos: barbecho rotativo que preserva la fertilidad del suelo (siglo VIII)',
+        'Monasterios benedictinos como centros de innovación agrícola: selección de semillas, viticultura (siglos VII-XII)',
+        'El arado pesado de vertedera permite cultivar los suelos arcillosos del norte de Europa (siglo X)',
+      ],
+    },
+    {
+      nombre: 'Revolución Agrícola y Capitalismo',
+      desde: 1450,
+      hasta: 1880,
+      icono: '🐂',
+      hitosDestacados: ['Enclosures y Capitalismo Agrario', 'Mecanización Agrícola y Éxodo Rural'],
+      eventos: [
+        'Los Grandes Descubrimientos introducen en Europa la patata, el maíz, el tomate y el tabaco (1492-1600)',
+        'Enclosures ingleses: los campos comunales se cercan y los campesinos son expulsados (siglos XV-XIX)',
+        'Rotación Norfolk de cuatro campos (nabo, trigo, cebada, pasto): duplica la productividad (siglo XVIII)',
+        'Segadora mecánica de Cyrus McCormick: un hombre hace el trabajo de doce (1831)',
+        'El ferrocarril conecta las granjas del interior con los mercados urbanos y portuarios (1840s-1880s)',
+      ],
+    },
+    {
+      nombre: 'Industrialización de la Agricultura',
+      desde: 1880,
+      hasta: 1994,
+      icono: '🚜',
+      hitosDestacados: ['La Revolución Verde', 'Agroindustria y Globalización Alimentaria'],
+      eventos: [
+        'El tractor de gasolina sustituye al caballo en las grandes explotaciones americanas (1900s-1920s)',
+        'Fritz Haber sintetiza el amoniaco: los fertilizantes sintéticos permiten alimentar al mundo industrializado (1909)',
+        'Segunda Guerra Mundial acelera la mecanización: tractores, cosechadoras y pesticidas se generalizan',
+        'Norman Borlaug y la Revolución Verde: variedades de trigo de alto rendimiento salvan millones de vidas (1943-1970)',
+        'La agroindustria global: Cargill, ADM y Nestlé controlan el comercio alimentario mundial (1970s-1990s)',
+      ],
+    },
+    {
+      nombre: 'Agricultura en el Siglo XXI',
+      desde: 1994,
+      hasta: 2020,
+      icono: '🤖',
+      hitosDestacados: ['Transgénicos y Biotecnología Agrícola', 'Agricultura Ecológica y Soberanía Alimentaria', 'Agricultura de Precisión y Retos del Siglo XXI'],
+      eventos: [
+        'Flavr Savr: primer alimento transgénico aprobado para consumo humano en EE.UU. (1994)',
+        'La Vía Campesina y el movimiento global de soberanía alimentaria frente a la agroindustria (1993-2000s)',
+        'GPS y teledetección satelital: la agricultura de precisión optimiza insumos campo a campo (2000s)',
+        'Beyond Meat y la carne cultivada en laboratorio: alternativas proteicas sin ganadería (2009-2013)',
+        'El IPCC certifica que la agricultura produce el 23% de las emisiones globales de gases de efecto invernadero (2019)',
+      ],
+    },
+  ],
+
+  categorias: {
+    neolitico: 'Revolución Neolítica',
+    antiguo: 'Civilizaciones Agrarias',
+    moderno: 'Modernidad',
+    mecanizacion: 'Mecanización',
+    'moderno-sigloxx': 'Siglo XX',
+    digital: 'Controversias Contemporáneas',
+    precision: 'Agricultura de Precisión',
+  },
+
+  colores: {
+    neolitico: '#8B4513',
+    antiguo: '#DAA520',
+    moderno: '#2E8B57',
+    mecanizacion: '#1E90FF',
+    'moderno-sigloxx': '#228B22',
+    digital: '#DC143C',
+    precision: '#696969',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'La agricultura no es una tecnología más: es la tecnología que hizo posible todas las demás. Hace 12.000 años, nuestros ancestros en el Creciente Fértil comenzaron a cultivar trigo y domesticar ovejas, desencadenando una revolución que transformó la especie humana de nómada a sedentaria, de pequeñas bandas a grandes civilizaciones. Sin agricultura no hay ciudades, sin ciudades no hay escritura, sin escritura no hay historia. Doce milenios después, la humanidad sigue resolviendo la misma pregunta fundamental: cómo alimentar a cada vez más personas con los mismos recursos naturales, en un planeta con el clima cambiando aceleradamente.',
+
+    tablaComparativa: [
+      { hito: 'La Revolución Neolítica', periodo: '~10000-5000 a.C.', categoria: 'Revolución Neolítica', personaje: 'Agricultores anónimos del Creciente Fértil', aportacion: 'Domesticación de plantas y animales: el fundamento de toda la civilización humana' },
+      { hito: 'Agricultura en Mesopotamia y Egipto', periodo: '~5000-500 a.C.', categoria: 'Civilizaciones Agrarias', personaje: 'Faraones y reyes sumerios', aportacion: 'Irrigación a gran escala y gestión estatal de excedentes: la agricultura que financió la civilización' },
+      { hito: 'Enclosures y Capitalismo Agrario', periodo: '1450-1760', categoria: 'Modernidad', personaje: 'Parlamento inglés / Jethro Tull', aportacion: 'Privatización de la tierra y Revolución Agrícola: precondición de la Revolución Industrial' },
+      { hito: 'La Revolución Verde', periodo: '1943-1970', categoria: 'Siglo XX', personaje: 'Norman Borlaug', aportacion: 'Semillas de alto rendimiento que evitaron hambrunas masivas en el mundo en desarrollo' },
+      { hito: 'Transgénicos y Biotecnología Agrícola', periodo: '1994-2010', categoria: 'Controversias Contemporáneas', personaje: 'Monsanto / Golden Rice Project', aportacion: 'Modificación genética de cultivos: el debate más polarizado de la ciencia agrícola contemporánea' },
+      { hito: 'Agricultura de Precisión y Retos del Siglo XXI', periodo: '2000-2020', categoria: 'Agricultura de Precisión', personaje: 'Empresas tecnológicas agrícolas / FAO', aportacion: 'GPS, drones e IA para optimizar producción y reducir impacto ambiental ante el cambio climático' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🌱',
+        titulo: 'Agricultores y Agrónomos',
+        perfil: 'Profesionales del sector agrícola y ganadero',
+        texto: 'Esta cronología sitúa cada innovación técnica —el arado, el tractor, los fertilizantes, los OGM, los drones— en su contexto histórico. Entender por qué surgió cada tecnología y qué problemas resolvió ayuda a evaluar con perspectiva los debates actuales sobre agricultura sostenible y agricultura de precisión.',
+      },
+      {
+        icono: '🧬',
+        titulo: 'Biólogos e Investigadores',
+        perfil: 'Ciencias agrarias, biología molecular, ecología',
+        texto: 'La domesticación de plantas es uno de los experimentos de selección artificial más largos de la historia. Esta cronología muestra cómo el conocimiento empírico de los agricultores se transformó en ciencia agronómica sistemática, y cómo la biología molecular del siglo XX aceleró dramáticamente ese proceso con consecuencias aún debatidas.',
+      },
+      {
+        icono: '📊',
+        titulo: 'Economistas Agrarios',
+        perfil: 'Economía rural, comercio internacional, política agrícola',
+        texto: 'Los enclosures, la Revolución Verde y la agroindustria son hitos económicos tanto como técnicos. Esta cronología permite trazar la evolución del trabajo agrícola (de servidumbre feudal a contrato capitalista), la concentración de la propiedad, el poder de las multinacionales y los debates actuales sobre la PAC y la soberanía alimentaria.',
+      },
+      {
+        icono: '🛒',
+        titulo: 'Consumidores Conscientes',
+        perfil: 'Interesados en alimentación sostenible y trazabilidad',
+        texto: 'Cada decisión de compra —ecológico o convencional, local o importado, carne o proteína vegetal— se inscribe en una historia de 12.000 años. Esta cronología ayuda a entender qué hay detrás del debate entre OGM y ecológico, por qué la patata llegó a Europa en el siglo XVI o qué significa realmente la soberanía alimentaria.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Por qué la Revolución Neolítica fue tan radical si empeoró la salud individual?',
+        respuesta: 'Los restos óseos muestran que los primeros agricultores eran más bajos, tenían más caries, más enfermedades infecciosas y mayor desnutrición que los cazadores-recolectores. La agricultura produce más calorías por hectárea (permite más población) pero con menor diversidad nutricional. El triunfo de la agricultura no fue biológico sino demográfico: los agricultores tenían más hijos, así que su modo de vida se expandió aunque fuera individualmente peor. La densidad de población, no la calidad de vida, ganó.',
+        tip: 'Jared Diamond llamó a la agricultura "el peor error en la historia de la raza humana" — aunque reconoció que fue inevitable.',
+      },
+      {
+        pregunta: '¿Son seguros los transgénicos?',
+        respuesta: 'El consenso científico —expresado por la OMS, la Academia Nacional de Ciencias de EE.UU. y más de 2.000 estudios independientes— es que los OGM aprobados son seguros para el consumo humano. La controversia real no es de seguridad sino de política económica (monopolio de semillas), medioambiente (resistencia a herbicidas, pérdida de biodiversidad) y autonomía del agricultor (dependencia de patentes corporativas). La UE aplica el principio de precaución por razones políticas, no científicas sobre seguridad alimentaria.',
+        tip: 'La Golden Rice, diseñada para prevenir ceguera por déficit de vitamina A en niños, lleva 25 años bloqueada por regulaciones, no por problemas de seguridad.',
+      },
+      {
+        pregunta: '¿Qué fue la Revolución Verde y cuántas vidas salvó?',
+        respuesta: 'La Revolución Verde (1943-1970) fue el desarrollo de variedades de cereal de alto rendimiento (trigo, arroz, maíz) combinadas con fertilizantes sintéticos, pesticidas e irrigación intensiva. India, México y Pakistán triplicaron su producción en 20 años. Se estima que evitó la muerte por hambruna de entre 500 millones y 1.000 millones de personas. Su mayor limitación fue que benefició más a los agricultores con capital para comprar insumos que a los más pobres, aumentando la desigualdad rural en muchos países.',
+        tip: 'Norman Borlaug dijo que la Revolución Verde compraba tiempo para resolver el problema de la población, no lo resolvía permanentemente.',
+      },
+      {
+        pregunta: '¿Cuánto tarda en formarse el suelo agrícola que destruimos?',
+        respuesta: 'Formar 2,5 cm de suelo fértil (topsoil) requiere entre 500 y 1.000 años de procesos biológicos y geológicos. La agricultura industrial erosiona ese suelo a una velocidad entre 10 y 40 veces superior a su formación. El 40% del suelo agrícola global está degradado y el 10% severamente dañado. A ritmo actual, quedan entre 60 y 100 cosechas posibles en los suelos más sobreexplotados. Este es el reto silencioso más grave de la agricultura del siglo XXI.',
+        tip: 'Iowa (EE.UU.) ha perdido la mitad de su suelo fértil en 150 años de agricultura intensiva de maíz y soja.',
+      },
+      {
+        pregunta: '¿Por qué el mundo desarrollado subsidia tanto la agricultura si es tan eficiente?',
+        respuesta: 'Los subsidios agrícolas (PAC europea, Farm Bill americano) cumplen varias funciones no relacionadas con la eficiencia: seguridad alimentaria estratégica (no depender de importaciones en crisis), estabilidad de precios (los mercados agrícolas son muy volátiles), mantenimiento del mundo rural (gestión del territorio y el paisaje) y poder político (los agricultores están sobrerrepresentados electoralmente en muchos países). Sin subsidios, la agricultura de pequeña escala europea colapsaría frente a la gran producción americana, brasileña o ucraniana.',
+        tip: 'La PAC consume el 35% del presupuesto total de la Unión Europea aunque la agricultura solo representa el 1,4% del PIB europeo.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por la escala temporal',
+        cuerpo: 'La línea de tiempo comienza en el año -10000 (10000 a.C.) y termina en 2020. Observa que más del 90% de la historia cubre el período preindustrial: la agricultura fue prácticamente la misma durante 9.500 años antes de que la mecanización lo cambiara todo en solo 150. Esa asimetría temporal es la primera revelación de esta historia.',
+      },
+      {
+        titulo: 'Contrasta los colores por categoría',
+        cuerpo: 'El marrón oscuro marca el origen neolítico, el dorado las civilizaciones antiguas, el verde la modernidad preindustrial. Fíjate cómo el período del Siglo XX (verde oscuro) es extremadamente corto en la línea pero concentra los cambios más drásticos: Revolución Verde, agroindustria y transgénicos en menos de 60 años.',
+      },
+      {
+        titulo: 'Usa el tab Comparativa para ver los actores',
+        cuerpo: 'Filtra por "Controversias Contemporáneas" para ver los hitos de transgénicos y agricultura ecológica juntos: son contemporáneos y opuestos. Luego filtra por "Siglo XX" para ver cómo la Revolución Verde y la agroindustria definen la misma era desde perspectivas distintas.',
+      },
+      {
+        titulo: 'Explora el tab Contexto Histórico para ver las 6 eras',
+        cuerpo: 'Las 6 eras muestran que la agricultura no fue lineal: hubo regresiones (campo medieval vs. Roma), aceleraciones (Revolución Industrial) y rupturas (Revolución Verde). La era "Civilizaciones Agrarias" dura 3.500 años; la era "Agricultura en el Siglo XXI" solo 26. La velocidad del cambio es el patrón dominante del siglo XX.',
+      },
+      {
+        titulo: 'Reflexiona sobre el hito más cercano: Agricultura de Precisión',
+        cuerpo: 'El último hito (2000-2020) es el que vivimos ahora. Lee su descripción y pregúntate: ¿qué tecnologías agrícolas existen hoy que no existían hace 10 años? ¿Qué problemas del siglo XXI no existían en la Revolución Verde? Esta cronología te da el contexto para entender los debates actuales sobre alimentación, sostenibilidad y tecnología.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🌾',
+        texto: 'El trigo domesticado tiene entre 3 y 5 veces más granos por espiga que el trigo silvestre, pero esa productividad tiene un precio: los granos ya no caen solos al madurar (shattering). El trigo doméstico no puede reproducirse sin la ayuda humana. Nosotros lo domesticamos y él nos domesticó a nosotros: somos mutualistas obligados desde hace 10.000 años.',
+      },
+      {
+        icono: '🥔',
+        texto: 'La patata americana salvó a Europa de la hambruna en el siglo XVIII. Irlanda pasó a depender de ella casi exclusivamente... hasta que la plaga Phytophthora infestans destruyó las cosechas de 1845-1849: más de 1 millón de muertos y 2 millones de emigrantes. La historia de la patata es la historia perfecta de los riesgos del monocultivo.',
+      },
+      {
+        icono: '🧪',
+        texto: 'Sin el proceso Haber-Bosch de síntesis del amoniaco (1909), la Tierra no podría alimentar a más de 4.000 millones de personas. Actualmente alimenta a más de 8.000 millones. El 50% del nitrógeno presente en el cuerpo humano de un europeo medio proviene de fertilizantes sintéticos, no de ciclos naturales del suelo. Somos, literalmente, criaturas de la química industrial.',
+      },
+      {
+        icono: '🌍',
+        texto: 'La agricultura ocupa el 50% de toda la tierra habitable del planeta (excluyendo hielo y desiertos) y consume el 70% del agua dulce extraída globalmente. Es la actividad humana con mayor impacto sobre los ecosistemas de la Tierra, muy por encima de la urbanización o la industria. Transformar la agricultura es la palanca más potente para abordar la crisis climática.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que la Revolución Neolítica fue un progreso inevitable',
+        cuerpo: 'Durante miles de años, los cazadores-recolectores convivieron con los primeros agricultores sin adoptar la agricultura. La vida nómada era en muchos aspectos superior: más diversidad alimentaria, menos trabajo diario (los Kung San trabajaban ~4 horas diarias para alimentarse), menor riesgo de hambruna por fallo de un cultivo. La agricultura triunfó porque permite más población, no porque mejore la calidad de vida individual. No fue una elección consciente sino un proceso gradual de dependencia mutua con las plantas domesticadas.',
+      },
+      {
+        titulo: 'Confundir "ecológico" con "natural" o "tradicional"',
+        cuerpo: 'La agricultura ecológica certificada es un sistema de producción moderno, con regulación formal (desde 1972) y cadenas de distribución industrializadas. No es "la agricultura de antes": los campesinos medievales usaban pesticidas naturales (azufre, arsénico) y no practicaban la rotación certificada. La agricultura ecológica es una respuesta contemporánea a los problemas de la agroindustria, no un retorno al pasado.',
+      },
+      {
+        titulo: 'Pensar que los transgénicos son algo radicalmente nuevo',
+        cuerpo: 'Los humanos llevan 10.000 años modificando genéticamente plantas y animales mediante selección artificial. El maíz moderno es irreconocible respecto al teosinte silvestre del que deriva. La diferencia con los OGM es la precisión y la velocidad: la biotecnología hace en años lo que la selección artificial tardaba siglos, y puede introducir genes de otras especies. El debate legítimo no es si modificar genéticamente (siempre lo hemos hecho) sino cómo y con qué consecuencias.',
+      },
+      {
+        titulo: 'Asumir que la Revolución Verde resolvió el hambre',
+        cuerpo: 'La Revolución Verde multiplicó la producción global de alimentos, pero el hambre siguió existiendo. El hambre no es un problema de producción insuficiente (el mundo produce calorías suficientes para todos) sino de distribución y acceso: pobreza, conflictos, infraestructura, especulación. Hoy se producen suficientes alimentos para 10.000 millones de personas y aun así 700 millones pasan hambre. La Revolución Verde resolvió el problema técnico, no el político y económico.',
+      },
+    ],
+  },
+};
