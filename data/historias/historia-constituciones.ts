@@ -1,0 +1,367 @@
+import type { HistoriaData } from './types';
+
+export const historiaConstituciones: HistoriaData = {
+  slug: 'historia-constituciones',
+  titulo: 'Historia de las Constituciones y la Democracia: De la Magna Carta al Siglo XXI',
+  subtitulo: 'Ocho siglos de lucha por limitar el poder y ampliar los derechos ciudadanos',
+  descripcionSEO: 'Cronología interactiva de las constituciones y la democracia: de la Magna Carta (1215) a la erosión democrática del siglo XXI. Parlamentarismo inglés, revolución americana, revolución francesa, sufragio universal, Weimar, Declaración Universal de los Derechos Humanos, tercera ola democratizadora y democracias iliberales en 10 hitos y 6 eras.',
+  keywords: [
+    'historia constituciones democracia cronología',
+    'magna carta bill of rights parlamentarismo inglés',
+    'constitución estados unidos declaración independencia',
+    'revolución francesa derechos del hombre ciudadano',
+    'sufragio universal femenino nueva zelanda',
+    'weimar democracia entreguerras declaración universal derechos humanos',
+    'tercera ola democratizadora caída muro berlín',
+  ],
+  anioInicio: 1215,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'magna-carta',
+      nombre: 'Magna Carta',
+      anioInicio: 1215,
+      anioFin: 1302,
+      color: '#8B4513',
+      categoria: 'precursores',
+      descripcion: 'El rey Juan I de Inglaterra firma la Magna Carta (1215) bajo presión de los barones: primer documento que limita el poder real por escrito y establece que nadie puede ser arrestado sin juicio. Las Cortes castellanas y el Parlamento inglés emergen como instituciones representativas. La Declaración de Joyeuse Entrée en Brabante (1356) y la Bula de Oro húngara (1222) muestran un patrón europeo: nobleza arrancando garantías a los reyes.',
+      obraIconica: 'Magna Carta (1215): primer límite escrito al poder regio en la historia de Occidente',
+      paises: ['Inglaterra', 'Europa Medieval'],
+    },
+    {
+      id: 'parlamentarismo-ingles',
+      nombre: 'Parlamentarismo Inglés',
+      anioInicio: 1628,
+      anioFin: 1689,
+      color: '#8B4513',
+      categoria: 'precursores',
+      descripcion: 'La Petition of Right (1628) refuerza las restricciones al rey. La Guerra Civil inglesa (1642-1651) y la ejecución de Carlos I sacuden Europa. La Gloriosa Revolución (1688) destronó a Jacobo II sin derramamiento de sangre. El Bill of Rights (1689) estableció la supremacía parlamentaria, la libertad de expresión en el parlamento y las elecciones libres: el modelo que Locke teorizó y que exportaría el constitucionalismo moderno.',
+      obraIconica: 'Bill of Rights inglés (1689): supremacía parlamentaria y derechos civiles garantizados',
+      paises: ['Inglaterra', 'Gran Bretaña'],
+    },
+    {
+      id: 'independencia-americana',
+      nombre: 'Independencia Americana y Constitución',
+      anioInicio: 1776,
+      anioFin: 1791,
+      color: '#DC143C',
+      categoria: 'revoluciones',
+      descripcion: 'La Declaración de Independencia (1776) proclama que "todos los hombres son creados iguales" con derechos inalienables. La Constitución de 1787 es la primera constitución escrita moderna y la más duradera: separación de poderes, sistema federal, frenos y contrapesos. La Carta de Derechos (Bill of Rights, 1791) añade las primeras diez enmiendas. Los Federalist Papers de Madison, Hamilton y Jay son el mayor texto de ingeniería constitucional de la historia.',
+      obraIconica: 'Constitución de los Estados Unidos (1787): primera constitución escrita que sigue en vigor',
+      paises: ['Estados Unidos', 'América del Norte'],
+    },
+    {
+      id: 'revolucion-francesa',
+      nombre: 'Revolución Francesa y Derechos del Hombre',
+      anioInicio: 1789,
+      anioFin: 1815,
+      color: '#DC143C',
+      categoria: 'revoluciones',
+      descripcion: 'La Revolución Francesa produce la Declaración de los Derechos del Hombre y del Ciudadano (1789), documento fundacional del derecho constitucional moderno: soberanía nacional, igualdad ante la ley, libertad de expresión. La sucesión de constituciones francesas (1791, 1793, 1795, 1799) muestra la inestabilidad del proceso revolucionario. El Código Napoleónico (1804) exporta los principios constitucionales a Europa por la fuerza de las armas.',
+      obraIconica: 'Declaración de los Derechos del Hombre y del Ciudadano (1789): los derechos como fundamento del Estado',
+      paises: ['Francia', 'Europa Occidental'],
+    },
+    {
+      id: 'constitucionalismo-liberal',
+      nombre: 'Constitucionalismo Liberal',
+      anioInicio: 1812,
+      anioFin: 1871,
+      color: '#228B22',
+      categoria: 'liberal',
+      descripcion: 'La Constitución de Cádiz (1812), "La Pepa", es la primera constitución liberal española y modelo para América Latina y Europa. Las oleadas revolucionarias de 1830 y 1848 extienden el constitucionalismo por Europa. La unificación de Italia (1861) y Alemania (1871) crean nuevos Estados-nación con constituciones. La tensión entre constituciones liberales y regímenes oligárquicos marca todo el siglo XIX europeo.',
+      obraIconica: 'Constitución de Cádiz (1812): primera constitución liberal de España, modelo para América Latina',
+      paises: ['España', 'Europa', 'América Latina'],
+    },
+    {
+      id: 'sufragio-universal',
+      nombre: 'Sufragio Universal y Derechos Cívicos',
+      anioInicio: 1867,
+      anioFin: 1920,
+      color: '#FF69B4',
+      categoria: 'sufragio',
+      descripcion: 'Nueva Zelanda (1893) es el primer país con sufragio femenino. El movimiento sufragista (las suffragettes inglesas, lideradas por Emmeline Pankhurst) conquista el voto femenino en el Reino Unido (1918) y Estados Unidos (1920). El sufragio masculino universal se generaliza en Europa. El reconocimiento del derecho al voto transforma la democracia de oligarquía ilustrada en gobierno del pueblo real.',
+      obraIconica: 'Nueva Zelanda: primer país con sufragio femenino (1893); EE.UU. 19ª Enmienda (1920)',
+      paises: ['Nueva Zelanda', 'Reino Unido', 'Estados Unidos', 'Europa'],
+    },
+    {
+      id: 'weimar-entreguerras',
+      nombre: 'Weimar y Democracias de Entreguerras',
+      anioInicio: 1919,
+      anioFin: 1939,
+      color: '#DAA520',
+      categoria: 'crisis',
+      descripcion: 'La Constitución de Weimar (1919) es la democracia más avanzada de su época: sufragio universal, proporcionalidad, Estado social. Pero la hiperinflación, el Crack del 29 y la fragmentación parlamentaria la vuelven frágil. En 14 años, Hitler la destruye democráticamente usando sus propias reglas. Las democracias europeas caen en cadena ante el fascismo y el nazismo. Lección permanente: la democracia puede suicidarse por sus propios mecanismos.',
+      obraIconica: 'Constitución de Weimar (1919): la democracia más avanzada de su era, destruida en 14 años',
+      paises: ['Alemania', 'Europa', 'España', 'Italia'],
+    },
+    {
+      id: 'onu-ddhh',
+      nombre: 'ONU y Declaración Universal de DDHH',
+      anioInicio: 1945,
+      anioFin: 1955,
+      color: '#20B2AA',
+      categoria: 'internacional',
+      descripcion: 'Tras el horror de la Segunda Guerra Mundial, la humanidad codifica los derechos humanos: la Declaración Universal de Derechos Humanos (1948) de la ONU, el Convenio Europeo de Derechos Humanos (1950) y el Tribunal Europeo de Derechos Humanos. Las nuevas constituciones de Alemania (1949), Italia (1948) y Japón (1947) incorporan la dignidad humana como valor fundacional inviolable. El constitucionalismo se convierte en estándar internacional.',
+      obraIconica: 'Declaración Universal de los Derechos Humanos, ONU (1948): los 30 artículos que deben proteger a toda persona',
+      paises: ['ONU', 'Global', 'Alemania', 'Italia', 'Europa'],
+    },
+    {
+      id: 'tercera-ola',
+      nombre: 'Tercera Ola Democratizadora',
+      anioInicio: 1974,
+      anioFin: 1991,
+      color: '#32CD32',
+      categoria: 'democratizacion',
+      descripcion: 'Samuel Huntington acuña el término "tercera ola": la democratización masiva que comienza con la Revolución de los Claveles en Portugal (1974), sigue con la Transición española (Constitución de 1978), barre América Latina en los 80 y culmina con la caída del Muro de Berlín (1989) y el colapso de la URSS (1991). Más de 30 países adoptan constituciones democráticas en menos de 20 años. El mayor avance democrático de la historia.',
+      obraIconica: 'Caída del Muro de Berlín (1989): inicio de la democratización masiva de Europa del Este',
+      paises: ['Portugal', 'España', 'América Latina', 'Europa del Este', 'Global'],
+    },
+    {
+      id: 'erosion-democratica',
+      nombre: 'Erosión Democrática en el Siglo XXI',
+      anioInicio: 2000,
+      anioFin: 2020,
+      color: '#DAA520',
+      categoria: 'crisis',
+      descripcion: 'Levitsky y Ziblatt (Cómo mueren las democracias, 2018) documentan cómo las democracias actuales mueren desde dentro: no por golpe de estado sino por erosión gradual de instituciones, medios y normas. Las democracias iliberales (Hungría, Polonia, Turquía) usan instrumentos constitucionales para concentrar el poder. Las redes sociales y la desinformación cuestionan la deliberación democrática. El Brexit y el trumpismo reabren el debate sobre los fundamentos de la democracia liberal.',
+      obraIconica: 'Cómo mueren las democracias de Levitsky y Ziblatt (2018): anatomía del retroceso democrático',
+      paises: ['Global', 'Hungría', 'Polonia', 'Estados Unidos', 'Europa'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Precedentes Medievales',
+      desde: 1215,
+      hasta: 1688,
+      icono: '📜',
+      hitosDestacados: ['Magna Carta'],
+      eventos: [
+        'Magna Carta: Juan I firma el primer límite escrito al poder real (1215)',
+        'Bula de Oro húngara: la nobleza arranca garantías al rey Andrés II (1222)',
+        'El Parlamento inglés de Simón de Montfort incluye por primera vez a representantes burgueses (1265)',
+        'Las Cortes de Castilla y Aragón consolidan la representación estamental frente a la Corona',
+      ],
+    },
+    {
+      nombre: 'Revoluciones Atlánticas',
+      desde: 1688,
+      hasta: 1815,
+      icono: '🔥',
+      hitosDestacados: ['Parlamentarismo Inglés', 'Independencia Americana y Constitución', 'Revolución Francesa y Derechos del Hombre'],
+      eventos: [
+        'Gloriosa Revolución inglesa: el Parlamento depone a Jacobo II sin derramamiento de sangre (1688)',
+        'Bill of Rights inglés: supremacía parlamentaria y derechos civiles (1689)',
+        'Declaración de Independencia de Estados Unidos: todos los hombres son creados iguales (1776)',
+        'Constitución de Estados Unidos: primera constitución escrita y más duradera de la historia (1787)',
+        'Declaración de los Derechos del Hombre y del Ciudadano en la Revolución Francesa (1789)',
+      ],
+    },
+    {
+      nombre: 'Constitucionalismo Liberal',
+      desde: 1815,
+      hasta: 1914,
+      icono: '⚖️',
+      hitosDestacados: ['Constitucionalismo Liberal', 'Sufragio Universal y Derechos Cívicos'],
+      eventos: [
+        'Constitución de Cádiz (1812): primera constitución liberal española, referente para América Latina',
+        'Oleada revolucionaria de 1830: constituciones liberales en Francia, Bélgica y Polonia',
+        'Primavera de los Pueblos (1848): oleada constitucionalista barre Europa',
+        'Unificación de Italia (1861) y Alemania (1871): nuevos Estados-nación con constituciones',
+        'Nueva Zelanda se convierte en el primer país del mundo con sufragio femenino (1893)',
+      ],
+    },
+    {
+      nombre: 'Entreguerras y Crisis',
+      desde: 1914,
+      hasta: 1945,
+      icono: '⚔️',
+      hitosDestacados: ['Weimar y Democracias de Entreguerras'],
+      eventos: [
+        'Fin de la Primera Guerra Mundial: colapso de los imperios austrohúngaro, ruso y otomano (1918)',
+        'Constitución de Weimar: la democracia más avanzada de su era (1919)',
+        'Crisis económica del 29 y hiperinflación debilitan las democracias europeas',
+        'Hitler asciende al poder usando mecanismos democráticos de Weimar (1933)',
+      ],
+    },
+    {
+      nombre: 'Orden Internacional de DDHH',
+      desde: 1945,
+      hasta: 1974,
+      icono: '🕊️',
+      hitosDestacados: ['ONU y Declaración Universal de DDHH'],
+      eventos: [
+        'Creación de la ONU tras el horror de la Segunda Guerra Mundial (1945)',
+        'Constituciones de Italia (1948), Japón (1947) y Alemania (1949) con dignidad humana como fundamento',
+        'Declaración Universal de los Derechos Humanos: 30 artículos para toda persona (1948)',
+        'Convenio Europeo de Derechos Humanos y Tribunal Europeo de Derechos Humanos (1950)',
+      ],
+    },
+    {
+      nombre: 'Democratización y Crisis',
+      desde: 1974,
+      hasta: 2020,
+      icono: '🌍',
+      hitosDestacados: ['Tercera Ola Democratizadora', 'Erosión Democrática en el Siglo XXI'],
+      eventos: [
+        'Revolución de los Claveles en Portugal: inicio de la tercera ola democratizadora (1974)',
+        'Transición española: Constitución de 1978 como modelo de pacto constituyente',
+        'Caída del Muro de Berlín y colapso de la URSS: más de 30 países adoptan democracia (1989-1991)',
+        'Hungría y Polonia usan mecanismos constitucionales para erosionar el Estado de derecho (2010-2020)',
+        'Levitsky y Ziblatt publican Cómo mueren las democracias: manual para identificar el retroceso (2018)',
+      ],
+    },
+  ],
+
+  categorias: {
+    precursores: 'Precursores Medievales',
+    revoluciones: 'Revoluciones Atlánticas',
+    liberal: 'Constitucionalismo Liberal',
+    sufragio: 'Era del Sufragio',
+    crisis: 'Crisis Democrática',
+    internacional: 'Orden Internacional',
+    democratizacion: 'Democratización',
+  },
+
+  colores: {
+    precursores: '#8B4513',
+    revoluciones: '#DC143C',
+    liberal: '#228B22',
+    sufragio: '#FF69B4',
+    crisis: '#DAA520',
+    internacional: '#20B2AA',
+    democratizacion: '#32CD32',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'Las constituciones son la gramática del poder: los textos que deciden quién manda, hasta dónde puede mandar y qué derechos nadie puede arrebatarle al ciudadano. En ocho siglos, la humanidad ha pasado de la Magna Carta —un acuerdo entre un rey y sus barones— a la Declaración Universal de Derechos Humanos, válida para toda persona por el mero hecho de serlo. Esta cronología muestra que la democracia no es un destino alcanzado, sino un proceso permanente de conquista y defensa de derechos. El retroceso democrático del siglo XXI demuestra que ningún avance es irreversible.',
+
+    tablaComparativa: [
+      { hito: 'Magna Carta', periodo: '1215', categoria: 'Precursores Medievales', personaje: 'Juan I de Inglaterra / barones rebeldes', aportacion: 'Primer límite escrito al poder real: nadie puede ser arrestado sin juicio' },
+      { hito: 'Bill of Rights inglés', periodo: '1689', categoria: 'Precursores Medievales', personaje: 'Guillermo III de Orange / Parlamento', aportacion: 'Supremacía parlamentaria, elecciones libres y libertad de expresión parlamentaria' },
+      { hito: 'Constitución de EE.UU.', periodo: '1787', categoria: 'Revoluciones Atlánticas', personaje: 'Madison / Hamilton / Jay', aportacion: 'Primera constitución escrita en vigor: separación de poderes y sistema federal' },
+      { hito: 'Declaración DDHH Francia', periodo: '1789', categoria: 'Revoluciones Atlánticas', personaje: 'Asamblea Nacional Constituyente', aportacion: 'Soberanía nacional, igualdad ante la ley, libertad de expresión como fundamento del Estado' },
+      { hito: 'Constitución de Weimar', periodo: '1919', categoria: 'Crisis Democrática', personaje: 'Hugo Preuss / República de Weimar', aportacion: 'La democracia más avanzada de su época: sufragio universal, proporcionalidad, Estado social' },
+      { hito: 'DUDH ONU', periodo: '1948', categoria: 'Orden Internacional', personaje: 'Eleanor Roosevelt / René Cassin', aportacion: '30 artículos de derechos inalienables para toda persona, sin distinción de raza, sexo o nación' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de Derecho',
+        perfil: 'Grado, Máster o oposiciones de Derecho Constitucional',
+        texto: 'Esta cronología permite situar cada texto constitucional en su contexto histórico e identificar los principios que viajan de un documento a otro: la separación de poderes de Montesquieu aparece en la Constitución americana, la francesa y todas las posteriores. Ver la evolución completa ayuda a entender por qué los derechos fundamentales están donde están.',
+      },
+      {
+        icono: '🗳️',
+        titulo: 'Ciudadano Interesado en Política',
+        perfil: 'Persona activa en debates electorales y democráticos',
+        texto: 'Entender cómo nacieron las democracias —y cómo han muerto algunas— es la mejor vacuna contra el populismo y la demagogia. Esta cronología muestra que la concentración de poder siempre ha seguido el mismo guion y que los ciudadanos informados son la mejor salvaguarda de las instituciones democráticas.',
+      },
+      {
+        icono: '📊',
+        titulo: 'Politólogo o Investigador',
+        perfil: 'Ciencias Políticas, Relaciones Internacionales, Historia Contemporánea',
+        texto: 'La tercera ola democratizadora de Huntington y el concepto de democracia iliberal de Zakaria son los marcos teóricos centrales de las últimas décadas. Esta cronología proporciona el arco histórico completo para contextualizar los debates académicos sobre retroceso democrático, populismo y constitucionalismo comparado.',
+      },
+      {
+        icono: '📰',
+        titulo: 'Periodista o Analista',
+        perfil: 'Periodismo político, análisis de actualidad democrática',
+        texto: 'Cuando Hungría o Polonia cambian su constitución para debilitar el poder judicial, están siguiendo un patrón documentado desde Weimar. Esta cronología proporciona el contexto histórico necesario para analizar con profundidad los retrocesos democráticos contemporáneos y distinguir el cambio constitucional legítimo de la autocracia disfrazada.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Cuál es la constitución más antigua que sigue en vigor?',
+        respuesta: 'La Constitución de los Estados Unidos (1787), con sus 27 enmiendas, es la constitución escrita más antigua que sigue en vigor en el mundo. La segunda es la de San Marino (1600), aunque en forma de estatutos medievales, no de constitución moderna. La mayor parte de las constituciones vigentes en el mundo datan del siglo XX.',
+        tip: 'La Constitución estadounidense se ha enmendado solo 27 veces en 237 años; la primera española de 1812 fue derogada a los dos años de aprobarse.',
+      },
+      {
+        pregunta: '¿Por qué fracasó la democracia de Weimar?',
+        respuesta: 'Por una confluencia de factores: hiperinflación (1923), Gran Depresión (1929), un sistema de representación proporcional que fragmentaba el Parlamento, el artículo 48 que permitía gobernar por decreto en emergencias —que Hitler usó extensivamente—, y una cultura política poco enraizada en la democracia tras décadas de autoritarismo imperial. La lección es que una constitución avanzada no es suficiente sin instituciones fuertes y una ciudadanía comprometida.',
+        tip: 'Hitler fue nombrado canciller por el presidente Hindenburg de forma completamente legal el 30 de enero de 1933.',
+      },
+      {
+        pregunta: '¿Qué es una democracia iliberal?',
+        respuesta: 'El término, acuñado por Fareed Zakaria en 1997, describe regímenes que mantienen elecciones formalmente libres pero erosionan sistemáticamente los contrapesos del Estado de derecho: independencia judicial, libertad de prensa, derechos de las minorías. Hungría bajo Orbán y Polonia bajo el PiS son los ejemplos más citados en Europa. Son democracias en el sentido de que el gobernante tiene mayoría electoral, pero no en el sentido de gobierno limitado por derechos.',
+        tip: 'El término "democracia iliberal" fue popularizado en Europa por el propio Viktor Orbán como autopromoción, vaciando de contenido crítico el concepto.',
+      },
+      {
+        pregunta: '¿Cuándo se reconoció el sufragio femenino en España?',
+        respuesta: 'En la Constitución de la Segunda República, en 1931. La diputada Clara Campoamor lo defendió brillantemente en el Parlamento contra la opinión de muchos republicanos que temían que las mujeres votaran conservador. Las mujeres españolas votaron por primera vez en las elecciones de noviembre de 1933. El franquismo eliminó el sufragio universal hasta la Transición y la Constitución de 1978.',
+        tip: 'Clara Campoamor tuvo que exiliarse en 1936 y murió en 1972 sin ver la democracia española restaurada.',
+      },
+      {
+        pregunta: '¿Es la Declaración Universal de los Derechos Humanos vinculante?',
+        respuesta: 'La DUDH de 1948 no es un tratado jurídicamente vinculante, sino una declaración de principios adoptada por la ONU. Sin embargo, muchos de sus artículos se han convertido en derecho internacional consuetudinario vinculante para todos los Estados. El Convenio Europeo de Derechos Humanos (1950) y los pactos internacionales de 1966 sí son tratados vinculantes que desarrollan la DUDH con mecanismos de enforcement.',
+        tip: 'El Tribunal Europeo de Derechos Humanos (Estrasburgo) ha dictado más de 22.000 sentencias vinculantes desde 1959 aplicando el CEDH.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa los saltos temporales en la Línea del Tiempo',
+        cuerpo: 'Los 10 hitos no están distribuidos uniformemente: hay un salto enorme entre la Magna Carta (1215) y el Parlamentarismo Inglés (1628). Eso refleja que los avances constitucionales son espasmódicos, no lineales. Identifica los períodos de aceleración (1776-1815, 1919-1948) y de aparente parálisis.',
+      },
+      {
+        titulo: 'Compara las revoluciones atlánticas',
+        cuerpo: 'Haz clic en "Independencia Americana y Constitución" y luego en "Revolución Francesa y Derechos del Hombre". Ambas ocurrieron con 13 años de diferencia y se influyeron mutuamente. Observa las diferencias: la americana fue más estable (la misma constitución dura 237 años); la francesa produjo 5 constituciones en 10 años.',
+      },
+      {
+        titulo: 'Identifica el patrón crisis-reforma',
+        cuerpo: 'Cada gran retroceso democrático va seguido de una reacción constitucional: el colapso de Weimar llevó a las constituciones garantistas de 1948-1949 con dignidad humana inviolable; la Segunda Guerra Mundial produjo la DUDH. Busca ese patrón en la tabla Comparativa filtrando por "Crisis Democrática" e "Orden Internacional".',
+      },
+      {
+        titulo: 'Explora la tercera ola en el Tab de Contexto Histórico',
+        cuerpo: 'En el Tab 4 (Contexto Histórico), la era "Democratización y Crisis" concentra el mayor avance y el más reciente retroceso democrático. La Transición española (1978) y la caída del Muro (1989) están en la misma era que la erosión democrática de Hungría y Polonia. Ese contraste dentro de una misma generación es extraordinario.',
+      },
+      {
+        titulo: 'Usa el buscador en la Comparativa para encontrar conexiones',
+        cuerpo: 'En el Tab 3 (Comparativa), busca "sufragio" o "dignidad" para ver qué hitos comparten conceptos. El sufragio universal aparece tanto en Weimar (1919) como en la DUDH (1948) y la tercera ola. La dignidad humana es el hilo conductor de todas las constituciones postbélicas.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📜',
+        texto: 'La Magna Carta original tiene solo 63 cláusulas, la mayoría sobre derechos feudales ya obsoletos. Solo dos siguen en vigor en el derecho inglés actual: la libertad de la Iglesia de Inglaterra y el derecho a un juicio justo. Pero su valor simbólico como primer límite al poder es incalculable.',
+      },
+      {
+        icono: '🗳️',
+        texto: 'En 1920, cuando la 19ª Enmienda americana reconoció el sufragio femenino, las mujeres negras en los estados del sur seguían siendo sistemáticamente excluidas del voto mediante intimidación y leyes de "impuesto electoral". La igualdad formal en la constitución no garantizó la igualdad real hasta la Ley de Derechos Electorales de 1965.',
+      },
+      {
+        icono: '⚡',
+        texto: 'La Constitución de Weimar (1919) fue pionera en incluir derechos sociales: derecho al trabajo, a la educación, a la seguridad social. Fue también la primera en reconocer explícitamente la igualdad entre hombres y mujeres. Esa avanzada constitución fue destruida por alguien que llegó al poder usando sus propias reglas.',
+      },
+      {
+        icono: '🌍',
+        texto: 'Entre 1974 y 1991 (la "tercera ola" de Huntington) más de 30 países adoptaron democracia: Portugal, España, Grecia, Argentina, Brasil, Chile, Filipinas, Corea del Sur, Polonia, Hungría, Checoslovaquia, y decenas más. Fue el mayor avance democrático de la historia en tan poco tiempo. Y algunas de esas democracias ya están retrocediendo.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Confundir democracia con elecciones',
+        cuerpo: 'Muchos regímenes autoritarios celebran elecciones formalmente libres pero sin garantías reales: sin separación de poderes, sin prensa independiente, sin jueces imparciales. La democracia requiere elecciones Y Estado de derecho. Hungría, Rusia o Venezuela celebran elecciones. No son democracias plenas porque el sistema está amañado estructuralmente a favor del gobernante.',
+      },
+      {
+        titulo: 'Creer que el sufragio universal llegó solo a los hombres blancos',
+        cuerpo: 'El sufragio universal masculino tardó décadas en ser realmente universal. En Estados Unidos, la 15ª Enmienda (1870) reconoció el voto de los hombres negros, pero fue efectivamente bloqueado en el sur hasta 1965. En muchos países europeos, el voto de la mujer llegó muy tardíamente: Francia en 1944, Italia en 1945, Suiza en 1971. El sufragio "universal" fue en práctica un proceso gradual con muchas exclusiones.',
+      },
+      {
+        titulo: 'Pensar que la democracia es el estado natural de las sociedades',
+        cuerpo: 'La democracia liberal es históricamente la excepción, no la norma. En 1941, había solo 11 democracias en el mundo. En 1974, inicio de la tercera ola, apenas 35. El pico fue en 2006 con 123 democracias electorales. Desde entonces, el índice global de democracia lleva años retrocediendo. La democracia es una conquista que requiere mantenimiento activo.',
+      },
+      {
+        titulo: 'Asumir que una constitución escrita garantiza derechos reales',
+        cuerpo: 'La URSS de Stalin tenía una constitución de 1936 que garantizaba libertad de expresión, de prensa y de reunión. Corea del Norte tiene una constitución vigente. La diferencia entre constituciones nominales y constituciones vivas es la existencia de mecanismos reales de garantía: poder judicial independiente, sociedad civil activa, alternancia efectiva en el poder.',
+      },
+    ],
+  },
+};

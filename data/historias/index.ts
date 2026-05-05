@@ -89,6 +89,10 @@ import { espanaContemporanea } from './espana-contemporanea';
 import { historiaAustriaHungria } from './historia-austria-hungria';
 import { historiaIslamClasico } from './historia-islam-clasico';
 import { historiaPortugalUltramar } from './historia-portugal-ultramar';
+import { historiaPensamientoPolitico } from './historia-pensamiento-politico';
+import { historiaConstituciones } from './historia-constituciones';
+import { historiaDerecho } from './historia-derecho';
+import { historiaEtica } from './historia-etica';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -181,6 +185,10 @@ const registry: Record<string, HistoriaData> = {
   'historia-austria-hungria': historiaAustriaHungria,
   'historia-islam-clasico': historiaIslamClasico,
   'historia-portugal-ultramar': historiaPortugalUltramar,
+  'historia-pensamiento-politico': historiaPensamientoPolitico,
+  'historia-constituciones': historiaConstituciones,
+  'historia-derecho': historiaDerecho,
+  'historia-etica': historiaEtica,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

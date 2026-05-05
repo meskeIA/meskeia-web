@@ -927,6 +927,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-austria-hungria/",   // Imperio Austro-Húngaro: del Congreso de Viena (1815) al derrumbe de 1918
   "/visualizador-historia/historia-islam-clasico/",     // Islam Clásico: de Mahoma (622) a la caída de Bagdad (1258)
   "/visualizador-historia/historia-portugal-ultramar/", // Portugal y el Ultramar: del Infante Enrique (1415) a la independencia de Brasil (1822)
+  "/visualizador-historia/historia-pensamiento-politico/", // Pensamiento político: de Platón al populismo del siglo XXI
+  "/visualizador-historia/historia-constituciones/",       // Constituciones y democracia: de la Magna Carta (1215) al siglo XXI
+  "/visualizador-historia/historia-derecho/",              // Historia del derecho: de Hammurabi al RGPD digital
+  "/visualizador-historia/historia-etica/",                // Ética: de Sócrates a la ética de la IA
 ];
 
 /**

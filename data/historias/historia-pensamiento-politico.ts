@@ -1,0 +1,366 @@
+import type { HistoriaData } from './types';
+
+export const historiaPensamientoPolitico: HistoriaData = {
+  slug: 'historia-pensamiento-politico',
+  titulo: 'Historia del Pensamiento Político: De Platón al Populismo del Siglo XXI',
+  subtitulo: 'Del ágora ateniense a la era digital: 2.500 años de ideas que cambiaron el poder',
+  descripcionSEO: 'Cronología interactiva del pensamiento político occidental: de Platón y Aristóteles a los populismos del siglo XXI. Filosofía griega, contractualismo (Hobbes, Locke, Rousseau), Ilustración, Marx, totalitarismos, neoliberalismo y democracia contemporánea en 10 hitos y 6 eras.',
+  keywords: [
+    'historia pensamiento político cronología',
+    'platón aristóteles filosofía política griega',
+    'contrato social hobbes locke rousseau',
+    'maquiavelo el príncipe renacimiento político',
+    'marx liberalismo ilustración montesquieu kant',
+    'totalitarismo neoliberalismo rawls hayek populismo',
+  ],
+  anioInicio: -427,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'pensamiento-griego',
+      nombre: 'Filosofía Política Griega',
+      anioInicio: -427,
+      anioFin: -322,
+      color: '#1E90FF',
+      categoria: 'clasico',
+      descripcion: 'Platón (La República, ~380 a.C.) y Aristóteles (La Política, ~330 a.C.) fundan la filosofía política occidental. Platón propone el gobierno de los filósofos-reyes. Aristóteles clasifica los regímenes (monarquía, aristocracia, república) y sus degeneraciones. La polis griega como modelo de organización política basada en la razón y la virtud cívica.',
+      obraIconica: 'La República de Platón (~380 a.C.) y La Política de Aristóteles (~330 a.C.)',
+      paises: ['Grecia', 'Atenas', 'Macedonia'],
+    },
+    {
+      id: 'pensamiento-romano',
+      nombre: 'Pensamiento Romano y Estoico',
+      anioInicio: -106,
+      anioFin: 180,
+      color: '#1E90FF',
+      categoria: 'clasico',
+      descripcion: 'Cicerón adapta la filosofía griega a la realidad republicana romana (De Re Publica, De Legibus). El estoicismo romano (Séneca, Epicteto, Marco Aurelio) desarrolla la idea de ley natural universal y la fraternidad humana más allá de la polis. El derecho natural estoico influirá durante siglos en el pensamiento político occidental.',
+      obraIconica: 'De Re Publica de Cicerón (54 a.C.) y las Meditaciones de Marco Aurelio (175 d.C.)',
+      paises: ['Roma', 'Imperio Romano'],
+    },
+    {
+      id: 'pensamiento-medieval',
+      nombre: 'Filosofía Política Medieval',
+      anioInicio: 354,
+      anioFin: 1274,
+      color: '#8B0000',
+      categoria: 'medieval',
+      descripcion: 'San Agustín (La Ciudad de Dios, 426) propone la separación entre ciudad terrenal y ciudad celestial. Tomás de Aquino sintetiza Aristóteles y el cristianismo: el poder político como natural y ordenado al bien común. Las polémicas entre papado e Imperio (Investiduras) marcan la lucha entre poder espiritual y temporal que definirá la política medieval.',
+      obraIconica: 'La Ciudad de Dios de San Agustín (426) y la Suma Teológica de Tomás de Aquino (1265-1274)',
+      paises: ['Europa medieval', 'Iglesia Católica', 'Sacro Imperio'],
+    },
+    {
+      id: 'maquiavelo-renacimiento',
+      nombre: 'Maquiavelo y el Renacimiento Político',
+      anioInicio: 1469,
+      anioFin: 1600,
+      color: '#B8860B',
+      categoria: 'moderno',
+      descripcion: 'Maquiavelo (El Príncipe, 1513) inaugura la ciencia política moderna: separación entre ética y política, el gobernante debe ser a la vez zorro y león. Jean Bodin desarrolla el concepto de soberanía absoluta. El humanismo cívico renacentista recupera los ideales republicanos romanos. La Reforma protestante rompe la unidad religiosa europea y redefine la relación entre fe, política y obediencia civil.',
+      obraIconica: 'El Príncipe de Maquiavelo (1513): nacimiento de la ciencia política moderna',
+      paises: ['Italia', 'Europa Occidental', 'Florencia'],
+    },
+    {
+      id: 'contractualismo',
+      nombre: 'Contractualismo: Hobbes, Locke y Rousseau',
+      anioInicio: 1651,
+      anioFin: 1762,
+      color: '#2E8B57',
+      categoria: 'ilustracion',
+      descripcion: 'Hobbes (Leviatán, 1651): estado de naturaleza como guerra de todos contra todos; el soberano absoluto garantiza el orden. Locke (Dos Tratados, 1689): los hombres nacen libres e iguales; el gobierno se legitima por consentimiento y protege derechos naturales; derecho a la revolución. Rousseau (El Contrato Social, 1762): voluntad general, soberanía popular. Tres visiones del contrato que fundarán el liberalismo, el conservadurismo y la democracia.',
+      obraIconica: 'Leviatán de Hobbes (1651), Segundo Tratado de Locke (1689) y El Contrato Social de Rousseau (1762)',
+      paises: ['Inglaterra', 'Francia', 'Europa Occidental'],
+    },
+    {
+      id: 'ilustracion-kantiana',
+      nombre: 'Ilustración y Republicanismo Kantiano',
+      anioInicio: 1748,
+      anioFin: 1795,
+      color: '#2E8B57',
+      categoria: 'ilustracion',
+      descripcion: 'Montesquieu (El Espíritu de las Leyes, 1748) sistematiza la separación de poderes y la teoría de los climas. Voltaire y los ilustrados atacan el fanatismo y la tiranía. Kant (La paz perpetua, 1795) propone una federación de repúblicas como condición para la paz internacional y desarrolla la ética del deber aplicada a la política. La Ilustración suministra el marco intelectual de las revoluciones americana y francesa.',
+      obraIconica: 'El Espíritu de las Leyes de Montesquieu (1748) y La paz perpetua de Kant (1795)',
+      paises: ['Francia', 'Prusia', 'Europa Occidental'],
+    },
+    {
+      id: 'liberalismo-marxismo',
+      nombre: 'Liberalismo Clásico y Marxismo',
+      anioInicio: 1848,
+      anioFin: 1917,
+      color: '#DC143C',
+      categoria: 'ideologias',
+      descripcion: 'John Stuart Mill (Sobre la Libertad, 1859) desarrolla el liberalismo político y el utilitarismo social. Marx y Engels (El Manifiesto Comunista, 1848; El Capital, 1867) proponen el materialismo histórico y la lucha de clases como motor de la historia. El anarquismo (Proudhon, Bakunin) y el socialismo reformista (Bernstein) completan el espectro ideológico. Las Internacionales obreras organizan a los trabajadores industriales a escala global.',
+      obraIconica: 'El Manifiesto Comunista de Marx y Engels (1848) y Sobre la Libertad de J.S. Mill (1859)',
+      paises: ['Europa', 'Alemania', 'Inglaterra', 'Francia', 'Rusia'],
+    },
+    {
+      id: 'totalitarismos',
+      nombre: 'Totalitarismos del Siglo XX',
+      anioInicio: 1917,
+      anioFin: 1945,
+      color: '#4B0082',
+      categoria: 'totalitarismo',
+      descripcion: 'La Revolución rusa (1917) instaura el primer Estado marxista-leninista. El fascismo italiano (Mussolini, 1922) y el nazismo alemán (Hitler, 1933) construyen regímenes totalitarios de signo contrario. Hannah Arendt (Los orígenes del totalitarismo, 1951) analiza los rasgos comunes. El estalinismo en la URSS y el nazismo en Alemania llevan al paroxismo la subordinación del individuo al Estado, culminando en la Segunda Guerra Mundial y el Holocausto.',
+      obraIconica: 'Los orígenes del totalitarismo de Hannah Arendt (1951) y Mein Kampf de Hitler (1925)',
+      paises: ['Alemania', 'Italia', 'URSS', 'Europa'],
+    },
+    {
+      id: 'neoliberalismo-justicia',
+      nombre: 'Neoliberalismo y Teoría de la Justicia',
+      anioInicio: 1944,
+      anioFin: 1991,
+      color: '#FF8C00',
+      categoria: 'contemporaneo',
+      descripcion: 'Hayek (Camino de servidumbre, 1944) y Friedman (Capitalismo y Libertad, 1962) relanzan el liberalismo económico frente al Estado del bienestar. Rawls (Teoría de la Justicia, 1971) propone el principio de diferencia como base de una sociedad justa. Isaiah Berlin distingue libertad positiva y negativa. El thatcherismo y el reaganismo aplican el neoliberalismo en política. La caída del Muro (1989) parece coronar el liberalismo como sistema definitivo.',
+      obraIconica: 'Teoría de la Justicia de John Rawls (1971) y Camino de servidumbre de Friedrich Hayek (1944)',
+      paises: ['Estados Unidos', 'Reino Unido', 'Europa Occidental', 'Occidente'],
+    },
+    {
+      id: 'populismos-siglo-xxi',
+      nombre: 'Populismos y Crisis Liberal',
+      anioInicio: 1991,
+      anioFin: 2020,
+      color: '#FF8C00',
+      categoria: 'contemporaneo',
+      descripcion: 'Fukuyama anuncia el "fin de la historia" (1992); Huntington responde con el "choque de civilizaciones" (1996). La crisis financiera de 2008, la globalización desigual y las redes sociales impulsan el auge de populismos de izquierda y derecha. Habermas defiende la democracia deliberativa. El debate sobre democracia iliberal (Orbán), identidad y comunitarismo (Sandel, Taylor) marcan el pensamiento político del siglo XXI.',
+      obraIconica: 'El fin de la historia de Fukuyama (1992) y El choque de civilizaciones de Huntington (1996)',
+      paises: ['Global', 'Europa', 'América', 'Estados Unidos'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Antigüedad Clásica',
+      desde: -427,
+      hasta: 476,
+      icono: '🏛️',
+      hitosDestacados: ['Filosofía Política Griega', 'Pensamiento Romano y Estoico'],
+      eventos: [
+        'Platón funda la Academia y escribe La República (~387 a.C.)',
+        'Aristóteles clasifica los regímenes políticos en La Política (~330 a.C.)',
+        'Cicerón escribe De Re Publica: la filosofía griega al servicio de Roma (54 a.C.)',
+        'Marco Aurelio escribe las Meditaciones: el estoicismo en el poder (175 d.C.)',
+      ],
+    },
+    {
+      nombre: 'Edad Media',
+      desde: 476,
+      hasta: 1453,
+      icono: '⛪',
+      hitosDestacados: ['Filosofía Política Medieval'],
+      eventos: [
+        'San Agustín publica La Ciudad de Dios, separando poder terrenal y celestial (426)',
+        'Querella de las Investiduras: choque entre papa Gregorio VII y el emperador Enrique IV (1076)',
+        'Tomás de Aquino sintetiza Aristóteles y el pensamiento cristiano en la Suma Teológica (1265-1274)',
+        'Marsilio de Padua defiende la soberanía del pueblo y la separación de poderes (1324)',
+      ],
+    },
+    {
+      nombre: 'Modernidad Temprana',
+      desde: 1453,
+      hasta: 1789,
+      icono: '📜',
+      hitosDestacados: ['Maquiavelo y el Renacimiento Político', 'Contractualismo: Hobbes, Locke y Rousseau', 'Ilustración y Republicanismo Kantiano'],
+      eventos: [
+        'Maquiavelo publica El Príncipe: la política separada de la moral (1513)',
+        'Reforma protestante: Lutero redefine la obediencia al poder secular (1517)',
+        'Hobbes escribe el Leviatán: soberanía absoluta como garantía del orden (1651)',
+        'Locke justifica la Revolución Gloriosa y el gobierno por consentimiento (1689)',
+        'Montesquieu sistematiza la separación de poderes en El Espíritu de las Leyes (1748)',
+      ],
+    },
+    {
+      nombre: 'Era de las Ideologías',
+      desde: 1789,
+      hasta: 1917,
+      icono: '⚙️',
+      hitosDestacados: ['Liberalismo Clásico y Marxismo'],
+      eventos: [
+        'La Revolución Francesa consagra los principios de libertad, igualdad y fraternidad (1789)',
+        'Marx y Engels publican El Manifiesto Comunista: la lucha de clases como motor histórico (1848)',
+        'John Stuart Mill defiende la libertad individual frente a la tiranía de la mayoría (1859)',
+        'Marx publica El Capital: análisis del modo de producción capitalista (1867)',
+        'Primera Internacional Obrera: la clase trabajadora como actor político global (1864-1876)',
+      ],
+    },
+    {
+      nombre: 'Era de los Totalitarismos',
+      desde: 1917,
+      hasta: 1945,
+      icono: '☠️',
+      hitosDestacados: ['Totalitarismos del Siglo XX'],
+      eventos: [
+        'Revolución rusa: Lenin instaura el primer Estado marxista-leninista (1917)',
+        'Mussolini toma el poder en Italia: primer régimen fascista europeo (1922)',
+        'Hitler llega al poder en Alemania: el nazismo como proyecto totalitario (1933)',
+        'Stalin consolida el terror estalinista: purgas y gulag en la URSS (1936-1938)',
+      ],
+    },
+    {
+      nombre: 'Mundo Contemporáneo',
+      desde: 1945,
+      hasta: 2020,
+      icono: '🌐',
+      hitosDestacados: ['Neoliberalismo y Teoría de la Justicia', 'Populismos y Crisis Liberal'],
+      eventos: [
+        'Declaración Universal de los Derechos Humanos: nuevo fundamento del orden internacional (1948)',
+        'Rawls publica la Teoría de la Justicia: el liberalismo igualitario como alternativa (1971)',
+        'Reagan y Thatcher aplican el neoliberalismo: Estado mínimo y mercado libre (1979-1989)',
+        'Caída del Muro de Berlín: Fukuyama anuncia el fin de la historia (1989-1992)',
+        'Crisis financiera de 2008 y auge de los populismos: crisis del orden liberal (2008-2020)',
+      ],
+    },
+  ],
+
+  categorias: {
+    clasico: 'Pensamiento Clásico',
+    medieval: 'Pensamiento Medieval',
+    moderno: 'Modernidad Política',
+    ilustracion: 'Ilustración',
+    ideologias: 'Era de las Ideologías',
+    totalitarismo: 'Totalitarismos',
+    contemporaneo: 'Pensamiento Contemporáneo',
+  },
+
+  colores: {
+    clasico: '#1E90FF',
+    medieval: '#8B0000',
+    moderno: '#B8860B',
+    ilustracion: '#2E8B57',
+    ideologias: '#DC143C',
+    totalitarismo: '#4B0082',
+    contemporaneo: '#FF8C00',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El pensamiento político occidental ha recorrido 2.500 años de historia, desde las reflexiones de Platón sobre el Estado ideal hasta los debates contemporáneos sobre populismo y democracia iliberal. Las grandes preguntas siguen siendo las mismas: ¿Quién debe gobernar y por qué? ¿Cuáles son los límites legítimos del poder? ¿Cómo conciliar libertad e igualdad? Las respuestas han variado radicalmente según la época y el contexto, pero el diálogo entre estas tradiciones sigue siendo el corazón de la filosofía política contemporánea.',
+
+    tablaComparativa: [
+      { hito: 'Filosofía Política Griega', periodo: '427-322 a.C.', categoria: 'Pensamiento Clásico', personaje: 'Platón / Aristóteles', aportacion: 'Fundamentos de la filosofía política: polis, virtud cívica, clasificación de regímenes' },
+      { hito: 'Filosofía Política Medieval', periodo: '354-1274', categoria: 'Pensamiento Medieval', personaje: 'San Agustín / Tomás de Aquino', aportacion: 'Síntesis entre teología cristiana y filosofía clásica; legitimidad del poder temporal' },
+      { hito: 'Maquiavelo y el Renacimiento Político', periodo: '1469-1600', categoria: 'Modernidad Política', personaje: 'Maquiavelo / Jean Bodin', aportacion: 'Ciencia política autónoma de la ética; concepto de soberanía absoluta del Estado' },
+      { hito: 'Contractualismo: Hobbes, Locke y Rousseau', periodo: '1651-1762', categoria: 'Ilustración', personaje: 'Hobbes / Locke / Rousseau', aportacion: 'Contrato social como fundamento del poder; derechos naturales y soberanía popular' },
+      { hito: 'Liberalismo Clásico y Marxismo', periodo: '1848-1917', categoria: 'Era de las Ideologías', personaje: 'Marx / J.S. Mill', aportacion: 'Materialismo histórico y lucha de clases; libertad individual y utilitarismo social' },
+      { hito: 'Neoliberalismo y Teoría de la Justicia', periodo: '1944-1991', categoria: 'Pensamiento Contemporáneo', personaje: 'Rawls / Hayek', aportacion: 'Principio de diferencia como base de la justicia; crítica del Estado planificador' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Estudiante de Ciencias Políticas o Filosofía',
+        perfil: 'Universidad o Bachillerato',
+        texto: 'Esta cronología ofrece una visión panorámica de las corrientes que se estudian en profundidad en el aula. Úsala para contextualizar a cada autor en su momento histórico y entender por qué surgió cada teoría como respuesta a los problemas políticos de su época.',
+      },
+      {
+        icono: '🗳️',
+        titulo: 'Ciudadano comprometido',
+        perfil: 'Interesado en política y democracia',
+        texto: 'Entender de dónde vienen las ideas que debatimos hoy —libertad, igualdad, contrato social, bien común— ayuda a participar con más criterio en el debate democrático. Muchos argumentos actuales son variantes modernas de posiciones debatidas hace siglos.',
+      },
+      {
+        icono: '📚',
+        titulo: 'Lector curioso de historia',
+        perfil: 'Sin formación específica en filosofía',
+        texto: 'No hace falta haber leído a Kant para entender por qué sus ideas sobre la paz perpetua inspiraron la creación de la ONU. Esta cronología explica las grandes ideas en contexto, sin tecnicismos, mostrando cómo influyeron en la historia real.',
+      },
+      {
+        icono: '🏛️',
+        titulo: 'Politólogo o investigador',
+        perfil: 'Análisis y comparación de sistemas políticos',
+        texto: 'La perspectiva histórica de largo plazo permite identificar patrones recurrentes: cómo las crisis generan nuevas teorías, cómo las ideologías se adaptan o fracasan según el contexto, y qué debates del siglo XXI tienen raíces en disputas filosóficas de hace cinco siglos.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Qué es el contrato social y por qué importa hoy?',
+        respuesta: 'El contrato social es la idea de que los ciudadanos ceden parte de su libertad natural a una autoridad común a cambio de seguridad y derechos garantizados. Hobbes, Locke y Rousseau lo interpretaron de formas radicalmente distintas: desde el soberano absoluto hasta la soberanía popular. Toda constitución democrática moderna se apoya implícitamente en alguna versión de esta teoría.',
+        tip: 'La Declaración de Independencia de EE.UU. (1776) y la Declaración de los Derechos del Hombre (1789) son aplicaciones directas de las ideas de Locke y Rousseau.',
+      },
+      {
+        pregunta: '¿Por qué fracasaron los totalitarismos del siglo XX?',
+        respuesta: 'Los regímenes totalitarios fracasaron por una combinación de factores: la resistencia de sociedades civiles que nunca se dejaron absorber completamente por el Estado, la insostenibilidad económica de los sistemas de planificación central, la corrupción inherente a los sistemas sin contrapeso al poder, y en el caso nazi, la derrota militar en la Segunda Guerra Mundial.',
+        tip: 'Hannah Arendt mostró que el totalitarismo no era simplemente una tiranía agravada, sino un fenómeno nuevo: buscaba la transformación total del ser humano, no solo su obediencia.',
+      },
+      {
+        pregunta: '¿Qué diferencia al liberalismo del neoliberalismo?',
+        respuesta: 'El liberalismo clásico (Locke, Mill) defiende las libertades civiles y políticas, y en versiones como la de Rawls admite un Estado redistributivo para garantizar igualdad de oportunidades. El neoliberalismo (Hayek, Friedman) enfatiza la libertad económica por encima de todo, desconfía de la planificación estatal y propugna la minimización del Estado. Son compatibles en lo político pero divergen radicalmente en lo económico.',
+        tip: 'Ironía histórica: Hayek, que se oponía al "camino a la servidumbre" del socialismo, admiraba el sistema de Seguridad Social suizo como compatible con sus principios.',
+      },
+      {
+        pregunta: '¿Qué es el populismo y por qué es tan debatido?',
+        respuesta: 'El populismo es una lógica política que divide la sociedad en "el pueblo puro" frente a "la élite corrupta" y afirma representar la voluntad del pueblo contra esas élites. No es de izquierda ni de derecha en sí mismo: hay populismos de ambos signos. El debate es si el populismo es una amenaza a la democracia liberal o una respuesta legítima a sus déficits de representación.',
+        tip: 'El politólogo Cas Mudde define el populismo como una "ideología delgada" que puede combinarse con cualquier ideología "gruesa" (nacionalismo, socialismo, etc.).',
+      },
+      {
+        pregunta: '¿Qué pensador político influyó más en la historia?',
+        respuesta: 'Es inevitable y subjetivo, pero John Locke tiene un caso sólido: sus ideas sobre derechos naturales, separación de poderes y gobierno por consentimiento inspiraron directamente la Revolución Gloriosa inglesa (1688), la Independencia americana (1776) y la Revolución francesa (1789). Karl Marx transformó el siglo XX de formas que ningún otro filósofo puede igualar. Ambos tendrían impactos que superaron sus intenciones.',
+        tip: 'Thomas Jefferson copió casi literalmente párrafos de Locke en la Declaración de Independencia de EE.UU.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Empieza por los colores en la Línea del Tiempo',
+        cuerpo: 'El azul representa el pensamiento clásico griego y romano, el verde el contractualismo y la Ilustración, el rojo el marxismo y las ideologías de masas, el índigo los totalitarismos. Antes de leer nada, identifica visualmente qué períodos duraron más y cuáles fueron más breves pero más intensos.',
+      },
+      {
+        titulo: 'Conecta los hitos con sus contextos históricos',
+        cuerpo: 'Cada teoría política surge como respuesta a una crisis o problema concreto. Hobbes escribió el Leviatán durante la guerra civil inglesa. Marx escribió el Manifiesto en plena oleada revolucionaria de 1848. Hayek escribió Camino de servidumbre mientras observaba el ascenso del nazismo. La teoría y la historia son inseparables.',
+      },
+      {
+        titulo: 'Usa la Comparativa para ver las líneas de continuidad',
+        cuerpo: 'En la tabla Comparativa, filtra por "Ilustración" para ver cómo Montesquieu, Locke y Rousseau construyeron sobre las bases griegas. Luego filtra por "Pensamiento Contemporáneo" para ver cómo Rawls y Hayek reinterpretan ese legado en el siglo XX.',
+      },
+      {
+        titulo: 'Busca los debates que atraviesan siglos',
+        cuerpo: 'Algunos debates son eternos: ¿puede haber política sin moral? (Maquiavelo vs. Tomás de Aquino); ¿libertad o igualdad? (Mill vs. Rousseau); ¿mercado o Estado? (Hayek vs. Rawls). Identificar estos ejes te ayuda a situar cualquier debate político actual en su genealogía histórica.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el panorama de las eras',
+        cuerpo: 'Las 6 eras muestran cómo se agruparon y solaparon las grandes tradiciones. La era "Modernidad Temprana" es la más densa: incluye el Renacimiento, la Reforma, el contractualismo y la Ilustración en solo tres siglos. La "Era de los Totalitarismos" es la más breve pero la más catastrófica: apenas 28 años que cambiaron para siempre la política del siglo XX.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📜',
+        texto: 'Maquiavelo era también dramaturgo y poeta, no solo teórico político. Escribió El Príncipe en pocas semanas, de un tirón, como un memo para los Médici. Fue encarcelado y torturado por sus conexiones con la República florentina antes de escribir su obra más famosa.',
+      },
+      {
+        icono: '🗳️',
+        texto: 'La democracia ateniense excluía a esclavos, mujeres y extranjeros: solo votaban los ciudadanos varones libres, aproximadamente el 10-15% de la población. Pese a ello, Atenas gobernó mediante asambleas de miles de ciudadanos que tomaban decisiones directamente, sin representantes.',
+      },
+      {
+        icono: '📚',
+        texto: 'Marx y Engels escribieron el Manifiesto Comunista en apenas dos meses, con un plazo dado por la Liga de los Comunistas. Tiene solo 23 páginas. Sin embargo, cambió el curso de la historia del siglo XX de una forma que pocas obras filosóficas han igualado.',
+      },
+      {
+        icono: '🌐',
+        texto: 'La idea de "derechos humanos" universales es más reciente de lo que parece: la Declaración Universal de 1948 fue el primer documento que los codificó a escala global. El concepto de derechos "inalienables" de Locke del siglo XVII tardó casi 300 años en convertirse en derecho internacional.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que Platón defendía la democracia',
+        cuerpo: 'Platón era profundamente crítico con la democracia ateniense. La consideraba una forma degenerada de gobierno donde gobiernan los menos capaces: "la tiranía de los mediocres". Propuso en su lugar el gobierno de los filósofos-reyes, los únicos capaces de conocer el Bien. La muerte de Sócrates a manos de la democracia ateniense marcó profundamente su pensamiento.',
+      },
+      {
+        titulo: 'Confundir el contrato social con un contrato real firmado',
+        cuerpo: 'El "contrato social" no es un documento histórico ni un acuerdo que nadie firmó. Es una ficción filosófica: un experimento mental para preguntarse cuál sería el fundamento racional de la autoridad política. Hobbes, Locke y Rousseau lo usaron con fines distintos: no describían la historia real, sino que construían un argumento moral sobre la legitimidad del poder.',
+      },
+      {
+        titulo: 'Identificar a Marx con el comunismo soviético',
+        cuerpo: 'Marx murió en 1883, décadas antes de la Revolución rusa. Nunca describió en detalle cómo funcionaría el comunismo en la práctica. El leninismo, el estalinismo y el maoísmo son interpretaciones del marxismo que incluyen elementos que Marx no previó y que otros marxistas han rechazado. Atribuir a Marx todos los crímenes del siglo XX comunista es un error histórico y filosófico.',
+      },
+      {
+        titulo: 'Pensar que el neoliberalismo y el liberalismo político son lo mismo',
+        cuerpo: 'Liberalismo político (defensa de las libertades civiles y los derechos individuales) y neoliberalismo económico (mercado libre, Estado mínimo, privatizaciones) son corrientes relacionadas pero distintas. Un liberal político puede defender un Estado del bienestar robusto, como hace Rawls. Un neoliberal como Hayek puede valorar la democracia pero prioriza la libertad económica sobre la redistribución.',
+      },
+    ],
+  },
+};
