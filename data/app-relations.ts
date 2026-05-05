@@ -4215,6 +4215,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'La integración europea es el proyecto más transformador de la España democrática: la entrada en la CEE (1986) fue el premio a la Transición y el motor del desarrollo económico de los años 80 y 90.' },
   ],
 
+  // Imperio Austro-Húngaro, Islam Clásico y Portugal Ultramar — (2026-05-05)
+  'visualizador-historia-historia-austria-hungria': [
+    { url: '/visualizador-historia/primera-guerra-mundial/', icon: '💣', name: 'La Primera Guerra Mundial', description: 'El asesinato del Archiduque Franz Ferdinand en Sarajevo (1914) fue el detonante de la Primera Guerra Mundial y el fin del Imperio Austro-Húngaro: sin ese disparo, la guerra habría tenido otro origen o no habría estallado ese verano.' },
+    { url: '/visualizador-historia/historia-alemania/', icon: '🇩🇪', name: 'Historia de Alemania', description: 'Austria-Hungría y Alemania son la cara y la cruz de la Europa centroeuropea: aliados en la Triple Alianza, derrotados juntos en 1918, y sus imperios desmembrados dan lugar a la República de Weimar y las repúblicas sucesorias austro-húngaras.' },
+    { url: '/visualizador-historia/historia-italia/', icon: '🇮🇹', name: 'Historia de Italia', description: 'Italia nació en parte contra Austria: el Risorgimento fue también una guerra de independencia contra el dominio habsburgués en Lombardía y Véneto. Las guerras de 1848, 1859 y 1866 definen la relación italo-austríaca.' },
+    { url: '/visualizador-historia/historia-union-europea/', icon: '🇪🇺', name: 'La Unión Europea', description: 'Los Estados sucesorios del Imperio Austro-Húngaro (Austria, Hungría, Chequia, Eslovaquia, Croacia, Eslovenia...) son hoy miembros de la UE: la integración europea reimagina el espacio de convivencia que los Habsburgo gestionaron durante siglos.' },
+  ],
+  'visualizador-historia-historia-islam-clasico': [
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'España Medieval', description: 'Al-Ándalus es el capítulo español de la civilización islámica clásica: la llegada de Tariq ibn Ziyad (711) y el Califato de Córdoba conectan directamente la Edad de Oro islámica con la historia medieval española.' },
+    { url: '/visualizador-historia/las-cruzadas/', icon: '✝️', name: 'Las Cruzadas', description: 'Las Cruzadas son el punto de fricción entre la civilización islámica y la cristiana: la Primera Cruzada (1096) responde a la expansión turco-selyúcida y la toma de Jerusalén, y durante dos siglos el Mediterráneo es el campo de batalla compartido.' },
+    { url: '/visualizador-historia/historia-oriente-medio/', icon: '🌍', name: 'Historia de Oriente Medio', description: 'El Islam clásico es el fundamento de Oriente Medio moderno: el Califato Abasí de Bagdad es el antecedente directo de Irak, y la fractura suní-chií (desde la batalla de Kerbala en 680) sigue estructurando la geopolítica actual.' },
+    { url: '/visualizador-historia/mongol/', icon: '🐎', name: 'El Imperio Mongol', description: 'Los mongoles pusieron fin al Islam clásico: el saqueo de Bagdad por Hulagu (1258) destruyó la Casa de la Sabiduría y mató al último califa abasí, cerrando la Edad de Oro islámica con una de las mayores destrucciones culturales de la historia.' },
+  ],
+  'visualizador-historia-historia-portugal-ultramar': [
+    { url: '/visualizador-historia/historia-conquista-america/', icon: '⛵', name: 'La Conquista de América', description: 'Portugal y España se repartieron el mundo: el Tratado de Tordesillas (1494) dividió el Atlántico entre las dos potencias ibéricas, dando a Portugal Brasil y la ruta a Asia mientras España se quedaba con el resto de América.' },
+    { url: '/visualizador-historia/exploracion/', icon: '🧭', name: 'La Era de las Exploraciones', description: 'Portugal fue el iniciador de la Era de las Exploraciones: el Infante Enrique el Navegante, Bartolomeu Dias y Vasco de Gama establecieron las técnicas cartográficas y de navegación que luego adoptaron todas las potencias europeas.' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'Brasil es el legado más duradero de Portugal en el mundo: la independencia de 1822 con Pedro I crea el mayor país lusófono, y la influencia portuguesa en Brasil va desde el idioma hasta las instituciones jurídicas y la cultura colonial.' },
+    { url: '/visualizador-historia/espana-austrias/', icon: '⚜️', name: 'La España de los Austrias', description: 'Portugal y España vivieron juntos bajo la Unión Ibérica (1580-1640): Felipe II heredó Portugal tras la derrota de Alcazarquivir, uniendo las dos mayores potencias coloniales del mundo durante 60 años que marcaron la historia de ambos imperios.' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

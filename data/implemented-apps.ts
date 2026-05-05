@@ -924,6 +924,9 @@ export const implementedAppsUrls = [
   "/guia-razas-perros/",                           // Directorio 40 razas de perros: tamaño, energía, temperamento, mantenimiento y compatibilidad
   "/guia-razas-gatos/",                            // Directorio 35 razas de gatos: pelo, energía, temperamento y compatibilidad con niños/perros
   "/guia-insectos-jardin/",                        // Directorio 35 insectos del jardín: rol, identificación y qué hacer con cada uno
+  "/visualizador-historia/historia-austria-hungria/",   // Imperio Austro-Húngaro: del Congreso de Viena (1815) al derrumbe de 1918
+  "/visualizador-historia/historia-islam-clasico/",     // Islam Clásico: de Mahoma (622) a la caída de Bagdad (1258)
+  "/visualizador-historia/historia-portugal-ultramar/", // Portugal y el Ultramar: del Infante Enrique (1415) a la independencia de Brasil (1822)
 ];
 
 /**
