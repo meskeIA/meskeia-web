@@ -4287,6 +4287,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-economia-mundial/', icon: '📊', name: 'Historia de la Economía Mundial', description: 'La soberanía alimentaria y los precios agrícolas son variables macroeconómicas clave: los alimentos representan el 10% del PIB global y las crisis de precios agrícolas de 1973 y 2008 desencadenaron crisis políticas en todo el mundo.' },
   ],
 
+  // EJE C: Educación, Ocio y Turismo — Roadmap v12 (2026-05-05)
+  'visualizador-historia-historia-educacion': [
+    { url: '/visualizador-historia/historia-pensamiento-politico/', icon: '📜', name: 'Historia del Pensamiento Político', description: 'Educación y filosofía política son inseparables: Platón fundó la Academia para crear gobernantes filósofos; Rousseau y los ilustrados hicieron de la educación universal la base de la ciudadanía democrática; Dewey convirtió la escuela en el laboratorio de la democracia.' },
+    { url: '/visualizador-historia/historia-constituciones/', icon: '⚖️', name: 'Historia de las Constituciones y la Democracia', description: 'La educación pública es una conquista constitucional del siglo XIX y XX: el derecho a la educación aparece en las constituciones liberales y se consolida en la DUDH de 1948 y los pactos internacionales de derechos económicos, sociales y culturales.' },
+    { url: '/visualizador-historia/historia-islam-clasico/', icon: '🌙', name: 'El Islam Clásico', description: 'Las madrasas islámicas del siglo IX y la Casa de la Sabiduría de Bagdad preservaron y transmitieron el saber clásico greco-romano durante la Edad Media: la universidad europea debe mucho a este modelo educativo islámico.' },
+    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet transformó la educación más que cualquier tecnología anterior: los MOOCs de Coursera (2012), Khan Academy, Wikipedia y ahora la IA generativa replantean qué es aprender, quién puede hacerlo y cuánto cuesta.' },
+  ],
+  'visualizador-historia-historia-ocio': [
+    { url: '/visualizador-historia/historia-trabajo/', icon: '🔨', name: 'Historia del Trabajo', description: 'El ocio moderno nació como conquista del movimiento obrero: las vacaciones pagadas (Francia 1936), la jornada de 8 horas y el fin de semana son derechos laborales que crearon el tiempo libre para las clases trabajadoras por primera vez en la historia.' },
+    { url: '/visualizador-historia/historia-turismo/', icon: '✈️', name: 'Historia del Turismo', description: 'El turismo es la institucionalización del ocio: el Grand Tour aristocrático (siglo XVII), el turismo de Thomas Cook (1841) y el turismo de masas de posguerra son etapas del mismo proceso de convertir el viaje en ocio organizado.' },
+    { url: '/visualizador-historia/historia-musica-popular/', icon: '🎵', name: 'Historia de la Música Popular', description: 'La música popular es el contenido central del ocio del siglo XX: el jazz, el rock, el pop y el hip-hop son géneros que nacieron para el entretenimiento masivo y definen épocas enteras de la historia cultural.' },
+    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet reinventó el ocio: YouTube, Netflix, Spotify, los videojuegos online y TikTok son formas de entretenimiento que no existían hace 30 años y que hoy ocupan más tiempo de ocio que la televisión o el cine.' },
+  ],
+  'visualizador-historia-historia-turismo': [
+    { url: '/visualizador-historia/historia-ocio/', icon: '🎭', name: 'Historia del Ocio', description: 'El turismo es el ocio aplicado al viaje: la democratización del tiempo libre en el siglo XX es la misma fuerza que convirtió el viaje de privilegio aristocrático en fenómeno de masas con 1.400 millones de turistas internacionales al año.' },
+    { url: '/visualizador-historia/historia-trabajo/', icon: '🔨', name: 'Historia del Trabajo', description: 'El turismo de masas fue posible gracias a las vacaciones pagadas: sin el Frente Popular francés (1936) y las leyes laborales del siglo XX, los trabajadores no habrían tenido ni el tiempo ni el dinero para convertirse en turistas.' },
+    { url: '/visualizador-historia/exploracion/', icon: '🧭', name: 'La Era de las Exploraciones', description: 'El Grand Tour del siglo XVII hereda el espíritu explorador de los viajeros renacentistas: el viaje como formación, como curiosidad y como experiencia transformadora es una continuación secularizada de la era de los descubrimientos geográficos.' },
+    { url: '/visualizador-historia/historia-capitalismo/', icon: '📈', name: 'Historia del Capitalismo', description: 'El turismo es la mayor industria de servicios del capitalismo global: Airbnb, Booking, los fondos de inversión hoteleros y el overtourism son capítulos del capitalismo financiero aplicados al deseo humano de viajar.' },
+  ],
+
   // Apps de referencia específica (2026-05-03)
   'aditivos-e-alimentarios': [
     { url: '/guia-especias/', icon: '🌿', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias. El complemento natural a la lectura de etiquetas.' },

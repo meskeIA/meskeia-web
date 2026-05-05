@@ -1,0 +1,365 @@
+import type { HistoriaData } from './types';
+
+export const historiaOcio: HistoriaData = {
+  slug: 'historia-ocio',
+  titulo: 'Historia del Ocio: Del Circo Romano al Streaming Global',
+  subtitulo: 'Dos mil ochocientos años de juego, espectáculo y diversión: cómo la humanidad ha llenado su tiempo libre',
+  descripcionSEO: 'Cronología interactiva de la historia del ocio: de los Juegos Olímpicos griegos (776 a.C.) al streaming global (2020). Gladiadores, teatro shakespeariano, cine, televisión, videojuegos y redes sociales en 10 hitos y 6 eras que narran cómo la humanidad ha disfrutado su tiempo libre a lo largo de la historia.',
+  keywords: [
+    'historia del ocio cronología',
+    'juegos olímpicos griegos circo romano gladiadores',
+    'teatro shakespeare globe theatre entretenimiento',
+    'cine lumières hollywood entretenimiento masas',
+    'televisión cultura pop videojuegos internet',
+    'streaming netflix tiktok ocio digital redes sociales',
+  ],
+  anioInicio: -776,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'olimpiadas-grecia',
+      nombre: 'Juegos Olímpicos y Ocio en la Antigüedad',
+      anioInicio: -776,
+      anioFin: -146,
+      color: '#1E90FF',
+      categoria: 'clasico',
+      descripcion: 'Los Juegos Olímpicos griegos (776 a.C.) son el primer evento de ocio organizado a escala supranacional: atletas de toda la Hélade compiten cada cuatro años en honor a Zeus, y se firma una tregua sagrada durante su celebración. El teatro griego (Esquilo, Sófocles, Aristófanes) es la primera industria del entretenimiento: el Estado subvenciona las entradas para que el ciudadano pobre pueda asistir. Los simposios, la música, los juegos de mesa (pessoi, kubeia) y los concursos de poesía estructuran el tiempo libre aristocrático. El ocio griego es también formación ciudadana.',
+      obraIconica: 'Juegos Olímpicos griegos (776 a.C.): el primer evento de ocio internacional de la historia',
+      paises: ['Grecia', 'Atenas', 'Olimpia'],
+    },
+    {
+      id: 'circo-romano',
+      nombre: 'Circo Romano y Gladiadores',
+      anioInicio: -264,
+      anioFin: 476,
+      color: '#1E90FF',
+      categoria: 'clasico',
+      descripcion: 'El Circo Máximo (250.000 espectadores) y el Coliseo (50.000-80.000) son las mayores infraestructuras de ocio del mundo antiguo. Las luchas de gladiadores, las carreras de cuadrigas, los combates de fieras y los naumachiae (batallas navales simuladas en el Coliseo inundado) son el entretenimiento de masas del Imperio Romano. El pan y circo (panem et circenses, Juvenal): el Estado financia espectáculos gratuitos para la plebe urbana como instrumento político. Los ludi (juegos públicos) suman más de 100 días festivos al año en el calendario romano del siglo IV d.C.',
+      obraIconica: 'El Coliseo (80 d.C.) y los ludi romanos: el entretenimiento de masas del Imperio Romano',
+      paises: ['Roma', 'Imperio Romano', 'Mediterráneo'],
+    },
+    {
+      id: 'ocio-medieval',
+      nombre: 'Ocio Medieval: Fiestas, Torneos y Carnavales',
+      anioInicio: 476,
+      anioFin: 1576,
+      color: '#8B0000',
+      categoria: 'medieval',
+      descripcion: 'El calendario medieval estructura el ocio en torno a las fiestas religiosas: Navidad, Carnaval, Corpus Christi y más de 100 días festivos al año. Los torneos caballerescos (siglo XI en adelante) son el espectáculo aristocrático por excelencia: combates ritualizados que mezclan ocio, entrenamiento militar y exhibición social. Los juglares, trovadores y ministriles llevan el entretenimiento a plazas y castillos. El Carnaval invierte jerárquicamente el orden social: los pobres se disfrazan de nobles. Los juegos de mesa (ajedrez, tablas reales) y los dados son el ocio cotidiano de todas las clases sociales.',
+      obraIconica: 'El Carnaval medieval y los torneos caballerescos: el ocio como ritual social e inversión del orden',
+      paises: ['Europa Medieval', 'Francia', 'Castilla', 'Italia'],
+    },
+    {
+      id: 'teatro-isabelino',
+      nombre: 'Teatro Isabelino y Ocio Renacentista',
+      anioInicio: 1576,
+      anioFin: 1700,
+      color: '#228B22',
+      categoria: 'moderno',
+      descripcion: 'El Globe Theatre de Londres (1599) es la primera sala de entretenimiento popular moderna: Shakespeare escribe para 3.000 espectadores de todas las clases sociales. El teatro del Siglo de Oro español (Lope de Vega, Calderón) y la Commedia dell\'arte italiana crean las primeras industrias teatrales comerciales. Los salones aristocráticos parisinos son centros de ocio intelectual. La imprenta genera el primer mercado editorial: novelas de caballería, picarescas, poesía popular. El ocio renacentista se seculariza: ya no gira exclusivamente en torno a la Iglesia.',
+      obraIconica: 'Globe Theatre de Shakespeare (1599): primer teatro comercial popular, 3.000 espectadores de todas las clases sociales',
+      paises: ['Inglaterra', 'España', 'Italia', 'Francia'],
+    },
+    {
+      id: 'cafes-ilustracion',
+      nombre: 'Salones, Cafés y Ocio Ilustrado',
+      anioInicio: 1650,
+      anioFin: 1836,
+      color: '#228B22',
+      categoria: 'moderno',
+      descripcion: 'Los cafés londinenses (1652) y los salones parisinos (siglo XVIII) son los espacios de ocio intelectual y sociabilidad burguesa: se leen periódicos, se debate de política y filosofía, se hacen negocios. Los cafés son el origen de las bolsas de valores (Lloyd\'s of London nació en un café). La ópera (Monteverdi, 1607) y el ballet se convierten en ocio de élite aristocrática. Los parques públicos y los jardines de placer (Vauxhall Gardens, Londres, 1661) ofrecen entretenimiento masivo. El ocio burgués ilustrado distingue el tiempo de trabajo del tiempo libre como esferas separadas.',
+      obraIconica: 'Los cafés londinenses (1652) y los salones ilustrados: nacimiento del debate público y la sociabilidad burguesa',
+      paises: ['Inglaterra', 'Francia', 'Europa Occidental'],
+    },
+    {
+      id: 'vacaciones-obreras',
+      nombre: 'Vacaciones Obreras y Ocio Industrial',
+      anioInicio: 1836,
+      anioFin: 1895,
+      color: '#DC143C',
+      categoria: 'industrial',
+      descripcion: 'El ferrocarril (desde 1830) permite los primeros desplazamientos turísticos de la clase media. Thomas Cook organiza el primer viaje de grupo en tren (1841). Las reducciones de la jornada laboral (primero sábados libres, luego fines de semana) crean el tiempo libre obrero. Los parques públicos urbanos (Central Park, 1858) democratizan el acceso al verde. Las vacaciones pagadas son todavía un privilegio de funcionarios y empleados de comercio. El music hall inglés y el café-concert francés son los primeros espectáculos de entretenimiento populares con precio de entrada bajo para el público obrero.',
+      obraIconica: 'Primer viaje organizado de Thomas Cook en tren (1841) y Central Park (1858): democratización del ocio urbano',
+      paises: ['Reino Unido', 'Estados Unidos', 'Francia', 'Europa Industrial'],
+    },
+    {
+      id: 'cine-masas',
+      nombre: 'Cine y el Nacimiento del Entretenimiento de Masas',
+      anioInicio: 1895,
+      anioFin: 1950,
+      color: '#FF8C00',
+      categoria: 'masas',
+      descripcion: 'Los hermanos Lumière proyectan la primera película (1895). El cine mudo crea las primeras estrellas globales: Chaplin, Keaton, Valentino. Hollywood se convierte en la fábrica de sueños mundial (1920s). El cine sonoro (El cantante de jazz, 1927) y el color (El mago de Oz, 1939) perfeccionan el medio. Las vacaciones pagadas se generalizan en Francia (Frente Popular, 1936) y crean el primer turismo de masas. La radio (1920s) lleva el entretenimiento al hogar. El cine es el primer medio de masas verdaderamente global: Hollywood exporta el American way of life al mundo entero.',
+      obraIconica: 'Los Lumière (1895) y Hollywood (1920s): el cine como primera industria global del entretenimiento de masas',
+      paises: ['Francia', 'Estados Unidos', 'Global'],
+    },
+    {
+      id: 'television-era-dorada',
+      nombre: 'Televisión y la Era Dorada del Entretenimiento',
+      anioInicio: 1950,
+      anioFin: 1980,
+      color: '#FF8C00',
+      categoria: 'masas',
+      descripcion: 'La televisión entra en los hogares occidentales en los años 50: en 1960, el 90% de los hogares estadounidenses tiene TV. La coronación de Isabel II (1953) y el debate Kennedy-Nixon (1960) muestran el poder político del nuevo medio. Las retransmisiones deportivas (Mundial de fútbol 1966 en color) crean audiencias de cientos de millones. El ocio se privatiza: la familia en el salón frente al televisor reemplaza al cine, el bar y la plaza. El rock\'n\'roll, los festivales (Woodstock 1969) y la cultura pop crean por primera vez una cultura juvenil global diferenciada de la adulta.',
+      obraIconica: 'Televisión en el hogar (1950s) y Woodstock (1969): privatización del ocio y nacimiento de la cultura juvenil global',
+      paises: ['Estados Unidos', 'Europa Occidental', 'Global'],
+    },
+    {
+      id: 'videojuegos-internet',
+      nombre: 'Videojuegos e Internet: El Ocio Digital',
+      anioInicio: 1972,
+      anioFin: 2007,
+      color: '#20B2AA',
+      categoria: 'digital',
+      descripcion: 'Pong (1972) inaugura la era de los videojuegos. Los arcades, el Atari 2600, el Nintendo NES y el Game Boy crean generaciones de jugadores. Sony PlayStation (1994) y Microsoft Xbox (2001) convierten los videojuegos en el sector de entretenimiento más grande del mundo, superando al cine en ingresos. Internet (años 90) y los primeros foros, chats y juegos online crean nuevas formas de sociabilidad virtual. Los MP3 y el iPod (2001) transforman el consumo musical. YouTube (2005) democratiza la creación de contenido: cualquiera puede ser creador de entretenimiento.',
+      obraIconica: 'PlayStation (1994) y YouTube (2005): los videojuegos superan al cine y cualquiera puede crear entretenimiento',
+      paises: ['Estados Unidos', 'Japón', 'Global', 'Internet'],
+    },
+    {
+      id: 'streaming-redes',
+      nombre: 'Streaming, Redes Sociales y Ocio Inmersivo',
+      anioInicio: 2007,
+      anioFin: 2020,
+      color: '#20B2AA',
+      categoria: 'digital',
+      descripcion: 'Netflix (streaming de vídeo, 2007), Spotify (música en streaming, 2008) y las redes sociales (Facebook 2004, Instagram 2010, TikTok 2016) transforman radicalmente el ocio: contenido ilimitado, personalizado y disponible en cualquier momento y lugar. El tiempo de pantalla supera las 7 horas diarias por persona en países desarrollados. Los eSports (competiciones de videojuegos) llenan estadios de 40.000 personas y tienen audiencias de millones. Los creadores de contenido de YouTube y Twitch son las nuevas estrellas. La pandemia de 2020 digitaliza también el último reducto del ocio presencial: la sala de cine, el teatro y los conciertos.',
+      obraIconica: 'Netflix (2007) y TikTok (2016): el entretenimiento personalizado infinito que redefine el tiempo libre',
+      paises: ['Estados Unidos', 'China', 'Global', 'Internet'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Antigüedad Clásica',
+      desde: -776,
+      hasta: 476,
+      icono: '🏟️',
+      hitosDestacados: ['Juegos Olímpicos y Ocio en la Antigüedad', 'Circo Romano y Gladiadores'],
+      eventos: [
+        'Primeros Juegos Olímpicos en Olimpia con tregua sagrada entre ciudades griegas (776 a.C.)',
+        'El teatro de Atenas: el Estado paga las entradas para que los pobres puedan asistir (siglo V a.C.)',
+        'Inauguración del Circo Máximo de Roma con capacidad para 250.000 espectadores (siglo III a.C.)',
+        'Inauguración del Coliseo: 50.000 espectadores y 100 días de ludi gratuitos al año (80 d.C.)',
+        'Juvenal acuña "panem et circenses": el entretenimiento como instrumento de control político (siglo II d.C.)',
+      ],
+    },
+    {
+      nombre: 'Ocio Medieval',
+      desde: 476,
+      hasta: 1576,
+      icono: '🎭',
+      hitosDestacados: ['Ocio Medieval: Fiestas, Torneos y Carnavales'],
+      eventos: [
+        'Los torneos caballerescos se convierten en espectáculo aristocrático a partir del siglo XI',
+        'El Carnaval medieval como inversión ritual del orden social: pobres disfrazados de nobles',
+        'Los juglares y trovadores llevan el entretenimiento a plazas, castillos y ferias',
+        'El ajedrez, llegado de Persia vía el Islam, conquista todas las clases sociales europeas (siglo X)',
+      ],
+    },
+    {
+      nombre: 'Modernidad Temprana',
+      desde: 1576,
+      hasta: 1836,
+      icono: '🎪',
+      hitosDestacados: ['Teatro Isabelino y Ocio Renacentista', 'Salones, Cafés y Ocio Ilustrado'],
+      eventos: [
+        'El Globe Theatre de Shakespeare abre en Londres: 3.000 espectadores de todas las clases (1599)',
+        'Primer café londinense en Oxford: nace el espacio de debate público (1652)',
+        'Vauxhall Gardens de Londres: primer parque de atracciones pagado y abierto a todas las clases (1661)',
+        'La ópera y el ballet se establecen como entretenimiento aristocrático en toda Europa (siglo XVII)',
+        'Los salones ilustrados parisinos: el debate filosófico como forma de ocio burgués (siglo XVIII)',
+      ],
+    },
+    {
+      nombre: 'Ocio Industrial y de Masas',
+      desde: 1836,
+      hasta: 1950,
+      icono: '🎬',
+      hitosDestacados: ['Vacaciones Obreras y Ocio Industrial', 'Cine y el Nacimiento del Entretenimiento de Masas'],
+      eventos: [
+        'Thomas Cook organiza el primer viaje de grupo en tren entre Leicester y Loughborough (1841)',
+        'Central Park de Nueva York: primer gran parque público urbano diseñado para el ocio masivo (1858)',
+        'Los hermanos Lumière proyectan la primera película pública en el Grand Café de París (1895)',
+        'Hollywood se convierte en la capital mundial del entretenimiento (años 1920)',
+        'El Frente Popular francés consigue las primeras vacaciones pagadas para todos los trabajadores (1936)',
+      ],
+    },
+    {
+      nombre: 'Televisión y Cultura Pop',
+      desde: 1950,
+      hasta: 2007,
+      icono: '📺',
+      hitosDestacados: ['Televisión y la Era Dorada del Entretenimiento', 'Videojuegos e Internet: El Ocio Digital'],
+      eventos: [
+        'La televisión entra masivamente en los hogares: el 90% de los hogares estadounidenses tiene TV en 1960',
+        'Woodstock: 400.000 personas durante 3 días marcan el nacimiento de la cultura juvenil global (1969)',
+        'Pong de Atari inaugura la industria global de los videojuegos (1972)',
+        'Sony PlayStation convierte los videojuegos en el mayor sector de entretenimiento del mundo (1994)',
+        'YouTube democratiza la creación de contenido: cualquiera puede publicar vídeos para audiencias globales (2005)',
+      ],
+    },
+    {
+      nombre: 'Ocio Digital Global',
+      desde: 2007,
+      hasta: 2020,
+      icono: '📱',
+      hitosDestacados: ['Streaming, Redes Sociales y Ocio Inmersivo'],
+      eventos: [
+        'Netflix lanza el streaming de vídeo bajo demanda: fin del horario fijo de televisión (2007)',
+        'El smartphone convierte cada momento de espera en tiempo de ocio digital (iPhone 2007, Android 2008)',
+        'Los eSports llenan estadios y superen en audiencia a las ligas deportivas tradicionales (años 2010)',
+        'TikTok alcanza 1.000 millones de usuarios: el vídeo corto como formato dominante del ocio (2020)',
+      ],
+    },
+  ],
+
+  categorias: {
+    clasico: 'Ocio Clásico',
+    medieval: 'Ocio Medieval',
+    moderno: 'Modernidad',
+    industrial: 'Era Industrial',
+    masas: 'Entretenimiento de Masas',
+    digital: 'Ocio Digital',
+  },
+
+  colores: {
+    clasico: '#1E90FF',
+    medieval: '#8B0000',
+    moderno: '#228B22',
+    industrial: '#DC143C',
+    masas: '#FF8C00',
+    digital: '#20B2AA',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El ocio no es un lujo moderno: desde los Juegos Olímpicos griegos hasta TikTok, el ser humano siempre ha encontrado formas de jugar, espectarse y descansar. La historia del entretenimiento refleja cómo cada sociedad organiza su tiempo libre, quién tiene acceso a él y qué valores proyecta en sus diversiones. El salto más radical no fue el cine ni la televisión, sino la Revolución Industrial: al separar el tiempo de trabajo del tiempo libre, creó por primera vez el concepto moderno de ocio como esfera autónoma de la vida. Hoy, con el smartphone en el bolsillo, el ocio ha dejado de tener horarios, lugares o incluso límites claros.',
+
+    tablaComparativa: [
+      { hito: 'Juegos Olímpicos griegos', periodo: '776-146 a.C.', categoria: 'Ocio Clásico', personaje: 'Atletas de la Hélade', aportacion: 'Primer evento de ocio organizado a escala supranacional; tregua sagrada y teatro subvencionado por el Estado' },
+      { hito: 'Circo Romano y Gladiadores', periodo: '264 a.C.-476 d.C.', categoria: 'Ocio Clásico', personaje: 'Emperadores y gladiadores', aportacion: 'Panem et circenses: espectáculo gratuito masivo como instrumento político; Coliseo con 80.000 espectadores' },
+      { hito: 'Teatro Isabelino', periodo: '1576-1700', categoria: 'Modernidad', personaje: 'William Shakespeare', aportacion: 'Globe Theatre: primer teatro comercial popular con 3.000 espectadores de todas las clases sociales' },
+      { hito: 'Cine de los Lumière', periodo: '1895-1950', categoria: 'Entretenimiento de Masas', personaje: 'Hermanos Lumière / Hollywood', aportacion: 'Primera industria global del entretenimiento; exportación del American way of life al mundo entero' },
+      { hito: 'Televisión en el hogar', periodo: '1950-2007', categoria: 'Entretenimiento de Masas', personaje: 'RCA / BBC / grandes cadenas', aportacion: 'Privatización del ocio: el hogar sustituye a la plaza; audiencias de cientos de millones simultáneas' },
+      { hito: 'Streaming y redes sociales', periodo: '2007-2020', categoria: 'Ocio Digital', personaje: 'Netflix / TikTok / YouTube', aportacion: 'Ocio personalizado e ilimitado; fin del horario fijo; cualquiera puede ser creador de entretenimiento global' },
+    ],
+
+    escenarios: [
+      {
+        icono: '🎓',
+        titulo: 'Historiador cultural',
+        perfil: 'Investigador o estudiante de humanidades',
+        texto: 'Esta cronología ofrece un marco comparativo para analizar cómo cada período histórico ha organizado su tiempo libre: quién tenía acceso al ocio, cómo el Estado lo financiaba o controlaba, y qué función social cumplían los espectáculos. Especialmente útil para trabajos sobre historia social, cultura de masas o economía del entretenimiento.',
+      },
+      {
+        icono: '🎮',
+        titulo: 'Diseñador de entretenimiento',
+        perfil: 'Profesional de la industria creativa y digital',
+        texto: 'Entender la evolución histórica del ocio permite identificar patrones: cada nueva tecnología (imprenta, radio, cine, TV, internet, streaming) ha democratizado el acceso al entretenimiento y ha cambiado quién puede ser "creador". El diseñador actual hereda 2.800 años de innovación en cómo captar y mantener la atención humana.',
+      },
+      {
+        icono: '📊',
+        titulo: 'Sociólogo del tiempo libre',
+        perfil: 'Investigador de comportamiento social y consumo',
+        texto: 'La historia del ocio es la historia de cómo las sociedades han organizado la tensión entre trabajo y descanso. La jornada de 8 horas, las vacaciones pagadas, el fin de semana: cada logro laboral ha redefinido qué es "tiempo libre". Hoy el smartphone ha borrado esa frontera y el ocio ha colonizado todos los intersticios del día.',
+      },
+      {
+        icono: '🍿',
+        titulo: 'Consumidor curioso',
+        perfil: 'Cualquier persona interesada en la cultura popular',
+        texto: 'Si te preguntas por qué Netflix funciona con suscripción mensual y no por función como el cine, o por qué los videojuegos han superado al cine en ingresos, la respuesta está en los patrones históricos del ocio. Esta cronología conecta el Coliseo romano con TikTok a través de 2.800 años de innovación en entretenimiento de masas.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Cuándo nació el concepto moderno de "vacaciones"?',
+        respuesta: 'Las vacaciones pagadas para todos los trabajadores son una conquista del siglo XX. En España y Francia llegaron con los Frentes Populares de los años 30 (Francia 1936). Antes, el "tiempo libre" existía en forma de fiestas religiosas y domingos, pero no como derecho laboral universal. El turismo de masas moderno —costa mediterránea, paquetes de vuelo+hotel— nació en los años 60 con la aviación comercial asequible y las pagas extras.',
+        tip: 'Thomas Cook organizó el primer viaje turístico en tren en 1841, pero su clientela era exclusivamente clase media y alta.',
+      },
+      {
+        pregunta: '¿Por qué los videojuegos superaron al cine en ingresos?',
+        respuesta: 'Los videojuegos son ocio activo e interactivo frente al ocio pasivo del cine, lo que genera mayor tiempo de uso y mayor gasto por usuario. Además, los modelos de negocio evolucionaron: de la venta única a los juegos "free-to-play" con compras integradas (skins, pases de batalla). En 2020, la industria global de videojuegos facturó 155.000 millones de dólares, tres veces más que el cine.',
+        tip: 'Fortnite generó 2.400 millones de dólares en 2018 siendo completamente gratuito de descargar.',
+      },
+      {
+        pregunta: '¿El "pan y circo" romano realmente funcionaba como control político?',
+        respuesta: 'Parcialmente. Los ludi gratuitos eran herramientas reales de legitimación política: el emperador ganaba popularidad distribuyendo espectáculos y trigo. Pero Juvenal, que acuñó la frase, la usaba de forma crítica y sarcástica: lamentaba que los romanos solo se preocuparan por el estómago y el entretenimiento, olvidando la participación cívica republicana. El paralelo con la televisión y las redes sociales es frecuente en la reflexión contemporánea.',
+        tip: 'El Coliseo podía llenarse y vaciarse completamente en 10 minutos gracias a sus 80 salidas diseñadas por los ingenieros romanos.',
+      },
+      {
+        pregunta: '¿Cuándo surgió la idea de que el ocio es un "derecho"?',
+        respuesta: 'La Declaración Universal de Derechos Humanos (1948) reconoce en su artículo 24 el derecho al descanso y al ocio, incluyendo vacaciones pagadas. Pero la lucha por el tiempo libre fue anterior: el movimiento obrero del siglo XIX reivindicó la jornada de 8 horas con el lema "ocho horas de trabajo, ocho de descanso, ocho de ocio". En España, la jornada de 8 horas se legalizó en 1919.',
+        tip: 'El sábado como día libre es una conquista de los años 20 y 30 del siglo XX en la mayoría de los países occidentales.',
+      },
+      {
+        pregunta: '¿El ocio digital ha sustituido completamente al ocio presencial?',
+        respuesta: 'No completamente, aunque la tendencia es intensa. El tiempo de pantalla supera las 7 horas diarias en muchos países, pero el ocio presencial —conciertos, festivales, deportes en directo, restauración— ha crecido al mismo tiempo que el digital, especialmente entre jóvenes. La pandemia de 2020 aceleró la digitalización forzada, pero también generó una "revancha del ocio presencial" desde 2022, con récords de asistencia a conciertos y festivales.',
+        tip: 'Taylor Swift generó en 2023 más impacto económico con su gira de conciertos que muchas industrias regionales: el "efecto Eras Tour".',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa los grandes saltos tecnológicos en la Línea del Tiempo',
+        cuerpo: 'Identifica los momentos en que una tecnología nueva redefine el ocio: el ferrocarril (1840s), el cine (1895), la televisión (1950s), el videojuego (1972), internet (1990s) y el smartphone (2007). Fíjate en que cada salto tecnológico acorta el tiempo hasta el siguiente: los cambios se aceleran.',
+      },
+      {
+        titulo: 'Compara quién tenía acceso al ocio en cada época',
+        cuerpo: 'Haz clic en los hitos de la Antigüedad y compáralos con los de la Era Industrial. En Roma el espectáculo era gratuito para todos (panem et circenses). En la modernidad temprana, el teatro o la ópera eran de pago y estratificados por clase. El cine y la televisión los democratizaron. El streaming actual es el primer ocio verdaderamente sin barreras de precio de acceso.',
+      },
+      {
+        titulo: 'Usa la tabla Comparativa para ver la evolución del "creador"',
+        cuerpo: 'En la tabla Comparativa, observa la columna "Personaje" de cada era: gladiadores contratados, compañías teatrales, estudios de Hollywood, grandes cadenas de TV... hasta llegar a YouTube y TikTok, donde el "personaje" es cualquier usuario. La historia del ocio es también la historia de quién puede crear entretenimiento.',
+      },
+      {
+        titulo: 'Explora el Contexto Histórico para ver las eras completas',
+        cuerpo: 'Las 6 eras agrupan los hitos en períodos coherentes. La era "Ocio Industrial y de Masas" (1836-1950) es especialmente densa: en solo 115 años nacen el turismo, el cine, la radio, las vacaciones pagadas y el primer turismo de masas. Identifica cuántos cambios se comprimieron en ese período.',
+      },
+      {
+        titulo: 'Reflexiona sobre el ocio hoy a partir de la cronología',
+        cuerpo: 'Después de recorrer los 2.800 años, pregúntate: ¿en qué se parece el Coliseo romano a Netflix? ¿En qué se diferencia Woodstock de un festival de streaming? La historia del ocio es el mejor espejo para entender por qué consumimos entretenimiento como lo hacemos hoy.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '🏟️',
+        texto: 'El Coliseo romano podía vaciarse completamente en 10 minutos gracias a sus 80 salidas diseñadas por ingenieros romanos. Los arquitectos modernos de estadios siguen usando el mismo principio de "vomitorios" para la evacuación rápida de espectadores.',
+      },
+      {
+        icono: '☕',
+        texto: 'Lloyd\'s of London, el mayor mercado de seguros del mundo, nació en un café de la City londinense en 1688. Los cafés del siglo XVII eran los "coworkings" e "incubadoras" de su época: en ellos nacieron bolsas, periódicos, partidos políticos y empresas de todo tipo.',
+      },
+      {
+        icono: '🎮',
+        texto: 'La industria global de videojuegos (155.000 millones de dólares en 2020) es ya mayor que el cine y la música juntos. Y Fortnite, uno de los juegos más rentables de la historia, es completamente gratuito de descargar: ganó 2.400 millones de dólares solo con skins y accesorios cosméticos.',
+      },
+      {
+        icono: '📺',
+        texto: 'El debate televisado entre Kennedy y Nixon (1960) es el primer caso documentado en que un medio de comunicación cambia el resultado de una elección: quienes lo escucharon en radio creyeron que Nixon había ganado; quienes lo vieron en TV creyeron que había ganado Kennedy. La imagen venció al argumento.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que el ocio es un invento moderno',
+        cuerpo: 'Las sociedades preindustriales tenían más días festivos que las industriales: el calendario romano del siglo IV contaba más de 100 días de ludi oficiales; el medieval sumaba domingos y fiestas religiosas hasta superar los 120 días sin trabajo. La Revolución Industrial redujo el tiempo libre al implantar la jornada diaria de 12-16 horas. Recuperar el ocio fue una conquista obrera del siglo XIX y XX, no una herencia de tiempos anteriores.',
+      },
+      {
+        titulo: 'Pensar que el cine "mató" al teatro',
+        cuerpo: 'Cada nuevo medio de ocio ha convivido con los anteriores, transformándolos pero no eliminándolos. El cine no acabó con el teatro; la televisión no acabó con el cine; internet no acabó con la televisión. Todos coexisten. Lo que cambia es la cuota de atención y el modelo de negocio. El teatro sigue siendo un formato vivo y en muchos casos más rentable por espectador que el cine.',
+      },
+      {
+        titulo: 'Confundir "tiempo libre" con "ocio de calidad"',
+        cuerpo: 'El concepto de "ocio" como actividad libre, voluntaria y con valor en sí misma (no solo recuperación para el trabajo) es relativamente reciente. Los griegos distinguían entre scholē (ocio reflexivo, origen de "escuela") y ascholia (no-ocio, ocupación). La sociología del ocio moderna, desde Joffre Dumazedier (1962), distingue ocio como descanso, diversión y desarrollo personal: tres funciones que no siempre coinciden en una misma actividad.',
+      },
+      {
+        titulo: 'Asumir que el ocio digital sustituye al presencial',
+        cuerpo: 'Los datos no confirman que el ocio digital haya sustituido al presencial: la asistencia a conciertos, festivales y eventos deportivos alcanzó máximos históricos en 2023-2024. Lo que ha ocurrido es una expansión del tiempo total dedicado al ocio gracias a los intersticios del día (transporte, esperas) capturados por el smartphone. El ocio presencial y el digital crecen en paralelo, con el presencial volviéndose más "experiencial" y premium.',
+      },
+    ],
+  },
+};

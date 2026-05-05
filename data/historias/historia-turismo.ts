@@ -1,0 +1,365 @@
+import type { HistoriaData } from './types';
+
+export const historiaTurismo: HistoriaData = {
+  slug: 'historia-turismo',
+  titulo: 'Historia del Turismo: Del Grand Tour al Turismo Sostenible',
+  subtitulo: 'Tres siglos y medio de viajes, destinos y experiencias: cómo el turismo se convirtió en la mayor industria del mundo',
+  descripcionSEO: 'Cronología interactiva de la historia del turismo: del Grand Tour aristocrático (1670) a la pandemia y el turismo sostenible (2020). Thomas Cook, Orient Express, turismo de masas mediterráneo, Club Med, Lonely Planet, Airbnb y el overtourism en 10 hitos y 6 eras.',
+  keywords: [
+    'historia del turismo cronología',
+    'grand tour aristocrático thomas cook agencias viaje',
+    'orient express belle époque turismo lujo',
+    'turismo de masas mediterráneo vuelos charter',
+    'club med all-inclusive mochileros lonely planet',
+    'airbnb overtourism turismo sostenible pandemia',
+  ],
+  anioInicio: 1670,
+  anioFin: 2020,
+
+  hitos: [
+    {
+      id: 'grand-tour',
+      nombre: 'El Grand Tour Europeo',
+      anioInicio: 1670,
+      anioFin: 1815,
+      color: '#8B4513',
+      categoria: 'elitista',
+      descripcion: 'El Grand Tour (siglos XVII-XVIII) es el primer turismo moderno: jóvenes aristócratas ingleses recorren Francia, Italia (Roma, Florencia, Venecia, Nápoles) y a veces Grecia como parte de su formación. El viaje dura de 1 a 3 años y puede incluir un séquito de tutores, criados y médicos. Giovanni Piranesi y los paisajistas crean el mercado del souvenir artístico. El Grand Tour crea el concepto de "destinos turísticos" y el valor cultural del viaje. Con la Revolución Francesa y las guerras napoleónicas (1789-1815) el Grand Tour se interrumpe y se democratiza hacia las clases medias altas.',
+      obraIconica: 'El Grand Tour (siglos XVII-XVIII): el primer turismo moderno como rito de formación aristocrática',
+      paises: ['Reino Unido', 'Francia', 'Italia', 'Suiza', 'Europa'],
+    },
+    {
+      id: 'termalismo-balnearios',
+      nombre: 'Termalismo y Balnearios Aristocráticos',
+      anioInicio: 1750,
+      anioFin: 1870,
+      color: '#8B4513',
+      categoria: 'elitista',
+      descripcion: 'Bath (Inglaterra), Baden-Baden (Alemania) y Vichy (Francia) son los destinos termales de la aristocracia y la alta burguesía: el agua termal como medicina, pero también como espacio de sociabilidad, matrimonios y política. La reina Victoria populariza los baños de mar en Brighton; las clases medias la imitan en cascada. Los casinos de Baden-Baden y Monte Carlo fusionan turismo, lujo y juego. El termalismo inventa el concepto de "destino de salud" y el hotel moderno como establecimiento completo (habitación, restaurante, spa, actividades). Los Alpes suizos se convierten en destino de veraneo para las élites europeas.',
+      obraIconica: 'Bath y Baden-Baden (siglo XVIII-XIX): el termalismo como primer turismo de salud y sociabilidad aristocrática',
+      paises: ['Reino Unido', 'Alemania', 'Francia', 'Suiza', 'Mónaco'],
+    },
+    {
+      id: 'thomas-cook',
+      nombre: 'Thomas Cook y el Turismo Organizado',
+      anioInicio: 1841,
+      anioFin: 1883,
+      color: '#1E90FF',
+      categoria: 'industrial',
+      descripcion: 'Thomas Cook organiza el primer viaje turístico en tren (1841): 570 personas de Leicester a Loughborough para asistir a un mitin antialcohol. Es el nacimiento del turismo organizado. Cook inventa el paquete turístico todo incluido (transporte + alojamiento + guía), el cheque de viaje y la primera guía turística moderna. En 1869 organiza la primera excursión a Egipto y Tierra Santa. En 1872, la primera vuelta al mundo organizada (222 días, 22.000 km). Thomas Cook & Son se convierte en la primera agencia de viajes global. El turismo deja de ser exclusivo de aristócratas y llega a las clases medias.',
+      obraIconica: 'Thomas Cook (1841): inventor del paquete turístico, el cheque de viaje y el turismo organizado moderno',
+      paises: ['Reino Unido', 'Inglaterra', 'Egipto', 'Europa'],
+    },
+    {
+      id: 'belle-epoque-turismo',
+      nombre: 'El Orient Express y el Turismo Belle Époque',
+      anioInicio: 1883,
+      anioFin: 1914,
+      color: '#1E90FF',
+      categoria: 'industrial',
+      descripcion: 'El Orient Express (1883, París-Constantinopla) simboliza el lujo del viaje en tren: compartimentos privados, vagón restaurante con menú gourmet, servicio de mayordomo. La Riviera francesa (Niza, Cannes, Mónaco) y el lago de Como se convierten en destinos de invierno para la aristocracia europea. Los grandes hoteles-palacio (Ritz de París 1898, Ritz de Londres 1906) definen el lujo hotelero moderno. Los carteles art nouveau de los ferrocarriles inventan el turismo de imagen: la publicidad turística como arte. La Guía Baedeker y la Guía Michelin (1900) crean los primeros sistemas de clasificación de destinos.',
+      obraIconica: 'Orient Express (1883) y Guía Michelin (1900): lujo ferroviario y primeros sistemas de clasificación turística',
+      paises: ['Francia', 'Europa', 'Imperio Otomano', 'Riviera'],
+    },
+    {
+      id: 'turismo-masas',
+      nombre: 'El Turismo de Masas de Posguerra',
+      anioInicio: 1945,
+      anioFin: 1965,
+      color: '#228B22',
+      categoria: 'masas',
+      descripcion: 'La aviación comercial, el aumento del poder adquisitivo y las vacaciones pagadas generalizadas crean el turismo de masas. El primer vuelo chárter de turistas (1949) conecta el Reino Unido con los destinos mediterráneos. La Costa Brava española y la Costa del Sol reciben millones de turistas del norte de Europa en los 50 y 60. El decreto de Stabilimento Balneare italiano inventa el turbolito de playa con sombrilla. El automóvil y las autopistas democratizan el turismo interior. El turismo se convierte en motor económico clave para España, Italia, Grecia y el Mediterráneo.',
+      obraIconica: 'El turismo de masas mediterráneo (1950s-60s): el sol, la playa y los vuelos chárter democratizan el viaje internacional',
+      paises: ['España', 'Italia', 'Grecia', 'Francia', 'Mediterráneo'],
+    },
+    {
+      id: 'club-med-allinclusive',
+      nombre: 'Club Med y el All-Inclusive',
+      anioInicio: 1950,
+      anioFin: 1980,
+      color: '#228B22',
+      categoria: 'masas',
+      descripcion: 'El Club Méditerranée (1950, fundado en Mallorca) inventa el resort all-inclusive: todo incluido (alojamiento, comidas, actividades, animación) por un precio fijo. Elimina el estrés del turista que no habla el idioma y no quiere gestionar nada. El modelo se replica en el Caribe, Canarias y el Mediterráneo. Disneylandia (1955, California) inventa el parque temático como destino turístico completo: la experiencia controlada y la economía de la ilusión. Las navieras reconvierten los cruceros trasatlánticos en cruceros de placer para clase media. El turismo se industrializa con paquetes estandarizados para millones de personas.',
+      obraIconica: 'Club Med (1950) y Disneylandia (1955): la estandarización del turismo de masas como producto industrial',
+      paises: ['Francia', 'España', 'Estados Unidos', 'Caribe', 'Mediterráneo'],
+    },
+    {
+      id: 'mochileros-lonely-planet',
+      nombre: 'Turismo de Mochileros y Globalización Turística',
+      anioInicio: 1972,
+      anioFin: 2000,
+      color: '#DC143C',
+      categoria: 'global',
+      descripcion: 'La Lonely Planet (1973, Australia-Asia) y el Southeast Asia on a Shoestring (1975) crean el mercado del turismo mochilero: viajes económicos, inmersión cultural, hostels y rutas alternativas. Los Interrail (1972) democratizan el viaje en tren por Europa para los jóvenes. La aparición de las líneas aéreas de bajo coste (Southwest 1967, Ryanair 1984, easyJet 1995) hace que el vuelo sea tan barato como el autobús. Las llegadas turísticas internacionales pasan de 25 millones (1950) a 700 millones (2000). El turismo rural, el ecoturismo y el turismo cultural se desarrollan como alternativas al turismo de sol y playa.',
+      obraIconica: 'Lonely Planet (1973) y Ryanair (1984): el turismo mochilero y las aerolíneas low cost democratizan el mundo',
+      paises: ['Australia', 'Europa', 'Asia', 'Global'],
+    },
+    {
+      id: 'airbnb-experiencias',
+      nombre: 'Airbnb y el Turismo de Experiencias',
+      anioInicio: 2008,
+      anioFin: 2015,
+      color: '#FF8C00',
+      categoria: 'digital',
+      descripcion: 'Airbnb (2008) crea el alojamiento colaborativo: particulares alquilan habitaciones o pisos completos a turistas. En 2015 ya tiene más alojamientos que la cadena hotelera más grande del mundo. TripAdvisor (2000), Booking.com (2005) y Google Maps transforman la planificación del viaje: el turista es ahora un experto informado. Instagram (2010) crea el "turismo instagrameable": destinos elegidos por su fotografiabilidad, murales y fondos. GetYourGuide y Airbnb Experiences permiten comprar experiencias locales directamente. La economía colaborativa desintermedia el sector turístico y presiona a hoteles y agencias tradicionales.',
+      obraIconica: 'Airbnb (2008) e Instagram (2010): la economía colaborativa y la fotografía como motor de decisión turística',
+      paises: ['Estados Unidos', 'Global', 'Internet'],
+    },
+    {
+      id: 'overtourism',
+      nombre: 'Overtourism y la Crisis del Turismo Masivo',
+      anioInicio: 2015,
+      anioFin: 2020,
+      color: '#4B0082',
+      categoria: 'sostenible',
+      descripcion: 'Las llegadas turísticas internacionales alcanzan 1.500 millones en 2019. Venecia, Barcelona, Ámsterdam, Dubrovnik y los templos de Kioto sufren overtourism: masificación que destruye la experiencia turística y la calidad de vida local. Los vecinos de Barcelona protestan contra Airbnb y los pisos turísticos que expulsan a los residentes. El movimiento anti-turismo (carteles "Tourists go home") emerge en destinos saturados. La huella de carbono de la aviación turística representa el 2,5% de las emisiones globales. El concepto de turismo sostenible y responsable cobra fuerza como alternativa al modelo masivo.',
+      obraIconica: 'Protestas anti-turismo en Barcelona y Venecia (2017-2019): el overtourism como crisis del modelo turístico masivo',
+      paises: ['España', 'Italia', 'Países Bajos', 'Japón', 'Global'],
+    },
+    {
+      id: 'pandemia-turismo',
+      nombre: 'La Pandemia y el Turismo Sostenible',
+      anioInicio: 2020,
+      anioFin: 2020,
+      color: '#4B0082',
+      categoria: 'sostenible',
+      descripcion: 'La pandemia de COVID-19 (2020) destruye el turismo mundial: las llegadas internacionales caen un 74%, la mayor caída de la historia. 100 millones de empleos turísticos desaparecen en semanas. Sin turistas, Venecia recupera sus canales limpios, los ciervos de Nara pasean por las calles y los elefantes de Chiang Mai descansan. La pandemia fuerza la reflexión sobre un modelo turístico alternativo: más lento, más local, más sostenible. El turismo de proximidad, el slow travel y el turismo regenerativo emergen como tendencias post-pandémicas. El sector se recupera en 2022-2023 pero el debate sobre los límites del crecimiento turístico se instala definitivamente.',
+      obraIconica: 'COVID-19 (2020): la mayor crisis de la historia del turismo y el catalizador del turismo sostenible',
+      paises: ['Global', 'España', 'Italia', 'Francia', 'Asia'],
+    },
+  ],
+
+  eras: [
+    {
+      nombre: 'Turismo Aristocrático',
+      desde: 1670,
+      hasta: 1841,
+      icono: '🎩',
+      hitosDestacados: ['El Grand Tour Europeo', 'Termalismo y Balnearios Aristocráticos'],
+      eventos: [
+        'Los aristócratas ingleses inician el Grand Tour por Europa continental como rito de formación (1670s)',
+        'Roma, Florencia, Venecia y Nápoles se convierten en los primeros "destinos turísticos" de la historia',
+        'Bath y Baden-Baden inventan el turismo de salud termal para la aristocracia europea (siglo XVIII)',
+        'Los casinos de Monte Carlo fusionan turismo, lujo y juego para la élite continental (1800s)',
+      ],
+    },
+    {
+      nombre: 'Industrialización del Turismo',
+      desde: 1841,
+      hasta: 1914,
+      icono: '🚂',
+      hitosDestacados: ['Thomas Cook y el Turismo Organizado', 'El Orient Express y el Turismo Belle Époque'],
+      eventos: [
+        'Thomas Cook organiza el primer viaje turístico en tren con 570 personas (1841)',
+        'Cook inventa el paquete todo incluido, el cheque de viaje y la agencia de viajes moderna (1845-1865)',
+        'Primera excursión organizada a Egipto y Tierra Santa: el turismo cultural internacional (1869)',
+        'El Orient Express une París y Constantinopla: el lujo ferroviario como destino en sí mismo (1883)',
+        'La Guía Michelin y la Guía Baedeker crean los primeros sistemas de clasificación turística (1900)',
+      ],
+    },
+    {
+      nombre: 'Entreguerras y Democratización',
+      desde: 1914,
+      hasta: 1945,
+      icono: '✈️',
+      hitosDestacados: [],
+      eventos: [
+        'La Primera Guerra Mundial interrumpe el turismo internacional europeo (1914-1918)',
+        'Los primeros vuelos comerciales de pasajeros abren la era de la aviación civil (1919)',
+        'El Frente Popular francés y el New Deal americano introducen las vacaciones pagadas obligatorias (1936)',
+        'Los Estados totalitarios (Nazi-Alemania, Italia fascista) organizan el turismo masivo de Estado como propaganda (1930s)',
+        'La Segunda Guerra Mundial paraliza de nuevo el turismo internacional (1939-1945)',
+      ],
+    },
+    {
+      nombre: 'Turismo de Masas',
+      desde: 1945,
+      hasta: 1972,
+      icono: '☀️',
+      hitosDestacados: ['El Turismo de Masas de Posguerra', 'Club Med y el All-Inclusive'],
+      eventos: [
+        'Los vuelos chárter desde el Reino Unido a la Costa Brava y Costa del Sol inauguran el turismo masivo mediterráneo (1949)',
+        'El Club Méditerranée inventa el resort all-inclusive en Mallorca: todo incluido por precio fijo (1950)',
+        'Disneylandia abre en California e inventa el parque temático como destino completo (1955)',
+        'El SEAT 600 y el Volkswagen Escarabajo democratizan el turismo de carretera en España y Europa (1957-1965)',
+        'España recibe 14 millones de turistas en 1964: el turismo se convierte en motor económico del desarrollismo franquista',
+      ],
+    },
+    {
+      nombre: 'Globalización Turística',
+      desde: 1972,
+      hasta: 2008,
+      icono: '🌍',
+      hitosDestacados: ['Turismo de Mochileros y Globalización Turística'],
+      eventos: [
+        'Los Interrail democratizan el viaje en tren por Europa para jóvenes con presupuesto limitado (1972)',
+        'Lonely Planet y Southeast Asia on a Shoestring crean el mercado del turismo mochilero (1973-1975)',
+        'Ryanair y easyJet lanzan el modelo de aerolínea low cost europeo: volar más barato que el autobús (1984-1995)',
+        'Internet y Expedia permiten reservar vuelos y hoteles directamente sin agencia de viajes (1996-2000)',
+        'Las llegadas turísticas internacionales alcanzan 700 millones anuales: el turismo es la mayor industria mundial (2000)',
+      ],
+    },
+    {
+      nombre: 'Turismo Digital y Sostenible',
+      desde: 2008,
+      hasta: 2020,
+      icono: '🌱',
+      hitosDestacados: ['Airbnb y el Turismo de Experiencias', 'Overtourism y la Crisis del Turismo Masivo', 'La Pandemia y el Turismo Sostenible'],
+      eventos: [
+        'Airbnb revoluciona el alojamiento turístico con el modelo colaborativo peer-to-peer (2008)',
+        'Instagram convierte la fotografiabilidad en criterio de elección de destinos: el turismo instagrameable (2010)',
+        'Las llegadas internacionales alcanzan 1.500 millones: Venecia, Barcelona y Kioto sufren overtourism extremo (2019)',
+        'COVID-19 provoca la mayor caída de la historia del turismo: -74% en llegadas internacionales (2020)',
+      ],
+    },
+  ],
+
+  categorias: {
+    elitista: 'Turismo de Élite',
+    industrial: 'Industrialización',
+    masas: 'Turismo de Masas',
+    global: 'Globalización Turística',
+    digital: 'Era Digital',
+    sostenible: 'Turismo Sostenible',
+  },
+
+  colores: {
+    elitista: '#8B4513',
+    industrial: '#1E90FF',
+    masas: '#228B22',
+    global: '#DC143C',
+    digital: '#FF8C00',
+    sostenible: '#4B0082',
+  },
+
+  disclaimer: 'exempt',
+
+  educativo: {
+    intro: 'El turismo es hoy la mayor industria del mundo, pero su historia tiene apenas 350 años. Desde los jóvenes aristócratas ingleses que recorrían Europa a caballo en el siglo XVII hasta los 1.500 millones de turistas internacionales anuales del siglo XXI, el viaje ha pasado de ser un privilegio reservado a unos pocos a una actividad masiva con enormes consecuencias económicas, culturales y medioambientales. La cronología del turismo es también la historia de la democratización del ocio, la globalización de las economías y el dilema entre desarrollo y sostenibilidad.',
+
+    tablaComparativa: [
+      { hito: 'El Grand Tour Europeo', periodo: '1670-1815', categoria: 'Turismo de Élite', personaje: 'Aristócratas ingleses / Goethe', aportacion: 'Invención del turismo cultural y el concepto de destino turístico' },
+      { hito: 'Thomas Cook y el Turismo Organizado', periodo: '1841-1883', categoria: 'Industrialización', personaje: 'Thomas Cook', aportacion: 'Paquete todo incluido, cheque de viaje y primera agencia de viajes global' },
+      { hito: 'El Orient Express y el Turismo Belle Époque', periodo: '1883-1914', categoria: 'Industrialización', personaje: 'Georges Nagelmackers', aportacion: 'Lujo ferroviario, grandes hoteles-palacio y primeras guías de clasificación turística' },
+      { hito: 'El Turismo de Masas de Posguerra', periodo: '1945-1965', categoria: 'Turismo de Masas', personaje: 'Vladimir Raitz (primer chárter)', aportacion: 'Democratización del viaje internacional con vuelos chárter y turismo mediterráneo' },
+      { hito: 'Turismo de Mochileros y Globalización Turística', periodo: '1972-2000', categoria: 'Globalización Turística', personaje: 'Tony y Maureen Wheeler (Lonely Planet)', aportacion: 'Turismo alternativo, rutas asiáticas y aerolíneas low cost para todos' },
+      { hito: 'Airbnb y el Turismo de Experiencias', periodo: '2008-2015', categoria: 'Era Digital', personaje: 'Brian Chesky (Airbnb)', aportacion: 'Economía colaborativa, desintermediación hotelera y turismo instagrameable' },
+    ],
+
+    escenarios: [
+      {
+        icono: '✈️',
+        titulo: 'Viajero Frecuente',
+        perfil: 'Persona que viaja varias veces al año por placer',
+        texto: 'Esta cronología te sitúa en una perspectiva histórica: el vuelo barato de Ryanair que usas hoy es el resultado de décadas de desregulación aérea y la revolución low cost de los 80-90. El Airbnb donde te alojas nació en 2008 de una crisis económica. Cada herramienta del viajero moderno tiene una historia que cambia cómo la ves.',
+      },
+      {
+        icono: '🏨',
+        titulo: 'Profesional del Sector Turístico',
+        perfil: 'Hoteleros, agentes de viaje, guías turísticos',
+        texto: 'El turismo ha sido reinventado varias veces: por Thomas Cook, por el avión, por internet y por Airbnb. Esta cronología muestra los ciclos de disrupción del sector y ayuda a identificar qué modelo de negocio resiste y cuál queda obsoleto. El debate entre turismo masivo y sostenible es el reto de la próxima disrupción.',
+      },
+      {
+        icono: '🏙️',
+        titulo: 'Gestor de Destino Turístico',
+        perfil: 'Responsables de turismo municipal, regional o nacional',
+        texto: 'El overtourism de Venecia o Barcelona no es un problema nuevo: es la consecuencia lógica de décadas de éxito turístico sin planificación de capacidad. Esta cronología muestra cómo los destinos pasan de ser descubiertos a masificarse y cómo el ciclo de vida de un destino turístico puede gestionarse o agotarse.',
+      },
+      {
+        icono: '🎒',
+        titulo: 'Turista Ocasional',
+        perfil: 'Persona que viaja una o dos veces al año en vacaciones',
+        texto: 'Lo que hoy parece normal —coger un avión de bajo coste, reservar por internet, leer reseñas en TripAdvisor— era impensable hace 50 años. Esta cronología muestra cómo el acceso al viaje internacional fue conquistado poco a poco por las clases medias, y qué retos plantea ese acceso masivo para los destinos del mundo.',
+      },
+    ],
+
+    faq: [
+      {
+        pregunta: '¿Cuándo se inventaron las agencias de viaje?',
+        respuesta: 'Thomas Cook organizó el primer viaje grupal en tren en 1841 y fundó la primera agencia de viajes moderna en 1845. Inventó el paquete turístico (transporte + alojamiento + guía), el cheque de viaje y la primera vuelta al mundo organizada (1872, 222 días). Thomas Cook & Son fue durante décadas la mayor empresa turística del mundo, hasta su quiebra en 2019, curiosamente el mismo año del récord histórico de turismo.',
+        tip: 'Thomas Cook no viajó por placer: organizó el primer viaje para llevar a 570 personas a un mitin antialcohol en Leicester.',
+      },
+      {
+        pregunta: '¿Qué es el overtourism y cómo afecta a los destinos?',
+        respuesta: 'El overtourism (sobreturismo) es la situación en que el número de turistas supera la capacidad de carga de un destino: deteriora el patrimonio, expulsa a los residentes, satura las infraestructuras y destruye la autenticidad que atraía a los visitantes. Venecia pierde 1.000 residentes al año; Barcelona tiene más plazas turísticas que habitantes en algunos barrios; las colas para la Fontana di Trevi duran horas. El overtourism es la consecuencia no planificada del éxito.',
+        tip: 'En 2019, el 80% del turismo mundial se concentraba en el 10% de los destinos del planeta.',
+      },
+      {
+        pregunta: '¿Por qué el turismo de masas nació en el Mediterráneo?',
+        respuesta: 'La combinación de sol, playa, gastronomía, precio bajo y proximidad a los mercados emisores del norte de Europa fue irresistible. España, Italia y Grecia ofrecían en los 50-60 lo que el norte no tenía: clima, alegría y coste de vida económico. El franquismo en España apostó decididamente por el turismo como motor de divisas: en 1964 España ya era el segundo destino turístico mundial con 14 millones de visitantes.',
+        tip: 'El turismo salvó a la España franquista de la autarquía económica: "Spain is different" fue el primer eslogan turístico de éxito masivo.',
+      },
+      {
+        pregunta: '¿Cómo cambió internet el turismo?',
+        respuesta: 'Internet eliminó la intermediación: antes viajabas a través de una agencia; ahora investigas, comparas, reservas y pagas tú mismo. Expedia (1996), Booking.com (2005) y TripAdvisor (2000) trasladaron el poder del sector al turista informado. Airbnb (2008) eliminó la necesidad del hotel convencional. Google Maps eliminó la necesidad de guías locales. El resultado: más turistas, viajes más baratos, menos margen para los intermediarios tradicionales.',
+        tip: 'Thomas Cook, fundada en 1841, quebró en 2019 con 9 millones de clientes sin vuelo de vuelta a casa, víctima del modelo de negocio digital que no supo adoptar.',
+      },
+      {
+        pregunta: '¿Qué pasó con el turismo durante la pandemia de COVID-19?',
+        respuesta: 'En 2020, las llegadas turísticas internacionales cayeron un 74%: de 1.500 millones a 381 millones. 100 millones de empleos turísticos desaparecieron en semanas. Países como España, Tailandia o Grecia, que dependen del turismo para el 10-20% del PIB, sufrieron recesiones devastadoras. Paradójicamente, la ausencia de turistas mostró la cara B: Venecia con canales limpios, templos de Machu Picchu sin colas, playas vírgenes. La pandemia aceleró el debate sobre el turismo sostenible.',
+        tip: 'El sector tardó hasta 2023 en recuperar los niveles de 2019, pero con un perfil diferente: más turismo de lujo y experiencias, menos turismo masivo barato.',
+      },
+    ],
+
+    pasos: [
+      {
+        titulo: 'Observa el salto visual entre el turismo de élite y el de masas',
+        cuerpo: 'En la Línea del Tiempo, fíjate en el salto entre los bloques marrones del Grand Tour (1670-1815) y los bloques verdes del turismo de masas (1945-1972). Entre ambos hay casi 130 años de industrialización gradual: el tren, la agencia de viajes, el avión. El turismo moderno es una construcción histórica, no un fenómeno natural.',
+      },
+      {
+        titulo: 'Compara Thomas Cook con Airbnb en la tabla Comparativa',
+        cuerpo: 'Ambos reinventaron el turismo en su época. Cook (1841) eliminó las barreras del viaje organizado para la clase media victoriana. Airbnb (2008) eliminó la barrera del hotel para el turista digital. Compara sus aportaciones en la pestaña Comparativa: verás el mismo patrón de disrupción con 167 años de diferencia.',
+      },
+      {
+        titulo: 'Identifica los períodos sin hitos declarados',
+        cuerpo: 'El período de entreguerras (1914-1945) no tiene hitos propios: es la era de las guerras que interrumpen el turismo, pero también de la aviación comercial naciente y las primeras vacaciones pagadas. En la pestaña Contexto Histórico, lee los eventos de esa era: son el puente entre el turismo elitista y el turismo de masas.',
+      },
+      {
+        titulo: 'Usa el filtro de categorías en la Comparativa',
+        cuerpo: 'Filtra por "Turismo de Masas" para ver los hitos que democratizaron el viaje. Luego filtra por "Era Digital" y "Turismo Sostenible" para ver la fase actual. El contraste entre democratización masiva y sus consecuencias (overtourism, pandemia) es el dilema central del turismo contemporáneo.',
+      },
+      {
+        titulo: 'Termina con el Contexto Histórico para el cuadro completo',
+        cuerpo: 'Las 6 eras muestran cómo cada período tuvo su modelo turístico dominante. La era "Turismo Digital y Sostenible" (2008-2020) es la más compleja: agrupa la revolución Airbnb, el Instagram turístico, el overtourism y la pandemia en solo 12 años. Es el período que define los retos del turismo del siglo XXI.',
+      },
+    ],
+
+    tips: [
+      {
+        icono: '📅',
+        texto: 'El turismo es hoy la mayor industria del mundo: 1 de cada 10 empleos en el planeta depende directa o indirectamente del turismo, y representa el 10% del PIB mundial. Pero hace solo 80 años era un privilegio de los pocos que podían costear un billete de tren o de barco.',
+      },
+      {
+        icono: '🎒',
+        texto: 'La Lonely Planet nació de un viaje en furgoneta de Londres a Kabul en 1972. Sus fundadores, Tony y Maureen Wheeler, escribieron la primera guía a mano y la graparon en la mesa de la cocina. Vendió 1.500 copias en su primera semana y cambió para siempre el mercado del turismo mochilero.',
+      },
+      {
+        icono: '🏨',
+        texto: 'Airbnb fue fundada en 2008 por tres diseñadores sin dinero para pagar el alquiler en San Francisco. Pusieron colchones hinchables en su apartamento para alojar a visitantes de una conferencia. En 2015 ya tenía más alojamientos disponibles que la cadena Hilton, fundada en 1919.',
+      },
+      {
+        icono: '🌍',
+        texto: 'Sin turistas durante el confinamiento de 2020, Venecia recuperó sus canales transparentes y los patos volvieron a nadar donde antes circulaban vaporettos. Los ciervos de Nara (Japón) salieron a pasear por las calles vacías. La naturaleza tardó solo semanas en recuperarse de décadas de turismo masivo.',
+      },
+    ],
+
+    errores: [
+      {
+        titulo: 'Creer que el turismo siempre ha sido accesible para todos',
+        cuerpo: 'Hasta mediados del siglo XX, viajar internacionalmente era un privilegio reservado a aristócratas y clases altas. El turismo de masas tiene apenas 70 años: nació con los vuelos chárter de los años 50 y las vacaciones pagadas generalizadas. La posibilidad de coger un vuelo de bajo coste por 30 euros es una conquista social muy reciente, no un derecho histórico.',
+      },
+      {
+        titulo: 'Pensar que el turismo sostenible es una moda reciente',
+        cuerpo: 'El debate sobre los límites del turismo existe desde los años 70. El primer concepto de "capacidad de carga turística" lo formuló el geógrafo J. Christopher Lime en 1971. El ecoturismo como término nació en 1983. Lo que ha cambiado es la urgencia: con 1.500 millones de turistas internacionales anuales, el problema de escala hace inevitable la conversación sobre límites.',
+      },
+      {
+        titulo: 'Confundir turismo con viaje',
+        cuerpo: 'Los seres humanos han viajado desde siempre: por comercio, conquista, peregrinación y diplomacia. Pero el turismo —viajar por placer, con tiempo libre y dinero para gastar— es una invención moderna del siglo XVII-XVIII. El Grand Tour aristocrático es el primer turismo porque combina por primera vez el viaje voluntario, el ocio y el consumo cultural como fin en sí mismo.',
+      },
+      {
+        titulo: 'Asumir que más turismo siempre es mejor para el destino',
+        cuerpo: 'El caso de Venecia ilustra la paradoja: el turismo que salvó económicamente a la ciudad durante décadas está destruyendo ahora lo que la hacía única. Con 30 millones de turistas anuales y solo 250.000 residentes permanentes (cada vez menos), Venecia se ha convertido en un parque temático sin comunidad local. El crecimiento turístico sin límites puede matar el producto que vende.',
+      },
+    ],
+  },
+};

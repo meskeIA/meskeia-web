@@ -97,6 +97,9 @@ import { historiaCapitalismo } from './historia-capitalismo';
 import { historiaComercio } from './historia-comercio';
 import { historiaTrabajo } from './historia-trabajo';
 import { historiaAgricultura } from './historia-agricultura';
+import { historiaEducacion } from './historia-educacion';
+import { historiaOcio } from './historia-ocio';
+import { historiaTurismo } from './historia-turismo';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -197,6 +200,9 @@ const registry: Record<string, HistoriaData> = {
   'historia-comercio': historiaComercio,
   'historia-trabajo': historiaTrabajo,
   'historia-agricultura': historiaAgricultura,
+  'historia-educacion': historiaEducacion,
+  'historia-ocio': historiaOcio,
+  'historia-turismo': historiaTurismo,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

@@ -935,6 +935,9 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-comercio/",             // Comercio mundial: de Mesopotamia al e-commerce global
   "/visualizador-historia/historia-trabajo/",              // Trabajo: de la esclavitud antigua al teletrabajo
   "/visualizador-historia/historia-agricultura/",          // Agricultura: de la revolución neolítica a la precisión
+  "/visualizador-historia/historia-educacion/",            // Educación: de la Academia de Platón al aula digital
+  "/visualizador-historia/historia-ocio/",                 // Ocio: del circo romano al streaming global
+  "/visualizador-historia/historia-turismo/",              // Turismo: del Grand Tour al turismo sostenible
 ];
 
 /**
