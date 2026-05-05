@@ -74,6 +74,9 @@ import { historiaDerechosHumanos } from './historia-derechos-humanos';
 import { historiaMedicinaContemporanea } from './historia-medicina-contemporanea';
 import { historiaEconomiaMundial } from './historia-economia-mundial';
 import { historiaInteligenciaArtificial } from './historia-inteligencia-artificial';
+import { historiaFutbol } from './historia-futbol';
+import { historiaMusicaPopular } from './historia-musica-popular';
+import { historiaArquitecturaModerna } from './historia-arquitectura-moderna';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -151,6 +154,9 @@ const registry: Record<string, HistoriaData> = {
   'historia-medicina-contemporanea': historiaMedicinaContemporanea,
   'historia-economia-mundial': historiaEconomiaMundial,
   'historia-inteligencia-artificial': historiaInteligenciaArtificial,
+  'historia-futbol': historiaFutbol,
+  'historia-musica-popular': historiaMusicaPopular,
+  'historia-arquitectura-moderna': historiaArquitecturaModerna,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

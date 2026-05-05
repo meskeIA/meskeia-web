@@ -4111,6 +4111,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet fue el ecosistema que hizo posible el big data, y el big data fue el combustible que permitió entrenar los modelos de deep learning: sin los datos de búsquedas de Google, las redes sociales y Wikipedia, GPT no existiría' },
   ],
 
+  // Cultura Popular y Deporte — Roadmap v11 EJE C (2026-05-04)
+  'visualizador-historia-historia-futbol': [
+    { url: '/visualizador-historia/deporte/', icon: '🏅', name: 'Historia del Deporte', description: 'La historia general del deporte incluye los Juegos Olímpicos, el atletismo y los grandes momentos del deporte mundial: el fútbol es el capítulo más largo de esa historia global' },
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'Inglaterra inventó el fútbol moderno: la Football Association (1863), la Football League (1888) y la Premier League (1992) son instituciones británicas que globalizaron el deporte más popular del mundo' },
+    { url: '/visualizador-historia/historia-america-latina/', icon: '🌎', name: 'Historia de América Latina', description: 'Brasil y Argentina son las dos grandes potencias del fútbol mundial: Pelé, Maradona, Ronaldinho y Messi son la cara latinoamericana del deporte más popular del planeta' },
+    { url: '/visualizador-historia/historia-oriente-medio/', icon: '🕌', name: 'Historia del Oriente Medio', description: 'El Mundial de Qatar 2022 fue el primer Mundial celebrado en Oriente Medio: la llegada del dinero del Golfo al fútbol europeo es el capítulo más reciente de la geopolítica del fútbol' },
+  ],
+  'visualizador-historia-historia-musica-popular': [
+    { url: '/visualizador-historia/historia-eeuu/', icon: '🦅', name: 'Historia de los EE.UU.', description: 'El blues, el jazz, el rock & roll y el hip-hop nacieron en Estados Unidos: la música popular americana es inseparable de la historia social del país, desde la esclavitud hasta los derechos civiles y la cultura global' },
+    { url: '/visualizador-historia/historia-inteligencia-artificial/', icon: '🤖', name: 'Historia de la IA', description: 'La IA generativa (Suno, Udio) está empezando a componer música: el debate sobre derechos de autor y el futuro de la industria musical son los capítulos más recientes de la historia de la música popular' },
+    { url: '/visualizador-historia/historia-japon-moderno/', icon: '⛩️', name: 'Historia del Japón Moderno', description: 'El manga, el anime y el K-pop son la versión asiática del fenómeno de la cultura popular globalizada: BTS y BLACKPINK repitieron en el siglo XXI lo que Los Beatles hicieron con la invasión británica de 1964' },
+    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Napster, iTunes, YouTube, Spotify y TikTok son los hitos de internet que destruyeron y reconstruyeron la industria musical: la historia de la música popular del siglo XXI es inseparable de la historia de internet' },
+  ],
+  'visualizador-historia-historia-arquitectura-moderna': [
+    { url: '/visualizador-historia/historia-descubrimientos-cientificos/', icon: '🔭', name: 'Historia de los Descubrimientos Científicos', description: 'El hormigón armado, el acero estructural y el vidrio float son descubrimientos científicos que hicieron posible la arquitectura moderna: sin la metalurgia del siglo XIX no hay rascacielos' },
+    { url: '/visualizador-historia/historia-inteligencia-artificial/', icon: '🤖', name: 'Historia de la IA', description: 'El diseño paramétrico con IA está transformando la arquitectura: las formas imposibles de Zaha Hadid que requerían CATIA en los 90 hoy se generan con prompts de IA generativa' },
+    { url: '/visualizador-historia/historia-economia-mundial/', icon: '📉', name: 'Historia de la Economía Mundial', description: 'Los ciclos económicos definen la arquitectura: el boom de los 60 produjo el brutalismo del Estado del Bienestar; la crisis de 2008 paralizó miles de proyectos; el dinero del Golfo financia los rascacielos más altos del mundo' },
+    { url: '/visualizador-historia/historia-reino-unido/', icon: '👑', name: 'Historia del Reino Unido', description: 'El Crystal Palace (1851), la arquitectura High-Tech de Norman Foster y Richard Rogers, el Barbican y el Shard son hitos de la arquitectura británica desde la Revolución Industrial hasta el siglo XXI' },
+  ],
+
   // Naciones Pendientes — Roadmap v11 EJE A (2026-05-04)
   'visualizador-historia-historia-china-moderna': [
     { url: '/visualizador-historia/china-dinastias/', icon: '🏯', name: 'China Imperial: Dinastías', description: 'La historia dinástica de China termina donde empieza la China moderna: la caída de la dinastía Qing en 1912 es el momento en que el milenario sistema imperial da paso a la República y luego al comunismo maoísta' },

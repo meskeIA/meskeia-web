@@ -878,6 +878,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-oriente-medio/",  // Oriente Medio 1916→presente, 10 hitos, 6 eras
   "/visualizador-historia/historia-africa/",          // África 1884→presente, 10 hitos, 6 eras
 
+  // Cultura Popular y Deporte — Roadmap v11 EJE C (2026-05-04)
+  "/visualizador-historia/historia-futbol/",              // Fútbol 1863→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-musica-popular/",      // Música Popular 1920→presente, 10 hitos, 6 eras
+  "/visualizador-historia/historia-arquitectura-moderna/", // Arquitectura Moderna 1851→presente, 10 hitos, 6 eras
+
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
   "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
