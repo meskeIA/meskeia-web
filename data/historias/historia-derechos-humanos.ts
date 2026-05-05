@@ -2,8 +2,8 @@ import type { HistoriaData } from './types';
 
 export const historiaDerechosHumanos: HistoriaData = {
   slug: 'historia-derechos-humanos',
-  titulo: 'Historia de los Derechos Humanos: De la Revolución Francesa al Siglo XXI',
-  subtitulo: 'Dos siglos de lucha por la dignidad humana: de la Declaración del 89 a los derechos digitales y la Agenda 2030',
+  titulo: 'El Movimiento por los Derechos Humanos: Del Siglo de las Luces a la Agenda 2030',
+  subtitulo: 'Cómo dos siglos de activismo, tratados y luchas colectivas construyeron el sistema internacional de derechos humanos',
   descripcionSEO: 'Cronología interactiva de los derechos humanos: desde la Declaración de los Derechos del Hombre (1789) y la abolición de la esclavitud hasta la Declaración Universal de 1948, el Tribunal Penal Internacional y los derechos digitales del siglo XXI. 10 hitos, 6 eras, perspectiva neutral y factual.',
   keywords: [
     'historia derechos humanos cronología',
