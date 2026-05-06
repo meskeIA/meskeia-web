@@ -285,6 +285,37 @@ Canonical absoluto añadido a las 19 apps top (`alternates.canonical: 'https://m
 - JSON-LD / Structured Data (Prioridad 2): helper genérico aplicado a las 19 apps top. Permite rich snippets, FAQ, breadcrumb. Requiere decisión de diseño (¿WebApplication? ¿Course? ¿FAQ por app?).
 - Resto del catálogo (~800 apps): si el patrón funciona en top 19, replicar a las siguientes 100-200.
 
+#### Nota técnica: cobertura de canonical en TODA la web (verificado 2026-05-06)
+
+Pregunta surgida tras los cambios: "¿el canonical solo está en las 19 apps top, qué pasa con las otras ~640?"
+
+**Respuesta: TODAS las apps de meskeIA tienen canonical funcional. Verificado con curl en producción.**
+
+Cómo funciona:
+- `app/layout.tsx` (root) usa `generateBaseMetadata()` de `lib/metadata.ts`
+- `generateBaseMetadata()` define `metadataBase: 'https://meskeia.com'` + `alternates: { canonical: './' }`
+- Por la herencia de metadata de Next.js 13+, **toda página que NO declare `alternates` propio** hereda la del root layout
+- `canonical: './'` con `metadataBase` resuelve automáticamente a la URL completa de la página actual
+
+Verificación empírica (curl a producción 2026-05-06):
+- `algebra-ecuaciones` (sin canonical en su metadata.ts) → HTML servido contiene `<link rel="canonical" href="https://meskeia.com/algebra-ecuaciones/"/>` ✅
+- `temporizador-pomodoro` (sin canonical en su metadata.ts) → idéntico ✅
+
+Cobertura real (727 metadata.ts contados):
+| Tipo | Cantidad | Canonical |
+|------|---------:|-----------|
+| Con `alternates` explícito en metadata.ts | 89 | ✅ Explícito |
+| Sin `alternates` propio | ~640 | ✅ Heredado del root |
+
+Los 19 canonicals que se añadieron explícitamente en esta sesión son **redundantes técnicamente** (ya funcionaban vía herencia) pero útiles para:
+- Auditoría rápida con grep
+- Predictibilidad si alguien toca `lib/metadata.ts`
+- Comportamiento explícito en las apps de mayor tráfico
+
+**Implicación**: NO hay que aplicar canonical a las 640 apps restantes. Ya funcionan correctamente.
+
+**Caso a vigilar**: si en el futuro una app específica añade `alternates: { ... }` a su metadata.ts pero olvida `canonical`, o lo escribe mal, romperá su SEO. Auditar con grep si se sospecha.
+
 ---
 
 ## 8. Métricas a seguir
