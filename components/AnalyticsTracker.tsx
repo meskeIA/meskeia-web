@@ -42,8 +42,16 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     // URL base para API (relativa, funciona en cualquier dominio)
     const API_BASE = '/api/analytics';
 
-    // Generar ID único de sesión
-    const sessionId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Obtener o crear sesion_id persistente entre páginas de la misma pestaña.
+    // sessionStorage vive durante toda la pestaña del navegador y se borra al cerrarla.
+    // Esto permite enlazar visitas a múltiples páginas como una única sesión real
+    // (antes se generaba uno nuevo por cada page load → cada visita parecía una sesión distinta).
+    const SESSION_KEY = 'meskeia_session_id';
+    let sessionId = sessionStorage.getItem(SESSION_KEY);
+    if (!sessionId) {
+      sessionId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem(SESSION_KEY, sessionId);
+    }
 
     // Detectar si está instalada como PWA
     const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
