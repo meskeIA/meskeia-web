@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-break-even/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Break-Even | meskeIA',
     description: 'Herramienta gratuita para calcular el punto de equilibrio de tu negocio.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

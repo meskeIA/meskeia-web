@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-tension-arterial',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Tensión Arterial | meskeIA',
     description: 'Clasifica tu presión arterial según guías europeas ESH/ESC. Historial de mediciones incluido.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calculadora Tensión Arterial meskeIA',

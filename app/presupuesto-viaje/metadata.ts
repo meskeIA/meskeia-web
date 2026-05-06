@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Calculadora de Presupuesto de Viaje - meskeIA',
     description: 'Planifica tu viaje por categorías y divide los gastos entre el grupo de viajeros.',
     url: 'https://meskeia.com/presupuesto-viaje/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

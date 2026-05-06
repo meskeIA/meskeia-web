@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-simbolos-quimicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Símbolos Químicos — Aprende la Tabla Periódica',
     description:
       '¿Sabes qué elemento es "Au"? ¡Pon a prueba tus conocimientos de química con este quiz interactivo!',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

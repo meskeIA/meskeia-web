@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-carruseles/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Carruseles para Redes Sociales | meskeIA',
     description: 'Crea carruseles profesionales para Instagram y LinkedIn gratis. Sin registro.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Generador de Carruseles meskeIA',

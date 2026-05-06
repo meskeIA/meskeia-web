@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-tamano-adulto-perro',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Predictor de Tamaño Adulto para Cachorros',
     description: 'Calcula el peso final de tu cachorro según su raza y peso actual',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

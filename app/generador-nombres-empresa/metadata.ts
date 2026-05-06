@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-nombres-empresa/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Nombres para Empresa | meskeIA',
     description: 'Herramienta gratuita para generar nombres creativos de empresa y verificar dominios.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

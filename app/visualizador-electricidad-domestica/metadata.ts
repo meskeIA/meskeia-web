@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-electricidad-domestica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Electricidad Doméstica - Cuadro Eléctrico y Protecciones',
     description: 'Por qué salta el diferencial, qué hace cada magnetotérmico y cómo funciona tu instalación eléctrica.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Electricidad Doméstica meskeIA' },
 };

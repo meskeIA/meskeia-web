@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia/herencias/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía Herencias | meskeIA',
     description: 'Checklist, estimadores de impuestos y orientación paso a paso para gestionar una herencia en España.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

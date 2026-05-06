@@ -17,5 +17,11 @@ export const metadata: Metadata = {
     title: 'Ciclo Menstrual: Fases y Hormonas — meskeIA',
     description: 'Las 4 fases del ciclo, las 4 hormonas protagonistas, SOP y anticonceptivos.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

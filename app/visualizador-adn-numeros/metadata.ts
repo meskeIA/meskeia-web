@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-adn-numeros',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tu ADN en Números',
     description: 'Cifras fascinantes sobre el genoma humano explicadas de forma visual e interactiva.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'ADN en Números meskeIA' },
 };

@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Dualidad, incertidumbre, superposición y efecto túnel con animaciones interactivas',
     url: 'https://meskeia.com/visualizador-mecanica-cuantica/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

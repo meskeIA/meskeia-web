@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-tipos-rocas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tipos de Rocas - Explicador Visual',
     description: 'Del magma al mármol: los 3 tipos de rocas y el ciclo que nunca se detiene, con visualizaciones interactivas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Tipos Rocas meskeIA' },
 };

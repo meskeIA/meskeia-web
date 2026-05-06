@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-matrices',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Matrices - Explicador Visual Interactivo',
     description: 'El álgebra lineal cobra vida: matrices que rotan, escalan y reflejan figuras ante tus ojos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Matrices Explicador meskeIA' },
 };

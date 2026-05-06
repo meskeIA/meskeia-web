@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-varietales-vino',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Varietales de Vino | meskeIA',
     description: '40 varietales de vino del mundo: notas de sabor, cuerpo, taninos y maridaje perfecto.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía de Varietales de Vino meskeIA',

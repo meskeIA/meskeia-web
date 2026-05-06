@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Estadística en la Vida Cotidiana | meskeIA',
     description: 'Probabilidad, sesgos estadísticos y paradojas con ejemplos de la vida real.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

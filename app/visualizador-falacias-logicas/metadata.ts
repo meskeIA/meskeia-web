@@ -28,12 +28,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-falacias-logicas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Falacias Lógicas | meskeIA',
     description:
       'Detecta los 12 errores de razonamiento más comunes con ejemplos interactivos',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Visualizador Falacias Lógicas meskeIA',

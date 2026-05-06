@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/tabla-periodica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tabla Periódica Interactiva | meskeIA',
     description: 'Explora los 118 elementos químicos de forma visual y educativa.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

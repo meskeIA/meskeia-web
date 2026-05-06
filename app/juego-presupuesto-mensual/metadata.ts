@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/juego-presupuesto-mensual/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Juego de Presupuesto Mensual | meskeIA',
     description: '¿Puedes llegar a fin de mes? Juego educativo de gestión de presupuesto',
+    images: ['https://meskeia.com/og-image.png']
   },
 };
 

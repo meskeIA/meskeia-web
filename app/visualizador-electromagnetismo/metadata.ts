@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     title: 'Electromagnetismo | meskeIA',
     description: 'Campo eléctrico, magnético, inducción y espectro EM con visualizaciones interactivas',
     url: 'https://meskeia.com/visualizador-electromagnetismo/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

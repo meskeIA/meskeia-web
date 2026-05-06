@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-aves-comunes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Aves Comunes | meskeIA',
     description: '40 aves de España y Europa: hábitat, alimentación, canto y cuándo verlas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía de Aves Comunes meskeIA',

@@ -12,11 +12,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-inversiones/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Dónde invertir? Test de perfil inversor | meskeIA',
     description: 'Test de 10 preguntas para elegir entre fondos indexados, acciones, renta fija, inmobiliario o pensiones.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/selector-inversiones/' },
   other: {

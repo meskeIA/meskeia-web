@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-cuerpo-numeros',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tu Cuerpo en Números - Explicador Visual',
     description: '206 huesos, 37,2 billones de células, ADN que llega a Plutón 4 veces. Tu cuerpo es asombroso.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Cuerpo en Números meskeIA' },
 };

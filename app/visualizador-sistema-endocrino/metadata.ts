@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sistema-endocrino',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Sistema Endocrino - Explicador Visual',
     description: 'De la insulina al cortisol: el sistema endocrino paso a paso.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sistema Endocrino meskeIA' },
 };

@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-autonomo-vs-sl/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador Autónomo vs SL 2025 | meskeIA',
     description: '¿Cuándo conviene más una SL que ser autónomo? Compara la carga fiscal',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Comparador Autónomo vs SL meskeIA',

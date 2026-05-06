@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Visualizador de Criptografía | meskeIA',
     description: 'AES, RSA, SHA-256, firma digital y TLS: cómo funciona la criptografía que protege tus datos cada día.',
     url: 'https://meskeia.com/visualizador-criptografia/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

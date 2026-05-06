@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Testosterona - La Hormona del Rendimiento | meskeIA',
     description: 'Fisiología de la testosterona: producción, efectos y moduladores naturales.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-deduccion-obras-energeticas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Deducción IRPF obras energéticas — España 2026',
     description: '20%, 40% y 60% de deducción por mejora energética. Requisitos y plazos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Orientador Deducción Obras Energéticas meskeIA',

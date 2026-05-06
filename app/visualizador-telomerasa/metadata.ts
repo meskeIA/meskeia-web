@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     title: 'Telomerasa - Envejecimiento e Inmortalidad Celular | meskeIA',
     description: 'La enzima que alarga los telómeros y su papel en el envejecimiento y el cáncer.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

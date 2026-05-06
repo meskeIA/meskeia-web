@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-validacion-idea',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Validación de Idea | meskeIA',
     description: '¿Tu idea tiene mercado real? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Test de Validación de Idea meskeIA' },
 };

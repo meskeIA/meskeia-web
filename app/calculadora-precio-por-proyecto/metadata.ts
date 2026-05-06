@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-precio-por-proyecto/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Precio por Proyecto Freelance | meskeIA',
     description: 'Calcula el precio justo de tu próximo proyecto freelance. Desglose completo y rango de negociación.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calculadora Precio por Proyecto meskeIA',

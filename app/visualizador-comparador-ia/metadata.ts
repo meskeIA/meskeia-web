@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Tabla interactiva: ChatGPT, Claude, Gemini, Copilot, Mistral, Perplexity, Llama y DeepSeek. Filtra por precio, privacidad y caso de uso.',
     url: 'https://meskeia.com/visualizador-comparador-ia/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

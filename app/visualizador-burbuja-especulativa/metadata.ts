@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'De los tulipanes holandeses al cripto: por qué las burbujas siempre siguen el mismo patrón y cómo reconocerlas.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

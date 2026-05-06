@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-internet-60-segundos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona Internet en 60 Segundos',
     description: 'Qué pasa cuando pulsas buscar. El viaje invisible de tus datos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Internet 60s meskeIA' },
 };

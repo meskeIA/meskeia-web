@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Oxitocina - La Hormona del Vínculo | meskeIA',
     description: 'Cómo la oxitocina crea vínculos, genera confianza y conecta a las personas.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

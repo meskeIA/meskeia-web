@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-optimizacion-ia',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso de Optimización para IAs (GEO/AEO) - meskeIA',
     description: 'Aprende GEO y AEO: el nuevo SEO para la era de las IAs. ChatGPT, Perplexity, Gemini.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Curso Optimización IA meskeIA',

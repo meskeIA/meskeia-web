@@ -17,11 +17,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-quimica-organica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Química Orgánica - Grupos Funcionales y Reacciones | meskeIA',
     description: 'Explora grupos funcionales, benceno, SN2, esterificación, isomería cis/trans y óptica con visualizaciones interactivas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Química Orgánica meskeIA' },
 };

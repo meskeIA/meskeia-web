@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sesgos-cognitivos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona tu Cerebro al Decidir',
     description: 'Los sesgos cognitivos que distorsionan tus decisiones — sin que lo sepas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sesgos Cognitivos meskeIA' },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-osteoporosis',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Osteoporosis — El Ciclo de Remodelado Óseo',
     description: 'El hueso pierde densidad en silencio. Entiende cómo y por qué con este explicador visual interactivo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/visualizador-osteoporosis/' },
   other: { 'application-name': 'Osteoporosis Visualizador meskeIA' },

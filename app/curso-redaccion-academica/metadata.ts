@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-redaccion-academica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso de Redacción Académica - meskeIA',
     description: 'Guía práctica para escribir TFG, TFM, tesis y artículos académicos de calidad.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Curso Redacción Académica meskeIA',

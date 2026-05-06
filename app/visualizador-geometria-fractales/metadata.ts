@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-geometria-fractales',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Geometría de Fractales - Explicador Visual Interactivo',
     description: 'Triángulo de Sierpinski, copo de Koch, alfombra y Hilbert: genera fractales paso a paso y descubre por qué la naturaleza los usa.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Geometría Fractales meskeIA' },
 };

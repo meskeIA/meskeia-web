@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'ADN Polimerasa - La Fotocopiadora del Genoma | meskeIA',
     description: 'Cómo la ADN polimerasa copia el genoma con precisión extraordinaria.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

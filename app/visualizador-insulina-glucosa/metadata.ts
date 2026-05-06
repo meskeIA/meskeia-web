@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-insulina-glucosa/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Insulina y Glucosa | meskeIA',
     description: 'Cómo regula el cuerpo el azúcar en sangre: insulina, glucosa y metabolismo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Visualizador Insulina y Glucosa meskeIA',

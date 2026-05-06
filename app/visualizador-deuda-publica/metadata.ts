@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Deuda soberana explicada: bonos, prima de riesgo, quién la financia y sostenibilidad.',
     url: 'https://meskeia.com/visualizador-deuda-publica/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sueldo-neto',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tu Sueldo al Desnudo - Explicador Visual',
     description: 'De bruto a neto: visualiza cada descuento de tu sueldo con gráficos interactivos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Visualizador Sueldo Neto meskeIA',

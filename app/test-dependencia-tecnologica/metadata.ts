@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-dependencia-tecnologica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Dependencia Tecnológica | meskeIA',
     description: '¿Cuánto depende tu trabajo de la tecnología? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Test de Dependencia Tecnológica meskeIA',

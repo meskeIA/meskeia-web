@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-complemento-minimos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador de Complemento a Mínimos 2026 | meskeIA',
     description: 'Pensiones mínimas 2026: calcula si tienes derecho al complemento a mínimos de la SS',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador Complemento a Mínimos meskeIA',

@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-plusvalias-irpf/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Plusvalías IRPF 2025 | meskeIA',
     description: 'Estima el IRPF por ganancias patrimoniales: inmuebles, fondos, acciones',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador Plusvalías IRPF meskeIA',

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-infusiones',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Infusiones | meskeIA',
     description: 'Directorio de 55 infusiones: usos tradicionales, preparación y contraindicaciones. Filtros por familia.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía Infusiones meskeIA',

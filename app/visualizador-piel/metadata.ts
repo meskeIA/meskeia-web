@@ -10,5 +10,11 @@ export const metadata: Metadata = {
     description:
       'Explora la estructura y funciones de la piel: capas, cicatrización, fototipos y mecanismos de protección.',
     url: 'https://meskeia.com/visualizador-piel/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

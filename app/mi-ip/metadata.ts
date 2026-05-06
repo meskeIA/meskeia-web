@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/mi-ip',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mi IP Pública y Conexión',
     description: 'Descubre tu IP, ubicación y datos de conexión',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

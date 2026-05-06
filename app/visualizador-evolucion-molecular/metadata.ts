@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-evolucion-molecular',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Evolución Molecular - Visualizador Interactivo',
     description: 'Mutaciones, reloj molecular y árboles filogenéticos: la evolución a nivel de secuencias de ADN.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Evolución Molecular meskeIA' },
 };

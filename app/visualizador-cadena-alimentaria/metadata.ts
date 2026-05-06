@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-cadena-alimentaria',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'De la Granja a tu Mesa - Explicador Visual',
     description: 'Cadena alimentaria, reparto de precios al agricultor, desperdicio y alternativas locales.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Cadena Alimentaria meskeIA' },
 };

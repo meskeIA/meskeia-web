@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-tiempo-ahorro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Cuánto tardo en ahorrar? | meskeIA',
     description: 'Descubre cuándo alcanzarás tu objetivo de ahorro con esta calculadora visual',
+    images: ['https://meskeia.com/og-image.png']
   },
 };
 

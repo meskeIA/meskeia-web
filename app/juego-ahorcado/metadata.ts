@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/juego-ahorcado',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Juego del Ahorcado en Español | meskeIA',
     description: 'Adivina la palabra letra a letra. 4 categorías temáticas, sin publicidad.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Juego del Ahorcado meskeIA',

@@ -24,11 +24,18 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     type: 'website',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Biomas meskeIA' },
 };

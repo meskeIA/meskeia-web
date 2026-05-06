@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-pantallas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona una Pantalla - Tecnología de Displays',
     description: 'Píxeles, resoluciones, OLED vs LCD, luz azul: todo lo que hay detrás de tu pantalla, explicado visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Pantallas meskeIA' },
 };

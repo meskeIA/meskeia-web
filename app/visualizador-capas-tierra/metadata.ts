@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-capas-tierra',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Capas de la Tierra - Explicador Visual',
     description: '6.371 km hasta el centro: 5.400 grados C de hierro solido que nadie ha visto jamas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Capas Tierra meskeIA' },
 };

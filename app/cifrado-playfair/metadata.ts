@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/cifrado-playfair/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cifrado Playfair | meskeIA',
     description: 'Cifrado por digramas con visualización de matriz',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

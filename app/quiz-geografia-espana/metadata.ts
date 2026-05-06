@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-geografia-espana/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Geografía de España',
     description:
       '¿Conoces todas las provincias, ríos y montañas de España? 75 preguntas en 3 niveles. ¡Pon a prueba tus conocimientos!',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

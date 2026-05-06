@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-digestion-nutrientes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Digestión y Nutrientes — De la Comida a la Célula',
     description: 'Qué pasa con cada macronutriente tras comer. Visión bioquímica complementaria al sistema digestivo anatómico.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Digestión y Nutrientes meskeIA' },
 };

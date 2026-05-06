@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Visualizador de Blockchain | meskeIA',
     description: 'Bloques, hashing, PoW vs PoS, contratos inteligentes y DeFi: cómo funciona una blockchain explicado visualmente.',
     url: 'https://meskeia.com/visualizador-blockchain/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

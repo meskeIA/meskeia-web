@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Visualizador de la Cicatrización | meskeIA',
     description: 'Las 4 fases de reparación de heridas: hemostasia, inflamación, proliferación y remodelado. Células, mediadores y factores explicados visualmente.',
     url: 'https://meskeia.com/visualizador-cicatrizacion/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

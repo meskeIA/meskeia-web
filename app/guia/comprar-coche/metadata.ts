@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia/comprar-coche/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía para Comprar un Coche en España',
     description: 'Comparador de formas de compra, simulador de préstamo y calculadora de consumo gratuitos.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

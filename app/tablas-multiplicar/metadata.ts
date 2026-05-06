@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/tablas-multiplicar',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Entrenador Tablas de Multiplicar | meskeIA',
     description: 'Juego educativo para aprender las tablas de multiplicar.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

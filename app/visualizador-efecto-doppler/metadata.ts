@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Efecto Doppler: Visualizador Interactivo | meskeIA',
     description: 'Por qué suenan diferente las sirenas cuando se acercan y se alejan — y cómo esto mide galaxias.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

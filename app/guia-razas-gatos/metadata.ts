@@ -19,12 +19,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-razas-gatos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Directorio de Razas de Gatos - meskeIA',
     description:
       'Encuentra tu raza de gato ideal entre 35 razas con filtros interactivos por tamaño, pelo, energía y compatibilidad.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía Razas de Gatos meskeIA',

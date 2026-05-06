@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Conversor de Divisas - meskeIA',
     description: 'Convierte entre más de 30 divisas. Tipos de cambio del BCE actualizados a diario.',
     url: 'https://meskeia.com/conversor-divisas/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

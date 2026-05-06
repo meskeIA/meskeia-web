@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Visualizador del Hígado | meskeIA',
     description: 'El hígado como laboratorio del cuerpo: 500+ funciones vitales explicadas de forma visual e interactiva.',
     url: 'https://meskeia.com/visualizador-higado/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

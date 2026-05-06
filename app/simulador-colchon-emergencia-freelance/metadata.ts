@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-colchon-emergencia-freelance',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Colchon de Emergencia Freelance | meskeIA',
     description: 'Calcula cuantos meses puedes sobrevivir sin ingresos con tu ahorro actual.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Colchon Emergencia Freelance meskeIA',

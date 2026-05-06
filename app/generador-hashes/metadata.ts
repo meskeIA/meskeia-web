@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-hashes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Hashes - MD5, SHA-256, SHA-512',
     description: 'Genera y verifica hashes criptográficos de textos y archivos.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

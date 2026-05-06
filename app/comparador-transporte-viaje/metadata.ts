@@ -23,11 +23,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/comparador-transporte-viaje/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de transporte para viajes | meskeIA',
     description: 'Avión vs tren vs bus vs coche: coste, tiempo y CO₂ para tu trayecto.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/comparador-transporte-viaje/' },
   other: {

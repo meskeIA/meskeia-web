@@ -24,11 +24,18 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Qué idioma aprender? Test orientativo | meskeIA',
     description: 'Test de 10 preguntas para elegir entre inglés, francés, alemán, portugués o chino/japonés.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/selector-idioma/',

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-viaje-comida',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Viaje de tu Comida — Sistema Digestivo',
     description: 'El recorrido completo de un bocado por tu cuerpo. 6 etapas con enzimas, tiempos y datos sorprendentes.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Viaje Comida meskeIA' },
 };

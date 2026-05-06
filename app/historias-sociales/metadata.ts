@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/historias-sociales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Historias Sociales Visuales | meskeIA',
     description: 'Crea historias sociales visuales para preparar situaciones nuevas. Para autismo, TDAH y discapacidad cognitiva.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

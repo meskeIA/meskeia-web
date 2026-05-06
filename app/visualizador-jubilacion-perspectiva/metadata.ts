@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-jubilacion-perspectiva',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tu Jubilación en Perspectiva',
     description: 'Visualiza tu carrera laboral y cómo se traduce en pensión.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Jubilación Perspectiva meskeIA' },
 };

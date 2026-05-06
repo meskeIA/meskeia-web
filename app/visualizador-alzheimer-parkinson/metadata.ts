@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-alzheimer-parkinson',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Alzheimer y Parkinson: Mecanismo Neurobiológico',
     description: 'Placas amiloides, ovillos de Tau, α-sinucleína y circuito dopaminérgico — neurobiología molecular explicada.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Alzheimer Parkinson Neurobiología meskeIA' },
 };

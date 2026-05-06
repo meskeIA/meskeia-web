@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-vacunas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona una Vacuna',
     description: 'Sistema inmune, tipos de vacunas e inmunidad de rebaño.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Vacunas meskeIA' },
 };

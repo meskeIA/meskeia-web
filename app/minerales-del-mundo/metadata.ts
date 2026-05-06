@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/minerales-del-mundo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Minerales del Mundo - Guía Completa',
     description: 'Explora 50 minerales esenciales con su composición, dureza, usos y curiosidades.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Minerales del Mundo meskeIA',

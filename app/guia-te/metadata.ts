@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-te/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía del Té | meskeIA',
     description: '40 variedades de té del mundo: temperatura, tiempo de infusión, notas de sabor y cafeína.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía del Té meskeIA',

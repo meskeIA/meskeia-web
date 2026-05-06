@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/planificador-itinerario',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planificador de Itinerario de Viaje | meskeIA',
     description: 'Organiza tu viaje día a día con actividades, horarios y notas. Gratis y sin registro.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Planificador Itinerario Viaje meskeIA',

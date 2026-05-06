@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-optica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Óptica - Explicador Visual Interactivo',
     description: 'Rayos de luz, prismas y lentes: la óptica cobra vida ante tus ojos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Óptica Explicador meskeIA' },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-anatomia-flor',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Anatomía de una Flor - Explicador Visual',
     description: 'Partes de la flor, polinización, frutos y semillas. Explicador visual interactivo en español.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Anatomía Flor meskeIA' },
 };

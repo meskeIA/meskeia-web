@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-zarit-cuidador/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Zarit - Sobrecarga del Cuidador | meskeIA',
     description: 'Escala Zarit: evalúa la sobrecarga del cuidador familiar',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Test Zarit Cuidador meskeIA' },
 };

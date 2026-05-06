@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-cancer',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cáncer: Biología Molecular — Oncogenes, Hallmarks e Inmunoterapia',
     description: 'Oncogenes, genes supresores, los 6 hallmarks y la inmunoterapia PD-1/PD-L1. Biología molecular pura.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Cáncer Biología Molecular meskeIA' },
 };

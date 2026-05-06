@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'El efecto más espectacular de la física cuántica: conductividad perfecta y levitación magnética real. Visualizador interactivo con 8 materiales y animaciones.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

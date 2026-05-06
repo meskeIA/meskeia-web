@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Ecuaciones Algebraicas - Resolución Paso a Paso',
     description: 'Resuelve ecuaciones lineales, cuadráticas y sistemas 2x2 con explicaciones paso a paso y visualización gráfica de parábolas',
-    url: 'https://next.meskeia.com/algebra-ecuaciones',
+    url: 'https://meskeia.com/algebra-ecuaciones',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Ecuaciones | meskeIA',
     description: 'Resuelve ecuaciones algebraicas con explicaciones paso a paso y gráficas interactivas',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calculadora de Ecuaciones meskeIA',

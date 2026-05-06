@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Dopamina - El Sistema de Recompensa | meskeIA',
     description: 'Cómo la dopamina controla la motivación, el placer y la conducta.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

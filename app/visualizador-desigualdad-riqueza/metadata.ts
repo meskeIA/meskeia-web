@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Desigualdad de la Riqueza | meskeIA',
     description: 'Curva de Lorenz interactiva, Gini y distribución de la riqueza global.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

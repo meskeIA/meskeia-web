@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-microbioma',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Microbioma — Billones de Aliados en tu Interior',
     description: 'Descubre el ecosistema bacteriano del cuerpo humano: intestino, piel, boca y pulmones. Eje intestino-cerebro y factores que alteran la microbiota.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/visualizador-microbioma/',

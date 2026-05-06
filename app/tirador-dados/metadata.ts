@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/tirador-dados',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tirador de Dados Online',
     description: 'Dados virtuales para D&D, Pathfinder y juegos de mesa. Múltiples tipos de dados con historial.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Tirador de Dados meskeIA',

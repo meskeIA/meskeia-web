@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/declaracion-renta-fallecidos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Declaración Renta Fallecidos - Guía Herederos | meskeIA',
     description: 'Todo lo que necesitas saber para presentar la declaración IRPF de una persona fallecida en España.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Declaración Renta Fallecidos meskeIA',

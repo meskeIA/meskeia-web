@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Tiroides - La Glándula del Metabolismo | meskeIA',
     description: 'Cómo funciona el tiroides, sus hormonas y el eje de regulación.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

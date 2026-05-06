@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'La economía del mercado de vivienda en España: de la burbuja 2008 a los nuevos máximos.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

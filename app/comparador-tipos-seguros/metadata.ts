@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-tipos-seguros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de Tipos de Seguros - meskeIA',
     description: 'Guía educativa sobre tipos de seguros en España: vida, auto, hogar y salud.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/comparador-tipos-seguros/',

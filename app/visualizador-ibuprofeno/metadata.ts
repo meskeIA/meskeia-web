@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Ibuprofeno: El Antiinflamatorio que Bloquea las COX',
     description: 'Por qué es mejor para la inflamación y qué paga en estómago, riñón y corazón.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

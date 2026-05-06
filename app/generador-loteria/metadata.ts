@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-loteria',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Números de Lotería',
     description: 'Genera números para Primitiva, Euromillones, Bonoloto y más',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

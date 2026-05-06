@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ojo-humano-vision',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ojo Humano y Visión - Explicador Visual Interactivo',
     description: 'Anatomía del ojo, fotorreceptores, defectos visuales y curiosidades: la visión humana explicada visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Ojo Humano Explicador meskeIA' },
 };

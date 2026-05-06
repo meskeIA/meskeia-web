@@ -27,11 +27,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-mecanica-fluidos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mecánica de Fluidos: Reynolds, Magnus y el mito de Bernoulli',
     description: 'Por qué la pelota curva, por qué el avión vuela de verdad, y qué es el número de Reynolds. Visualizador interactivo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Mecánica de Fluidos meskeIA' },
 };

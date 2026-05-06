@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/checklist-segunda-opinion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Checklist de Segunda Opinión | meskeIA',
     description: '¿Cuestionas tus propias decisiones antes de actuar? Descúbrelo gratis.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Checklist de Segunda Opinión meskeIA',

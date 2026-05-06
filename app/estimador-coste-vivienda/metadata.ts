@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-coste-vivienda/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Coste Real de Vivienda',
     description: 'Calcula el coste mensual real de mantener una vivienda con todos los gastos incluidos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador Coste Vivienda meskeIA',

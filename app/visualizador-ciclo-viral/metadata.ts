@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Las 6 etapas del ciclo viral, estrategias ADN vs ARN y mecanismos de evasión inmune.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

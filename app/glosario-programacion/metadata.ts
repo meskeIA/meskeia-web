@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/glosario-programacion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Glosario de Programación - meskeIA',
     description: 'Aprende el significado de los términos de programación más usados en desarrollo web.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Glosario de Programación meskeIA',

@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-grado-dependencia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Grado de Dependencia | meskeIA',
     description: 'Estima el grado de dependencia según el baremo BVD y conoce los pasos para solicitarlo',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Orientador Grado Dependencia meskeIA',

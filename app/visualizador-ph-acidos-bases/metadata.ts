@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ph-acidos-bases',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Escala de pH: Ácidos y Bases - Explicador Visual',
     description: 'Descubre el pH de lo que te rodea: del limón a la lejía, pasando por el agua pura.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'pH Ácidos y Bases meskeIA' },
 };

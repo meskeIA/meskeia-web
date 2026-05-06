@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor de Horarios Mundial',
     description: 'Convierte horarios entre zonas horarias. Compara la hora en diferentes ciudades.',
-    url: 'https://next.meskeia.com/conversor-horarios',
+    url: 'https://meskeia.com/conversor-horarios',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Conversor de Horarios | meskeIA',
     description: 'Convierte horarios entre zonas horarias del mundo',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Conversor de Horarios meskeIA',

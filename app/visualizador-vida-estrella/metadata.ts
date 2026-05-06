@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-vida-estrella',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'La Vida de una Estrella - Explicador Visual',
     description: 'El ciclo de vida estelar explicado: del hidrógeno al agujero negro.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Vida Estrella meskeIA' },
 };

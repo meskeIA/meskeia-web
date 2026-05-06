@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sangre-componentes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Componentes de la Sangre - Tubo de Ensayo Visual',
     description: 'Plasma, eritrocitos, leucocitos, plaquetas, grupos ABO/Rh y cascada de coagulación.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sangre Componentes meskeIA' },
 };

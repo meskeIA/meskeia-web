@@ -21,5 +21,11 @@ export const metadata: Metadata = {
     description:
       'Matriz interactiva de 6 tipos de régimen, espectro de poder y evolución histórica agregada. Enfoque puramente tipológico y estructural.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

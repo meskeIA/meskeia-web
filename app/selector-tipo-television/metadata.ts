@@ -25,12 +25,19 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-tipo-television/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿OLED, QLED o LED? Elige la tecnología TV ideal | meskeIA',
     description:
       'Test de 10 preguntas para saber qué tipo de panel de TV te conviene según uso, habitación y presupuesto.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/selector-tipo-television/',

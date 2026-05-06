@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-metamorfosis',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Metamorfosis Animal - Explicador Visual',
     description: 'Tres tipos de metamorfosis animal explicados con animaciones paso a paso.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Metamorfosis Explicador meskeIA' },
 };

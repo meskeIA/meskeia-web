@@ -17,5 +17,11 @@ export const metadata: Metadata = {
     title: 'Diabetes: Mecanismo Biológico de Insulina y Glucagón — meskeIA',
     description: 'Cómo funciona el páncreas y qué mecanismos moleculares alteran la regulación de la glucosa.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

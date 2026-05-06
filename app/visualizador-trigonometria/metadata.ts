@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-trigonometria',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Trigonometría: Círculo Unitario Interactivo — meskeIA',
     description: 'Círculo unitario animado, gráficas con sliders de amplitud/frecuencia/fase e identidades pitagóricas visualizadas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Visualizador Trigonometría meskeIA',

@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Endorfinas - Los Opioides de tu Cuerpo | meskeIA',
     description: 'El mito del runner\'s high, los opioides endógenos y cómo activar el sistema naturalmente.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

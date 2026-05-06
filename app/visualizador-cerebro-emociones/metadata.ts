@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     description:
       'Amígdala, dopamina, circuito del miedo y regulación emocional: la neurociencia de las emociones explicada visualmente.',
     url: 'https://meskeia.com/visualizador-cerebro-emociones/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

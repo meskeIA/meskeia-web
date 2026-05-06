@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-precio-real-cosas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Precio Real de las Cosas',
     description: 'Traduce precios a horas de trabajo. Cambia tu perspectiva sobre el consumo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Precio Real Cosas meskeIA' },
 };

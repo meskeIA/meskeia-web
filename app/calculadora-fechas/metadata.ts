@@ -24,6 +24,12 @@ export const metadata: Metadata = {
       'Calcula diferencias entre fechas, suma/resta días, determina edades exactas y días de la semana',
     type: 'website',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

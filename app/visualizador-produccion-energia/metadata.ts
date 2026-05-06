@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-produccion-energia',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo se Produce la Energía - Explicador Visual',
     description: 'Las fuentes de energía explicadas: mecanismos, costes, CO2 y el futuro energético de España.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Producción Energía meskeIA' },
 };

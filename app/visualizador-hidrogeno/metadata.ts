@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'El elemento más abundante del universo que alimenta las estrellas y podría descarbonizar la economía',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

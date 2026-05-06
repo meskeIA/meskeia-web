@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/mapa-riesgo-emprendedor',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mapa de Riesgo del Emprendedor | meskeIA',
     description: '¿Tienes plan B? Evalúa tus riesgos con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Mapa de Riesgo del Emprendedor meskeIA' },
 };

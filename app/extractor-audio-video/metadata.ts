@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/extractor-audio-video/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Extractor de Audio de Vídeo | meskeIA',
     description: 'Extrae y recorta audio de vídeos AVI, MP4, MOV. 100% privado, sin subir archivos a ningún servidor.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

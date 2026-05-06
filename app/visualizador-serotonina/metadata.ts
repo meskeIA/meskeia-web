@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Serotonina: Mucho Más que la Hormona de la Felicidad',
     description: 'El 90% en el intestino, no en el cerebro. Síntesis, funciones y mecanismo de los SSRI.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

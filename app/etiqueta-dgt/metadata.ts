@@ -23,12 +23,19 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/etiqueta-dgt/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Etiqueta DGT y ZBE — ¿Puedes circular? | meskeIA',
     description:
       'Introduce el combustible y año de tu coche para conocer tu etiqueta DGT y si puedes entrar en las zonas de bajas emisiones.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/etiqueta-dgt/',

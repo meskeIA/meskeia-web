@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Anestesia: Cómo se Apaga y Enciende la Consciencia',
     description: '170 años de cirugía sin dolor: mecanismos moleculares y el misterio que aún no resolvemos.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

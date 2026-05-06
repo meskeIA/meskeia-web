@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-gps',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona el GPS - Satélites y Relatividad',
     description: 'De los satélites a tu bolsillo: trilateración, relojes atómicos y la corrección de Einstein, explicados visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'GPS meskeIA' },
 };

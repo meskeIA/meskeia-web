@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-historia-escritura',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'La Evolución de la Escritura',
     description: '40.000 años de escritura: cuevas, cuneiforme, alfabetos, Gutenberg y emojis. ¿Estamos volviendo a los pictogramas?',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Historia de la Escritura meskeIA' },
 };

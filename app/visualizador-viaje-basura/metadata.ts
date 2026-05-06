@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-viaje-basura',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Viaje de tu Basura - Reciclaje y Residuos',
     description: 'Contenedores, plantas de reciclaje, tiempos de degradación y datos de España: todo sobre tus residuos, explicado visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Viaje Basura meskeIA' },
 };

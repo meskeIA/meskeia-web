@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Flujos Migratorios Globales: Mapa Interactivo 2024',
     description: '117 millones de personas desplazadas forzosamente en el mundo. Visualiza las principales rutas migratorias globales.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -21,12 +21,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-tipos-arroz',
     locale: 'es_ES',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Tipos de Arroz del Mundo',
     description:
       'Aprende a elegir el arroz correcto para cada plato: 30 variedades del mundo, su origen, características y uso ideal.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/guia-tipos-arroz',

@@ -21,11 +21,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/comparador-electrico/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Cuándo compensa el eléctrico? | meskeIA',
     description: 'Calcula el año exacto en que el coche eléctrico empieza a salirte más barato que la gasolina.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/comparador-electrico/',

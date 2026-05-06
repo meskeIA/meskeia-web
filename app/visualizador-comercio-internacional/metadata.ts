@@ -22,5 +22,11 @@ export const metadata: Metadata = {
     description:
       'Ventaja comparativa, balanza comercial, tipos de cambio y aranceles explicados visualmente',
     url: 'https://meskeia.com/visualizador-comercio-internacional/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

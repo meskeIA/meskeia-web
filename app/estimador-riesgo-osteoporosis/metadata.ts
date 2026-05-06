@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-riesgo-osteoporosis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador de Riesgo de Osteoporosis | meskeIA',
     description: 'Test validado de riesgo de osteoporosis y recomendaciones preventivas',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador Riesgo Osteoporosis meskeIA',

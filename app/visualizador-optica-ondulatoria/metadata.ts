@@ -27,11 +27,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-optica-ondulatoria',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Óptica Ondulatoria — Interferencia y Difracción',
     description: 'La naturaleza ondulatoria de la luz en acción: Young, difracción, polarización y coherencia láser.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Óptica Ondulatoria Explicador meskeIA' },
 };

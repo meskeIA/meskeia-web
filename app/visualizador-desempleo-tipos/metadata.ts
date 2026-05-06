@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Por qué hay desempleo, sus 4 tipos y qué pueden hacer las políticas económicas.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

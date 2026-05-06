@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/diario-emocional/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Diario Emocional Visual | meskeIA',
     description: 'Registra tu estado de ánimo diario y descubre patrones emocionales',
+    images: ['https://meskeia.com/og-image.png']
   },
 };
 

@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Lactasa - La Enzima de la Leche | meskeIA',
     description: 'Cómo funciona la lactasa y por qué muchos adultos la pierden.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

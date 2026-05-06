@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/huesos-cuerpo-humano',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Huesos del Cuerpo Humano - Guía Anatómica',
     description: 'Explora los 206 huesos del esqueleto humano con información detallada.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Huesos del Cuerpo Humano meskeIA',

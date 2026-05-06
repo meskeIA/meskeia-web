@@ -12,11 +12,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-seguro-vida/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Seguro de vida sí o no? Test gratuito | meskeIA',
     description: 'Test de 10 preguntas para saber si necesitas seguro de vida y qué cobertura te conviene.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/selector-seguro-vida/' },
   other: {

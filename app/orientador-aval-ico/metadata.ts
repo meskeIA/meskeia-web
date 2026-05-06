@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-aval-ico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Aval ICO Vivienda',
     description:
       'El gobierno avala hasta el 20% de tu hipoteca si tienes menos de 35 años. Descubre cómo funciona y si puedes solicitarlo.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

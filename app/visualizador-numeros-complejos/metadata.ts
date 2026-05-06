@@ -17,5 +17,11 @@ export const metadata: Metadata = {
     title: 'Números Complejos: El Plano de Argand y e^(iπ)+1=0',
     description: 'Multiplicar números complejos es rotar y escalar. Descúbrelo en el plano de Argand interactivo.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-smi',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador SMI 2026 — ¿Cuánto cobras neto?',
     description: 'Calcula tu neto con el nuevo SMI, los atrasos retroactivos y compara con tu provincia.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador SMI meskeIA',

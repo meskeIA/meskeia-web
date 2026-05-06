@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/mapa-compromisos-capacidad',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mapa de Compromisos vs Capacidad | meskeIA',
     description: '¿Tu carga es sostenible? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Mapa de Compromisos vs Capacidad meskeIA',

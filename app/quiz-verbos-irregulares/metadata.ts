@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-verbos-irregulares',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Verbos Irregulares en Inglés | meskeIA',
     description: 'Aprende los verbos irregulares en inglés: 75 verbos, niveles A1-B2, sin publicidad.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Quiz Verbos Irregulares meskeIA',

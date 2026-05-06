@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-emprendimiento',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso de Emprendimiento Práctico',
     description: 'Aprende a emprender con metodología práctica: Pensar, Escuchar, Planear, Clarificar, Respaldar e Iterar.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/mapa-decisiones-urgentes-importantes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mapa de Decisiones Urgentes vs Importantes | meskeIA',
     description: '¿Vives en modo urgencia permanente? Descúbrelo con este test gratuito basado en Eisenhower.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Mapa de Decisiones Urgentes vs Importantes meskeIA',

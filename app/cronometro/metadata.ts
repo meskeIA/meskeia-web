@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cronómetro y Temporizador Online',
     description: 'Mide el tiempo con precisión. Cronómetro con vueltas y temporizador con alarma.',
-    url: 'https://next.meskeia.com/cronometro',
+    url: 'https://meskeia.com/cronometro',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cronómetro y Temporizador | meskeIA',
     description: 'Cronómetro con vueltas y temporizador de cuenta atrás',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Cronómetro meskeIA',

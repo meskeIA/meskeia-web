@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-gastos-deducibles/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Gastos Deducibles Autónomos | meskeIA',
     description: 'Herramienta gratuita para calcular el ahorro fiscal de autónomos con gastos deducibles.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

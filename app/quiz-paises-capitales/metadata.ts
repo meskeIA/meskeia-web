@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-paises-capitales',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Países y Capitales del Mundo | meskeIA',
     description: 'Pon a prueba tu geografía: capitales, banderas y más. 195 países, sin publicidad.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Quiz Países y Capitales meskeIA',

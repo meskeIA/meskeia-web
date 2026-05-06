@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ciclos-sueno',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Qué Pasa Cuando Duermes - Explicador Visual',
     description: 'La ciencia del sueño explicada visualmente: fases, ciclos, necesidades por edad y enemigos del descanso.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Ciclos Sueño meskeIA' },
 };

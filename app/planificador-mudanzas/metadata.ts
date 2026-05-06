@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/planificador-mudanzas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planificador de Mudanzas | meskeIA',
     description: 'Organiza tu mudanza paso a paso: tareas, inventario y presupuesto en una sola herramienta.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Planificador de Mudanzas meskeIA',

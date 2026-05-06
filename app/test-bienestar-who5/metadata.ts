@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-bienestar-who5/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Bienestar WHO-5 | meskeIA',
     description: 'Escala de bienestar de la OMS: 5 preguntas, 2 minutos, con recursos de ayuda',
+    images: ['https://meskeia.com/og-image.png']
   },
 };
 

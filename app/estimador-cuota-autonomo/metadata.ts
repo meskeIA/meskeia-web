@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-cuota-autonomo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Cuota de Autónomo 2025',
     description: 'Estima tu cuota de autónomo según el sistema de cotización por ingresos reales',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador Cuota Autónomo meskeIA',

@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-reclamar-seguro-coche/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía Reclamar Seguro Coche - meskeIA',
     description: 'Guía completa para decidir cuándo reclamar al seguro del coche.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/guia-reclamar-seguro-coche/',

@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     title: 'El Magnesio: 300 Reacciones Enzimáticas y Deficiencia Silenciosa',
     description: 'ATP, músculo, NMDA y la deficiencia infradiagnosticada',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

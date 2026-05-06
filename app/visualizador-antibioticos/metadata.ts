@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'Por qué atacan bacterias pero no virus, y por qué las bacterias aprenden a sobrevivir.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

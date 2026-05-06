@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-oceano',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Los Números del Océano - Explicador Visual',
     description: '71% de la Tierra, 11 km de profundidad, 8M toneladas de plástico/año. Las cifras del océano.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Océano meskeIA' },
 };

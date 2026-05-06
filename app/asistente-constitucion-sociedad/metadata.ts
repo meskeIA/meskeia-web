@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/asistente-constitucion-sociedad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Asistente Constitución Sociedad | meskeIA',
     description: 'Guía completa para crear una SL, SLU o SA: trámites, costes y documentación necesaria.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-tejidos-fibras',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Tejidos y Fibras | meskeIA',
     description: 'Directorio de 35 materiales textiles con propiedades, cuidados, sostenibilidad y usos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía Tejidos y Fibras meskeIA',

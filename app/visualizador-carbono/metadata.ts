@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'Un solo elemento que forma el diamante más duro, el grafeno más delgado y todas las moléculas de la vida',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

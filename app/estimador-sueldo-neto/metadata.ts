@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-sueldo-neto/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Sueldo Neto ↔ Bruto 2025',
     description: 'Oriéntate sobre tu sueldo bruto a neto o neto a bruto. IRPF y SS actualizados.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador Sueldo Neto meskeIA',

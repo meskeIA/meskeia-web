@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-trigonometria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Trigonometría | meskeIA',
     description: 'Herramienta de trigonometría completa online.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

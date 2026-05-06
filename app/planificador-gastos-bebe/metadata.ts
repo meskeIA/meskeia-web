@@ -19,12 +19,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/planificador-gastos-bebe',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planificador de Gastos del Primer Año del Bebé | meskeIA',
     description:
       'Estima el coste del primer año de tu bebé en España. 10 categorías con niveles ajustado, medio y confortable.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Planificador Gastos Bebé meskeIA',

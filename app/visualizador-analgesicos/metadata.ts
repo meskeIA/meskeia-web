@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'Solo uno es antiagregante. Solo uno actúa en el SNC. Solo uno es seguro con estómago vacío. Conoce la diferencia.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

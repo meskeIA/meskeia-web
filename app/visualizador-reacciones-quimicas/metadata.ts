@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-reacciones-quimicas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Reacciones Químicas - Explicador Visual',
     description: 'Los átomos no se crean ni destruyen, solo cambian de pareja. Química visual e interactiva.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Reacciones Químicas meskeIA' },
 };

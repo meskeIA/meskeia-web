@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Visualizador del Índice Glucémico y Carga Glucémica',
     description: 'Por qué la sandía tiene IG alto pero carga glucémica baja. Entiende la diferencia que cambia cómo interpretar los alimentos.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

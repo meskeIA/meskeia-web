@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sistema-nervioso',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Sistema Nervioso - Explicador Visual',
     description: 'De la neurona a los neurotransmisores: el sistema nervioso paso a paso.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sistema Nervioso meskeIA' },
 };

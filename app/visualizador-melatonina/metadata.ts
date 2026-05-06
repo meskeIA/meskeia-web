@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Melatonina - La Hormona del Reloj Interno | meskeIA',
     description: 'Curva circadiana, efecto de la luz, jet lag y suplementos de melatonina.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

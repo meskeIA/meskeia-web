@@ -25,11 +25,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sistema-pensiones',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sistema de Pensiones Español — Visualizador',
     description: 'Reparto vs capitalización, ratio trabajadores/pensionistas, reformas y proyecciones AIREF.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sistema de Pensiones meskeIA' },
 };

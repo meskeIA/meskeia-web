@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-roi-marketing/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador ROI Marketing | meskeIA',
     description: 'Herramienta gratuita para calcular el ROI de tus campañas de marketing digital.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

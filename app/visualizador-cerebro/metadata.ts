@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-cerebro',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Piensa tu Cerebro - Explicador Visual',
     description: '86.000 millones de neuronas, 150 billones de sinapsis. Así funciona la máquina más compleja del universo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Cerebro meskeIA' },
 };

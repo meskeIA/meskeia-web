@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-logica-proposicional',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Lógica Proposicional Interactiva | meskeIA',
     description: 'Tablas de verdad, mapas de Karnaugh y formas normales FNC/FND en un visualizador interactivo para bachillerato y universidad.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Lógica Proposicional meskeIA' },
 };

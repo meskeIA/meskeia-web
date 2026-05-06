@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-transporte-plantas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Transporte en las Plantas - Explicador Visual',
     description: 'El agua sube 100 metros sin motor: descubre el sistema de transporte más eficiente de la naturaleza.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Transporte Plantas Explicador meskeIA' },
 };

@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia/montar-negocio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía para Montar un Negocio en España',
     description: 'Calculadoras de break-even, cashflow, ROI y generador de nombres para emprendedores.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

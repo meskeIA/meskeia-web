@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/mapa-automatizacion-personal',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mapa de Automatización Personal | meskeIA',
     description: '¿Qué tareas deberías automatizar y cuáles proteger? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Mapa de Automatización Personal meskeIA',

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-historia-dinero',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'La Evolución del Dinero - Del Trueque al Bitcoin',
     description: 'La historia del dinero explicada de forma visual: trueque, monedas, billetes, tarjetas y criptomonedas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Historia Dinero meskeIA' },
 };

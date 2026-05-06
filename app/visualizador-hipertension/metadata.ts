@@ -17,11 +17,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-hipertension/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hipertensión — Qué le Ocurre al Cuerpo',
     description: 'El 46% de los hipertensos en España no saben que lo son. Entiende por qué la presión alta daña sin avisar.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Hipertensión meskeIA' },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-termodinamica-quimica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Termodinámica Química - Explicador Visual',
     description: 'ΔG = ΔH - TΔS: cuándo y por qué las reacciones son espontáneas. Con Le Chatelier y equilibrio Kₑq.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Termodinámica Química meskeIA' },
 };

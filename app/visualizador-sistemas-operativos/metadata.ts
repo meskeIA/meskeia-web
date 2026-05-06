@@ -29,12 +29,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sistemas-operativos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sistemas Operativos Interactivo | meskeIA',
     description:
       'Estados de proceso SVG, Gantt de scheduling, paginación y sistema de ficheros. Aprende cómo funciona un SO.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Visualizador Sistemas Operativos meskeIA',

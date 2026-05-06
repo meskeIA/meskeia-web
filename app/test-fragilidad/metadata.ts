@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-fragilidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test de Fragilidad (Escala FRAIL) | meskeIA',
     description: 'Detección precoz de fragilidad en mayores con la escala FRAIL validada',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Test Fragilidad FRAIL meskeIA',

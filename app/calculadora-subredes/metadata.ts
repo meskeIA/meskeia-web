@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-subredes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Subredes IP | meskeIA',
     description: 'Calcula subredes IP con CIDR, máscaras y rangos de hosts.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calculadora de Subredes IP meskeIA',

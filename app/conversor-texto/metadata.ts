@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/conversor-texto/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Conversor de Texto | meskeIA',
     description: 'Convierte texto a diferentes formatos: mayúsculas, minúsculas, invertido y más',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

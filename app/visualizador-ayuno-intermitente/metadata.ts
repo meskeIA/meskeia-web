@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Visualizador del Ayuno Intermitente — Fases Metabólicas',
     description: 'Qué ocurre en tu cuerpo durante el ayuno: glucógeno, gluconeogénesis, cetosis y autofagia explicados paso a paso.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

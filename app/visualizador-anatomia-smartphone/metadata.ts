@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-anatomia-smartphone',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Anatomía de un Smartphone - Componentes, Minerales y Coste Real',
     description: 'Procesador, batería, 30+ minerales de 15 países, márgenes de beneficio y obsolescencia: todo lo que esconde tu móvil.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Anatomía Smartphone meskeIA' },
 };

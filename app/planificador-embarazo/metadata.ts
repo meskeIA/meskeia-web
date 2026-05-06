@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/planificador-embarazo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planificador de Embarazo y Bebé - meskeIA',
     description: 'Calculadora FPP, checklist por trimestres, lista de compras del bebé y calendario de vacunas España 2024.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Planificador de Embarazo meskeIA',

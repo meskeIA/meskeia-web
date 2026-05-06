@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Enchufes por País - Adaptadores para viajeros - meskeIA',
     description: 'Descubre qué enchufe y adaptador necesitas para cada país. Voltaje y frecuencia incluidos.',
     url: 'https://meskeia.com/enchufes-por-pais/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-deduccion-discapacidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimación de Deducción IRPF por Discapacidad | meskeIA',
     description: 'Ahorro fiscal por discapacidad: mínimos personales y familiares en IRPF',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Estimación Deducción Discapacidad meskeIA' },
 };

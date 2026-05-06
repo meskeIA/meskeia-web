@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-estrategia-empresarial',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso de Estrategia Empresarial | meskeIA',
     description: 'Pensamiento estratégico para la era de la incertidumbre. 10 capítulos, 120 minutos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Curso Estrategia Empresarial meskeIA',

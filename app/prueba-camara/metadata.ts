@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/prueba-camara',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Prueba de Cámara Web Online',
     description: 'Test de webcam gratis antes de tus videollamadas',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

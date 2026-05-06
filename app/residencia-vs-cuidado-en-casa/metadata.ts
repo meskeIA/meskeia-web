@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/residencia-vs-cuidado-en-casa/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Residencia vs Cuidado en Casa | meskeIA',
     description: 'Comparativa de opciones de cuidado para mayores: costes y factores clave',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Residencia vs Cuidado en Casa meskeIA',

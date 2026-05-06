@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-madurez-digital/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Test Madurez Digital en el Trabajo',
     description:
       '¿Qué tan digital es tu empresa? 15 preguntas → perfil de madurez + recomendaciones prácticas. ¡Descúbrelo ahora!',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-coste-plazos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Coste Real a Plazos - meskeIA',
     description: 'Descubre el precio oculto de comprar a plazos. Calcula TAE e intereses reales.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-desarrollo-farmaco',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo se Descubre un Medicamento - Explicador Visual',
     description: 'De 10.000 moléculas candidatas a 1 medicamento aprobado: el pipeline farmacéutico explicado visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Desarrollo Fármaco meskeIA' },
 };

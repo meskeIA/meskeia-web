@@ -19,12 +19,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-facturacion-retencion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador de Retenciones IRPF - Autónomos 2025 | meskeIA',
     description:
       'Descubre qué retención IRPF aplicar en tus facturas como autónomo. 15%, 7% inicio de actividad, arrendamientos y más.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Orientador Facturación Retención meskeIA',

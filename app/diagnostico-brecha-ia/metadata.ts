@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/diagnostico-brecha-ia',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Diagnóstico de Brecha IA | meskeIA',
     description: '¿La IA te hace mejor o te hace dependiente? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Diagnóstico de Brecha IA meskeIA',

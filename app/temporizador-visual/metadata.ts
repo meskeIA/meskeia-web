@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/temporizador-visual/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Temporizador Visual | meskeIA',
     description: 'Cuenta atrás con colores y botones grandes. Ideal para personas con autismo o dificultades cognitivas.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

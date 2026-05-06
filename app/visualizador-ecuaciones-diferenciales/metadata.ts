@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ecuaciones-diferenciales',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Visualizador de Ecuaciones Diferenciales',
     description: 'Campo de direcciones, Lotka-Volterra animado y aplicaciones reales: enfriamiento Newton y circuitos RC como ODE.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Ecuaciones Diferenciales meskeIA' },
 };

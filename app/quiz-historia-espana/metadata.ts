@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-historia-espana/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Historia de España',
     description:
       '¿Cuánto sabes de historia española? Desde los romanos hasta la Constitución de 1978. ¡Pon a prueba tus conocimientos!',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

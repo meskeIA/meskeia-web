@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-musculos-movimiento',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Músculos y Movimiento - Explicador Visual',
     description: 'Del sarcómero a las articulaciones: cómo se mueve el cuerpo humano.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Músculos y Movimiento meskeIA' },
 };

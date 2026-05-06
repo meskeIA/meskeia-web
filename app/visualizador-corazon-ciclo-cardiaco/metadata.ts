@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     title: 'Ciclo Cardíaco | meskeIA',
     description: 'Sístole, diástole, válvulas y ECG con animaciones interactivas',
     url: 'https://meskeia.com/visualizador-corazon-ciclo-cardiaco/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

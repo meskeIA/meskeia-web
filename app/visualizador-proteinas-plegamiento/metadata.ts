@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-proteinas-plegamiento',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Plegamiento de Proteínas: Estructura y Enfermedades',
     description: 'Del gen a la estructura 3D: 4 niveles, funnel energético y enfermedades de mal plegamiento.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Plegamiento de Proteínas meskeIA' },
 };

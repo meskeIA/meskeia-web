@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/checklist-pre-mortem',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Checklist Pre-Mortem | meskeIA',
     description: '¿Anticipas riesgos o confías en que todo saldrá bien? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Checklist Pre-Mortem meskeIA',

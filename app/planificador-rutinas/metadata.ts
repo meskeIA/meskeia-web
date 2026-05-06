@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/planificador-rutinas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planificador Visual de Rutinas | meskeIA',
     description: 'Agenda visual con pictogramas para estructurar el día. Ideal para autismo y TDAH.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

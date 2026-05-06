@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-tarifa-freelance/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Tarifa Freelance | meskeIA',
     description: 'Herramienta gratuita para calcular tu tarifa freelance ideal. Evita cobrar de menos.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

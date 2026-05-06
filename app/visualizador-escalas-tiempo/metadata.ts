@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-escalas-tiempo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cuánto Tarda el Mundo',
     description: 'Visualiza escalas temporales que desafían tu intuición.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Escalas Tiempo meskeIA' },
 };

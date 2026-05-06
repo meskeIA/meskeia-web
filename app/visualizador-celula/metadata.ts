@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-celula',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'La Célula por Dentro - Explicador Visual',
     description: '37,2 billones de células en tu cuerpo. ¿Sabes qué hay dentro de cada una?',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Célula Explicador meskeIA' },
 };

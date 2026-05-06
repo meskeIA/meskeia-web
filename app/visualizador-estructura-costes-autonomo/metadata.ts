@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-estructura-costes-autonomo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estructura de Costes del Autónomo - Explicador Visual',
     description: 'De lo que facturas a lo que te queda: cascada interactiva con IVA, RETA, IRPF y gastos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Visualizador Estructura Costes Autónomo meskeIA',

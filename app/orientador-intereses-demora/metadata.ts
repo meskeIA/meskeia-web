@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-intereses-demora/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador de Intereses de Demora 2025',
     description: 'Cuánto puedes reclamar por facturas impagadas: interés comercial (BCE+8pp) e interés civil para España 2025.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

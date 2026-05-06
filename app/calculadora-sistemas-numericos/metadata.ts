@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-sistemas-numericos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Sistemas Numéricos - meskeIA',
     description: 'Convierte entre binario, octal, decimal y hexadecimal con pasos detallados.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calculadora Sistemas Numéricos meskeIA',

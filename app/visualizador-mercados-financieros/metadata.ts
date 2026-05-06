@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Visualizador de Mercados Financieros | meskeIA',
     description: 'Cómo funciona la bolsa: libro de órdenes, formación de precios, tipos de activos e índices bursátiles.',
     url: 'https://meskeia.com/visualizador-mercados-financieros/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

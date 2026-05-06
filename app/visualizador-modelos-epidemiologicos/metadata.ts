@@ -27,11 +27,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-modelos-epidemiologicos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Modelos Epidemiológicos SIR/SEIR',
     description: 'Las matemáticas que predicen cómo se propagan las enfermedades. Simulador interactivo con curvas en tiempo real.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Modelos Epidemiológicos SIR SEIR meskeIA' },
 };

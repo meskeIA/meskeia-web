@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ciclo-agua',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Ciclo del Agua - El Viaje Infinito de cada Gota',
     description: 'El agua que bebes hoy puede haber sido bebida por un dinosaurio. Explicador visual interactivo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Ciclo del Agua meskeIA' },
 };

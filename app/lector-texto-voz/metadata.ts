@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/lector-texto-voz/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Lector de Texto en Voz Alta | meskeIA',
     description: 'Text-to-speech en español con resaltado de palabras en tiempo real. Gratis y sin registro.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

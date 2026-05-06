@@ -21,5 +21,11 @@ export const metadata: Metadata = {
     description:
       'Tokens, embeddings, atención y temperatura explicados con visualizaciones interactivas',
     url: 'https://meskeia.com/visualizador-llm-funcionamiento/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

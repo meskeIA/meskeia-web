@@ -17,5 +17,11 @@ export const metadata: Metadata = {
     title: 'El Oro: Por Qué la Relatividad Explica su Color y su Nobleza',
     description: 'Einstein explica por qué el oro es amarillo, no se oxida y está en cada circuito electrónico',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

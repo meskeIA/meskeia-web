@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/requisitos-nomada-digital/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Visa Nómada Digital — ¿Cumples los Requisitos?',
     description:
       'Comprueba en minutos si puedes optar a la Visa Nómada Digital española. Empleado o freelancer, con ingresos mínimos y documentación.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

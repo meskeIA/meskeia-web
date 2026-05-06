@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Selector de Formación Postgrado — ¿Máster, FP, Bootcamp u Oposiciones?',
     description: 'Descubre qué tipo de formación postgrado se adapta mejor a tu perfil en 10 preguntas.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

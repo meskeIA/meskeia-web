@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/contador-silabas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Contador de Sílabas en Español - meskeIA',
     description: 'Cuenta y separa las sílabas de cualquier texto en español',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

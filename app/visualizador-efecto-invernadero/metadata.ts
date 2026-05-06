@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-efecto-invernadero',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Efecto Invernadero - Explicador Visual Interactivo',
     description: 'CO₂, metano, vapor de agua: cómo funcionan los gases de efecto invernadero y por qué el exceso es el problema.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Efecto Invernadero meskeIA' },
 };

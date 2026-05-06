@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-adn-codigo-genetico',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ADN y Código Genético - Explicador Visual Interactivo',
     description: '3.200 millones de letras forman tu libro de instrucciones. Descubre cómo se leen.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'ADN y Código Genético meskeIA' },
 };

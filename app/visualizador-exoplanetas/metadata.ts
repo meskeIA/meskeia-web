@@ -23,5 +23,11 @@ export const metadata: Metadata = {
     description:
       'Animaciones interactivas del método de tránsito, velocidad radial, zona habitable y clasificación de los más de 5.500 exoplanetas confirmados.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

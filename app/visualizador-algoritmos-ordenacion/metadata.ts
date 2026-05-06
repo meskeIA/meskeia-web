@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Algoritmos de Ordenación: Visualizador Paso a Paso | meskeIA',
     description: 'Por qué Quicksort es 100 veces más rápido que Burbuja en listas grandes — visualizado paso a paso.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

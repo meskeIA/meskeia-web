@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/compresor-imagenes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Compresor de Imágenes por Lotes | meskeIA',
     description: 'Comprime múltiples imágenes sin límites ni marcas de agua. 100% gratis.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Compresor de Imágenes meskeIA',

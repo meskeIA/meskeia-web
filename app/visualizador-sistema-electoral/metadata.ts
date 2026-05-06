@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sistema-electoral',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona una Elección — Sistemas Electorales Explicados',
     description: 'Ley D\'Hondt paso a paso, sistemas electorales comparados y el efecto de las circunscripciones en España.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sistema Electoral meskeIA' },
 };

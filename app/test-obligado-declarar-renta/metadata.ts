@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/test-obligado-declarar-renta',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Estoy obligado a declarar la Renta 2025?',
     description: 'Test rápido con los umbrales actualizados de la campaña 2026.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Test Obligación Declarar Renta meskeIA',

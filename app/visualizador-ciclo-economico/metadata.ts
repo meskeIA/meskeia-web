@@ -30,12 +30,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ciclo-economico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ciclo Económico — Expansión, Recesión y Yield Curve | meskeIA',
     description:
       'Fases del ciclo económico, indicadores líderes y curva de rendimientos invertida como predictor de recesión.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Ciclo Económico meskeIA',

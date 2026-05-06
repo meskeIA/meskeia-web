@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-clima',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona el Clima - Explicador Visual',
     description: 'Efecto invernadero, corrientes oceánicas y calentamiento global explicados con datos y visualizaciones.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Clima meskeIA' },
 };

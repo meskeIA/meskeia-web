@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estadistica-avanzada/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora Estadística Avanzada | meskeIA',
     description: 'Tests de hipótesis, regresión, correlación e intervalos de confianza. Análisis estadístico profesional gratis.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estadística Avanzada meskeIA',

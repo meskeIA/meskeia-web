@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/recortador-audio',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Recortador de Audio Online | meskeIA',
     description: 'Recorta MP3, WAV, OGG gratis. Sin límites ni marcas de agua.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Recortador de Audio meskeIA',

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-idiomas-mundo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Mapa de los Idiomas del Mundo',
     description: 'Más de 7.000 idiomas en el mundo: familias, hablantes, lenguas en peligro y curiosidades fascinantes.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Idiomas del Mundo meskeIA' },
 };

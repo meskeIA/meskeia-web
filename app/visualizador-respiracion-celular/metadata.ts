@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-respiracion-celular',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Respiración Celular - Explicador Visual',
     description: 'De una molécula de glucosa a 38 ATP: la respiración celular como nunca la habías visto.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Respiración Celular Explicador meskeIA' },
 };

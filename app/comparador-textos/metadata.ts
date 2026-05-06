@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Comparador de Textos Online - Diff',
     description: 'Compara dos textos lado a lado y encuentra todas las diferencias. Herramienta gratuita.',
-    url: 'https://next.meskeia.com/comparador-textos',
+    url: 'https://meskeia.com/comparador-textos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de Textos | meskeIA',
     description: 'Encuentra diferencias entre dos textos con resaltado visual',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Comparador de Textos meskeIA',

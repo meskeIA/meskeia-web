@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-decisiones-inversion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso Decisiones de Inversión | meskeIA',
     description: 'Aprende a invertir desde cero con nuestro curso gratuito. 10 capítulos + herramientas + casos reales.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Curso Decisiones de Inversión meskeIA',

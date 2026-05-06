@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     description:
       'Guías paso a paso para las decisiones más importantes de tu vida. Herramientas gratuitas para tomar mejores decisiones.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   robots: 'index, follow',
 };

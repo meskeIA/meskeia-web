@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calendario-fiscal-emprendedor',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calendario Fiscal del Emprendedor - meskeIA',
     description: 'Todas las fechas fiscales para autónomos y sociedades en España. No te pierdas ninguna declaración.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calendario Fiscal meskeIA',

@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Por qué los océanos absorben el 30% de nuestras emisiones y qué pasa cuando ese sumidero se satura.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

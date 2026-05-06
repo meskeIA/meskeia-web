@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Visualizador del Envejecimiento Celular | meskeIA',
     description: 'Telómeros, senescencia, hallmarks of aging y relojes biológicos: los mecanismos moleculares del envejecimiento explicados visualmente.',
     url: 'https://meskeia.com/visualizador-envejecimiento-celular/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

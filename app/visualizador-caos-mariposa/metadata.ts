@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Dos trayectorias separadas por 0.01 que acaban en lugares completamente distintos. El caos visualizado.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

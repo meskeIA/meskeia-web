@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-especias',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Especias | meskeIA',
     description: 'Directorio de 65 especias: perfil de sabor, usos culinarios y consejos de conservación.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Guía Especias meskeIA',

@@ -20,12 +20,19 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_ES',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Tipos de Pasta Italiana',
     description:
       'Descubre 40 tipos de pasta italiana: forma, región, tiempo de cocción y salsa ideal.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/guia-tipos-pasta',

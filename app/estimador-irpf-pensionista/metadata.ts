@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-irpf-pensionista/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador IRPF Pensionista 2025 | meskeIA',
     description: 'Renta del pensionista orientativa: cuota IRPF y pensión neta mensual 2025',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimador IRPF Pensionista meskeIA',

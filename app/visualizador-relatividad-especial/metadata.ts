@@ -21,5 +21,11 @@ export const metadata: Metadata = {
     description:
       'Dilatación del tiempo, E=mc² y paradoja de los gemelos con sliders interactivos',
     url: 'https://meskeia.com/visualizador-relatividad-especial/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

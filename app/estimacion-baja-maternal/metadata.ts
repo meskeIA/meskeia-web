@@ -19,12 +19,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-baja-maternal',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimacion de Baja Maternal y Paternal | meskeIA',
     description:
       'Calcula la duracion y distribucion del permiso por nacimiento en Espana. Timeline visual con semanas obligatorias, voluntarias y extras.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimacion Baja Maternal meskeIA',

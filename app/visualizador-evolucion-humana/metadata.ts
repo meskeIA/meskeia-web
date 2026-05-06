@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Evolución Humana | meskeIA',
     description: 'De Lucy a Homo sapiens: timeline, migraciones y revolución cognitiva',
     url: 'https://meskeia.com/visualizador-evolucion-humana/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

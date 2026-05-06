@@ -27,11 +27,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-circuitos-electronicos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Circuitos Electrónicos: de la física al chip',
     description: 'Visualizador interactivo: R/L/C, transistor BJT, puertas lógicas y la jerarquía del transistor al procesador.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Circuitos Electrónicos meskeIA' },
 };

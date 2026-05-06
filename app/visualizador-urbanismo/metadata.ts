@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     siteName: 'meskeIA',
     locale: 'es_ES',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Urbanismo y Planificación Urbana',
     description: 'Modelos urbanos, densidad de ciudades del mundo, movilidad y sostenibilidad. Herramienta visual educativa.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };
 

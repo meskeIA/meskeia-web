@@ -17,5 +17,11 @@ export const metadata: Metadata = {
     title: 'Vitamina B12: Ciclo de Metilación y Factor Intrínseco',
     description: 'Sistema de absorción especial, grupos de riesgo y síntomas neurológicos',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-plusvalia-municipal/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador Plusvalía Municipal (IIVTNU) 2025',
     description: 'Oriéntate sobre el impuesto municipal al vender o heredar un inmueble. Dos métodos comparados según RDL 26/2021.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

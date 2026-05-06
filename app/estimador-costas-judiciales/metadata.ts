@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-costas-judiciales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador de Costas Judiciales 2026 | meskeIA',
     description: 'Calcula cuánto puede costar un juicio en España: abogado, procurador, tasas y peritos',
+    images: ['https://meskeia.com/og-image.png']
   },
 };
 

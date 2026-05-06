@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/quiz-reinos-naturaleza',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Reinos de la Naturaleza | meskeIA',
     description: 'Clasifica organismos sorprendentes: desde murciélagos hasta virus. 43 casos, 3 niveles, con curiosidades científicas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Quiz Reinos de la Naturaleza meskeIA',

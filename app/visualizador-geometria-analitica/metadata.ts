@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-geometria-analitica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Geometría Analítica — Cónicas Interactivas',
     description: 'Explora las 4 cónicas con gráficas SVG interactivas, sliders y ecuaciones canónicas en tiempo real.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Geometría Analítica meskeIA' },
 };

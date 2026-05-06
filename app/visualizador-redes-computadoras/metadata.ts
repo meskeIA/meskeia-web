@@ -27,11 +27,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-redes-computadoras',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Redes de Computadoras: TCP/IP, DNS, Routing y CDN',
     description: 'Visualiza cómo internet funciona por dentro: TCP/IP, DNS, BGP y CDN con animaciones interactivas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Visualizador Redes Computadoras meskeIA' },
 };

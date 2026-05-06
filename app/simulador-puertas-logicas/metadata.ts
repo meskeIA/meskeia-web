@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-puertas-logicas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Puertas Lógicas | meskeIA',
     description: 'Simula puertas lógicas, genera tablas de verdad y prueba circuitos digitales.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

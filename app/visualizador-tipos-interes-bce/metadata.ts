@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'Cómo el BCE sube tipos y afecta a hipotecas, bolsa, crédito y economía real',
     url: 'https://meskeia.com/visualizador-tipos-interes-bce/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'Del sauce al laboratorio: cómo la aspirina inhibe irreversiblemente COX y bloquea prostaglandinas.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

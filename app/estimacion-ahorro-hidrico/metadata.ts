@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-ahorro-hidrico',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimación de Ahorro Hídrico | meskeIA',
     description: 'Descubre cuánta agua y dinero puedes ahorrar en casa con 10 hábitos sostenibles.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimación de Ahorro Hídrico meskeIA',

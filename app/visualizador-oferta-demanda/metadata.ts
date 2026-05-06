@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-oferta-demanda',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Oferta, Demanda y por qué Suben los Precios',
     description: 'Visualiza cómo las curvas de oferta y demanda determinan los precios con ejemplos reales.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Oferta Demanda meskeIA' },
 };

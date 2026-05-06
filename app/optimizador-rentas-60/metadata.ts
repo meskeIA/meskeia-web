@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/optimizador-rentas-60/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Optimizador de Rentas 60+ | meskeIA',
     description: 'Minimiza el IRPF en la jubilación: orden óptimo de retirada de pensión, PP, ahorro y alquiler',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Optimizador Rentas 60 meskeIA',

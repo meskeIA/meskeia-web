@@ -18,11 +18,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-bono-joven-alquiler/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador Bono Joven Alquiler',
     description:
       'Comprueba si tienes derecho al Bono Alquiler Joven: €250/mes durante 2 años. Orientador rápido y gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

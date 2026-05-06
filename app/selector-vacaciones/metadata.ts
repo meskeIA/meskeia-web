@@ -23,11 +23,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-vacaciones/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Qué vacaciones te convienen? Test gratuito | meskeIA',
     description: 'Test de 10 preguntas para descubrir tu tipo de vacaciones ideal.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/selector-vacaciones/' },
   other: {

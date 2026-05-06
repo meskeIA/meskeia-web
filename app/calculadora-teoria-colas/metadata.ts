@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-teoria-colas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora Teoría de Colas M/M/1 | meskeIA',
     description: 'Analiza sistemas de colas M/M/1 con métricas completas y gráficos interactivos.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

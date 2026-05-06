@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-proceso-legislativo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Viaje de una Ley - Proceso Legislativo en España',
     description: 'Cómo nace, se debate, se aprueba y se publica una ley en España. Explicador visual interactivo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Proceso Legislativo meskeIA' },
 };

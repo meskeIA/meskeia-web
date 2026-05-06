@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/time-tracker/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Time Tracker - meskeIA',
     description: 'Registro de horas por proyecto para freelancers y autónomos',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Time Tracker meskeIA',

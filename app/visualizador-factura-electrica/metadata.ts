@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-factura-electrica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tu Electricidad al Desnudo',
     description: 'Entiende por qué pagas lo que pagas de luz.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Factura Eléctrica meskeIA' },
 };

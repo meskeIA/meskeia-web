@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimador-impuesto-donaciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador del Impuesto de Donaciones 2025',
     description: 'Estima el ISD donaciones en las 17 comunidades autónomas. Orientación fiscal antes de acudir al asesor.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

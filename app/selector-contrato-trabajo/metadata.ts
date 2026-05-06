@@ -25,12 +25,19 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-contrato-trabajo/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Qué tipo de contrato te conviene? Test gratuito | meskeIA',
     description:
       'Test de 10 preguntas para elegir entre contrato indefinido, temporal, autónomo, prácticas o funcionario.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/selector-contrato-trabajo/' },
   other: {

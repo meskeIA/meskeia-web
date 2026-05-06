@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-viaje-paquete',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Viaje de un Paquete - Logística del E-commerce',
     description: 'Almacén, transporte, última milla: el viaje invisible de cada paquete que compras online.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Viaje Paquete meskeIA' },
 };

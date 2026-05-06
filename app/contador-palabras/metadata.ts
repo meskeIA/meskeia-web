@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Contador de Palabras y Caracteres Online',
     description: 'Analiza tu texto: cuenta palabras, caracteres, párrafos. Calcula tiempo de lectura y densidad de palabras clave.',
-    url: 'https://next.meskeia.com/contador-palabras',
+    url: 'https://meskeia.com/contador-palabras',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Contador de Palabras | meskeIA',
     description: 'Cuenta palabras, caracteres, párrafos y tiempo de lectura',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Contador de Palabras meskeIA',

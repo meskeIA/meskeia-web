@@ -17,11 +17,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-sistema-linfatico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Sistema Linfático — Explicador Visual',
     description: 'El sistema olvidado: drenaje, inmunidad y equilibrio de fluidos explicados visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Sistema Linfático meskeIA' },
 };

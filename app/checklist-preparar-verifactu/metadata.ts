@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/checklist-preparar-verifactu/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Checklist VeriFactu 2027 | meskeIA',
     description: 'Prepara tu negocio para la facturación electrónica obligatoria. Requisitos, plazos, software y sanciones.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Checklist VeriFactu meskeIA',

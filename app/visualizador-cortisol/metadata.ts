@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Cortisol - Hormona del Estrés | meskeIA',
     description: 'Ritmo circadiano, estrés agudo vs crónico, efectos en el cuerpo y moduladores',
     url: 'https://meskeia.com/visualizador-cortisol/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

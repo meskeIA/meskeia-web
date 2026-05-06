@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-setas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Setas - Identificación y comestibilidad',
     description: '40 setas con ficha completa: comestibilidad, hábitat, temporada, especies confusas y avisos de seguridad. Micología para todos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Guía de Setas meskeIA' },
 };

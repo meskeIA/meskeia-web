@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     title: 'Visualizador del Metabolismo del Alcohol — Acetaldehído',
     description: 'Cómo el cuerpo metaboliza el alcohol y por qué el acetaldehído es el protagonista perjudicial: hígado, boca, cerebro y estómago.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

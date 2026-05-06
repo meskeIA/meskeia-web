@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Limpiador de Texto Online - Formatea y Limpia',
     description: 'Elimina espacios extra, líneas duplicadas, caracteres especiales y más. Herramienta gratuita.',
-    url: 'https://next.meskeia.com/limpiador-texto',
+    url: 'https://meskeia.com/limpiador-texto',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Limpiador de Texto | meskeIA',
     description: 'Limpia texto: elimina espacios, duplicados, caracteres especiales',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Limpiador de Texto meskeIA',

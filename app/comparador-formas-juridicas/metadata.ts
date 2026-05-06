@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/comparador-formas-juridicas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Comparador de Formas Jurídicas - meskeIA',
     description: 'Autónomo vs SL vs Cooperativa: encuentra la mejor opción para tu negocio.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Comparador Formas Jurídicas meskeIA',

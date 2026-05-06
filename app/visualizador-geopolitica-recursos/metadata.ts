@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Geopolítica de los Recursos | meskeIA',
     description: 'Mapa interactivo de recursos estratégicos globales y la dependencia de Europa.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

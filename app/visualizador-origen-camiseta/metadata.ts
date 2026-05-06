@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-origen-camiseta',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'De dónde Viene tu Camiseta',
     description: '¿Cuánto cuesta realmente hacer una camiseta? Descubre el desglose global etapa por etapa.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Origen Camiseta meskeIA' },
 };

@@ -18,5 +18,11 @@ export const metadata: Metadata = {
     description:
       'Neurotransmisor en el cerebro, hormona en la sangre. Cascada lucha-huida, receptores α y β y casos donde salva vidas.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

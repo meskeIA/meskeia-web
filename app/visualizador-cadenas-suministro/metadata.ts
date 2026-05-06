@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Just-in-time, disrupciones históricas y relocalización — la logística que mueve la economía global.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

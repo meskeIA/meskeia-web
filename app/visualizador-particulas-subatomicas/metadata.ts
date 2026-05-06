@@ -25,6 +25,12 @@ export const metadata: Metadata = {
     description:
       'Modelo Estándar completo: quarks, leptones, bosones y las 4 fuerzas fundamentales con visualizaciones interactivas',
     url: 'https://meskeia.com/visualizador-particulas-subatomicas/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 

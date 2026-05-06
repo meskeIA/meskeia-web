@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/cara-o-cruz',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cara o Cruz | meskeIA',
     description: 'Moneda virtual con animación realista y estadísticas.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

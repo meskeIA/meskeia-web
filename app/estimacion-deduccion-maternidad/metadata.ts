@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-deduccion-maternidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimacion de Deduccion por Maternidad IRPF | meskeIA',
     description: 'Deduccion maternidad IRPF: 1.200 euros/ano + 1.000 euros guarderia por hijo menor de 3 anos',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Estimacion Deduccion Maternidad meskeIA' },
 };

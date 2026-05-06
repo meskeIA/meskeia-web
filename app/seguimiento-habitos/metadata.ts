@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/seguimiento-habitos',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Seguimiento de Hábitos - meskeIA',
     description: 'Construye rutinas saludables con visualización de rachas y logros',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

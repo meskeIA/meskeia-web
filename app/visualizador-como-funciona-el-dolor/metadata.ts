@@ -19,11 +19,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-como-funciona-el-dolor',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Funciona el Dolor — Explicador Visual',
     description: 'De la lesión al cerebro: las 4 fases del dolor, tipos y sensibilización central explicados visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Cómo Funciona el Dolor meskeIA' },
 };

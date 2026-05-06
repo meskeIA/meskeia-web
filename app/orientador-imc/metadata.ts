@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-imc',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador IMC - Índice de Masa Corporal',
     description: 'Calcula tu IMC gratis y conoce tu clasificación según la OMS.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

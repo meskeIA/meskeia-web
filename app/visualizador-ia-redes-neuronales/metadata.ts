@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Visualizador de Redes Neuronales e IA | meskeIA',
     description: 'Cómo aprende una IA: neuronas artificiales, capas, entrenamiento y backpropagation explicados visualmente.',
     url: 'https://meskeia.com/visualizador-ia-redes-neuronales/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

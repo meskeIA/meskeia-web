@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Océanos y Corrientes Oceánicas | meskeIA',
     description: 'AMOC, corriente del Golfo, acidificación y zonas muertas visualizadas interactivamente',
     url: 'https://meskeia.com/visualizador-oceanos-corrientes/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

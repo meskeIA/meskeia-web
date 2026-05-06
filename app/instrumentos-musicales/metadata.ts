@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/instrumentos-musicales',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Instrumentos Musicales - Guía Completa',
     description: 'Explora 45 instrumentos musicales de todo el mundo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Instrumentos Musicales meskeIA',

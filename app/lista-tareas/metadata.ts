@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lista de Tareas - Organiza tu Productividad',
     description: 'Gestiona tus tareas con prioridades y fechas. Sin registro, 100% privado.',
-    url: 'https://next.meskeia.com/lista-tareas',
+    url: 'https://meskeia.com/lista-tareas',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Lista de Tareas | meskeIA',
     description: 'Organiza tus tareas con prioridades y fechas límite',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Lista de Tareas meskeIA',

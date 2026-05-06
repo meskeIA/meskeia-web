@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Economía Circular | meskeIA',
     description: 'Del modelo lineal a los ciclos cerrados: estrategias, datos de España y casos reales',
     url: 'https://meskeia.com/visualizador-economia-circular/',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

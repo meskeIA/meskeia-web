@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'De la falla geológica al tsunami en 800 km/h: todos los principios de la sismología y la alerta temprana.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

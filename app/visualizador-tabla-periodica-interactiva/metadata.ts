@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-tabla-periodica-interactiva',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tendencias Tabla Periódica - Explicador Visual',
     description: 'La tabla periódica como nunca la habías visto: mapas de calor de propiedades atómicas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Tabla Periódica Tendencias meskeIA' },
 };

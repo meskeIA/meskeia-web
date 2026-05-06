@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-anatomia-vuelo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Anatomia de un Vuelo - Explicador Visual',
     description: 'Por que vuelan los aviones, las 7 fases de un vuelo y datos reales de un Madrid-Londres.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Anatomia Vuelo meskeIA' },
 };

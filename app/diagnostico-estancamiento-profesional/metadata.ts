@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/diagnostico-estancamiento-profesional',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Diagnóstico de Estancamiento Profesional | meskeIA',
     description: '¿Estás en zona de confort, estrés o flujo? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Diagnóstico de Estancamiento Profesional meskeIA',

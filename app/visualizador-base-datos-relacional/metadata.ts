@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'Por qué un índice convierte una búsqueda de segundos en milisegundos — y cuándo NoSQL es mejor opción.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

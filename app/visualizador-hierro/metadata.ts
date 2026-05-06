@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'El Hierro: Hemoglobina, Absorción y Anemia Ferropénica',
     description: 'Absorción hemo vs no hemo, hepcidina y espectro desde déficit hasta sobrecarga',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-estados-materia',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estados de la Materia - Explicador Visual',
     description: 'De -273°C al plasma solar: los 4 estados de la materia con animaciones interactivas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Estados Materia meskeIA' },
 };

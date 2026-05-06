@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/lista-equipaje',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Lista de Equipaje Inteligente - meskeIA',
     description: 'Genera tu checklist de viaje personalizado según destino y tipo de viaje.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Lista de Equipaje - meskeIA',

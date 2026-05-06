@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Impacto de la IA en los Sectores | meskeIA',
     description: 'Automatización por sector, empleos en riesgo y emergentes, y el futuro del trabajo con IA.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

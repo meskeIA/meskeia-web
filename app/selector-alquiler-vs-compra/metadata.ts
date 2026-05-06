@@ -23,11 +23,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-alquiler-vs-compra/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Alquilar o comprar casa? Test gratuito | meskeIA',
     description: 'Test de 10 preguntas para saber si estás en el momento vital adecuado para comprar o si es mejor seguir alquilando.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/selector-alquiler-vs-compra/' },
   other: {

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-diversificacion-clientes',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador de Diversificación de Clientes Freelance | meskeIA',
     description: 'Analiza la concentración de tu cartera de clientes con el índice Herfindahl. Detecta dependencia excesiva y riesgo de falso autónomo.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Orientador Diversificación Clientes meskeIA',

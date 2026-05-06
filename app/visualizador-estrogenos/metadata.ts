@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Estrógenos - Hormonas del Ciclo y la Salud | meskeIA',
     description: 'Fisiología de los estrógenos: tipos, ciclo menstrual, menopausia y efectos en el cuerpo.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

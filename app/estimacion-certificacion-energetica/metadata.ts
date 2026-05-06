@@ -19,12 +19,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-certificacion-energetica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimacion de Certificacion Energetica | meskeIA',
     description:
       'Descubre la letra energetica aproximada de tu vivienda (A-G) segun antiguedad, aislamiento y sistemas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Estimacion Certificacion Energetica meskeIA',

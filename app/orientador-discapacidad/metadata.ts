@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/orientador-discapacidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Orientador Grado de Discapacidad | meskeIA',
     description: '¿Vale la pena solicitar el reconocimiento de discapacidad? Test orientativo gratuito basado en criterios del RD 888/2022.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

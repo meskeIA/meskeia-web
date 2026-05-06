@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-materiales-construccion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Materiales de Construcción | meskeIA',
     description: 'Calcula azulejos, pintura, tarima y mortero para tus reformas en pocos segundos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Calculadora Materiales Construcción meskeIA',

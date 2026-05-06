@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-marketing-digital/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso de Marketing Digital 2025',
     description: 'Aprende marketing digital con estrategias actualizadas a 2025. Curso gratuito de meskeIA.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

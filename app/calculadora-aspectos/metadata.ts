@@ -15,5 +15,11 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-aspectos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

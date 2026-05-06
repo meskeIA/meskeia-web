@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-funciones-mundo',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Funciones que Gobiernan el Mundo',
     description: 'Lineal, exponencial, logarítmica y cuadrática con ejemplos reales.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Funciones Mundo meskeIA' },
 };

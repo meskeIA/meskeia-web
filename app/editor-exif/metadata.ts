@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/editor-exif',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Editor EXIF - Visualiza y Elimina Metadatos | meskeIA',
     description: 'Analiza y elimina datos ocultos de tus fotos. Protege tu privacidad al compartir imágenes.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Editor EXIF meskeIA',

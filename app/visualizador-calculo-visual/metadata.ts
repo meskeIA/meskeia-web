@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Cálculo Visual: Límites, Derivadas e Integrales',
     description: 'El teorema fundamental que une derivadas e integrales, animado para que lo entiendas de verdad.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

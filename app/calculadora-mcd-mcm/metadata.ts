@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/calculadora-mcd-mcm/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora MCD y MCM Online',
     description: 'Calcula el MCD y MCM de varios números con explicación paso a paso.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

@@ -19,5 +19,11 @@ export const metadata: Metadata = {
     description:
       'El 85% de los fondos activos no baten al índice en 10 años — y las comisiones son la razón principal.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/analisis-decision-reversible',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Análisis Decisión Reversible vs Irreversible | meskeIA',
     description: '¿Distingues decisiones tipo 1 de tipo 2? Descúbrelo con este test gratuito.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Análisis Decisión Reversible vs Irreversible meskeIA',

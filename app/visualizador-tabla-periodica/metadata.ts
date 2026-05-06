@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-tabla-periodica',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'La Tabla Periódica en tu Vida - Explicador Visual',
     description: 'Los elementos químicos que tocas, respiras y llevas en el bolsillo cada día.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Tabla Periódica Vida meskeIA' },
 };

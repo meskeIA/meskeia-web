@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-prestacion-nacimiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimacion de Prestacion por Nacimiento | meskeIA',
     description: 'Estima tu prestacion por nacimiento de la Seguridad Social: cuantia diaria, duracion y total.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Estimacion Prestacion Nacimiento meskeIA' },
 };

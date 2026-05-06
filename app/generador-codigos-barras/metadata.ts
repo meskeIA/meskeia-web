@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/generador-codigos-barras',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Códigos de Barras Gratis',
     description: 'Crea códigos de barras EAN-13, UPC, Code128 y más. Sin registro.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

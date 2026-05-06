@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'ATP Sintasa - El Motor Molecular | meskeIA',
     description: 'La máquina molecular rotante que produce la energía de tus células.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

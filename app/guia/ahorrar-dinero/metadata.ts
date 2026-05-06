@@ -15,10 +15,17 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia/ahorrar-dinero/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía para Ahorrar Dinero en España',
     description: 'Calculadoras y herramientas gratuitas para ordenar tus finanzas personales.',
+    images: ['https://meskeia.com/og-image.png']
   },
 };

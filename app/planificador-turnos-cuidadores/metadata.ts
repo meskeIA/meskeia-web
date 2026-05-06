@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/planificador-turnos-cuidadores/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planificador de Turnos de Cuidadores | meskeIA',
     description: 'Calendario visual para organizar turnos de cuidado familiar',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Planificador Turnos Cuidadores meskeIA' },
 };

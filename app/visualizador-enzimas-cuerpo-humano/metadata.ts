@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-enzimas-cuerpo-humano',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Las Enzimas del Cuerpo Humano - Catalizadores de la Vida',
     description: 'Modelo llave-cerradura, enzimas digestivas, metabólicas y hepáticas explicadas visualmente.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Enzimas del Cuerpo Humano meskeIA' },
 };

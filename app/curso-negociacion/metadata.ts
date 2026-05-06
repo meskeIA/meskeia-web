@@ -15,11 +15,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/curso-negociacion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Curso de Negociación Exitosa - meskeIA',
     description: 'Aprende técnicas de negociación profesional: BATNA, ZOPA, persuasión, cierre de acuerdos y más.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Curso de Negociación Exitosa meskeIA',

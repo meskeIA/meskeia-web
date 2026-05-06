@@ -8,5 +8,11 @@ export const metadata: Metadata = {
     title: 'Catalasa - La Enzima más Rápida | meskeIA',
     description: 'La enzima que destruye el agua oxigenada a 40 millones de reacciones por segundo.',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };

@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-fases-luna-eclipses',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Fases de la Luna y Eclipses - Explicador Visual',
     description: 'Explora la danza Sol-Tierra-Luna: fases, eclipses, mareas y curiosidades cósmicas.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Fases Luna meskeIA' },
 };

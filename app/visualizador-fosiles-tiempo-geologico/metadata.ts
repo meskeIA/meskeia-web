@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-fosiles-tiempo-geologico',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Fosiles y Tiempo Geologico - Explicador Visual',
     description: 'Si la Tierra fuera un dia de 24h, los humanos aparecemos en los ultimos 4 segundos.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Fosiles Geologico meskeIA' },
 };

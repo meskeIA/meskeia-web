@@ -12,11 +12,18 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-tipo-vivienda/',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: '¿Piso, casa o ático? Test de vivienda | meskeIA',
     description: 'Test de 10 preguntas para elegir entre piso, casa unifamiliar, ático, estudio o piso compartido.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: { canonical: 'https://meskeia.com/selector-tipo-vivienda/' },
   other: {

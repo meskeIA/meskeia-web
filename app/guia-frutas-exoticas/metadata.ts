@@ -20,12 +20,19 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/guia-frutas-exoticas',
     locale: 'es_ES',
     siteName: 'meskeIA',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Frutas Exóticas del Mundo | meskeIA',
     description:
       'Descubre 40 frutas tropicales y raras del mundo: origen, temporada, beneficios y curiosidades.',
+    images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
     canonical: 'https://meskeia.com/guia-frutas-exoticas',

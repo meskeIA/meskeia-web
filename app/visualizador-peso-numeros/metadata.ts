@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-peso-numeros',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'El Peso de los Números',
     description: 'Escalas numéricas que desafían la intuición: de un euro a un billón.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Peso Números meskeIA' },
 };

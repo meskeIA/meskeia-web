@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-anatomia-nomina',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Anatomía de una Nómina - Explicador Visual',
     description: 'Haz clic en cada línea de la nómina y descubre qué significa.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Anatomía Nómina meskeIA',

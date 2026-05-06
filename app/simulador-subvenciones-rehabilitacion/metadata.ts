@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/simulador-subvenciones-rehabilitacion',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador de Subvenciones Rehabilitación Energética | meskeIA',
     description: 'Estima las ayudas y deducciones disponibles para la rehabilitación energética de tu vivienda en España.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Simulador Subvenciones Rehabilitación meskeIA',

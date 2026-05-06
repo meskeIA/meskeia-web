@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/visualizador-ciclo-vida-freelance',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ciclo de Vida de un Proyecto Freelance - Explicador Visual',
     description: 'Solo el 40-60% del tiempo de un freelance es facturable. Descubre donde se pierde el resto.',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Ciclo Vida Freelance meskeIA' },
 };

@@ -12,14 +12,21 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lista de Compras Inteligente - Organiza tu Supermercado',
     description: 'Crea y organiza tu lista de compras por categorías. Guarda en el navegador y comparte fácilmente.',
-    url: 'https://next.meskeia.com/lista-compras',
+    url: 'https://meskeia.com/lista-compras',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Lista de Compras | meskeIA',
     description: 'Lista de compras inteligente con organización por categorías',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: {
     'application-name': 'Lista de Compras meskeIA',

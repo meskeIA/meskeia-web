@@ -16,11 +16,18 @@ export const metadata: Metadata = {
     url: 'https://meskeia.com/estimacion-prestaciones-dependencia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Estimación de Prestaciones por Dependencia | meskeIA',
     description: 'Prestaciones SAAD por grado de dependencia: cuantías máximas y servicios disponibles',
+    images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Estimación Prestaciones Dependencia meskeIA' },
 };

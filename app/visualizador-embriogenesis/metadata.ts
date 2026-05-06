@@ -17,6 +17,12 @@ export const metadata: Metadata = {
     url: URL,
     siteName: 'meskeIA',
     type: 'website',
+    images: [{
+      url: 'https://meskeia.com/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'meskeIA',
+    }]
   },
 };
 
