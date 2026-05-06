@@ -58,8 +58,15 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
 
   const displayApps = apps.slice(0, 4); // Máximo 4 apps
 
-  // Slug de la app de origen para tracking de embudo (sin slashes ni query)
-  const originSlug = (pathname || '').replace(/^\/|\/$/g, '').split('?')[0] || 'home';
+  // Slug de la app de origen para tracking de embudo.
+  // Normaliza barras internas a guiones para que rutas dinámicas
+  // (/visualizador-historia/historia-turismo/) coincidan con el formato
+  // del campo `aplicacion` (visualizador-historia-historia-turismo).
+  const originSlug =
+    (pathname || '')
+      .replace(/^\/|\/$/g, '')
+      .split('?')[0]
+      .replace(/\//g, '-') || 'home';
 
   /**
    * Añade ?from=related-{origen} al href para medir el embudo de descubrimiento.
