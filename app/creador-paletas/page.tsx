@@ -530,7 +530,7 @@ export default function CreadorPaletasPage() {
             <div className={styles.faqItem}>
               <h4>❓ ¿Qué es el contraste de accesibilidad y por qué importa?</h4>
               <p>
-                La WCAG 2.1 establece ratios mínimos de contraste entre texto y fondo: 4.5:1 para texto normal (AA) y 7:1 para texto normal (AAA). Las leyes de accesibilidad en España (RD 1112/2018) obligan a cumplir AA en webs del sector público. Empresas privadas con más de 50 empleados también deben cumplirlo desde 2023. Un texto gris claro sobre fondo blanco puede ser bonito pero completamente ilegible para personas con visión reducida o en pantallas con mucha luz.
+                La WCAG 2.1 establece ratios mínimos de contraste entre texto y fondo: 4.5:1 para texto normal (AA) y 7:1 para texto normal (AAA). Diversas normativas obligan a cumplir AA en webs del sector público (RD 1112/2018 en España, ADA Title III en EE.UU., AODA en Canadá, EAA en la UE desde 2025). Un texto gris claro sobre fondo blanco puede ser bonito pero completamente ilegible para personas con visión reducida o en pantallas con mucha luz.
               </p>
               <p className={styles.faqTip}>
                 💡 <strong>Cómo verificar:</strong> Usa el WebAIM Contrast Checker (webaim.org/resources/contrastchecker) con los HEX de tu paleta. Como mínimo, texto de cuerpo y fondo deben superar 4.5:1. Los tonos 700-900 de la escala suelen funcionar bien sobre fondos claros.
@@ -669,7 +669,7 @@ export default function CreadorPaletasPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>♿</span>
               <h4>Comprueba WCAG antes de publicar</h4>
-              <p>Ratio mínimo 4.5:1 para texto normal, 3:1 para texto grande (+18px). Las leyes de accesibilidad en España obligan a cumplirlo en webs públicas. Es también buen diseño.</p>
+              <p>Ratio mínimo 4.5:1 para texto normal, 3:1 para texto grande (+18px). Las normativas de accesibilidad de muchos países lo exigen en webs públicas. Es también buen diseño.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🌓</span>

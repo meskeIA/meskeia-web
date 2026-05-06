@@ -292,7 +292,7 @@ export default function GlosarioFisicaQuimicaPage() {
       {/* Sección educativa */}
       <EducationalSection
         title="📚 Guía completa de Física y Química"
-        subtitle="Todo lo que necesitas saber para estudiar ciencias exactas en ESO, Bachillerato y universidad"
+        subtitle="Todo lo que necesitas saber para estudiar ciencias exactas en secundaria, preparatoria y universidad"
       >
         {/* Contenido original mantenido */}
         <section className={styles.guideSection}>
@@ -306,8 +306,8 @@ export default function GlosarioFisicaQuimicaPage() {
             <div className={styles.contentCard}>
               <h4>Niveles de Dificultad</h4>
               <p>
-                <strong>Básico:</strong> Conceptos fundamentales, ESO.<br/>
-                <strong>Intermedio:</strong> Bachillerato y preparación universitaria.<br/>
+                <strong>Básico:</strong> Conceptos fundamentales, secundaria.<br/>
+                <strong>Intermedio:</strong> Preparatoria y preparación universitaria.<br/>
                 <strong>Avanzado:</strong> Universidad y estudios superiores.
               </p>
             </div>
@@ -424,7 +424,7 @@ export default function GlosarioFisicaQuimicaPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🎒</span>
-                <h4>Estudiante ESO / Bachillerato</h4>
+                <h4>Estudiante de secundaria o preparatoria</h4>
               </div>
               <p className={styles.escenarioExample}>
                 Tienes el examen de Física y Química en dos semanas. Necesitas afianzar conceptos como fuerza, presión, pH y enlace químico.
@@ -506,7 +506,7 @@ export default function GlosarioFisicaQuimicaPage() {
             <div className={styles.faqItem}>
               <dt>¿Cuánto se necesita saber de matemáticas para física?</dt>
               <dd>
-                Para ESO basta con proporciones y ecuaciones de primer grado. Para Bachillerato se necesita trigonometría, sistemas de ecuaciones y notación científica. Para la carrera, cálculo diferencial e integral, álgebra lineal y ecuaciones diferenciales son imprescindibles. La asignatura &quot;Matemáticas para físicos&quot; suele ocupar los dos primeros años de carrera.
+                Para secundaria basta con proporciones y ecuaciones de primer grado. Para preparatoria se necesita trigonometría, sistemas de ecuaciones y notación científica. Para la carrera, cálculo diferencial e integral, álgebra lineal y ecuaciones diferenciales son imprescindibles. La asignatura &quot;Matemáticas para físicos&quot; suele ocupar los dos primeros años de carrera.
                 <span className={styles.faqTip}>Dominar derivadas e integrales básicas resuelve el 80% de los problemas de primer año universitario.</span>
               </dd>
             </div>
@@ -538,8 +538,8 @@ export default function GlosarioFisicaQuimicaPage() {
             <div className={styles.faqItem}>
               <dt>¿Cómo se aplica la física y la química en ingeniería?</dt>
               <dd>
-                Prácticamente toda la ingeniería usa ambas: la ingeniería civil aplica mecánica de sólidos y fluidos; la electrónica, electromagnetismo y semiconductores (química del silicio); la química industrial diseña reactores basándose en cinética química y termodinámica; la biomedicina combina óptica (TAC, endoscopias) con bioquímica. Las empresas más demandantes de estos perfiles en España son Repsol, Iberdrola, SEAT e Indra.
-                <span className={styles.faqTip}>En la selectividad española (EBAU), física y química son las asignaturas que más nota media elevan para ingeniería (peso × 0,2 cada una).</span>
+                Prácticamente toda la ingeniería usa ambas: la ingeniería civil aplica mecánica de sólidos y fluidos; la electrónica, electromagnetismo y semiconductores (química del silicio); la química industrial diseña reactores basándose en cinética química y termodinámica; la biomedicina combina óptica (TAC, endoscopias) con bioquímica. Grandes empleadores de estos perfiles incluyen petroleras, eléctricas, automoción y telecomunicaciones (Repsol, Pemex, YPF, Iberdrola, SEAT, etc.).
+                <span className={styles.faqTip}>En los exámenes de admisión universitaria de muchos países hispanohablantes, física y química son asignaturas con peso alto para carreras de ingeniería.</span>
               </dd>
             </div>
           </dl>
@@ -549,7 +549,7 @@ export default function GlosarioFisicaQuimicaPage() {
         <section className={styles.guideSection}>
           <h2>Cómo estudiar Física y Química de forma sistemática (7 pasos)</h2>
           <p className={styles.introParagraph}>
-            Un método probado para pasar de cero al dominio de los conceptos, aplicable tanto a ESO como a primer año de carrera.
+            Un método probado para pasar de cero al dominio de los conceptos, aplicable tanto a secundaria como a primer año de carrera.
           </p>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
@@ -584,14 +584,14 @@ export default function GlosarioFisicaQuimicaPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <h4>Memoriza los 20 conceptos básicos de cada rama</h4>
-                <p>En física: fuerza, energía, trabajo, potencia, velocidad, aceleración, presión, temperatura, campo eléctrico, onda. En química: átomo, mol, pH, enlace, reacción, oxidación, equilibrio, electronegatividad, entalpía, estequiometría. Con estos 20 se resuelve el 80% de los problemas de selectividad.</p>
+                <p>En física: fuerza, energía, trabajo, potencia, velocidad, aceleración, presión, temperatura, campo eléctrico, onda. En química: átomo, mol, pH, enlace, reacción, oxidación, equilibrio, electronegatividad, entalpía, estequiometría. Con estos 20 se resuelve el 80% de los problemas de los exámenes preuniversitarios.</p>
               </div>
             </li>
             <li className={styles.step}>
               <span className={styles.stepNumber}>6</span>
               <div className={styles.stepContent}>
-                <h4>Practica con exámenes reales de EBAU de tu comunidad autónoma</h4>
-                <p>Descarga los 5 últimos exámenes de selectividad de tu CC.AA. (disponibles en la web de la universidad). Cronométrate: cada problema de física debería resolverse en 15-20 minutos. La repetición de patrones reduce la ansiedad y mejora la velocidad.</p>
+                <h4>Practica con exámenes reales del examen de admisión de tu país o región</h4>
+                <p>Descarga los 5 últimos exámenes de admisión universitaria (EBAU/PCE en España, PAES en Chile, ICFES en Colombia, EXANI en México, ENEM en Brasil, etc., disponibles en la web de la universidad o ministerio). Cronométrate: cada problema de física debería resolverse en 15-20 minutos. La repetición de patrones reduce la ansiedad y mejora la velocidad.</p>
               </div>
             </li>
             <li className={styles.step}>

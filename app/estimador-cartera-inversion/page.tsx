@@ -1074,8 +1074,7 @@ export default function SimuladorCarteraPage() {
               <p>
                 1. <strong>Riesgo de vender en pérdidas:</strong> Si el mercado ha caído un 20% y vendes, cristalizas esas pérdidas.
                 Si hubieras esperado 2-3 años, probablemente se habría recuperado.<br />
-                2. <strong>Impacto fiscal:</strong> Pagas impuestos sobre las ganancias (19-26% según tramo en España). Si vendes con pérdidas,
-                puedes compensarlas con ganancias futuras durante los próximos 4 años.<br />
+                2. <strong>Impacto fiscal:</strong> Pagas impuestos sobre las ganancias (las tasas varían según país: 19-26% en España, 10-20% en México con CETES, 15-35% en Argentina, etc.). En muchos países puedes compensar pérdidas con ganancias futuras durante varios años. Consulta tu normativa fiscal.<br />
                 3. <strong>Coste de oportunidad:</strong> Pierdes el potencial de crecimiento futuro del capital retirado.
               </p>
               <p>
@@ -1209,14 +1208,16 @@ export default function SimuladorCarteraPage() {
                   Compara brokers por: <strong>comisiones de compra/venta, custodia anual, variedad de fondos/ETFs</strong>.
                 </p>
                 <p>
-                  <strong>Opciones en España:</strong><br />
-                  • MyInvestor: Sin comisiones de custodia, amplio catálogo de fondos.<br />
-                  • Openbank: Compra/venta de ETFs desde 5 €, sin custodia si tienes nómina.<br />
-                  • Interactive Brokers: Muy barato para ETFs internacionales, pero más complejo.
+                  <strong>Ejemplos de brokers populares (verifica disponibilidad en tu país):</strong><br />
+                  • <strong>España:</strong> MyInvestor, Openbank, Renta 4.<br />
+                  • <strong>México:</strong> GBM+, Kuspit, Bursanet, Interactive Brokers.<br />
+                  • <strong>Argentina:</strong> IOL, Balanz, Cocos Capital.<br />
+                  • <strong>Chile/Colombia/Perú:</strong> Fintual, Tyba, Trii, Renta4 LatAm.<br />
+                  • <strong>Internacional:</strong> Interactive Brokers, eToro, DEGIRO (revisa disponibilidad por país).
                 </p>
                 <p>
-                  <strong>Documentación necesaria:</strong> DNI, justificante de domicilio, número de cuenta bancaria.
-                  Proceso 100% online (10-20 minutos).
+                  <strong>Documentación necesaria habitual:</strong> documento de identidad, justificante de domicilio, número de cuenta bancaria.
+                  Proceso 100% online en la mayoría de brokers (10-20 minutos).
                 </p>
               </div>
             </div>
@@ -1358,8 +1359,8 @@ export default function SimuladorCarteraPage() {
               La disciplina vence a la inteligencia en inversión.
             </li>
             <li>
-              <strong>Ignorar la fiscalidad e impuestos sobre ganancias:</strong> En España pagas 19-26% sobre ganancias al vender. Si haces muchas compra/ventas,
-              pagas impuestos cada año. <strong>Solución:</strong> Buy and hold (compra y mantén), aprovecha traspasos sin tributar entre fondos, minimiza rotación.
+              <strong>Ignorar la fiscalidad e impuestos sobre ganancias:</strong> Cada vez que vendes, pagas impuestos sobre las ganancias (la tasa depende de tu país; consulta tu normativa). Si haces muchas compra/ventas,
+              pagas impuestos cada año. <strong>Solución:</strong> Buy and hold (compra y mantén), aprovecha traspasos sin tributar entre fondos cuando tu legislación lo permita, minimiza rotación.
               Vende solo cuando necesites el dinero o rebalancees (1-2 veces/año máx).
             </li>
             <li>

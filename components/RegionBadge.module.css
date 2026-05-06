@@ -1,0 +1,78 @@
+/**
+ * RegionBadge Component Styles
+ *
+ * Badge compacto para señalizar el ámbito geográfico de una app.
+ * Discreto pero claramente visible. Compatible con dark mode.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1;
+}
+
+/* Variante es-only: ámbar/info — destaca pero no alarma */
+.es-only {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+[data-theme='dark'] .es-only {
+  background: rgba(252, 211, 77, 0.12);
+  color: #fcd34d;
+  border-color: rgba(252, 211, 77, 0.3);
+}
+
+/* Variante es-data: gris/neutro — solo informativo */
+.es-data {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .es-data {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+/* Variante global: verde/positivo */
+.global {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+[data-theme='dark'] .global {
+  background: rgba(110, 231, 183, 0.12);
+  color: #6ee7b7;
+  border-color: rgba(110, 231, 183, 0.3);
+}
+
+@media (max-width: 480px) {
+  .badge {
+    font-size: 0.8125rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .icon {
+    font-size: 1rem;
+  }
+}

@@ -753,13 +753,13 @@ export default function SimuladorPuertasLogicasPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🎓</span>
-                <strong>Estudiante de bachillerato</strong>
+                <strong>Estudiante preuniversitario</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Examen PAU: &quot;Simplifica A·(A+B)&quot;. Usando el teorema de absorción: A·(A+B) = A·A + A·B = A + A·B = <strong>A</strong>. Resultado: una conexión directa sin puertas.
+                Examen tipo: &quot;Simplifica A·(A+B)&quot;. Usando el teorema de absorción: A·(A+B) = A·A + A·B = A + A·B = <strong>A</strong>. Resultado: una conexión directa sin puertas.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Memoriza las leyes De Morgan: NOT(A·B) = NOT(A)+NOT(B). Son las más preguntadas en selectividad.
+                💡 Memoriza las leyes De Morgan: NOT(A·B) = NOT(A)+NOT(B). Son las más preguntadas en exámenes preuniversitarios.
               </p>
             </div>
 

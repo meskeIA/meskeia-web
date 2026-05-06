@@ -652,7 +652,7 @@ export default function SimuladorGeneticaPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🎓</span>
-                <h3>Estudiante de ESO y Bachillerato</h3>
+                <h3>Estudiante de secundaria y preparatoria</h3>
               </div>
               <div className={styles.escenarioExample}>
                 <p>Ejemplo de ejercicio:</p>
@@ -1015,7 +1015,7 @@ Hija portadora × marido sano:
             <li>
               <strong>❌ Olvidar que &quot;portador&quot; significa heterocigoto asintomático:</strong>{' '}
               Un portador (Aa) tiene fenotipo dominante. Si el enunciado dice &quot;portador&quot;,
-              el genotipo es Aa, no aa. Este error se comete en el 40% de los exámenes de selectividad.
+              el genotipo es Aa, no aa. Este error se comete en el 40% de los exámenes preuniversitarios.
             </li>
             <li>
               <strong>❌ Aplicar la 3ª Ley a genes ligados:</strong> Si dos características

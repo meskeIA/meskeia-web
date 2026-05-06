@@ -367,8 +367,8 @@ export default function ContadorSilabasPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>📚</span>
-              <h4>Lengua y Literatura (ESO/Bachillerato)</h4>
-              <p>El análisis métrico es obligatorio en los exámenes de Lengua Castellana de ESO y Bachillerato. Incluye identificar el número de sílabas, el tipo de verso (tónico), las licencias poéticas (sinalefa, dialefa, sineresis, dieresis) y la rima (consonante o asonante). Esta herramienta ayuda a verificar cuentas antes de entregar trabajos.</p>
+              <h4>Lengua y Literatura (secundaria y preparatoria)</h4>
+              <p>El análisis métrico es habitual en los exámenes de Lengua Castellana en secundaria y preparatoria. Incluye identificar el número de sílabas, el tipo de verso (tónico), las licencias poéticas (sinalefa, dialefa, sineresis, dieresis) y la rima (consonante o asonante). Esta herramienta ayuda a verificar cuentas antes de entregar trabajos.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🎵</span>

@@ -231,6 +231,30 @@ import { FISCAL_IRPF_META } from '@/data/fiscal';
 }
 ```
 
+### 1.bis Lenguaje Latam-friendly (OBLIGATORIO desde 2026-05-06)
+
+meskeIA sirve a todo el público hispanohablante (España + Latam = ~50% del tráfico). En toda app NUEVA, evitar términos exclusivos de España salvo que la app sea fiscal-España (ver tabla más abajo):
+
+| Evitar (España-only) | Preferir (universal) |
+|---|---|
+| ESO, Bachillerato | secundaria, preparatoria, educación media |
+| selectividad, EBAU, EvAU, PAU | examen de admisión universitaria |
+| sobresaliente / notable / aprobado (sin contexto) | añadir nota numérica + tabla equivalencias |
+| DNI, NIE, NIF, CIF | documento de identidad |
+| AEAT, Hacienda española | autoridad fiscal de tu país |
+| CCAA, comunidad autónoma | región / estado / provincia |
+| Madrid, Barcelona como ejemplos | usar ciudad neutra o varias |
+| "festivos en España" | "festivos de tu país" |
+
+**Apps fiscales-España estructurales** (IRPF, IVA español, ITP/AJD, RETA, ISD…): añadir `<RegionBadge variant="es-only" />` justo después del hero. Ver componente `components/RegionBadge.tsx`.
+
+**Apps con datos de referencia España pero metodología universal** (intereses, finanzas genéricas con ejemplos en €): usar `<RegionBadge variant="es-data" />`.
+
+**Reglas técnicas adicionales**:
+- Parser numérico: usar `parseSpanishNumber` que ya admite `1,234.56` y `1.234,56`
+- Moneda: si no es contable-España, considerar dejar el símbolo configurable o usar genérico
+- En bloques educativos, citar normativa España solo cuando sea relevante; preferir ejemplos universales
+
 ### 2. Ciclo de creación de nueva app (2 fases obligatorias)
 
 Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no opcional.

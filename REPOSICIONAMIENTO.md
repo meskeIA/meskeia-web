@@ -4,7 +4,7 @@
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 > Actualizar este documento al final de cada sesión que toque el tema.
 
-**Última actualización:** 2026-05-06
+**Última actualización:** 2026-05-06 (sesión tarde)
 
 ---
 
@@ -119,10 +119,11 @@ Inspirada en la filosofía de la página *Acerca de*: "el conocimiento debe ser 
 
 | Fase | Qué se hace | Riesgo | Estado |
 |------|------------|--------|--------|
-| **0** | Tracking de origen de clics | 🟢 Cero | 🚧 EN CURSO (2026-05-06) |
-| **1** | Componente `ContinuaCon` con datos dinámicos | 🟢 Bajo | ⏳ Pendiente |
+| **0** | Tracking de origen de clics | 🟢 Cero | ✅ COMPLETADA (2026-05-06) — acumulando datos |
+| **1** | Componente `ContinuaCon` con datos dinámicos | 🟢 Bajo | ⏳ Pendiente (esperar 3-5 días de datos FASE 0) |
 | **2** | Home con tracción real (top semanal, caminos) | 🟡 Bajo | ⏳ Pendiente |
 | **3** | Decisión sobre `app-relations.ts` (4.680 líneas curadas) | A decidir | ⏳ Pendiente (depende de FASE 0) |
+| **L** | Auditoría Latam-friendly + adaptación apps top | 🟢 Bajo | ✅ COMPLETADA (2026-05-06 tarde) |
 
 ### Detalle de FASE 0 — Tracking
 
@@ -176,13 +177,32 @@ Inspirada en la filosofía de la página *Acerca de*: "el conocimiento debe ser 
 - Auditoría inicial del catálogo (816 apps, 11→15 suites, 25+ tipologías)
 - Diagnóstico estratégico inicial: crisis de identidad, inflación de tipologías, BACKLOG táctico
 
-### 2026-05-06
+### 2026-05-06 (mañana)
 - Auditoría con datos reales de Turso (3 meses de tracking)
 - Identificación de Pareto extremo: 21 apps = 50% del tráfico
 - Hallazgo de inversión invertida (visualizadores vs simuladores)
 - Confirmación del reposicionamiento por parte del usuario
 - Creación de este documento de seguimiento
-- **FASE 0 en curso**: implementación del tracking de origen de clics
+- **FASE 0 implementada y validada**: tracking `?from=related-{slug}` en `RelatedApps` + lectura en `AnalyticsTracker` (commits `25c3831e` y `756339f3`). Verificado en producción con clics reales del usuario.
+
+### 2026-05-06 (tarde) — Auditoría Latam-friendly + implementación quick wins
+- **Auditoría Latam de top 33 apps** completada con datos geográficos reales (23% Latam directo + 25% USA hispanohablante).
+- **Hallazgo clave**: la mayoría de menciones España están en bloques educativos, no en lógica de cálculo. Apps técnicamente universales con apariencia "españolizada".
+- **Implementación completa de las 6 prioridades**:
+
+  | # | Tarea | Estado |
+  |---|-------|--------|
+  | 5 | Componente `RegionBadge` con 3 variantes | ✅ |
+  | 2 | 2 apps fiscales etiquetadas con `<RegionBadge variant="es-only" />` (`estimador-compraventa-inmueble`, `orientador-tarifa-freelance`) | ✅ |
+  | 6 | Regla "1.bis Lenguaje Latam-friendly" añadida en `CLAUDE.md` proyecto | ✅ |
+  | 3 | Quick wins de copy en 9 apps top (ESO/Bachillerato/selectividad → universal) | ✅ |
+  | 4 | Bloques educativos pulidos en 3 apps (`estimador-prestamos`, `calculadora-fechas`, `estimador-cartera-inversion`) | ✅ |
+  | 1 | `calculadora-notas` ampliada con 6 escalas Latam (MX, AR, CL, CO, PE, VE), 15 resultados de conversión, tabla con 7 columnas, tab EvAU marcado como 🇪🇸 | ✅ |
+
+- **Total modificado**: 14 apps + 1 componente nuevo + 1 doc proyecto.
+- **Tiempo**: ~2,5 horas.
+- **Build**: 0 errores, 1088 páginas generadas.
+- **Apps top que NO necesitaban cambio** (ya Latam-friendly): `juego-memoria`, `curso-negociacion`, `generador-gradientes`, `curso-pensamiento-sistemico`, `conversor-braille`, `generador-anagramas`, `calculadora-cocina`, `calculadora-estadistica`, `contraste-colores`, `test-perfil-inversor`.
 
 ---
 
@@ -193,7 +213,10 @@ Inspirada en la filosofía de la página *Acerca de*: "el conocimiento debe ser 
 | Apps por sesión | 1,07 | 2,0+ |
 | % catálogo descubierto | 61,3% | 80%+ |
 | Recurrencia global | 28,5% | 40%+ |
-| CTR RelatedApps | (sin datos) | medir y luego optimizar |
+| CTR RelatedApps | (acumulando desde 2026-05-06) | medir y luego optimizar |
+| % tráfico Latam global | 23% | 30%+ a 1 mes |
+| `calculadora-notas` % Latam | 4% | 20%+ a 1 mes (tras escalas Latam) |
+| Apps con >40% Latam | 11 | 18+ a 1 mes |
 
 ---
 
@@ -207,4 +230,7 @@ Inspirada en la filosofía de la página *Acerca de*: "el conocimiento debe ser 
 
 ---
 
-**Próximo paso al retomar:** verificar datos de tracking acumulados desde el despliegue de FASE 0 y decidir parámetros de FASE 1.
+**Próximo paso al retomar:**
+1. Revisar datos de tracking FASE 0 (CTR de RelatedApps por app, top pares "from→to") tras 3-5 días de acumulación.
+2. Comprobar si la apertura Latam de `calculadora-notas` y los quick wins de copy mueven el % Latam (medir en 2-3 semanas).
+3. Decidir parámetros de FASE 1 (componente `ContinuaCon`) con datos reales.

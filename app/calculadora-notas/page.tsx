@@ -24,13 +24,15 @@ interface AsignaturaEvau {
   tipo: TipoMateria;
 }
 
-// Funciones de conversión
+// Funciones de conversión multi-país (España + Latam + USA)
 const convertirNota = (nota: number, desde: string) => {
-  // Normalizar a escala 0-10
+  // Normalizar a escala 0-10 (referencia común)
   let nota10: number;
 
   switch (desde) {
     case 'espana':
+    case 'mexico':
+    case 'argentina':
       nota10 = nota;
       break;
     case 'gpa':
@@ -39,6 +41,19 @@ const convertirNota = (nota: number, desde: string) => {
     case 'porcentaje':
       nota10 = nota / 10;
       break;
+    case 'chile':
+      // Chile: 1.0-7.0 → mapear a 0-10. (chile-1)/6 * 10
+      nota10 = ((nota - 1) / 6) * 10;
+      break;
+    case 'colombia':
+      // Colombia: 0-5 → 0-10
+      nota10 = nota * 2;
+      break;
+    case 'peru':
+    case 'venezuela':
+      // Perú/Venezuela: 0-20 → 0-10
+      nota10 = nota / 2;
+      break;
     default:
       nota10 = nota;
   }
@@ -46,9 +61,12 @@ const convertirNota = (nota: number, desde: string) => {
   // Limitar entre 0 y 10
   nota10 = Math.max(0, Math.min(10, nota10));
 
-  // Convertir a todas las escalas
+  // Convertir a todas las escalas numéricas
   const gpa = (nota10 / 10) * 4;
   const porcentaje = nota10 * 10;
+  const chile = 1 + (nota10 / 10) * 6;
+  const colombia = nota10 / 2;
+  const peru = nota10 * 2;
 
   // Letra USA
   let letra: string;
@@ -60,7 +78,7 @@ const convertirNota = (nota: number, desde: string) => {
   else if (nota10 >= 4) letra = 'D';
   else letra = 'F';
 
-  // ECTS
+  // ECTS (Espacio Europeo)
   let ects: string;
   if (nota10 >= 9) ects = 'A (Excelente)';
   else if (nota10 >= 8) ects = 'B (Muy Bien)';
@@ -69,20 +87,62 @@ const convertirNota = (nota: number, desde: string) => {
   else if (nota10 >= 5) ects = 'E (Suficiente)';
   else ects = 'F (Suspenso)';
 
-  // Calificación España
-  let calificacion: string;
-  if (nota10 >= 9) calificacion = 'Sobresaliente';
-  else if (nota10 >= 7) calificacion = 'Notable';
-  else if (nota10 >= 5) calificacion = 'Aprobado';
-  else calificacion = 'Suspenso';
+  // Calificación cualitativa España (aprobado ≥5)
+  let calificacionEs: string;
+  if (nota10 >= 9) calificacionEs = 'Sobresaliente';
+  else if (nota10 >= 7) calificacionEs = 'Notable';
+  else if (nota10 >= 5) calificacionEs = 'Aprobado';
+  else calificacionEs = 'Suspenso';
+
+  // Calificación cualitativa México (aprobado ≥6)
+  let calificacionMx: string;
+  if (nota10 >= 9.5) calificacionMx = 'Excelente';
+  else if (nota10 >= 8) calificacionMx = 'Muy bien';
+  else if (nota10 >= 7) calificacionMx = 'Bien';
+  else if (nota10 >= 6) calificacionMx = 'Suficiente';
+  else calificacionMx = 'Reprobado';
+
+  // Calificación cualitativa Chile (aprobado ≥4.0 sobre 7)
+  let calificacionCl: string;
+  if (chile >= 6.5) calificacionCl = 'Sobresaliente';
+  else if (chile >= 5.5) calificacionCl = 'Muy bueno';
+  else if (chile >= 5.0) calificacionCl = 'Bueno';
+  else if (chile >= 4.0) calificacionCl = 'Suficiente';
+  else calificacionCl = 'Reprobado';
+
+  // Calificación cualitativa Colombia (aprobado ≥3.0 sobre 5)
+  let calificacionCo: string;
+  if (colombia >= 4.6) calificacionCo = 'Excelente';
+  else if (colombia >= 4.0) calificacionCo = 'Sobresaliente';
+  else if (colombia >= 3.5) calificacionCo = 'Bueno';
+  else if (colombia >= 3.0) calificacionCo = 'Aceptable';
+  else calificacionCo = 'Insuficiente';
+
+  // Calificación cualitativa Perú/Venezuela (aprobado ≥11 sobre 20)
+  let calificacionPe: string;
+  if (peru >= 18) calificacionPe = 'Excelente';
+  else if (peru >= 14) calificacionPe = 'Bueno';
+  else if (peru >= 11) calificacionPe = 'Aprobado';
+  else calificacionPe = 'Desaprobado';
 
   return {
     espana: nota10,
+    mexico: nota10,
+    argentina: nota10,
     gpa,
     porcentaje,
+    chile,
+    colombia,
+    peru,
     letra,
     ects,
-    calificacion
+    calificacionEs,
+    calificacionMx,
+    calificacionCl,
+    calificacionCo,
+    calificacionPe,
+    // Mantener el nombre antiguo por compatibilidad
+    calificacion: calificacionEs,
   };
 };
 
@@ -330,7 +390,7 @@ export default function CalculadoraNotasPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Calculadora de Notas Académicas</h1>
         <p className={styles.subtitle}>
-          Media ponderada, simulador EvAU y conversor de escalas de calificación
+          Media ponderada, simulador EvAU (España) y conversor de escalas entre España, México, Argentina, Chile, Colombia, Perú, Venezuela, GPA USA y porcentaje
         </p>
       </header>
 
@@ -348,7 +408,7 @@ export default function CalculadoraNotasPage() {
           className={`${styles.tab} ${tabActivo === 'evau' ? styles.activo : ''}`}
           onClick={() => setTabActivo('evau')}
         >
-          <span>🎓</span> Simulador EvAU
+          <span>🎓</span> Simulador EvAU 🇪🇸
         </button>
         <button
           className={`${styles.tab} ${tabActivo === 'conversor' ? styles.activo : ''}`}
@@ -721,9 +781,21 @@ export default function CalculadoraNotasPage() {
                   value={escalaOrigen}
                   onChange={(e) => setEscalaOrigen(e.target.value)}
                 >
-                  <option value="espana">España (0-10)</option>
-                  <option value="gpa">GPA USA (0-4)</option>
-                  <option value="porcentaje">Porcentaje (0-100)</option>
+                  <optgroup label="🇪🇸 España y equivalentes">
+                    <option value="espana">España (0-10)</option>
+                    <option value="mexico">México (0-10)</option>
+                    <option value="argentina">Argentina (0-10)</option>
+                  </optgroup>
+                  <optgroup label="🌎 Latam (otras escalas)">
+                    <option value="chile">Chile (1-7)</option>
+                    <option value="colombia">Colombia (0-5)</option>
+                    <option value="peru">Perú (0-20)</option>
+                    <option value="venezuela">Venezuela (0-20)</option>
+                  </optgroup>
+                  <optgroup label="🇺🇸 Internacionales">
+                    <option value="gpa">GPA USA (0-4)</option>
+                    <option value="porcentaje">Porcentaje (0-100)</option>
+                  </optgroup>
                 </select>
               </div>
 
@@ -736,7 +808,14 @@ export default function CalculadoraNotasPage() {
                   className={styles.conversorInput}
                   value={notaConversor}
                   onChange={(e) => setNotaConversor(e.target.value)}
-                  placeholder={escalaOrigen === 'espana' ? '7,5' : escalaOrigen === 'gpa' ? '3,0' : '75'}
+                  placeholder={
+                    escalaOrigen === 'chile' ? '5,8' :
+                    escalaOrigen === 'colombia' ? '4,2' :
+                    escalaOrigen === 'peru' || escalaOrigen === 'venezuela' ? '15' :
+                    escalaOrigen === 'gpa' ? '3,0' :
+                    escalaOrigen === 'porcentaje' ? '75' :
+                    '7,5'
+                  }
                 />
               </div>
             </div>
@@ -744,28 +823,64 @@ export default function CalculadoraNotasPage() {
             {resultadoConversor && (
               <div className={styles.conversorResultados}>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>España (0-10)</span>
+                  <span className={styles.conversorEscala}>🇪🇸 España (0-10)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.espana, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>GPA USA (0-4)</span>
+                  <span className={styles.conversorEscala}>🇲🇽 México (0-10)</span>
+                  <span className={styles.conversorValor}>{formatNumber(resultadoConversor.mexico, 2)}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇦🇷 Argentina (0-10)</span>
+                  <span className={styles.conversorValor}>{formatNumber(resultadoConversor.argentina, 2)}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇨🇱 Chile (1-7)</span>
+                  <span className={styles.conversorValor}>{formatNumber(resultadoConversor.chile, 2)}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇨🇴 Colombia (0-5)</span>
+                  <span className={styles.conversorValor}>{formatNumber(resultadoConversor.colombia, 2)}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇵🇪 Perú / 🇻🇪 Venezuela (0-20)</span>
+                  <span className={styles.conversorValor}>{formatNumber(resultadoConversor.peru, 2)}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇺🇸 GPA USA (0-4)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.gpa, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>Porcentaje</span>
+                  <span className={styles.conversorEscala}>📊 Porcentaje</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.porcentaje, 0)}%</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>Letra (USA)</span>
+                  <span className={styles.conversorEscala}>🇺🇸 Letra (USA)</span>
                   <span className={styles.conversorValor}>{resultadoConversor.letra}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>ECTS</span>
+                  <span className={styles.conversorEscala}>🇪🇺 ECTS (Europa)</span>
                   <span className={styles.conversorValor}>{resultadoConversor.ects}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}>Calificación España</span>
-                  <span className={styles.conversorValor}>{resultadoConversor.calificacion}</span>
+                  <span className={styles.conversorEscala}>🇪🇸 Calificación España</span>
+                  <span className={styles.conversorValor}>{resultadoConversor.calificacionEs}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇲🇽 Calificación México</span>
+                  <span className={styles.conversorValor}>{resultadoConversor.calificacionMx}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇨🇱 Calificación Chile</span>
+                  <span className={styles.conversorValor}>{resultadoConversor.calificacionCl}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇨🇴 Calificación Colombia</span>
+                  <span className={styles.conversorValor}>{resultadoConversor.calificacionCo}</span>
+                </div>
+                <div className={styles.conversorResultado}>
+                  <span className={styles.conversorEscala}>🇵🇪 Calificación Perú/Venezuela</span>
+                  <span className={styles.conversorValor}>{resultadoConversor.calificacionPe}</span>
                 </div>
               </div>
             )}
@@ -774,61 +889,84 @@ export default function CalculadoraNotasPage() {
             <h3 className={styles.sectionTitle} style={{ marginTop: 'var(--spacing-xl)' }}>
               <span>📋</span> Tabla de Equivalencias
             </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'var(--spacing-md)' }}>
+              Equivalencias aproximadas entre escalas de calificación de los principales países hispanohablantes.
+              España, México y Argentina comparten escala 0-10 (con vocabulario distinto).
+            </p>
             <table className={styles.tablaConversion}>
               <thead>
                 <tr>
-                  <th>España</th>
-                  <th>GPA</th>
-                  <th>Letra</th>
-                  <th>ECTS</th>
-                  <th>Calificación</th>
+                  <th>0-10<br/>🇪🇸🇲🇽🇦🇷</th>
+                  <th>1-7<br/>🇨🇱</th>
+                  <th>0-5<br/>🇨🇴</th>
+                  <th>0-20<br/>🇵🇪🇻🇪</th>
+                  <th>GPA<br/>🇺🇸</th>
+                  <th>Letra<br/>🇺🇸</th>
+                  <th>%</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>9 - 10</td>
-                  <td>3.6 - 4.0</td>
+                  <td>9,0 - 10,0</td>
+                  <td>6,4 - 7,0</td>
+                  <td>4,5 - 5,0</td>
+                  <td>18 - 20</td>
+                  <td>3,6 - 4,0</td>
                   <td>A</td>
-                  <td>A</td>
-                  <td>Sobresaliente</td>
+                  <td>90 - 100</td>
                 </tr>
                 <tr>
-                  <td>8 - 8.9</td>
-                  <td>3.2 - 3.5</td>
+                  <td>8,0 - 8,9</td>
+                  <td>5,8 - 6,3</td>
+                  <td>4,0 - 4,4</td>
+                  <td>16 - 17</td>
+                  <td>3,2 - 3,5</td>
                   <td>B+</td>
-                  <td>B</td>
-                  <td>Notable Alto</td>
+                  <td>80 - 89</td>
                 </tr>
                 <tr>
-                  <td>7 - 7.9</td>
-                  <td>2.8 - 3.1</td>
+                  <td>7,0 - 7,9</td>
+                  <td>5,2 - 5,7</td>
+                  <td>3,5 - 3,9</td>
+                  <td>14 - 15</td>
+                  <td>2,8 - 3,1</td>
                   <td>B</td>
-                  <td>C</td>
-                  <td>Notable</td>
+                  <td>70 - 79</td>
                 </tr>
                 <tr>
-                  <td>6 - 6.9</td>
-                  <td>2.4 - 2.7</td>
+                  <td>6,0 - 6,9</td>
+                  <td>4,6 - 5,1</td>
+                  <td>3,0 - 3,4</td>
+                  <td>12 - 13</td>
+                  <td>2,4 - 2,7</td>
                   <td>C+</td>
-                  <td>D</td>
-                  <td>Bien</td>
+                  <td>60 - 69</td>
                 </tr>
                 <tr>
-                  <td>5 - 5.9</td>
-                  <td>2.0 - 2.3</td>
+                  <td>5,0 - 5,9</td>
+                  <td>4,0 - 4,5</td>
+                  <td>2,5 - 2,9</td>
+                  <td>10 - 11</td>
+                  <td>2,0 - 2,3</td>
                   <td>C</td>
-                  <td>E</td>
-                  <td>Aprobado</td>
+                  <td>50 - 59</td>
                 </tr>
                 <tr>
-                  <td>0 - 4.9</td>
-                  <td>0 - 1.9</td>
+                  <td>0 - 4,9</td>
+                  <td>1,0 - 3,9</td>
+                  <td>0 - 2,4</td>
+                  <td>0 - 9</td>
+                  <td>0 - 1,9</td>
                   <td>F</td>
-                  <td>F</td>
-                  <td>Suspenso</td>
+                  <td>0 - 49</td>
                 </tr>
               </tbody>
             </table>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: 'var(--spacing-md)' }}>
+              <strong>Nota mínima de aprobado por país:</strong> España, México y Argentina = 5 (sobre 10) ·
+              Chile = 4 (sobre 7) · Colombia = 3 (sobre 5) · Perú y Venezuela = 11 (sobre 20).
+              En algunos sistemas existen variaciones según institución.
+            </p>
           </div>
 
           {/* Panel lateral vacío para mantener layout */}

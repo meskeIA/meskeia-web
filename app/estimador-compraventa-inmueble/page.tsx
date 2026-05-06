@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCompraventa.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, ShareCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
@@ -282,6 +282,8 @@ export default function SimuladorCompraventaPage() {
           local comercial, nave industrial y terreno. ITP/IVA por comunidad autónoma, notaría, registro y plusvalía.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
 
       <LegalNotice lastUpdated="2024-12-20" />
 

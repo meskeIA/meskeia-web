@@ -1186,11 +1186,11 @@ export default function SimuladorPrestamosPage() {
         <div className={styles.faqGrid}>
           <details className={styles.faqItem}>
             <summary className={styles.faqQuestion}>
-              ¿Cuál es el sistema de amortización más usado en España?
+              ¿Cuál es el sistema de amortización más usado?
             </summary>
             <div className={styles.faqAnswer}>
               <p>
-                El <strong>sistema francés</strong> es el más común (90%+ de préstamos personales).
+                El <strong>sistema francés</strong> es el más común en banca de retail (90%+ de préstamos personales) en España y en la mayoría de países hispanohablantes.
                 Ofrece cuota fija durante todo el plazo, lo que facilita la planificación presupuestaria.
               </p>
               <p>
@@ -1246,13 +1246,13 @@ export default function SimuladorPrestamosPage() {
               ¿Qué documentos necesito para solicitar un préstamo?
             </summary>
             <div className={styles.faqAnswer}>
-              <p>Documentación estándar requerida por los bancos españoles:</p>
+              <p>Documentación estándar habitual (los nombres exactos varían por país):</p>
               <ul>
-                <li><strong>DNI/NIE</strong> en vigor</li>
-                <li><strong>Última declaración de la renta</strong> (IRPF)</li>
-                <li><strong>Nóminas de los últimos 3 meses</strong> (o certificado de ingresos si eres autónomo)</li>
+                <li><strong>Documento de identidad oficial</strong> en vigor (DNI/NIE en España, INE en México, DNI en Argentina/Perú, RUT en Chile, cédula en Colombia/Ecuador, etc.)</li>
+                <li><strong>Última declaración de impuestos sobre la renta</strong> (IRPF en España, ISR en México, equivalentes en otros países)</li>
+                <li><strong>Recibos de salario de los últimos 3 meses</strong> (o certificado de ingresos si eres trabajador independiente)</li>
                 <li><strong>Extractos bancarios de los últimos 3-6 meses</strong></li>
-                <li><strong>Contrato laboral</strong> (si eres asalariado) o <strong>modelo 036/037</strong> (si eres autónomo)</li>
+                <li><strong>Contrato laboral</strong> (si eres asalariado) o <strong>alta de actividad económica</strong> (si trabajas por cuenta propia)</li>
               </ul>
               <p>
                 Algunos bancos pueden pedir <strong>aval</strong> o <strong>garantía</strong> si el
@@ -1267,8 +1267,7 @@ export default function SimuladorPrestamosPage() {
             </summary>
             <div className={styles.faqAnswer}>
               <p>
-                Los bancos consultan bases de datos como <strong>CIRBE (Banco de España)</strong> y
-                <strong>ficheros de morosidad</strong> (ASNEF, RAI). Analizan:
+                Los bancos consultan bases de datos de riesgo crediticio (<strong>CIRBE</strong> y ficheros como ASNEF/RAI en España, <strong>buró de crédito</strong> en México, <strong>BCRA</strong> en Argentina, <strong>Datacrédito</strong> en Colombia, etc.). Analizan:
               </p>
               <ul>
                 <li><strong>Nivel de endeudamiento actual:</strong> ¿Tienes otros préstamos?</li>
@@ -1411,9 +1410,9 @@ export default function SimuladorPrestamosPage() {
                 Reúne estos documentos antes de solicitar (acelera la aprobación):
               </p>
               <ul>
-                <li>DNI/NIE en vigor</li>
-                <li>Últimas 3 nóminas (o declaración trimestral IVA si eres autónomo)</li>
-                <li>Última declaración de la renta (IRPF)</li>
+                <li>Documento de identidad oficial en vigor</li>
+                <li>Últimos 3 recibos de salario (o declaración periódica de impuestos si eres trabajador independiente)</li>
+                <li>Última declaración de impuestos sobre la renta</li>
                 <li>Extractos bancarios de los últimos 3-6 meses</li>
                 <li>Contrato de trabajo o certificado de empresa</li>
               </ul>
@@ -1561,8 +1560,8 @@ export default function SimuladorPrestamosPage() {
               Antes de solicitar, consulta tu situación en:
             </p>
             <ul>
-              <li><strong>CIRBE (Banco de España):</strong> Listado de tus deudas bancarias</li>
-              <li><strong>ASNEF:</strong> Fichero de morosidad (si estás, corrígelo antes)</li>
+              <li><strong>Central de riesgos del banco central de tu país:</strong> Listado de tus deudas bancarias (CIRBE en España, equivalentes en cada país)</li>
+              <li><strong>Ficheros de morosidad / buró de crédito:</strong> Si apareces, corrígelo antes</li>
             </ul>
             <p>
               Puedes solicitar estos informes <strong>gratis una vez al año.</strong>
@@ -1714,7 +1713,7 @@ export default function SimuladorPrestamosPage() {
             <ul>
               <li>Al principio pagas más intereses</li>
               <li>Al final pagas más capital</li>
-              <li>Más usado en España</li>
+              <li>El más usado en banca de retail hispanohablante</li>
               <li>Ideal si prefieres previsibilidad</li>
             </ul>
           </div>

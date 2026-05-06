@@ -549,9 +549,9 @@ export default function CalculadoraMovimientoPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🎓</span>
-                <h4>Estudiante de Bachillerato</h4>
+                <h4>Estudiante de preparatoria</h4>
               </div>
-              <p>En la PAU, el <strong>MRUA</strong> y el <strong>tiro parabólico</strong> acumulan más del 60 % de los problemas de cinemática. El MRU suele aparecer como paso previo o condición inicial.</p>
+              <p>En el examen de admisión universitaria, el <strong>MRUA</strong> y el <strong>tiro parabólico</strong> acumulan más del 60 % de los problemas de cinemática. El MRU suele aparecer como paso previo o condición inicial.</p>
               <div className={styles.escenarioExample}>
                 <strong>Ejemplo tipo examen:</strong> Un coche parte del reposo y acelera a 3 m/s² durante 8 s. ¿Qué distancia recorre? → d = ½·a·t² = ½·3·64 = <strong>96 m</strong>
               </div>

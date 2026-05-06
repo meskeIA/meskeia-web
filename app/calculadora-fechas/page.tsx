@@ -625,7 +625,7 @@ export default function CalculadoraFechas() {
                   </code>
                 </div>
                 <p className={styles.escenarioTip}>
-                  <strong>Consejo:</strong> Los plazos administrativos en España suelen ser días hábiles.
+                  <strong>Consejo:</strong> Los plazos administrativos en muchos países suelen ser días hábiles.
                   Resta sábados, domingos y festivos del resultado.
                 </p>
               </div>
@@ -757,7 +757,7 @@ export default function CalculadoraFechas() {
                 <ol>
                   <li>Calcula la diferencia en días naturales.</li>
                   <li><strong>Resta fines de semana:</strong> Aproximadamente 2 días por cada 7 (28-29% del total).</li>
-                  <li><strong>Resta festivos:</strong> Consulta el calendario oficial (España tiene ~14 festivos nacionales/autonómicos).</li>
+                  <li><strong>Resta festivos:</strong> Consulta el calendario oficial de tu país (suelen ser entre 10 y 18 días al año entre nacionales y regionales).</li>
                   <li><strong>Usa la calculadora de día de la semana:</strong> Verifica si la fecha límite cae en fin de semana.</li>
                 </ol>
                 <p className={styles.faqTip}>
@@ -814,7 +814,7 @@ export default function CalculadoraFechas() {
                     trabajas con horas exactas.</li>
                 </ul>
                 <p className={styles.faqTip}>
-                  <strong>Ejemplo:</strong> Diferencia entre 01/01/2026 (Madrid) y 10/01/2026 (Tokio) = 9 días, sin importar el huso.
+                  <strong>Ejemplo:</strong> Diferencia entre 01/01/2026 (Ciudad de México) y 10/01/2026 (Tokio) = 9 días, sin importar el huso.
                 </p>
               </div>
 
@@ -863,13 +863,13 @@ export default function CalculadoraFechas() {
               <div className={styles.faqItem}>
                 <h3>¿Cómo verifico si mi cálculo de edad es correcto para trámites oficiales?</h3>
                 <p>
-                  Para documentos oficiales (DNI, pasaporte, pensiones), verifica lo siguiente:
+                  Para documentos oficiales (documento de identidad, pasaporte, pensiones), verifica lo siguiente:
                 </p>
                 <ol>
                   <li><strong>Fecha de nacimiento exacta:</strong> Usa la fecha del certificado de nacimiento (día/mes/año).</li>
                   <li><strong>Fecha de referencia:</strong> Normalmente es la fecha de presentación del trámite.</li>
-                  <li><strong>Criterio de mayoría de edad:</strong> En España, 18 años se cumplen el día del cumpleaños
-                    (no el día siguiente).</li>
+                  <li><strong>Criterio de mayoría de edad:</strong> En la mayoría de países hispanohablantes, los 18 años se cumplen el día del cumpleaños
+                    (no el día siguiente). Verifica la normativa específica de tu país.</li>
                   <li><strong>Redondeo:</strong> La administración suele usar años completos, no meses/días adicionales.</li>
                 </ol>
                 <p className={styles.faqTip}>
@@ -928,7 +928,7 @@ export default function CalculadoraFechas() {
                   <h3>Ajusta manualmente si trabajas con días hábiles</h3>
                   <p>
                     Si necesitas excluir fines de semana: divide el resultado entre 7, multiplica por 5 (días laborables
-                    por semana) y resta festivos nacionales/autonómicos.
+                    por semana) y resta los festivos nacionales y regionales aplicables.
                   </p>
                 </div>
               </div>
@@ -963,8 +963,7 @@ export default function CalculadoraFechas() {
                 <div className={styles.stepContent}>
                   <h3>Verifica con fuentes oficiales si hay regulaciones específicas</h3>
                   <p>
-                    En contextos legales/administrativos, consulta la normativa específica (ej: Ley de Procedimiento Administrativo
-                    Común para plazos administrativos en España). Nuestra calculadora proporciona datos técnicos, no asesoramiento legal.
+                    En contextos legales/administrativos, consulta la normativa específica de tu país sobre cómputo de plazos administrativos. Nuestra calculadora proporciona datos técnicos, no asesoramiento legal.
                   </p>
                 </div>
               </div>
@@ -1000,8 +999,8 @@ export default function CalculadoraFechas() {
                 <span className={styles.tipIcon}>🌍</span>
                 <h3>Contratos internacionales: especifica huso y normativa</h3>
                 <p>
-                  Si trabajas con empresas extranjeras, especifica el huso horario (ej: CET, UTC+1) y qué calendario
-                  de festivos aplica (España, EU, país contraparte).
+                  Si trabajas con empresas extranjeras, especifica el huso horario (ej: CET, UTC-6, UTC-3) y qué calendario
+                  de festivos aplica (tu país, el del cliente o ambos).
                 </p>
               </div>
 
@@ -1028,10 +1027,10 @@ export default function CalculadoraFechas() {
               {/* Tip 6 */}
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon}>📆</span>
-                <h3>Considera festivos nacionales y autonómicos</h3>
+                <h3>Considera festivos nacionales y regionales</h3>
                 <p>
-                  España tiene ~12 festivos nacionales + 2-4 autonómicos. Para días hábiles, resta todos los festivos
-                  aplicables según la comunidad autónoma del trámite.
+                  La mayoría de países hispanohablantes tienen entre 8 y 16 festivos nacionales más algunos regionales.
+                  Para días hábiles, resta todos los festivos aplicables según el país y la región del trámite.
                 </p>
               </div>
             </div>
@@ -1046,7 +1045,7 @@ export default function CalculadoraFechas() {
             <ul className={styles.warningList}>
               <li>
                 <strong>No confundir días naturales con días hábiles:</strong> Los plazos legales/administrativos
-                en España suelen ser hábiles (excluyen fines de semana y festivos). Esta calculadora muestra días naturales por defecto.
+                en muchos países suelen contarse en días hábiles (excluyen fines de semana y festivos). Esta calculadora muestra días naturales por defecto.
               </li>
               <li>
                 <strong>No asumir que todos los meses tienen 30 días:</strong> Febrero tiene 28/29, y 7 meses tienen 31 días.
@@ -1070,7 +1069,7 @@ export default function CalculadoraFechas() {
               </li>
               <li>
                 <strong>Olvidar el cambio de horario (verano/invierno):</strong> Si trabajas con horas exactas (no solo fechas),
-                recuerda que en España cambiamos la hora 2 veces al año (último domingo de marzo y octubre).
+                recuerda que algunos países (España, parte de EE.UU., Chile, Paraguay…) cambian la hora 2 veces al año, mientras que otros (México desde 2022, Argentina, Colombia, Perú…) no lo hacen.
               </li>
               <li>
                 <strong>No documentar la fuente del cálculo en trámites oficiales:</strong> Algunos organismos requieren

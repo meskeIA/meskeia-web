@@ -239,7 +239,7 @@ export default function SimuladorFisicaPage() {
         {/* Sección 2: Casos de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🏫 Clases de Física ESO/Bachillerato</h3>
+            <h3>🏫 Clases de Física en secundaria y preparatoria</h3>
             <p>Visualiza caída libre, péndulos y tiro parabólico en tiempo real para reforzar los conceptos teóricos con experimentación interactiva.</p>
           </div>
           <div className={styles.escenarioCard}>

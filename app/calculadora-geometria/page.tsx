@@ -623,8 +623,8 @@ export default function CalculadoraGeometriaPage() {
 
             <div className={styles.tableRow}>
               <div className={styles.tableCell}><strong>Nivel Académico</strong></div>
-              <div className={styles.tableCell}>ESO (1º-2º), Bachillerato</div>
-              <div className={styles.tableCell}>ESO (3º-4º), Bachillerato, Universidad</div>
+              <div className={styles.tableCell}>Secundaria inicial, preparatoria</div>
+              <div className={styles.tableCell}>Secundaria avanzada, preparatoria, universidad</div>
             </div>
 
             <div className={styles.tableRow}>
@@ -681,7 +681,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📚 Laura - ESO 3º (Matemáticas)</h4>
+              <h4>📚 Laura - Secundaria, Matemáticas</h4>
               <p>
                 <strong>Situación:</strong> Deberes de geometría sobre áreas y perímetros.
               </p>
@@ -696,7 +696,7 @@ export default function CalculadoraGeometriaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>👨‍🏫 Profesor Andrés - Bachillerato (Matemáticas)</h4>
+              <h4>👨‍🏫 Profesor Andrés - Preparatoria (Matemáticas)</h4>
               <p>
                 <strong>Situación:</strong> Creación de exámenes y ejercicios de geometría.
               </p>
@@ -736,7 +736,7 @@ export default function CalculadoraGeometriaPage() {
               Depende del contexto del ejercicio:
             </p>
             <ul className={styles.faqList}>
-              <li><strong>Resultados exactos:</strong> Deja π en la fórmula (ej: A = 25π cm²). Más preciso para Bachillerato</li>
+              <li><strong>Resultados exactos:</strong> Deja π en la fórmula (ej: A = 25π cm²). Más preciso a nivel preuniversitario</li>
               <li><strong>Resultados decimales:</strong> Usa π ≈ 3,1416 cuando te pidan número con decimales</li>
               <li><strong>Esta calculadora:</strong> Usa el valor completo de π (Math.PI en JavaScript) con 4 decimales de precisión</li>
               <li><strong>Regla general:</strong> Si el problema dice "calcula el valor numérico", aproxima π. Si dice "expresa el resultado", deja π</li>
@@ -746,7 +746,7 @@ export default function CalculadoraGeometriaPage() {
           <div className={styles.faqItem}>
             <h4 className={styles.faqQuestion}>¿Cuál es la diferencia entre área y perímetro?</h4>
             <p className={styles.faqAnswer}>
-              Confusión muy común en ESO. Piensa en ejemplos físicos:
+              Confusión muy común en secundaria. Piensa en ejemplos físicos:
             </p>
             <ul className={styles.faqList}>
               <li><strong>Perímetro (u):</strong> La longitud del CONTORNO. Como una valla alrededor de un jardín. Se mide en metros lineales</li>
@@ -778,7 +778,7 @@ export default function CalculadoraGeometriaPage() {
               <li><strong>Definición:</strong> Distancia del centro del polígono al punto medio de un lado</li>
               <li><strong>Uso:</strong> Fórmula del área = (Perímetro × Apotema) / 2</li>
               <li><strong>Diferencia con radio:</strong> El radio va del centro a un VÉRTICE. El apotema va del centro al LADO</li>
-              <li><strong>Dato del problema:</strong> Si no te dan el apotema, a veces puedes calcularlo con trigonometría (Bachillerato)</li>
+              <li><strong>Dato del problema:</strong> Si no te dan el apotema, a veces puedes calcularlo con trigonometría (nivel preuniversitario)</li>
               <li><strong>Esta calculadora:</strong> Calcula el apotema automáticamente para pentágono y hexágono regulares</li>
             </ul>
           </div>
@@ -818,9 +818,9 @@ export default function CalculadoraGeometriaPage() {
             <ul className={styles.faqList}>
               <li><strong>Para practicar:</strong> Perfecto. Resuelves ejercicios y verificas resultados al instante</li>
               <li><strong>Para entender:</strong> Te muestra las fórmulas aplicadas en cada caso. Compara con tu procedimiento manual</li>
-              <li><strong>Limitación EVAU:</strong> En el examen debes JUSTIFICAR el procedimiento. No basta el resultado numérico</li>
+              <li><strong>Limitación en exámenes:</strong> En el examen debes JUSTIFICAR el procedimiento. No basta el resultado numérico</li>
               <li><strong>Estrategia recomendada:</strong> Resuelve el problema a mano, luego verifica aquí. Si no coincide, revisa tu proceso</li>
-              <li><strong>Ventaja Bachillerato:</strong> 4 decimales de precisión son suficientes para problemas de geometría analítica</li>
+              <li><strong>Para preparatoria:</strong> 4 decimales de precisión son suficientes para problemas de geometría analítica</li>
             </ul>
           </div>
         </section>
@@ -1026,7 +1026,7 @@ export default function CalculadoraGeometriaPage() {
                 </p>
                 <p>
                   <strong>Cómo evitarlo:</strong> Usa π ≈ 3,14 (mínimo) o mejor π ≈ 3,1416. Si tu calculadora
-                  tiene botón π, úsalo. Si dejas π simbólico (ej: 25π cm²), aún mejor en Bachillerato.
+                  tiene botón π, úsalo. Si dejas π simbólico (ej: 25π cm²), aún mejor a nivel preuniversitario.
                 </p>
               </div>
 

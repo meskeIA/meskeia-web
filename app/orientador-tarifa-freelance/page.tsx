@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './OrientadorTarifaFreelance.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -157,6 +157,8 @@ export default function CalculadoraTarifaFreelancePage() {
           Calcula tu tarifa por hora, día y proyecto considerando todos tus gastos, impuestos y vacaciones. Evita cobrar de menos.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
 
       <LegalNotice lastUpdated="2026-02-02" />
 

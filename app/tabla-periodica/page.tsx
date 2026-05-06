@@ -475,10 +475,10 @@ export default function TablaPerodicaPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🧑‍🔬</span>
-                <h3>Estudiante de química (selectividad)</h3>
+                <h3>Estudiante de química (preuniversitario)</h3>
               </div>
               <p className={styles.escenarioDesc}>
-                La configuración electrónica del Fe (Z=26) determina sus 2 estados de oxidación (+2 y +3). [Ar] 3d⁶ 4s² pierde primero 4s, luego 3d. Pregunta típica de selectividad.
+                La configuración electrónica del Fe (Z=26) determina sus 2 estados de oxidación (+2 y +3). [Ar] 3d⁶ 4s² pierde primero 4s, luego 3d. Pregunta típica en exámenes preuniversitarios.
               </p>
               <div className={styles.escenarioTip}>
                 <strong>Tip:</strong> Los metales de transición tienen configuraciones electrónicas irregulares: Cr([Ar]3d⁵4s¹) y Cu([Ar]3d¹⁰4s¹) por estabilidad de semilleno y lleno.
@@ -686,7 +686,7 @@ export default function TablaPerodicaPage() {
               <div className={styles.tipIcon}>🎯</div>
               <h3>Metales de transición: la excepción es la regla</h3>
               <p>
-                Cr([Ar]3d⁵4s¹) y Cu([Ar]3d¹⁰4s¹) son las excepciones más importantes. Recuérdalas: salen en selectividad y oposiciones.
+                Cr([Ar]3d⁵4s¹) y Cu([Ar]3d¹⁰4s¹) son las excepciones más importantes. Recuérdalas: salen en exámenes preuniversitarios y oposiciones.
               </p>
             </div>
 
