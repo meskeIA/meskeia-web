@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/calculadora-geometria/',
+  },
   openGraph: {
     type: 'website',
     title: 'Calculadora de Geometría | meskeIA',

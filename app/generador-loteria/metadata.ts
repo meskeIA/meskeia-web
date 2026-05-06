@@ -1,13 +1,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Generador de Números de Lotería - Primitiva, Euromillones, Bonoloto | meskeIA',
+  title: 'Generador Lotería: Primitiva, Euromillones, Bonoloto | meskeIA',
   description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo y Quiniela. Combinaciones al azar, historial y estadísticas. Gratis y sin registro.',
   keywords: 'generador loteria, numeros primitiva, euromillones, bonoloto, el gordo, quiniela, numeros aleatorios, combinaciones loteria, numeros suerte',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/generador-loteria/',
+  },
   openGraph: {
     type: 'website',
     title: 'Generador de Números de Lotería - Primitiva, Euromillones, Bonoloto',

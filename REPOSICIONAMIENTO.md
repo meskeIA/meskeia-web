@@ -256,6 +256,35 @@ La hipótesis del usuario sobre VPN era parcialmente correcta, pero la mayoría 
 
 **Mantenimiento**: si en futuras auditorías aparecen nuevos rangos de scraping en el dashboard de geografía, añadirlos a la lista. Build verificado: 1088 páginas, 0 errores.
 
+### 2026-05-06 (sesión madrugada) — Auditoría SEO de top 19 apps + quick fixes (opción B)
+
+Auditoría SEO de las 19 apps top reveló score medio **6,2/14** y 3 patrones sistémicos:
+- 19/19 sin `alternates.canonical` (las apps top no usan `generateBaseMetadata` que ya lo provee)
+- 19/19 sin JSON-LD / Structured Data
+- 18/19 con title largo (>60 chars); 5 con title que se trunca en Google (>70 chars)
+- 4 con description larga (>180 chars) que también se trunca
+
+**Implementado** (opción B = quick fixes + canonical sistemático):
+
+5 titles acortados (problema crítico de truncado en SERP):
+- `curso-optimizacion-ia`: 107 → 64 chars
+- `visualizador-algoritmos`: 86 → 62 chars
+- `estimador-compraventa-inmueble`: 82 → 58 chars
+- `generador-loteria`: 77 → 62 chars
+- `calculadora-cocina`: 75 → 61 chars
+
+4 descriptions acortadas (problema de truncado):
+- `simulador-puertas-logicas`: 214 → 168 chars
+- `visualizador-algoritmos`: 203 → 162 chars
+- `curso-optimizacion-ia`: 202 → 153 chars
+- `curso-negociacion`: 188 → 156 chars
+
+Canonical absoluto añadido a las 19 apps top (`alternates.canonical: 'https://meskeia.com/{slug}/'`). Importante ahora que existe el parámetro `?from=related-{slug}` del tracking FASE 0: Google podría indexar variantes y considerarlas duplicadas.
+
+**Pendiente para próxima sesión SEO**:
+- JSON-LD / Structured Data (Prioridad 2): helper genérico aplicado a las 19 apps top. Permite rich snippets, FAQ, breadcrumb. Requiere decisión de diseño (¿WebApplication? ¿Course? ¿FAQ por app?).
+- Resto del catálogo (~800 apps): si el patrón funciona en top 19, replicar a las siguientes 100-200.
+
 ---
 
 ## 8. Métricas a seguir

@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/tabla-periodica/',
+  },
   openGraph: {
     type: 'website',
     title: 'Tabla Periódica Interactiva | meskeIA',

@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/calculadora-estadistica/',
+  },
   openGraph: {
     type: 'website',
     title: 'Calculadora Estadística | meskeIA',

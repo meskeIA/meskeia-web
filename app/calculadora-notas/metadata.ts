@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/calculadora-notas/',
+  },
   openGraph: {
     type: 'website',
     title: 'Calculadora de Notas Académicas | meskeIA',

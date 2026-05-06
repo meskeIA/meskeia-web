@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/contador-silabas/',
+  },
   openGraph: {
     type: 'website',
     title: 'Contador de Sílabas en Español - meskeIA',

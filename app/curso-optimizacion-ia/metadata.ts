@@ -1,13 +1,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Curso de Optimización para IAs (GEO/AEO) - Posiciona tu Contenido en ChatGPT, Perplexity y Gemini | meskeIA',
-  description: 'Aprende GEO y AEO: optimiza tu contenido para que las IAs lo citen. Domina LLMs, RAG, E-E-A-T, Schema Markup y estrategias para ChatGPT, Perplexity, Gemini y AI Overviews. Curso pionero en español 2025.',
+  title: 'Curso GEO/AEO: Optimiza Contenido para ChatGPT y LLMs | meskeIA',
+  description: 'Aprende GEO y AEO: cómo optimizar tu contenido para que ChatGPT, Perplexity y Gemini lo citen. LLMs, RAG, E-E-A-T y Schema Markup. Curso en español.',
   keywords: 'GEO, AEO, Generative Engine Optimization, Answer Engine Optimization, optimización para IA, ChatGPT SEO, Perplexity SEO, Gemini SEO, AI Overviews, LLM, RAG, E-E-A-T, Schema Markup, citaciones IA, posicionamiento IA, curso SEO 2025',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/curso-optimizacion-ia/',
+  },
   openGraph: {
     type: 'website',
     title: 'Curso de Optimización para IAs (GEO/AEO) - Posiciona tu Contenido en IAs',

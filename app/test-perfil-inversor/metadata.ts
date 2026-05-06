@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/test-perfil-inversor/',
+  },
   openGraph: {
     type: 'website',
     title: 'Test de Perfil Inversor - Descubre tu Tolerancia al Riesgo',

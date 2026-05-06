@@ -1,13 +1,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Estimador Compraventa Inmobiliaria - Calcula Gastos Comprador y Vendedor | meskeIA',
+  title: 'Gastos de Compraventa Inmobiliaria - Calculadora | meskeIA',
   description: 'Calcula gastos de compraventa de vivienda, local comercial, nave industrial y terreno en España. ITP/IVA por comunidad autónoma, notaría, registro y plusvalía.',
   keywords: 'simulador compraventa, gastos compra vivienda, ITP por comunidad, gastos notario, registro propiedad, plusvalía municipal, impuestos vivienda, calculadora inmobiliaria, compra local comercial, nave industrial, compra terreno, IVA inmuebles',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/estimador-compraventa-inmueble/',
+  },
   openGraph: {
     type: 'website',
     title: 'Estimador Compraventa Inmobiliaria - meskeIA',

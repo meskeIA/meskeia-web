@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/generador-anagramas/',
+  },
   openGraph: {
     type: 'website',
     title: 'Generador de Anagramas en Español',

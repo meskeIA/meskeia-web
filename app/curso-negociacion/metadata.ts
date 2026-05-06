@@ -2,12 +2,15 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Curso de Negociación Exitosa - Domina el Arte de Negociar | meskeIA',
-  description: 'Aprende técnicas de negociación profesional: BATNA, ZOPA, tácticas de persuasión, cierre de acuerdos, resolución de conflictos y negociación multicultural. Curso completo con 12 capítulos.',
+  description: 'Aprende negociación profesional: BATNA, ZOPA, tácticas de persuasión, cierre de acuerdos, resolución de conflictos y negociación multicultural. 12 capítulos.',
   keywords: 'negociación, BATNA, ZOPA, persuasión, Cialdini, cierre de ventas, contratos, mediación, arbitraje, negociación internacional, curso negociación, técnicas negociación',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/curso-negociacion/',
+  },
   openGraph: {
     type: 'website',
     title: 'Curso de Negociación Exitosa - meskeIA',

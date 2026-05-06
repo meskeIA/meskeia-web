@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/juego-memoria/',
+  },
   openGraph: {
     type: 'website',
     title: 'Juego de Memoria - Encuentra las Parejas | meskeIA',

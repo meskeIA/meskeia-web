@@ -1,13 +1,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Cocina - Conversor, Escalador de Recetas y Tiempos | meskeIA',
+  title: 'Calculadora de Cocina: Recetas, Tiempos y Conversor | meskeIA',
   description: 'Calculadora de cocina online: convierte unidades (tazas, gramos, ml), escala recetas, consulta tiempos de cocción y encuentra sustitutos de ingredientes. Gratis y sin registro.',
   keywords: 'calculadora cocina, conversor unidades cocina, tazas a gramos, escalador recetas, tiempos coccion, sustitutos ingredientes, medidas cocina, recetas, conversion, temperatura horno',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/calculadora-cocina/',
+  },
   openGraph: {
     type: 'website',
     title: 'Calculadora de Cocina - Conversor y Escalador de Recetas',

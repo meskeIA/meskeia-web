@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/generador-tonos/',
+  },
   openGraph: {
     type: 'website',
     title: 'Generador de Tonos Online - Frecuencias de Audio',

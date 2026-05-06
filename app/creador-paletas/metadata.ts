@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/creador-paletas/',
+  },
   openGraph: {
     type: 'website',
     title: 'Creador de Paletas de Colores - meskeIA',

@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/conversor-braille/',
+  },
   openGraph: {
     type: 'website',
     title: 'Conversor de Código Braille en Español',

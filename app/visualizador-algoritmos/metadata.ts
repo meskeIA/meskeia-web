@@ -1,13 +1,16 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Visualizador de Algoritmos de Ordenación - Aprende Bubble, Quick, Merge Sort | meskeIA',
-  description: 'Visualiza paso a paso cómo funcionan los algoritmos de ordenación: Bubble Sort, Selection Sort, Insertion Sort, Quick Sort y Merge Sort. Herramienta educativa interactiva para estudiantes de informática.',
+  title: 'Visualizador de Algoritmos de Ordenación Paso a Paso | meskeIA',
+  description: 'Visualiza paso a paso cómo funcionan los algoritmos: Bubble, Selection, Insertion, Quick y Merge Sort. Herramienta interactiva para estudiantes de informática.',
   keywords: 'algoritmos ordenación, bubble sort, quick sort, merge sort, selection sort, insertion sort, visualizador algoritmos, estructuras datos, informática, programación, universidad, aprender algoritmos, complejidad algoritmos',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
+  alternates: {
+    canonical: 'https://meskeia.com/visualizador-algoritmos/',
+  },
   openGraph: {
     type: 'website',
     title: 'Visualizador de Algoritmos de Ordenación - meskeIA',
