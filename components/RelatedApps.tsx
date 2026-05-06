@@ -2,6 +2,7 @@
 
 import styles from './RelatedApps.module.css';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 /**
  * Interfaz para una app relacionada
@@ -50,10 +51,24 @@ interface RelatedAppsProps {
  * ```
  */
 export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = '🔗' }: RelatedAppsProps) {
+  const pathname = usePathname();
+
   // No renderizar si no hay apps o hay más de 4 (limitar a 4 máximo)
   if (!apps || apps.length === 0) return null;
 
   const displayApps = apps.slice(0, 4); // Máximo 4 apps
+
+  // Slug de la app de origen para tracking de embudo (sin slashes ni query)
+  const originSlug = (pathname || '').replace(/^\/|\/$/g, '').split('?')[0] || 'home';
+
+  /**
+   * Añade ?from=related-{origen} al href para medir el embudo de descubrimiento.
+   * El AnalyticsTracker lee este parámetro y lo guarda en datos_adicionales.from.
+   */
+  const buildHref = (url: string): string => {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}from=related-${originSlug}`;
+  };
 
   return (
     <section className={styles.relatedApps} aria-label="Aplicaciones relacionadas">
@@ -65,7 +80,7 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = 
         {displayApps.map((app) => (
           <Link
             key={app.url}
-            href={app.url}
+            href={buildHref(app.url)}
             className={styles.card}
             aria-label={`Ir a ${app.name}`}
           >

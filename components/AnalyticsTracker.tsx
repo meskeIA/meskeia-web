@@ -85,6 +85,10 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
 
+    // Detectar origen de navegación interna (?from=related-{slug}, ?from=continua-{slug}, etc.)
+    // Permite medir el embudo de descubrimiento entre apps
+    const fromParam = urlParams.get('from');
+
     // Datos de entrada (registro inicial)
     const entryData = {
       aplicacion: finalAppName,
@@ -99,6 +103,7 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
         const extra: Record<string, string> = {};
         if (refParam) extra.ref = refParam;
         if (referrerHostname) extra.referrer_ia = referrerHostname;
+        if (fromParam) extra.from = fromParam.slice(0, 80);
         return Object.keys(extra).length > 0 ? extra : undefined;
       })(),
     };
