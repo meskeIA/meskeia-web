@@ -11,7 +11,7 @@ import { applicationsDatabase, type Application } from '@/data/applications';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
 // Tipo para las vistas principales
-type MainView = 'home' | 'suites' | 'guias' | 'porquemeskeia' | 'faq';
+type MainView = 'home' | 'porquemeskeia' | 'faq';
 
 // Obtener app por URL
 function getAppByUrl(url: string): Application | undefined {
@@ -190,30 +190,15 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
 
         <div className={styles.divider} />
 
-        {/* Navegación principal - Botones simples */}
+        {/* Catálogo completo - acceso a /apps */}
         <div className={styles.navButtons}>
-          <button
-            type="button"
-            className={`${styles.navButton} ${currentView === 'suites' ? styles.navButtonActive : ''}`}
-            onClick={() => handleViewChange('suites')}
+          <Link
+            href="/apps"
+            className={`${styles.navButton} ${pathname === '/apps' ? styles.navButtonActive : ''}`}
           >
             <span className={styles.navButtonIcon}>📦</span>
-            <span className={styles.navButtonText}>Suites</span>
-          </button>
-        </div>
-
-        <div className={styles.divider} />
-
-        {/* Guías - Vista con todas las guías disponibles */}
-        <div className={styles.navButtons}>
-          <button
-            type="button"
-            className={`${styles.navButton} ${currentView === 'guias' ? styles.navButtonActive : ''}`}
-            onClick={() => handleViewChange('guias')}
-          >
-            <span className={styles.navButtonIcon}>📚</span>
-            <span className={styles.navButtonText}>Guías</span>
-          </button>
+            <span className={styles.navButtonText}>Catálogo completo</span>
+          </Link>
         </div>
 
         <div className={styles.divider} />
