@@ -66,7 +66,7 @@ const ogHtml = `<!DOCTYPE html>
       ${svgAtSize(160)}
       <div class="name">meske<b>IA</b></div>
     </div>
-    <div class="tagline">Aplicaciones web gratuitas para simplificar tu día a día</div>
+    <div class="tagline">Estudio, finanzas y herramientas. Gratis y en español.</div>
   </div>
   <div class="bg-icon">${svgAtSize(420)}</div>
 </body>
