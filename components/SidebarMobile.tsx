@@ -10,20 +10,12 @@ import { getRecentApps, type RecentApp } from '@/lib/recentApps';
 import { applicationsDatabase, type Application } from '@/data/applications';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
-// Tipo para las vistas principales
-type MainView = 'home' | 'porquemeskeia' | 'faq';
-
 // Obtener app por URL
 function getAppByUrl(url: string): Application | undefined {
   return applicationsDatabase.find(app => app.url === url);
 }
 
-interface SidebarMobileProps {
-  onViewChange?: (view: MainView) => void;
-  currentView?: MainView;
-}
-
-export default function SidebarMobile({ onViewChange, currentView = 'home' }: SidebarMobileProps) {
+export default function SidebarMobile() {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
@@ -75,14 +67,6 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
     };
   }, [isOpen]);
 
-  // Manejar cambio de vista
-  const handleViewChange = useCallback((view: MainView) => {
-    setIsOpen(false);
-    if (onViewChange) {
-      onViewChange(view);
-    }
-  }, [onViewChange]);
-
   // Toggle para apps recientes
   const toggleRecentApps = useCallback(() => {
     const newState = !recentAppsCollapsed;
@@ -125,9 +109,9 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
       >
         {/* Header */}
         <div className={styles.sidebarHeader}>
-          <div className={styles.logoWrapper} onClick={() => handleViewChange('home')}>
+          <Link href="/" className={styles.logoWrapper} onClick={() => setIsOpen(false)}>
             <MeskeiaLogo inline showThemeToggle={false} />
-          </div>
+          </Link>
           <button
             className={styles.closeButton}
             onClick={() => setIsOpen(false)}
@@ -191,23 +175,6 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
 
           <div className={styles.divider} />
 
-          {/* Botón Inicio (solo cuando no estamos en home) */}
-          {currentView !== 'home' && (
-            <>
-              <div className={styles.navButtons}>
-                <button
-                  type="button"
-                  className={`${styles.navButton} ${styles.navButtonHome}`}
-                  onClick={() => handleViewChange('home')}
-                >
-                  <span className={styles.navButtonIcon}>🏠</span>
-                  <span className={styles.navButtonText}>Inicio</span>
-                </button>
-              </div>
-              <div className={styles.divider} />
-            </>
-          )}
-
           {/* Catálogo completo - acceso a /apps */}
           <div className={styles.navButtons}>
             <Link
@@ -218,28 +185,6 @@ export default function SidebarMobile({ onViewChange, currentView = 'home' }: Si
               <span className={styles.navButtonIcon}>📦</span>
               <span className={styles.navButtonText}>Catálogo completo</span>
             </Link>
-          </div>
-
-          <div className={styles.divider} />
-
-          {/* Links informativos */}
-          <div className={styles.infoLinks}>
-            <button
-              type="button"
-              className={`${styles.infoLink} ${currentView === 'porquemeskeia' ? styles.infoLinkActive : ''}`}
-              onClick={() => handleViewChange('porquemeskeia')}
-            >
-              <span className={styles.navButtonIcon}>ℹ️</span>
-              <span>Por qué meskeIA</span>
-            </button>
-            <button
-              type="button"
-              className={`${styles.infoLink} ${currentView === 'faq' ? styles.infoLinkActive : ''}`}
-              onClick={() => handleViewChange('faq')}
-            >
-              <span className={styles.navButtonIcon}>❓</span>
-              <span>Preguntas frecuentes</span>
-            </button>
           </div>
         </div>
 

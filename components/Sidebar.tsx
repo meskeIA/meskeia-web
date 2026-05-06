@@ -10,20 +10,12 @@ import { getRecentApps, type RecentApp } from '@/lib/recentApps';
 import { applicationsDatabase, type Application } from '@/data/applications';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
-// Tipo para las vistas principales
-type MainView = 'home' | 'porquemeskeia' | 'faq';
-
 // Obtener app por URL
 function getAppByUrl(url: string): Application | undefined {
   return applicationsDatabase.find(app => app.url === url);
 }
 
-interface SidebarProps {
-  onViewChange?: (view: MainView) => void;
-  currentView?: MainView;
-}
-
-export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarProps) {
+export default function Sidebar() {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
@@ -72,13 +64,6 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
     localStorage.setItem('meskeia_recent_apps_collapsed', String(newState));
   }, [recentAppsCollapsed]);
 
-  // Manejar cambio de vista
-  const handleViewChange = useCallback((view: MainView) => {
-    if (onViewChange) {
-      onViewChange(view);
-    }
-  }, [onViewChange]);
-
   // Evitar hidratación incorrecta
   if (!mounted) {
     return (
@@ -96,7 +81,7 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
     <aside className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ''}`}>
       {/* Header con logo */}
       <div className={styles.sidebarHeader}>
-        <div className={styles.logoWrapper} onClick={() => handleViewChange('home')}>
+        <Link href="/" className={styles.logoWrapper}>
           {/* Logo completo cuando expandido, solo icono cuando colapsado */}
           {isCollapsed ? (
             <div className={styles.logoIconOnly}>
@@ -108,7 +93,7 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
           ) : (
             <MeskeiaLogo inline showThemeToggle={false} />
           )}
-        </div>
+        </Link>
       </div>
 
       {/* Toggle button en línea separada */}
@@ -176,20 +161,6 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
 
         <div className={styles.divider} />
 
-        {/* Botón Buscar - siempre visible, lleva a home con búsqueda */}
-        <div className={styles.navButtons}>
-          <button
-            type="button"
-            className={styles.navButton}
-            onClick={() => handleViewChange('home')}
-          >
-            <span className={styles.navButtonIcon}>🔍</span>
-            <span className={styles.navButtonText}>Buscar</span>
-          </button>
-        </div>
-
-        <div className={styles.divider} />
-
         {/* Catálogo completo - acceso a /apps */}
         <div className={styles.navButtons}>
           <Link
@@ -199,28 +170,6 @@ export default function Sidebar({ onViewChange, currentView = 'home' }: SidebarP
             <span className={styles.navButtonIcon}>📦</span>
             <span className={styles.navButtonText}>Catálogo completo</span>
           </Link>
-        </div>
-
-        <div className={styles.divider} />
-
-        {/* Links informativos */}
-        <div className={styles.infoLinks}>
-          <button
-            type="button"
-            className={`${styles.infoLink} ${currentView === 'porquemeskeia' ? styles.infoLinkActive : ''}`}
-            onClick={() => handleViewChange('porquemeskeia')}
-          >
-            <span className={styles.navButtonIcon}>ℹ️</span>
-            <span>Por qué meskeIA</span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.infoLink} ${currentView === 'faq' ? styles.infoLinkActive : ''}`}
-            onClick={() => handleViewChange('faq')}
-          >
-            <span className={styles.navButtonIcon}>❓</span>
-            <span>Preguntas frecuentes</span>
-          </button>
         </div>
       </div>
 
