@@ -8,9 +8,6 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  alternates: {
-    canonical: 'https://meskeia.com/curso-negociacion/',
-  },
   openGraph: {
     type: 'website',
     title: 'Curso de Negociación Exitosa - meskeIA',

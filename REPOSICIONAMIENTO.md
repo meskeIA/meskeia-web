@@ -4,7 +4,7 @@
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 > Actualizar este documento al final de cada sesión que toque el tema.
 
-**Última actualización:** 2026-05-06 (sesión tarde-noche)
+**Última actualización:** 2026-05-06 (sesión madrugada — auditoría rutas dinámicas)
 
 ---
 
@@ -316,6 +316,39 @@ Los 19 canonicals que se añadieron explícitamente en esta sesión son **redund
 
 **Caso a vigilar**: si en el futuro una app específica añade `alternates: { ... }` a su metadata.ts pero olvida `canonical`, o lo escribe mal, romperá su SEO. Auditar con grep si se sospecha.
 
+### 2026-05-06 (sesión madrugada — auditoría rutas dinámicas) — Bug de canonical en cursos detectado y corregido
+
+Auditoría de las rutas dinámicas (`/visualizador-historia/[slug]/` y subrutas de cursos `/curso-X/[capitulo]/[leccion]/`) tras el SEO sweep anterior. Verificado todo con `curl` en producción.
+
+**Hallazgos**:
+
+| Ruta | Estado | Mecanismo |
+|------|--------|-----------|
+| `/visualizador-historia/[slug]/` (101 slugs) | ✅ Correcto | `generateMetadata()` con canonical absoluto por slug |
+| Guías journey `/guia/X/` (8 rutas) | ✅ Correcto | Sin canonical hardcodeado en metadata.ts → herencia root |
+| Cursos sin canonical hardcodeado (11 de 13) | ✅ Correcto | Herencia root resuelve a URL actual |
+| **Cursos `curso-optimizacion-ia` y `curso-negociacion`** | ❌ Bug → ✅ Corregido | Layout cascadeaba canonical fijo a TODAS las lecciones |
+
+**Detalle del bug**:
+
+El `layout.tsx` de cada curso hace `export { metadata } from './metadata'`. En el SEO sweep anterior se añadió `alternates: { canonical: 'https://meskeia.com/curso-X/' }` a 2 cursos del top 19. Como Next.js cascadea metadata de layouts a todas las páginas hijas, esto provocó que **20 lecciones heredaran el canonical de la homepage del curso** — Google las habría tratado como duplicados.
+
+Verificado con `curl`:
+- Antes: `https://meskeia.com/curso-negociacion/preparacion/fundamentos-negociacion/` → canonical apuntaba a `/curso-negociacion/`
+- Después del fix: cada lección obtiene su canonical correcto vía herencia del root layout (que usa `metadataBase` + `canonical: './'`)
+
+**Fix aplicado**: eliminado el bloque `alternates: { canonical: ... }` de:
+- `app/curso-optimizacion-ia/metadata.ts`
+- `app/curso-negociacion/metadata.ts`
+
+Las homepages de ambos cursos siguen teniendo canonical correcto vía herencia (mismo patrón verificado en las ~640 apps sin canonical explícito).
+
+**Build**: 1088 páginas, 0 errores.
+
+**Lección aprendida**: cuando una app tiene rutas hijas (cursos, contenedores), el `layout.tsx` no debe llevar `canonical` hardcodeado en su metadata. La herencia del root layout es la solución correcta y se aplica automáticamente.
+
+**Total auditoría**: 0 problemas en historias dinámicas (verificadas), 0 en guías, 2 cursos con bug (corregidos).
+
 ---
 
 ## 8. Métricas a seguir
@@ -343,6 +376,8 @@ Los 19 canonicals que se añadieron explícitamente en esta sesión son **redund
 ---
 
 **Próximo paso al retomar:**
-1. Revisar datos de tracking FASE 0 (CTR de RelatedApps por app, top pares "from→to") tras 3-5 días de acumulación.
-2. Comprobar si la apertura Latam de `calculadora-notas` y los quick wins de copy mueven el % Latam (medir en 2-3 semanas).
-3. Decidir parámetros de FASE 1 (componente `ContinuaCon`) con datos reales.
+1. JSON-LD / Structured Data en top 19 apps (Prioridad 2 SEO) — helper genérico aplicable a `WebApplication`, `Course`, `FAQ`. Habilita rich snippets en Google.
+2. Revisar datos de tracking FASE 0 (CTR de RelatedApps por app, top pares "from→to") tras 3-5 días de acumulación.
+3. Comprobar si la apertura Latam de `calculadora-notas` y los quick wins de copy mueven el % Latam (medir en 2-3 semanas).
+4. Decidir parámetros de FASE 1 (componente `ContinuaCon`) con datos reales.
+5. Análisis de las ~319 apps con 0 visitas (informativo, sin urgencia).

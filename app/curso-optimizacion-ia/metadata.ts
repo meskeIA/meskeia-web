@@ -8,9 +8,6 @@ export const metadata: Metadata = {
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
-  alternates: {
-    canonical: 'https://meskeia.com/curso-optimizacion-ia/',
-  },
   openGraph: {
     type: 'website',
     title: 'Curso de Optimización para IAs (GEO/AEO) - Posiciona tu Contenido en IAs',
