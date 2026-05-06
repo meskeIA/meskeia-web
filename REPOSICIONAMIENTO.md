@@ -238,6 +238,24 @@ Títulos personalizados añadidos para los 3 cursos en `getRelatedAppsTitle` ("O
 - Si los cursos cerrar el gap mueve la métrica de apps por sesión
 - Qué relaciones siguen siendo "muertas" para mejorar más
 
+### 2026-05-06 (sesión noche tardía) — Filtro de datacenters cloud (opción E)
+
+Auditoría de geografía sospechosa reveló **~215 eventos de tráfico no humano no detectado** (6,8% del total) procedente de:
+- **Tencent Cloud HK** (~79 eventos, 75 IPs distintas, duración 0s)
+- **Tencent Cloud China continental** (~62 eventos, 60 IPs)
+- **AWS Singapur** (~28 eventos)
+- **Episodio puntual Kazajistán** (46 eventos en 3 minutos, IP única)
+
+La hipótesis del usuario sobre VPN era parcialmente correcta, pero la mayoría son **scrapers desde datacenters cloud**, no humanos con VPN. Detectado por patrón típico: 1 IP por visita + duración 0s + rangos IP de proveedor cloud conocido.
+
+**Implementación**: añadida constante `DATACENTER_PATTERNS` y función `esIpDatacenter()` en `app/api/analytics/track/route.ts`. Los eventos de IPs en estos rangos se marcan como `modo='bot'` y aparecen en la fila "Bots" del dashboard (no contaminan el "Total Real").
+
+**Patrones cubiertos** (rangos detectados empíricamente):
+- Tencent Cloud: `43.128/15`, `43.152/14`, `49.232.x`, `82.156-157.x`, `101.32.x`, `101.42.x`, `119.28.x`, `124.156.x`, `129.226.x`, `140.143.x`, `150.109.x`, `152.136.x`, `192.144.x`
+- AWS Singapur: `47.128-129.x`, `18.136.x`, `43.172-173.x`
+
+**Mantenimiento**: si en futuras auditorías aparecen nuevos rangos de scraping en el dashboard de geografía, añadirlos a la lista. Build verificado: 1088 páginas, 0 errores.
+
 ---
 
 ## 8. Métricas a seguir

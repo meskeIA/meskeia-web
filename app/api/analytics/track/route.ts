@@ -39,6 +39,45 @@ function anonymizeIP(ip: string): string {
   return 'anonymous';
 }
 
+/**
+ * Rangos de IPs de datacenters cloud conocidos.
+ * Estos rangos NO albergan navegadores humanos: son crawlers, scrapers o
+ * peticiones automatizadas. Se marcan como modo='bot' para no contaminar
+ * las métricas de tráfico real.
+ *
+ * Detectados empíricamente en datos reales (2026-05-06):
+ * - Tencent Cloud (HK + China continental + Singapur)
+ * - AWS Singapur
+ *
+ * Mantener esta lista actualizada cuando aparezcan nuevos patrones de
+ * scraping en el dashboard de geografía.
+ */
+const DATACENTER_PATTERNS: RegExp[] = [
+  // Tencent Cloud — bloques 43.128/15 y 43.152/14
+  /^43\.(12[89]|13\d|14[0-3]|15[2-9])\./,
+  // Tencent Cloud — otros rangos
+  /^49\.232\./,
+  /^82\.15[67]\./,
+  /^101\.(32|42)\./,
+  /^119\.28\./,
+  /^124\.156\./,
+  /^129\.226\./,
+  /^140\.143\./,
+  /^150\.109\./,
+  /^152\.136\./,
+  /^192\.144\./,
+  // AWS Singapur (rangos detectados)
+  /^47\.12[89]\./,
+  /^18\.136\./,
+  /^43\.17[2-3]\./,
+];
+
+/** Comprueba si la IP de origen pertenece a un datacenter cloud conocido. */
+function esIpDatacenter(ip: string | null): boolean {
+  if (!ip) return false;
+  return DATACENTER_PATTERNS.some(p => p.test(ip));
+}
+
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: getCorsHeaders('POST, OPTIONS') });
 }
@@ -88,7 +127,6 @@ export async function POST(request: NextRequest) {
     const resolucion = truncar(datos.resolucion, 50);
     const tipo_dispositivo = truncar(datos.tipo_dispositivo, 50);
     const es_recurrente = datos.es_recurrente ? 1 : 0;
-    const modo = esBot ? 'bot' : (truncar(datos.modo, 20) || 'web');
     const sesion_id = truncar(datos.sesion_id, 50);
 
     // RGPD: Anonimizar IP (truncar último octeto)
@@ -97,6 +135,10 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-real-ip') ||
       null;
     const ip_address = rawIP ? anonymizeIP(rawIP) : null;
+
+    // Detección compuesta de bot: por user agent O por IP de datacenter cloud
+    const esBotIP = esIpDatacenter(rawIP);
+    const modo = (esBot || esBotIP) ? 'bot' : (truncar(datos.modo, 20) || 'web');
 
     // RGPD: Geolocalización solo país, vía headers de Vercel (sin servicios externos)
     // Vercel proporciona estos headers automáticamente en Edge Runtime
