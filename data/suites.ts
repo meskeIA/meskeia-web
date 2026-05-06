@@ -1,11 +1,13 @@
 /**
- * Definición de las 11 Suites Temáticas de meskeIA
+ * Definición de las Suites Temáticas de meskeIA
  *
  * Las Suites agrupan apps por "problemas que resuelven", no por tipo de herramienta.
  * Una app puede pertenecer a múltiples suites (clasificación NO excluyente).
  * Ordenadas alfabéticamente por nombre.
  *
- * Actualizado: 2026-03-15
+ * Última reorganización: 2026-05-06
+ *  - "Marketing y Contenido" fusionado en "Diseño y Contenido"
+ *  - "Jubilación y Patrimonio" fusionado en "Legal, Fiscal y Patrimonio"
  */
 
 // Tipos de suites disponibles (exportado como valor para compatibilidad con Turbopack)
@@ -18,10 +20,8 @@ export const SUITE_IDS = [
   'freelance',
   'tecnicas',
   'inmobiliaria',
-  'jubilacion',
   'juegos',
   'legal-fiscal',
-  'marketing',
   'productividad',
   'salud',
   'viajes',
@@ -29,7 +29,7 @@ export const SUITE_IDS = [
 
 export type SuiteType = typeof SUITE_IDS[number];
 
-// Definición de las 14 Suites (ordenadas alfabéticamente por nombre)
+// Definición de las 13 Suites (ordenadas alfabéticamente por nombre)
 export const suites = [
   {
     id: 'accesibilidad' as SuiteType,
@@ -45,9 +45,9 @@ export const suites = [
   },
   {
     id: 'diseno' as SuiteType,
-    name: 'Diseño y Desarrollo',
+    name: 'Diseño y Contenido',
     icon: '🎨',
-    description: 'Herramientas para diseñadores y desarrolladores'
+    description: 'Herramientas para diseñadores, desarrolladores y creadores de contenido (SEO, redes sociales, paletas, gradientes)'
   },
   {
     id: 'estudiantes' as SuiteType,
@@ -80,12 +80,6 @@ export const suites = [
     description: 'Hipotecas, alquiler y gestión del hogar'
   },
   {
-    id: 'jubilacion' as SuiteType,
-    name: 'Jubilación y Patrimonio',
-    icon: '🌅',
-    description: 'Planifica tu etapa de jubilación: pensiones, patrimonio, herencias y salud preventiva'
-  },
-  {
     id: 'juegos' as SuiteType,
     name: 'Juegos y Ocio',
     icon: '🎲',
@@ -93,15 +87,9 @@ export const suites = [
   },
   {
     id: 'legal-fiscal' as SuiteType,
-    name: 'Legal y Fiscal',
+    name: 'Legal, Fiscal y Patrimonio',
     icon: '⚖️',
-    description: 'Orientación en impuestos, herencias, trámites legales y obligaciones fiscales en España'
-  },
-  {
-    id: 'marketing' as SuiteType,
-    name: 'Marketing y Contenido',
-    icon: '📢',
-    description: 'SEO, redes sociales y creación de contenido'
+    description: 'Impuestos, herencias, jubilación, pensiones, trámites legales y planificación patrimonial'
   },
   {
     id: 'productividad' as SuiteType,

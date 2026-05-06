@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import MiniSearch from 'minisearch';
-import { Application, applicationsDatabase, moments, suites, SuiteType } from '@/data/applications';
+import { Application, applicationsDatabase, suites, SuiteType } from '@/data/applications';
 import AsistenteChat from './AsistenteChat';
 import styles from './SearchBar.module.css';
 
@@ -14,7 +14,6 @@ type AppResult = {
   icon: string;
   url: string;
   suites: SuiteType[];
-  contexts?: string[];
 };
 
 type AppDoc = Application & { id: string };
@@ -22,7 +21,7 @@ type AppDoc = Application & { id: string };
 const indicePrincipal = new MiniSearch<AppDoc>({
   idField: 'id',
   fields: ['name', 'description', 'keywords', 'suites'],
-  storeFields: ['name', 'description', 'icon', 'url', 'suites', 'contexts'],
+  storeFields: ['name', 'description', 'icon', 'url', 'suites'],
   extractField: (document, fieldName) => {
     const val = (document as unknown as Record<string, unknown>)[fieldName];
     if (Array.isArray(val)) return val.join(' ');
@@ -247,44 +246,33 @@ export default function SearchBar({ large = false }: SearchBarProps) {
           </p>
         </div>
       ) : (
-        results.map((result, index) => {
-          const appMoments = result.contexts?.map(contextId =>
-            moments.find(m => m.id === contextId)
-          ).filter(Boolean) || [];
-
-          return (
-            <a
-              key={index}
-              href={result.url}
-              className={`${styles.resultItem} ${
-                index === selectedIndex ? styles.selected : ''
-              }`}
-              onClick={handleResultClick}
-            >
-              <div className={styles.resultIcon}>{result.icon}</div>
-              <div className={styles.resultContent}>
-                <div className={styles.resultTitle}>
-                  {result.name}
-                </div>
-                <div className={styles.resultDescription}>
-                  {result.description}
-                </div>
-                <div className={styles.resultMeta}>
-                  <span className={styles.resultSuites}>
-                    {result.suites.map((suiteId: SuiteType) =>
-                      suites.find(s => s.id === suiteId)?.icon
-                    ).join(' ')}
-                  </span>
-                  {appMoments.length > 0 && (
-                    <span className={styles.resultMoments}>
-                      {appMoments.map(m => m?.icon).join(' ')}
-                    </span>
-                  )}
-                </div>
+        results.map((result, index) => (
+          <a
+            key={index}
+            href={result.url}
+            className={`${styles.resultItem} ${
+              index === selectedIndex ? styles.selected : ''
+            }`}
+            onClick={handleResultClick}
+          >
+            <div className={styles.resultIcon}>{result.icon}</div>
+            <div className={styles.resultContent}>
+              <div className={styles.resultTitle}>
+                {result.name}
               </div>
-            </a>
-          );
-        })
+              <div className={styles.resultDescription}>
+                {result.description}
+              </div>
+              <div className={styles.resultMeta}>
+                <span className={styles.resultSuites}>
+                  {result.suites.map((suiteId: SuiteType) =>
+                    suites.find(s => s.id === suiteId)?.icon
+                  ).join(' ')}
+                </span>
+              </div>
+            </div>
+          </a>
+        ))
       )}
     </>
   );

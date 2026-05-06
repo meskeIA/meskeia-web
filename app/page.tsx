@@ -7,13 +7,13 @@ import SearchBar from '@/components/SearchBar';
 import HomeFooter from '@/components/home/HomeFooter';
 import WhyMeskeIA from '@/components/home/WhyMeskeIA';
 import FAQ from '@/components/home/FAQ';
-import { suites, SuiteType, applicationsDatabase, moments, MomentType, getAppsBySuite } from '@/data/applications';
+import { suites, SuiteType, getAppsBySuite } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import { addRecentApp } from '@/lib/recentApps';
 import styles from './page.module.css';
 
 // Tipos de vista para el área principal
-type MainView = 'home' | 'momentos' | 'suites' | 'guias' | 'porquemeskeia' | 'faq';
+type MainView = 'home' | 'suites' | 'guias' | 'porquemeskeia' | 'faq';
 
 // Datos de las guías disponibles
 const guidesData = [
@@ -121,21 +121,16 @@ const guidesData = [
 function HomeContent() {
   const searchParams = useSearchParams();
   const [currentView, setCurrentView] = useState<MainView>('home');
-  const [selectedMoment, setSelectedMoment] = useState<MomentType | null>(null);
   const [selectedSuite, setSelectedSuite] = useState<SuiteType | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Leer parámetros de URL para filtros
   useEffect(() => {
-    const momentParam = searchParams.get('momento') as MomentType | null;
     const suiteParam = searchParams.get('suite') as SuiteType | null;
     const vistaParam = searchParams.get('vista') as MainView | null;
 
     if (vistaParam) {
       setCurrentView(vistaParam);
-    } else if (momentParam && moments.some(m => m.id === momentParam)) {
-      setCurrentView('momentos');
-      setSelectedMoment(momentParam);
     } else if (suiteParam && suites.some(s => s.id === suiteParam)) {
       setCurrentView('suites');
       setSelectedSuite(suiteParam);
@@ -174,7 +169,6 @@ function HomeContent() {
   useEffect(() => {
     const handleViewChange = (e: CustomEvent<{ view: MainView }>) => {
       setCurrentView(e.detail.view);
-      setSelectedMoment(null);
       setSelectedSuite(null);
     };
 
@@ -189,19 +183,6 @@ function HomeContent() {
       .sort((a, b) => a.name.localeCompare(b.name, 'es'));
   };
 
-  // Obtener apps por momento (solo implementadas) y ordenar alfabéticamente
-  const getAppsByMoment = (momentId: MomentType) => {
-    return applicationsDatabase
-      .filter(app => app.contexts?.includes(momentId))
-      .filter(app => isAppImplemented(app.url))
-      .sort((a, b) => a.name.localeCompare(b.name, 'es'));
-  };
-
-  // Contar apps por momento (solo implementadas)
-  const getMomentCount = (momentId: MomentType) => {
-    return getAppsByMoment(momentId).length;
-  };
-
   // Manejar click en app (añadir a recientes)
   const handleAppClick = useCallback((url: string) => {
     addRecentApp(url);
@@ -210,65 +191,12 @@ function HomeContent() {
   // Volver a home
   const goHome = () => {
     setCurrentView('home');
-    setSelectedMoment(null);
     setSelectedSuite(null);
   };
 
   // Renderizar contenido según la vista
   const renderMainContent = () => {
     switch (currentView) {
-      case 'momentos':
-        return (
-          <section className={styles.viewSection}>
-            <div className={styles.viewHeader}>
-              <button onClick={goHome} className={styles.backButton}>← Volver</button>
-              <h2 className={styles.viewTitle}>✨ ¿Qué estás haciendo?</h2>
-            </div>
-            <div className={styles.momentsGrid}>
-              {moments.map((moment) => {
-                const count = getMomentCount(moment.id);
-                const isActive = selectedMoment === moment.id;
-
-                return (
-                  <button
-                    type="button"
-                    key={moment.id}
-                    className={`${styles.momentButton} ${isActive ? styles.active : ''}`}
-                    onClick={() => setSelectedMoment(isActive ? null : moment.id)}
-                    title={moment.description}
-                  >
-                    <span className={styles.momentIcon}>{moment.icon}</span>
-                    <span className={styles.momentName}>{moment.name}</span>
-                    <span className={styles.momentCount}>{count} apps</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {selectedMoment && (
-              <div className={styles.appsPanel}>
-                <div className={styles.appsPanelHeader}>
-                  <h3>
-                    <span>{moments.find(m => m.id === selectedMoment)?.icon}</span>
-                    {moments.find(m => m.id === selectedMoment)?.name}
-                  </h3>
-                  <button onClick={() => setSelectedMoment(null)} className={styles.closeBtn}>×</button>
-                </div>
-                <ul className={styles.appsList}>
-                  {getAppsByMoment(selectedMoment).map((app, index) => (
-                    <li key={index} className={styles.appItem}>
-                      <a href={app.url} onClick={() => handleAppClick(app.url)} title={app.description}>
-                        <span className={styles.appItemIcon}>{app.icon}</span>
-                        {app.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </section>
-        );
-
       case 'suites':
         return (
           <section className={styles.viewSection}>

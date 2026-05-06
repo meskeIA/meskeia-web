@@ -12,45 +12,35 @@
 
 ---
 
-## Arquitectura de Clasificación: Suites + Momentos
+## Arquitectura de Clasificación: Suites Temáticas
 
-meskeIA usa un sistema de clasificación bidimensional para organizar las apps:
+meskeIA organiza las apps en 13 Suites Temáticas (clasificación NO excluyente — una app puede pertenecer a múltiples suites).
 
-### Suites Temáticas (11) - "¿Qué problema resuelve?"
+> **Histórico**: el sistema de "Momentos" (cruce con suites) se eliminó el 2026-05-06 al volverse contraproducente con +800 apps (conteos absurdos como "Estudiando 446 apps" no permitían descubrimiento real).
 
-Clasificación **NO excluyente**: una app puede pertenecer a múltiples suites.
+### Suites (13) - "¿Qué problema resuelve?"
 
 | ID | Suite | Icono | Descripción |
 |----|-------|-------|-------------|
-| `cultura` | Cultura General | 📚 | Conocimiento, referencias |
-| `diseno` | Diseño y Desarrollo | 🎨 | Herramientas para diseñadores/devs |
-| `estudiantes` | Estudiantes | 🧮 | Matemáticas, ciencias, estudio |
+| `accesibilidad` | Accesibilidad e Inclusión | ♿ | Autismo, TDAH, dislexia, discapacidad |
+| `cultura` | Cultura General | 📚 | Conocimiento, referencias, divulgación |
+| `diseno` | Diseño y Contenido | 🎨 | Diseño, desarrollo, SEO, redes sociales (fusión 2026-05-06) |
+| `estudiantes` | Estudiantes | 🧮 | Matemáticas, ciencias, estudio reglado |
 | `finanzas` | Finanzas e Inversión | 📈 | Ahorro, inversión, planificación |
 | `freelance` | Freelance y Autónomo | 💼 | Herramientas para independientes |
 | `tecnicas` | Herramientas Técnicas | 🔧 | Herramientas especializadas |
 | `inmobiliaria` | Inmobiliaria y Hogar | 🏘️ | Hipotecas, alquiler, gestión hogar |
 | `juegos` | Juegos y Ocio | 🎲 | Diversión y entretenimiento |
-| `marketing` | Marketing y Contenido | 📢 | SEO, redes sociales, contenido |
+| `legal-fiscal` | Legal, Fiscal y Patrimonio | ⚖️ | Impuestos, herencias, jubilación, pensiones (fusión 2026-05-06) |
 | `productividad` | Productividad | ⚡ | Organización personal |
 | `salud` | Salud y Bienestar | 🏥 | Salud, nutrición, mascotas |
-
-### Momentos (7) - "¿Cuándo lo usas?"
-
-| ID | Momento | Icono |
-|----|---------|-------|
-| `trabajo` | En el trabajo | 💼 |
-| `estudio` | Estudiando | 🎓 |
-| `casa` | En casa | 🏠 |
-| `dinero` | Gestionando dinero | 💰 |
-| `creando` | Creando contenido | 🎨 |
-| `relax` | Tiempo libre | 🎮 |
-| `curiosidad` | Por curiosidad | 🔍 |
+| `viajes` | Viajes y Turismo | ✈️ | Planificación de viajes |
 
 ### Archivos de datos
 
 | Archivo | Descripción |
 |---------|-------------|
-| `data/suites.ts` | Definición de las 11 suites |
+| `data/suites.ts` | Definición de las 13 suites |
 | `data/applications.ts` | Base de datos de apps |
 | `data/implemented-apps.ts` | URLs de apps implementadas |
 | `data/app-relations.ts` | Cross-linking entre apps |
@@ -108,7 +98,7 @@ Ruta dinámica para cronologías históricas. Cada historia = un archivo `data/h
 **Fase secuencial** (director de proyecto después de que todos los agentes terminan):
 ```
 1. data/historias/index.ts  — añadir imports + entradas en registry
-2. data/applications.ts     — añadir entradas con suites + contexts
+2. data/applications.ts     — añadir entradas con suites
 3. data/implemented-apps.ts — añadir URLs
 4. data/app-relations.ts    — añadir bloques appKey + cross-links mutuos
 5. npm run build            — generateStaticParams() prerenderiza todo automáticamente
@@ -140,7 +130,7 @@ Verificadas con el usuario y validadas en producción (2026-05-03):
 2. **Eras continuas**: el rango `desde/hasta` de las 6 eras debe cubrir `anioInicio→anioFin` sin huecos ni solapamientos.
 3. **IDs de hitos**: kebab-case sin acentos ni caracteres especiales (`'reino-antiguo'`, `'conquista-constantinopla'`).
 4. **Años negativos**: `anioInicio: -3100` = 3100 a.C. El template convierte automáticamente para mostrar.
-5. **Suites y contexts estándar** para apps de historia: `suites: ["cultura", "estudiantes"]`, `contexts: ["estudio", "curiosidad"]`.
+5. **Suites estándar** para apps de historia: `suites: ["cultura", "estudiantes"]`.
 6. **Archivo de referencia**: `data/historias/roma.ts` — el más completo y correcto para copiar la estructura.
 
 ### appKey en app-relations.ts
@@ -225,7 +215,6 @@ import { FISCAL_IRPF_META } from '@/data/fiscal';
 {
   name: "Calculadora de IVA",
   suites: ['freelance', 'tecnicas'],  // OBLIGATORIO: mínimo 1
-  contexts: ['trabajo', 'dinero'],     // OBLIGATORIO: mínimo 1
   icon: "🧾",
   // ...
 }
@@ -294,7 +283,7 @@ Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no op
 **Fase 1 — App funcional** (skill `/nueva-app-meskeia`):
 ```
 [ ] 1. Crear carpeta app/[nombre-app]/ (usar template: templates/app-base/, copiar también layout.template.ts → layout.tsx)
-[ ] 2. Añadir entrada en data/applications.ts (suites + contexts)
+[ ] 2. Añadir entrada en data/applications.ts (suites)
 [ ] 3. Añadir URL en data/implemented-apps.ts
 [ ] 4. Añadir relaciones en data/app-relations.ts
 [ ] 5. Incluir <EducationalSection> con bloque educativo básico en page.tsx
@@ -534,7 +523,7 @@ git push origin main
 - `robots.txt` - Desde `app/robots.ts`
 
 ### Manuales (actualizar siempre)
-- `data/applications.ts` - Añadir app con suites + contexts
+- `data/applications.ts` - Añadir app con suites
 - `data/implemented-apps.ts` - Añadir URL
 - `data/app-relations.ts` - Añadir relaciones
 - `public/ai-index.json` - **Auto-generado** por `npm run build`, no editar
