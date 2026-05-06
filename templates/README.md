@@ -7,7 +7,8 @@ Plantillas reutilizables para acelerar el desarrollo de nuevas apps.
 ```
 templates/
 ├── app-base/                      # Plantilla base de aplicación
-│   ├── metadata.template.ts       # Metadata SEO
+│   ├── metadata.template.ts       # Metadata SEO + JSON-LD (Schema.org)
+│   ├── layout.template.ts         # Server component que renderiza JSON-LD
 │   ├── page.template.tsx          # Componente principal
 │   └── App.module.template.css    # Estilos CSS Module
 ├── trpc-router.template.ts        # Router tRPC con ejemplos
@@ -28,6 +29,7 @@ cp -r templates/app-base app/mi-nueva-app
 cd app/mi-nueva-app
 mv page.template.tsx page.tsx
 mv metadata.template.ts metadata.ts
+mv layout.template.ts layout.tsx
 mv App.module.template.css MiNuevaApp.module.css
 
 # 3. Reemplazar placeholders en todos los archivos:

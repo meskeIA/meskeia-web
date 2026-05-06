@@ -255,13 +255,32 @@ meskeIA sirve a todo el público hispanohablante (España + Latam = ~50% del tr�
 - Moneda: si no es contable-España, considerar dejar el símbolo configurable o usar genérico
 - En bloques educativos, citar normativa España solo cuando sea relevante; preferir ejemplos universales
 
+### 1.ter JSON-LD / Structured Data (OBLIGATORIO desde 2026-05-06)
+
+Toda app nueva DEBE incluir Schema.org JSON-LD para que Google y las IAs (ChatGPT, Perplexity, Gemini) reconozcan correctamente el contenido. Habilita rich snippets en SERP.
+
+**Está automatizado en el template** (`templates/app-base/`):
+- `metadata.template.ts` exporta `jsonLd` usando `generateWebAppSchema` desde `lib/schema-templates.ts`
+- `layout.template.ts` importa `jsonLd` y renderiza `<script type="application/ld+json">` antes del `{children}`
+
+**Solo hay que** rellenar correctamente al crear la app:
+- `name`: nombre claro y descriptivo
+- `description`: 1-2 frases sobre qué hace y para quién
+- `url`: URL absoluta completa con barra final (`https://meskeia.com/[slug]/`)
+- `category`: una de `EducationalApplication` (cursos, simuladores, glosarios, calculadoras académicas), `FinanceApplication` (apps con cálculo financiero), `UtilityApplication` (conversores, generadores) o `BusinessApplication`
+- `features`: 4-8 características reales de la app
+
+**Verificación**: tras el build, comprobar que `.next/server/app/[slug].html` contiene `"@type":"WebApplication"`. Idealmente validar 1 app con Google Rich Results Test (https://search.google.com/test/rich-results) cuando esté en producción.
+
+**Apps existentes sin JSON-LD**: NO retrofit masivo. Solo añadir si una app concreta empieza a tener tráfico relevante (>15-20 visitas/mes).
+
 ### 2. Ciclo de creación de nueva app (2 fases obligatorias)
 
 Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no opcional.
 
 **Fase 1 — App funcional** (skill `/nueva-app-meskeia`):
 ```
-[ ] 1. Crear carpeta app/[nombre-app]/ (usar template: templates/app-base/)
+[ ] 1. Crear carpeta app/[nombre-app]/ (usar template: templates/app-base/, copiar también layout.template.ts → layout.tsx)
 [ ] 2. Añadir entrada en data/applications.ts (suites + contexts)
 [ ] 3. Añadir URL en data/implemented-apps.ts
 [ ] 4. Añadir relaciones en data/app-relations.ts
