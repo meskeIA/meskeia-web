@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Creador de Paletas de Colores - Armonías y Esquemas | meskeIA',
@@ -26,3 +27,21 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Creador de Paletas de Colores',
+  description: 'Generador de paletas de colores armónicas: complementarios, análogos, triádicos, tetrádicos y monocromáticos. Exporta los colores como variables CSS, SCSS o JSON.',
+  url: 'https://meskeia.com/creador-paletas/',
+  category: 'UtilityApplication',
+  features: [
+    'Generación automática de paletas armónicas',
+    '5 esquemas: complementario, análogo, triádico, tetrádico, monocromático',
+    'Selector de color base (HEX, RGB, HSL)',
+    'Exportar como CSS, SCSS o JSON',
+    'Visualización de cada color con código hex',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['paleta colores', 'color harmony', 'diseño', 'CSS', 'esquema cromático'],
+});

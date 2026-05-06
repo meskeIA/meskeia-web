@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de Código Braille - Texto a Braille en Español | meskeIA',
@@ -32,3 +33,20 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Conversor de Código Braille',
+  description: 'Convierte texto a código Braille y viceversa con el alfabeto Braille español completo, incluyendo ñ y acentos. Visualización interactiva con celdas Unicode.',
+  url: 'https://meskeia.com/conversor-braille/',
+  category: 'UtilityApplication',
+  features: [
+    'Conversión bidireccional texto ↔ Braille',
+    'Alfabeto Braille español completo (ñ, vocales acentuadas)',
+    'Visualización con celdas Braille Unicode',
+    'Soporte para números y signos de puntuación',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['Braille', 'accesibilidad', 'discapacidad visual', 'conversor texto Braille'],
+});

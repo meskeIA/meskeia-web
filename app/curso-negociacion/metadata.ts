@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Negociación Exitosa - Domina el Arte de Negociar | meskeIA',
@@ -32,3 +33,22 @@ export const metadata: Metadata = {
     'application-name': 'Curso de Negociación Exitosa meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Curso de Negociación Exitosa',
+  description: 'Curso gratuito de negociación profesional en español. 12 capítulos que cubren BATNA, ZOPA, tácticas de persuasión, cierre de acuerdos, resolución de conflictos y negociación multicultural.',
+  url: 'https://meskeia.com/curso-negociacion/',
+  category: 'EducationalApplication',
+  features: [
+    'Curso completo de 12 capítulos sobre negociación',
+    'Conceptos clave: BATNA, ZOPA, principios de Cialdini',
+    'Tácticas de persuasión y cierre de acuerdos',
+    'Resolución de conflictos y mediación',
+    'Negociación multicultural e internacional',
+    'Progreso guardado localmente entre sesiones',
+    'Acceso 100% gratis sin registro',
+    'Sin publicidad',
+    'En español',
+  ],
+  keywords: ['curso negociación', 'BATNA', 'ZOPA', 'persuasión', 'Cialdini', 'mediación', 'conflictos'],
+});

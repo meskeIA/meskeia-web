@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Tonos Online - Frecuencias de Audio Gratis | meskeIA',
@@ -32,3 +33,19 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Generador de Tonos',
+  description: 'Generador online de tonos y frecuencias de audio entre 20 Hz y 20.000 Hz. Útil para tests de audio, calibración de altavoces y auriculares, ejercicios de tinnitus y experimentos acústicos.',
+  url: 'https://meskeia.com/generador-tonos/',
+  category: 'UtilityApplication',
+  features: [
+    'Generación de tonos puros entre 20 Hz y 20.000 Hz',
+    'Cuatro formas de onda: senoidal, cuadrada, triangular, sierra',
+    'Control fino de frecuencia y volumen',
+    'Útil para tests de audio y calibración',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+  ],
+  keywords: ['generador tonos', 'frecuencias audio', 'test audio', 'calibración altavoces', 'tinnitus'],
+});

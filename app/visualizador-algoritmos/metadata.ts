@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Algoritmos de Ordenación Paso a Paso | meskeIA',
@@ -35,3 +36,21 @@ export const metadata: Metadata = {
     'application-name': 'Visualizador de Algoritmos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Visualizador de Algoritmos de Ordenación',
+  description: 'Visualizador interactivo paso a paso de algoritmos de ordenación: Bubble Sort, Selection Sort, Insertion Sort, Quick Sort y Merge Sort. Herramienta educativa para estudiantes de informática y programación.',
+  url: 'https://meskeia.com/visualizador-algoritmos/',
+  category: 'EducationalApplication',
+  features: [
+    'Visualización paso a paso de 5 algoritmos de ordenación',
+    'Bubble Sort, Selection Sort, Insertion Sort, Quick Sort, Merge Sort',
+    'Control de velocidad de la animación',
+    'Comparación de complejidad temporal de cada algoritmo',
+    'Conjuntos de datos personalizables',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['algoritmos', 'ordenación', 'sorting', 'estructuras de datos', 'informática', 'universidad', 'FP'],
+});

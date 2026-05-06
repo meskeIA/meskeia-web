@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Puertas Lógicas - AND, OR, NOT, NAND, XOR | meskeIA',
@@ -32,3 +33,21 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Simulador de Puertas Lógicas',
+  description: 'Simulador interactivo de puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR) con tablas de verdad, circuitos digitales predefinidos (Half Adder, Full Adder, Multiplexor) y evaluador de expresiones booleanas.',
+  url: 'https://meskeia.com/simulador-puertas-logicas/',
+  category: 'EducationalApplication',
+  features: [
+    'Simulador interactivo de 7 tipos de puertas lógicas',
+    'Tablas de verdad generadas automáticamente',
+    'Circuitos predefinidos: Half Adder, Full Adder, Multiplexor',
+    'Evaluador de expresiones booleanas',
+    'Visualización paso a paso de la propagación de señales',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['puertas lógicas', 'electrónica digital', 'álgebra booleana', 'tablas verdad', 'universidad', 'FP'],
+});

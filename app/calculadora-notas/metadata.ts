@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Notas Académicas - Media Ponderada y EvAU | meskeIA',
@@ -32,3 +33,21 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Calculadora de Notas Académicas',
+  description: 'Calculadora de notas académicas para estudiantes hispanohablantes. Calcula media ponderada por créditos, simulador EvAU (España), y conversiones entre escalas de calificación de México, Argentina, Chile, Colombia, Perú y Venezuela.',
+  url: 'https://meskeia.com/calculadora-notas/',
+  category: 'EducationalApplication',
+  features: [
+    'Calculadora de media ponderada con créditos ECTS',
+    'Simulador de nota EvAU (selectividad España)',
+    'Conversión entre 6+ escalas de calificación de Latam',
+    'Calculadora de "qué nota necesitas para aprobar"',
+    'Tabla de equivalencias entre sistemas educativos',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['calculadora notas', 'media ponderada', 'ECTS', 'EvAU', 'GPA', 'conversor notas', 'estudiantes'],
+});

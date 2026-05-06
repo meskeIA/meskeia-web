@@ -1,4 +1,6 @@
 import { CourseProvider } from './CourseContext';
+import { jsonLd } from './metadata';
+
 export { metadata } from './metadata';
 
 export default function CursoLayout({
@@ -6,5 +8,13 @@ export default function CursoLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <CourseProvider>{children}</CourseProvider>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <CourseProvider>{children}</CourseProvider>
+    </>
+  );
 }

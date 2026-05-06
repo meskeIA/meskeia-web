@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador Lotería: Primitiva, Euromillones, Bonoloto | meskeIA',
@@ -32,3 +33,20 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Generador de Números de Lotería',
+  description: 'Generador de combinaciones aleatorias para loterías españolas: Primitiva, Euromillones, Bonoloto, El Gordo y Quiniela. Genera números al azar con historial y estadísticas.',
+  url: 'https://meskeia.com/generador-loteria/',
+  category: 'UtilityApplication',
+  features: [
+    'Generador de números aleatorios para 5 loterías españolas',
+    'Primitiva, Euromillones, Bonoloto, El Gordo, Quiniela',
+    'Múltiples combinaciones por sorteo',
+    'Historial de combinaciones generadas',
+    'Estadísticas básicas de los números generados',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+  ],
+  keywords: ['lotería', 'números aleatorios', 'Primitiva', 'Euromillones', 'Bonoloto'],
+});

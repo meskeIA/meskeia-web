@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Cocina: Recetas, Tiempos y Conversor | meskeIA',
@@ -35,3 +36,21 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora de Cocina meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Calculadora de Cocina',
+  description: 'Calculadora de cocina online con conversor de unidades (tazas, gramos, ml, onzas), escalador de recetas, tabla de tiempos de cocción y buscador de sustitutos de ingredientes.',
+  url: 'https://meskeia.com/calculadora-cocina/',
+  category: 'UtilityApplication',
+  features: [
+    'Conversor de unidades de cocina (volumen, peso, temperatura)',
+    'Escalador de recetas según número de comensales',
+    'Tabla de tiempos de cocción por alimento y método',
+    'Buscador de sustitutos de ingredientes',
+    'Conversor de temperaturas de horno (°C, °F, gas)',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['calculadora cocina', 'conversor unidades', 'escalador recetas', 'tiempos cocción', 'sustitutos ingredientes'],
+});

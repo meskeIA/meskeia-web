@@ -4,7 +4,7 @@
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 > Actualizar este documento al final de cada sesión que toque el tema.
 
-**Última actualización:** 2026-05-06 (sesión madrugada — auditoría rutas dinámicas)
+**Última actualización:** 2026-05-06 (sesión madrugada — JSON-LD top 19)
 
 ---
 
@@ -349,6 +349,37 @@ Las homepages de ambos cursos siguen teniendo canonical correcto vía herencia (
 
 **Total auditoría**: 0 problemas en historias dinámicas (verificadas), 0 en guías, 2 cursos con bug (corregidos).
 
+### 2026-05-06 (sesión madrugada — JSON-LD en top 19) — Structured Data desplegado
+
+Aplicado JSON-LD / Structured Data a las 19 apps top (las mismas del SEO sweep anterior). Habilita rich snippets en Google y permite que IAs (ChatGPT, Perplexity) reconozcan mejor el contenido como app web.
+
+**Helper aprovechado**: `lib/schema-templates.ts` (ya existía con `generateWebAppSchema`, `generateFAQSchema`, `generateHowToSchema`, etc.). No fue necesario crear nada nuevo.
+
+**Patrón aplicado** (per app):
+1. `metadata.ts`: `import { generateWebAppSchema } from '@/lib/schema-templates'` + `export const jsonLd = generateWebAppSchema({...})`
+2. `layout.tsx`: importa `jsonLd` y renderiza `<script type="application/ld+json">` antes de `{children}`
+
+**Por qué `layout.tsx` y no `page.tsx`**: las páginas top tienen múltiples estados/returns (ej. `test-perfil-inversor` tiene 3 returns: start, quiz, resultado). Si el `<script>` va dentro del `page.tsx` solo aparece en uno de los estados. Al ponerlo en el `layout.tsx` (server component), aparece SIEMPRE antes del contenido, sin depender del estado del componente cliente.
+
+**Categorías Schema.org asignadas**:
+
+| Categoría | Apps |
+|-----------|------|
+| `EducationalApplication` (10) | tabla-periodica, simulador-genetica, simulador-puertas-logicas, calculadora-notas, juego-memoria, calculadora-estadistica, calculadora-geometria, contador-silabas, visualizador-algoritmos, curso-optimizacion-ia, curso-negociacion |
+| `FinanceApplication` (2) | test-perfil-inversor, estimador-compraventa-inmueble |
+| `UtilityApplication` (6) | conversor-braille, generador-anagramas, calculadora-cocina, creador-paletas, generador-loteria, generador-tonos |
+
+**Verificación**: el build genera 2 schemas por página top — el `WebSite` global (root layout) + el `WebApplication` específico de la app. Confirmado en HTML estático (`.next/server/app/tabla-periodica.html`).
+
+**Nota sobre cursos**: el JSON-LD del `layout.tsx` cursos cascadea a todas las lecciones (`/curso-X/Y/Z/`). Esto es intencional y beneficioso: Google ve cada lección como parte del curso. Si en el futuro queremos schemas por lección, tocaría refactor por lección.
+
+**Build**: 1088 páginas, 0 errores.
+
+**Pendiente para próxima sesión SEO** (cuando datos justifiquen):
+- Replicar JSON-LD a las siguientes 100-200 apps
+- Considerar `Course` schema específico (mejor que WebApplication para los 2 cursos top)
+- FAQ schema en apps con bloques de preguntas frecuentes (mayor probabilidad de rich snippets)
+
 ---
 
 ## 8. Métricas a seguir
@@ -376,8 +407,8 @@ Las homepages de ambos cursos siguen teniendo canonical correcto vía herencia (
 ---
 
 **Próximo paso al retomar:**
-1. JSON-LD / Structured Data en top 19 apps (Prioridad 2 SEO) — helper genérico aplicable a `WebApplication`, `Course`, `FAQ`. Habilita rich snippets en Google.
-2. Revisar datos de tracking FASE 0 (CTR de RelatedApps por app, top pares "from→to") tras 3-5 días de acumulación.
-3. Comprobar si la apertura Latam de `calculadora-notas` y los quick wins de copy mueven el % Latam (medir en 2-3 semanas).
-4. Decidir parámetros de FASE 1 (componente `ContinuaCon`) con datos reales.
-5. Análisis de las ~319 apps con 0 visitas (informativo, sin urgencia).
+1. Revisar datos de tracking FASE 0 (CTR de RelatedApps por app, top pares "from→to") tras 3-5 días de acumulación.
+2. Comprobar si la apertura Latam de `calculadora-notas` y los quick wins de copy mueven el % Latam (medir en 2-3 semanas).
+3. Decidir parámetros de FASE 1 (componente `ContinuaCon`) con datos reales.
+4. Análisis de las ~319 apps con 0 visitas (informativo, sin urgencia).
+5. Replicar JSON-LD a más apps si Google Search Console muestra rich snippets en las 19 top.

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Genética Mendeliana - Cruces y Herencia | meskeIA',
@@ -32,3 +33,21 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Simulador de Genética Mendeliana',
+  description: 'Simulador interactivo de cruces genéticos y herencia mendeliana. Genera cuadros de Punnett, árboles genealógicos, herencia ligada al sexo y simulación de poblaciones para entender genotipos y fenotipos.',
+  url: 'https://meskeia.com/simulador-genetica/',
+  category: 'EducationalApplication',
+  features: [
+    'Generador de cuadros de Punnett (mono y dihíbridos)',
+    'Visualización de cruces genéticos paso a paso',
+    'Herencia ligada al sexo y autosómica',
+    'Árboles genealógicos (pedigrees)',
+    'Simulación de frecuencias alélicas en poblaciones',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['genética', 'Mendel', 'cuadro de Punnett', 'herencia', 'bachillerato', 'biología'],
+});

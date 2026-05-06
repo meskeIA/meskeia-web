@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Anagramas - Encuentra Palabras con tus Letras | meskeIA',
@@ -32,3 +33,20 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Generador de Anagramas',
+  description: 'Generador de anagramas en español. Encuentra todas las palabras válidas que se pueden formar con un conjunto de letras. Útil para Wordle, Scrabble, Apalabrados y crucigramas.',
+  url: 'https://meskeia.com/generador-anagramas/',
+  category: 'UtilityApplication',
+  features: [
+    'Genera anagramas a partir de letras introducidas',
+    'Diccionario español integrado',
+    'Filtros por longitud de palabra',
+    'Útil para juegos de palabras (Wordle, Scrabble, Apalabrados)',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['anagramas', 'palabras', 'Wordle', 'Scrabble', 'crucigramas', 'juegos palabras'],
+});

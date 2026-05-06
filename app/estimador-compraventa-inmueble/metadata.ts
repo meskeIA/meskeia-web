@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Gastos de Compraventa Inmobiliaria - Calculadora | meskeIA',
@@ -35,3 +36,21 @@ export const metadata: Metadata = {
     'application-name': 'Simulador Compraventa Inmobiliaria meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Estimador Gastos Compraventa Inmobiliaria',
+  description: 'Calculadora de gastos de compraventa de vivienda, local comercial, nave industrial y terreno en España. Incluye ITP/AJD por comunidad autónoma, IVA en obra nueva, gastos de notaría, registro de la propiedad, plusvalía municipal y comisiones.',
+  url: 'https://meskeia.com/estimador-compraventa-inmueble/',
+  category: 'FinanceApplication',
+  features: [
+    'Cálculo de ITP por comunidad autónoma (España)',
+    'IVA + AJD en obra nueva',
+    'Gastos de notaría y registro de la propiedad',
+    'Plusvalía municipal (IIVTNU)',
+    'Comisiones de inmobiliaria configurables',
+    'Cuatro tipos de inmueble: vivienda, local, nave, terreno',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+  ],
+  keywords: ['compraventa inmueble', 'ITP', 'IVA', 'plusvalía municipal', 'gastos vivienda España', 'inmobiliaria'],
+});

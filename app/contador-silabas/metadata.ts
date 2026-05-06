@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Contador de Sílabas - Separa y Cuenta Sílabas en Español | meskeIA',
@@ -32,3 +33,20 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Contador de Sílabas',
+  description: 'Contador y separador de sílabas en español. Divide palabras y textos en sílabas siguiendo las reglas del español. Útil para métrica poética, ortografía y enseñanza del idioma.',
+  url: 'https://meskeia.com/contador-silabas/',
+  category: 'EducationalApplication',
+  features: [
+    'Separación silábica de palabras y textos',
+    'Conteo automático de sílabas',
+    'Análisis métrico para poesía',
+    'Identificación de diptongos, hiatos y triptongos',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['contador sílabas', 'separar sílabas', 'silabeador', 'métrica poesía', 'ortografía'],
+});

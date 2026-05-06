@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Estadística Online - Media, Mediana, Desviación | meskeIA',
@@ -32,3 +33,21 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: 'Calculadora Estadística',
+  description: 'Calculadora estadística online para análisis descriptivo: media, mediana, moda, varianza, desviación estándar, cuartiles y percentiles. Visualización gráfica de los datos.',
+  url: 'https://meskeia.com/calculadora-estadistica/',
+  category: 'EducationalApplication',
+  features: [
+    'Estadísticos descriptivos: media, mediana, moda',
+    'Medidas de dispersión: varianza, desviación estándar, rango',
+    'Cuartiles, deciles y percentiles',
+    'Gráfico de distribución de datos',
+    'Detección de valores atípicos (outliers)',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
+  keywords: ['estadística', 'media mediana moda', 'desviación estándar', 'análisis datos', 'estudiantes'],
+});
