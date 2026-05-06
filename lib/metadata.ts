@@ -5,8 +5,8 @@ import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 // Configuración base del sitio
 export const siteConfig = {
   name: 'meskeIA',
-  title: `${TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas`,
-  description: 'Gratuitas y sin registro',
+  title: `${TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas en español`,
+  description: 'Plataforma educativa gratuita: estudio, finanzas personales y herramientas prácticas. Sin registro ni publicidad.',
   url: 'https://meskeia.com',
   ogImage: 'https://meskeia.com/og-image.png',
   author: 'meskeIA',
@@ -269,7 +269,7 @@ export function generateAppJsonLd(options: {
 export function generateToolsMetadata(): Metadata {
   const title = 'Catálogo Completo de Aplicaciones';
   const description =
-    `Explora nuestro catálogo de ${TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas organizadas por categorías: calculadoras financieras, cursos, herramientas de productividad, juegos y más. Todo en español.`;
+    `Catálogo completo de ${TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas en español: estudio, finanzas personales y herramientas prácticas. Sin registro.`;
 
   return generateBaseMetadata({
     title,

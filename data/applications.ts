@@ -1,7 +1,7 @@
 /**
  * Base de datos completa de aplicaciones meskeIA
- * Total: 250 aplicaciones organizadas por 15 Suites Temáticas + 7 Momentos
- * Actualizado: 2026-03-15
+ * Organizadas por 11 Suites Temáticas + 7 Momentos
+ * Para conocer el total actualizado: `import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps'`
  *
  * CONVENCIÓN DE NOMBRES:
  * - calculadora-: Apps que calculan/resuelven

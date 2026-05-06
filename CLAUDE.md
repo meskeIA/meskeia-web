@@ -255,6 +255,19 @@ meskeIA sirve a todo el público hispanohablante (España + Latam = ~50% del tr�
 - Moneda: si no es contable-España, considerar dejar el símbolo configurable o usar genérico
 - En bloques educativos, citar normativa España solo cuando sea relevante; preferir ejemplos universales
 
+### 1.quater Cifras del catálogo (OBLIGATORIO desde 2026-05-06)
+
+Las cifras del catálogo (número de apps, visualizadores, cursos, etc.) **solo aparecen vía variable** importada desde `@/data/implemented-apps` (`TOTAL_IMPLEMENTED_APPS`). **PROHIBIDO hardcodear números** de apps en textos UI/SEO/JSON-LD.
+
+**Por qué**: El proyecto crece rápido (84 → 220 → 824 en pocos meses) y los números hardcoded quedan obsoletos sin aviso. Históricamente ha pasado en `FAQ.tsx`, `app/layout.tsx` (JSON-LD) y otros sitios. Cualquier cifra hardcoded es deuda técnica garantizada.
+
+**Regla operativa**:
+- Si una pieza de UI **necesita** la cifra para su mensaje → importar `TOTAL_IMPLEMENTED_APPS` y usar template literal: `` `${TOTAL_IMPLEMENTED_APPS} aplicaciones...` ``
+- Si una pieza **no la necesita** → eliminarla en lugar de dejar un número que envejecerá. Ejemplo: la FAQ "¿son realmente gratuitas?" no necesita decir "todas las 84 apps", basta con "todas las aplicaciones".
+- En JSON-LD/Schema.org: la `description` no requiere cifra, mejor omitirla.
+
+**Auditoría manual periódica**: `grep -rE "\b[0-9]{2,4}\b\s+aplicaciones?" --include="*.tsx" --include="*.ts" --include="*.md"` para detectar regresiones.
+
 ### 1.ter JSON-LD / Structured Data (OBLIGATORIO desde 2026-05-06)
 
 Toda app nueva DEBE incluir Schema.org JSON-LD para que Google y las IAs (ChatGPT, Perplexity, Gemini) reconozcan correctamente el contenido. Habilita rich snippets en SERP.

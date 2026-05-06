@@ -9,8 +9,8 @@ export default function HomeFooter() {
       <div className={styles.container}>
         {/* Copyright y descripción */}
         <div className={styles.mainInfo}>
-          <p className={styles.copyright}>© 2026 meskeIA - Biblioteca de Aplicaciones Web Gratuitas</p>
-          <p className={styles.tagline}>Aplicaciones desarrolladas para simplificar tu día a día</p>
+          <p className={styles.copyright}>© 2026 meskeIA — Plataforma educativa gratuita en español</p>
+          <p className={styles.tagline}>Estudio, finanzas personales y herramientas prácticas. Sin registro y sin publicidad.</p>
         </div>
 
         {/* Enlaces de navegación */}
@@ -40,8 +40,8 @@ export default function HomeFooter() {
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
-                  title: 'meskeIA - Biblioteca de Aplicaciones Web',
-                  text: 'Descubre 84 aplicaciones web gratuitas en español',
+                  title: 'meskeIA — Plataforma educativa gratuita',
+                  text: 'Estudio, finanzas personales y herramientas prácticas. Aplicaciones gratuitas en español, sin registro.',
                   url: window.location.href
                 })
               } else {

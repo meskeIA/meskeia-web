@@ -9,7 +9,7 @@ export default function FAQ() {
   const faqs = [
     {
       question: '¿Son realmente gratuitas todas las aplicaciones?',
-      answer: 'Sí, completamente gratuitas sin registro, sin anuncios y sin costos ocultos. Todas las 84 aplicaciones están disponibles para usar libremente.'
+      answer: 'Sí, completamente gratuitas sin registro, sin anuncios y sin costos ocultos. Todas las aplicaciones están disponibles para usar libremente.'
     },
     {
       question: '¿Qué datos recogéis de los usuarios?',

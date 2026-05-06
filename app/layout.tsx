@@ -78,7 +78,7 @@ export default function RootLayout({
               '@type': 'WebSite',
               name: 'meskeIA',
               url: 'https://meskeia.com',
-              description: 'Biblioteca gratuita de más de 220 aplicaciones web educativas en español. Sin registro ni instalación.',
+              description: 'Plataforma educativa gratuita en español: estudio, finanzas personales y herramientas prácticas. Sin registro ni publicidad.',
               inLanguage: 'es',
               publisher: {
                 '@type': 'Organization',

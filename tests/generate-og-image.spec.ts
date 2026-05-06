@@ -89,7 +89,7 @@ test('generar og-image.png con nuevo logo Enjambre', async ({ page }) => {
         </div>
       </div>
       <div class="bar"></div>
-      <div class="tagline">621 aplicaciones web gratuitas para tu día a día</div>
+      <div class="tagline">Estudio, finanzas y herramientas. Gratis y en español.</div>
     </body>
     </html>
   `);

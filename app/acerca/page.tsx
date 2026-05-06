@@ -19,9 +19,11 @@ export default function AcercaPage() {
         {/* Introducción */}
         <div className={styles.intro}>
           <p>
-            <strong>meskeIA</strong> es una biblioteca de <strong>aplicaciones web gratuitas</strong> en español.
-            Calculadoras, visualizadores interactivos, guías de decisión, herramientas de productividad y mucho más.
-            Todo funciona <strong>sin registro</strong>, <strong>sin anuncios</strong>, <strong>sin instalar nada</strong> y <strong>100% en español</strong>.
+            <strong>meskeIA</strong> es una plataforma gratuita de aplicaciones web en español:{' '}
+            <strong>estudio</strong> (visualizadores, ciencia, historia),{' '}
+            <strong>finanzas personales</strong> (inversión, hipotecas, impuestos) y{' '}
+            <strong>herramientas prácticas</strong> (productividad, diseño, juegos y más).
+            Sin registro y sin publicidad.
           </p>
 
           <div className={styles.stats}>
@@ -44,24 +46,26 @@ export default function AcercaPage() {
         <h2 className={styles.sectionTitle}>¿Para quién es meskeIA?</h2>
         <div className={styles.section}>
           <div className={styles.casosUso}>
-            <div className={styles.caso}>
-              <h3>💼 Inversores y Ahorradores</h3>
-              <p>Calculadoras de hipotecas, interés compuesto, TAE, IRPF, pensiones, herencias y análisis de inversiones.</p>
-            </div>
-
+            {/* Eje 1: Estudio */}
             <div className={styles.caso}>
               <h3>🎓 Estudiantes y Bachillerato</h3>
               <p>Visualizadores de física, química y biología. Calculadoras científicas, estadísticas y conversores de unidades para el estudio.</p>
             </div>
 
             <div className={styles.caso}>
-              <h3>💻 Profesionales y Trabajadores</h3>
-              <p>Gestión del tiempo, Pomodoro, herramientas de productividad, generadores de texto y utilidades del día a día.</p>
+              <h3>🔬 Curiosos del Conocimiento</h3>
+              <p>Visualizadores interactivos de economía, ciencia, historia, geopolítica y fenómenos cotidianos para entender el mundo.</p>
             </div>
 
             <div className={styles.caso}>
-              <h3>🎨 Creativos y Diseñadores</h3>
-              <p>Paletas de colores, tipografías, gradientes, códigos QR, iconos SVG y herramientas visuales para proyectos creativos.</p>
+              <h3>🏥 Salud y Bienestar</h3>
+              <p>Calculadoras de IMC, calorías y macronutrientes. Visualizadores de mecanismos biológicos, fármacos, vitaminas y hormonas.</p>
+            </div>
+
+            {/* Eje 2: Finanzas personales */}
+            <div className={styles.caso}>
+              <h3>💼 Inversores y Ahorradores</h3>
+              <p>Calculadoras de hipotecas, interés compuesto, TAE, IRPF, pensiones, herencias y análisis de inversiones.</p>
             </div>
 
             <div className={styles.caso}>
@@ -70,18 +74,19 @@ export default function AcercaPage() {
             </div>
 
             <div className={styles.caso}>
-              <h3>🏥 Salud y Bienestar</h3>
-              <p>Calculadoras de IMC, calorías y macronutrientes. Visualizadores de mecanismos biológicos, fármacos, vitaminas y hormonas.</p>
-            </div>
-
-            <div className={styles.caso}>
-              <h3>🔬 Curiosos del Conocimiento</h3>
-              <p>Más de 200 visualizadores interactivos de economía, ciencia, historia, geopolítica y fenómenos cotidianos para entender el mundo.</p>
-            </div>
-
-            <div className={styles.caso}>
               <h3>👨‍👩‍👧 Familias y Cuidadores</h3>
               <p>Herramientas para gestionar la dependencia, planificar cuidados, calcular prestaciones y organizar el bienestar familiar.</p>
+            </div>
+
+            {/* Eje 3: Herramientas prácticas */}
+            <div className={styles.caso}>
+              <h3>💻 Profesionales y Trabajadores</h3>
+              <p>Gestión del tiempo, Pomodoro, herramientas de productividad, generadores de texto y utilidades del día a día.</p>
+            </div>
+
+            <div className={styles.caso}>
+              <h3>🎨 Creativos y Diseñadores</h3>
+              <p>Paletas de colores, tipografías, gradientes, códigos QR, iconos SVG y herramientas visuales para proyectos creativos.</p>
             </div>
           </div>
         </div>
