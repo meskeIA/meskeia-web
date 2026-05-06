@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Contraste de Colores - Verificador WCAG AA/AAA | meskeIA',
   description: 'Verifica la accesibilidad del contraste entre colores según WCAG 2.1. Calcula ratio de contraste, cumplimiento AA/AAA para texto normal y grande.',
@@ -23,3 +24,15 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Contraste de Colores - Verificador WCAG AA/AAA",
+  description: "Verifica la accesibilidad del contraste entre colores según WCAG 2.1. Calcula ratio de contraste, cumplimiento AA/AAA para texto normal y grande.",
+  url: 'https://meskeia.com/contraste-colores/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

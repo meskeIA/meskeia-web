@@ -1,7 +1,7 @@
 import { CourseProvider } from './CourseContext';
-import { metadata as pageMetadata } from './metadata';
+import { jsonLd } from './metadata';
 
-export const metadata = pageMetadata;
+export { metadata } from './metadata';
 
 export default function CursoDecisionesInversionLayout({
   children,
@@ -9,8 +9,12 @@ export default function CursoDecisionesInversionLayout({
   children: React.ReactNode;
 }) {
   return (
-    <CourseProvider>
-      {children}
-    </CourseProvider>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <CourseProvider>{children}</CourseProvider>
+    </>
   );
 }

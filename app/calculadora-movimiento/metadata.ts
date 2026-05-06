@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Movimiento - Cinemática MRU, MRUA, Caída Libre | meskeIA',
   description: 'Calculadora de cinemática con MRU, MRUA, caída libre y tiro parabólico. Calcula velocidad, aceleración, distancia y tiempo con fórmulas y ejemplos prácticos.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Movimiento - Cinemática MRU, MRUA, Caída Libre",
+  description: "Calculadora de cinemática con MRU, MRUA, caída libre y tiro parabólico. Calcula velocidad, aceleración, distancia y tiempo con fórmulas y ejemplos prácticos.",
+  url: 'https://meskeia.com/calculadora-movimiento/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

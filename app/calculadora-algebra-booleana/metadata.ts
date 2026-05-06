@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Álgebra Booleana con Mapas de Karnaugh | meskeIA',
   description: 'Simplifica expresiones booleanas usando mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, obtén la forma mínima SOP/POS y visualiza las agrupaciones.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Álgebra Booleana meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Álgebra Booleana con Mapas de Karnaugh",
+  description: "Simplifica expresiones booleanas usando mapas de Karnaugh de 2, 3 y 4 variables. Genera tablas de verdad, obtén la forma mínima SOP/POS y visualiza las agrupaciones.",
+  url: 'https://meskeia.com/calculadora-algebra-booleana/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

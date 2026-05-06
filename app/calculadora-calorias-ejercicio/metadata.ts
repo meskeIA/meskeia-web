@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Calorías Quemadas por Ejercicio | meskeIA',
   description: 'Calcula las calorías quemadas según tu actividad física. Usa valores MET científicos para correr, nadar, ciclismo, caminar y más de 30 ejercicios.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Calorías Quemadas por Ejercicio",
+  description: "Calcula las calorías quemadas según tu actividad física. Usa valores MET científicos para correr, nadar, ciclismo, caminar y más de 30 ejercicios.",
+  url: 'https://meskeia.com/calculadora-calorias-ejercicio/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

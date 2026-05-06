@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Física - Caída Libre, Péndulo, Ondas, Proyectiles | meskeIA',
   description: 'Simulador interactivo de física con animaciones en tiempo real. Experimenta con caída libre, péndulo simple, tiro parabólico, ondas y movimiento armónico simple.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Simulador de Física meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Simulador de Física - Caída Libre, Péndulo, Ondas, Proyectiles",
+  description: "Simulador interactivo de física con animaciones en tiempo real. Experimenta con caída libre, péndulo simple, tiro parabólico, ondas y movimiento armónico simple.",
+  url: 'https://meskeia.com/simulador-fisica/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

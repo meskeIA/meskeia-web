@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Conversor de Horarios Mundial - Zonas Horarias | meskeIA',
   description: 'Convierte horarios entre diferentes zonas horarias del mundo. Compara la hora actual en múltiples ciudades. Herramienta gratuita y sin registro.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Conversor de Horarios meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Horarios Mundial - Zonas Horarias",
+  description: "Convierte horarios entre diferentes zonas horarias del mundo. Compara la hora actual en múltiples ciudades. Herramienta gratuita y sin registro.",
+  url: 'https://meskeia.com/conversor-horarios/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

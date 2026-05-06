@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de IVA Online - Calcula IVA 21%, 10%, 4% | meskeIA',
   description: 'Calculadora de IVA española gratuita. Añade o quita IVA al 21%, 10% o 4%. Calcula base imponible, cuota de IVA y total con un clic.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de IVA Online - Calcula IVA 21%, 10%, 4%",
+  description: "Calculadora de IVA española gratuita. Añade o quita IVA al 21%, 10% o 4%. Calcula base imponible, cuota de IVA y total con un clic.",
+  url: 'https://meskeia.com/calculadora-iva/',
+  category: 'FinanceApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

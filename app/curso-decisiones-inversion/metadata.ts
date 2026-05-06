@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Curso Decisiones de Inversión - Aprende a Invertir desde Cero | meskeIA',
   description: 'Curso gratuito de inversión con 10 capítulos, herramientas interactivas y casos reales. Aprende asset allocation, gestión de riesgo, ETFs y estrategias de inversión profesionales.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Curso Decisiones de Inversión meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso Decisiones de Inversión - Aprende a Invertir desde Cero",
+  description: "Curso gratuito de inversión con 10 capítulos, herramientas interactivas y casos reales. Aprende asset allocation, gestión de riesgo, ETFs y estrategias de inversión profesionales.",
+  url: 'https://meskeia.com/curso-decisiones-inversion/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Analizador de Espectro de Audio - Visualiza frecuencias en tiempo real | meskeIA',
   description: 'Analizador de espectro FFT gratuito. Visualiza las frecuencias de audio en tiempo real con tu micrófono. Ideal para músicos, técnicos de sonido y curiosos.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Analizador de Espectro de Audio - Visualiza frecuencias en tiempo real",
+  description: "Analizador de espectro FFT gratuito. Visualiza las frecuencias de audio en tiempo real con tu micrófono. Ideal para músicos, técnicos de sonido y curiosos.",
+  url: 'https://meskeia.com/analizador-espectro/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

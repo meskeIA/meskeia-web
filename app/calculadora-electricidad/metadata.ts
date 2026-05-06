@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Electricidad - Ley de Ohm, Potencia, Circuitos | meskeIA',
   description: 'Calculadora eléctrica completa: Ley de Ohm (V=IR), potencia eléctrica, resistencias en serie y paralelo, consumo energético y costes. Ideal para estudiantes y electricistas.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Electricidad - Ley de Ohm, Potencia, Circuitos",
+  description: "Calculadora eléctrica completa: Ley de Ohm (V=IR), potencia eléctrica, resistencias en serie y paralelo, consumo energético y costes. Ideal para estudiantes y electricistas.",
+  url: 'https://meskeia.com/calculadora-electricidad/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

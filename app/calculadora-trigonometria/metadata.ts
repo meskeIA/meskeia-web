@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Trigonometría - Seno, Coseno, Tangente | meskeIA',
   description: 'Calcula funciones trigonométricas, resuelve triángulos, convierte ángulos y aplica identidades. Herramienta completa de trigonometría.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Trigonometría - Seno, Coseno, Tangente",
+  description: "Calcula funciones trigonométricas, resuelve triángulos, convierte ángulos y aplica identidades. Herramienta completa de trigonometría.",
+  url: 'https://meskeia.com/calculadora-trigonometria/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

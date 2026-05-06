@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Guía para Invertir - Primeros Pasos en Inversión | meskeIA',
   description: 'Guía para empezar a invertir: interés compuesto, perfil de riesgo, simulador de cartera, plusvalías y planificación. Herramientas gratuitas para principiantes.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía para Invertir - Primeros Pasos en Inversión",
+  description: "Guía para empezar a invertir: interés compuesto, perfil de riesgo, simulador de cartera, plusvalías y planificación. Herramientas gratuitas para principiantes.",
+  url: 'https://meskeia.com/guia/invertir/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

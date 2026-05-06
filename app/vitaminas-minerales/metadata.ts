@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Vitaminas y Minerales - Guía de 30 Nutrientes Esenciales | meskeIA',
   description: 'Guía completa de 30 vitaminas y minerales esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso. Información nutricional fiable.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Vitaminas y Minerales meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Vitaminas y Minerales - Guía de 30 Nutrientes Esenciales",
+  description: "Guía completa de 30 vitaminas y minerales esenciales: funciones, fuentes alimentarias, dosis diaria recomendada, síntomas de deficiencia y exceso. Información nutricional fiable.",
+  url: 'https://meskeia.com/vitaminas-minerales/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

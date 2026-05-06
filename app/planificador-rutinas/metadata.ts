@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Planificador Visual de Rutinas - Agenda Visual del Día | meskeIA',
   description: 'Crea rutinas diarias con pictogramas visuales. Ideal para personas con autismo, TDAH, discapacidad intelectual o cualquier persona que se beneficie de una agenda visual estructurada. Sin registro, funciona sin conexión.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador Visual de Rutinas - Agenda Visual del Día",
+  description: "Crea rutinas diarias con pictogramas visuales. Ideal para personas con autismo, TDAH, discapacidad intelectual o cualquier persona que se beneficie de una agenda visual estructurada. Sin registro, funciona sin conexión.",
+  url: 'https://meskeia.com/planificador-rutinas/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

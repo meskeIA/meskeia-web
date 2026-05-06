@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Conversor de Unidades Científico - Longitud, Masa, Temperatura y más | meskeIA',
   description: 'Conversor de unidades completo con 13 categorías: longitud, masa, temperatura, área, volumen, tiempo, velocidad, datos, química, presión, energía, fuerza y potencia. Conversiones instantáneas y precisas.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Unidades Científico - Longitud, Masa, Temperatura y más",
+  description: "Conversor de unidades completo con 13 categorías: longitud, masa, temperatura, área, volumen, tiempo, velocidad, datos, química, presión, energía, fuerza y potencia. Conversiones instantáneas y precisas.",
+  url: 'https://meskeia.com/conversor-unidades/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

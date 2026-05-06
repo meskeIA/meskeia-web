@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Estimador de Préstamos - Francés, Alemán y Americano | meskeIA',
   description: 'Compara sistemas de amortización: francés (cuota fija), alemán (amortización constante) y americano. Cuadro completo, TAE vs TIN y comisiones.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Préstamos - Francés, Alemán y Americano",
+  description: "Compara sistemas de amortización: francés (cuota fija), alemán (amortización constante) y americano. Cuadro completo, TAE vs TIN y comisiones.",
+  url: 'https://meskeia.com/estimador-prestamos/',
+  category: 'FinanceApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

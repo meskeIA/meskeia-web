@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Wordle en Español - Adivina la Palabra | meskeIA',
   description: 'Juega al Wordle en español. Adivina la palabra de 5 letras en 6 intentos. Nueva palabra cada día. Gratis y sin registro.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Wordle en Español - Adivina la Palabra",
+  description: "Juega al Wordle en español. Adivina la palabra de 5 letras en 6 intentos. Nueva palabra cada día. Gratis y sin registro.",
+  url: 'https://meskeia.com/juego-wordle/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

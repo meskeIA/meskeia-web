@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Guía Freelance en España - Autónomos, Impuestos y Facturación | meskeIA',
   description: 'Guía completa para freelances y autónomos en España: cuota de autónomo, IRPF, IVA, facturación, tarifas y comparativa con SL. Herramientas gratuitas.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía Freelance en España - Autónomos, Impuestos y Facturación",
+  description: "Guía completa para freelances y autónomos en España: cuota de autónomo, IRPF, IVA, facturación, tarifas y comparativa con SL. Herramientas gratuitas.",
+  url: 'https://meskeia.com/guia/freelance/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

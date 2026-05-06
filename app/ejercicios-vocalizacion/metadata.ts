@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Ejercicios de Vocalización para Parkinson - Logopedia en Casa | meskeIA',
   description: 'Ejercicios guiados de vocalización para personas con enfermedad de Parkinson. Práctica de vocales sostenidas, frases y volumen de voz con medidor visual en tiempo real. Sin datos enviados a servidores.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ejercicios de Vocalización para Parkinson - Logopedia en Casa",
+  description: "Ejercicios guiados de vocalización para personas con enfermedad de Parkinson. Práctica de vocales sostenidas, frases y volumen de voz con medidor visual en tiempo real. Sin datos enviados a servidores.",
+  url: 'https://meskeia.com/ejercicios-vocalizacion/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

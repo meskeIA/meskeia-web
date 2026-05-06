@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Porcentajes Online - 5 Modos de Cálculo | meskeIA',
   description: 'Calculadora de porcentajes completa y gratuita. Calcula el X% de una cantidad, qué porcentaje es, aumentos, disminuciones y variación porcentual.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Porcentajes Online - 5 Modos de Cálculo",
+  description: "Calculadora de porcentajes completa y gratuita. Calcula el X% de una cantidad, qué porcentaje es, aumentos, disminuciones y variación porcentual.",
+  url: 'https://meskeia.com/calculadora-porcentajes/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

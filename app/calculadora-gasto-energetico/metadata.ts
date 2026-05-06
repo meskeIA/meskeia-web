@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Gasto Energético - Consumo Eléctrico del Hogar | meskeIA',
   description: 'Calcula el consumo eléctrico de tus electrodomésticos y el coste mensual en tu factura de luz. Precios PVPC actualizados, comparativa de tarifas y consejos de ahorro.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Gasto Energético meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Gasto Energético - Consumo Eléctrico del Hogar",
+  description: "Calcula el consumo eléctrico de tus electrodomésticos y el coste mensual en tu factura de luz. Precios PVPC actualizados, comparativa de tarifas y consejos de ahorro.",
+  url: 'https://meskeia.com/calculadora-gasto-energetico/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

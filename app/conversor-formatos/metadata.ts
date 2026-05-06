@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Conversor de Formatos de Archivo - JSON, CSV, Excel, XML, YAML | meskeIA',
   description: 'Convierte archivos entre JSON, CSV, Excel (.xlsx), XML y YAML. 100% privado, todo se procesa en tu navegador. Gratis y sin registro.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Formatos de Archivo - JSON, CSV, Excel, XML, YAML",
+  description: "Convierte archivos entre JSON, CSV, Excel (.xlsx), XML y YAML. 100% privado, todo se procesa en tu navegador. Gratis y sin registro.",
+  url: 'https://meskeia.com/conversor-formatos/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

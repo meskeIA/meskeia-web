@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Glosario de Física y Química - Definiciones y Conceptos | meskeIA',
   description: 'Glosario completo de términos de física y química. Más de 100 definiciones con niveles básico, intermedio y avanzado. Búsqueda por categorías y modo quiz para aprender.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Glosario de Física y Química - Definiciones y Conceptos",
+  description: "Glosario completo de términos de física y química. Más de 100 definiciones con niveles básico, intermedio y avanzado. Búsqueda por categorías y modo quiz para aprender.",
+  url: 'https://meskeia.com/glosario-fisica-quimica/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

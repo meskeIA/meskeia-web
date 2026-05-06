@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Suscripciones - Control de Gastos Recurrentes | meskeIA',
   description: 'Controla todas tus suscripciones (Netflix, Spotify, gym...). Calcula el gasto mensual y anual total. Detecta suscripciones olvidadas y optimiza tu presupuesto.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Suscripciones - Control de Gastos Recurrentes",
+  description: "Controla todas tus suscripciones (Netflix, Spotify, gym...). Calcula el gasto mensual y anual total. Detecta suscripciones olvidadas y optimiza tu presupuesto.",
+  url: 'https://meskeia.com/calculadora-suscripciones/',
+  category: 'FinanceApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

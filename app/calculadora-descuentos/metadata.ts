@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Descuentos Online - Calcula Rebajas y Ofertas | meskeIA',
   description: 'Calculadora de descuentos gratuita. Calcula el precio final con descuento, ahorro en euros y descuentos encadenados. Ideal para rebajas, Black Friday y ofertas.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Descuentos Online - Calcula Rebajas y Ofertas",
+  description: "Calculadora de descuentos gratuita. Calcula el precio final con descuento, ahorro en euros y descuentos encadenados. Ideal para rebajas, Black Friday y ofertas.",
+  url: 'https://meskeia.com/calculadora-descuentos/',
+  category: 'FinanceApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

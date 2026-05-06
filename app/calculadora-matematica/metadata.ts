@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora Matemática Avanzada - Matrices, Ecuaciones | meskeIA',
   description: 'Calculadora científica avanzada: operaciones con matrices, determinantes, sistemas de ecuaciones, fracciones y expresiones algebraicas.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Matemática Avanzada - Matrices, Ecuaciones",
+  description: "Calculadora científica avanzada: operaciones con matrices, determinantes, sistemas de ecuaciones, fracciones y expresiones algebraicas.",
+  url: 'https://meskeia.com/calculadora-matematica/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

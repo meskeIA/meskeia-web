@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Estimador de Cartera de Inversión - Monte Carlo | meskeIA',
   description: 'Simula la evolución de tu cartera de inversión con Monte Carlo. Visualiza escenarios, calcula Sharpe, volatilidad y probabilidad de alcanzar tus objetivos financieros.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Cartera de Inversión - Monte Carlo",
+  description: "Simula la evolución de tu cartera de inversión con Monte Carlo. Visualiza escenarios, calcula Sharpe, volatilidad y probabilidad de alcanzar tus objetivos financieros.",
+  url: 'https://meskeia.com/estimador-cartera-inversion/',
+  category: 'FinanceApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

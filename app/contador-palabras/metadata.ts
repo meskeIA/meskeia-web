@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Contador de Palabras - Análisis de Texto Online | meskeIA',
   description: 'Contador de palabras, caracteres, párrafos y frases online. Calcula tiempo de lectura, densidad de palabras clave y estadísticas de texto. Gratis, privado y sin registro.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Contador de Palabras meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Contador de Palabras - Análisis de Texto Online",
+  description: "Contador de palabras, caracteres, párrafos y frases online. Calcula tiempo de lectura, densidad de palabras clave y estadísticas de texto. Gratis, privado y sin registro.",
+  url: 'https://meskeia.com/contador-palabras/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

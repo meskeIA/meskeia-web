@@ -4,7 +4,7 @@
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 > Actualizar este documento al final de cada sesión que toque el tema.
 
-**Última actualización:** 2026-05-06 (sesión madrugada — JSON-LD top 19)
+**Última actualización:** 2026-05-06 (sesión madrugada — JSON-LD top 19 + 50)
 
 ---
 
@@ -379,6 +379,31 @@ Aplicado JSON-LD / Structured Data a las 19 apps top (las mismas del SEO sweep a
 - Replicar JSON-LD a las siguientes 100-200 apps
 - Considerar `Course` schema específico (mejor que WebApplication para los 2 cursos top)
 - FAQ schema en apps con bloques de preguntas frecuentes (mayor probabilidad de rich snippets)
+
+### 2026-05-06 (sesión madrugada — JSON-LD ampliado a top 50 siguientes)
+
+Tras validar las top 19 con Google Rich Results Test (✅ 1 elemento válido, warning opcional `aggregateRating` ignorado intencionalmente), se extiende el JSON-LD a las siguientes 50 apps por tráfico.
+
+**Identificación**: query Turso (top 300 ordenadas por visitas reales, excluyendo bots/MCP/ChatGPT, excluyendo las ya con jsonLd y la home `meskeIA`), filtrando apps con folder existente. Resultado: 50 apps válidas con visitas entre 11 y 63.
+
+**Script de auto-aplicación**: `scripts/apply-jsonld-batch.mjs`. Para cada app:
+1. Extrae `title` y `description` del `metadata.ts` existente
+2. Asigna `applicationCategory` por patrón del slug (FinanceApplication para hipotecas/IVA/inversión, EducationalApplication para cursos/simuladores/glosarios, UtilityApplication para conversores/generadores)
+3. Añade `import { generateWebAppSchema }` y `export const jsonLd`
+4. Modifica el `layout.tsx` (creando uno si no existe, ej. guías journey)
+
+**Resultados**:
+- 46 apps con metadata + layout actualizados
+- 4 apps que ya tenían `jsonLd` manual pre-existente (`calculadora-fechas`, `enchufes-por-pais`, `generador-contrasenas`, `presupuesto-viaje`): solo se actualizó el layout para cargarlo
+- 1 caso que requirió fix manual (`curso-decisiones-inversion`: layout con formato multilínea no detectado por la regex del script)
+- 4 layouts nuevos creados para guías journey (`guia/comprar-casa`, `guia/invertir`, `guia/freelance`) y otras (`ejercicios-vocalizacion`, `planificador-rutinas`, `comparador-formas-juridicas`)
+- 4 layouts de cursos con `CourseProvider` actualizados con regex específico
+
+**Verificación**: 50/50 apps con `WebApplication` schema en HTML estático generado (`.next/server/app/...html`). Build limpio: 1088 páginas, 0 errores.
+
+**Cobertura total tras este sweep**: 19 (top SEO sweep) + 50 (este) + ~20 con jsonLd previo manual = **~89 apps** con JSON-LD activo (vs ~20 en sesión anterior).
+
+**Calidad del schema en este lote**: features genéricos ("Funciona en navegador, sin registro, gratis, en español") frente a features detallados de las 19 top. Decisión consciente: priorizar cobertura sobre detalle. Si Search Console muestra tracción en alguna app concreta, se puede enriquecer manualmente ese lote después.
 
 ---
 

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Glosario de Programación - Términos de Desarrollo Web | meskeIA',
   description: 'Diccionario completo de términos de programación en español. Aprende el significado de API, componente, hook, props, state y más de 100 conceptos esenciales.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Glosario de Programación meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Glosario de Programación - Términos de Desarrollo Web",
+  description: "Diccionario completo de términos de programación en español. Aprende el significado de API, componente, hook, props, state y más de 100 conceptos esenciales.",
+  url: 'https://meskeia.com/glosario-programacion/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Inferencia Bayesiana | meskeIA',
   description: 'Aplica el teorema de Bayes paso a paso. Calcula probabilidades posteriores, actualiza creencias con evidencia y visualiza el proceso de inferencia bayesiana.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Inferencia Bayesiana",
+  description: "Aplica el teorema de Bayes paso a paso. Calcula probabilidades posteriores, actualiza creencias con evidencia y visualiza el proceso de inferencia bayesiana.",
+  url: 'https://meskeia.com/inferencia-bayesiana/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

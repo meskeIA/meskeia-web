@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Conversor Binario Online - Texto a Binario y Binario a Texto | meskeIA',
   description: 'Conversor binario gratuito. Convierte texto a código binario (0 y 1) y viceversa. Incluye hexadecimal, octal y ASCII. Aprende sistemas numéricos.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor Binario Online - Texto a Binario y Binario a Texto",
+  description: "Conversor binario gratuito. Convierte texto a código binario (0 y 1) y viceversa. Incluye hexadecimal, octal y ASCII. Aprende sistemas numéricos.",
+  url: 'https://meskeia.com/conversor-binario/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

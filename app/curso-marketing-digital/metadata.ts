@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Curso de Marketing Digital 2025 - Estrategias que Funcionan | meskeIA',
   description: 'Aprende marketing digital desde cero: branding, SEO, redes sociales, publicidad online, automatización e IA. 30 capítulos prácticos con ejemplos reales.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Marketing Digital 2025 - Estrategias que Funcionan",
+  description: "Aprende marketing digital desde cero: branding, SEO, redes sociales, publicidad online, automatización e IA. 30 capítulos prácticos con ejemplos reales.",
+  url: 'https://meskeia.com/curso-marketing-digital/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

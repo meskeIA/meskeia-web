@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Comparador de Formas Jurídicas - Autónomo vs SL vs Cooperativa | meskeIA',
   description: 'Compara las diferentes formas jurídicas para emprender en España: autónomo, sociedad limitada, cooperativa, asociación, comunidad de bienes. Capital, fiscalidad, responsabilidad y trámites.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Comparador Formas Jurídicas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador de Formas Jurídicas - Autónomo vs SL vs Cooperativa",
+  description: "Compara las diferentes formas jurídicas para emprender en España: autónomo, sociedad limitada, cooperativa, asociación, comunidad de bienes. Capital, fiscalidad, responsabilidad y trámites.",
+  url: 'https://meskeia.com/comparador-formas-juridicas/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

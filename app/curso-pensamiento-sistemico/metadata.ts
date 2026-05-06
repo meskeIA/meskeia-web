@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Curso de Pensamiento Sistémico - Entiende el Mundo como Sistemas Interconectados | meskeIA',
   description: 'Aprende a pensar en sistemas: redes, retroalimentación, emergencia, antifragilidad. Aplica el pensamiento sistémico a organizaciones, economía, tecnología y tu vida. Curso actualizado 2025 con casos reales.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Curso Pensamiento Sistémico meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Pensamiento Sistémico - Entiende el Mundo como Sistemas Interconectados",
+  description: "Aprende a pensar en sistemas: redes, retroalimentación, emergencia, antifragilidad. Aplica el pensamiento sistémico a organizaciones, economía, tecnología y tu vida. Curso actualizado 2025 con casos reales.",
+  url: 'https://meskeia.com/curso-pensamiento-sistemico/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

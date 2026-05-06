@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Estadística Médica - Sensibilidad, Especificidad, VPP, VPN | meskeIA',
   description: 'Calcula sensibilidad, especificidad, valores predictivos (VPP/VPN), razones de verosimilitud, odds ratio, riesgo relativo y NNT. Herramienta gratuita para estudiantes de medicina y epidemiología.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Estadística Médica - Sensibilidad, Especificidad, VPP, VPN",
+  description: "Calcula sensibilidad, especificidad, valores predictivos (VPP/VPN), razones de verosimilitud, odds ratio, riesgo relativo y NNT. Herramienta gratuita para estudiantes de medicina y epidemiología.",
+  url: 'https://meskeia.com/calculadora-estadistica-medica/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

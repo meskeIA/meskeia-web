@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Guía para Comprar Casa en España - Calculadoras y Simuladores | meskeIA',
   description: 'Guía completa para comprar vivienda en España: simulador de hipoteca, gastos de compraventa (ITP, notaría, registro), alquiler vs compra y más. Herramientas gratuitas.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía para Comprar Casa en España - Calculadoras y Simuladores",
+  description: "Guía completa para comprar vivienda en España: simulador de hipoteca, gastos de compraventa (ITP, notaría, registro), alquiler vs compra y más. Herramientas gratuitas.",
+  url: 'https://meskeia.com/guia/comprar-casa/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

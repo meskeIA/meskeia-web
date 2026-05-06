@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Visualizador de Estructuras de Datos - Arrays, Pilas, Colas, Árboles | meskeIA',
   description: 'Visualiza operaciones en estructuras de datos: arrays, pilas (stacks), colas (queues), listas enlazadas, árboles binarios y grafos. Animaciones paso a paso para entender cada operación.',
@@ -32,3 +33,15 @@ export const metadata: Metadata = {
     'application-name': 'Visualizador de Estructuras de Datos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Visualizador de Estructuras de Datos - Arrays, Pilas, Colas, Árboles",
+  description: "Visualiza operaciones en estructuras de datos: arrays, pilas (stacks), colas (queues), listas enlazadas, árboles binarios y grafos. Animaciones paso a paso para entender cada operación.",
+  url: 'https://meskeia.com/visualizador-estructuras-datos/',
+  category: 'EducationalApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

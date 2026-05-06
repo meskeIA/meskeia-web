@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Convertidor de Colores - HEX, RGB, HSL, CMYK | meskeIA',
   description: 'Convierte colores entre HEX, RGB, HSL y CMYK al instante. Color picker visual, paletas automáticas y análisis de color para diseñadores web.',
@@ -23,3 +24,15 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Convertidor de Colores - HEX, RGB, HSL, CMYK",
+  description: "Convierte colores entre HEX, RGB, HSL y CMYK al instante. Color picker visual, paletas automáticas y análisis de color para diseñadores web.",
+  url: 'https://meskeia.com/conversor-colores/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

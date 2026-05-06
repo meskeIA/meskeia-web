@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Generador de Gradientes CSS - Lineales, Radiales, Cónicos | meskeIA',
   description: 'Crea gradientes CSS profesionales: lineales, radiales y cónicos. Editor visual con múltiples colores, ángulos personalizables y código listo para copiar.',
@@ -23,3 +24,15 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Gradientes CSS - Lineales, Radiales, Cónicos",
+  description: "Crea gradientes CSS profesionales: lineales, radiales y cónicos. Editor visual con múltiples colores, ángulos personalizables y código listo para copiar.",
+  url: 'https://meskeia.com/generador-gradientes/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});

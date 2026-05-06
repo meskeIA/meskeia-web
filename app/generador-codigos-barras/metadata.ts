@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Generador de Códigos de Barras - EAN, UPC, Code128 Gratis | meskeIA',
   description: 'Genera códigos de barras gratis: EAN-13, EAN-8, UPC-A, Code128, Code39 y más. Descarga en PNG. Sin registro, 100% privado.',
@@ -29,3 +30,15 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Códigos de Barras - EAN, UPC, Code128 Gratis",
+  description: "Genera códigos de barras gratis: EAN-13, EAN-8, UPC-A, Code128, Code39 y más. Descarga en PNG. Sin registro, 100% privado.",
+  url: 'https://meskeia.com/generador-codigos-barras/',
+  category: 'UtilityApplication',
+  features: [
+      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Gratuito y sin publicidad",
+      "En español"
+  ],
+});
