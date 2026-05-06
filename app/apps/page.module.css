@@ -1,4 +1,4 @@
-/* Página de Herramientas - Catálogo completo */
+/* Página /apps — Catálogo completo (FASE 4) */
 
 .container {
   max-width: 1400px;
@@ -6,282 +6,500 @@
   padding: 120px 2rem 80px;
 }
 
-/* Header */
+/* ─── Header simplificado ──────────────────────── */
 .pageHeader {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .pageTitle {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   color: var(--primary);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   font-weight: 700;
 }
 
 .pageSubtitle {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   color: var(--text-secondary);
-  margin-bottom: 2rem;
 }
 
-/* Estadísticas */
-.stats {
+/* ─── Pestañas Apps / Caminos guiados ─────────── */
+.tabs {
   display: flex;
   justify-content: center;
-  gap: 3rem;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border, rgba(46, 134, 171, 0.15));
   flex-wrap: wrap;
-  margin-top: 2rem;
 }
 
-.statItem {
-  display: flex;
-  flex-direction: column;
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: -2px;
 }
 
-.statNumber {
-  font-size: 2.5rem;
-  font-weight: 700;
+.tab:hover {
   color: var(--primary);
-  line-height: 1;
 }
 
-.statLabel {
-  font-size: 0.95rem;
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.tabCount {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .tabCount {
+  background: rgba(46, 134, 171, 0.25);
+}
+
+/* ─── Buscador local ─────────────────────────── */
+.searchRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border, rgba(46, 134, 171, 0.15));
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.clearButton {
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border, rgba(46, 134, 171, 0.2));
+  border-radius: 8px;
   color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
-/* Filtros */
+.clearButton:hover {
+  background: var(--hover, rgba(46, 134, 171, 0.05));
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ─── Filtros por suite (chips) ──────────────── */
 .filtersContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 3rem;
-  padding: 1.5rem;
-  background: var(--bg-card);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.filterButton {
-  padding: 0.75rem 1.5rem;
-  background: var(--hover);
-  border: 2px solid transparent;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
+.filterChip {
+  padding: 0.5rem 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border, rgba(46, 134, 171, 0.15));
+  border-radius: 999px;
+  font-size: 0.875rem;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   white-space: nowrap;
 }
 
-.filterButton:hover {
-  background: var(--bg-card);
+.filterChip:hover {
   border-color: var(--primary);
   color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
 }
 
-.filterButton.active {
+.filterChipActive {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.25);
 }
 
-/* Grid de herramientas */
-.toolsGrid {
+.filterChipActive:hover {
+  color: white;
+}
+
+.filterCount {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.filterChipActive .filterCount {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+}
+
+/* ─── Resumen de resultados ───────────────────── */
+.resultsCount {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+/* ─── Grid de apps compactas ──────────────────── */
+.appsGrid {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 3rem 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 4rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.5rem;
 }
 
-.toolCard {
+.appCard {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  gap: 1rem;
+  border: 1px solid var(--border, rgba(46, 134, 171, 0.1));
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.toolCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(46, 134, 171, 0.12);
+.appCard:hover {
   border-color: var(--primary);
 }
 
-.toolIcon {
-  font-size: 2.5rem;
+.appCardExpanded {
+  grid-column: 1 / -1;
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.12);
+}
+
+.appCardHeader {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.appCardIcon {
+  font-size: 1.4rem;
   flex-shrink: 0;
-  width: 60px;
-  height: 60px;
+  width: 32px;
+  text-align: center;
+}
+
+.appCardName {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appCardExpanded .appCardName {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  font-weight: 600;
+}
+
+.appCardSuites {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  letter-spacing: 0.1em;
+}
+
+.appCardChevron {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.appCardExpanded .appCardChevron {
+  color: var(--primary);
+}
+
+/* ─── Cuerpo de la card expandida ─────────────── */
+.appCardBody {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid var(--border, rgba(46, 134, 171, 0.1));
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.appCardDescription {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.appCardSuiteTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.appCardSuiteTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+[data-theme='dark'] .appCardSuiteTag {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+.appCardCta {
+  align-self: flex-start;
+  padding: 0.6rem 1.25rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white !important;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.appCardCta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+/* ─── No results ──────────────────────────────── */
+.noResults {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ─── Pestaña Guías ───────────────────────────── */
+.guidesIntro {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.guidesGrid {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 3rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.guideCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border, rgba(46, 134, 171, 0.15));
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.guideCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(46, 134, 171, 0.12);
+}
+
+.guideCardLink {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.guideIcon {
+  font-size: 2.25rem;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--hover);
+  background: rgba(46, 134, 171, 0.08);
   border-radius: 10px;
 }
 
-.toolContent {
+[data-theme='dark'] .guideIcon {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+.guideContent {
   flex: 1;
   min-width: 0;
 }
 
-.toolTitle {
-  font-size: 1.1rem;
+.guideTitle {
+  font-size: 1.05rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.4rem 0;
   color: var(--text-primary);
 }
 
-.toolTitle a {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.toolTitle a:hover {
-  color: var(--primary);
-}
-
-.toolDescription {
-  font-size: 0.95rem;
+.guideDescription {
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  margin: 0 0 0.5rem 0;
 }
 
-.toolMeta {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.toolCategory {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: linear-gradient(135deg, rgba(46, 134, 171, 0.1), rgba(72, 169, 166, 0.1));
+.guideMeta {
+  font-size: 0.8rem;
   color: var(--primary);
-  border-radius: 6px;
-  font-size: 0.85rem;
   font-weight: 500;
 }
 
-/* No results */
-.noResults {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--text-secondary);
-}
-
-/* CTA Section */
-.ctaSection {
-  text-align: center;
-  padding: 3rem 2rem;
-  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(72, 169, 166, 0.05));
-  border-radius: 12px;
-  margin-top: 2rem;
-}
-
-.ctaSection h2 {
-  font-size: 1.8rem;
+.guideArrow {
+  font-size: 1.25rem;
   color: var(--primary);
-  margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
-.ctaSection p {
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-}
-
-.ctaButton {
-  display: inline-block;
-  padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
-}
-
-.ctaButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
-}
-
-/* Responsive */
+/* ─── Responsive ──────────────────────────────── */
 @media (max-width: 768px) {
   .container {
     padding: 100px 1rem 60px;
   }
 
   .pageTitle {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .pageSubtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
-  .stats {
-    gap: 2rem;
+  .tab {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
   }
 
-  .statNumber {
-    font-size: 2rem;
+  .searchRow {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .filtersContainer {
-    padding: 1rem;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
-  .filterButton {
-    padding: 0.6rem 1rem;
+  .filterChip {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .resultsCount {
+    text-align: left;
+  }
+
+  .appsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .appCardHeader {
+    padding: 0.7rem 0.85rem;
+  }
+
+  .appCardName {
+    font-size: 0.9rem;
+  }
+
+  .guidesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .guideCardLink {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .guideIcon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.85rem;
+  }
+
+  .guideTitle {
+    font-size: 1rem;
+  }
+
+  .guideDescription {
     font-size: 0.85rem;
   }
+}
 
-  .toolsGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .toolCard {
-    padding: 1.25rem;
-  }
-
-  .toolIcon {
-    width: 50px;
-    height: 50px;
-    font-size: 2rem;
-  }
-
-  .ctaSection {
-    padding: 2rem 1.5rem;
-  }
-
-  .ctaSection h2 {
-    font-size: 1.5rem;
-  }
-
-  .ctaButton {
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
+/* Respeto a usuarios con preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .appCard,
+  .guideCard,
+  .appCardCta,
+  .filterChip,
+  .tab,
+  .searchInput {
+    transition: none;
   }
 }

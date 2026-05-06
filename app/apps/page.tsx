@@ -2,125 +2,243 @@
 // @disclaimer: exempt
 
 import { LegalNotice, ShareCard } from '@/components';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import FixedHeader from '@/components/FixedHeader';
 import Footer from '@/components/Footer';
 import { suites, applicationsDatabase, SuiteType } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
+import { guidesJourney } from '@/data/guides-journey';
 import styles from './page.module.css';
 
+type Tab = 'apps' | 'guias';
+
+// Normaliza una cadena para búsqueda: minúsculas + sin acentos
+const normalize = (s: string): string =>
+  s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
 export default function AppsPage() {
+  const [tab, setTab] = useState<Tab>('apps');
   const [selectedSuite, setSelectedSuite] = useState<SuiteType | 'all'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedUrl, setExpandedUrl] = useState<string | null>(null);
 
   // Filtrar solo apps implementadas y ordenar alfabéticamente
-  const implementedApps = useMemo(() =>
-    applicationsDatabase
-      .filter(app => isAppImplemented(app.url))
-      .sort((a, b) => a.name.localeCompare(b.name, 'es')),
+  const implementedApps = useMemo(
+    () =>
+      applicationsDatabase
+        .filter((app) => isAppImplemented(app.url))
+        .sort((a, b) => a.name.localeCompare(b.name, 'es')),
     []
   );
 
-  const getAppsBySuite = (suiteId: SuiteType) => {
-    return implementedApps.filter(app => app.suites.includes(suiteId));
-  };
+  // Conteo por suite (apps implementadas)
+  const suiteCounts = useMemo(() => {
+    const counts = new Map<SuiteType, number>();
+    implementedApps.forEach((app) => {
+      app.suites.forEach((s) => counts.set(s, (counts.get(s) || 0) + 1));
+    });
+    return counts;
+  }, [implementedApps]);
 
-  // Filtrar apps por suite seleccionada
-  const filteredApps = selectedSuite === 'all'
-    ? implementedApps
-    : implementedApps.filter(app => app.suites.includes(selectedSuite));
+  // Apps filtradas por suite + búsqueda
+  const filteredApps = useMemo(() => {
+    let list = implementedApps;
+    if (selectedSuite !== 'all') {
+      list = list.filter((app) => app.suites.includes(selectedSuite));
+    }
+    const q = normalize(searchTerm.trim());
+    if (q.length >= 2) {
+      list = list.filter((app) => {
+        const haystack = normalize(
+          `${app.name} ${app.description} ${app.keywords.join(' ')}`
+        );
+        return haystack.includes(q);
+      });
+    }
+    return list;
+  }, [implementedApps, selectedSuite, searchTerm]);
 
-  const totalApps = TOTAL_IMPLEMENTED_APPS;
-  const totalSuites = suites.length;
+  const toggleExpanded = useCallback((url: string) => {
+    setExpandedUrl((current) => (current === url ? null : url));
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedSuite('all');
+    setSearchTerm('');
+  }, []);
 
   return (
     <>
       <FixedHeader />
 
       <main className={styles.container}>
-        {/* Header */}
+        {/* Header simplificado */}
         <header className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>Catálogo Completo de Apps</h1>
+          <h1 className={styles.pageTitle}>Catálogo completo</h1>
           <p className={styles.pageSubtitle}>
-            Aplicaciones web gratuitas organizadas por suites temáticas. Sin registro, sin anuncios.
+            {TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas en español. Sin registro y sin publicidad.
           </p>
-
-          {/* Estadísticas */}
-          <div className={styles.stats}>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>{totalApps}</span>
-              <span className={styles.statLabel}>Apps</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>{totalSuites}</span>
-              <span className={styles.statLabel}>Suites</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>100%</span>
-              <span className={styles.statLabel}>Gratuitas</span>
-            </div>
-          </div>
         </header>
 
-        {/* Filtros por suite */}
-        <div className={styles.filtersContainer}>
+        {/* Pestañas */}
+        <div className={styles.tabs} role="tablist">
           <button
-            className={`${styles.filterButton} ${selectedSuite === 'all' ? styles.active : ''}`}
-            onClick={() => setSelectedSuite('all')}
+            role="tab"
+            aria-selected={tab === 'apps'}
+            className={`${styles.tab} ${tab === 'apps' ? styles.tabActive : ''}`}
+            onClick={() => setTab('apps')}
           >
-            📦 Todas ({totalApps})
+            📦 Apps <span className={styles.tabCount}>{TOTAL_IMPLEMENTED_APPS}</span>
           </button>
-          {suites.map((suite) => {
-            const count = getAppsBySuite(suite.id).length;
-            return (
+          <button
+            role="tab"
+            aria-selected={tab === 'guias'}
+            className={`${styles.tab} ${tab === 'guias' ? styles.tabActive : ''}`}
+            onClick={() => setTab('guias')}
+          >
+            🧭 Caminos guiados <span className={styles.tabCount}>{guidesJourney.length}</span>
+          </button>
+        </div>
+
+        {tab === 'apps' && (
+          <>
+            {/* Búsqueda local */}
+            <div className={styles.searchRow}>
+              <input
+                type="search"
+                className={styles.searchInput}
+                placeholder="Buscar en el catálogo..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Buscar dentro del catálogo"
+              />
+              {(selectedSuite !== 'all' || searchTerm) && (
+                <button type="button" className={styles.clearButton} onClick={handleClearFilters}>
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+
+            {/* Filtros por suite */}
+            <div className={styles.filtersContainer}>
               <button
-                key={suite.id}
-                className={`${styles.filterButton} ${selectedSuite === suite.id ? styles.active : ''}`}
-                onClick={() => setSelectedSuite(suite.id)}
+                type="button"
+                className={`${styles.filterChip} ${selectedSuite === 'all' ? styles.filterChipActive : ''}`}
+                onClick={() => setSelectedSuite('all')}
               >
-                {suite.icon} {suite.name} ({count})
+                📦 Todas <span className={styles.filterCount}>{TOTAL_IMPLEMENTED_APPS}</span>
               </button>
-            );
-          })}
-        </div>
+              {suites.map((suite) => {
+                const count = suiteCounts.get(suite.id) || 0;
+                if (count === 0) return null;
+                return (
+                  <button
+                    type="button"
+                    key={suite.id}
+                    className={`${styles.filterChip} ${selectedSuite === suite.id ? styles.filterChipActive : ''}`}
+                    onClick={() => setSelectedSuite(suite.id)}
+                  >
+                    <span aria-hidden="true">{suite.icon}</span> {suite.name} <span className={styles.filterCount}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Grid de herramientas */}
-        <div className={styles.toolsGrid}>
-          {filteredApps.map((app, index) => (
-            <article key={index} className={styles.toolCard}>
-              <div className={styles.toolIcon}>{app.icon}</div>
-              <div className={styles.toolContent}>
-                <h3 className={styles.toolTitle}>
-                  <Link href={app.url}>{app.name}</Link>
-                </h3>
-                <p className={styles.toolDescription}>{app.description}</p>
-                <div className={styles.toolMeta}>
-                  <span className={styles.toolCategory}>
-                    {app.suites.map(suiteId =>
-                      suites.find(s => s.id === suiteId)?.icon
-                    ).join(' ')}
-                  </span>
-                </div>
+            {/* Resumen de resultados */}
+            <p className={styles.resultsCount}>
+              {filteredApps.length === implementedApps.length
+                ? `${filteredApps.length} aplicaciones`
+                : `${filteredApps.length} de ${implementedApps.length} aplicaciones`}
+            </p>
+
+            {/* Grid compacto con expansión inline */}
+            {filteredApps.length === 0 ? (
+              <div className={styles.noResults}>
+                <p>No se encontraron apps con estos filtros.</p>
+                <button type="button" className={styles.clearButton} onClick={handleClearFilters}>
+                  Limpiar filtros
+                </button>
               </div>
-            </article>
-          ))}
-        </div>
+            ) : (
+              <ul className={styles.appsGrid}>
+                {filteredApps.map((app) => {
+                  const isExpanded = expandedUrl === app.url;
+                  return (
+                    <li
+                      key={app.url}
+                      className={`${styles.appCard} ${isExpanded ? styles.appCardExpanded : ''}`}
+                    >
+                      <button
+                        type="button"
+                        className={styles.appCardHeader}
+                        onClick={() => toggleExpanded(app.url)}
+                        aria-expanded={isExpanded}
+                      >
+                        <span className={styles.appCardIcon}>{app.icon}</span>
+                        <span className={styles.appCardName}>{app.name}</span>
+                        <span className={styles.appCardSuites} aria-hidden="true">
+                          {app.suites.map((suiteId) =>
+                            suites.find((s) => s.id === suiteId)?.icon
+                          ).join(' ')}
+                        </span>
+                        <span className={styles.appCardChevron} aria-hidden="true">
+                          {isExpanded ? '▾' : '▸'}
+                        </span>
+                      </button>
 
-        {/* Mensaje si no hay resultados (no debería pasar) */}
-        {filteredApps.length === 0 && (
-          <div className={styles.noResults}>
-            <p>No se encontraron Apps en esta suite.</p>
-          </div>
+                      {isExpanded && (
+                        <div className={styles.appCardBody}>
+                          <p className={styles.appCardDescription}>{app.description}</p>
+                          <div className={styles.appCardSuiteTags}>
+                            {app.suites.map((suiteId) => {
+                              const suite = suites.find((s) => s.id === suiteId);
+                              if (!suite) return null;
+                              return (
+                                <span key={suiteId} className={styles.appCardSuiteTag}>
+                                  {suite.icon} {suite.name}
+                                </span>
+                              );
+                            })}
+                          </div>
+                          <Link href={app.url} className={styles.appCardCta}>
+                            Abrir aplicación →
+                          </Link>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
         )}
 
-        {/* CTA */}
-        <div className={styles.ctaSection}>
-          <h2>¿Buscas algo específico?</h2>
-          <p>Usa nuestro buscador para encontrar la App perfecta</p>
-          <Link href="/" className={styles.ctaButton}>
-            🔍 Buscar Apps
-          </Link>
-        </div>
+        {tab === 'guias' && (
+          <>
+            <p className={styles.guidesIntro}>
+              Procesos completos curados: cada guía agrupa varias herramientas con texto explicativo
+              para resolver una situación concreta.
+            </p>
+            <ul className={styles.guidesGrid}>
+              {guidesJourney.map((guide) => (
+                <li key={guide.id} className={styles.guideCard}>
+                  <Link href={guide.url} className={styles.guideCardLink}>
+                    <div className={styles.guideIcon} aria-hidden="true">{guide.icon}</div>
+                    <div className={styles.guideContent}>
+                      <h3 className={styles.guideTitle}>{guide.name}</h3>
+                      <p className={styles.guideDescription}>{guide.description}</p>
+                      <span className={styles.guideMeta}>{guide.toolsCount} herramientas</span>
+                    </div>
+                    <span className={styles.guideArrow} aria-hidden="true">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        <LegalNotice />
       </main>
 
       <ShareCard appName="meskeIA" />
