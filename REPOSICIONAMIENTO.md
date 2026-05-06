@@ -4,7 +4,7 @@
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 > Actualizar este documento al final de cada sesión que toque el tema.
 
-**Última actualización:** 2026-05-06 (sesión madrugada — JSON-LD top 19 + 50)
+**Última actualización:** 2026-05-06 (sesión madrugada — JSON-LD top 19 + 50 + decisión apps 0-visitas)
 
 ---
 
@@ -435,5 +435,12 @@ Tras validar las top 19 con Google Rich Results Test (✅ 1 elemento válido, wa
 1. Revisar datos de tracking FASE 0 (CTR de RelatedApps por app, top pares "from→to") tras 3-5 días de acumulación.
 2. Comprobar si la apertura Latam de `calculadora-notas` y los quick wins de copy mueven el % Latam (medir en 2-3 semanas).
 3. Decidir parámetros de FASE 1 (componente `ContinuaCon`) con datos reales.
-4. Análisis de las ~319 apps con 0 visitas (informativo, sin urgencia).
-5. Replicar JSON-LD a más apps si Google Search Console muestra rich snippets en las 19 top.
+4. **Sweep adicional JSON-LD** (revisar ~2026-08-06): aplicar el patrón a las apps que hayan ganado tráfico en los últimos 3 meses, siempre que Search Console muestre tracción en las 89 actuales.
+
+**Pospuesto por inmadurez de los datos** (decisión 2026-05-06):
+- **Análisis de apps con 0 visitas**: sería medir el mundo *antes* de las palancas que se han activado en estas mismas sesiones. Concretamente:
+  - Difusión en X iniciada hace solo 1 semana
+  - `RelatedApps` mejorado en top apps en esta sesión (cross-linking necesita semanas para internalizarse)
+  - JSON-LD desplegado hoy (Google indexa a su ritmo)
+  - 50 apps top con SEO mejorado pendiente de verse efecto
+- **Criterio para retomarlo**: mínimo 2-3 meses de difusión activa + nuevo SEO maduros. Antes de eso, "0 visitas" sigue significando "no descubierta", no "inútil".
