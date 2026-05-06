@@ -216,6 +216,28 @@ Tras el sweep inicial de las 2 apps fiscales del top 33, se completa la cobertur
 
 **Apps no etiquetadas conscientemente**: `simulador-hipoteca`, `estimador-hipoteca`, `estimador-prestamos` (ya pulidas con copy multi-país en sesión anterior), `generador-facturas` (formato puede ser universal, requiere revisión manual), apps puramente educativas/lúdicas.
 
+### 2026-05-06 (sesión noche) — Mejora de RelatedApps en top apps (opción C)
+
+Mejorar el descubrimiento interno (1,07 apps/sesión actual → objetivo 2,0+) en las apps que generan más tráfico. Cambios en `data/app-relations.ts`:
+
+| App | Cambio aplicado |
+|-----|-----------------|
+| **tabla-periodica** (#1, 344 visitas) | De 3 apps todas química → 4 apps con cross-sell estudiantil (genética, calc-notas, glosario) |
+| **test-perfil-inversor** (#2, 293 visitas) | De 4 apps todas perfiles/sesgos → mezcla con apps de **acción** (cartera, interés compuesto) |
+| **simulador-genetica** (#3, 147 visitas, 102m duración) | De familia biomedicina genérica → cross-sell estudiantil top |
+| **calculadora-notas** (#7, 70 visitas) | De productividad genérica → apps top educativas (tabla, genética, glosario) |
+| **simulador-genetica** (#3) | Bridge a apps top educativas para aprovechar la audiencia de máxima permanencia |
+| **generador-anagramas** (#6, 87 visitas) | De solo texto → mezcla con juegos de palabras (Wordle, Ahorcado) |
+| **curso-optimizacion-ia** (#12) — **GAP cerrado** | NO tenía entrada → ahora tiene 4 apps cruzadas con otros cursos y herramientas |
+| **curso-pensamiento-sistemico**, **curso-negociacion** | También sin entrada → añadidas con cross-cursos + herramientas relevantes |
+
+Títulos personalizados añadidos para los 3 cursos en `getRelatedAppsTitle` ("Otros cursos meskeIA").
+
+**Hipótesis a validar**: con FASE 0 ya activa midiendo el `?from=related-{slug}`, en 1-2 semanas sabremos:
+- Si los nuevos pares cross-categoría (química → matemáticas, anagramas → juegos) funcionan
+- Si los cursos cerrar el gap mueve la métrica de apps por sesión
+- Qué relaciones siguen siendo "muertas" para mejorar más
+
 ---
 
 ## 8. Métricas a seguir

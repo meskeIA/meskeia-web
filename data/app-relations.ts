@@ -498,7 +498,12 @@ const familiaApps: RelatedApp[] = [
 // ==========================================
 export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ESTUDIANTES
-  'calculadora-notas': estudiantesApps.filter(a => a.url !== '/calculadora-notas/'),
+  'calculadora-notas': [
+    { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'La app top para estudiar química' },
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces y probabilidades genéticas' },
+    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Ciencias', description: 'Términos clave para estudiar' },
+    { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica de estudio 25/5' },
+  ],
   'creador-flashcards': estudiantesApps.filter(a => a.url !== '/creador-flashcards/'),
   'generador-horarios-estudio': estudiantesApps.filter(a => a.url !== '/generador-horarios-estudio/'),
   'temporizador-pomodoro': [...estudiantesApps.filter(a => a.url !== '/temporizador-pomodoro/').slice(0, 2), ...productividadApps.slice(0, 2)],
@@ -517,9 +522,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/').slice(0, 1),
   ],
   'test-perfil-inversor': [
+    { url: '/estimador-cartera-inversion/', icon: '💼', name: 'Cartera según tu Perfil', description: 'Asignación de activos personalizada' },
+    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Cuánto crecerá tu inversión' },
+    { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Evita errores cognitivos al invertir' },
     { url: '/test-tolerancia-riesgo-detallado/', icon: '📊', name: 'Test Riesgo Detallado', description: 'Evaluación profunda en 5 dimensiones' },
-    { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Detecta tus sesgos cognitivos' },
-    ...finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/').slice(0, 2),
   ],
   'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/estimador-cartera-inversion/'),
   'calculadora-tir-van': finanzasInversionApps.filter(a => a.url !== '/estimador-tir-van/'),
@@ -1997,7 +2003,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'contador-silabas': textoApps,
   'conversor-markdown-html': [...textoApps.slice(0, 2), ...webDevApps.slice(0, 2)],
   'generador-lorem-ipsum': textoApps,
-  'generador-anagramas': textoApps,
+  'generador-anagramas': [
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+    { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
+    { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Palabras y caracteres' },
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+  ],
   'detector-idioma': textoApps,
   'conjugador-verbos': [
     { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
@@ -2413,8 +2424,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-electricidad': [{ url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' }],
   'tabla-periodica': [
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tu química' },
-    { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },
-    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario', description: 'Términos de física y química' },
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos paso a paso' },
+    { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora de Notas', description: 'Nota media y conversor multi-país' },
+    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave para estudiar' },
   ],
   'glosario-fisica-quimica': [{ url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
 
@@ -2489,7 +2501,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-algebra-booleana': informaticaApps.filter(a => a.url !== '/calculadora-algebra-booleana/'),
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
-  'simulador-genetica': biomedicinaApps.filter(a => a.url !== '/simulador-genetica/'),
+  'simulador-genetica': [
+    { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
+    { url: '/calculadora-estadistica/', icon: '📈', name: 'Estadística', description: 'Probabilidades y distribuciones' },
+    { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora de Notas', description: 'Nota media y conversor multi-país' },
+    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Ciencias', description: 'Términos clave de biología y química' },
+  ],
   'calculadora-estadistica-medica': biomedicinaApps.filter(a => a.url !== '/calculadora-estadistica-medica/'),
 
   // CREATIVIDAD Y DISEÑO EXTRA
@@ -4470,6 +4487,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Plantas aromáticas repelentes de plagas: albahaca, lavanda, menta y más' },
     { url: '/guia-setas/', icon: '🍄', name: 'Guía de Setas', description: '40 setas: comestibilidad, hábitat, temporada e identificación' },
   ],
+
+  // CURSOS — relaciones cruzadas (gap completado 2026-05-06)
+  'curso-optimizacion-ia': [
+    { url: '/curso-pensamiento-sistemico/', icon: '🧩', name: 'Curso Pensamiento Sistémico', description: 'Resolver problemas complejos paso a paso' },
+    { url: '/curso-negociacion/', icon: '🤝', name: 'Curso Negociación', description: 'Técnicas profesionales de negociación' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: '100+ términos clave de código y dev' },
+    { url: '/visualizador-algoritmos/', icon: '📊', name: 'Visualizador Algoritmos', description: 'Cómo funcionan algoritmos de ordenación' },
+  ],
+  'curso-pensamiento-sistemico': [
+    { url: '/curso-optimizacion-ia/', icon: '🤖', name: 'Curso GEO/AEO', description: 'Optimiza tu contenido para que los LLMs te citen' },
+    { url: '/curso-negociacion/', icon: '🤝', name: 'Curso Negociación', description: 'Técnicas profesionales de negociación' },
+    { url: '/curso-decisiones-inversion/', icon: '💼', name: 'Curso Decisiones de Inversión', description: 'Marco mental para invertir mejor' },
+    { url: '/matriz-eisenhower/', icon: '📊', name: 'Matriz Eisenhower', description: 'Prioriza urgente vs importante' },
+  ],
+  'curso-negociacion': [
+    { url: '/curso-pensamiento-sistemico/', icon: '🧩', name: 'Curso Pensamiento Sistémico', description: 'Resolver problemas complejos' },
+    { url: '/curso-optimizacion-ia/', icon: '🤖', name: 'Curso GEO/AEO', description: 'Optimiza tu contenido para que los LLMs te citen' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu hora antes de negociar' },
+    { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas profesionales a clientes' },
+  ],
 };
 
 /**
@@ -4495,6 +4532,11 @@ export function getRelatedAppsTitle(appSlug: string): { title: string; icon: str
     'calculadora-notas': { title: 'Más herramientas para estudiantes', icon: '📚' },
     'creador-flashcards': { title: 'Más herramientas para estudiar', icon: '📚' },
     'generador-horarios-estudio': { title: 'Mejora tu rendimiento académico', icon: '📚' },
+
+    // Cursos meskeIA
+    'curso-optimizacion-ia': { title: 'Otros cursos meskeIA', icon: '🎓' },
+    'curso-pensamiento-sistemico': { title: 'Otros cursos meskeIA', icon: '🎓' },
+    'curso-negociacion': { title: 'Otros cursos meskeIA', icon: '🎓' },
 
     // Herencias - Apps movidas a ex-meskeia
 
