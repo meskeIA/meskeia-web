@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { ESTILOS_PARENTALES } from '@/data/fiscal';
@@ -131,6 +131,9 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
             Descubre tu tendencia educativa con este test de autoconocimiento
           </p>
         </header>
+
+      <RegionBadge variant="es-data" />
+
 
         <LegalNotice />
 

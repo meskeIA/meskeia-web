@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import styles from './EstimadorSucesiones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalNotice, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -368,6 +368,9 @@ export default function EstimadorImpuestoSucesionesPage() {
           </a>
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

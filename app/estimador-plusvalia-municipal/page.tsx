@@ -12,7 +12,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -165,6 +165,9 @@ export default function EstimadorPlusvaliaMunicipalPage() {
           Método objetivo y método real según RDL 26/2021.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

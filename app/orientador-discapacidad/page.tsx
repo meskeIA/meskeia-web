@@ -9,7 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   DisclaimerCard,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -272,6 +272,9 @@ export default function OrientadorDiscapacidadPage() {
           ¿Vale la pena solicitar el reconocimiento? · Test orientativo · RD 888/2022
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       {/* DISCLAIMER MÉDICO — SIEMPRE VISIBLE */}
       <DisclaimerCard variant="medical" severity="critical" />

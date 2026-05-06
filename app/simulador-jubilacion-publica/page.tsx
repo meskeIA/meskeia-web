@@ -11,7 +11,7 @@ import {
   DisclaimerCard,
   DataReference,
   NumberInput,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -421,6 +421,9 @@ export default function SimuladorJubilacionPublicaPage() {
             Edad, pensión estimada, anticipada y parcial · Sistema dual 2026
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

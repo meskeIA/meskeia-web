@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import styles from './EstimadorPensionViudedad.module.css';
 import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -192,6 +192,9 @@ export default function EstimadorPensionViudedad() {
         <h1 className={styles.title}>Estimador Pensión de Viudedad</h1>
         <p className={styles.subtitle}>Seguridad Social · Cuantía orientativa 2025 · Porcentajes 52% / 60% / 70%</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial"
         severity="critical">

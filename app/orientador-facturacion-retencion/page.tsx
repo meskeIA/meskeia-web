@@ -9,6 +9,7 @@ import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import DataReference from '@/components/DataReference';
+import RegionBadge from '@/components/RegionBadge';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './OrientadorFacturacionRetencion.module.css';
 import { metadata, jsonLd } from './metadata';
@@ -224,6 +225,8 @@ export default function OrientadorFacturacionRetencionPage() {
             </p>
           </div>
         </header>
+
+        <RegionBadge variant="es-only" />
 
         <main className={styles.main}>
           <LegalNotice />

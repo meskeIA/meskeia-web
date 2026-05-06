@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './ResidenciaVsCuidadoCasa.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -152,6 +152,9 @@ export default function ResidenciaVsCuidadoCasa() {
         <h1 className={styles.title}>Residencia vs Cuidado en Casa</h1>
         <p className={styles.subtitle}>Compara costes y factores de las opciones de cuidado para mayores · 2025</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial"
         severity="high">

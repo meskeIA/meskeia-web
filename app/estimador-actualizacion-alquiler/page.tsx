@@ -5,7 +5,7 @@ import styles from './EstimadorActualizacionAlquiler.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, NumberInput, ResultCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -119,6 +119,9 @@ export default function EstimadorActualizacionAlquilerPage() {
           Estima la subida máxima permitida según tu tipo de contrato — IRAV o IPC
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './AsistenteAltaAutonomo.module.css';
 import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -437,6 +437,9 @@ export default function AsistenteAltaAutonomoPage() {
           Checklist interactivo con todos los trámites y calculadora de cuota.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial" severity="critical" />
 

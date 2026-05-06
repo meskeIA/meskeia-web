@@ -11,7 +11,7 @@ import {
   LegalNotice,
   RelatedApps,
   DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -198,6 +198,9 @@ export default function RequisitosNomadaDigitalPage() {
         </p>
         <p className={styles.heroLaw}>Ley 28/2022 de Startups · RD 1008/2023</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

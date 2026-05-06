@@ -9,7 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   DisclaimerCard,
-  LegalNotice,
+  LegalNotice, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
 import { getRelatedApps } from '@/data/app-relations';
@@ -91,6 +91,9 @@ export default function EstimacionPrestacionesDependencia() {
           reconocido. Cuantías máximas estatales 2025 orientativas.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

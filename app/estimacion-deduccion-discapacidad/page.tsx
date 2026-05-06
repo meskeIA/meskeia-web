@@ -10,7 +10,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -96,6 +96,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           Calcula el ahorro fiscal aproximado por los mínimos de discapacidad en tu declaración de la renta
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

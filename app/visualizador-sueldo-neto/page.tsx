@@ -10,7 +10,7 @@ import {
   LegalNotice,
   ShareCard,
   DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -222,6 +222,9 @@ export default function VisualizadorSueldoNetoPage() {
           <h1 className={styles.title}>Tu Sueldo al Desnudo</h1>
           <p className={styles.subtitle}>Visualiza cómo se transforma tu bruto en neto — cada euro, paso a paso</p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" />

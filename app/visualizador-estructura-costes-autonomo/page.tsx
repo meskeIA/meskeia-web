@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -250,6 +250,9 @@ export default function VisualizadorEstructuraCostesAutonomo() {
         <h1 className={styles.title}>Estructura de Costes del Autónomo</h1>
         <p className={styles.subtitle}>De lo que facturas a lo que te queda: visualiza cada euro</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

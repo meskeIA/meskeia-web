@@ -4,7 +4,7 @@
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 > Actualizar este documento al final de cada sesión que toque el tema.
 
-**Última actualización:** 2026-05-06 (sesión tarde)
+**Última actualización:** 2026-05-06 (sesión tarde-noche)
 
 ---
 
@@ -203,6 +203,18 @@ Inspirada en la filosofía de la página *Acerca de*: "el conocimiento debe ser 
 - **Tiempo**: ~2,5 horas.
 - **Build**: 0 errores, 1088 páginas generadas.
 - **Apps top que NO necesitaban cambio** (ya Latam-friendly): `juego-memoria`, `curso-negociacion`, `generador-gradientes`, `curso-pensamiento-sistemico`, `conversor-braille`, `generador-anagramas`, `calculadora-cocina`, `calculadora-estadistica`, `contraste-colores`, `test-perfil-inversor`.
+
+### 2026-05-06 (sesión tarde-noche) — Cobertura completa de RegionBadge
+
+Tras el sweep inicial de las 2 apps fiscales del top 33, se completa la cobertura de **todas las apps fiscales-España** del catálogo:
+
+- **Total apps con `<RegionBadge>` ahora: 56** (vs 2 antes de esta sesión)
+- **52 con variant `es-only`**: cálculo fiscal/legal estructural España (IRPF, RETA, ITP/AJD, IBI, ISD, plusvalía, SAAD, prestaciones SS, modelos AEAT…)
+- **4 con variant `es-data`**: tests/planificadores universales con datos referenciales España (`test-zarit-cuidador`, `test-estilo-parental`, `planificador-gastos-bebe`, `visualizador-ciclo-vida-freelance`, `visualizador-tipos-cliente-freelance`)
+
+**Método**: 3 scripts incrementales con criterio de seguridad (skip si ya tiene badge, fallback al patrón `</header>` si no encuentra el patrón ideal). Bug del regex (coma trailing en imports multilínea) corregido con script de fix. Build verificado: 1088 páginas, 0 errores.
+
+**Apps no etiquetadas conscientemente**: `simulador-hipoteca`, `estimador-hipoteca`, `estimador-prestamos` (ya pulidas con copy multi-país en sesión anterior), `generador-facturas` (formato puede ser universal, requiere revisión manual), apps puramente educativas/lúdicas.
 
 ---
 

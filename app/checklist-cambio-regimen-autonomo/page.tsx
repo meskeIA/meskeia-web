@@ -9,6 +9,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
+import RegionBadge from '@/components/RegionBadge';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
@@ -261,6 +262,8 @@ export default function ChecklistCambioRegimenPage() {
             De estimación objetiva (módulos) a estimación directa simplificada — Guía y checklist paso a paso
           </p>
         </header>
+
+        <RegionBadge variant="es-only" />
 
         <LegalNotice />
 

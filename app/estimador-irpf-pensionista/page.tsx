@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import styles from './EstimadorIrpfPensionista.module.css';
 import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -148,6 +148,9 @@ export default function EstimadorIrpfPensionista() {
         <h1 className={styles.title}>Estimador IRPF Pensionista</h1>
         <p className={styles.subtitle}>Cuánto pagas de renta siendo jubilado y cuál es tu pensión neta real · 2025</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial"
         severity="critical">

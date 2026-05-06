@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import styles from './EstimadorIRPF.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -202,6 +202,9 @@ export default function EstimadorIRPFPage() {
           Oriéntate sobre tu declaración de la renta: cuota íntegra, retenciones y resultado orientativo
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial" severity="critical" />
 

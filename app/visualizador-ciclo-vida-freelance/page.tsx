@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -438,6 +438,9 @@ export default function VisualizadorCicloVidaFreelancePage() {
           <h1 className={styles.title}>El Ciclo de Vida de un Proyecto Freelance</h1>
           <p className={styles.subtitle}>Visualiza las fases, tiempos y cuellos de botella de cada proyecto</p>
         </header>
+
+      <RegionBadge variant="es-data" />
+
 
         <LegalNotice />
 

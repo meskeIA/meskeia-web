@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -448,6 +448,9 @@ export default function VisualizadorCosteSanidadPage() {
           <h1 className={styles.title}>Lo que Cuesta Enfermarse</h1>
           <p className={styles.subtitle}>El coste real de la sanidad — lo que pagas, lo que no ves, y lo que otros países envidian</p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

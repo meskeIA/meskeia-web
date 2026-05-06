@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styles from './EstimadorComplementoMinimos.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard, DataReference,
+  ShareCard, DisclaimerCard, DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -135,6 +135,9 @@ export default function EstimadorComplementoMinimosPage() {
             Comprueba si tu pensión puede completarse hasta el mínimo garantizado por la Seguridad Social (2026)
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

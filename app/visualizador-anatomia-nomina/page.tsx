@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -209,6 +209,9 @@ export default function VisualizadorAnatomiaNominaPage() {
           <h1 className={styles.title}>Anatomía de una Nómina</h1>
           <p className={styles.subtitle}>Pulsa en cada línea para descubrir qué significa y por qué aparece ahí</p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

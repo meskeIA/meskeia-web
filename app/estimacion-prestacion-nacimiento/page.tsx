@@ -10,7 +10,7 @@ import {
   ShareCard,
   DisclaimerCard,
   LegalNotice,
-  NumberInput,
+  NumberInput, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
 import { getRelatedApps } from '@/data/app-relations';
@@ -188,6 +188,9 @@ export default function EstimacionPrestacionNacimiento() {
           durante el permiso por nacimiento y cuidado del menor en Espana.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

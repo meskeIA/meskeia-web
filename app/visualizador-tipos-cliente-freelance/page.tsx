@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
@@ -256,6 +256,9 @@ export default function VisualizadorTiposClienteFreelance() {
         </h1>
         <p>Conoce las 6 relaciones comerciales y sus implicaciones en España</p>
       </header>
+
+      <RegionBadge variant="es-data" />
+
 
       <LegalNotice />
 

@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -199,6 +199,9 @@ export default function VisualizadorViajeImpuestosPage() {
           <h1 className={styles.title}>El Viaje de tus Impuestos</h1>
           <p className={styles.subtitle}>¿A dónde va tu dinero? Visualiza el gasto público español partida a partida</p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

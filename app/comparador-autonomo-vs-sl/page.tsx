@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import styles from './ComparadorAutonomoVsSL.module.css';
 import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -171,6 +171,9 @@ export default function ComparadorAutonomoVsSLPage() {
           Oriéntate sobre qué forma fiscal conviene más según tu nivel de ingresos
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial" severity="critical" />
 

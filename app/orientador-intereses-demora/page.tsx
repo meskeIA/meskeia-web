@@ -12,7 +12,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -140,6 +140,9 @@ export default function OrientadorInteresesDemoraPage() {
           Interés comercial (Ley 3/2004) e interés legal (Código Civil).
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

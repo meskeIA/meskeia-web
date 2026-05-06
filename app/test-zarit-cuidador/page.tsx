@@ -9,7 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   DisclaimerCard,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
 import { getRelatedApps } from '@/data/app-relations';
@@ -116,6 +116,9 @@ export default function TestZaritCuidadorPage() {
             Escala Zarit validada en español (22 ítems) · Evaluación orientativa del nivel de sobrecarga
           </p>
         </header>
+
+      <RegionBadge variant="es-data" />
+
 
         {/* Disclaimer CRÍTICO — salud mental */}
         <DisclaimerCard variant="medical" severity="high">

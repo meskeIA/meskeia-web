@@ -10,7 +10,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import {
@@ -188,6 +188,9 @@ export default function EstimacionBajaMaternalPage() {
           Calcula la duracion de tu permiso por nacimiento y cuidado del menor segun la legislacion espanola vigente
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

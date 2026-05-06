@@ -9,7 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   DisclaimerCard,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
@@ -165,6 +165,9 @@ export default function PlanificadorTurnosCuidadoresPage() {
             Organiza los turnos de cuidado entre familiares con un calendario semanal visual
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

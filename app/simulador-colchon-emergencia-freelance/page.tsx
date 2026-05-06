@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorColchonEmergenciaFreelance.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
-  ShareCard, DisclaimerCard,
+  ShareCard, DisclaimerCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -186,6 +186,9 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
             Calcula cuantos meses puedes sobrevivir sin ingresos con tu ahorro actual
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

@@ -11,7 +11,7 @@ import {
   DisclaimerCard,
   DataReference,
   ResultCard,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
@@ -218,6 +218,9 @@ export default function EstimadorSMIPage() {
             </div>
           </div>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

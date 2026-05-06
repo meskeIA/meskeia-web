@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCuotaAutonomo.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -241,6 +241,9 @@ export default function EstimadorCuotaAutonomoPage() {
           Estima tu cuota mensual orientativa según el sistema de cotización por ingresos reales
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial" severity="critical" />
 

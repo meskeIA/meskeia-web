@@ -11,7 +11,7 @@ import {
   DisclaimerCard,
   ResultCard,
   NumberInput,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
@@ -121,6 +121,9 @@ export default function OrientadorDeduccionObrasEnergeticasPage() {
             Oriéntate sobre las 3 deducciones por mejora de eficiencia energética en vivienda
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

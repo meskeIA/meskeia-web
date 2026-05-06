@@ -10,7 +10,7 @@ import {
   LegalNotice,
   DisclaimerCard,
   DataReference,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { OBLIGACION_DECLARAR_2025, FISCAL_IRPF_META } from '@/data/fiscal';
@@ -346,6 +346,9 @@ export default function TestObligadoDeclararRentaPage() {
             <span className={styles.fechaTag}>30 jun — Fin del plazo</span>
           </div>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

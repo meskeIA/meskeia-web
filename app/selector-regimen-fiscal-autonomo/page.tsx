@@ -9,7 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
-  DisclaimerCard,
+  DisclaimerCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -449,6 +449,9 @@ export default function SelectorRegimenFiscalAutonomo() {
           10 preguntas para orientarte sobre si te conviene módulos, estimación directa simplificada, directa normal o constituir una SL.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
       <DisclaimerCard variant="financial" severity="critical" />

@@ -11,7 +11,7 @@ import {
   DisclaimerCard,
   DataReference,
   NumberInput,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -233,6 +233,9 @@ export default function PlanificadorAhorroJubilacionPage() {
             Brecha, ahorro necesario, ventaja fiscal y proyección de capital
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

@@ -9,7 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   DisclaimerCard,
-  LegalNotice,
+  LegalNotice, RegionBadge
 } from '@/components';
 import { GASTOS_PRIMER_ANO_BEBE } from '@/data/fiscal';
 import { formatCurrency } from '@/lib';
@@ -97,6 +97,9 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
             Estima cuánto cuesta el primer año de tu bebé en España con 10 categorías de gasto
           </p>
         </header>
+
+      <RegionBadge variant="es-data" />
+
 
         <LegalNotice />
 

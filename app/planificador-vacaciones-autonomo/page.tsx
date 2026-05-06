@@ -9,7 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
-  DisclaimerCard,
+  DisclaimerCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -167,6 +167,9 @@ export default function PlanificadorVacacionesAutonomoPage() {
             Calcula el impacto económico real de tus vacaciones y planifica cómo compensarlo
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         {/* Enlaces legales RGPD */}
         <LegalNotice />

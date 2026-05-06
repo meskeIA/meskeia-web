@@ -9,7 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   LegalNotice,
-  DisclaimerCard,
+  DisclaimerCard, RegionBadge
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -191,6 +191,9 @@ export default function DeclaracionRentaFallecidosPage() {
           <h1 className={styles.title}><span aria-hidden="true">📋</span> Declaración de la Renta de Persona Fallecida</h1>
           <p className={styles.subtitle}>Guía interactiva paso a paso para herederos — Campaña IRPF 2025</p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

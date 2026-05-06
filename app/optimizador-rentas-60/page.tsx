@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import styles from './OptimizadorRentas60.module.css';
 import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -244,6 +244,9 @@ export default function OptimizadorRentas60() {
         <h1 className={styles.title}>Optimizador de Rentas 60+</h1>
         <p className={styles.subtitle}>Estrategia IRPF · Pensión · Plan de pensiones · Ahorro · Alquiler · España 2025</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial"
         severity="high">

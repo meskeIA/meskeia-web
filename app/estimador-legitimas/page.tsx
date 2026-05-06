@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './EstimadorLegitimas.module.css';
-import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -264,6 +264,9 @@ export default function EstimadorLegitimas() {
         <h1 className={styles.title}>Estimador de Legítimas</h1>
         <p className={styles.subtitle}>Herencia forzosa por régimen civil · Código Civil + Derechos Forales · España 2025</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <DisclaimerCard variant="financial"
         severity="critical">

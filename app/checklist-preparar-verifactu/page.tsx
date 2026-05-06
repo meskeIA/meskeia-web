@@ -9,7 +9,7 @@ import {
   EducationalSection,
   RelatedApps,
   LegalNotice,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
@@ -215,6 +215,9 @@ export default function ChecklistPrepararVerifactuPage() {
             Prepara tu negocio para la facturación electrónica obligatoria (enero 2027)
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

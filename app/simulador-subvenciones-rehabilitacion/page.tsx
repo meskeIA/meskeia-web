@@ -10,7 +10,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  NumberInput,
+  NumberInput, RegionBadge
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -264,6 +264,9 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
             Estima las ayudas Next Generation EU, deducciones IRPF e IVA reducido para tu reforma energética
           </p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
 

@@ -8,6 +8,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
+import RegionBadge from '@/components/RegionBadge';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorPlanPensiones.module.css';
 
@@ -466,6 +467,8 @@ export default function SelectorPlanPensiones() {
           EPSV o si es mejor otra estrategia de ahorro para la jubilación.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
 
       <div className={styles.legalNoticeWrapper}>
         <LegalNotice />

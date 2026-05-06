@@ -10,7 +10,7 @@ import {
   LegalNotice,
   ShareCard,
   DisclaimerCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -151,6 +151,9 @@ export default function VisualizadorJubilacionPerspectivaPage() {
           <h1 className={styles.title}>Tu Jubilación en Perspectiva</h1>
           <p className={styles.subtitle}>Visualiza tu vida laboral y cómo se traduce en pensión — año a año</p>
         </header>
+
+      <RegionBadge variant="es-only" />
+
 
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" />

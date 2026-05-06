@@ -9,7 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   DisclaimerCard,
-  ShareCard,
+  ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
@@ -112,6 +112,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
         <p className={styles.subtitle}>Comprueba si puedes recibir hasta 250 €/mes durante 2 años</p>
         <p className={styles.heroLaw}>Real Decreto 42/2022 · Plan Estatal de Vivienda 2022-2025</p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 

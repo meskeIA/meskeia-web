@@ -10,7 +10,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  DataReference,
+  DataReference, RegionBadge
 } from '@/components';
 import NumberInput from '@/components/NumberInput';
 import { formatCurrency } from '@/lib';
@@ -151,6 +151,9 @@ export default function EstimacionDeduccionMaternidadPage() {
           Estima la deduccion por maternidad: {formatCurrency(1200)}/ano por hijo menor de 3 anos + guarderia
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
+
 
       <LegalNotice />
 
