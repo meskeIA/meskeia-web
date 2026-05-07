@@ -36,14 +36,16 @@ export async function OPTIONS() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { brutoAnual, situacion, numHijos, hijosMenores3, pagas } = body;
+    const { brutoAnual, salarioBrutoAnual, situacion, numHijos, hijosMenores3, pagas } = body;
+    const bruto = typeof brutoAnual === 'number' ? brutoAnual : salarioBrutoAnual;
 
-    // Validación básica
-    if (typeof brutoAnual !== 'number' || brutoAnual <= 0) {
+    // Validación básica — acepta `brutoAnual` o `salarioBrutoAnual` por compatibilidad
+    // con distintos schemas OpenAPI publicados en GPTs de ChatGPT.
+    if (typeof bruto !== 'number' || bruto <= 0) {
       return NextResponse.json(
         {
           error:
-            'El campo brutoAnual es obligatorio y debe ser un número positivo en euros/año. ' +
+            'El campo brutoAnual (o salarioBrutoAnual) es obligatorio y debe ser un número positivo en euros/año. ' +
             'Ejemplo: 30000 para un salario bruto de 30.000€ anuales.',
         },
         { status: 400, headers: corsHeaders() }
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // Calcular sueldo neto
     const resultado = calcularSueldoNeto({
-      brutoAnual,
+      brutoAnual: bruto,
       situacion: situacionValida,
       numHijos: typeof numHijos === 'number' ? numHijos : 0,
       hijosMenores3: typeof hijosMenores3 === 'number' ? hijosMenores3 : 0,
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Analytics (no bloquea la respuesta)
-    registrarLlamadaChatGPT(brutoAnual, situacionValida).catch(() => {});
+    registrarLlamadaChatGPT(bruto, situacionValida).catch(() => {});
 
     return NextResponse.json(
       { ...resultado, aviso_legal: AVISO_LEGAL },
