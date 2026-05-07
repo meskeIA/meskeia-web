@@ -2667,6 +2667,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-anatomia-nomina/', icon: '📄', name: 'Anatomía de la Nómina', description: 'Qué significa cada concepto' },
   ],
 
+  // SIMULADORES FISCALES-ESPAÑA — Tanda 2 (2026-05-07)
+  'simulador-modulos-vs-directa': [
+    { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Autónomo vs SL', description: 'Otra decisión clave del autónomo' },
+    { url: '/estimador-cuota-autonomo/', icon: '🧾', name: 'Cuota de Autónomo', description: 'Tu cuota RETA mensual' },
+    { url: '/calculadora-iva/', icon: '💶', name: 'Calculadora IVA', description: 'Tipos general, reducido, superreducido' },
+    { url: '/simulador-irpf-tramos/', icon: '📊', name: 'Tramos IRPF Visuales', description: 'Cómo se aplica el IRPF' },
+  ],
+  'simulador-heredar-vivienda': [
+    { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Impuesto de Sucesiones', description: 'ISD por CCAA en detalle' },
+    { url: '/estimador-plusvalia-municipal/', icon: '🏙️', name: 'Plusvalía Municipal', description: 'IIVTNU método objetivo y real' },
+    { url: '/estimador-plusvalias-irpf/', icon: '📈', name: 'Plusvalía IRPF', description: 'Ganancia patrimonial al vender' },
+    { url: '/orientacion-tramitacion-herencias/', icon: '📋', name: 'Tramitar Herencia', description: 'Checklist y plazos' },
+  ],
+  'simulador-renta-plan-pensiones': [
+    { url: '/selector-plan-pensiones/', icon: '🏦', name: 'Selector Plan Pensiones', description: '¿Te conviene un plan?' },
+    { url: '/simulador-irpf-tramos/', icon: '📊', name: 'Tramos IRPF Visuales', description: 'Cómo afecta el marginal' },
+    { url: '/simulador-jubilacion-publica/', icon: '👴', name: 'Jubilación Pública', description: 'Tu pensión de la SS' },
+    { url: '/estimador-irpf-pensionista/', icon: '📋', name: 'IRPF Pensionista', description: 'IRPF en la jubilación' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },

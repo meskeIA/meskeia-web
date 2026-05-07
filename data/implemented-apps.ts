@@ -409,6 +409,11 @@ export const implementedAppsUrls = [
   "/simulador-desglose-nomina/",    // Bruto → SS → IRPF → Neto paso a paso animado, modo simple/detallado, sankey
   "/simulador-mito-tramo-superior/", // Demuestra que el mito "subir de tramo te quita más" es falso con números reales
 
+  // Tanda 2 simuladores Fiscales-España visuales (2026-05-07)
+  "/simulador-modulos-vs-directa/", // Autónomos: comparativa ED Simplificada vs Módulos por actividad
+  "/simulador-heredar-vivienda/",   // ISD + plusvalía municipal + IRPF al vender, 17 CCAA, 4 casos
+  "/simulador-renta-plan-pensiones/", // 3 escenarios IRPF (sin/con plan óptimo/con plan mal rescate)
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
