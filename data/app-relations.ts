@@ -2535,6 +2535,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-modelos-epidemiologicos/', icon: '🦠', name: 'Modelos Epidemiológicos', description: 'SIR y dinámica de contagios' },
   ],
 
+  // SIMULADORES BACHILLERATO/UNIVERSIDAD — Tanda 2 (2026-05-07)
+  'simulador-gas-ideal': [
+    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
+    { url: '/visualizador-termodinamica/', icon: '🔥', name: 'Termodinámica Visual', description: 'Energía, calor y entropía' },
+    { url: '/visualizador-estados-materia/', icon: '💧', name: 'Estados de la Materia', description: 'Sólido, líquido y gaseoso' },
+    { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo y MAS', description: 'Oscilaciones y energía mecánica' },
+  ],
+  'simulador-campo-electrico': [
+    { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ley de Ohm' },
+    { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'Campos E y B, inducción' },
+    { url: '/simulador-ondas-interferencia/', icon: '🌊', name: 'Ondas e Interferencia', description: 'Superposición y estacionarias' },
+    { url: '/calculadora-electricidad/', icon: '🔌', name: 'Calculadora Electricidad', description: 'Ohm, potencia y consumo' },
+  ],
+  'simulador-ondas-interferencia': [
+    { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo y MAS', description: 'Oscilaciones y resonancia' },
+    { url: '/visualizador-sonido-ondas/', icon: '🔊', name: 'Sonido y Ondas', description: 'Acústica y armónicos' },
+    { url: '/visualizador-optica-ondulatoria/', icon: '🌈', name: 'Óptica Ondulatoria', description: 'Doble rendija y difracción' },
+    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },

@@ -377,6 +377,11 @@ export const implementedAppsUrls = [
   "/simulador-equilibrio-quimico/", // Le Chatelier interactivo: 6 reacciones reversibles, perturbaciones, Q vs Kc, van't Hoff
   "/simulador-lotka-volterra/",     // Modelo depredador-presa: oscilaciones, diagrama de fases, RK4, modo logístico, 4 presets
 
+  // Tanda 2 simuladores Bachillerato/Universidad (2026-05-07)
+  "/simulador-gas-ideal/",          // PV=nRT + procesos (isotermo/isobaro/isocoro/adiabático) + ciclos Carnot/Otto/Diesel/Stirling, diagrama PV
+  "/simulador-campo-electrico/",    // Cargas puntuales interactivas: líneas de campo, equipotenciales, mapa color |E|, carga prueba con F y U
+  "/simulador-ondas-interferencia/", // Onda viajera 1D, interferencia 2D 2 fuentes, ondas estacionarias en cuerda y tubo (5 modos armónicos)
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
