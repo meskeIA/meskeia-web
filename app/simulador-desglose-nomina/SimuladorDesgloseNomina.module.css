@@ -1,0 +1,1004 @@
+/* ─── Contenedor general ──────────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Hero ────────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.heroIcon {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ─── Main ────────────────────────────────────────────────────────────── */
+.main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ─── Panel ───────────────────────────────────────────────────────────── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panelTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+/* ─── Forms ───────────────────────────────────────────────────────────── */
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.subLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0.4rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ─── Slider ──────────────────────────────────────────────────────────── */
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  margin-top: 0.4rem;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderHints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.manualSlider {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* ─── Ejemplos preconfigurados ───────────────────────────────────────── */
+.ejemplosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+
+.ejemploBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.7rem 0.5rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.ejemploBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.ejemploActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.ejemploActivo:hover {
+  color: white;
+}
+
+.ejemploIcono {
+  font-size: 1.35rem;
+}
+
+.ejemploEtiqueta {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.ejemploImporte {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+/* ─── Modo toggle ────────────────────────────────────────────────────── */
+.modoToggle {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.modoBtn {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.modoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.modoActivo {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.modoActivo:hover {
+  color: white;
+}
+
+/* ─── KPIs ────────────────────────────────────────────────────────────── */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpiCard {
+  background: var(--bg-card);
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.kpiLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.kpiValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.kpiHint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.kpiSS {
+  border-color: #fdba74;
+  background: linear-gradient(135deg, #fff7ed 0%, var(--bg-card) 80%);
+}
+
+.kpiSS .kpiValue {
+  color: #c2410c;
+}
+
+.kpiIRPF {
+  border-color: #fca5a5;
+  background: linear-gradient(135deg, #fef2f2 0%, var(--bg-card) 80%);
+}
+
+.kpiIRPF .kpiValue {
+  color: #b91c1c;
+}
+
+.kpiNeto {
+  border-color: #86efac;
+  background: linear-gradient(135deg, #f0fdf4 0%, var(--bg-card) 80%);
+}
+
+.kpiNeto .kpiValue {
+  color: #15803d;
+}
+
+/* ─── Sankey simplificado ─────────────────────────────────────────────── */
+.sankeyBar {
+  display: flex;
+  width: 100%;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid #e5e7eb;
+  margin-bottom: 0.75rem;
+}
+
+.sankeySS {
+  background: linear-gradient(135deg, #fb923c, #f97316);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.6s ease;
+}
+
+.sankeyIRPF {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.6s ease;
+}
+
+.sankeyNeto {
+  background: linear-gradient(135deg, #4ade80, #16a34a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.6s ease;
+}
+
+.sankeyLabel {
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  padding: 0 0.4rem;
+}
+
+.sankeyLeyenda {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.legendDot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+.legendSS {
+  background: #f97316;
+}
+
+.legendIRPF {
+  background: #dc2626;
+}
+
+.legendNeto {
+  background: #16a34a;
+}
+
+/* ─── Desglose paso a paso ────────────────────────────────────────────── */
+.desgloseList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.desglosePaso {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: var(--bg-card);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.pasoOculto {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.pasoVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pasoNumero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: var(--primary);
+  color: white;
+  flex-shrink: 0;
+}
+
+.pasoContenido {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.pasoEtiqueta {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.pasoDetalle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.pasoDelta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.pasoImporte {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Variantes por tipo de paso */
+.pasoBruto {
+  background: linear-gradient(135deg, #eff6ff, var(--bg-card));
+  border-color: #93c5fd;
+}
+
+.pasoBruto .pasoNumero {
+  background: #2563eb;
+}
+
+.pasoBruto .pasoImporte {
+  color: #1d4ed8;
+}
+
+.pasoRestaSS {
+  background: linear-gradient(135deg, #fff7ed, var(--bg-card));
+  border-color: #fdba74;
+}
+
+.pasoRestaSS .pasoNumero {
+  background: #f97316;
+}
+
+.pasoRestaIRPF {
+  background: linear-gradient(135deg, #fef2f2, var(--bg-card));
+  border-color: #fca5a5;
+}
+
+.pasoRestaIRPF .pasoNumero {
+  background: #dc2626;
+}
+
+.pasoReduccion {
+  background: linear-gradient(135deg, #fef9c3, var(--bg-card));
+  border-color: #fde68a;
+}
+
+.pasoReduccion .pasoNumero {
+  background: #ca8a04;
+}
+
+.pasoIntermedio {
+  background: linear-gradient(135deg, #f5f3ff, var(--bg-card));
+  border-color: #c4b5fd;
+}
+
+.pasoIntermedio .pasoNumero {
+  background: #7c3aed;
+}
+
+.pasoNeto {
+  background: linear-gradient(135deg, #f0fdf4, var(--bg-card));
+  border-color: #86efac;
+}
+
+.pasoNeto .pasoNumero {
+  background: #16a34a;
+}
+
+.pasoNeto .pasoImporte {
+  color: #15803d;
+}
+
+.pasoDestacado {
+  border-width: 2.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.pasoDestacado .pasoEtiqueta {
+  font-size: 1rem;
+}
+
+.pasoDestacado .pasoImporte {
+  font-size: 1.2rem;
+}
+
+/* ─── Tabla de tramos IRPF ────────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.tramosTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tramosTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tramosTable td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tramosTable tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.tramosNota {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.75rem 0 0;
+}
+
+/* ─── EducationalSection v2.0 ─────────────────────────────────────────── */
+.guideSection {
+  margin-bottom: 2rem;
+}
+
+.guideSection h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.guideSection h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.guideSection p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.6rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+  color: var(--text-secondary);
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.escenarioCard h4 {
+  color: var(--primary);
+}
+
+.escenarioCard p {
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem;
+}
+
+.escenarioTip {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-style: italic;
+  margin: 0.4rem 0 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+
+.faqItem h4 {
+  font-size: 0.92rem;
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.86rem;
+  margin: 0;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  padding-top: 0.1rem;
+}
+
+.stepContent h4 {
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.95rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.warningBox {
+  background: #fef3c7;
+  border: 1.5px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #92400e;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: #78350f;
+  padding-left: 1.4rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+/* ─── Dark mode ──────────────────────────────────────────────────────── */
+[data-theme='dark'] .panel {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .select {
+  background: #1a1a1a;
+  border-color: #4b5563;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .slider {
+  background: #4b5563;
+}
+
+[data-theme='dark'] .manualSlider {
+  background: #1a1a1a;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .ejemploBtn {
+  background: #1a1a1a;
+  border-color: #4b5563;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .ejemploActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .modoBtn {
+  background: #1a1a1a;
+  border-color: #4b5563;
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .modoActivo {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .kpiCard {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .kpiSS {
+  background: linear-gradient(135deg, #2a1a0a 0%, var(--bg-card) 80%);
+  border-color: #c2410c;
+}
+
+[data-theme='dark'] .kpiSS .kpiValue {
+  color: #fdba74;
+}
+
+[data-theme='dark'] .kpiIRPF {
+  background: linear-gradient(135deg, #2a0a0a 0%, var(--bg-card) 80%);
+  border-color: #b91c1c;
+}
+
+[data-theme='dark'] .kpiIRPF .kpiValue {
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .kpiNeto {
+  background: linear-gradient(135deg, #0a2a14 0%, var(--bg-card) 80%);
+  border-color: #15803d;
+}
+
+[data-theme='dark'] .kpiNeto .kpiValue {
+  color: #86efac;
+}
+
+[data-theme='dark'] .sankeyBar {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .desglosePaso {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .pasoBruto {
+  background: linear-gradient(135deg, #0a1f3a, var(--bg-card));
+  border-color: #2563eb;
+}
+
+[data-theme='dark'] .pasoBruto .pasoImporte {
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .pasoRestaSS {
+  background: linear-gradient(135deg, #2a1a0a, var(--bg-card));
+  border-color: #f97316;
+}
+
+[data-theme='dark'] .pasoRestaIRPF {
+  background: linear-gradient(135deg, #2a0a0a, var(--bg-card));
+  border-color: #dc2626;
+}
+
+[data-theme='dark'] .pasoReduccion {
+  background: linear-gradient(135deg, #2a1f0a, var(--bg-card));
+  border-color: #ca8a04;
+}
+
+[data-theme='dark'] .pasoIntermedio {
+  background: linear-gradient(135deg, #1a0f2a, var(--bg-card));
+  border-color: #7c3aed;
+}
+
+[data-theme='dark'] .pasoNeto {
+  background: linear-gradient(135deg, #0a2a14, var(--bg-card));
+  border-color: #16a34a;
+}
+
+[data-theme='dark'] .pasoNeto .pasoImporte {
+  color: #86efac;
+}
+
+[data-theme='dark'] .tramosTable td,
+[data-theme='dark'] .comparativaTable td {
+  border-color: #374151;
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .tramosTable tr:nth-child(even) td,
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #1e1e1e;
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2d1b00;
+  border-color: #d97706;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    padding: 1.25rem 1rem;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .ejemplosGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .desglosePaso {
+    grid-template-columns: 28px 1fr;
+    gap: 0.6rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .pasoNumero {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+
+  .pasoImporte {
+    grid-column: 1 / -1;
+    text-align: right;
+    font-size: 1rem;
+  }
+
+  .pasoEtiqueta {
+    font-size: 0.88rem;
+  }
+
+  .pasoDestacado .pasoImporte {
+    font-size: 1.1rem;
+  }
+
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .desglosePaso,
+  .pasoOculto,
+  .pasoVisible,
+  .sankeySS,
+  .sankeyIRPF,
+  .sankeyNeto {
+    transition: none;
+  }
+}

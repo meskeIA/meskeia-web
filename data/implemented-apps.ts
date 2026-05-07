@@ -404,6 +404,11 @@ export const implementedAppsUrls = [
   "/simulador-regresion/",          // Lineal + polinómica + logística con OLS o gradiente animado, R²/MSE/accuracy
   "/simulador-kmeans/",             // K-means clustering con animación asignación-recálculo, k-means++ y método del codo
 
+  // Tanda 1 simuladores Fiscales-España visuales (2026-05-07)
+  "/simulador-irpf-tramos/",        // Visual interactivo de los 6 tramos IRPF 2025 + slider "qué pasa si subo X €"
+  "/simulador-desglose-nomina/",    // Bruto → SS → IRPF → Neto paso a paso animado, modo simple/detallado, sankey
+  "/simulador-mito-tramo-superior/", // Demuestra que el mito "subir de tramo te quita más" es falso con números reales
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto

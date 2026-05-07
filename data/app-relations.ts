@@ -2647,6 +2647,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo funciona un LLM', description: 'Tokens, embeddings, atención' },
   ],
 
+  // SIMULADORES FISCALES-ESPAÑA — Tanda 1 (2026-05-07)
+  'simulador-irpf-tramos': [
+    { url: '/simulador-mito-tramo-superior/', icon: '🚫', name: 'Mito del Tramo Superior', description: '¿Subir de tramo te quita más?' },
+    { url: '/simulador-desglose-nomina/', icon: '💼', name: 'Desglose de Nómina', description: 'Bruto a neto paso a paso' },
+    { url: '/estimador-irpf/', icon: '📋', name: 'Estimador IRPF Completo', description: 'Calcula tu cuota con mínimos personales' },
+    { url: '/test-obligado-declarar-renta/', icon: '✅', name: 'Test ¿Obligado a Declarar?', description: 'Comprueba si debes hacer la Renta' },
+  ],
+  'simulador-desglose-nomina': [
+    { url: '/simulador-irpf-tramos/', icon: '📊', name: 'Tramos IRPF Visuales', description: 'Cómo funcionan los 6 tramos' },
+    { url: '/simulador-mito-tramo-superior/', icon: '🚫', name: 'Mito del Tramo Superior', description: 'Lo que pasa al cruzar de tramo' },
+    { url: '/estimador-irpf/', icon: '📋', name: 'Estimador IRPF Completo', description: 'Cuota con situación familiar' },
+    { url: '/visualizador-sueldo-neto/', icon: '💰', name: 'Sueldo Neto Visual', description: 'Cómo se reparte tu salario' },
+  ],
+  'simulador-mito-tramo-superior': [
+    { url: '/simulador-irpf-tramos/', icon: '📊', name: 'Tramos IRPF Visuales', description: 'Vista interactiva de los 6 tramos' },
+    { url: '/simulador-desglose-nomina/', icon: '💼', name: 'Desglose de Nómina', description: 'Del bruto al neto paso a paso' },
+    { url: '/estimador-irpf/', icon: '📋', name: 'Estimador IRPF Completo', description: 'Tu cuota orientativa anual' },
+    { url: '/visualizador-anatomia-nomina/', icon: '📄', name: 'Anatomía de la Nómina', description: 'Qué significa cada concepto' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },
