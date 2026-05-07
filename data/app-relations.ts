@@ -2621,6 +2621,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
 
+  // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 3 (2026-05-07)
+  'simulador-maquina-turing': [
+    { url: '/simulador-automatas-finitos/', icon: '🔄', name: 'Autómatas Finitos DFA/NFA', description: 'Lenguajes regulares y editor visual' },
+    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
+    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Cifrados clásicos y modernos' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+  'simulador-automatas-finitos': [
+    { url: '/simulador-maquina-turing/', icon: '📜', name: 'Máquina de Turing', description: 'Modelo computacional universal' },
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
+    { url: '/calculadora-algebra-booleana/', icon: '⚙️', name: 'Álgebra Booleana', description: 'Karnaugh, SOP/POS, tablas verdad' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+  'simulador-regresion': [
+    { url: '/simulador-kmeans/', icon: '🎯', name: 'K-Means Clustering', description: 'Aprendizaje no supervisado' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'Redes Neuronales', description: 'Perceptrones y aprendizaje' },
+    { url: '/calculadora-estadistica/', icon: '📈', name: 'Calculadora Estadística', description: 'Media, mediana, desviación' },
+    { url: '/visualizador-estadistica-inferencial/', icon: '📊', name: 'Estadística Inferencial', description: 'Intervalos y contraste hipótesis' },
+  ],
+  'simulador-kmeans': [
+    { url: '/simulador-regresion/', icon: '📉', name: 'Regresión Lineal y Logística', description: 'OLS y descenso de gradiente' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'Redes Neuronales', description: 'Perceptrones y aprendizaje' },
+    { url: '/calculadora-estadistica/', icon: '📈', name: 'Calculadora Estadística', description: 'Media, mediana, desviación' },
+    { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo funciona un LLM', description: 'Tokens, embeddings, atención' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },

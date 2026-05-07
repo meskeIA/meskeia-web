@@ -398,6 +398,12 @@ export const implementedAppsUrls = [
   "/simulador-arboles-bst-avl/",    // BST y AVL: insertar/eliminar/buscar con rotaciones LL/RR/LR/RL y 4 recorridos
   "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
 
+  // Tanda 3 simuladores Informática FP/Universidad (2026-05-07)
+  "/simulador-maquina-turing/",     // Cinta animada + tabla de reglas + 4 programas clásicos (incrementador binario, aⁿbⁿ, duplicador, palíndromos)
+  "/simulador-automatas-finitos/",  // DFA/NFA con editor visual, validación animada, modo batch y 4 ejemplos
+  "/simulador-regresion/",          // Lineal + polinómica + logística con OLS o gradiente animado, R²/MSE/accuracy
+  "/simulador-kmeans/",             // K-means clustering con animación asignación-recálculo, k-means++ y método del codo
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
