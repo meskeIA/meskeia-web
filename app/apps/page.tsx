@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import { suites, applicationsDatabase, SuiteType } from '@/data/applications';
 import { isAppImplemented, TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import { guidesJourney } from '@/data/guides-journey';
+import { withFrom } from '@/lib/trackingFrom';
 import styles from './page.module.css';
 
 type Tab = 'apps' | 'guias';
@@ -196,7 +197,7 @@ export default function AppsPage() {
                               );
                             })}
                           </div>
-                          <Link href={app.url} className={styles.appCardCta}>
+                          <Link href={withFrom(app.url, 'catalog')} className={styles.appCardCta}>
                             Abrir aplicación →
                           </Link>
                         </div>
@@ -218,7 +219,7 @@ export default function AppsPage() {
             <ul className={styles.guidesGrid}>
               {guidesJourney.map((guide) => (
                 <li key={guide.id} className={styles.guideCard}>
-                  <Link href={guide.url} className={styles.guideCardLink}>
+                  <Link href={withFrom(guide.url, 'catalog-guides')} className={styles.guideCardLink}>
                     <div className={styles.guideIcon} aria-hidden="true">{guide.icon}</div>
                     <div className={styles.guideContent}>
                       <h3 className={styles.guideTitle}>{guide.name}</h3>

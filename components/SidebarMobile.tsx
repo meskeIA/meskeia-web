@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import styles from './SidebarMobile.module.css';
 import MeskeiaLogo from './MeskeiaLogo';
 import { getRecentApps, type RecentApp } from '@/lib/recentApps';
+import { withFrom } from '@/lib/trackingFrom';
 import { applicationsDatabase, type Application } from '@/data/applications';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 
@@ -153,7 +154,7 @@ export default function SidebarMobile() {
                     return (
                       <Link
                         key={recent.url}
-                        href={recent.url}
+                        href={withFrom(recent.url, 'sidebar-recent')}
                         className={`${styles.recentApp} ${pathname === recent.url ? styles.navItemActive : ''}`}
                         onClick={() => setIsOpen(false)}
                       >

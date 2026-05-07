@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './DailyApps.module.css';
 import { getDailyApps } from '@/lib/dailyApps';
+import { withFrom } from '@/lib/trackingFrom';
 import { type Application } from '@/data/applications';
 
 interface DailyAppsProps {
@@ -66,7 +67,7 @@ export default function DailyApps({ count = 4 }: DailyAppsProps) {
         {dailyApps.map((app) => (
           <Link
             key={app.url}
-            href={app.url}
+            href={withFrom(app.url, 'home-daily')}
             className={styles.appCard}
           >
             <div className={styles.cardHeader}>

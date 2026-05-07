@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import MiniSearch from 'minisearch';
 import { Application, applicationsDatabase, suites, SuiteType } from '@/data/applications';
+import { withFrom } from '@/lib/trackingFrom';
 import AsistenteChat from './AsistenteChat';
 import styles from './SearchBar.module.css';
 
@@ -220,7 +221,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
         results.map((result, index) => (
           <a
             key={index}
-            href={result.url}
+            href={withFrom(result.url, 'search')}
             className={`${styles.resultItemCompact} ${
               index === selectedIndex ? styles.selected : ''
             }`}
@@ -249,7 +250,7 @@ export default function SearchBar({ large = false }: SearchBarProps) {
         results.map((result, index) => (
           <a
             key={index}
-            href={result.url}
+            href={withFrom(result.url, 'search')}
             className={`${styles.resultItem} ${
               index === selectedIndex ? styles.selected : ''
             }`}

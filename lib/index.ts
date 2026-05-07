@@ -30,3 +30,5 @@ export {
   getDailyAppsForDate,
   getRotationCycleDays,
 } from './dailyApps';
+
+export { withFrom } from './trackingFrom';

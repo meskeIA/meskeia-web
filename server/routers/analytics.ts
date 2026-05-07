@@ -684,4 +684,204 @@ export const analyticsRouter = router({
         message: `IP ${ipActual} guardada correctamente`,
       };
     }),
+
+  /**
+   * Procedure: getNavegacion
+   * Análisis de patrones de navegación entre apps usando sesion_id.
+   *
+   * Devuelve:
+   *  - KPIs globales: total sesiones, apps por sesión (medio), %single-app, %multi-app
+   *  - Distribución de longitud de sesión (1, 2, 3, 4-5, 6+ apps)
+   *  - Origen de la primera app de la sesión (home / directo / referencia)
+   *  - Top pares from→to (transiciones internas)
+   *  - Apps "puente" vs "puerta" (continúan vs terminan sesión)
+   *
+   * Excluye bots, mcp y mi-ip por defecto.
+   */
+  getNavegacion: publicProcedure
+    .input(
+      z.object({
+        dias: z.number().int().positive().default(14), // ventana de análisis
+      })
+    )
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      // Leer IP excluida
+      let ipExcluida = '';
+      try {
+        const cfg = await client.execute({
+          sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+          args: [],
+        });
+        if (cfg.rows.length > 0) ipExcluida = String(cfg.rows[0].valor);
+      } catch { /* tabla aún no existe */ }
+
+      // Calcular fecha límite (hace N días)
+      const ahora = new Date();
+      const limite = new Date(ahora);
+      limite.setDate(limite.getDate() - input.dias);
+
+      // Cargar visitas relevantes ordenadas por sesión y momento
+      // Excluimos bot, mcp y mi-ip ya en SQL para reducir ruido
+      const result = await client.execute({
+        sql: `SELECT id, aplicacion, sesion_id, modo, datos_adicionales, ip_address, timestamp
+              FROM uso_aplicaciones
+              WHERE sesion_id IS NOT NULL AND sesion_id != ''
+                AND modo NOT IN ('bot', 'mcp')
+                ${ipExcluida ? 'AND (ip_address != ? OR ip_address IS NULL)' : ''}
+              ORDER BY sesion_id ASC, id ASC`,
+        args: ipExcluida ? [ipExcluida] : [],
+      });
+
+      // Parsear timestamp español "DD/MM/YYYY, HH:MM:SS" → Date
+      const parsearFecha = (ts: string): Date | null => {
+        const m = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}),?\s*(\d{1,2}):(\d{2}):(\d{2})/);
+        if (!m) return null;
+        return new Date(
+          parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]),
+          parseInt(m[4]), parseInt(m[5]), parseInt(m[6])
+        );
+      };
+
+      // Estructura: agrupar por sesion_id manteniendo orden
+      type Visita = { app: string; from: string | null; modo: string };
+      const sesiones = new Map<string, Visita[]>();
+
+      for (const row of result.rows) {
+        const ts = String(row.timestamp || '');
+        const fecha = parsearFecha(ts);
+        if (!fecha || fecha < limite) continue;
+
+        const sesionId = String(row.sesion_id);
+        const app = String(row.aplicacion || '');
+        const modo = String(row.modo || 'web');
+
+        let from: string | null = null;
+        try {
+          if (row.datos_adicionales) {
+            const datos = JSON.parse(String(row.datos_adicionales));
+            if (datos && typeof datos.from === 'string') from = datos.from;
+          }
+        } catch { /* ignorar */ }
+
+        if (!sesiones.has(sesionId)) sesiones.set(sesionId, []);
+        sesiones.get(sesionId)!.push({ app, from, modo });
+      }
+
+      // KPIs globales
+      const totalSesiones = sesiones.size;
+      let totalVisitas = 0;
+      let sesionesConHome = 0;
+      let sesionesSingleApp = 0;
+      let sesionesMultiApp = 0;
+      const distribLongitud: Record<string, number> = { '1': 0, '2': 0, '3': 0, '4-5': 0, '6+': 0 };
+
+      // Origen de primera app por sesión
+      const origenPrimeraApp: Record<string, number> = {
+        'home': 0,
+        'directo-google-ia': 0,
+      };
+
+      // Pares from→to: clave "from|to"
+      const paresFromTo: Map<string, number> = new Map();
+
+      // Para apps puente/puerta:
+      // - apariciones[app] = veces que aparece como visita en una sesión
+      // - continuaciones[app] = veces que después de visitar app hay otra app distinta en la sesión
+      const apariciones: Map<string, number> = new Map();
+      const continuaciones: Map<string, number> = new Map();
+      const incInc = (m: Map<string, number>, k: string) => m.set(k, (m.get(k) || 0) + 1);
+
+      for (const [, visitas] of sesiones) {
+        const appsUnicas = new Set(visitas.map(v => v.app));
+        totalVisitas += visitas.length;
+
+        // Longitud
+        const n = appsUnicas.size;
+        if (n === 1) { sesionesSingleApp++; distribLongitud['1']++; }
+        else { sesionesMultiApp++; }
+        if (n === 2) distribLongitud['2']++;
+        else if (n === 3) distribLongitud['3']++;
+        else if (n >= 4 && n <= 5) distribLongitud['4-5']++;
+        else if (n >= 6) distribLongitud['6+']++;
+
+        // Pasa por home
+        if (appsUnicas.has('home') || appsUnicas.has('/')) sesionesConHome++;
+
+        // Origen primera app
+        const primera = visitas[0];
+        if (primera.app === 'home' || primera.app === '/') origenPrimeraApp['home']++;
+        else origenPrimeraApp['directo-google-ia']++;
+
+        // Pares from→to (usa from si existe, si no encadena con la app anterior)
+        for (let i = 0; i < visitas.length; i++) {
+          const v = visitas[i];
+          // Apariciones contables: cada visita única en la sesión
+          incInc(apariciones, v.app);
+
+          // Continuación: si hay siguiente visita y es app distinta, esta es app puente
+          const tieneSiguiente = visitas.slice(i + 1).some(s => s.app !== v.app);
+          if (tieneSiguiente) incInc(continuaciones, v.app);
+
+          // Par from→to: priorizar el `from` explícito (RelatedApps, home-daily, search...)
+          let origen: string | null = null;
+          if (v.from) {
+            origen = v.from;
+          } else if (i > 0) {
+            origen = `prev:${visitas[i - 1].app}`;
+          }
+          if (origen) {
+            const key = `${origen}|${v.app}`;
+            paresFromTo.set(key, (paresFromTo.get(key) || 0) + 1);
+          }
+        }
+      }
+
+      // Top pares from→to (top 30)
+      const topPares = Array.from(paresFromTo.entries())
+        .map(([k, count]) => {
+          const [origen, destino] = k.split('|');
+          return { origen, destino, count };
+        })
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 30);
+
+      // Apps puente/puerta (top 20 por apariciones, mostrando ratio de continuación)
+      const tablaPuente = Array.from(apariciones.entries())
+        .map(([app, apar]) => ({
+          app,
+          apariciones: apar,
+          continuaciones: continuaciones.get(app) || 0,
+          ratio: apar > 0 ? (continuaciones.get(app) || 0) / apar : 0,
+        }))
+        .filter(r => r.apariciones >= 3) // mínimo 3 apariciones para ser estadísticamente útil
+        .sort((a, b) => b.apariciones - a.apariciones)
+        .slice(0, 20);
+
+      const appsPorSesionMedio = totalSesiones > 0 ? totalVisitas / totalSesiones : 0;
+      const pctSingleApp = totalSesiones > 0 ? (sesionesSingleApp / totalSesiones) * 100 : 0;
+      const pctMultiApp = totalSesiones > 0 ? (sesionesMultiApp / totalSesiones) * 100 : 0;
+      const pctConHome = totalSesiones > 0 ? (sesionesConHome / totalSesiones) * 100 : 0;
+      const pctOrigenHome = totalSesiones > 0 ? (origenPrimeraApp['home'] / totalSesiones) * 100 : 0;
+      const pctOrigenDirecto = totalSesiones > 0 ? (origenPrimeraApp['directo-google-ia'] / totalSesiones) * 100 : 0;
+
+      return {
+        ventanaDias: input.dias,
+        kpis: {
+          totalSesiones,
+          totalVisitas,
+          appsPorSesionMedio: Math.round(appsPorSesionMedio * 100) / 100,
+          pctSingleApp: Math.round(pctSingleApp * 10) / 10,
+          pctMultiApp: Math.round(pctMultiApp * 10) / 10,
+          pctConHome: Math.round(pctConHome * 10) / 10,
+          pctOrigenHome: Math.round(pctOrigenHome * 10) / 10,
+          pctOrigenDirecto: Math.round(pctOrigenDirecto * 10) / 10,
+        },
+        distribucionLongitud: distribLongitud,
+        topPares,
+        tablaPuente,
+      };
+    }),
 });
