@@ -2575,6 +2575,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-evolucion-molecular/', icon: '🧪', name: 'Evolución Molecular', description: 'Mutaciones y árboles filogenéticos' },
   ],
 
+  // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 1 (2026-05-07)
+  'simulador-planificador-procesos': [
+    { url: '/simulador-reemplazo-paginas/', icon: '🧩', name: 'Reemplazo de Páginas', description: 'FIFO, LRU, Optimal, Clock, LFU' },
+    { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
+    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
+    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+  ],
+  'simulador-reemplazo-paginas': [
+    { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador de Procesos', description: 'FCFS, SJF, Round Robin, Priority' },
+    { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Procesos, hilos, memoria y E/S' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+  ],
+  'simulador-sql-join': [
+    { url: '/playground-sql/', icon: '🗄️', name: 'Playground SQL', description: 'Editor SQL interactivo con ejercicios' },
+    { url: '/visualizador-base-datos-relacional/', icon: '📚', name: 'Bases de Datos Relacionales', description: 'Modelo E-R, tablas y normalización' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+  'simulador-ordenacion': [
+    { url: '/visualizador-algoritmos-ordenacion/', icon: '📈', name: 'Visualizador Algoritmos', description: 'Algoritmos clásicos animados' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+    { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador Procesos', description: 'FCFS, SJF, Round Robin' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },

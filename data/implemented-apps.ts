@@ -387,6 +387,12 @@ export const implementedAppsUrls = [
   "/simulador-vsepr/",              // Geometría molecular 3D rotable según VSEPR: AX_nE_m con átomo central + pares enlazantes/libres, hibridación
   "/simulador-deriva-genetica/",    // Wright-Fisher: deriva + selección + mutación + migración. Hasta 50 trayectorias, P(fijación), Hardy-Weinberg
 
+  // Tanda 1 simuladores Informática FP/Universidad (2026-05-07)
+  "/simulador-planificador-procesos/", // FCFS/SJF/SRTF/Round Robin/Priority con diagrama de Gantt y métricas (espera, turnaround, throughput)
+  "/simulador-reemplazo-paginas/",  // FIFO/LRU/Optimal/Clock/LFU con tabla matricial, modo comparativa y detección anomalía Belady
+  "/simulador-sql-join/",           // INNER/LEFT/RIGHT/FULL OUTER/CROSS con tablas editables, diagrama Venn animado y SQL generado
+  "/simulador-ordenacion/",         // 7 algoritmos paso a paso (Bubble/Selection/Insertion/Merge/Quick/Heap/Counting) con array personalizado
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
