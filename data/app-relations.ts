@@ -2555,6 +2555,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
   ],
 
+  // SIMULADORES BACHILLERATO/UNIVERSIDAD — Tanda 3 (2026-05-07)
+  'simulador-titulacion': [
+    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
+    { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala pH y reacciones' },
+    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Estequiometría y reactivo limitante' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
+  ],
+  'simulador-vsepr': [
+    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y reacciones reversibles' },
+    { url: '/visualizador-enlaces-quimicos/', icon: '🔗', name: 'Enlaces Químicos', description: 'Iónico, covalente y metálico' },
+    { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Funciones y nomenclatura' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Configuración electrónica y propiedades' },
+  ],
+  'simulador-deriva-genetica': [
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Genética Mendeliana', description: 'Cruces, Punnett y herencia' },
+    { url: '/simulador-lotka-volterra/', icon: '🦊', name: 'Depredador-Presa', description: 'Dinámica de poblaciones' },
+    { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'Evolución y adaptación' },
+    { url: '/visualizador-evolucion-molecular/', icon: '🧪', name: 'Evolución Molecular', description: 'Mutaciones y árboles filogenéticos' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },

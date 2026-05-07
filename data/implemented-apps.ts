@@ -382,6 +382,11 @@ export const implementedAppsUrls = [
   "/simulador-campo-electrico/",    // Cargas puntuales interactivas: líneas de campo, equipotenciales, mapa color |E|, carga prueba con F y U
   "/simulador-ondas-interferencia/", // Onda viajera 1D, interferencia 2D 2 fuentes, ondas estacionarias en cuerda y tubo (5 modos armónicos)
 
+  // Tanda 3 simuladores Bachillerato/Universidad (2026-05-07)
+  "/simulador-titulacion/",         // Titulación ácido-base interactiva: bureta + matraz + curva pH gota a gota, 4 tipos AF/AD x BF/BD, 4 indicadores
+  "/simulador-vsepr/",              // Geometría molecular 3D rotable según VSEPR: AX_nE_m con átomo central + pares enlazantes/libres, hibridación
+  "/simulador-deriva-genetica/",    // Wright-Fisher: deriva + selección + mutación + migración. Hasta 50 trayectorias, P(fijación), Hardy-Weinberg
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
