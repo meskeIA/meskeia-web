@@ -113,20 +113,6 @@
   overflow: hidden;
 }
 
-/* Categoría badge */
-.appCategory {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: var(--hover);
-  padding: 4px 8px;
-  border-radius: 12px;
-  align-self: flex-start;
-  margin-top: auto;
-}
-
 /* Estado de carga */
 .loading {
   display: flex;
@@ -217,14 +203,6 @@
 .skeletonDescription:last-of-type {
   width: 50%;
   margin-bottom: var(--spacing-sm);
-}
-
-.skeletonCategory {
-  height: 24px;
-  width: 100px;
-  background: var(--hover);
-  border-radius: 12px;
-  margin-top: auto;
 }
 
 @keyframes shimmer {
