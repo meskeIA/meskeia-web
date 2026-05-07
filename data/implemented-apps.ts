@@ -371,6 +371,12 @@ export const implementedAppsUrls = [
   "/simulador-genetica/",           // Simulador de genética mendeliana con Punnett
   "/calculadora-estadistica-medica/", // Estadística médica: sensibilidad, especificidad, VPP, VPN, OR, RR, NNT
 
+  // Tanda 1 simuladores Bachillerato/Universidad (2026-05-07)
+  "/simulador-proyectiles/",        // Movimiento parabólico 2D: alcance, altura máx, tiempo de vuelo. Gravedades planetarias, resistencia aire
+  "/simulador-pendulo/",            // Péndulo simple y MAS: T, f, ω, energía cinética/potencial, modos pequeños ángulos vs no lineal
+  "/simulador-equilibrio-quimico/", // Le Chatelier interactivo: 6 reacciones reversibles, perturbaciones, Q vs Kc, van't Hoff
+  "/simulador-lotka-volterra/",     // Modelo depredador-presa: oscilaciones, diagrama de fases, RK4, modo logístico, 4 presets
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto

@@ -2502,12 +2502,38 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': [
+    { url: '/simulador-lotka-volterra/', icon: '🦊', name: 'Depredador-Presa', description: 'Lotka-Volterra: dinámica de poblaciones' },
     { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
     { url: '/calculadora-estadistica/', icon: '📈', name: 'Estadística', description: 'Probabilidades y distribuciones' },
-    { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora de Notas', description: 'Nota media y conversor multi-país' },
     { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Ciencias', description: 'Términos clave de biología y química' },
   ],
   'calculadora-estadistica-medica': biomedicinaApps.filter(a => a.url !== '/calculadora-estadistica-medica/'),
+
+  // SIMULADORES BACHILLERATO/UNIVERSIDAD — Tanda 1 (2026-05-07)
+  'simulador-proyectiles': [
+    { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo Simple y MAS', description: 'Oscilaciones, período y energía' },
+    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Más simulaciones de física' },
+    { url: '/calculadora-movimiento/', icon: '🚀', name: 'Cinemática', description: 'MRU, MRUA y caída libre' },
+    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
+  ],
+  'simulador-pendulo': [
+    { url: '/simulador-proyectiles/', icon: '🎯', name: 'Proyectiles 2D', description: 'Movimiento parabólico interactivo' },
+    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Más simulaciones de física' },
+    { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ley de Ohm' },
+    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave para estudiar' },
+  ],
+  'simulador-equilibrio-quimico': [
+    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Estequiometría y reactivo limitante' },
+    { url: '/visualizador-cinetica-quimica/', icon: '📈', name: 'Cinética Química', description: 'Velocidades de reacción' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
+    { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala y reacciones de equilibrio' },
+  ],
+  'simulador-lotka-volterra': [
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Genética Mendeliana', description: 'Cruces, Punnett y poblaciones' },
+    { url: '/visualizador-ecosistema/', icon: '🌳', name: 'Ecosistemas', description: 'Cadenas tróficas y biodiversidad' },
+    { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'Evolución y adaptación' },
+    { url: '/visualizador-modelos-epidemiologicos/', icon: '🦠', name: 'Modelos Epidemiológicos', description: 'SIR y dinámica de contagios' },
+  ],
 
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
