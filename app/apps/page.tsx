@@ -177,11 +177,6 @@ export default function AppsPage() {
                       >
                         <span className={styles.appCardIcon}>{app.icon}</span>
                         <span className={styles.appCardName}>{app.name}</span>
-                        <span className={styles.appCardSuites} aria-hidden="true">
-                          {app.suites.map((suiteId) =>
-                            suites.find((s) => s.id === suiteId)?.icon
-                          ).join(' ')}
-                        </span>
                         <span className={styles.appCardChevron} aria-hidden="true">
                           {isExpanded ? '▾' : '▸'}
                         </span>

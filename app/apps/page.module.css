@@ -245,13 +245,6 @@
   font-weight: 600;
 }
 
-.appCardSuites {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  letter-spacing: 0.1em;
-}
-
 .appCardChevron {
   font-size: 0.85rem;
   color: var(--text-muted);
