@@ -2596,8 +2596,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-ordenacion': [
     { url: '/visualizador-algoritmos-ordenacion/', icon: '📈', name: 'Visualizador Algoritmos', description: 'Algoritmos clásicos animados' },
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
+    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Inserción, borrado y rotaciones' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+
+  // SIMULADORES INFORMÁTICA FP/UNIVERSIDAD — Tanda 2 (2026-05-07)
+  'simulador-grafos': [
+    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Inserción, borrado y rotaciones' },
+    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
     { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
-    { url: '/simulador-planificador-procesos/', icon: '⏱️', name: 'Planificador Procesos', description: 'FCFS, SJF, Round Robin' },
+    { url: '/simulador-recursion/', icon: '🔁', name: 'Recursión', description: 'Pila de llamadas y árbol recursivo' },
+  ],
+  'simulador-arboles-bst-avl': [
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
+    { url: '/visualizador-estructuras-datos/', icon: '🗂️', name: 'Estructuras de Datos', description: 'Pilas, colas, árboles y hash' },
+    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: '7 algoritmos paso a paso' },
+    { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
+  ],
+  'simulador-recursion': [
+    { url: '/simulador-arboles-bst-avl/', icon: '🌳', name: 'Árboles BST y AVL', description: 'Estructuras recursivas' },
+    { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'DFS recursivo y otros' },
+    { url: '/simulador-ordenacion/', icon: '📊', name: 'Algoritmos Ordenación', description: 'Merge Sort y Quick Sort recursivos' },
     { url: '/glosario-programacion/', icon: '📖', name: 'Glosario Programación', description: 'Términos clave A-Z' },
   ],
 

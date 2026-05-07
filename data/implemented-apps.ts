@@ -393,6 +393,11 @@ export const implementedAppsUrls = [
   "/simulador-sql-join/",           // INNER/LEFT/RIGHT/FULL OUTER/CROSS con tablas editables, diagrama Venn animado y SQL generado
   "/simulador-ordenacion/",         // 7 algoritmos paso a paso (Bubble/Selection/Insertion/Merge/Quick/Heap/Counting) con array personalizado
 
+  // Tanda 2 simuladores Informática FP/Universidad (2026-05-07)
+  "/simulador-grafos/",             // Editor visual de grafos + BFS/DFS/Dijkstra/A* con cola/pila/heap viva y 4 presets
+  "/simulador-arboles-bst-avl/",    // BST y AVL: insertar/eliminar/buscar con rotaciones LL/RR/LR/RL y 4 recorridos
+  "/simulador-recursion/",          // 6 funciones recursivas (factorial, Fibonacci, Hanoi, MCD, suma dígitos, búsqueda binaria) con pila viva
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
