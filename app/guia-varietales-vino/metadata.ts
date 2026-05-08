@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Varietales de Vino - Uvas, sabores y maridaje | meskeIA',
-  description: '40 varietales de vino: tipo de uva, origen, notas de sabor, cuerpo, taninos, acidez, temperatura de servicio y maridaje. Tintos, blancos y espumosos del mundo.',
-  keywords: 'varietales vino, uvas vino, tempranillo, cabernet sauvignon, pinot noir, chardonnay, rioja, borgoña, maridaje vino, cata vino, notas sabor vino, vino tinto blanco espumoso',
+  description: '45 varietales de vino del mundo: tintos, blancos, espumosos y generosos. Origen, notas de sabor, cuerpo, taninos, acidez, temperatura de servicio y maridaje. Incluye uvas LATAM (Malbec, Torrontés, Carménère, País).',
+  keywords: 'varietales vino, uvas vino, tempranillo, cabernet sauvignon, pinot noir, chardonnay, malbec, torrontes, carmenere, rioja, borgoña, maridaje vino, cata vino, vino tinto blanco espumoso, vino generoso, jerez',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Guía de Varietales de Vino | meskeIA',
-    description: '40 varietales de vino: tipo de uva, origen, notas de sabor, cuerpo, taninos, acidez y maridaje. Tintos, blancos y espumosos del mundo.',
+    description: '45 varietales del mundo: tintos, blancos, espumosos y generosos. Notas de sabor, taninos, acidez y maridaje. Incluye uvas LATAM.',
     url: 'https://meskeia.com/guia-varietales-vino',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Varietales de Vino | meskeIA',
-    description: '40 varietales de vino del mundo: notas de sabor, cuerpo, taninos y maridaje perfecto.',
+    description: '45 varietales del mundo: notas de sabor, cuerpo, taninos y maridaje perfecto. Incluye uvas LATAM.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,11 +36,12 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Guía de Varietales de Vino',
-  description: 'Directorio de 40 varietales de vino del mundo con tipo de uva, origen, zonas principales, notas de sabor, cuerpo, taninos, acidez, temperatura de servicio, maridaje y curiosidades enológicas. Filtros por tipo (Tinto, Blanco, Espumoso) y buscador. Indicadores visuales de cuerpo, taninos y acidez.',
+  description: 'Directorio de 45 varietales de vino del mundo con tipo de uva, origen, zonas principales, notas de sabor, cuerpo, taninos, acidez, temperatura de servicio, maridaje y curiosidades enológicas. Filtros por tipo (Tinto, Blanco, Espumoso, Generoso) y buscador. Incluye uvas latinoamericanas (Malbec, Torrontés, Carménère, Tannat, País, Bonarda) y varietales mediterráneos.',
   url: 'https://meskeia.com/guia-varietales-vino/',
   features: [
-    '40 varietales de vino con perfil enológico completo',
-    'Filtro por tipo: Tinto, Blanco, Espumoso',
+    '45 varietales de vino con perfil enológico completo',
+    'Filtros por tipo: Tinto, Blanco, Espumoso, Generoso',
+    'Cobertura LATAM: Malbec, Torrontés, Carménère, Tannat, País, Bonarda',
     'Buscador por nombre, origen o nota de sabor',
     'Indicadores visuales de cuerpo, taninos y acidez',
     'Temperatura de servicio y maridaje para cada varietal',

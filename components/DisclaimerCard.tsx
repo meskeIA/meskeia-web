@@ -4,7 +4,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import styles from './DisclaimerCard.module.css';
 
-export type DisclaimerVariant = 'financial' | 'general' | 'medical' | 'educational' | 'technical';
+export type DisclaimerVariant = 'financial' | 'general' | 'medical' | 'educational' | 'technical' | 'alcohol';
 export type DisclaimerSeverity = 'critical' | 'high' | 'medium' | 'low';
 
 interface DisclaimerCardProps {
@@ -29,6 +29,7 @@ const DEFAULT_TITLES: Record<DisclaimerVariant, string> = {
   general: 'Información Importante',
   educational: 'Aviso Educativo',
   technical: 'Información Técnica Importante',
+  alcohol: 'Aviso importante: bebida alcohólica',
 };
 
 const DEFAULT_ICONS: Record<DisclaimerVariant, string> = {
@@ -37,6 +38,7 @@ const DEFAULT_ICONS: Record<DisclaimerVariant, string> = {
   general: 'ℹ️',
   educational: '📚',
   technical: '🔧',
+  alcohol: '🍷',
 };
 
 // Severidades que NUNCA pueden ser colapsadas (Niveles 1 y 2 de la política)
@@ -257,6 +259,31 @@ function DefaultContent({
           </p>
           <p className={styles.limitation}>
             meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.
+          </p>
+        </>
+      );
+
+    case 'alcohol':
+      return (
+        <>
+          <p>
+            Esta herramienta es <strong>educativa e informativa</strong> y describe variedades,
+            estilos y maridajes de bebidas alcohólicas. <strong>Solo apta para personas mayores de edad</strong>
+            {' '}(18 años en España, edad legal según país de residencia).
+          </p>
+          <p>
+            El consumo de alcohol conlleva <strong>riesgos para la salud</strong>: efectos
+            cardiovasculares, hepáticos, neurológicos, riesgo de dependencia y consecuencias
+            sobre el embarazo. Ninguna cantidad de alcohol está exenta de riesgo.
+          </p>
+          <p>
+            <strong>Nunca conduzcas, manejes maquinaria peligrosa ni tomes decisiones críticas
+            tras consumir alcohol.</strong> Si necesitas ayuda con el consumo problemático,
+            contacta con tu médico o con líneas de ayuda especializadas.
+          </p>
+          <p className={styles.limitation}>
+            meskeIA no promueve el consumo de alcohol y no se responsabiliza del uso que se
+            haga de esta información. Bebe con moderación y responsabilidad.
           </p>
         </>
       );

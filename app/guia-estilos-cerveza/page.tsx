@@ -1,8 +1,7 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
-import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaEstilosCerveza.module.css';
 
@@ -691,6 +690,126 @@ const ESTILOS: EstiloCerveza[] = [
     descripcion: 'Estilo americano que combina levaduras ale con acondicionamiento lager. Muy suave y refrescante, un híbrido exclusivo de Estados Unidos.',
     curiosidad: 'Surgió como alternativa americana a las Pilsner en los estados sin tradición cervecera alemana',
   },
+  // ── ESTILOS AÑADIDOS (7) ──
+  {
+    nombre: 'New England IPA / Hazy IPA',
+    nombreOriginal: 'New England IPA',
+    tipo: 'Ale',
+    pais: 'EE.UU. (Vermont)',
+    colorEBC: 'Dorado',
+    fermentacion: 'Alta',
+    ibu: '40-65',
+    abv: '6.0-8.5%',
+    temperaturaServicio: '6-9°C',
+    amargor: 'Medio',
+    notasDeSabor: ['Mango', 'Maracuyá', 'Durazno', 'Cítricos suaves', 'Jugo tropical'],
+    maridaje: ['Ceviche', 'Sushi roll', 'Fish tacos', 'Pollo al curry', 'Quesos cremosos'],
+    marcasDestacadas: ['The Alchemist Heady Topper', 'Tree House Julius', 'Trillium'],
+    descripcion: 'El estilo craft que revolucionó la cerveza desde 2010. Turbia, con apariencia de zumo, lúpulo masivo en cold-side (dry hopping intensivo) y levadura London III. Amargor moderado pese al lúpulo abundante: el equilibrio se inclina hacia el aroma frutal explosivo. Heady Topper de The Alchemist (Vermont, 2003) es considerada la NEIPA fundacional.',
+    curiosidad: 'La turbiedad característica viene de los polifenoles del lúpulo y de las levaduras especiales que no floculan. Los puristas la consideran "cerveza mal hecha"; los millennials la convirtieron en el estilo más vendido del craft entre 2017-2022.',
+  },
+  {
+    nombre: 'Double IPA / Imperial IPA',
+    nombreOriginal: 'Double IPA',
+    tipo: 'Ale',
+    pais: 'EE.UU. (California)',
+    colorEBC: 'Dorado',
+    fermentacion: 'Alta',
+    ibu: '60-100',
+    abv: '7.5-10.5%',
+    temperaturaServicio: '9-13°C',
+    amargor: 'Muy alto',
+    notasDeSabor: ['Lúpulo intenso', 'Resina de pino', 'Cítrico potente', 'Alcohol cálido', 'Caramelo'],
+    maridaje: ['Curry tailandés picante', 'Hamburguesas con queso azul', 'BBQ ahumado', 'Tacos picantes'],
+    marcasDestacadas: ['Russian River Pliny the Elder', 'Stone Ruination', 'Bell\'s Hopslam'],
+    descripcion: 'Versión amplificada de la IPA: más malta para soportar más lúpulo, más alcohol para más cuerpo. Pliny the Elder (Russian River, 1999) definió el estilo. Cuerpo medio-alto que sostiene el amargor brutal y el alcohol notorio. Es el estilo que define la "West Coast" cervecera.',
+    curiosidad: 'El nombre "Imperial" rinde homenaje a las cervezas amplificadas exportadas a la corte rusa. Vinnie Cilurzo, creador del estilo en 1994 para Blind Pig Brewing, dijo que cuando se quedó sin dinero para malta de calidad, decidió compensarlo con cantidades brutales de lúpulo barato.',
+  },
+  {
+    nombre: 'Belgian Strong Golden Ale',
+    nombreOriginal: 'Belgian Strong Golden Ale',
+    tipo: 'Ale',
+    pais: 'Bélgica',
+    colorEBC: 'Dorado',
+    fermentacion: 'Alta',
+    ibu: '20-35',
+    abv: '7.5-10.5%',
+    temperaturaServicio: '6-10°C',
+    amargor: 'Medio',
+    notasDeSabor: ['Pera', 'Manzana', 'Especias', 'Pimienta blanca', 'Levadura belga', 'Alcohol fino'],
+    maridaje: ['Mejillones', 'Gambas al ajillo', 'Pollo a la mantequilla', 'Quesos suaves'],
+    marcasDestacadas: ['Duvel', 'Delirium Tremens', 'La Chouffe'],
+    descripcion: 'El estilo definido por Duvel (1923, Moortgat). Color claro engañoso para una cerveza de 8.5% ABV: parece una lager rubia, golpea como una ale fuerte. Carbonatación muy alta, espuma densa, sequedad final pese a la fuerza alcohólica. Distinta del Tripel por usar maltas más claras y levaduras distintas.',
+    curiosidad: 'Duvel significa "diablo" en flamenco. Le pusieron ese nombre porque cuando un trabajador la probó por primera vez en 1923 exclamó "Esta es una verdadera cerveza del diablo". Su perfil engañoso (apariencia inocente, fuerza brutal) honra el nombre.',
+  },
+  {
+    nombre: 'Belgian Quadrupel',
+    nombreOriginal: 'Quadrupel / Belgian Dark Strong Ale',
+    tipo: 'Ale',
+    pais: 'Bélgica / Países Bajos',
+    colorEBC: 'Marrón',
+    fermentacion: 'Alta',
+    ibu: '20-35',
+    abv: '9.0-12.0%',
+    temperaturaServicio: '12-14°C',
+    amargor: 'Bajo',
+    notasDeSabor: ['Pasa', 'Dátil', 'Chocolate negro', 'Caramelo intenso', 'Alcohol cálido', 'Especias dulces'],
+    maridaje: ['Estofado de buey', 'Queso azul', 'Chocolate negro 70%', 'Postres con frutos secos', 'Foie gras'],
+    marcasDestacadas: ['Westvleteren 12', 'Rochefort 10', 'La Trappe Quadrupel', 'St. Bernardus Abt 12'],
+    descripcion: 'La cerveza más fuerte de la familia trapense. El término "Quadrupel" no es histórico: fue acuñado por La Trappe (Holanda) en 1990. Westvleteren 12 (categoría Quadrupel) es considerada por muchos críticos como la mejor cerveza del mundo. Cuerpo enorme, complejidad de frutas secas y alcohol presente pero elegante.',
+    curiosidad: 'Westvleteren 12, elaborada por los monjes trapenses de la abadía de Sint-Sixtus en Bélgica, solo se vende directamente en la abadía o en su café cercano, en cantidades limitadas (1 caja al mes por persona, previa cita telefónica con matrícula del coche). Su escasez forzada la convierte en la cerveza más buscada del mundo, pese a no hacer publicidad ni distribución comercial.',
+  },
+  {
+    nombre: 'Mexican Lager',
+    nombreOriginal: 'Mexican Lager / Vienna Mexicana',
+    tipo: 'Lager',
+    pais: 'México',
+    colorEBC: 'Ámbar',
+    fermentacion: 'Baja',
+    ibu: '12-25',
+    abv: '4.2-5.5%',
+    temperaturaServicio: '4-7°C',
+    amargor: 'Bajo',
+    notasDeSabor: ['Maíz suave', 'Lima', 'Malta vienesa', 'Pan tostado leve', 'Refrescante'],
+    maridaje: ['Tacos al pastor', 'Ceviche', 'Totopos con guacamole', 'Fajitas', 'Micheladas'],
+    marcasDestacadas: ['Negra Modelo', 'Modelo Especial', 'Pacífico', 'Bohemia', 'Dos Equis Ámbar'],
+    descripcion: 'La cerveza mexicana nace de la influencia austriaca y alemana del siglo XIX: el emperador Maximiliano I trajo cerveceros vieneses en 1864. Las versiones claras (Corona, Modelo Especial) son adjunct lagers ligeras, pero las ámbar (Negra Modelo, Dos Equis) son auténticas Vienna Lager con malta tostada. Modelo Especial superó a Bud Light como cerveza más vendida en EE.UU. en 2023.',
+    curiosidad: 'La tradición de servir Corona con lima nació en Mazatlán en 1981, según la leyenda, cuando un barman colocó una rodaja de lima en la botella como apuesta. Originalmente, la lima podría haber tenido función práctica (ahuyentar moscas). Hoy es marca registrada del estilo y un ritual obligatorio en los bares mexicanos exportados al mundo.',
+  },
+  {
+    nombre: 'Altbier',
+    nombreOriginal: 'Altbier',
+    tipo: 'Ale',
+    pais: 'Alemania (Düsseldorf)',
+    colorEBC: 'Cobre',
+    fermentacion: 'Alta',
+    ibu: '25-50',
+    abv: '4.3-5.5%',
+    temperaturaServicio: '7-10°C',
+    amargor: 'Medio',
+    notasDeSabor: ['Malta de Múnich', 'Lúpulo Spalt', 'Frutos secos', 'Caramelo seco', 'Pan tostado'],
+    maridaje: ['Schweinshaxe (codillo)', 'Salchichas', 'Queso Limburger', 'Chucrut', 'Steak tartar'],
+    marcasDestacadas: ['Diebels', 'Uerige', 'Schumacher', 'Füchschen'],
+    descripcion: 'La cerveza tradicional de Düsseldorf, fermentada con levadura ale (alta) pero acondicionada en frío como una lager. El nombre "alt" (viejo) hace referencia al método ancestral anterior al descubrimiento de la levadura lager. Color cobrizo limpio, cuerpo medio, amargor pronunciado pero equilibrado por la malta tostada.',
+    curiosidad: 'En Düsseldorf, el camarero te trae cervezas Altbier sin que las pidas — una tras otra, hasta que tapes el vaso con el posavasos. La rivalidad entre Düsseldorf (Altbier) y Colonia (Kölsch) es uno de los grandes derbis cerveceros alemanes: ciudades vecinas, cervezas opuestas pese a usar fermentación parecida.',
+  },
+  {
+    nombre: 'Flanders Red Ale',
+    nombreOriginal: 'Flanders Red Ale / Oud Bruin',
+    tipo: 'Silvestre',
+    pais: 'Bélgica (Flandes Occidental)',
+    colorEBC: 'Caoba',
+    fermentacion: 'Espontánea',
+    ibu: '10-25',
+    abv: '5.0-6.5%',
+    temperaturaServicio: '8-12°C',
+    amargor: 'Bajo',
+    notasDeSabor: ['Cereza ácida', 'Vinagre balsámico', 'Madera', 'Frutas oscuras', 'Taninos vínicos'],
+    maridaje: ['Carne de pato', 'Queso de cabra envejecido', 'Postres de frutos rojos', 'Pizza con anchoas'],
+    marcasDestacadas: ['Rodenbach Grand Cru', 'Duchesse de Bourgogne', 'Petrus Aged Pale'],
+    descripcion: 'Llamada "el Borgoña de Flandes" por su carácter vínico. Maduración 18-24 meses en grandes barricas de roble (foudres) con cultivos mixtos de Lactobacillus, Brettanomyces y bacterias acéticas. La acidez compleja es muy distinta de la Lambic belga: más limpia, vínica y con notas de barrica. Rodenbach usa hasta 250 toneles centenarios.',
+    curiosidad: 'Rodenbach (fundada en 1821 en Roeselare) tiene una de las cervecerías más impresionantes del mundo: 294 grandes foudres de roble alineados en sus bodegas del siglo XIX, con capacidades de 12.000 a 65.000 litros. Algunos toneles tienen más de 150 años en activo y son protagonistas absolutos del proceso de maduración.',
+  },
 ];
 
 export default function GuiaEstilosCerveza() {
@@ -727,10 +846,12 @@ export default function GuiaEstilosCerveza() {
 
       <header className={styles.hero}>
         <h1>Guia de Estilos de Cerveza</h1>
-        <p>40 estilos del mundo con IBU, ABV, temperatura de servicio y maridaje</p>
+        <p>47 estilos del mundo con IBU, ABV, temperatura de servicio y maridaje</p>
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard variant="alcohol" severity="high" />
 
       <main className={styles.main}>
         <div className={styles.controles}>

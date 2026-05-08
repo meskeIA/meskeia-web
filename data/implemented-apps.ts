@@ -955,8 +955,10 @@ export const implementedAppsUrls = [
   "/guia-setas/",                                  // Directorio 40 setas: comestibilidad, hábitat, temporada, identificación y avisos de seguridad
   "/guia-superalimentos/",                         // Directorio 40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones
   "/guia-cortes-carne/",                           // Directorio 45 cortes de carne: animal, terneza, método de cocción y temperatura ideal
-  "/guia-varietales-vino/",                        // Directorio 40 varietales de uva: tipo, cuerpo, taninos, acidez, temperatura de servicio y maridaje
-  "/guia-estilos-cerveza/",                        // Directorio 40 estilos de cerveza: IBU, ABV, color EBC, fermentación, temperatura y maridaje
+  "/guia-varietales-vino/",                        // Directorio 45 varietales de uva: tipo, cuerpo, taninos, acidez, temperatura, maridaje. Incluye uvas LATAM y generosos
+  "/que-vino-elegir/",                             // Asistente situacional para elegir vino: cena, regalo, restaurante, ocasión, explorar
+  "/guia-estilos-cerveza/",                        // Directorio 47 estilos de cerveza: IBU, ABV, color EBC, fermentación, temperatura, maridaje. Incluye NEIPA, Quadrupel, Mexican Lager
+  "/que-cerveza-elegir/",                          // Asistente situacional para elegir cerveza: comida, regalo, bar, ocasión, explorar
   "/guia-tipos-pan/",                              // Directorio 35 tipos de pan del mundo: harina, fermentación, textura, acompañamientos y curiosidades
   "/guia-tipos-pasta/",                            // Directorio 40 tipos de pasta italianos: forma, región, tiempo de cocción y salsa ideal
   "/guia-tipos-arroz/",                            // Directorio 30 variedades de arroz del mundo: tipo de grano, almidón, región y uso culinario

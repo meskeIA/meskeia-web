@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
 import {
@@ -9,6 +8,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaVarietalesVino.module.css';
@@ -16,7 +16,7 @@ import { jsonLd } from './metadata';
 
 // ── Tipos ───────────────────────────────────────────────────────────────────
 
-type TipoUva = 'Tinto' | 'Blanco' | 'Rosado' | 'Espumoso';
+type TipoUva = 'Tinto' | 'Blanco' | 'Rosado' | 'Espumoso' | 'Generoso';
 type Cuerpo = 'Ligero' | 'Medio' | 'Medio-complejo' | 'Complejo';
 type Taninos = 'Sin taninos' | 'Bajos' | 'Medios' | 'Altos' | 'Muy altos';
 type Acidez = 'Baja' | 'Media' | 'Alta' | 'Muy alta';
@@ -62,7 +62,7 @@ const ACIDEZ_NIVEL: Record<Acidez, number> = {
   'Muy alta': 4,
 };
 
-const TIPOS: Array<TipoUva | 'Todos'> = ['Todos', 'Tinto', 'Blanco', 'Espumoso'];
+const TIPOS: Array<TipoUva | 'Todos'> = ['Todos', 'Tinto', 'Blanco', 'Espumoso', 'Generoso'];
 
 // ── Datos: 40 varietales ─────────────────────────────────────────────────────
 
@@ -288,6 +288,50 @@ const VARIETALES: Varietal[] = [
     descripcion: 'En el Roussillon, la Garnacha Negra produce los Vins Doux Naturels (VDN) de Maury y Banyuls: vinos generosos con mutaje (adición de alcohol para detener la fermentación) que producen vinos dulces extraordinarios para el maridaje con chocolate y foie gras.',
     curiosidad: 'El Banyuls, elaborado con Grenache Noir en la Côte Vermeille (la única appellation francesa que llega al mar), es el maridaje clásico con el chocolate en la alta cocina francesa. El chocolate Valrhona —el más usado por los chefs con estrella Michelin— tiene su sede muy cerca de los viñedos de Grenache del Ródano norte.',
   },
+  {
+    nombre: 'Bonarda', nombreOriginal: 'Bonarda Argentina / Charbono', tipo: 'Tinto', origen: 'Saboya (Francia) → Argentina',
+    zonasPrincipales: ['Mendoza (San Rafael, Maipú)', 'San Juan', 'La Rioja Argentina'],
+    notasDeSabor: ['Frutas rojas maduras', 'Ciruela', 'Mora', 'Especias suaves', 'Regaliz'],
+    cuerpo: 'Medio', taninos: 'Medios', acidez: 'Media',
+    temperaturaServicio: '16–17 °C',
+    maridaje: ['Empanadas', 'Asado argentino', 'Milanesa napolitana', 'Pizza', 'Pastas con tomate'],
+    dosDestacadas: ['I.G. Mendoza', 'I.G. San Rafael', 'I.G. San Juan'],
+    descripcion: 'La segunda uva tinta más plantada en Argentina (después del Malbec). Llegada con inmigrantes italianos en el siglo XIX, durante décadas fue subestimada como uva de mezcla. Hoy productores como Altos Las Hormigas, Anaia o Durigutti la elaboran como varietal de calidad, especialmente desde San Rafael (Mendoza). Produce vinos jugosos, accesibles y con mucha fruta.',
+    curiosidad: 'La Bonarda Argentina es genéticamente la misma uva que el Charbono de California y el Douce Noir de Saboya (Francia). Durante 150 años en Argentina se la confundió con la Bonarda italiana (Croatina o Uva Rara), pero el análisis de ADN realizado en 2007 demostró que son uvas distintas. La uva nunca fue renombrada y mantiene el nombre incorrecto.',
+  },
+  {
+    nombre: 'País / Misión', nombreOriginal: 'País (CL) / Misión (MX-EE.UU.) / Listán Prieto (ES)', tipo: 'Tinto', origen: 'España (Canarias) → América colonial',
+    zonasPrincipales: ['Valle del Itata (Chile)', 'Valle del Bío-Bío', 'Valle del Maule', 'Norte de México', 'Mendoza histórica'],
+    notasDeSabor: ['Frutas rojas frescas', 'Cereza', 'Especias suaves', 'Hierbas secas', 'Tierra'],
+    cuerpo: 'Ligero', taninos: 'Bajos', acidez: 'Alta',
+    temperaturaServicio: '14–16 °C',
+    maridaje: ['Pastel de choclo', 'Cazuela chilena', 'Empanadas de pino', 'Asados ligeros', 'Charcutería artesanal'],
+    dosDestacadas: ['D.O. Valle del Itata', 'D.O. Valle del Maule', 'I.G. Cariño'],
+    descripcion: 'La uva ancestral de la viticultura latinoamericana, llegada con los conquistadores españoles en el siglo XVI. Es la "uva Listán Prieto" canaria que durante 400 años fue la base del vino popular en Chile, México, Perú y Argentina. Casi extinta a finales del siglo XX, ha sido recuperada por viticultores artesanos del sur de Chile como Roberto Henríquez, Louis-Antoine Luyt o Pedro Parra.',
+    curiosidad: 'La Misión de California (la uva de los misioneros franciscanos), la País de Chile y la Listán Prieto de Canarias son genéticamente la misma uva. El análisis de ADN realizado en UC Davis en 2008 confirmó esta conexión transatlántica entre las viñas de cuatro continentes. Es la primera uva vinífera europea que llegó a América, plantada originalmente por los conquistadores en el siglo XVI.',
+  },
+  {
+    nombre: 'Gamay', nombreOriginal: 'Gamay Noir à Jus Blanc', tipo: 'Tinto', origen: 'Francia (Beaujolais)',
+    zonasPrincipales: ['Beaujolais', 'Loire (Touraine)', 'Saboya', 'Suiza (Romandía)', 'Niagara (Canadá)'],
+    notasDeSabor: ['Frambuesa', 'Cereza', 'Plátano (Beaujolais Nouveau)', 'Violeta', 'Granito mineral'],
+    cuerpo: 'Ligero', taninos: 'Bajos', acidez: 'Alta',
+    temperaturaServicio: '13–15 °C (servir ligeramente fresco)',
+    maridaje: ['Charcutería', 'Pollo a la brasa', 'Pâté en croûte', 'Quesos suaves de cabra', 'Picnic veraniego'],
+    dosDestacadas: ['A.O.C. Morgon', 'A.O.C. Fleurie', 'A.O.C. Moulin-à-Vent', 'A.O.C. Beaujolais-Villages'],
+    descripcion: 'Producido habitualmente por maceración carbónica (los racimos enteros fermentan sin pisar las uvas), produce vinos jugosos, frescos y muy bebibles. Los diez "crus" del Beaujolais (Morgon, Fleurie, Moulin-à-Vent, Brouilly, Chiroubles, Chénas, Côte de Brouilly, Juliénas, Régnié, Saint-Amour) producen vinos serios capaces de envejecer 10-15 años, muy distintos del Beaujolais Nouveau industrial.',
+    curiosidad: 'En 1395, Felipe el Atrevido, duque de Borgoña, prohibió la Gamay en la Côte d\'Or llamándola "uva muy mala y muy desleal con el hombre", reservándola al Beaujolais. La medida fue para proteger al noble Pinot Noir. La prohibición definió la geografía vinícola francesa moderna: hoy Borgoña sigue siendo Pinot Noir y Beaujolais sigue siendo Gamay.',
+  },
+  {
+    nombre: 'Aglianico', nombreOriginal: 'Aglianico', tipo: 'Tinto', origen: 'Italia (Campania/Basilicata)',
+    zonasPrincipales: ['Taurasi DOCG (Campania)', 'Aglianico del Vulture DOCG (Basilicata)', 'Cilento', 'Beneventano'],
+    notasDeSabor: ['Cereza negra', 'Ciruela', 'Alquitrán', 'Regaliz', 'Cuero', 'Especias volcánicas'],
+    cuerpo: 'Complejo', taninos: 'Muy altos', acidez: 'Alta',
+    temperaturaServicio: '17–19 °C',
+    maridaje: ['Cordero a la brasa', 'Ragù napolitano', 'Pecorino añejo', 'Caza de pluma', 'Embutidos curados'],
+    dosDestacadas: ['DOCG Taurasi', 'DOCG Aglianico del Vulture Superiore', 'DOC Cilento'],
+    descripcion: 'Conocida como "el Barolo del Sur" por su estructura, longevidad y complejidad. Las cepas más antiguas crecen en suelos volcánicos del monte Vulture (Basilicata) o en los suelos calcáreos del Irpinia (Campania). Necesita 5-10 años de envejecimiento en botella para suavizar sus taninos brutales y desarrollar la complejidad terciaria que la convierte en uno de los grandes tintos italianos.',
+    curiosidad: 'El nombre Aglianico podría derivar de "Hellenico" (griego), por su origen helénico: los griegos colonizadores de Magna Grecia la trajeron al sur de Italia hace 2.500 años. Es probablemente una de las uvas vinícolas más antiguas que se cultivan continuadamente en el mundo. Plinio el Viejo la mencionaba con elogio en sus escritos del siglo I d.C.',
+  },
   // ── BLANCOS (16) ──
   {
     nombre: 'Chardonnay', nombreOriginal: 'Chardonnay', tipo: 'Blanco', origen: 'Francia (Borgoña)',
@@ -421,7 +465,51 @@ const VARIETALES: Varietal[] = [
     descripcion: 'El Macabeo es la uva blanca más versátil de España: base del Cava (espumoso), del Rioja Blanco envejecido y de los blancos del Languedoc francés. Sola produce vinos frescos y ligeros; con crianza en barrica en Rioja puede desarrollar complejidad oxidativa notable. Es la uva más plantada de Rioja.',
     curiosidad: 'El Cava —el espumoso español por excelencia— se elabora con tres uvas autóctonas: Macabeo (base), Xarel·lo (cuerpo) y Parellada (frescor). Este trinomio fue establecido en los años 1870 por Josep Raventós, fundador de Codorníu, que copió el método champenoise francés con variedades locales. El Cava tiene hoy más de 37.000 hectáreas plantadas.',
   },
-  // ── ESPUMOSOS (4) ──
+  {
+    nombre: 'Torrontés', nombreOriginal: 'Torrontés Riojano', tipo: 'Blanco', origen: 'Argentina (cruce nativo)',
+    zonasPrincipales: ['Cafayate (Salta)', 'Valles Calchaquíes', 'La Rioja Argentina', 'Mendoza'],
+    notasDeSabor: ['Jazmín', 'Rosa', 'Melocotón blanco', 'Lima', 'Naranja amarga', 'Especias dulces'],
+    cuerpo: 'Ligero', taninos: 'Sin taninos', acidez: 'Media',
+    temperaturaServicio: '8–10 °C',
+    maridaje: ['Ceviche peruano', 'Empanadas salteñas', 'Cocina tailandesa', 'Sushi', 'Ensaladas tropicales'],
+    dosDestacadas: ['I.G. Cafayate', 'I.G. Valles Calchaquíes', 'I.G. La Rioja'],
+    descripcion: 'La uva blanca emblemática de Argentina y la única variedad totalmente endémica del país. Nació allí del cruce espontáneo entre la Listán Prieto (País) y el Moscatel de Alejandría tras la llegada de las uvas españolas en el siglo XVI. Las viñas más altas del mundo plantadas a escala comercial están en los Valles Calchaquíes (Salta), entre 1.700 y 3.111 metros de altitud.',
+    curiosidad: 'Cafayate, en la provincia de Salta, es la "capital mundial del Torrontés". La altitud extrema de sus viñedos genera una luminosidad UV brutal y diferencias térmicas día-noche superiores a 20°C, claves para concentrar sus aromas florales únicos. Las uvas se vendimian en marzo, justo cuando en el hemisferio norte empieza la primavera.',
+  },
+  {
+    nombre: 'Pinot Grigio', nombreOriginal: 'Pinot Grigio (IT) / Pinot Gris (FR/DE)', tipo: 'Blanco', origen: 'Francia (Borgoña) → Italia',
+    zonasPrincipales: ['Friuli-Venezia Giulia', 'Veneto', 'Trentino-Alto Adige', 'Alsacia (Pinot Gris)', 'Oregón (Willamette)'],
+    notasDeSabor: ['Manzana verde', 'Lima', 'Almendra', 'Miel (Alsacia)', 'Pera', 'Melocotón blanco'],
+    cuerpo: 'Ligero', taninos: 'Sin taninos', acidez: 'Media',
+    temperaturaServicio: '9–11 °C',
+    maridaje: ['Risotto al limón', 'Vitello tonnato', 'Mariscos', 'Prosciutto e melone', 'Ensaladas frescas'],
+    dosDestacadas: ['DOC Friuli Colli Orientali', 'DOC Alto Adige', 'DOC delle Venezie', 'A.O.C. Alsace Pinot Gris'],
+    descripcion: 'El blanco italiano más exportado del mundo. En Italia (Veneto, Friuli) produce blancos ligeros, secos y refrescantes; en Alsacia (donde se llama Pinot Gris) produce blancos voluptuosos, oleosos y a menudo con dulzor residual o de vendimia tardía (Vendanges Tardives, Sélection de Grains Nobles). La misma uva, dos estilos opuestos según el clima.',
+    curiosidad: 'El Pinot Grigio es genéticamente idéntico al Pinot Gris alsaciano, al Ruländer alemán y al Szürkebarát húngaro. Es una mutación cromática del Pinot Noir: las cuatro variedades de la familia Pinot (Noir, Gris, Blanc y Meunier) son la misma uva con distintos colores de piel.',
+  },
+  {
+    nombre: 'Vermentino', nombreOriginal: 'Vermentino / Pigato (Liguria) / Favorita (Piamonte)', tipo: 'Blanco', origen: 'Mediterráneo (Liguria/Cerdeña)',
+    zonasPrincipales: ['Vermentino di Gallura DOCG (Cerdeña)', 'Liguria', 'Bolgheri', 'Maremma', 'Córcega', 'Provenza'],
+    notasDeSabor: ['Pomelo', 'Hierbas mediterráneas', 'Sal marina', 'Almendra fresca', 'Manzanilla', 'Lima'],
+    cuerpo: 'Medio', taninos: 'Sin taninos', acidez: 'Alta',
+    temperaturaServicio: '9–11 °C',
+    maridaje: ['Spaghetti alle vongole', 'Mariscos al vapor', 'Focaccia con romero', 'Pecorino sardo', 'Pez espada a la plancha'],
+    dosDestacadas: ['DOCG Vermentino di Gallura', 'DOC Bolgheri Bianco', 'DOC Maremma Toscana', 'DOC Riviera Ligure di Ponente'],
+    descripcion: 'La uva blanca más característica del Mediterráneo italiano. En Cerdeña (Gallura) produce el único DOCG blanco de la isla. En Liguria se llama Pigato y en algunas zonas Favorita o Rolle (Provenza francesa). Su salinidad marina y su mineralidad de granito la convierten en el maridaje perfecto para la cocina costera del Mediterráneo.',
+    curiosidad: 'La Vermentino llegó al Mediterráneo italiano probablemente desde España vía Córcega en el siglo XIV, según los registros históricos de la República de Génova. Su nombre podría derivar de "vermena" (rama joven en italiano) o del verbo "fermentare". Hoy se cultiva con éxito en Australia (Margaret River) y California (Lodi).',
+  },
+  {
+    nombre: 'Moscatel', nombreOriginal: 'Moscatel de Alejandría / Muscat à Petits Grains', tipo: 'Blanco', origen: 'Mediterráneo antiguo',
+    zonasPrincipales: ['Málaga', 'Valencia', 'Setúbal (Portugal)', 'Asti (Italia)', 'Alsacia', 'Australia (Rutherglen)'],
+    notasDeSabor: ['Uvas frescas', 'Miel', 'Naranja amarga', 'Jazmín', 'Melocotón', 'Especias dulces', 'Lichi'],
+    cuerpo: 'Medio', taninos: 'Sin taninos', acidez: 'Media',
+    temperaturaServicio: '7–9 °C (seco/espumoso) · 11–13 °C (dulce)',
+    maridaje: ['Foie gras', 'Queso azul', 'Helados de fruta', 'Frutas frescas', 'Tapas saladas (versión seca)', 'Postres con frutos secos'],
+    dosDestacadas: ['D.O. Málaga', 'D.O. Valencia', 'DOCG Moscato d\'Asti', 'DOC Setúbal'],
+    descripcion: 'Una de las uvas vinícolas más antiguas del mundo, cultivada desde hace al menos 3.000 años en el Mediterráneo. Produce vinos de prácticamente todos los estilos: secos y aromáticos en Alsacia, espumosos dulces en Asti (Moscato d\'Asti), licorosos en Setúbal y Málaga, y de vendimia tardía en Australia (Rutherglen). Su aroma intenso a "uva fresca" es inconfundible.',
+    curiosidad: 'Existen más de 200 variedades de Moscatel registradas, todas relacionadas genéticamente. Las dos más importantes son la Moscatel de Alejandría (la "uva moscatel" de mesa, también vinificada) y la Moscatel de Grano Menudo (Muscat à Petits Grains, la noble del Asti italiano y del Frontignan francés). Su nombre deriva del latín "muscus" (almizcle).',
+  },
+  // ── ESPUMOSOS (3) ──
   {
     nombre: 'Xarel·lo', nombreOriginal: 'Xarel·lo', tipo: 'Espumoso', origen: 'España (Cataluña)',
     zonasPrincipales: ['Penedès (Cava)', 'Alella', 'Tarragona'],
@@ -456,7 +544,7 @@ const VARIETALES: Varietal[] = [
     curiosidad: 'El nombre Meunier significa "molinero" en francés, por el aspecto de las hojas cubiertas de un polvillo blanco que parece harina de molino. Es la única variedad de Champagne que puede cultivarse en zonas bajas con riesgo de heladas: brota más tarde y madura antes que el Pinot Noir y el Chardonnay, esquivando las heladas de primavera de la Vallée de la Marne.',
   },
   {
-    nombre: 'Pedro Ximénez', nombreOriginal: 'Pedro Ximénez (PX)', tipo: 'Espumoso', origen: 'España (Andalucía)',
+    nombre: 'Pedro Ximénez', nombreOriginal: 'Pedro Ximénez (PX)', tipo: 'Generoso', origen: 'España (Andalucía)',
     zonasPrincipales: ['Montilla-Moriles', 'Jerez', 'Málaga'],
     notasDeSabor: ['Pasa de Corinto', 'Higo', 'Café', 'Chocolate negro', 'Regaliz', 'Caramelo'],
     cuerpo: 'Complejo', taninos: 'Sin taninos', acidez: 'Baja',
@@ -465,6 +553,17 @@ const VARIETALES: Varietal[] = [
     dosDestacadas: ['D.O. Montilla-Moriles', 'D.O. Jerez-Xérès-Sherry'],
     descripcion: 'El Pedro Ximénez produce uno de los vinos más extraordinarios del mundo: el PX de Jerez y Montilla-Moriles, un vino dulce de vendimia tardía, pasas al sol, con densidad de sirope y concentración de sabores incomparable. Es el vino de postre más increíble de España.',
     curiosidad: 'Las uvas PX para el vino dulce se deshidratan al sol durante 2 semanas antes de la vendimia en la "soleo" (exposición solar). El resultado es que los granos pierden el 70% de su peso en agua y concentran todos los azúcares. Necesitan 9 kg de uva fresca para producir 1 litro de PX. Los mejores PX de Toro Albalá tienen más de 50 años en barrica.',
+  },
+  {
+    nombre: 'Palomino Fino', nombreOriginal: 'Palomino Fino / Listán Blanco (Canarias)', tipo: 'Generoso', origen: 'España (Jerez/Andalucía)',
+    zonasPrincipales: ['Marco de Jerez', 'Sanlúcar de Barrameda', 'El Puerto de Santa María', 'Condado de Huelva', 'Canarias (Listán Blanco)'],
+    notasDeSabor: ['Almendra', 'Levadura de flor', 'Manzanilla', 'Salinidad marina', 'Frutos secos (Oloroso)', 'Nuez (Amontillado)'],
+    cuerpo: 'Medio-complejo', taninos: 'Sin taninos', acidez: 'Media',
+    temperaturaServicio: '6–8 °C (Fino/Manzanilla) · 12–14 °C (Oloroso/Amontillado)',
+    maridaje: ['Jamón ibérico', 'Pescaíto frito', 'Almendras saladas', 'Atún rojo', 'Gazpacho', 'Queso curado (Oloroso)', 'Caza (Oloroso)'],
+    dosDestacadas: ['D.O. Jerez-Xérès-Sherry', 'D.O. Manzanilla-Sanlúcar de Barrameda', 'D.O. Condado de Huelva'],
+    descripcion: 'La uva blanca del Marco de Jerez, base de toda la familia de vinos generosos andaluces: Fino, Manzanilla, Amontillado, Palo Cortado y Oloroso. El sistema de criaderas y soleras —único en el mundo— y el velo biológico de "flor" producen vinos imposibles de replicar fuera de Andalucía. Sin Palomino no existirían los grandes generosos españoles.',
+    curiosidad: 'Bajo el "velo de flor" (capa de levaduras Saccharomyces beticus que cubre el vino en las botas de roble americano de 600 litros) se elaboran los Finos y Manzanillas. El velo consume el oxígeno y los azúcares residuales, produciendo el sabor punzante, salino y almendrado característico. Es uno de los pocos casos en el mundo en los que las levaduras crecen en superficie del vino durante años, dando lugar a un envejecimiento biológico único.',
   },
 ];
 
@@ -503,12 +602,14 @@ function TipoBadge({ tipo }: { tipo: TipoUva }) {
     Blanco: styles.badgeBlanco,
     Rosado: styles.badgeRosado,
     Espumoso: styles.badgeEspumoso,
+    Generoso: styles.badgeGeneroso,
   };
   const iconoMap: Record<TipoUva, string> = {
     Tinto: '🍷',
     Blanco: '🥂',
     Rosado: '🌸',
     Espumoso: '🍾',
+    Generoso: '🥃',
   };
   return (
     <span className={`${styles.tipoBadge} ${claseMap[tipo]}`}>
@@ -551,10 +652,12 @@ export default function GuiaVarietalesVinoPage() {
 
         <header className={styles.hero}>
           <h1>🍷 Guía de Varietales de Vino</h1>
-          <p>40 uvas del mundo: notas de sabor, cuerpo, taninos, temperatura de servicio y maridaje</p>
+          <p>45 uvas del mundo: notas de sabor, cuerpo, taninos, temperatura de servicio y maridaje</p>
         </header>
 
         <LegalNotice />
+
+        <DisclaimerCard variant="alcohol" severity="high" />
 
         <main className={styles.main}>
           {/* ── Controles ── */}

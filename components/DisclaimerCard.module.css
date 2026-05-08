@@ -64,6 +64,19 @@
   color: #e5e5e5;
 }
 
+/* Alcohol (Burdeos - Bebida alcohólica, mayoría de edad) */
+.variant-alcohol {
+  background: #fbeae9;
+  border-color: #8b1a3a;
+  color: #1a1a1a;
+}
+
+[data-theme='dark'] .variant-alcohol {
+  background: #3a1620;
+  border-color: #c44569;
+  color: #e5e5e5;
+}
+
 /* ========================================
    SEVERIDAD (Prominencia visual)
    ======================================== */

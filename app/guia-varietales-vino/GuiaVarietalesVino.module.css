@@ -180,6 +180,16 @@
   color: #1e40af;
 }
 
+.badgeGeneroso {
+  background: #fef3c7;
+  color: #78350f;
+}
+
+[data-theme='dark'] .badgeGeneroso {
+  background: #3a2a08;
+  color: #fbbf24;
+}
+
 .origenPill {
   display: inline-block;
   padding: 0.2rem 0.6rem;
