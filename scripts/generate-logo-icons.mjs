@@ -47,15 +47,15 @@ const ogHtml = `<!DOCTYPE html>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       width:1200px; height:630px; overflow:hidden;
-      background: linear-gradient(135deg, #081d35 0%, #0d2a4a 60%, #071322 100%);
+      background: #F5F7FA;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     }
     .brand   { display:flex; align-items:center; gap:40px; margin-bottom:30px; }
-    .name    { font-size:100px; font-weight:300; color:#fff; letter-spacing:8px; line-height:1; }
+    .name    { font-size:100px; font-weight:300; color:#1A1A1A; letter-spacing:8px; line-height:1; }
     .name b  { color:#2E86AB; font-weight:700; }
     .divider { width:120px; height:3px; background:#2E86AB; margin-bottom:30px; border-radius:2px; }
-    .tagline { font-size:28px; color:rgba(255,255,255,0.82); font-weight:300; letter-spacing:1.5px; text-align:center; }
+    .tagline { font-size:28px; color:#666666; font-weight:300; letter-spacing:1.5px; text-align:center; }
   </style>
 </head>
 <body>
