@@ -985,6 +985,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia/escandinavia/",                  // Escandinavia: de los vikingos al modelo nórdico
   "/visualizador-historia/paises-bajos/",                  // Países Bajos: de los frisios a la Holanda moderna
   "/visualizador-historia/polonia/",                       // Polonia: de Mieszko I a la Polonia contemporánea
+  // Roadmap v13 EJE B2 — Naciones pendientes Asia-Pacífico (2026-05-08)
+  "/visualizador-historia/corea/",                         // Corea: de los Tres Reinos a la Península Dividida
+  "/visualizador-historia/australia/",                     // Australia: de los Aborígenes al Commonwealth
+  "/visualizador-historia/sudeste-asiatico/",              // Sudeste Asiático: de Angkor al ASEAN
 ];
 
 /**

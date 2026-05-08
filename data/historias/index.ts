@@ -103,6 +103,9 @@ import { historiaTurismo } from './historia-turismo';
 import { escandinavia } from './escandinavia';
 import { paisesBajos } from './paises-bajos';
 import { polonia } from './polonia';
+import { corea } from './corea';
+import { australia } from './australia';
+import { sudeste_asiatico } from './sudeste-asiatico';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -209,6 +212,9 @@ const registry: Record<string, HistoriaData> = {
   escandinavia,
   'paises-bajos': paisesBajos,
   polonia,
+  corea,
+  australia,
+  'sudeste-asiatico': sudeste_asiatico,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
