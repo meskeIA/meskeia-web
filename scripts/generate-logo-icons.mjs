@@ -48,27 +48,23 @@ const ogHtml = `<!DOCTYPE html>
     body {
       width:1200px; height:630px; overflow:hidden;
       background: linear-gradient(135deg, #081d35 0%, #0d2a4a 60%, #071322 100%);
-      display:flex; align-items:center; padding:0 80px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     }
-    .left { display:flex; flex-direction:column; gap:24px; }
-    .row  { display:flex; align-items:center; gap:28px; }
-    .name { font-size:88px; font-weight:300; color:#fff; letter-spacing:6px; line-height:1; }
-    .name b { color:#2E86AB; font-weight:700; }
-    .tagline { font-size:26px; color:rgba(255,255,255,0.5); font-weight:300; letter-spacing:1px; }
-    .accent  { color:#23d8d0; }
-    .bg-icon { margin-left:auto; opacity:0.06; flex-shrink:0; }
+    .brand   { display:flex; align-items:center; gap:40px; margin-bottom:30px; }
+    .name    { font-size:100px; font-weight:300; color:#fff; letter-spacing:8px; line-height:1; }
+    .name b  { color:#2E86AB; font-weight:700; }
+    .divider { width:120px; height:3px; background:#2E86AB; margin-bottom:30px; border-radius:2px; }
+    .tagline { font-size:28px; color:rgba(255,255,255,0.82); font-weight:300; letter-spacing:1.5px; text-align:center; }
   </style>
 </head>
 <body>
-  <div class="left">
-    <div class="row">
-      ${svgAtSize(160)}
-      <div class="name">meske<b>IA</b></div>
-    </div>
-    <div class="tagline">Estudio, finanzas y herramientas. Gratis y en español.</div>
+  <div class="brand">
+    ${svgAtSize(200)}
+    <div class="name">meske<b>IA</b></div>
   </div>
-  <div class="bg-icon">${svgAtSize(420)}</div>
+  <div class="divider"></div>
+  <div class="tagline">Aplicaciones web gratuitas para simplificar tu día a día</div>
 </body>
 </html>`;
 
