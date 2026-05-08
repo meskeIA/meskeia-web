@@ -989,6 +989,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia/corea/",                         // Corea: de los Tres Reinos a la Península Dividida
   "/visualizador-historia/australia/",                     // Australia: de los Aborígenes al Commonwealth
   "/visualizador-historia/sudeste-asiatico/",              // Sudeste Asiático: de Angkor al ASEAN
+  // Roadmap v13 EJE B3 — Naciones pendientes América (2026-05-08)
+  "/visualizador-historia/brasil-moderno/",                // Brasil: del Imperio a la República del s.XXI
+  "/visualizador-historia/mexico-moderno/",                // México: del Grito de Dolores a la 4T
+  "/visualizador-historia/canada/",                        // Canadá: de la Nueva Francia al Estado Multicultural
 ];
 
 /**
