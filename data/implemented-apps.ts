@@ -981,6 +981,10 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-educacion/",            // Educación: de la Academia de Platón al aula digital
   "/visualizador-historia/historia-ocio/",                 // Ocio: del circo romano al streaming global
   "/visualizador-historia/historia-turismo/",              // Turismo: del Grand Tour al turismo sostenible
+  // Roadmap v13 EJE B1 — Naciones pendientes Europa (2026-05-08)
+  "/visualizador-historia/escandinavia/",                  // Escandinavia: de los vikingos al modelo nórdico
+  "/visualizador-historia/paises-bajos/",                  // Países Bajos: de los frisios a la Holanda moderna
+  "/visualizador-historia/polonia/",                       // Polonia: de Mieszko I a la Polonia contemporánea
 ];
 
 /**
