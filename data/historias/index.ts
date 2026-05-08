@@ -109,6 +109,16 @@ import { sudeste_asiatico } from './sudeste-asiatico';
 import { brasilModerno } from './brasil-moderno';
 import { mexicoModerno } from './mexico-moderno';
 import { canada } from './canada';
+import { argentina } from './argentina';
+import { colombia } from './colombia';
+import { chile } from './chile';
+import { peru } from './peru';
+import { cuba } from './cuba';
+import { venezuela } from './venezuela';
+import { uruguay } from './uruguay';
+import { centroamerica } from './centroamerica';
+import { republicaDominicana } from './republica-dominicana';
+import { puertoRico } from './puerto-rico';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -221,6 +231,16 @@ const registry: Record<string, HistoriaData> = {
   'brasil-moderno': brasilModerno,
   'mexico-moderno': mexicoModerno,
   canada,
+  argentina,
+  colombia,
+  chile,
+  peru,
+  cuba,
+  venezuela,
+  uruguay,
+  centroamerica,
+  'republica-dominicana': republicaDominicana,
+  'puerto-rico': puertoRico,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

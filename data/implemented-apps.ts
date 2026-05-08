@@ -989,6 +989,18 @@ export const implementedAppsUrls = [
   "/visualizador-historia/corea/",                         // Corea: de los Tres Reinos a la Península Dividida
   "/visualizador-historia/australia/",                     // Australia: de los Aborígenes al Commonwealth
   "/visualizador-historia/sudeste-asiatico/",              // Sudeste Asiático: de Angkor al ASEAN
+  // Roadmap v14 — Cronologías LATAM (2026-05-08)
+  "/visualizador-historia/argentina/",                     // Argentina: de la Revolución de Mayo a Milei
+  "/visualizador-historia/colombia/",                      // Colombia: de la Independencia al Proceso de Paz
+  "/visualizador-historia/chile/",                         // Chile: de la Independencia a Boric
+  "/visualizador-historia/peru/",                          // Perú: de la Independencia al Perú contemporáneo
+  "/visualizador-historia/cuba/",                          // Cuba: de la Guerra de los Diez Años al 11J
+  "/visualizador-historia/venezuela/",                     // Venezuela: de Bolívar a la crisis contemporánea
+  "/visualizador-historia/uruguay/",                       // Uruguay: del batllismo a la democracia plena
+  "/visualizador-historia/centroamerica/",                 // Centroamérica: de la independencia al corredor migratorio
+  "/visualizador-historia/republica-dominicana/",          // R. Dominicana: de Duarte al Caribe del s.XXI
+  "/visualizador-historia/puerto-rico/",                   // Puerto Rico: del Tratado de París al ELA contemporáneo
+
   // Roadmap v13 EJE B3 — Naciones pendientes América (2026-05-08)
   "/visualizador-historia/brasil-moderno/",                // Brasil: del Imperio a la República del s.XXI
   "/visualizador-historia/mexico-moderno/",                // México: del Grito de Dolores a la 4T
