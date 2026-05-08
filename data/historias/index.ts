@@ -119,6 +119,9 @@ import { uruguay } from './uruguay';
 import { centroamerica } from './centroamerica';
 import { republicaDominicana } from './republica-dominicana';
 import { puertoRico } from './puerto-rico';
+import { redesSociales } from './redes-sociales';
+import { siliconValley } from './silicon-valley';
+import { criptomonedas } from './criptomonedas';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -241,6 +244,9 @@ const registry: Record<string, HistoriaData> = {
   centroamerica,
   'republica-dominicana': republicaDominicana,
   'puerto-rico': puertoRico,
+  'redes-sociales': redesSociales,
+  'silicon-valley': siliconValley,
+  criptomonedas,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {

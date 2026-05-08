@@ -1010,6 +1010,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia/brasil-moderno/",                // Brasil: del Imperio a la República del s.XXI
   "/visualizador-historia/mexico-moderno/",                // México: del Grito de Dolores a la 4T
   "/visualizador-historia/canada/",                        // Canadá: de la Nueva Francia al Estado Multicultural
+
+  // Roadmap v13 EJE E2 — Era Big Tech (2026-05-08)
+  "/visualizador-historia/redes-sociales/",               // Redes Sociales: de SixDegrees a la era IA social
+  "/visualizador-historia/silicon-valley/",               // Silicon Valley: del garaje de HP a la regulación Big Tech
+  "/visualizador-historia/criptomonedas/",                // Criptomonedas: de Bitcoin al mercado institucional
 ];
 
 /**
