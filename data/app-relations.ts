@@ -2687,6 +2687,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-irpf-pensionista/', icon: '📋', name: 'IRPF Pensionista', description: 'IRPF en la jubilación' },
   ],
 
+  // ORIENTADOR PATRIMONIO — Art. 31 Ley 19/1991 (2026-05-08)
+  'orientador-limite-conjunto-patrimonio': [
+    { url: '/estimador-irpf/', icon: '📋', name: 'Estimador IRPF', description: 'Cuota íntegra de tu declaración' },
+    { url: '/estimador-plusvalias-irpf/', icon: '💹', name: 'Plusvalías IRPF', description: 'Ganancia patrimonial en venta de activos' },
+    { url: '/simulador-heredar-vivienda/', icon: '🏠', name: 'Heredar Vivienda', description: 'ISD + plusvalía + IRPF al vender' },
+    { url: '/estimador-impuesto-sucesiones/', icon: '⚖️', name: 'Impuesto de Sucesiones', description: 'ISD por CCAA y parentesco' },
+  ],
+
   // CREATIVIDAD Y DISEÑO EXTRA
   'generador-avatares': [
     { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Diseña paletas de colores' },

@@ -24,3 +24,4 @@ export * from './nomada-digital';
 export * from './dependencia';
 export * from './maternidad';
 export * from './smi';
+export * from './patrimonio';

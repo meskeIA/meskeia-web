@@ -1,0 +1,756 @@
+/* ─── Variables y contenedor ─────────────────────────────────────────────── */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --hero-bg: #1a5278;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+  --color-info: #0ea5e9;
+
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────────────── */
+
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.heroIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ─── Sección principal: panel de inputs ────────────────────────────────── */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.panelTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panelDesc {
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
+  line-height: 1.6;
+}
+
+/* ─── Formulario ────────────────────────────────────────────────────────── */
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.formGroup.full {
+  grid-column: 1 / -1;
+}
+
+.formLabel {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.formHint {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.formInput,
+.formSelect {
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.formInput:focus,
+.formSelect:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .formInput,
+[data-theme='dark'] .formSelect {
+  background: #1f1f1f;
+}
+
+/* ─── Toggle modo IRPF ──────────────────────────────────────────────────── */
+
+.toggleGroup {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--hover);
+  padding: 0.3rem;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  color: var(--text-primary);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toggleBtn.toggleActive {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(46, 134, 171, 0.25);
+}
+
+/* ─── Botón principal ───────────────────────────────────────────────────── */
+
+.btnPrimary {
+  padding: 0.9rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  width: 100%;
+  margin-top: var(--spacing-md);
+}
+
+.btnPrimary:hover {
+  background: #256a8a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+}
+
+.btnPrimary:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Resultado ─────────────────────────────────────────────────────────── */
+
+.resultadoCard {
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  border-left: 6px solid var(--color-info);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left-width: 6px;
+}
+
+.resultadoCard.descarteBonificacion {
+  border-left-color: var(--color-info);
+  background: linear-gradient(to right, rgba(14, 165, 233, 0.08), transparent);
+}
+
+.resultadoCard.descarteLimite {
+  border-left-color: var(--color-warning);
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.08), transparent);
+}
+
+.resultadoCard.posible {
+  border-left-color: var(--color-success);
+  background: linear-gradient(to right, rgba(22, 163, 74, 0.10), transparent);
+}
+
+[data-theme='dark'] .resultadoCard.descarteBonificacion {
+  background: linear-gradient(to right, rgba(14, 165, 233, 0.15), transparent);
+}
+
+[data-theme='dark'] .resultadoCard.descarteLimite {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.15), transparent);
+}
+
+[data-theme='dark'] .resultadoCard.posible {
+  background: linear-gradient(to right, rgba(22, 163, 74, 0.18), transparent);
+}
+
+.resultadoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.resultadoIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.resultadoTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.resultadoMensaje {
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.resultadoCifras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.cifraItem {
+  background: var(--hover);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+}
+
+.cifraLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.cifraValue {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cifraValue.positivo {
+  color: var(--color-success);
+}
+
+/* Llamada a la acción del asesor */
+.ctaAsesor {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .ctaAsesor {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ─── Aviso bienes improductivos ────────────────────────────────────────── */
+
+.avisoBienes {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(245, 158, 11, 0.10);
+  border-left: 4px solid var(--color-warning);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoBienes {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.avisoTitulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: #b45309;
+}
+
+[data-theme='dark'] .avisoTitulo {
+  color: #fbbf24;
+}
+
+/* ─── Cómo funciona (explicación previa) ────────────────────────────────── */
+
+.comoFuncionaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.comoFuncionaCard {
+  background: var(--hover);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.comoFuncionaIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.comoFuncionaTitle {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+
+.comoFuncionaText {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ─── EducationalSection ─────────────────────────────────────────────────── */
+
+.guideSection {
+  padding: var(--spacing-md) 0;
+}
+
+.guideSection h3 {
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 1.3rem;
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.notaTabla {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: var(--spacing-md);
+}
+
+/* ─── PATRÓN v2.0: Tabla comparativa ────────────────────────────────────── */
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+[data-theme='dark'] .comparativaTable {
+  background: var(--bg-card);
+}
+
+/* ─── PATRÓN v2.0: Escenarios ───────────────────────────────────────────── */
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+}
+
+.escenarioCard h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.escenarioExample {
+  background: var(--hover);
+  padding: 0.7rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.escenarioExample p {
+  margin: 0.2rem 0;
+  line-height: 1.5;
+}
+
+.escenarioTip {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-style: italic;
+  border-top: 1px dashed var(--border);
+  padding-top: 0.5rem;
+}
+
+/* ─── PATRÓN v2.0: FAQ ──────────────────────────────────────────────────── */
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.faqItem h4 {
+  color: var(--primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.05rem;
+}
+
+.faqItem p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.faqTip {
+  margin-top: 0.7rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* ─── PATRÓN v2.0: Step Guide ───────────────────────────────────────────── */
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ─── PATRÓN v2.0: Tips ─────────────────────────────────────────────────── */
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tipCard h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ─── PATRÓN v2.0: Warning Box ──────────────────────────────────────────── */
+
+.warningBox {
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(220, 38, 38, 0.12);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-danger);
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fca5a5;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary);
+}
+
+.warningList li {
+  margin-bottom: 0.6rem;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.warningList li:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resultadoCifras {
+    grid-template-columns: 1fr;
+  }
+
+  .comoFuncionaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .panelTitle {
+    font-size: 1.2rem;
+  }
+
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .resultadoTitle {
+    font-size: 1.2rem;
+  }
+
+  .resultadoIcon {
+    font-size: 1.6rem;
+  }
+}

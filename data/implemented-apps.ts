@@ -414,6 +414,9 @@ export const implementedAppsUrls = [
   "/simulador-heredar-vivienda/",   // ISD + plusvalía municipal + IRPF al vender, 17 CCAA, 4 casos
   "/simulador-renta-plan-pensiones/", // 3 escenarios IRPF (sin/con plan óptimo/con plan mal rescate)
 
+  // Orientador Patrimonio (Art. 31 Ley 19/1991) — (2026-05-08)
+  "/orientador-limite-conjunto-patrimonio/", // ¿Te beneficia el límite conjunto IRPF-Patrimonio? Descarte/posible
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
