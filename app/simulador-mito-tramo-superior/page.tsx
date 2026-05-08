@@ -240,7 +240,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
               <strong>me quitan más en total</strong>».
             </p>
             <p className={styles.mitoEjemplo}>
-              «Mejor no aceptar el ascenso, que entro al 30% y me joden vivo».
+              «Mejor no aceptar el ascenso, que entro al 30% y se lo quedan todo».
             </p>
           </div>
 
