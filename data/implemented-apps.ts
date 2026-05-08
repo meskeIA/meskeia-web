@@ -1011,6 +1011,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia/mexico-moderno/",                // México: del Grito de Dolores a la 4T
   "/visualizador-historia/canada/",                        // Canadá: de la Nueva Francia al Estado Multicultural
 
+  // Productos icónicos y Guerras (2026-05-08)
+  "/visualizador-historia/chocolate/",                    // Chocolate: de los olmecas a la industria global
+  "/visualizador-historia/azucar/",                       // Azúcar: de Papua Nueva Guinea a la crisis de salud global
+  "/visualizador-historia/guerras-napoleonicas/",         // Guerras Napoleónicas: de Brumario a Waterloo
+
   // Roadmap v13 EJE E2 — Era Big Tech (2026-05-08)
   "/visualizador-historia/redes-sociales/",               // Redes Sociales: de SixDegrees a la era IA social
   "/visualizador-historia/silicon-valley/",               // Silicon Valley: del garaje de HP a la regulación Big Tech

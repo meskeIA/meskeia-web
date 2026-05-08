@@ -122,6 +122,9 @@ import { puertoRico } from './puerto-rico';
 import { redesSociales } from './redes-sociales';
 import { siliconValley } from './silicon-valley';
 import { criptomonedas } from './criptomonedas';
+import { chocolate } from './chocolate';
+import { azucar } from './azucar';
+import { guerrasNapoleonicas } from './guerras-napoleonicas';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -247,6 +250,9 @@ const registry: Record<string, HistoriaData> = {
   'redes-sociales': redesSociales,
   'silicon-valley': siliconValley,
   criptomonedas,
+  chocolate,
+  azucar,
+  'guerras-napoleonicas': guerrasNapoleonicas,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
