@@ -1027,6 +1027,13 @@ export const implementedAppsUrls = [
   "/visualizador-historia/historia-periodismo/",          // Historia del Periodismo: de la Acta Diurna a la IA generativa
   "/visualizador-historia/cartografia/",                  // Cartografía: de los primeros mapas al GPS y SIG
   "/visualizador-historia/estadistica/",                  // Estadística: del censo babilónico al Big Data e IA
+
+  // Roadmap v16 — Especias + Vida Cotidiana (2026-05-09)
+  "/visualizador-historia/especias-rutas-comerciales/",   // Especias: de las rutas de la Antigüedad al mercado global
+  "/visualizador-historia/urbanismo/",                    // Urbanismo: de Uruk a la ciudad inteligente sostenible
+  "/visualizador-historia/higiene-salud-publica/",        // Higiene y Salud Pública: de Mohenjo-daro a la OMS
+  "/visualizador-historia/vejez-longevidad/",             // Vejez y Longevidad: de la Antigüedad a la ciencia longevity
+  "/visualizador-historia/vivienda/",                     // Vivienda: de las primeras construcciones a la crisis asequible
 ];
 
 /**

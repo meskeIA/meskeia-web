@@ -130,6 +130,11 @@ import { diccionariosEnciclopedias } from './diccionarios-enciclopedias';
 import { historiaPeriodismo } from './historia-periodismo';
 import { cartografia } from './cartografia';
 import { estadistica } from './estadistica';
+import { especiasRutasComerciales } from './especias-rutas-comerciales';
+import { urbanismo } from './urbanismo';
+import { higieneSaludPublica } from './higiene-salud-publica';
+import { vejezLongevidad } from './vejez-longevidad';
+import { vivienda } from './vivienda';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -263,6 +268,11 @@ const registry: Record<string, HistoriaData> = {
   'historia-periodismo': historiaPeriodismo,
   cartografia,
   estadistica,
+  'especias-rutas-comerciales': especiasRutasComerciales,
+  urbanismo,
+  'higiene-salud-publica': higieneSaludPublica,
+  'vejez-longevidad': vejezLongevidad,
+  vivienda,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
