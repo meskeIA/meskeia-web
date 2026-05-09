@@ -1020,6 +1020,13 @@ export const implementedAppsUrls = [
   "/visualizador-historia/redes-sociales/",               // Redes Sociales: de SixDegrees a la era IA social
   "/visualizador-historia/silicon-valley/",               // Silicon Valley: del garaje de HP a la regulación Big Tech
   "/visualizador-historia/criptomonedas/",                // Criptomonedas: de Bitcoin al mercado institucional
+
+  // Opción E EJE E1+E3 — Lenguaje y Datos (2026-05-09)
+  "/visualizador-historia/idiomas-mundo/",                // Idiomas del Mundo: de las primeras lenguas al inglés global
+  "/visualizador-historia/diccionarios-enciclopedias/",   // Diccionarios y Enciclopedias: de los escribas a Wikipedia
+  "/visualizador-historia/historia-periodismo/",          // Historia del Periodismo: de la Acta Diurna a la IA generativa
+  "/visualizador-historia/cartografia/",                  // Cartografía: de los primeros mapas al GPS y SIG
+  "/visualizador-historia/estadistica/",                  // Estadística: del censo babilónico al Big Data e IA
 ];
 
 /**

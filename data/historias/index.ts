@@ -125,6 +125,11 @@ import { criptomonedas } from './criptomonedas';
 import { chocolate } from './chocolate';
 import { azucar } from './azucar';
 import { guerrasNapoleonicas } from './guerras-napoleonicas';
+import { idiomasMundo } from './idiomas-mundo';
+import { diccionariosEnciclopedias } from './diccionarios-enciclopedias';
+import { historiaPeriodismo } from './historia-periodismo';
+import { cartografia } from './cartografia';
+import { estadistica } from './estadistica';
 
 const registry: Record<string, HistoriaData> = {
   grecia,
@@ -253,6 +258,11 @@ const registry: Record<string, HistoriaData> = {
   chocolate,
   azucar,
   'guerras-napoleonicas': guerrasNapoleonicas,
+  'idiomas-mundo': idiomasMundo,
+  'diccionarios-enciclopedias': diccionariosEnciclopedias,
+  'historia-periodismo': historiaPeriodismo,
+  cartografia,
+  estadistica,
 };
 
 export function getHistoria(slug: string): HistoriaData | null {
