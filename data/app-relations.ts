@@ -4952,6 +4952,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu hora antes de negociar' },
     { url: '/calculadora-presupuestos/', icon: '📋', name: 'Presupuestos', description: 'Propuestas profesionales a clientes' },
   ],
+
+  // SIMULADORES EDUCATIVOS MATEMÁTICAS/ESTADÍSTICA (2026-05-10)
+  'simulador-distribucion-normal': [
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: 'Pendiente de la tangente visual' },
+    { url: '/simulador-regresion/', icon: '📉', name: 'Simulador Regresión', description: 'Lineal, polinómica y logística' },
+    { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles, distribuciones' },
+    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
+  ],
+  'simulador-derivada-pendiente': [
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Curva de Gauss interactiva' },
+    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
+    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
+    { url: '/simulador-regresion/', icon: '📉', name: 'Simulador Regresión', description: 'Ajuste de funciones a datos' },
+  ],
 };
 
 /**

@@ -420,6 +420,10 @@ export const implementedAppsUrls = [
   // Orientador Patrimonio (Art. 31 Ley 19/1991) — (2026-05-08)
   "/orientador-limite-conjunto-patrimonio/", // ¿Te beneficia el límite conjunto IRPF-Patrimonio? Descarte/posible
 
+  // Simuladores educativos Matemáticas/Estadística (2026-05-10) — escaparate Lista A Opus
+  "/simulador-distribucion-normal/", // Curva de Gauss interactiva: μ y σ, P(X<a/X>a/a<X<b), regla 68-95-99.7, tipificación Z, 6 problemas tipo
+  "/simulador-derivada-pendiente/",  // Derivada como pendiente de la tangente: 8 funciones, modo secante (límite), curva f'(x), clasificación de pendiente
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
