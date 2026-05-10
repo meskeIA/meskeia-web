@@ -1069,6 +1069,12 @@ export const implementedAppsUrls = [
   "/visualizador-historia/higiene-salud-publica/",        // Higiene y Salud Pública: de Mohenjo-daro a la OMS
   "/visualizador-historia/vejez-longevidad/",             // Vejez y Longevidad: de la Antigüedad a la ciencia longevity
   "/visualizador-historia/vivienda/",                     // Vivienda: de las primeras construcciones a la crisis asequible
+
+  // Simuladores Economía — Lista B Sonnet (2026-05-10)
+  "/simulador-oferta-demanda/",           // Canvas D+S curvas, P* equilibrio, desplazadores, precio techo/suelo, excedentes
+  "/simulador-elasticidad-precio/",       // Curva demanda con pendiente elástica, rectángulos IT superpuestos, 6 bienes
+  "/simulador-curva-phillips/",           // π vs u curva de Phillips, NAIRU, stagflation, 4 episodios históricos
+  "/simulador-multiplicador-gasto/",      // k=1/(1−PMC·(1−t)+m), rondas CSS, gráfico barras comparativo, tabla 8 rondas
 ];
 
 /**

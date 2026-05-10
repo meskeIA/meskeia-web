@@ -1,0 +1,722 @@
+/* Simulador de la Curva de Phillips — meskeIA */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* =========================================
+   HERO
+   ========================================= */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  color: white;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.subtitle strong {
+  font-weight: 700;
+}
+
+/* =========================================
+   SLIDERS
+   ========================================= */
+.slidersGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .slidersGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.sliderLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sliderValue {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--primary);
+  font-family: var(--font-mono, monospace);
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  margin: var(--spacing-xs) 0;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--secondary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--secondary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderRange {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* =========================================
+   TOGGLE LARGO PLAZO
+   ========================================= */
+.toggleLP {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border);
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.toggleInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSwitch {
+  flex-shrink: 0;
+  width: 40px;
+  height: 22px;
+  background: var(--border);
+  border-radius: 11px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggleSwitch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.toggleInput:checked + .toggleSwitch {
+  background: var(--primary);
+}
+
+.toggleInput:checked + .toggleSwitch::after {
+  transform: translateX(18px);
+}
+
+.toggleInput:focus-visible + .toggleSwitch {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toggleHint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding-left: 56px;
+  line-height: 1.4;
+}
+
+/* =========================================
+   CANVAS
+   ========================================= */
+.canvasWrapper {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 680px;
+  margin: 0 auto var(--spacing-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas {
+  width: 100%;
+  flex: 1;
+  display: block;
+  border-radius: var(--radius);
+}
+
+.legendaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  justify-content: center;
+  padding-top: var(--spacing-sm);
+}
+
+.legendaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legendaDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   PANEL DE RESULTADOS
+   ========================================= */
+.resultadosPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-xl);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .resultadosPanel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resultadoMain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(46, 134, 171, 0.08);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  min-width: 200px;
+}
+
+.resultadoLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono, monospace);
+}
+
+.resultadoValor {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-mono, monospace);
+  line-height: 1;
+}
+
+.resultadoFormula {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono, monospace);
+  word-break: break-all;
+}
+
+.clasificacionWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-self: start;
+}
+
+.clasificacionLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.clasificacionBadge {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.badgeRecesion {
+  background: rgba(31, 100, 180, 0.15);
+  color: #1F64B4;
+  border: 2px solid #1F64B4;
+}
+
+.badgeEstanflacion {
+  background: rgba(200, 60, 60, 0.12);
+  color: #C03030;
+  border: 2px solid #C03030;
+}
+
+.badgeEquilibrio {
+  background: rgba(39, 174, 96, 0.12);
+  color: #1E8449;
+  border: 2px solid #27AE60;
+}
+
+.badgeSobrecalentada {
+  background: rgba(224, 122, 31, 0.12);
+  color: #B35A00;
+  border: 2px solid #E07A1F;
+}
+
+.badgeNormal {
+  background: rgba(72, 169, 166, 0.12);
+  color: #2A7D7A;
+  border: 2px solid #48A9A6;
+}
+
+.interpretacionText {
+  grid-column: 1 / -1;
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* =========================================
+   TABLA HISTÓRICA
+   ========================================= */
+.historicaWrapper {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.historicaTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.historicaTabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.historicaTabla thead {
+  background: var(--primary);
+  color: white;
+}
+
+.historicaTabla th,
+.historicaTabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.historicaTabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* =========================================
+   BLOQUE EDUCATIVO — clases estándar
+   ========================================= */
+.formulaBox {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--radius);
+  font-family: var(--font-mono, monospace);
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--text-primary);
+  overflow-x: auto;
+  line-height: 1.7;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.88rem;
+}
+
+.tabla thead {
+  background: var(--primary);
+  color: white;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+}
+
+.faqItem h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.faqItem p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs) !important;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+}
+
+.tipCard strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.scenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scenarioIcon {
+  font-size: 2rem;
+}
+
+.scenarioCard strong {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.scenarioCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* =========================================
+   WARNING BOX
+   ========================================= */
+.warningBox {
+  background: rgba(224, 122, 31, 0.08);
+  border-left: 4px solid #E07A1F;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  color: #E07A1F;
+  font-size: 1.1rem;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.warningList li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningList li strong {
+  color: #E07A1F;
+}
+
+/* =========================================
+   DARK MODE
+   ========================================= */
+[data-theme='dark'] .resultadoMain {
+  background: rgba(46, 134, 171, 0.18);
+}
+
+[data-theme='dark'] .interpretacionText {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .badgeRecesion {
+  background: rgba(31, 100, 180, 0.25);
+  color: #7FB3D3;
+  border-color: #7FB3D3;
+}
+
+[data-theme='dark'] .badgeEstanflacion {
+  background: rgba(200, 60, 60, 0.22);
+  color: #E07A7A;
+  border-color: #E07A7A;
+}
+
+[data-theme='dark'] .badgeEquilibrio {
+  background: rgba(39, 174, 96, 0.20);
+  color: #52BE80;
+  border-color: #52BE80;
+}
+
+[data-theme='dark'] .badgeSobrecalentada {
+  background: rgba(224, 122, 31, 0.22);
+  color: #F0A050;
+  border-color: #F0A050;
+}
+
+[data-theme='dark'] .badgeNormal {
+  background: rgba(72, 169, 166, 0.22);
+  color: #48A9A6;
+  border-color: #48A9A6;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .historicaTabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 122, 31, 0.12);
+}
+
+[data-theme='dark'] .slider::-webkit-slider-thumb {
+  border-color: #2A2A2A;
+}
+
+[data-theme='dark'] .slider::-moz-range-thumb {
+  border-color: #2A2A2A;
+}
+
+/* =========================================
+   ACCESIBILIDAD — MOVIMIENTO REDUCIDO
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  .toggleSwitch,
+  .toggleSwitch::after {
+    transition: none !important;
+  }
+}

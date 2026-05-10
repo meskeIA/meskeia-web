@@ -1,0 +1,723 @@
+/* ============================================================
+   SimuladorMultiplicadorGasto.module.css
+   Paleta meskeIA — sin selector * suelto
+   ============================================================ */
+
+/* ---- LAYOUT BASE ------------------------------------------ */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---- HERO -------------------------------------------------- */
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ---- SLIDERS GRID ------------------------------------------ */
+.slidersGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .slidersGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sliderGroup {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+[data-theme='dark'] .sliderGroup {
+  border-color: #3a3a3a;
+}
+
+.sliderLabelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.sliderLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.sliderValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.sliderHints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ---- TOGGLE SIMPLE ----------------------------------------- */
+.toggleSimple {
+  max-width: 860px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1.5rem;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.toggleCheckbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggleText {
+  line-height: 1.4;
+}
+
+/* ---- PANEL DE RESULTADOS ----------------------------------- */
+.resultadosPanel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 860px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+  justify-content: center;
+}
+
+.kCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  min-width: 180px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+[data-theme='dark'] .kCard {
+  border-color: #3a3a3a;
+}
+
+.kCardMain {
+  background: var(--primary);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  min-width: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: #fff;
+}
+
+.kCardMain .kLabel {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.kCardMain .kDisplay {
+  color: #fff;
+}
+
+.kCardMain .kFormula {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.kLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.kDisplay {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.kFormula {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+/* ΔY card */
+.deltaYCard {
+  background: linear-gradient(135deg, #1a5278, var(--primary));
+  color: #fff;
+  border-radius: 14px;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  min-width: 220px;
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.deltaYLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.deltaYDisplay {
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.deltaYSub {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: monospace;
+}
+
+/* ---- SECCIÓN TÍTULOS --------------------------------------- */
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.sectionSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+}
+
+/* ---- COMPARATIVA 3 BARRAS VERTICALES ----------------------- */
+.compSection {
+  max-width: 860px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+}
+
+.compBarras {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: flex-end;
+  height: 180px;
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  padding: 1.5rem 2rem 1rem;
+}
+
+[data-theme='dark'] .compBarras {
+  border-color: #3a3a3a;
+}
+
+.compBarraCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.compBarraTrackV {
+  width: 100%;
+  max-width: 64px;
+  height: 110px;
+  background: #f0f0f0;
+  border-radius: 8px 8px 4px 4px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .compBarraTrackV {
+  background: #3a3a3a;
+}
+
+.compBarraFillV {
+  width: 100%;
+  border-radius: 6px 6px 2px 2px;
+  transition: height 0.6s ease;
+  min-height: 4px;
+}
+
+.compBarraValor {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.compBarraLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ---- DIAGRAMA DE RONDAS ------------------------------------ */
+.rondasSection {
+  max-width: 860px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+}
+
+.rondasDiagrama {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .rondasDiagrama {
+  border-color: #3a3a3a;
+}
+
+.rondaFila {
+  display: grid;
+  grid-template-columns: 110px 1fr 90px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .rondaFila {
+    grid-template-columns: 80px 1fr 70px;
+  }
+}
+
+.rondaLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rondaBarraTrack {
+  height: 22px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .rondaBarraTrack {
+  background: #3a3a3a;
+}
+
+.rondaBarraFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+
+.rondaValor {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rondasExtra {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* ---- TABLA DE RONDAS --------------------------------------- */
+.tablaSection {
+  max-width: 860px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+[data-theme='dark'] .tablaWrapper {
+  border-color: #3a3a3a;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+}
+
+.tabla th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.65rem 0.9rem;
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla th:first-child {
+  text-align: center;
+  border-radius: 12px 0 0 0;
+}
+
+.tabla th:last-child {
+  border-radius: 0 12px 0 0;
+}
+
+.tabla td {
+  padding: 0.55rem 0.9rem;
+  text-align: right;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: #2a2a2a;
+}
+
+.tabla td:first-child {
+  text-align: center;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla tr:hover td {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.tablaRowDestacada td {
+  background: rgba(224, 122, 31, 0.08);
+  font-weight: 600;
+}
+
+.tablaRowDestacada td:first-child {
+  color: #E07A1F;
+}
+
+/* ---- FORMULA BOX ------------------------------------------- */
+.formulaBox {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1.2rem;
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin: 1rem 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: #2a2a2a;
+  border-color: #444;
+  border-left-color: var(--primary);
+}
+
+/* ---- ESCENARIOS GRID --------------------------------------- */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 640px) {
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.1rem;
+}
+
+[data-theme='dark'] .scenarioCard {
+  border-color: #3a3a3a;
+}
+
+.scenarioIcon {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.scenarioCard h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.scenarioCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ---- FAQ --------------------------------------------------- */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: #3a3a3a;
+}
+
+.faqItem dt {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.faqItem dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ---- STEP GUIDE -------------------------------------------- */
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.stepContent {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ---- TIPS GRID --------------------------------------------- */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+@media (max-width: 600px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipCard {
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.25);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.12);
+  border-color: rgba(72, 169, 166, 0.3);
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+}
+
+.tipCard p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ---- WARNING BOX ------------------------------------------- */
+.warningBox {
+  background: rgba(224, 122, 31, 0.08);
+  border: 1px solid rgba(224, 122, 31, 0.35);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0 0;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 122, 31, 0.12);
+  border-color: rgba(224, 122, 31, 0.4);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.warningIcon {
+  font-size: 1.25rem;
+}
+
+.warningList {
+  padding-left: 1.2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningList li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ---- REDUCED MOTION ---------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .rondaBarraFill {
+    transition: none;
+  }
+  .compBarraFillV {
+    transition: none;
+  }
+}
+
+/* ---- DARK MODE OVERRIDES ----------------------------------- */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tabla th {
+  background: #1a4a68;
+}
+
+[data-theme='dark'] .tabla tr:hover td {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .tablaRowDestacada td {
+  background: rgba(224, 122, 31, 0.12);
+}
+
+[data-theme='dark'] .kCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .formulaBox {
+  color: var(--text-primary);
+}

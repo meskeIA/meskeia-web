@@ -5104,6 +5104,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-integral-area/', icon: '📐', name: 'Simulador Integrales', description: 'Área bajo la curva transformada' },
     { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
   ],
+
+  // SIMULADORES ECONOMÍA — Lista B Sonnet (2026-05-10)
+  'simulador-oferta-demanda': [
+    { url: '/visualizador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda (explicador)', description: 'Marco conceptual de las curvas que mueves en este simulador' },
+    { url: '/simulador-elasticidad-precio/', icon: '📈', name: 'Elasticidad Precio', description: 'Cuánto responde la cantidad al precio: la pendiente de la curva D' },
+    { url: '/visualizador-inflacion/', icon: '💸', name: 'Inflación', description: 'Desequilibrios de demanda generan inflación de demanda' },
+    { url: '/visualizador-estructuras-mercado/', icon: '🏭', name: 'Estructuras de Mercado', description: 'Cómo cambia la curva S en monopolio, oligopolio o competencia perfecta' },
+  ],
+  'simulador-elasticidad-precio': [
+    { url: '/simulador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'La elasticidad determina cómo se desplazan los excedentes al mover la curva' },
+    { url: '/visualizador-estructuras-mercado/', icon: '🏭', name: 'Estructuras de Mercado', description: 'El poder de mercado permite al monopolio explotar la inelasticidad' },
+    { url: '/simulador-distribucion-normal/', icon: '📐', name: 'Distribución Normal', description: 'Estadística aplicada a la variabilidad del precio en mercados reales' },
+    { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Cálculos cuantitativos complementarios para análisis económico' },
+  ],
+  'simulador-curva-phillips': [
+    { url: '/visualizador-inflacion/', icon: '💸', name: 'Inflación', description: 'El eje vertical de la curva de Phillips: tipos, causas y efectos' },
+    { url: '/visualizador-desempleo-tipos/', icon: '📉', name: 'Tipos de Desempleo', description: 'El eje horizontal: friccional, estructural, cíclico y NAIRU explicados' },
+    { url: '/simulador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'Los shocks de oferta desplazan la curva de Phillips verticalmente' },
+    { url: '/simulador-multiplicador-gasto/', icon: '💰', name: 'Multiplicador del Gasto', description: 'Más gasto público → más PIB → menos u → más π: la lógica de Phillips' },
+  ],
+  'simulador-multiplicador-gasto': [
+    { url: '/simulador-oferta-demanda/', icon: '📊', name: 'Oferta y Demanda', description: 'El multiplicador amplía la demanda agregada que mueve el equilibrio' },
+    { url: '/visualizador-inflacion/', icon: '💸', name: 'Inflación', description: 'Un multiplicador excesivo genera inflación de demanda' },
+    { url: '/simulador-curva-phillips/', icon: '📉', name: 'Curva de Phillips', description: 'Más gasto → más PIB → menos desempleo → posiblemente más inflación' },
+    { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Para verificar cálculos macroeconómicos del multiplicador' },
+  ],
 };
 
 /**
