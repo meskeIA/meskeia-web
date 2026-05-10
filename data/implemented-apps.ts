@@ -440,6 +440,12 @@ export const implementedAppsUrls = [
   "/simulador-trigonometria-circulo-unitario/",   // Círculo unitario animado, proyecciones sin/cos, ángulos notables, toggle grados/rad
   "/simulador-funciones-transformaciones/",       // f(x)=a·g(b·(x−c))+d, 5 bases, canvas dual base+transformada
 
+  // Simuladores educativos Física + Química — Lista B Sonnet (2026-05-10)
+  "/simulador-movimiento-circular/",             // MCU/MCNU, vectores v-tangencial y a-centrípeta, panel v/ac/Fc/T/f
+  "/simulador-mas-resorte/",                     // Resorte zigzag animado, gráfica x(t), barras Ek+Ep, amortiguamiento
+  "/simulador-tabla-periodica-tendencias/",      // 118 elementos heatmap, 5 propiedades, hover tooltip, flechas tendencia
+  "/simulador-estequiometria/",                  // 6 reacciones, reactivo limitante, barras moles, rendimiento configurable
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto

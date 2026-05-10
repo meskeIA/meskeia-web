@@ -5033,6 +5033,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Visión humana', description: 'Bastones y conos: neuronas que NO disparan PA' },
   ],
 
+  // SIMULADORES FÍSICA + QUÍMICA — Lista B Sonnet (2026-05-10)
+  'simulador-movimiento-circular': [
+    { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Otro sistema oscilatorio: a_c cambia, en MAS la aceleración varía linealmente' },
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'En MCU la energía cinética es constante: caso especial' },
+    { url: '/simulador-fluidos-bernoulli/', icon: '🌊', name: 'Fluidos: Bernoulli', description: 'La fuerza centrípeta en curvas y la presión en fluidos: misma física' },
+    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Lentes Ópticas', description: 'Otro simulador de Física EBAU con trazado geométrico' },
+  ],
+  'simulador-mas-resorte': [
+    { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'MCU: otro caso de movimiento periódico con ω constante' },
+    { url: '/simulador-pendulo/', icon: '🕰️', name: 'Péndulo Simple', description: 'Oscilador análogo al resorte para ángulos pequeños' },
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'E_k + E_p = constante, igual que en el MAS sin amortiguamiento' },
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'El amortiguamiento convierte E mecánica en calor' },
+  ],
+  'simulador-tabla-periodica-tendencias': [
+    { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'Las masas molares que usas en estequiometría vienen de la tabla' },
+    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'La reactividad química depende de las tendencias periódicas' },
+    { url: '/visualizador-tabla-periodica/', icon: '🔬', name: 'Tabla Periódica', description: 'Visualizador de la tabla periódica con información de cada elemento' },
+    { url: '/visualizador-tabla-periodica-interactiva/', icon: '⚗️', name: 'Tabla Periódica Interactiva', description: 'Tendencias, mapas de calor y datos ampliados' },
+  ],
+  'simulador-estequiometria': [
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Masas molares y reactividad explicadas desde la tabla periódica' },
+    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'Velocidad de las mismas reacciones que calculas aquí' },
+    { url: '/visualizador-quimica-organica/', icon: '🧬', name: 'Química Orgánica', description: 'Grupos funcionales y reacciones de compuestos orgánicos' },
+    { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'ΔH y ΔG de las reacciones estequiométricas' },
+  ],
+
   // SIMULADORES MATEMÁTICAS — Lista B Sonnet (2026-05-10)
   'simulador-monty-hall': [
     { url: '/simulador-teorema-bayes/', icon: '🎲', name: 'Teorema de Bayes', description: 'La probabilidad condicional detrás del problema' },

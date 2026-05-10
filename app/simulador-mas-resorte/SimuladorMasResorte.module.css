@@ -1,0 +1,630 @@
+/* ============================================================
+   SimuladorMasResorte.module.css — paleta meskeIA
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #fff;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ── Main wrapper ─────────────────────────────────────────── */
+.main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Sliders ──────────────────────────────────────────────── */
+.slidersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sliderLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sliderValue {
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, transparent);
+  padding: 0.1rem 0.45rem;
+  border-radius: 5px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary, #2E86AB);
+  cursor: pointer;
+  height: 6px;
+}
+
+.sliderHint {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999);
+}
+
+/* ── Simulation layout ────────────────────────────────────── */
+.simLayout {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.canvasWrapper {
+  flex: 0 0 300px;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.canvas {
+  border-radius: 8px;
+  background: #f8fafc;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1 / 1.6;
+  display: block;
+}
+
+.graficaWrapper {
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.graficaTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.graficaCanvas {
+  border-radius: 8px;
+  background: #f8fafc;
+  width: 100%;
+  display: block;
+}
+
+/* ── Energy bars ──────────────────────────────────────────── */
+.energyBars {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.energyBarsTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.energyBar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.energyLabel {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.energyTrack {
+  flex: 1;
+  background: #e5e7eb;
+  border-radius: 99px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.energyFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.05s linear;
+}
+
+.energyFillKin {
+  background: #E07A1F;
+}
+
+.energyFillPot {
+  background: var(--secondary, #48A9A6);
+}
+
+.energyFillTot {
+  background: #9ca3af;
+}
+
+.energyNum {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 60px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Values grid ──────────────────────────────────────────── */
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.valueCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.valueName {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.valueNum {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Control buttons ──────────────────────────────────────── */
+.controlButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.btnPause {
+  padding: 0.6rem 1.4rem;
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnPause:hover {
+  background: #256f93;
+}
+
+.btnPause:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.btnReset {
+  padding: 0.6rem 1.4rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btnReset:hover {
+  border-color: var(--primary, #2E86AB);
+  color: var(--primary, #2E86AB);
+}
+
+.btnReset:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+/* ── Formula box ──────────────────────────────────────────── */
+.formulaBox {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 8%, var(--bg-card));
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.formulaBox code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.92rem;
+  color: var(--primary, #2E86AB);
+  font-weight: 700;
+}
+
+/* ── Educational: tabla comparativa ──────────────────────── */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabla th {
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tabla tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 5%, var(--bg-card));
+}
+
+/* ── Educational: FAQ ────────────────────────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.35rem;
+  line-height: 1.55;
+}
+
+.faqTip {
+  font-size: 0.82rem;
+  color: var(--secondary, #48A9A6);
+  font-weight: 500;
+}
+
+/* ── Educational: step guide ─────────────────────────────── */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Educational: tips grid ──────────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Educational: scenarios ──────────────────────────────── */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.scenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--secondary, #48A9A6);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.scenarioIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.scenarioCard h4 {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+
+.scenarioCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Warning box (errores frecuentes) ────────────────────── */
+.warningBox {
+  background: #fff8f0;
+  border: 1.5px solid #f5a623;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c26d00;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.warningList li {
+  font-size: 0.86rem;
+  color: #78400a;
+  line-height: 1.5;
+}
+
+/* ── Subtitle inside educational section ─────────────────── */
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary, #2E86AB) 30%, transparent);
+  padding-bottom: 0.35rem;
+}
+
+/* ── Dark mode overrides ──────────────────────────────────── */
+[data-theme='dark'] .canvas,
+[data-theme='dark'] .graficaCanvas {
+  background: #1e2937;
+}
+
+[data-theme='dark'] .panel,
+[data-theme='dark'] .slidersGrid,
+[data-theme='dark'] .canvasWrapper,
+[data-theme='dark'] .graficaWrapper,
+[data-theme='dark'] .energyBars,
+[data-theme='dark'] .valueCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard,
+[data-theme='dark'] .scenarioCard {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: #374151;
+}
+
+[data-theme='dark'] .tabla tr:nth-child(even) td {
+  background: #2a3a4a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1a00;
+  border-color: #8b5e00;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #f5a623;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #d4a050;
+}
+
+[data-theme='dark'] .energyTrack {
+  background: #374151;
+}
+
+[data-theme='dark'] .btnReset {
+  border-color: #4b5563;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .btnReset:hover {
+  border-color: var(--primary, #2E86AB);
+  color: var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .formulaBox {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, #1e2937);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .simLayout {
+    flex-direction: column;
+  }
+
+  .canvasWrapper {
+    flex: none;
+    width: 100%;
+  }
+
+  .graficaWrapper {
+    width: 100%;
+  }
+
+  .valuesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tipsGrid,
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .energyFill {
+    transition: none;
+  }
+}
