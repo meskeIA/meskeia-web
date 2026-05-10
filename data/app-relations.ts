@@ -4990,6 +4990,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Z, p-valor, áreas bajo Gauss' },
     { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles' },
   ],
+  'simulador-conservacion-energia': [
+    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Simulador Lentes Ópticas', description: 'Trazado de rayos en lentes' },
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'La 1.ª ley generaliza la conservación de energía' },
+    { url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora de Movimiento', description: 'Cinemática del MRU y MRUA' },
+    { url: '/visualizador-fuerzas-invisibles/', icon: '🧲', name: 'Fuerzas Invisibles', description: 'Las fuerzas que actúan sobre los objetos' },
+  ],
+  'simulador-lentes-opticas': [
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Otro pilar de la física de Bachillerato' },
+    { url: '/visualizador-optica/', icon: '🌈', name: 'Óptica visual', description: 'Reflexión, refracción, lentes y prismas' },
+    { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Cómo funciona el ojo', description: 'El cristalino: una lente convergente biológica' },
+    { url: '/visualizador-optica-ondulatoria/', icon: '🌊', name: 'Óptica ondulatoria', description: 'Difracción, interferencia y polarización' },
+  ],
 };
 
 /**

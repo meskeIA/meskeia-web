@@ -427,6 +427,8 @@ export const implementedAppsUrls = [
   "/simulador-integral-area/", // Integral como suma de Riemann: 8 funciones, 4 métodos (izquierda/derecha/punto medio/trapecio), error vs valor exacto
   "/simulador-intervalos-confianza/", // 100 IC simulados (modo conceptual) + calculadora: nivel 80-99%, z o t Student, n 5-500
   "/simulador-test-hipotesis/", // Dos curvas H₀/H₁ superpuestas, regiones rechazo, α/β/p-valor/potencia visualizados
+  "/simulador-conservacion-energia/", // Pelota animada en pista (4 perfiles), barras E_c/E_p/E_total dinámicas, fricción ajustable
+  "/simulador-lentes-opticas/", // Trazado de 3 rayos principales en lentes convergente/divergente, imagen real o virtual
 
 
   // Creatividad y Diseño (1 implementada)
