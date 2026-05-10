@@ -429,6 +429,8 @@ export const implementedAppsUrls = [
   "/simulador-test-hipotesis/", // Dos curvas H₀/H₁ superpuestas, regiones rechazo, α/β/p-valor/potencia visualizados
   "/simulador-conservacion-energia/", // Pelota animada en pista (4 perfiles), barras E_c/E_p/E_total dinámicas, fricción ajustable
   "/simulador-lentes-opticas/", // Trazado de 3 rayos principales en lentes convergente/divergente, imagen real o virtual
+  "/simulador-cinetica-arrhenius/", // Maxwell-Boltzmann + Ea, recta Arrhenius, 5 reacciones reales, factor aceleración k(T₂)/k(T₁)
+  "/simulador-fluidos-bernoulli/", // Tubería Venturi/desnivel/estenosis, partículas animadas, manómetros, continuidad + Bernoulli
 
 
   // Creatividad y Diseño (1 implementada)

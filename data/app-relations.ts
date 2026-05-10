@@ -5002,6 +5002,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Cómo funciona el ojo', description: 'El cristalino: una lente convergente biológica' },
     { url: '/visualizador-optica-ondulatoria/', icon: '🌊', name: 'Óptica ondulatoria', description: 'Difracción, interferencia y polarización' },
   ],
+  'simulador-cinetica-arrhenius': [
+    { url: '/simulador-fluidos-bernoulli/', icon: '🌊', name: 'Fluidos Bernoulli', description: 'Otro pilar Bachillerato: presión y velocidad' },
+    { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'ΔH, ΔG, equilibrio y catalizadores' },
+    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos, balanceo y átomos' },
+    { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧬', name: 'Enzimas humanas', description: 'Catalizadores biológicos: bajan Ea drásticamente' },
+  ],
+  'simulador-fluidos-bernoulli': [
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Bernoulli es conservación de energía en fluidos' },
+    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'Otro pilar de Química/Física Bachillerato' },
+    { url: '/visualizador-corazon-ciclo-cardiaco/', icon: '❤️', name: 'Ciclo cardíaco', description: 'Bernoulli aplicada a la circulación humana' },
+    { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'Sangre humana', description: 'El fluido más característico que estudia Bernoulli' },
+  ],
 };
 
 /**
