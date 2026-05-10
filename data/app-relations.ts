@@ -533,6 +533,27 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // FINANZAS - HIPOTECA / INMOBILIARIA
   'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/estimador-hipoteca/'),
   'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/estimador-compraventa-inmueble/'),
+  'simulador-gastos-compraventa-garaje': [
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },
+    { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Calcula los gastos de tu trastero' },
+    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
+  ],
+  'simulador-gastos-compraventa-nave-industrial': [
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },
+    { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Calcula los gastos de tu garaje' },
+    { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Calcula los gastos de tu trastero' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
+  ],
+  'simulador-gastos-compraventa-trastero': [
+    { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },
+    { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Calcula los gastos de tu garaje' },
+    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
+  ],
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/estimador-prestamos/'),
   'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/orientador-alquiler-vs-compra/'),

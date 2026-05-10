@@ -72,6 +72,9 @@ export const implementedAppsUrls = [
   "/estimador-interes-compuesto/",
   "/estimador-hipoteca/",
   "/estimador-compraventa-inmueble/", // Gastos de compraventa: ITP/IVA, notaría, registro, plusvalía
+  "/simulador-gastos-compraventa-garaje/", // Gastos compraventa garaje: ITP, notaría, registro, plusvalía
+  "/simulador-gastos-compraventa-nave-industrial/", // Gastos compra nave industrial: IVA 21%, ITP, AJD
+  "/simulador-gastos-compraventa-trastero/", // Gastos compraventa trastero: ITP, notaría, registro
   "/estimador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
   "/orientador-deduccion-obras-energeticas/", // Orientador deducciones IRPF 20/40/60% por obras mejora energética vivienda

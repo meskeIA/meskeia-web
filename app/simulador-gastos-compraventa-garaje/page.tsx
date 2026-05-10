@@ -1,0 +1,786 @@
+'use client';
+// @disclaimer: NO — DisclaimerCard severity="critical" (fiscal España)
+
+import { useState, useMemo } from 'react';
+import styles from './SimuladorGarajeCompraventa.module.css';
+import {
+  MeskeiaLogo,
+  Footer,
+  EducationalSection,
+  RelatedApps,
+  NumberInput,
+  ResultCard,
+  LegalNotice,
+  DisclaimerCard,
+  ShareCard,
+  RegionBadge,
+} from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import {
+  ITP_CCAA,
+  ComunidadAutonoma,
+  calcularITP,
+  calcularAJD,
+  calcularNotario,
+  calcularRegistro,
+  calcularPlusvaliaMunicipal,
+  ENLACE_CATASTRO,
+} from '@/data/itp-ccaa';
+
+// ===== TIPOS =====
+type TipoTransmision = 'segunda-mano' | 'primera-mano';
+type PerfilComprador = 'general' | 'joven' | 'familia-numerosa' | 'discapacidad';
+
+interface ResultadosComprador {
+  precioGaraje: number;
+  impuestoTransmision: number;
+  tipoImpuesto: string;
+  porcentajeImpuesto: number;
+  ajd: number;
+  gastosNotario: number;
+  gastosRegistro: number;
+  gastosGestoria: number;
+  totalGastos: number;
+  totalOperacion: number;
+}
+
+interface ResultadosVendedor {
+  precioVenta: number;
+  plusvaliaMunicipal: number;
+  metodoPlusvalia: string;
+  exentoPlusvalia: boolean;
+  comisionInmobiliaria: number;
+  gastosGestoria: number;
+  totalGastos: number;
+  netoVendedor: number;
+  gananciaPatrimonial: number;
+  irpfGanancia: number;
+}
+
+// ===== CONSTANTES =====
+const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
+  { value: 'andalucia', label: 'Andalucía' },
+  { value: 'aragon', label: 'Aragón' },
+  { value: 'asturias', label: 'Asturias' },
+  { value: 'baleares', label: 'Islas Baleares' },
+  { value: 'canarias', label: 'Canarias' },
+  { value: 'cantabria', label: 'Cantabria' },
+  { value: 'castilla-leon', label: 'Castilla y León' },
+  { value: 'castilla-mancha', label: 'Castilla-La Mancha' },
+  { value: 'cataluna', label: 'Cataluña' },
+  { value: 'valencia', label: 'Comunidad Valenciana' },
+  { value: 'extremadura', label: 'Extremadura' },
+  { value: 'galicia', label: 'Galicia' },
+  { value: 'madrid', label: 'Comunidad de Madrid' },
+  { value: 'murcia', label: 'Región de Murcia' },
+  { value: 'navarra', label: 'Navarra' },
+  { value: 'pais-vasco', label: 'País Vasco' },
+  { value: 'rioja', label: 'La Rioja' },
+  { value: 'ceuta', label: 'Ceuta' },
+  { value: 'melilla', label: 'Melilla' },
+];
+
+const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
+  { value: 'general', label: 'General (sin bonificaciones)' },
+  { value: 'joven', label: 'Joven (< 35 años)' },
+  { value: 'familia-numerosa', label: 'Familia numerosa' },
+  { value: 'discapacidad', label: 'Persona con discapacidad' },
+];
+
+// Tramos IRPF para ganancias patrimoniales 2025 (base del ahorro)
+const TRAMOS_IRPF_AHORRO = [
+  { hasta: 6000, tipo: 19 },
+  { hasta: 50000, tipo: 21 },
+  { hasta: 200000, tipo: 23 },
+  { hasta: 300000, tipo: 27 },
+  { hasta: Infinity, tipo: 30 },
+];
+
+// ===== COMPONENTE PRINCIPAL =====
+export default function SimuladorGarajeCompraventaPage() {
+  // Estado del formulario — comprador
+  const [precioGaraje, setPrecioGaraje] = useState('');
+  const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
+  const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
+  const [perfilComprador, setPerfilComprador] = useState<PerfilComprador>('general');
+  const [gastosGestoria, setGastosGestoria] = useState('300');
+
+  // Estado del formulario — vendedor
+  const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  const [aniosPropiedad, setAniosPropiedad] = useState('');
+  const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
+  const [comisionInmobiliaria, setComisionInmobiliaria] = useState('3');
+
+  // Pestaña activa
+  const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
+
+  // ===== CÁLCULOS COMPRADOR =====
+  const resultadosComprador = useMemo((): ResultadosComprador | null => {
+    const precio = parseSpanishNumber(precioGaraje);
+    if (precio <= 0) return null;
+
+    const gestoria = parseSpanishNumber(gastosGestoria);
+    const datosCcaa = ITP_CCAA[ccaa];
+
+    let impuesto = 0;
+    let tipoImpuesto = '';
+    let porcentaje = 0;
+
+    if (tipoTransmision === 'primera-mano') {
+      // Garaje nuevo: IVA 10% (es inmueble residencial)
+      tipoImpuesto = 'IVA';
+      porcentaje = 10;
+      impuesto = precio * 0.1;
+    } else {
+      // Garaje segunda mano: ITP
+      // El garaje es inmueble residencial → puede optar a tipos reducidos
+      let tipoAplicable = datosCcaa.tipoGeneral;
+      if (perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
+        const reducido = datosCcaa.tiposReducidos.find(r => {
+          if (perfilComprador === 'joven' && r.nombre.toLowerCase().includes('joven')) return true;
+          if (perfilComprador === 'familia-numerosa' && r.nombre.toLowerCase().includes('familia')) return true;
+          if (perfilComprador === 'discapacidad' && r.nombre.toLowerCase().includes('discapacidad')) return true;
+          return false;
+        });
+        if (reducido && (!reducido.valorMaximo || precio <= reducido.valorMaximo)) {
+          tipoAplicable = reducido.tipo;
+        }
+      }
+      impuesto = calcularITP(precio, ccaa, tipoAplicable);
+      tipoImpuesto = 'ITP';
+      porcentaje = tipoAplicable;
+    }
+
+    // AJD solo aplica en primera mano (junto con IVA)
+    const ajd = tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa) : 0;
+    const notario = calcularNotario(precio);
+    const registro = calcularRegistro(precio);
+    const totalGastos = impuesto + ajd + notario + registro + gestoria;
+
+    return {
+      precioGaraje: precio,
+      impuestoTransmision: impuesto,
+      tipoImpuesto,
+      porcentajeImpuesto: porcentaje,
+      ajd,
+      gastosNotario: notario,
+      gastosRegistro: registro,
+      gastosGestoria: gestoria,
+      totalGastos,
+      totalOperacion: precio + totalGastos,
+    };
+  }, [precioGaraje, ccaa, tipoTransmision, perfilComprador, gastosGestoria]);
+
+  // ===== CÁLCULOS VENDEDOR =====
+  const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
+    const precioV = parseSpanishNumber(precioGaraje);
+    const precioC = parseSpanishNumber(precioCompraOriginal);
+    const anios = parseInt(aniosPropiedad) || 0;
+    const valorSuelo = parseSpanishNumber(valorCatastralSuelo);
+
+    if (precioV <= 0) return null;
+
+    const comisionPct = parseSpanishNumber(comisionInmobiliaria) / 100;
+    const gestoria = parseSpanishNumber(gastosGestoria);
+    const comision = precioV * comisionPct;
+
+    // Plusvalía municipal
+    let plusvalia = 0;
+    let metodoPlusvalia = 'No calculada (falta valor catastral del suelo)';
+    let exentoPlusvalia = false;
+
+    if (valorSuelo > 0 && anios > 0 && precioC > 0) {
+      const resultadoPlusvalia = calcularPlusvaliaMunicipal({
+        valorCatastralSuelo: valorSuelo,
+        aniosPropiedad: anios,
+        precioCompra: precioC,
+        precioVenta: precioV,
+      });
+      plusvalia = resultadoPlusvalia.recomendado;
+      exentoPlusvalia = resultadoPlusvalia.exento;
+      metodoPlusvalia = resultadoPlusvalia.exento
+        ? 'Exento (sin ganancia de valor)'
+        : resultadoPlusvalia.metodoReal < resultadoPlusvalia.metodoObjetivo
+          ? 'Método real (más favorable)'
+          : 'Método objetivo';
+    }
+
+    // Ganancia patrimonial para IRPF (garaje: sin exención por vivienda habitual ni edad)
+    const ganancia = precioC > 0 ? Math.max(0, precioV - precioC - comision - gestoria) : 0;
+
+    let irpf = 0;
+    if (ganancia > 0) {
+      let gananciaRestante = ganancia;
+      let limiteAnterior = 0;
+      for (const tramo of TRAMOS_IRPF_AHORRO) {
+        const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
+        if (baseTramo <= 0) break;
+        irpf += baseTramo * (tramo.tipo / 100);
+        gananciaRestante -= baseTramo;
+        limiteAnterior = tramo.hasta;
+      }
+    }
+
+    const totalGastos = plusvalia + comision + gestoria + irpf;
+    const neto = precioV - totalGastos;
+
+    return {
+      precioVenta: precioV,
+      plusvaliaMunicipal: plusvalia,
+      metodoPlusvalia,
+      exentoPlusvalia,
+      comisionInmobiliaria: comision,
+      gastosGestoria: gestoria,
+      totalGastos,
+      netoVendedor: neto,
+      gananciaPatrimonial: ganancia,
+      irpfGanancia: irpf,
+    };
+  }, [precioGaraje, precioCompraOriginal, aniosPropiedad, valorCatastralSuelo, comisionInmobiliaria, gastosGestoria]);
+
+  const datosCcaaActual = ITP_CCAA[ccaa];
+
+  return (
+    <div className={styles.container}>
+      <MeskeiaLogo />
+
+      {/* Hero Section */}
+      <header className={styles.hero}>
+        <span aria-hidden="true" className={styles.heroIcon}>🚗</span>
+        <h1 className={styles.title}>Simulador de Gastos de Compraventa de Garaje</h1>
+        <p className={styles.subtitle}>
+          Calcula el ITP, notaría, registro y plusvalía al comprar o vender una plaza de parking en España
+        </p>
+      </header>
+
+      <RegionBadge variant="es-only" />
+
+      <LegalNotice lastUpdated="2024-12-20" />
+
+      {/* Disclaimer Legal - CRÍTICO (app fiscal España) */}
+      <DisclaimerCard
+        variant="financial"
+        severity="critical"
+        context="simulador-gastos-compraventa-garaje"
+        collapsible={false}
+      />
+
+      {/* Formulario principal */}
+      <section className={styles.mainContent}>
+        {/* Panel izquierdo: datos */}
+        <div className={styles.formPanel}>
+          <h2 className={styles.sectionTitle}>📋 Datos del garaje</h2>
+
+          {/* Tipo de transmisión */}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Tipo de transmisión</label>
+            <div className={styles.transmisionGrid}>
+              <button
+                className={`${styles.transmisionBtn} ${tipoTransmision === 'segunda-mano' ? styles.active : ''}`}
+                onClick={() => setTipoTransmision('segunda-mano')}
+                aria-pressed={tipoTransmision === 'segunda-mano'}
+              >
+                <span aria-hidden="true" className={styles.transmisionIcon}>🔄</span>
+                <span>Segunda mano</span>
+                <span className={styles.transmisionSub}>Paga ITP</span>
+              </button>
+              <button
+                className={`${styles.transmisionBtn} ${tipoTransmision === 'primera-mano' ? styles.active : ''}`}
+                onClick={() => setTipoTransmision('primera-mano')}
+                aria-pressed={tipoTransmision === 'primera-mano'}
+              >
+                <span aria-hidden="true" className={styles.transmisionIcon}>🆕</span>
+                <span>Primera mano (obra nueva)</span>
+                <span className={styles.transmisionSub}>Paga IVA 10%</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Precio del garaje */}
+          <NumberInput
+            value={precioGaraje}
+            onChange={setPrecioGaraje}
+            label="Precio del garaje / plaza de parking"
+            placeholder="25000"
+            helperText="Precio escriturado o valor de referencia catastral (el mayor)"
+            min={0}
+          />
+
+          {/* Comunidad autónoma */}
+          <div className={styles.inputGroup}>
+            <label className={styles.label} htmlFor="select-ccaa">
+              Comunidad Autónoma (ubicación del garaje)
+            </label>
+            <select
+              id="select-ccaa"
+              value={ccaa}
+              onChange={(e) => setCcaa(e.target.value as ComunidadAutonoma)}
+              className={styles.select}
+            >
+              {COMUNIDADES.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Info CCAA */}
+          <div className={styles.infoCcaa}>
+            <div className={styles.infoCcaaHeader}>
+              <span aria-hidden="true" className={styles.infoCcaaIcon}>📍</span>
+              <span className={styles.infoCcaaNombre}>{datosCcaaActual.nombre}</span>
+            </div>
+            <div className={styles.infoCcaaGrid}>
+              <div className={styles.infoCcaaItem}>
+                <span className={styles.infoCcaaLabel}>ITP General</span>
+                <span className={styles.infoCcaaValue}>{datosCcaaActual.tipoGeneral}%</span>
+              </div>
+              <div className={styles.infoCcaaItem}>
+                <span className={styles.infoCcaaLabel}>AJD</span>
+                <span className={styles.infoCcaaValue}>{datosCcaaActual.ajd}%</span>
+              </div>
+            </div>
+            {datosCcaaActual.tramosProgresivos && (
+              <p className={styles.infoCcaaNote}>
+                Esta comunidad aplica escala progresiva ({datosCcaaActual.tramosProgresivos.map(t => `${t.tipo}%`).join(' → ')})
+              </p>
+            )}
+            <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
+          </div>
+
+          {/* Perfil del comprador (solo ITP segunda mano) */}
+          {tipoTransmision === 'segunda-mano' && (
+            <div className={styles.inputGroup}>
+              <label className={styles.label} htmlFor="select-perfil">
+                Perfil del comprador (tipos reducidos de ITP)
+              </label>
+              <select
+                id="select-perfil"
+                value={perfilComprador}
+                onChange={(e) => setPerfilComprador(e.target.value as PerfilComprador)}
+                className={styles.select}
+              >
+                {PERFILES_COMPRADOR.map(p => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+              {perfilComprador !== 'general' && datosCcaaActual.tiposReducidos.length > 0 && (
+                <div className={styles.tiposReducidosInfo}>
+                  <h4>Tipos reducidos disponibles en {datosCcaaActual.nombre}:</h4>
+                  <ul>
+                    {datosCcaaActual.tiposReducidos.map((tr, idx) => (
+                      <li key={idx}>
+                        <strong>{tr.tipo}%</strong> — {tr.nombre}
+                        {tr.valorMaximo && (
+                          <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Gestoría comprador */}
+          <div className={styles.inputGroup}>
+            <NumberInput
+              value={gastosGestoria}
+              onChange={setGastosGestoria}
+              label="Gastos de gestoría del comprador (€)"
+              placeholder="300"
+              helperText="Típico: 200-400 € (tramitación de escrituras)"
+              min={0}
+            />
+          </div>
+
+          {/* Enlace Catastro */}
+          <div className={styles.enlaceCatastro}>
+            <a
+              href={ENLACE_CATASTRO}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.catastroLink}
+            >
+              Consultar valor de referencia catastral en la Sede del Catastro
+            </a>
+          </div>
+        </div>
+
+        {/* Panel derecho: resultados */}
+        <div className={styles.resultados}>
+          {/* Pestañas */}
+          <div className={styles.tabs} role="tablist">
+            <button
+              role="tab"
+              aria-selected={pestanaActiva === 'comprador'}
+              className={`${styles.tab} ${pestanaActiva === 'comprador' ? styles.active : ''}`}
+              onClick={() => setPestanaActiva('comprador')}
+            >
+              Comprador
+            </button>
+            <button
+              role="tab"
+              aria-selected={pestanaActiva === 'vendedor'}
+              className={`${styles.tab} ${pestanaActiva === 'vendedor' ? styles.active : ''}`}
+              onClick={() => setPestanaActiva('vendedor')}
+            >
+              Vendedor
+            </button>
+          </div>
+
+          {/* Resultados Comprador */}
+          {pestanaActiva === 'comprador' && (
+            <div role="tabpanel">
+              {resultadosComprador ? (
+                <div className={styles.resultsInner}>
+                  <ResultCard
+                    title="Precio del garaje"
+                    value={formatCurrency(resultadosComprador.precioGaraje)}
+                    variant="default"
+                    icon="🚗"
+                  />
+                  <ResultCard
+                    title={`${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 1)}%)`}
+                    value={formatCurrency(resultadosComprador.impuestoTransmision)}
+                    variant="warning"
+                    icon="📋"
+                  />
+                  {resultadosComprador.ajd > 0 && (
+                    <ResultCard
+                      title={`AJD (${formatNumber(datosCcaaActual.ajd, 2)}%)`}
+                      value={formatCurrency(resultadosComprador.ajd)}
+                      variant="warning"
+                      icon="📄"
+                    />
+                  )}
+                  <ResultCard
+                    title="Gastos de notaría (+ IVA)"
+                    value={formatCurrency(resultadosComprador.gastosNotario)}
+                    variant="default"
+                    icon="📝"
+                  />
+                  <ResultCard
+                    title="Registro de la Propiedad (+ IVA)"
+                    value={formatCurrency(resultadosComprador.gastosRegistro)}
+                    variant="default"
+                    icon="🏛️"
+                  />
+                  {resultadosComprador.gastosGestoria > 0 && (
+                    <ResultCard
+                      title="Gastos de gestoría"
+                      value={formatCurrency(resultadosComprador.gastosGestoria)}
+                      variant="default"
+                      icon="📂"
+                    />
+                  )}
+                  <div className={styles.separador} />
+                  <ResultCard
+                    title="Total gastos adicionales"
+                    value={formatCurrency(resultadosComprador.totalGastos)}
+                    variant="info"
+                    icon="➕"
+                    description={`${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio`}
+                  />
+                  <ResultCard
+                    title="COSTE TOTAL DE ADQUISICIÓN"
+                    value={formatCurrency(resultadosComprador.totalOperacion)}
+                    variant="highlight"
+                    icon="💳"
+                    description="Precio + todos los gastos"
+                  />
+                </div>
+              ) : (
+                <div className={styles.placeholder}>
+                  <span aria-hidden="true" className={styles.placeholderIcon}>🚗</span>
+                  <p>Introduce el precio del garaje para ver el desglose de gastos del comprador</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Resultados Vendedor */}
+          {pestanaActiva === 'vendedor' && (
+            <div role="tabpanel">
+              <div className={styles.formVendedor}>
+                <h3 className={styles.formVendedorTitle}>Datos adicionales del vendedor</h3>
+                <NumberInput
+                  value={precioCompraOriginal}
+                  onChange={setPrecioCompraOriginal}
+                  label="Precio de compra original del garaje"
+                  placeholder="18000"
+                  helperText="Lo que pagaste cuando lo compraste"
+                  min={0}
+                />
+                <NumberInput
+                  value={aniosPropiedad}
+                  onChange={setAniosPropiedad}
+                  label="Años de propiedad"
+                  placeholder="8"
+                  helperText="Desde la compra hasta la venta actual"
+                  min={1}
+                  max={50}
+                />
+                <NumberInput
+                  value={valorCatastralSuelo}
+                  onChange={setValorCatastralSuelo}
+                  label="Valor catastral del suelo (€)"
+                  placeholder="5000"
+                  helperText="Figura en el recibo del IBI (solo la parte del suelo)"
+                  min={0}
+                />
+                <NumberInput
+                  value={comisionInmobiliaria}
+                  onChange={setComisionInmobiliaria}
+                  label="Comisión inmobiliaria del vendedor (%)"
+                  placeholder="3"
+                  helperText="Típico: 3-5%. La paga el vendedor"
+                  min={0}
+                  max={10}
+                />
+              </div>
+
+              {resultadosVendedor ? (
+                <div className={styles.resultsInner}>
+                  <ResultCard
+                    title="Precio de venta"
+                    value={formatCurrency(resultadosVendedor.precioVenta)}
+                    variant="default"
+                    icon="🏷️"
+                  />
+                  <ResultCard
+                    title="Plusvalía municipal"
+                    value={resultadosVendedor.exentoPlusvalia ? 'EXENTO' : formatCurrency(resultadosVendedor.plusvaliaMunicipal)}
+                    variant={resultadosVendedor.exentoPlusvalia ? 'success' : 'warning'}
+                    icon="🏛️"
+                    description={resultadosVendedor.metodoPlusvalia}
+                  />
+                  {resultadosVendedor.gananciaPatrimonial > 0 && (
+                    <ResultCard
+                      title="Ganancia patrimonial"
+                      value={formatCurrency(resultadosVendedor.gananciaPatrimonial)}
+                      variant="info"
+                      icon="📈"
+                      description="Base para IRPF"
+                    />
+                  )}
+                  <ResultCard
+                    title="IRPF sobre ganancia"
+                    value={formatCurrency(resultadosVendedor.irpfGanancia)}
+                    variant="warning"
+                    icon="💸"
+                    description="Tributación en base del ahorro (19%-30%)"
+                  />
+                  {resultadosVendedor.comisionInmobiliaria > 0 && (
+                    <ResultCard
+                      title={`Comisión inmobiliaria (${comisionInmobiliaria}%)`}
+                      value={formatCurrency(resultadosVendedor.comisionInmobiliaria)}
+                      variant="default"
+                      icon="🏪"
+                    />
+                  )}
+                  {resultadosVendedor.gastosGestoria > 0 && (
+                    <ResultCard
+                      title="Gastos de gestoría"
+                      value={formatCurrency(resultadosVendedor.gastosGestoria)}
+                      variant="default"
+                      icon="📂"
+                    />
+                  )}
+                  <div className={styles.separador} />
+                  <ResultCard
+                    title="Total gastos vendedor"
+                    value={formatCurrency(resultadosVendedor.totalGastos)}
+                    variant="warning"
+                    icon="➖"
+                  />
+                  <ResultCard
+                    title="IMPORTE NETO VENDEDOR"
+                    value={formatCurrency(resultadosVendedor.netoVendedor)}
+                    variant="highlight"
+                    icon="💰"
+                    description="Lo que realmente recibes tras gastos e impuestos"
+                  />
+                </div>
+              ) : (
+                <div className={styles.placeholder}>
+                  <span aria-hidden="true" className={styles.placeholderIcon}>📊</span>
+                  <p>Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Sección educativa */}
+      <EducationalSection
+        title="Todo lo que necesitas saber sobre la compraventa de garajes"
+        subtitle="Diferencias fiscales con vivienda, cuándo pagar ITP o IVA, plusvalía municipal y consejos prácticos"
+        icon="🚗"
+      >
+        {/* Tabla diferencias garaje vs vivienda */}
+        <section className={styles.eduSection}>
+          <h2>¿Qué diferencia fiscal hay entre un garaje y una vivienda?</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tablaComparativa}>
+              <thead>
+                <tr>
+                  <th>Concepto</th>
+                  <th>Garaje / Plaza parking</th>
+                  <th>Vivienda</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ITP segunda mano</td>
+                  <td>Tipo general CCAA (igual)</td>
+                  <td>Tipo general CCAA</td>
+                </tr>
+                <tr>
+                  <td>IVA obra nueva</td>
+                  <td>10% (residencial)</td>
+                  <td>10% (residencial)</td>
+                </tr>
+                <tr>
+                  <td>Tipos reducidos ITP</td>
+                  <td>Sí (joven, discapacidad…)</td>
+                  <td>Sí (joven, discapacidad…)</td>
+                </tr>
+                <tr>
+                  <td>Plusvalía municipal vendedor</td>
+                  <td>Sí (igual que vivienda)</td>
+                  <td>Sí</td>
+                </tr>
+                <tr>
+                  <td>Exención IRPF mayor 65 años</td>
+                  <td>NO (solo vivienda habitual)</td>
+                  <td>Sí (vivienda habitual)</td>
+                </tr>
+                <tr>
+                  <td>Reinversión vivienda habitual</td>
+                  <td>NO aplica</td>
+                  <td>Sí, puede eximir ganancia</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.notaTabla}>
+            Nota: la exención de IRPF para mayores de 65 años solo se aplica a la vivienda habitual, NO a garajes o trasteros independientes.
+          </p>
+        </section>
+
+        {/* Casos de uso */}
+        <section className={styles.eduSection}>
+          <h2>Casos habituales de compraventa de garaje</h2>
+          <div className={styles.casosGrid}>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span aria-hidden="true" className={styles.casoEmoji}>🚗</span>
+                <span className={styles.casoTag}>Comprar garaje solo (segunda mano)</span>
+              </div>
+              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid (6%), más notaría (~400 €), registro (~150 €) y gestoría (300 €). El coste total real asciende a ~27.350 €.</p>
+              <div className={styles.casoResultado}>ITP + gastos = aprox. 10-12% del precio</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span aria-hidden="true" className={styles.casoEmoji}>🏗️</span>
+                <span className={styles.casoTag}>Garaje de obra nueva con vivienda</span>
+              </div>
+              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al 10% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €), el IVA del garaje es también el 10% siempre que no supere dos plazas por vivienda.</p>
+              <div className={styles.casoResultado}>IVA 10% en garaje de obra nueva (residencial)</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span aria-hidden="true" className={styles.casoEmoji}>💸</span>
+                <span className={styles.casoTag}>Vender garaje con ganancia</span>
+              </div>
+              <p>Ana compró un garaje por 15.000 € hace 10 años y lo vende por 22.000 €. Debe pagar plusvalía municipal al ayuntamiento y tributar por la ganancia de 7.000 € en IRPF (base del ahorro: 19% los primeros 6.000 €, 21% el resto). Además abona la comisión si usa inmobiliaria.</p>
+              <div className={styles.casoResultado}>Ganancia tributa: IRPF ahorro + plusvalía municipal</div>
+            </div>
+            <div className={styles.casoCard}>
+              <div className={styles.casoHeader}>
+                <span aria-hidden="true" className={styles.casoEmoji}>🎯</span>
+                <span className={styles.casoTag}>Tipos reducidos de ITP para garaje</span>
+              </div>
+              <p>Carlos, 28 años, compra un garaje en Andalucía por 18.000 €. Al ser joven, puede aplicar el tipo reducido autonómico. El simulador detecta el tipo reducido disponible y lo aplica automáticamente al seleccionar "Joven" en el perfil del comprador.</p>
+              <div className={styles.casoResultado}>Tipos reducidos: aplican igual que en vivienda residencial</div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className={styles.eduSection}>
+          <h2>Preguntas frecuentes sobre compraventa de garaje</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Se puede comprar un garaje sin ser propietario de una vivienda?</h4>
+              <p>Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Qué ITP paga un garaje de segunda mano?</h4>
+              <p>El garaje tributa por el Impuesto de Transmisiones Patrimoniales (ITP) al mismo tipo que los inmuebles residenciales de su comunidad autónoma, que oscila entre el 4% (País Vasco) y el 11% (Cataluña, Comunidad Valenciana). El garaje se considera inmueble residencial y puede beneficiarse de tipos reducidos para jóvenes, familias numerosas o personas con discapacidad si los cumple.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h4>
+              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA al 10% más AJD (entre 0,5% y 1,5% según la comunidad). Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿El vendedor de un garaje paga plusvalía municipal?</h4>
+              <p>Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida.</p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>¿Existen tipos reducidos de ITP para garajes?</h4>
+              <p>Sí, en muchas comunidades autónomas los tipos reducidos aplicables a inmuebles residenciales también se pueden aplicar a garajes, siempre que el garaje se compre junto con o en el mismo acto que la vivienda, o cuando se cumplan los requisitos del comprador (edad, ingresos, discapacidad). Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Consejos */}
+        <section className={styles.eduSection}>
+          <h2>Consejos prácticos para la compraventa de un garaje</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span aria-hidden="true" className={styles.tipIcon}>🔍</span>
+              <strong>Consulta el valor catastral antes de negociar</strong>
+              <p>La base del ITP es el mayor entre el precio escriturado y el valor de referencia catastral. Si el catastral supera el precio de mercado, puedes pagar más ITP del esperado. Consulta en la Sede Electrónica del Catastro antes de firmar.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span aria-hidden="true" className={styles.tipIcon}>📋</span>
+              <strong>Verifica si la plaza está registrada independientemente</strong>
+              <p>Asegúrate de que el garaje tiene referencia catastral y número de finca registral propios. Si no está inscrito por separado, puede haber complicaciones en la escrituración y en el pago de impuestos.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span aria-hidden="true" className={styles.tipIcon}>📅</span>
+              <strong>Liquida el ITP en el plazo legal</strong>
+              <p>El ITP debe liquidarse en 30 días hábiles desde la firma de la escritura. El retraso genera recargos del 5% al 20% más intereses de demora. Planifica la liquidación desde el día de la firma.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span aria-hidden="true" className={styles.tipIcon}>👨‍💼</span>
+              <strong>Consulta con asesor fiscal si hay ganancia significativa</strong>
+              <p>Si la ganancia patrimonial al vender es importante, un asesor puede identificar gastos deducibles (reformas, mejoras documentadas) que reduzcan la base imponible del IRPF.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Warning Box */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span aria-hidden="true" className={styles.warningIcon}>⚠️</span>
+            <strong>Limitaciones de esta calculadora</strong>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>Estimaciones orientativas:</strong> Los importes reales pueden diferir según el valor de referencia catastral del inmueble, los coeficientes de plusvalía de cada municipio y los aranceles notariales concretos aplicados.</li>
+            <li><strong>Sin exención IRPF por vivienda habitual:</strong> Esta calculadora no aplica la exención por reinversión en vivienda habitual ni la exención para mayores de 65 años, ya que estas exenciones aplican a vivienda, no a garajes independientes.</li>
+            <li><strong>Tipos fiscales pueden cambiar:</strong> Los tipos de ITP, AJD y tarifas notariales corresponden a la normativa de diciembre 2024. Verifica con tu comunidad autónoma antes de tomar decisiones.</li>
+            <li><strong>Garajes en sótanos comerciales:</strong> Si el garaje está vinculado a un local o edificio de uso no residencial, el tipo de IVA puede ser del 21% en lugar del 10%. Consulta con un profesional.</li>
+          </ul>
+        </div>
+      </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('simulador-gastos-compraventa-garaje')} />
+      <ShareCard appName="simulador-gastos-compraventa-garaje" />
+      <Footer appName="simulador-gastos-compraventa-garaje" />
+    </div>
+  );
+}
