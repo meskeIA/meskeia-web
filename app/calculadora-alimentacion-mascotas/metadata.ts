@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Alimentación para Perros y Gatos',
     description: 'Calcula cuánto debe comer tu mascota según su peso, edad y nivel de actividad',
-    url: 'https://meskeia.com/calculadora-alimentacion-mascotas',
+    url: 'https://meskeia.com/calculadora-alimentacion-mascotas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

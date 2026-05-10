@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diagnóstico de Comunicación Interna | meskeIA',
     description: '¿Tu equipo comunica rápido pero sin profundidad? Test interactivo con diagnóstico visual.',
-    url: 'https://meskeia.com/diagnostico-comunicacion-interna',
+    url: 'https://meskeia.com/diagnostico-comunicacion-interna/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

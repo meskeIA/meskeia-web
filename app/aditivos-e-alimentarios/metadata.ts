@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Aditivos E Alimentarios | meskeIA',
     description: 'Busca y consulta los aditivos E más comunes: qué son, de dónde vienen y en qué alimentos los encontrarás.',
-    url: 'https://meskeia.com/aditivos-e-alimentarios',
+    url: 'https://meskeia.com/aditivos-e-alimentarios/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

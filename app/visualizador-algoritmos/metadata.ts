@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Visualizador de Algoritmos de Ordenación - meskeIA',
     description: 'Aprende algoritmos de ordenación con visualizaciones interactivas paso a paso. Bubble Sort, Quick Sort, Merge Sort y más.',
-    url: 'https://meskeia.com/visualizador-algoritmos',
+    url: 'https://meskeia.com/visualizador-algoritmos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

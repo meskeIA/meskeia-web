@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Guía de Hierbas Aromáticas para Cocina | meskeIA',
     description:
       'Descubre 27 hierbas aromáticas: perfil de sabor, intensidad, usos culinarios, origen, maridaje y guía de cultivo.',
-    url: 'https://meskeia.com/guia-hierbas-aromaticas',
+    url: 'https://meskeia.com/guia-hierbas-aromaticas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

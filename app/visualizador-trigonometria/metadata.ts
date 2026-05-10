@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Trigonometría: Círculo Unitario Interactivo — meskeIA',
     description: 'Aprende trigonometría con visualizaciones interactivas: círculo unitario, gráficas de sen/cos/tan con sliders y tabla de valores exactos.',
-    url: 'https://meskeia.com/visualizador-trigonometria',
+    url: 'https://meskeia.com/visualizador-trigonometria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

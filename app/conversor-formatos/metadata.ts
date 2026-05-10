@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor de Formatos de Archivo | meskeIA',
     description: 'Convierte entre JSON, CSV, Excel, XML y YAML. 100% privado, procesamiento local.',
-    url: 'https://meskeia.com/conversor-formatos',
+    url: 'https://meskeia.com/conversor-formatos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

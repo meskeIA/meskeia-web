@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Constelaciones del Cielo - Guía de 32 Constelaciones Famosas',
     description: 'Explora las 32 constelaciones más famosas: zodiacales, boreales y australes. Estrellas, mitología y curiosidades.',
-    url: 'https://meskeia.com/constelaciones-del-cielo',
+    url: 'https://meskeia.com/constelaciones-del-cielo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

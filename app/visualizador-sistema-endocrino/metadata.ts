@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Sistema Endocrino - Glándulas, Hormonas y Feedback',
     description: 'Glándulas, hormonas y feedback negativo explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-sistema-endocrino',
+    url: 'https://meskeia.com/visualizador-sistema-endocrino/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

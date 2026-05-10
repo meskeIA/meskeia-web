@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tu Cuerpo en Números - Estadísticas Asombrosas del Cuerpo Humano',
     description: 'Las cifras más increíbles del cuerpo humano explicadas visualmente: estructura, sistemas, células y récords.',
-    url: 'https://meskeia.com/visualizador-cuerpo-numeros',
+    url: 'https://meskeia.com/visualizador-cuerpo-numeros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

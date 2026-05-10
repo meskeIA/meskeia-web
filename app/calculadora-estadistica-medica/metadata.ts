@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Estadística Médica | meskeIA',
     description: 'Sensibilidad, especificidad, VPP, VPN, odds ratio, riesgo relativo y NNT. Para estudiantes de medicina y epidemiología.',
-    url: 'https://meskeia.com/calculadora-estadistica-medica',
+    url: 'https://meskeia.com/calculadora-estadistica-medica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

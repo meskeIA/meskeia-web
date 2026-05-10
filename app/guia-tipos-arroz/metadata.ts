@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description:
       'Guía de referencia de 30 variedades de arroz del mundo: tipo de grano, origen, tiempo de cocción, proporción de agua y uso culinario ideal.',
     type: 'website',
-    url: 'https://meskeia.com/guia-tipos-arroz',
+    url: 'https://meskeia.com/guia-tipos-arroz/',
     locale: 'es_ES',
     siteName: 'meskeIA',
     images: [{

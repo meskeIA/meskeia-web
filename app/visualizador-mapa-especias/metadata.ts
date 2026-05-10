@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Mapa de las Especias - Rutas, Origen e Historia',
     description: 'Las rutas que cambiaron el mundo: pimienta como moneda, nuez moscada más cara que el oro, guerras por el clavo. Historia visual de las especias.',
-    url: 'https://meskeia.com/visualizador-mapa-especias',
+    url: 'https://meskeia.com/visualizador-mapa-especias/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

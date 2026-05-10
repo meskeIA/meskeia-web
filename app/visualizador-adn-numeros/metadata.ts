@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tu ADN en Números — Biología del Genoma Humano',
     description: '3.200 millones de pares de bases, 74.000 millones de km de ADN en tu cuerpo, 96% compartido con el chimpancé. Datos asombrosos sobre la biología humana.',
-    url: 'https://meskeia.com/visualizador-adn-numeros',
+    url: 'https://meskeia.com/visualizador-adn-numeros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Visualizador de Teoría de Grafos - meskeIA',
     description: 'Aprende teoría de grafos con visualizaciones interactivas: Dijkstra animado, Euler, Hamilton y los Puentes de Königsberg.',
-    url: 'https://meskeia.com/visualizador-teoria-grafos',
+    url: 'https://meskeia.com/visualizador-teoria-grafos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

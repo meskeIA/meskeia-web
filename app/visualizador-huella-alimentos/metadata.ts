@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Huella de lo que Comes',
     description: 'Compara el impacto ambiental de los alimentos: CO2, agua y uso de suelo.',
-    url: 'https://meskeia.com/visualizador-huella-alimentos',
+    url: 'https://meskeia.com/visualizador-huella-alimentos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

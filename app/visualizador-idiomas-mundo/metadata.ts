@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Mapa de los Idiomas del Mundo',
     description: 'Familias lingüísticas, los idiomas más hablados, lenguas en peligro y curiosidades. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-idiomas-mundo',
+    url: 'https://meskeia.com/visualizador-idiomas-mundo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

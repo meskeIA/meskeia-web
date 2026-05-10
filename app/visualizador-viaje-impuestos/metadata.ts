@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Viaje de tus Impuestos - ¿A dónde va tu dinero?',
     description: 'Gráfico interactivo del gasto público en España. Descubre cuánto de tus impuestos va a pensiones, sanidad, educación y más.',
-    url: 'https://meskeia.com/visualizador-viaje-impuestos',
+    url: 'https://meskeia.com/visualizador-viaje-impuestos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

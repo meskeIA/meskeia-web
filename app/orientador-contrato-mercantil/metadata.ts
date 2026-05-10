@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Orientador de Contrato Mercantil | meskeIA',
     description:
       'Identifica qué tipo de contrato mercantil necesitas según tu situación y conoce las cláusulas esenciales para protegerte.',
-    url: 'https://meskeia.com/orientador-contrato-mercantil',
+    url: 'https://meskeia.com/orientador-contrato-mercantil/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

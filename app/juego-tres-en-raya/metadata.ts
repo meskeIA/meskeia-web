@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tres en Raya - Juego Clásico | meskeIA',
     description: 'Juega al clásico Tres en Raya contra la computadora.',
-    url: 'https://meskeia.com/juego-tres-en-raya',
+    url: 'https://meskeia.com/juego-tres-en-raya/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

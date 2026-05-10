@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Algoritmos de Ordenación | meskeIA',
     description: '7 algoritmos paso a paso con tu propio array y comparativa de rendimiento',
-    url: 'https://meskeia.com/simulador-ordenacion',
+    url: 'https://meskeia.com/simulador-ordenacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

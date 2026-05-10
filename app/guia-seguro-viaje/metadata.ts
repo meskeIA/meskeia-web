@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Seguro de Viaje según Destino | meskeIA',
     description: 'Qué cobertura necesitas según tu destino y tipo de viaje. Checklist completo antes de contratar.',
-    url: 'https://meskeia.com/guia-seguro-viaje',
+    url: 'https://meskeia.com/guia-seguro-viaje/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

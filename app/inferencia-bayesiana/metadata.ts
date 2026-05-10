@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Inferencia Bayesiana | meskeIA',
     description: 'Aplica el teorema de Bayes paso a paso. Calcula probabilidades posteriores con prior, likelihood y evidencia.',
-    url: 'https://meskeia.com/inferencia-bayesiana',
+    url: 'https://meskeia.com/inferencia-bayesiana/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

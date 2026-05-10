@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Sistema Solar en Números - Planetas, Distancias y Curiosidades',
     description: 'Los 8 planetas, sus distancias a escala, velocidad de la luz y curiosidades sorprendentes. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-sistema-solar',
+    url: 'https://meskeia.com/visualizador-sistema-solar/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

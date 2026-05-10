@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Matrices - El Lenguaje Secreto de las Transformaciones',
     description: 'Qué son las matrices y cómo transforman el mundo: rotación, escala, reflexión explicadas visualmente.',
-    url: 'https://meskeia.com/visualizador-matrices',
+    url: 'https://meskeia.com/visualizador-matrices/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

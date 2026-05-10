@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador Desglose de Nómina | meskeIA',
     description: 'Bruto a neto paso a paso animado: SS y IRPF',
-    url: 'https://meskeia.com/simulador-desglose-nomina',
+    url: 'https://meskeia.com/simulador-desglose-nomina/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [

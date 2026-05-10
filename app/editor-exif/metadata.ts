@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Editor EXIF - Protege tu Privacidad | meskeIA',
     description: 'Descubre qué datos ocultos revelan tus fotos y elimínalos fácilmente. Herramienta educativa de seguridad digital.',
-    url: 'https://meskeia.com/editor-exif',
+    url: 'https://meskeia.com/editor-exif/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

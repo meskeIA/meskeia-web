@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Regresión Lineal y Logística | meskeIA',
     description: 'Añade puntos y observa el modelo ajustarse en tiempo real',
-    url: 'https://meskeia.com/simulador-regresion',
+    url: 'https://meskeia.com/simulador-regresion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

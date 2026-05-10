@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Las Fuerzas Invisibles del Día a Día',
     description: 'Por qué no flotas, no resbalas, te lanzas al frenar, te duelen los oídos en el avión y los insectos flotan en el agua. Física explicada para todos.',
-    url: 'https://meskeia.com/visualizador-fuerzas-invisibles',
+    url: 'https://meskeia.com/visualizador-fuerzas-invisibles/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

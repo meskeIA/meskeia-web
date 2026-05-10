@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Mecánica de Fluidos: Reynolds, Magnus, Bernoulli y Mach — meskeIA',
     description: 'Visualiza en tiempo real el número de Reynolds, el efecto Magnus en deportes, por qué el avión NO vuela solo por Bernoulli, y los fenómenos de Mach y cavitación. Animaciones SVG interactivas.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-mecanica-fluidos',
+    url: 'https://meskeia.com/visualizador-mecanica-fluidos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Visualizador de Cosmología: Composición y Destino del Universo — meskeIA',
     description: 'El universo es 5% materia visible, 27% materia oscura y 68% energía oscura. Explora la línea de tiempo cósmica, la expansión acelerada y el destino final del cosmos.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-cosmologia',
+    url: 'https://meskeia.com/visualizador-cosmologia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Nutrición - Nutrición Avanzada Basada en Ciencia',
     description: 'Conocimiento nutricional avanzado basado en ciencia. Más allá de los consejos básicos que ya conoces.',
-    url: 'https://meskeia.com/curso-nutrisalud',
+    url: 'https://meskeia.com/curso-nutrisalud/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

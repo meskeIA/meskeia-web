@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Fotosíntesis - De la Luz Solar a la Vida',
     description: 'El proceso que sostiene la vida en la Tierra, explicado visualmente paso a paso.',
-    url: 'https://meskeia.com/visualizador-fotosintesis',
+    url: 'https://meskeia.com/visualizador-fotosintesis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

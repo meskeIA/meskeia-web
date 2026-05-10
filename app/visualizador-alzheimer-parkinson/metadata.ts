@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'Alzheimer y Parkinson: Mecanismo Neurobiológico — meskeIA',
     description: 'Qué ocurre molecularmente en el cerebro en el Alzheimer (Aβ/Tau) y el Parkinson (α-sinucleína/dopamina).',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-alzheimer-parkinson',
+    url: 'https://meskeia.com/visualizador-alzheimer-parkinson/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

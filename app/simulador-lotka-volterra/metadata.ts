@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador Depredador-Presa | meskeIA',
     description: 'Modelo Lotka-Volterra interactivo: oscilaciones, extinciones y equilibrios de ecosistemas',
-    url: 'https://meskeia.com/simulador-lotka-volterra',
+    url: 'https://meskeia.com/simulador-lotka-volterra/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona el Clima - Efecto Invernadero y Calentamiento Global',
     description: 'La ciencia del clima explicada visualmente: efecto invernadero, corrientes oceánicas y qué pasa a +1°C, +2°C y +4°C de calentamiento.',
-    url: 'https://meskeia.com/visualizador-clima',
+    url: 'https://meskeia.com/visualizador-clima/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

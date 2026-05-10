@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor IEEE 754 - Punto Flotante | meskeIA',
     description: 'Convierte decimales a IEEE 754 y visualiza signo, exponente y mantisa. Precisión simple y doble.',
-    url: 'https://meskeia.com/conversor-ieee754',
+    url: 'https://meskeia.com/conversor-ieee754/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

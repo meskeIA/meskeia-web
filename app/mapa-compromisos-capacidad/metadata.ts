@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mapa de Compromisos vs Capacidad | meskeIA',
     description: '¿Has dicho sí a más de lo que puedes hacer bien? Test interactivo de carga realista.',
-    url: 'https://meskeia.com/mapa-compromisos-capacidad',
+    url: 'https://meskeia.com/mapa-compromisos-capacidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

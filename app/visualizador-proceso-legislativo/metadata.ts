@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Viaje de una Ley - Proceso Legislativo en España',
     description: 'De la idea a la ley: cómo funciona el proceso legislativo en España explicado de forma visual.',
-    url: 'https://meskeia.com/visualizador-proceso-legislativo',
+    url: 'https://meskeia.com/visualizador-proceso-legislativo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

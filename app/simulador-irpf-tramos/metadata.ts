@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador Visual IRPF Tramos 2025 | meskeIA',
     description: 'Visualiza los tramos del IRPF y cómo afectan a tu cuota — interactivo y didáctico',
-    url: 'https://meskeia.com/simulador-irpf-tramos',
+    url: 'https://meskeia.com/simulador-irpf-tramos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

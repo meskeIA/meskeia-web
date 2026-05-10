@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Sonido y Ondas - Frecuencia, Amplitud y Decibelios',
     description: 'Explora la física del sonido: ondas, frecuencia, amplitud, decibelios y timbre. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-sonido-ondas',
+    url: 'https://meskeia.com/visualizador-sonido-ondas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

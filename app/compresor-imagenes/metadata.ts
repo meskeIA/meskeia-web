@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Compresor de Imágenes por Lotes - Sin Límites | meskeIA',
     description: 'Comprime múltiples imágenes a la vez sin límites ni marcas de agua. Reduce el tamaño de tus fotos manteniendo la calidad.',
-    url: 'https://meskeia.com/compresor-imagenes',
+    url: 'https://meskeia.com/compresor-imagenes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

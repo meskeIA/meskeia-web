@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Playground SQL - Aprende SQL Practicando | meskeIA',
     description: 'Editor SQL interactivo con ejercicios guiados. Practica SELECT, JOIN, GROUP BY y más sin instalar nada.',
-    url: 'https://meskeia.com/playground-sql',
+    url: 'https://meskeia.com/playground-sql/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Sistemas Numéricos - Binario, Octal, Decimal, Hex',
     description: 'Convierte números entre binario, octal, decimal y hexadecimal con explicación paso a paso. Ideal para estudiantes de informática.',
-    url: 'https://meskeia.com/calculadora-sistemas-numericos',
+    url: 'https://meskeia.com/calculadora-sistemas-numericos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

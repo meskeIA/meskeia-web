@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: 'Estimador Reformas del Hogar | meskeIA',
     description:
       'Estima el coste de tus reformas: cocina, baño, suelos, pintura y más. Precios de referencia España 2026.',
-    url: 'https://meskeia.com/estimador-reformas-hogar',
+    url: 'https://meskeia.com/estimador-reformas-hogar/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     type: 'website',

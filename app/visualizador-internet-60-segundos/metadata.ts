@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona Internet en 60 Segundos',
     description: 'El viaje invisible de tus datos: de tu navegador al servidor y vuelta en milisegundos.',
-    url: 'https://meskeia.com/visualizador-internet-60-segundos',
+    url: 'https://meskeia.com/visualizador-internet-60-segundos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

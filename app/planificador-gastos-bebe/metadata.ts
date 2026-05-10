@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Planificador de Gastos del Primer Año del Bebé | meskeIA',
     description:
       'Calcula cuánto cuesta el primer año de un bebé en España. 10 categorías, 3 niveles de gasto y resumen mensual/anual.',
-    url: 'https://meskeia.com/planificador-gastos-bebe',
+    url: 'https://meskeia.com/planificador-gastos-bebe/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

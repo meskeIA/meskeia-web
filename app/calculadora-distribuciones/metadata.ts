@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Distribuciones de Probabilidad | meskeIA',
     description: 'Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma y Beta. Con visualización de PDF y CDF.',
-    url: 'https://meskeia.com/calculadora-distribuciones',
+    url: 'https://meskeia.com/calculadora-distribuciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

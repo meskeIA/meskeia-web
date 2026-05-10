@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Huella de Carbono Personal - meskeIA',
     description: 'Calcula tu huella de carbono anual y descubre cómo reducir tu impacto ambiental.',
-    url: 'https://meskeia.com/calculadora-huella-carbono',
+    url: 'https://meskeia.com/calculadora-huella-carbono/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

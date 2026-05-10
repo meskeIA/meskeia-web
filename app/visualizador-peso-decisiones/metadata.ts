@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cuánto Pesa una Decisión',
     description: 'El impacto acumulado de decisiones cotidianas. Pequeños cambios, grandes resultados.',
-    url: 'https://meskeia.com/visualizador-peso-decisiones',
+    url: 'https://meskeia.com/visualizador-peso-decisiones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

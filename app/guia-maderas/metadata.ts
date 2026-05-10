@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Guía de Maderas - Directorio Interactivo | meskeIA',
     description:
       'Explora 35 tipos de madera: frondosas, coníferas, tropicales y más. Filtra por tipo, dificultad y sostenibilidad.',
-    url: 'https://meskeia.com/guia-maderas',
+    url: 'https://meskeia.com/guia-maderas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

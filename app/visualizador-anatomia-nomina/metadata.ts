@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Anatomía de una Nómina - Explicador Visual',
     description: 'Nómina ficticia interactiva: cada línea explicada. Devengos, deducciones, bases de cotización.',
-    url: 'https://meskeia.com/visualizador-anatomia-nomina',
+    url: 'https://meskeia.com/visualizador-anatomia-nomina/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Transformada de Fourier: Visualizador Interactivo — meskeIA',
     description: 'Cómo cualquier señal se descompone en sumas de senos. Síntesis, espectro, epiciclos y aplicaciones reales explicadas de forma visual.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-transformada-fourier',
+    url: 'https://meskeia.com/visualizador-transformada-fourier/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

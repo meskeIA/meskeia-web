@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Teoría de la Información: Entropía de Shannon, Huffman y Compresión — meskeIA',
     description: 'Visualizador interactivo: entropía de Shannon, árbol de Huffman, capacidad Shannon-Hartley y comparativa de formatos de compresión. Educativo y gratuito.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-teoria-informacion',
+    url: 'https://meskeia.com/visualizador-teoria-informacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Instrumentos Musicales - Guía de 45 Instrumentos del Mundo',
     description: 'Explora 45 instrumentos musicales: cuerda, viento, percusión, teclado y electrónicos con origen, materiales y curiosidades.',
-    url: 'https://meskeia.com/instrumentos-musicales',
+    url: 'https://meskeia.com/instrumentos-musicales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

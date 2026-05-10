@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Genética Mendeliana | meskeIA',
     description: 'Visualiza cruces genéticos, cuadros de Punnett y herencia mendeliana de forma interactiva',
-    url: 'https://meskeia.com/simulador-genetica',
+    url: 'https://meskeia.com/simulador-genetica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

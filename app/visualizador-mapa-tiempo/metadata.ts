@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Mapa de tu Tiempo - ¿En qué gastas tu vida?',
     description: 'Visualiza cómo se reparten las horas de tu vida: dormir, trabajar, comer y más.',
-    url: 'https://meskeia.com/visualizador-mapa-tiempo',
+    url: 'https://meskeia.com/visualizador-mapa-tiempo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

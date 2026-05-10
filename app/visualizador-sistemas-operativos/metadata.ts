@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: 'Sistemas Operativos Interactivo: Procesos, CPU, Memoria y Ficheros',
     description:
       'Visualiza estados de proceso, algoritmos de planificación con Gantt animado, paginación y sistema de ficheros. Interactivo y gratuito.',
-    url: 'https://meskeia.com/visualizador-sistemas-operativos',
+    url: 'https://meskeia.com/visualizador-sistemas-operativos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Tensión Arterial | meskeIA',
     description: 'Clasifica tu presión arterial según las guías ESH/ESC 2018 y guarda tu historial de mediciones.',
-    url: 'https://meskeia.com/orientador-tension-arterial',
+    url: 'https://meskeia.com/orientador-tension-arterial/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Analizador GEO/AEO - Optimiza para IAs - meskeIA',
     description: 'Analiza tu contenido para ser citado por ChatGPT, Perplexity y otras IAs. Puntuación GEO y recomendaciones.',
-    url: 'https://meskeia.com/analizador-geo',
+    url: 'https://meskeia.com/analizador-geo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: '2048 - Juego de Números | meskeIA',
     description: 'Desliza y combina números para llegar a 2048.',
-    url: 'https://meskeia.com/juego-2048',
+    url: 'https://meskeia.com/juego-2048/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

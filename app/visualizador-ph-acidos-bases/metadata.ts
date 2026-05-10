@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Escala de pH: Ácidos y Bases - Explicador Visual',
     description: 'La escala de pH de 0 a 14 con colores, sustancias cotidianas y neutralización. Interactivo y gratuito.',
-    url: 'https://meskeia.com/visualizador-ph-acidos-bases',
+    url: 'https://meskeia.com/visualizador-ph-acidos-bases/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

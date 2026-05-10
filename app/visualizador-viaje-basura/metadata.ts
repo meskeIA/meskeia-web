@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Viaje de tu Basura - Reciclaje y Residuos',
     description: 'Qué pasa con cada tipo de residuo: desde el cubo de tu casa hasta su nueva vida como producto reciclado.',
-    url: 'https://meskeia.com/visualizador-viaje-basura',
+    url: 'https://meskeia.com/visualizador-viaje-basura/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

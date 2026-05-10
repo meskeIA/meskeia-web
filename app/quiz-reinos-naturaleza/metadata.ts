@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Quiz Reinos de la Naturaleza | meskeIA',
     description: '¿Sabes que el coral es un animal y el liquen no es una planta? 43 organismos sorprendentes con sus curiosidades. ESO, Bachillerato y más.',
-    url: 'https://meskeia.com/quiz-reinos-naturaleza',
+    url: 'https://meskeia.com/quiz-reinos-naturaleza/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

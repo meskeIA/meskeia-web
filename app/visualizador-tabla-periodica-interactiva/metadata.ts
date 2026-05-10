@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tendencias de la Tabla Periódica - El Mapa de la Química',
     description: 'Electronegatividad, radio atómico y energía de ionización visualizados como mapas de calor interactivos.',
-    url: 'https://meskeia.com/visualizador-tabla-periodica-interactiva',
+    url: 'https://meskeia.com/visualizador-tabla-periodica-interactiva/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lupa Digital Online - Amplía con la Cámara',
     description: 'Lupa digital gratuita que usa la cámara para ampliar texto y objetos pequeños.',
-    url: 'https://meskeia.com/lupa-digital',
+    url: 'https://meskeia.com/lupa-digital/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

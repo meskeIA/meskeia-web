@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description:
       'Descubre 40 frutas tropicales y raras del mundo: origen, temporada, beneficios, formas de consumo y curiosidades.',
     type: 'website',
-    url: 'https://meskeia.com/guia-frutas-exoticas',
+    url: 'https://meskeia.com/guia-frutas-exoticas/',
     locale: 'es_ES',
     siteName: 'meskeIA',
     images: [{

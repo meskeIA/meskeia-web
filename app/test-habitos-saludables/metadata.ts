@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Hábitos Saludables - meskeIA',
     description: 'Evalúa tus hábitos de vida y obtén un perfil visual de tu bienestar.',
-    url: 'https://meskeia.com/test-habitos-saludables',
+    url: 'https://meskeia.com/test-habitos-saludables/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

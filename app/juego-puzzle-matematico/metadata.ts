@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Puzzle Matemático - Juego de Operaciones | meskeIA',
     description: 'Resuelve operaciones matemáticas contrarreloj. Entrena tu mente.',
-    url: 'https://meskeia.com/juego-puzzle-matematico',
+    url: 'https://meskeia.com/juego-puzzle-matematico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

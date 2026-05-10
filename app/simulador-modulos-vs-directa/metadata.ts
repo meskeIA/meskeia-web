@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador Módulos vs Estimación Directa | meskeIA',
     description: 'Compara los dos regímenes fiscales del autónomo y descubre cuál te conviene',
-    url: 'https://meskeia.com/simulador-modulos-vs-directa',
+    url: 'https://meskeia.com/simulador-modulos-vs-directa/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

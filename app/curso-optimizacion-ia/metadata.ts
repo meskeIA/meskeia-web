@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Optimización para IAs (GEO/AEO) - Posiciona tu Contenido en IAs',
     description: 'Aprende a optimizar tu contenido para que ChatGPT, Perplexity y Gemini lo citen. Curso pionero en español sobre GEO/AEO.',
-    url: 'https://meskeia.com/curso-optimizacion-ia',
+    url: 'https://meskeia.com/curso-optimizacion-ia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

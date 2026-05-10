@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cuanta Agua Gastas sin Saberlo',
     description: 'La huella hidrica invisible de tu vida cotidiana.',
-    url: 'https://meskeia.com/visualizador-agua-virtual',
+    url: 'https://meskeia.com/visualizador-agua-virtual/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

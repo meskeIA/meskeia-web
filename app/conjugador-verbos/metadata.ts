@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conjugador de Verbos Español | meskeIA',
     description: 'Conjuga cualquier verbo en español. Todos los tiempos, incluidos irregulares.',
-    url: 'https://meskeia.com/conjugador-verbos',
+    url: 'https://meskeia.com/conjugador-verbos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mapa de Automatización Personal | meskeIA',
     description: '¿Automatizas lo correcto o estás delegando lo que te hace valioso? Test interactivo.',
-    url: 'https://meskeia.com/mapa-automatizacion-personal',
+    url: 'https://meskeia.com/mapa-automatizacion-personal/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

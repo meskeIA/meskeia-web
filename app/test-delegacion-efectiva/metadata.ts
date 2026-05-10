@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Delegación Efectiva | meskeIA',
     description: '¿Delegas bien o solo sueltas tareas? Test interactivo basado en el Modelo Situacional de Hersey-Blanchard.',
-    url: 'https://meskeia.com/test-delegacion-efectiva',
+    url: 'https://meskeia.com/test-delegacion-efectiva/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

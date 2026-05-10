@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de SQL JOIN Visual | meskeIA',
     description: 'Aprende los JOIN de SQL con diagrama de Venn y líneas de coincidencia interactivas',
-    url: 'https://meskeia.com/simulador-sql-join',
+    url: 'https://meskeia.com/simulador-sql-join/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

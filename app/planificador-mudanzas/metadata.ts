@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Mudanzas - Organiza tu Mudanza | meskeIA',
     description: 'Checklist de tareas, inventario por habitación y control de presupuesto para tu mudanza. Herramienta gratuita online.',
-    url: 'https://meskeia.com/planificador-mudanzas',
+    url: 'https://meskeia.com/planificador-mudanzas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

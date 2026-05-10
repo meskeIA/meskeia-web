@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Infusiones | meskeIA',
     description: 'Consulta los usos tradicionales, preparación y contraindicaciones de 55 plantas para infusión. Filtros por familia.',
-    url: 'https://meskeia.com/guia-infusiones',
+    url: 'https://meskeia.com/guia-infusiones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

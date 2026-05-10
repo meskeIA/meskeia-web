@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estados de la Materia - Sólido, Líquido, Gas y Plasma',
     description: 'Partículas animadas, transiciones y diagrama de fases: la materia explicada visualmente.',
-    url: 'https://meskeia.com/visualizador-estados-materia',
+    url: 'https://meskeia.com/visualizador-estados-materia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

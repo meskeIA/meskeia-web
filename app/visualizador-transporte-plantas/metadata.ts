@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Transporte en las Plantas - Agua que Sube sin Motor',
     description: 'Cómo las plantas mueven agua y nutrientes sin bombas: xilema, floema, estomas y capilaridad explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-transporte-plantas',
+    url: 'https://meskeia.com/visualizador-transporte-plantas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

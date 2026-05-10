@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diagnóstico de Modelo de Negocio | meskeIA',
     description: '¿Tu modelo de negocio está equilibrado? Test basado en el Business Model Canvas.',
-    url: 'https://meskeia.com/diagnostico-modelo-negocio',
+    url: 'https://meskeia.com/diagnostico-modelo-negocio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

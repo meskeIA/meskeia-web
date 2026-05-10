@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Transferencia de Calor - Conducción, Convección y Radiación',
     description: 'Las 3 formas de transferir calor explicadas visualmente con animaciones de partículas, corrientes y ondas.',
-    url: 'https://meskeia.com/visualizador-termodinamica',
+    url: 'https://meskeia.com/visualizador-termodinamica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

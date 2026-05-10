@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Materiales de Construcción | meskeIA',
     description: 'Calcula azulejos, pintura, tarima y mortero para tus reformas. Con desperdicio y coste estimado.',
-    url: 'https://meskeia.com/calculadora-materiales-construccion',
+    url: 'https://meskeia.com/calculadora-materiales-construccion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

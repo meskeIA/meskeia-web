@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Osteoporosis — El Ciclo de Remodelado Óseo',
     description: 'El hueso que se renueva constantemente: osteoblastos, osteoclastos, densidad ósea y factores de riesgo. Visualizador educativo interactivo.',
-    url: 'https://meskeia.com/visualizador-osteoporosis',
+    url: 'https://meskeia.com/visualizador-osteoporosis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

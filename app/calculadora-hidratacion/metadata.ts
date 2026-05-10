@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Hidratación Diaria',
     description: 'Calcula cuánta agua necesitas beber al día según tu peso, actividad física y clima.',
-    url: 'https://meskeia.com/calculadora-hidratacion',
+    url: 'https://meskeia.com/calculadora-hidratacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

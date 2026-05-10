@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Fibonacci en la Naturaleza - La Secuencia que Lo Conecta Todo',
     description: 'La secuencia de Fibonacci y la proporción áurea explicadas visualmente: de los pétalos a las galaxias.',
-    url: 'https://meskeia.com/visualizador-fibonacci-naturaleza',
+    url: 'https://meskeia.com/visualizador-fibonacci-naturaleza/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona el Dolor — Nocicepción y Tipos',
     description: 'De la lesión al cerebro: fisiología de la nocicepción, tipos de dolor y sensibilización central. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-como-funciona-el-dolor',
+    url: 'https://meskeia.com/visualizador-como-funciona-el-dolor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

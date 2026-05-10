@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diagnóstico Explotación vs Exploración | meskeIA',
     description: '¿Tu organización está demasiado centrada en el corto plazo? Test interactivo basado en James G. March.',
-    url: 'https://meskeia.com/diagnostico-explotacion-exploracion',
+    url: 'https://meskeia.com/diagnostico-explotacion-exploracion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

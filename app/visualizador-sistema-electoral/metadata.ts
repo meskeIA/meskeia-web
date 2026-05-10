@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona una Elección — Sistemas Electorales Explicados',
     description: 'Ley D\'Hondt, sistemas proporcional y mayoritario, circunscripciones: cómo los votos se convierten en escaños.',
-    url: 'https://meskeia.com/visualizador-sistema-electoral',
+    url: 'https://meskeia.com/visualizador-sistema-electoral/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

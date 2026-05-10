@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Piscinas - Productos Químicos y Volumen | meskeIA',
     description: 'Calcula el volumen de tu piscina y las dosis exactas de cloro, pH y alguicida.',
-    url: 'https://meskeia.com/calculadora-piscinas',
+    url: 'https://meskeia.com/calculadora-piscinas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

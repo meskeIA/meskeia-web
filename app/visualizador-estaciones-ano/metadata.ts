@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Las Estaciones del Año - Por qué la Inclinación de 23,5° lo Cambia Todo',
     description: 'La Tierra no está más cerca del Sol en verano. La clave son 23,5° de inclinación. Explora la órbita, horas de luz y mitos.',
-    url: 'https://meskeia.com/visualizador-estaciones-ano',
+    url: 'https://meskeia.com/visualizador-estaciones-ano/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

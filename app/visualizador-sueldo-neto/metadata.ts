@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tu Sueldo al Desnudo - De Bruto a Neto Visual',
     description: 'Visualiza cada euro que se descuenta de tu sueldo: SS, IRPF, desempleo y formación. Gráfico cascada interactivo.',
-    url: 'https://meskeia.com/visualizador-sueldo-neto',
+    url: 'https://meskeia.com/visualizador-sueldo-neto/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Estilos de Cerveza | meskeIA',
     description: '47 estilos de cerveza con IBU, ABV, temperatura de servicio, notas de sabor y maridaje. Incluye NEIPA, Quadrupel y Mexican Lager.',
-    url: 'https://meskeia.com/guia-estilos-cerveza',
+    url: 'https://meskeia.com/guia-estilos-cerveza/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

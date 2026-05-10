@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Comparador de Formas Jurídicas - meskeIA',
     description: 'Descubre qué forma jurídica te conviene más: autónomo, SL, cooperativa o asociación. Comparativa completa.',
-    url: 'https://meskeia.com/comparador-formas-juridicas',
+    url: 'https://meskeia.com/comparador-formas-juridicas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

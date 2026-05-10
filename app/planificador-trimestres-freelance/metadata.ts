@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Planificador Trimestral para Autónomos | meskeIA',
     description:
       'Planifica tus 4 trimestres fiscales como autónomo en España. Ingresos, gastos, modelos 303/130 y alertas de meses críticos.',
-    url: 'https://meskeia.com/planificador-trimestres-freelance',
+    url: 'https://meskeia.com/planificador-trimestres-freelance/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

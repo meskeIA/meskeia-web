@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Matriz Eisenhower - Prioriza Tareas | meskeIA',
     description: 'Organiza tus tareas con la matriz Eisenhower. Clasifica por urgente/importante y mejora tu productividad.',
-    url: 'https://meskeia.com/matriz-eisenhower',
+    url: 'https://meskeia.com/matriz-eisenhower/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

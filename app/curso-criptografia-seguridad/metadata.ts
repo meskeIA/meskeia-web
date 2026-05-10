@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Criptografía y Seguridad | meskeIA',
     description: 'Aprende criptografía desde cero: historia, cifrados clásicos, AES, hashes y seguridad de contraseñas. Con herramientas prácticas para practicar.',
-    url: 'https://meskeia.com/curso-criptografia-seguridad',
+    url: 'https://meskeia.com/curso-criptografia-seguridad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

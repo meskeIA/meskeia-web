@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Subvenciones Rehabilitación Energética | meskeIA',
     description: 'Calcula las ayudas Next Generation EU y deducciones IRPF disponibles para la reforma energética de tu vivienda en España.',
-    url: 'https://meskeia.com/simulador-subvenciones-rehabilitacion',
+    url: 'https://meskeia.com/simulador-subvenciones-rehabilitacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

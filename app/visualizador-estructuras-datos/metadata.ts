@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Visualizador de Estructuras de Datos | meskeIA',
     description: 'Visualiza arrays, pilas, colas, listas enlazadas y árboles binarios con animaciones paso a paso.',
-    url: 'https://meskeia.com/visualizador-estructuras-datos',
+    url: 'https://meskeia.com/visualizador-estructuras-datos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Turnos - Organiza Horarios de Trabajo',
     description: 'Planifica turnos de trabajo para tu equipo. Gestiona empleados, franjas horarias y genera horarios automáticamente.',
-    url: 'https://meskeia.com/planificador-turnos',
+    url: 'https://meskeia.com/planificador-turnos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Escala del Universo',
     description: 'Del quark a la galaxia: 12 niveles de zoom interactivo con tamaños y comparaciones.',
-    url: 'https://meskeia.com/visualizador-escala-universo',
+    url: 'https://meskeia.com/visualizador-escala-universo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

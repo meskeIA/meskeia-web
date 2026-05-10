@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Macronutrientes - Proteínas, Carbohidratos y Grasas',
     description: 'Calcula tus macros diarios según tu objetivo: volumen, definición o mantenimiento.',
-    url: 'https://meskeia.com/calculadora-macros',
+    url: 'https://meskeia.com/calculadora-macros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Comparador Compra Vehículo: Contado vs Financiación vs Renting vs Leasing',
     description: 'Compara las 4 formas de adquirir un coche y descubre cuál te conviene más según tu situación.',
-    url: 'https://meskeia.com/comparador-vehiculos',
+    url: 'https://meskeia.com/comparador-vehiculos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

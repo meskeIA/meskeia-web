@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estructuras Cristalinas 3D - Celdas Unitarias Rotables',
     description: 'Arrastra para rotar celdas unitarias en 3D: los 7 sistemas cristalinos, BCC, FCC, HCP, sal, diamante y grafito.',
-    url: 'https://meskeia.com/visualizador-estructuras-cristalinas',
+    url: 'https://meskeia.com/visualizador-estructuras-cristalinas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

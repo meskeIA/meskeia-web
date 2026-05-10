@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Mundo en 100 Personas',
     description: 'Si el mundo fuera un pueblo de 100 habitantes. Estadísticas que sorprenden.',
-    url: 'https://meskeia.com/visualizador-mundo-100-personas',
+    url: 'https://meskeia.com/visualizador-mundo-100-personas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

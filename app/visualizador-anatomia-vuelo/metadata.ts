@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Anatomia de un Vuelo - Como Vuela un Avion Explicado',
     description: 'Aerodinamica, fases del vuelo, datos reales y la cabina del piloto explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-anatomia-vuelo',
+    url: 'https://meskeia.com/visualizador-anatomia-vuelo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

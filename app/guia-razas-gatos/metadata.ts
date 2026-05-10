@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Directorio de Razas de Gatos - Guía Interactiva',
     description:
       'Explora 35 razas de gatos con filtros por tamaño, pelo, energía y compatibilidad. Encuentra la raza perfecta para tu hogar.',
-    url: 'https://meskeia.com/guia-razas-gatos',
+    url: 'https://meskeia.com/guia-razas-gatos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

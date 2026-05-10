@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Síndrome del Impostor | meskeIA',
     description: '¿Subestimas tu competencia real? Test interactivo basado en la Escala de Clance.',
-    url: 'https://meskeia.com/test-sindrome-impostor',
+    url: 'https://meskeia.com/test-sindrome-impostor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

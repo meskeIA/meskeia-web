@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador Heredar Vivienda | meskeIA',
     description: 'Calcula ISD + plusvalía + IRPF al heredar y vender vivienda',
-    url: 'https://meskeia.com/simulador-heredar-vivienda',
+    url: 'https://meskeia.com/simulador-heredar-vivienda/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [

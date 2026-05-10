@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Electroquímica: Pilas, Electrólisis y Baterías',
     description: 'Cómo la química genera electricidad y viceversa — pilas galvánicas, electrólisis y baterías Li-ion con animaciones interactivas.',
-    url: 'https://meskeia.com/visualizador-electroquimica',
+    url: 'https://meskeia.com/visualizador-electroquimica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

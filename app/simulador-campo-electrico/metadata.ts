@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Campo Eléctrico | meskeIA',
     description: 'Coloca cargas puntuales y observa vectores, líneas de campo y equipotenciales en tiempo real',
-    url: 'https://meskeia.com/simulador-campo-electrico',
+    url: 'https://meskeia.com/simulador-campo-electrico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

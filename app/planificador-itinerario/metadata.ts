@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Itinerario de Viaje | meskeIA',
     description: 'Organiza tu viaje día a día con actividades, horarios y notas. Exporta tu itinerario completo.',
-    url: 'https://meskeia.com/planificador-itinerario',
+    url: 'https://meskeia.com/planificador-itinerario/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

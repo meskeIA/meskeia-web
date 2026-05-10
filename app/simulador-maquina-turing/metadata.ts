@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Máquina de Turing | meskeIA',
     description: 'Cinta, reglas y 4 programas clásicos animados paso a paso',
-    url: 'https://meskeia.com/simulador-maquina-turing',
+    url: 'https://meskeia.com/simulador-maquina-turing/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

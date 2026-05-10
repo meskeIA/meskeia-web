@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Sonómetro Online - Medidor de Decibelios',
     description: 'Mide el nivel de ruido en decibelios con tu micrófono. Gratis y sin instalación.',
-    url: 'https://meskeia.com/sonometro',
+    url: 'https://meskeia.com/sonometro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

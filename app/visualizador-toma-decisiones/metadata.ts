@@ -22,7 +22,7 @@ export const jsonLd = {
   '@type': 'WebApplication',
   name: 'Toma de Decisiones: Sistemas 1 y 2',
   description: 'Visualizador interactivo del proceso de toma de decisiones humano: fatiga decisional, heurísticos cognitivos, arquitectura de elección y nudges.',
-  url: 'https://meskeia.com/visualizador-toma-decisiones',
+  url: 'https://meskeia.com/visualizador-toma-decisiones/',
   applicationCategory: 'EducationalApplication',
   inLanguage: 'es',
   author: {

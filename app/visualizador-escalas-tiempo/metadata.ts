@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cuánto Tarda el Mundo',
     description: 'Escalas de tiempo fascinantes: de un parpadeo a la edad del universo.',
-    url: 'https://meskeia.com/visualizador-escalas-tiempo',
+    url: 'https://meskeia.com/visualizador-escalas-tiempo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

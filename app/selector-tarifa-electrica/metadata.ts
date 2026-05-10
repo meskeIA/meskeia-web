@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Selector de Tarifa Electrica - PVPC o Mercado Libre | meskeIA',
     description:
       'Responde 10 preguntas sobre tus habitos de consumo y descubre que tarifa electrica te conviene mas: PVPC regulada o mercado libre.',
-    url: 'https://meskeia.com/selector-tarifa-electrica',
+    url: 'https://meskeia.com/selector-tarifa-electrica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Tonos Online - Frecuencias de Audio',
     description: 'Genera tonos de 20Hz a 20000Hz. Tests de audio, calibración y experimentos acústicos.',
-    url: 'https://meskeia.com/generador-tonos',
+    url: 'https://meskeia.com/generador-tonos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

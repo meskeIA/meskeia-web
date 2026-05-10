@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor de Imágenes',
     description: 'Convierte imágenes entre JPG, PNG y WebP. Redimensiona y comprime.',
-    url: 'https://meskeia.com/conversor-imagenes',
+    url: 'https://meskeia.com/conversor-imagenes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Tejidos y Fibras | meskeIA',
     description: 'Consulta las propiedades de 35 tejidos y fibras: origen, cuidados, sostenibilidad y usos principales.',
-    url: 'https://meskeia.com/guia-tejidos-fibras',
+    url: 'https://meskeia.com/guia-tejidos-fibras/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

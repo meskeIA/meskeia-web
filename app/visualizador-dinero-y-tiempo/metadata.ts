@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Dinero y el Tiempo - Explicador Visual Interactivo',
     description: 'Visualiza cómo funciona una hipoteca, el interés compuesto, la inflación y la amortización anticipada con gráficos interactivos.',
-    url: 'https://meskeia.com/visualizador-dinero-y-tiempo',
+    url: 'https://meskeia.com/visualizador-dinero-y-tiempo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Prueba de Micrófono Online - Test Audio Gratis',
     description: 'Verifica tu micrófono antes de videollamadas. Visualización de audio y grabación.',
-    url: 'https://meskeia.com/prueba-microfono',
+    url: 'https://meskeia.com/prueba-microfono/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

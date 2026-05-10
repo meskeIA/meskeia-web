@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador FIRE - Independencia Financiera | meskeIA',
     description: 'Calcula cuántos años te faltan para alcanzar la independencia financiera',
-    url: 'https://meskeia.com/estimador-fire',
+    url: 'https://meskeia.com/estimador-fire/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

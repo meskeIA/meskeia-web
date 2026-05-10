@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Historia de la Humanidad en un Reloj',
     description: 'Si los 300.000 años del Homo sapiens fueran un día de 24 horas, internet llegó en el último segundo.',
-    url: 'https://meskeia.com/visualizador-historia-reloj',
+    url: 'https://meskeia.com/visualizador-historia-reloj/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

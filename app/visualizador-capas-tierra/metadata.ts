@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Capas de la Tierra - Del Suelo al Nucleo de Fuego',
     description: 'Corteza, manto y nucleo: viaje al interior de la Tierra explicado visualmente.',
-    url: 'https://meskeia.com/visualizador-capas-tierra',
+    url: 'https://meskeia.com/visualizador-capas-tierra/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Funciones que Gobiernan el Mundo',
     description: 'Las 4 funciones matemáticas que explican la realidad, con ejemplos cotidianos.',
-    url: 'https://meskeia.com/visualizador-funciones-mundo',
+    url: 'https://meskeia.com/visualizador-funciones-mundo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

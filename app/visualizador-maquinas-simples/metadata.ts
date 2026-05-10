@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Máquinas Simples - Palanca, Polea, Plano Inclinado y más',
     description: 'Cómo levantar 100 kg con solo 10 kg de fuerza: las 6 máquinas simples explicadas visualmente.',
-    url: 'https://meskeia.com/visualizador-maquinas-simples',
+    url: 'https://meskeia.com/visualizador-maquinas-simples/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

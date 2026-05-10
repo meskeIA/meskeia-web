@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Radioactividad: Desintegración, Vida Media y Datación — meskeIA',
     description: 'Explora la ley de desintegración exponencial, tipos de radiación α/β/γ, datación por C-14 y efectos biológicos de la radiación. Visualizador interactivo con gráficas SVG.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-radioactividad',
+    url: 'https://meskeia.com/visualizador-radioactividad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

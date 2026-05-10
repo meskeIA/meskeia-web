@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Recursión | meskeIA',
     description: 'Pila de llamadas, árbol recursivo y memoization paso a paso',
-    url: 'https://meskeia.com/simulador-recursion',
+    url: 'https://meskeia.com/simulador-recursion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

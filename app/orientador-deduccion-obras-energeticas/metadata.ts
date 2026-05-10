@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Deducción IRPF por obras energéticas — 20%, 40% y 60%',
     description: '3 deducciones por mejora energética en vivienda. Requisitos, plazos y base máxima deducible.',
-    url: 'https://meskeia.com/orientador-deduccion-obras-energeticas',
+    url: 'https://meskeia.com/orientador-deduccion-obras-energeticas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

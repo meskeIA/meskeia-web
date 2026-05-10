@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mapa de Riesgo del Emprendedor | meskeIA',
     description: '¿Qué pasa si tu proyecto no funciona? ¿Lo has pensado? Test interactivo.',
-    url: 'https://meskeia.com/mapa-riesgo-emprendedor',
+    url: 'https://meskeia.com/mapa-riesgo-emprendedor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

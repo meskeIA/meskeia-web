@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Tabla Periódica en tu Vida - Elementos que Usas a Diario',
     description: 'Qué elementos químicos hay en tu cuerpo, tu móvil y tu casa. Y cuáles podrían agotarse pronto.',
-    url: 'https://meskeia.com/visualizador-tabla-periodica',
+    url: 'https://meskeia.com/visualizador-tabla-periodica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

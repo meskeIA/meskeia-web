@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Viaje de tu Comida — Sistema Digestivo Explicado',
     description: 'Sigue el recorrido de un bocado desde la boca hasta la eliminación. 6 etapas, enzimas, tiempos y datos sorprendentes.',
-    url: 'https://meskeia.com/visualizador-viaje-comida',
+    url: 'https://meskeia.com/visualizador-viaje-comida/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

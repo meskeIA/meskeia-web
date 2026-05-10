@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Electricidad Doméstica - Cuadro Eléctrico y Protecciones',
     description: 'Entiende tu instalación eléctrica: cuadro general, diferencial, magnetotérmicos, circuitos obligatorios y protecciones.',
-    url: 'https://meskeia.com/visualizador-electricidad-domestica',
+    url: 'https://meskeia.com/visualizador-electricidad-domestica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

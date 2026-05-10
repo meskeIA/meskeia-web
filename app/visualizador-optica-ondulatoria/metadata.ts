@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Óptica Ondulatoria: Interferencia, Difracción y Polarización — meskeIA',
     description: 'Simula la doble rendija de Young, patrones de difracción, polarización con ley de Malus y propiedades del láser. Animaciones SVG en tiempo real.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-optica-ondulatoria',
+    url: 'https://meskeia.com/visualizador-optica-ondulatoria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

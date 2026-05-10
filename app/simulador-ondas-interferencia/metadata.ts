@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Simulador de Ondas e Interferencia | meskeIA',
     description:
       'Onda viajera, interferencia de 2 fuentes y ondas estacionarias con animación interactiva',
-    url: 'https://meskeia.com/simulador-ondas-interferencia',
+    url: 'https://meskeia.com/simulador-ondas-interferencia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [

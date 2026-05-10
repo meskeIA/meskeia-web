@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lógica Proposicional: Tablas de Verdad, Karnaugh y Formas Normales',
     description: '¿Cómo funcionan los conectores lógicos? Explora AND, OR, NOT, XOR, implicación y equivalencia con tablas de verdad interactivas, mapas de Karnaugh SVG y formas normales FNC/FND.',
-    url: 'https://meskeia.com/visualizador-logica-proposicional',
+    url: 'https://meskeia.com/visualizador-logica-proposicional/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

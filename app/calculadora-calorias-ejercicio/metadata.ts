@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Calorías Quemadas por Ejercicio',
     description: 'Calcula las calorías quemadas según tu actividad física con valores MET científicos.',
-    url: 'https://meskeia.com/calculadora-calorias-ejercicio',
+    url: 'https://meskeia.com/calculadora-calorias-ejercicio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

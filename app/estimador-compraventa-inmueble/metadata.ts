@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador Compraventa Inmobiliaria - meskeIA',
     description: 'Calcula todos los gastos de compra y venta de inmuebles en España: ITP, IVA, notaría, registro, plusvalía municipal y comisiones.',
-    url: 'https://meskeia.com/estimador-compraventa-inmueble',
+    url: 'https://meskeia.com/estimador-compraventa-inmueble/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

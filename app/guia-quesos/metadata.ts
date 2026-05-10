@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Quesos | meskeIA',
     description: '55 quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y denominación de origen.',
-    url: 'https://meskeia.com/guia-quesos',
+    url: 'https://meskeia.com/guia-quesos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

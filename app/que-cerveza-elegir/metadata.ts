@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: '¿Qué cerveza elegir? | meskeIA',
     description: 'Asistente situacional de cervezas: te ayuda a decidir según comida, ocasión, regalo o exploración. Recomendaciones razonadas con alternativas.',
-    url: 'https://meskeia.com/que-cerveza-elegir',
+    url: 'https://meskeia.com/que-cerveza-elegir/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

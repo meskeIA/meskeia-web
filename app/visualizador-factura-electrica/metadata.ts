@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tu Electricidad al Desnudo',
     description: 'Anatomía de la factura de la luz: cada concepto explicado de forma visual.',
-    url: 'https://meskeia.com/visualizador-factura-electrica',
+    url: 'https://meskeia.com/visualizador-factura-electrica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora Regla de Tres - Simple, Inversa y Compuesta',
     description: 'Resuelve proporciones con regla de tres simple, inversa y compuesta. Explicaciones paso a paso y ejemplos prácticos.',
-    url: 'https://meskeia.com/calculadora-regla-de-tres',
+    url: 'https://meskeia.com/calculadora-regla-de-tres/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

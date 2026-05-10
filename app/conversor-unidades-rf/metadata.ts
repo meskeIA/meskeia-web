@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor de Unidades RF - dBm, Watts, VSWR | meskeIA',
     description: 'Conversor especializado para radiofrecuencia: dBm↔Watts, VSWR↔Return Loss, frecuencia↔longitud de onda.',
-    url: 'https://meskeia.com/conversor-unidades-rf',
+    url: 'https://meskeia.com/conversor-unidades-rf/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

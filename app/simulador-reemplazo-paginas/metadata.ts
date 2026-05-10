@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Reemplazo de Páginas | meskeIA',
     description: 'FIFO, LRU, Optimal, Clock y LFU con visualización de fallos y comparativa',
-    url: 'https://meskeia.com/simulador-reemplazo-paginas',
+    url: 'https://meskeia.com/simulador-reemplazo-paginas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

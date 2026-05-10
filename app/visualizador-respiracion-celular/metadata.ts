@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Respiración Celular - La Central Energética de tus Células',
     description: 'Cómo las células convierten glucosa en energía: el proceso inverso a la fotosíntesis, explicado visualmente.',
-    url: 'https://meskeia.com/visualizador-respiracion-celular',
+    url: 'https://meskeia.com/visualizador-respiracion-celular/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

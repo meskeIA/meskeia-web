@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Metrónomo Online - Tempo Preciso para Músicos',
     description: 'Metrónomo online gratuito con tempo ajustable, tap tempo y múltiples compases.',
-    url: 'https://meskeia.com/metronomo',
+    url: 'https://meskeia.com/metronomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

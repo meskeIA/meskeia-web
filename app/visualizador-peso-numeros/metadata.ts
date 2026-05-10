@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Peso de los Números',
     description: '¿Qué significa realmente un billón? Comparaciones que hacen tangibles las grandes cifras.',
-    url: 'https://meskeia.com/visualizador-peso-numeros',
+    url: 'https://meskeia.com/visualizador-peso-numeros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

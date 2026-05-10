@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Quiz Figuras Retóricas | meskeIA',
     description: 'Identifica metáforas, hipérboles, anáforas y 24 figuras más. Quiz interactivo con ejemplos y explicaciones. Para ESO, Bachillerato y Selectividad.',
-    url: 'https://meskeia.com/quiz-figuras-retoricas',
+    url: 'https://meskeia.com/quiz-figuras-retoricas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

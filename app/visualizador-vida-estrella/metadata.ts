@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Vida de una Estrella - De la Nebulosa al Agujero Negro',
     description: 'Cómo nacen, viven y mueren las estrellas. Fusión nuclear, supernovas y agujeros negros explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-vida-estrella',
+    url: 'https://meskeia.com/visualizador-vida-estrella/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

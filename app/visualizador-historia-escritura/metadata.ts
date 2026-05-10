@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Evolución de la Escritura',
     description: 'De las pinturas rupestres a los emojis: 40.000 años de historia de la comunicación escrita. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-historia-escritura',
+    url: 'https://meskeia.com/visualizador-historia-escritura/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

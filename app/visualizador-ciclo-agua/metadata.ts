@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Ciclo del Agua - El Viaje Infinito de cada Gota',
     description: 'Descubre como viaja el agua por la Tierra: evaporacion, nubes, lluvia, rios y acuiferos en un ciclo que dura miles de millones de anos.',
-    url: 'https://meskeia.com/visualizador-ciclo-agua',
+    url: 'https://meskeia.com/visualizador-ciclo-agua/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

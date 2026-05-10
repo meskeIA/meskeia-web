@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Modelos Epidemiológicos SIR/SEIR: Matemáticas de las Epidemias — meskeIA',
     description: 'Simula modelos SIR y SEIR en tiempo real. Ajusta β, γ y σ con sliders y observa cómo cambian las curvas de infectados, R₀ y Rₜ. Compara gripe, COVID-19, sarampión y más.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-modelos-epidemiologicos',
+    url: 'https://meskeia.com/visualizador-modelos-epidemiologicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

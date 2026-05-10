@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Planificación de Procesos | meskeIA',
     description: 'FCFS, SJF, SRTF, Round Robin y Priority con diagrama de Gantt interactivo',
-    url: 'https://meskeia.com/simulador-planificador-procesos',
+    url: 'https://meskeia.com/simulador-planificador-procesos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

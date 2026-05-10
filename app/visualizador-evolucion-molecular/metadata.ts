@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Evolución Molecular - ADN, Mutaciones y Reloj Molecular',
     description: 'Simulador interactivo de mutaciones en secuencias de ADN, reloj molecular para datar divergencias evolutivas y constructor de árboles filogenéticos.',
-    url: 'https://meskeia.com/visualizador-evolucion-molecular',
+    url: 'https://meskeia.com/visualizador-evolucion-molecular/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

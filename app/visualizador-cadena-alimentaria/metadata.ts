@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'De la Granja a tu Mesa - Cadena Alimentaria Visual',
     description: 'El viaje de los alimentos desde el campo hasta tu plato: precios, desperdicio y alternativas explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-cadena-alimentaria',
+    url: 'https://meskeia.com/visualizador-cadena-alimentaria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

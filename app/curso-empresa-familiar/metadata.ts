@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Empresa Familiar - meskeIA',
     description: 'Domina la gestión de empresas familiares: gobierno, sucesión, profesionalización y modelos. Casos reales de Inditex, Mercadona y El Corte Inglés.',
-    url: 'https://meskeia.com/curso-empresa-familiar',
+    url: 'https://meskeia.com/curso-empresa-familiar/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

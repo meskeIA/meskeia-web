@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Golden Hour - Calculadora de Luz Dorada',
     description: 'Planifica tus sesiones de fotos con la mejor luz natural. Calcula golden hour y blue hour.',
-    url: 'https://meskeia.com/golden-hour',
+    url: 'https://meskeia.com/golden-hour/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

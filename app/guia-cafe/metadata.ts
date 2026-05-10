@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía del Café | meskeIA',
     description: '40 orígenes de café: especie, altitud, notas de sabor, procesado y preparación ideal. Guía de especies, procesados y tueste.',
-    url: 'https://meskeia.com/guia-cafe',
+    url: 'https://meskeia.com/guia-cafe/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

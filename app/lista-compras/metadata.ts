@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lista de Compras Inteligente - Organiza tu Supermercado',
     description: 'Crea y organiza tu lista de compras por categorías. Guarda en el navegador y comparte fácilmente.',
-    url: 'https://meskeia.com/lista-compras',
+    url: 'https://meskeia.com/lista-compras/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

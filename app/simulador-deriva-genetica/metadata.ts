@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Deriva Genética y Selección Natural | meskeIA',
     description: 'Genética de poblaciones interactiva: deriva, selección, Hardy-Weinberg',
-    url: 'https://meskeia.com/simulador-deriva-genetica',
+    url: 'https://meskeia.com/simulador-deriva-genetica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador VSEPR - Geometría Molecular 3D | meskeIA',
     description: 'Geometría molecular 3D rotable según teoría VSEPR',
-    url: 'https://meskeia.com/simulador-vsepr',
+    url: 'https://meskeia.com/simulador-vsepr/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

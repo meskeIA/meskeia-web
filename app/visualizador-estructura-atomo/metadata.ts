@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estructura del Átomo - Protones, Neutrones, Electrones',
     description: 'Visualiza protones, neutrones y electrones. Modelo de Bohr vs orbitales. Isótopos, iones y la escala atómica.',
-    url: 'https://meskeia.com/visualizador-estructura-atomo',
+    url: 'https://meskeia.com/visualizador-estructura-atomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

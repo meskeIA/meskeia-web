@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Los Números del Océano - Profundidad, Plástico y Clima',
     description: 'Las cifras del océano que deberías conocer: profundidad, zonas de vida, contaminación por plástico y regulación del clima.',
-    url: 'https://meskeia.com/visualizador-oceano',
+    url: 'https://meskeia.com/visualizador-oceano/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

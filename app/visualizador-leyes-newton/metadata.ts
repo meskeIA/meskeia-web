@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Las 3 Leyes de Newton - La Física que Mueve el Mundo',
     description: 'Inercia, F=ma y acción-reacción: las leyes que gobiernan todo movimiento, explicadas visualmente.',
-    url: 'https://meskeia.com/visualizador-leyes-newton',
+    url: 'https://meskeia.com/visualizador-leyes-newton/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

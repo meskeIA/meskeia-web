@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: 'Curso de Introducción a la Teoría Política | meskeIA',
     description:
       'Aprende los fundamentos de la teoría política: desde Platón y Aristóteles hasta Marx y Rawls. Curso interactivo con seguimiento de progreso.',
-    url: 'https://meskeia.com/curso-teoria-politica',
+    url: 'https://meskeia.com/curso-teoria-politica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

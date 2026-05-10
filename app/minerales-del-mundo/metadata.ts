@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Minerales del Mundo - Guía de 50 Minerales Esenciales',
     description: 'Explora 50 minerales esenciales con su composición, dureza, usos y curiosidades. Ideal para estudiantes de geología y curiosos.',
-    url: 'https://meskeia.com/minerales-del-mundo',
+    url: 'https://meskeia.com/minerales-del-mundo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

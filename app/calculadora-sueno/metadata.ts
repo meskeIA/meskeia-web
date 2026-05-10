@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Ciclos de Sueño',
     description: 'Calcula la hora ideal para dormir o despertar según los ciclos de sueño de 90 minutos.',
-    url: 'https://meskeia.com/calculadora-sueno',
+    url: 'https://meskeia.com/calculadora-sueno/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Radio meskeIA - Emisoras Online en Español | meskeIA',
     description: 'Escucha tus emisoras favoritas online. Gratis y sin registro.',
-    url: 'https://meskeia.com/radio-meskeia',
+    url: 'https://meskeia.com/radio-meskeia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

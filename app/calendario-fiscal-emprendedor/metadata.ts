@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calendario Fiscal del Emprendedor - meskeIA',
     description: 'Calendario fiscal completo para autónomos y sociedades. Fechas límite, modelos tributarios y recordatorios.',
-    url: 'https://meskeia.com/calendario-fiscal-emprendedor',
+    url: 'https://meskeia.com/calendario-fiscal-emprendedor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

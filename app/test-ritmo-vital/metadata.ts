@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Ritmo Vital | meskeIA',
     description: '¿Vives en modo urgencia permanente? Test interactivo sobre tu ritmo de vida.',
-    url: 'https://meskeia.com/test-ritmo-vital',
+    url: 'https://meskeia.com/test-ritmo-vital/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Pensamiento Sistémico - Entiende el Mundo como Sistemas',
     description: 'Aprende a ver el mundo como sistemas interconectados. Retroalimentación, emergencia, antifragilidad y aplicaciones prácticas.',
-    url: 'https://meskeia.com/curso-pensamiento-sistemico',
+    url: 'https://meskeia.com/curso-pensamiento-sistemico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

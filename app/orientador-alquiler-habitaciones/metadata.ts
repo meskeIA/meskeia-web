@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Alquiler por Habitaciones en Zona Tensionada',
     description: 'Reglas del alquiler por habitaciones en zona tensionada: techo de renta, SERPAVI, sanciones y municipios declarados.',
-    url: 'https://meskeia.com/orientador-alquiler-habitaciones',
+    url: 'https://meskeia.com/orientador-alquiler-habitaciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

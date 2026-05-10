@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Óptica - El Viaje de la Luz',
     description: 'Reflexión, refracción, lentes y colores: cómo se comporta la luz explicado visualmente.',
-    url: 'https://meskeia.com/visualizador-optica',
+    url: 'https://meskeia.com/visualizador-optica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

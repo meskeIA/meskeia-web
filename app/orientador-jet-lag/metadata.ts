@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador de Jet Lag | meskeIA',
     description: 'Calcula el impacto del jet lag en tu viaje y recibe consejos para adaptarte más rápido.',
-    url: 'https://meskeia.com/orientador-jet-lag',
+    url: 'https://meskeia.com/orientador-jet-lag/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cronómetro y Temporizador Online',
     description: 'Mide el tiempo con precisión. Cronómetro con vueltas y temporizador con alarma.',
-    url: 'https://meskeia.com/cronometro',
+    url: 'https://meskeia.com/cronometro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

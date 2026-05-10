@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Enlaces UTM',
     description: 'Genera enlaces UTM para trackear tus campañas de marketing en Google Analytics.',
-    url: 'https://meskeia.com/generador-utm',
+    url: 'https://meskeia.com/generador-utm/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

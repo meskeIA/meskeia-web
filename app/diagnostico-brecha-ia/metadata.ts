@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diagnóstico de Brecha IA | meskeIA',
     description: '¿Usas la IA para pensar mejor o para dejar de pensar? Test interactivo con diagnóstico visual.',
-    url: 'https://meskeia.com/diagnostico-brecha-ia',
+    url: 'https://meskeia.com/diagnostico-brecha-ia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

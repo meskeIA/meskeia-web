@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diagnóstico de Estancamiento Profesional | meskeIA',
     description: '¿Estás en zona de confort, estrés o flujo? Test interactivo basado en Csikszentmihalyi.',
-    url: 'https://meskeia.com/diagnostico-estancamiento-profesional',
+    url: 'https://meskeia.com/diagnostico-estancamiento-profesional/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

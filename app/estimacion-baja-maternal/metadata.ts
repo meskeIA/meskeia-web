@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Estimacion de Baja Maternal y Paternal | meskeIA',
     description:
       'Calcula la duracion y distribucion del permiso por nacimiento en Espana. 16 semanas igualitarias, semanas obligatorias, voluntarias y ampliaciones.',
-    url: 'https://meskeia.com/estimacion-baja-maternal',
+    url: 'https://meskeia.com/estimacion-baja-maternal/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

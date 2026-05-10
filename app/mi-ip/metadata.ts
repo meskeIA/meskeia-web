@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mi IP Pública y Conexión - Información de Red Completa',
     description: 'Descubre tu IP pública, ubicación, proveedor y velocidad de conexión. Gratis y sin registro.',
-    url: 'https://meskeia.com/mi-ip',
+    url: 'https://meskeia.com/mi-ip/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

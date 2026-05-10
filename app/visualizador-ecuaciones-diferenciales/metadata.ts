@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Visualizador de Ecuaciones Diferenciales — ODE Interactivo',
     description: '¿Cómo predice la ciencia la dinámica de poblaciones, el enfriamiento de un café o la carga de un condensador? Explora ecuaciones diferenciales con visualizaciones interactivas.',
-    url: 'https://meskeia.com/visualizador-ecuaciones-diferenciales',
+    url: 'https://meskeia.com/visualizador-ecuaciones-diferenciales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

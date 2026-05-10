@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador Fondo de Emergencia | meskeIA',
     description: 'Calcula tu fondo de emergencia ideal según tu situación personal y laboral',
-    url: 'https://meskeia.com/estimador-fondo-emergencia',
+    url: 'https://meskeia.com/estimador-fondo-emergencia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

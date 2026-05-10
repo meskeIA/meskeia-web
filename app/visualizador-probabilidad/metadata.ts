@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona la Probabilidad',
     description: 'Tu intuición falla con la probabilidad. Visualízalo con simulaciones interactivas.',
-    url: 'https://meskeia.com/visualizador-probabilidad',
+    url: 'https://meskeia.com/visualizador-probabilidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

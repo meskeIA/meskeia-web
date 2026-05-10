@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo se Descubre un Medicamento - Del Laboratorio a la Farmacia',
     description: 'El viaje de un fármaco: de 10.000 candidatos a 1 medicamento aprobado. Ensayos clínicos, aprobación regulatoria y por qué los medicamentos son caros.',
-    url: 'https://meskeia.com/visualizador-desarrollo-farmaco',
+    url: 'https://meskeia.com/visualizador-desarrollo-farmaco/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

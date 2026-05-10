@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Asistente Constitución de Asociación - Genera Documentos',
     description: 'Constituye tu asociación sin ánimo de lucro paso a paso. Genera Acta Fundacional y Estatutos personalizados.',
-    url: 'https://meskeia.com/asistente-constitucion-asociacion',
+    url: 'https://meskeia.com/asistente-constitucion-asociacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

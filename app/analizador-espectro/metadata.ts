@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Analizador de Espectro de Audio - meskeIA',
     description: 'Visualiza las frecuencias de audio en tiempo real con tu micrófono. Herramienta gratuita para músicos y técnicos.',
-    url: 'https://meskeia.com/analizador-espectro',
+    url: 'https://meskeia.com/analizador-espectro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

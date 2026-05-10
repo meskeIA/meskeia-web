@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Juego del Ahorcado en Español | meskeIA',
     description: 'Adivina la palabra letra a letra. 4 categorías temáticas, sin publicidad, sin registro.',
-    url: 'https://meskeia.com/juego-ahorcado',
+    url: 'https://meskeia.com/juego-ahorcado/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

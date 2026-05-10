@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Porciones - meskeIA',
     description: 'Aprende a estimar porciones de alimentos usando tu mano como referencia.',
-    url: 'https://meskeia.com/calculadora-porciones',
+    url: 'https://meskeia.com/calculadora-porciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

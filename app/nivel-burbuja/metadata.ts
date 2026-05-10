@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Nivel de Burbuja Digital + Inclinómetro - meskeIA',
     description: 'Mide inclinaciones y ángulos con el sensor de tu móvil. Herramienta gratuita para bricolaje.',
-    url: 'https://meskeia.com/nivel-burbuja',
+    url: 'https://meskeia.com/nivel-burbuja/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

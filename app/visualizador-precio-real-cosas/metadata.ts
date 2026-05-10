@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Precio Real de las Cosas - En Horas de tu Vida',
     description: '¿Cuántas horas de trabajo cuesta un café, un móvil o unas vacaciones? Cambia tu perspectiva sobre el dinero.',
-    url: 'https://meskeia.com/visualizador-precio-real-cosas',
+    url: 'https://meskeia.com/visualizador-precio-real-cosas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

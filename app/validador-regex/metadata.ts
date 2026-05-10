@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Validador de Expresiones Regulares',
     description: 'Testa y valida expresiones regulares con resaltado de coincidencias.',
-    url: 'https://meskeia.com/validador-regex',
+    url: 'https://meskeia.com/validador-regex/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

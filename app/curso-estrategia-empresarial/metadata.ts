@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Estrategia Empresarial - Pensamiento Estratégico para 2025',
     description: 'Domina la estrategia empresarial en entornos de alta incertidumbre. Desde Porter hasta la disrupción de la IA. 10 capítulos prácticos.',
-    url: 'https://meskeia.com/curso-estrategia-empresarial',
+    url: 'https://meskeia.com/curso-estrategia-empresarial/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

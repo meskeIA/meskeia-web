@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: 'Sistema de Pensiones: Reparto, Demografía y Reformas — meskeIA',
     description: 'Cómo funciona el sistema de pensiones español y por qué está bajo presión demográfica.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-sistema-pensiones',
+    url: 'https://meskeia.com/visualizador-sistema-pensiones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

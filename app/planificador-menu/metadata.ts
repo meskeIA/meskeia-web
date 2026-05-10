@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Menú Semanal - meskeIA',
     description: 'Organiza tu alimentación semanal de forma equilibrada con nuestro planificador gratuito.',
-    url: 'https://meskeia.com/planificador-menu',
+    url: 'https://meskeia.com/planificador-menu/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

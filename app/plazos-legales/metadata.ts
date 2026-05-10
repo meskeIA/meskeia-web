@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Plazos Legales España - Guía de Prescripción y Caducidad',
     description: 'Consulta los plazos legales más importantes en España: garantías, deudas, reclamaciones y más.',
-    url: 'https://meskeia.com/plazos-legales',
+    url: 'https://meskeia.com/plazos-legales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

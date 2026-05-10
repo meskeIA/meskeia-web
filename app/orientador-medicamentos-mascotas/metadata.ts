@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Medicamentos para Perros y Gatos',
     description: 'Calcula dosis de antiparasitarios y medicamentos según el peso de tu mascota',
-    url: 'https://meskeia.com/orientador-medicamentos-mascotas',
+    url: 'https://meskeia.com/orientador-medicamentos-mascotas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

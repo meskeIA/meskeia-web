@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor Base64',
     description: 'Codifica y decodifica texto, imágenes y archivos en Base64.',
-    url: 'https://meskeia.com/conversor-base64',
+    url: 'https://meskeia.com/conversor-base64/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Redes de Computadoras: TCP/IP, DNS, Routing y CDN — meskeIA',
     description: 'Explora cómo funciona internet: encapsulamiento TCP/IP animado, resolución DNS paso a paso, routing entre sistemas autónomos y simulación de CDN vs latencia.',
-    url: 'https://meskeia.com/visualizador-redes-computadoras',
+    url: 'https://meskeia.com/visualizador-redes-computadoras/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

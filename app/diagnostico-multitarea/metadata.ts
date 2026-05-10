@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diagnóstico de Multitarea | meskeIA',
     description: '¿Tu multitarea es productiva o destructiva? Test interactivo sobre context-switching.',
-    url: 'https://meskeia.com/diagnostico-multitarea',
+    url: 'https://meskeia.com/diagnostico-multitarea/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

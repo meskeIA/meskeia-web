@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Guía de Vinagres del Mundo | meskeIA',
     description:
       '25 vinagres del mundo con origen, acidez, intensidad, envejecimiento, notas de sabor, usos ideales y maridaje.',
-    url: 'https://meskeia.com/guia-vinagres-mundo',
+    url: 'https://meskeia.com/guia-vinagres-mundo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

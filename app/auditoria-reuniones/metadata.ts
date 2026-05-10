@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Auditoría de Reuniones | meskeIA',
     description: '¿Cuántas de tus reuniones podrían ser un email? Test interactivo con diagnóstico visual y acciones concretas.',
-    url: 'https://meskeia.com/auditoria-reuniones',
+    url: 'https://meskeia.com/auditoria-reuniones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

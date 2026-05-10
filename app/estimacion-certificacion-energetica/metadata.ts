@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Estimacion de Certificacion Energetica | meskeIA',
     description:
       'Calcula una estimacion orientativa de la letra energetica de tu vivienda segun sus caracteristicas. Gratuito y sin registro.',
-    url: 'https://meskeia.com/estimacion-certificacion-energetica',
+    url: 'https://meskeia.com/estimacion-certificacion-energetica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

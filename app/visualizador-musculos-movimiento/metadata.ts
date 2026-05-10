@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Músculos y Movimiento - Contracción, Articulaciones y ATP',
     description: 'Tipos de músculo, sarcómero, modelo de filamentos deslizantes y articulaciones del cuerpo humano explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-musculos-movimiento',
+    url: 'https://meskeia.com/visualizador-musculos-movimiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

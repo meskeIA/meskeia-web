@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Validador JSON y XML',
     description: 'Valida, formatea y minifica código JSON y XML al instante con detección de errores.',
-    url: 'https://meskeia.com/validador-json',
+    url: 'https://meskeia.com/validador-json/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

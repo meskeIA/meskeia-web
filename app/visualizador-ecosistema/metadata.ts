@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Ecosistemas - El Flujo de Energía que Sostiene la Vida',
     description: 'Pirámide trófica, regla del 10%, ciclos biogeoquímicos y datos fascinantes sobre ecología explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-ecosistema',
+    url: 'https://meskeia.com/visualizador-ecosistema/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Análisis Decisión Reversible vs Irreversible | meskeIA',
     description: '¿Das vueltas a decisiones que podrías probar sin riesgo? Test basado en Jeff Bezos.',
-    url: 'https://meskeia.com/analisis-decision-reversible',
+    url: 'https://meskeia.com/analisis-decision-reversible/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

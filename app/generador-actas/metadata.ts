@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Actas de Reunión - Profesional y Gratuito | meskeIA',
     description: 'Crea actas de reunión completas con plantillas, gestión de asistentes, orden del día y seguimiento de tareas. Exporta fácilmente a PDF.',
-    url: 'https://meskeia.com/generador-actas',
+    url: 'https://meskeia.com/generador-actas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

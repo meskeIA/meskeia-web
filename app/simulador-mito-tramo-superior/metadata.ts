@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: '¿Subir de Tramo IRPF te Quita MÁS? | meskeIA',
     description: 'Demuestra con números que el mito es falso',
-    url: 'https://meskeia.com/simulador-mito-tramo-superior',
+    url: 'https://meskeia.com/simulador-mito-tramo-superior/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

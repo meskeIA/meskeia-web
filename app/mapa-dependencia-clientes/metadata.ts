@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mapa de Dependencia de Clientes | meskeIA',
     description: '¿Tu negocio depende demasiado de pocos clientes? Test interactivo de concentración de riesgo.',
-    url: 'https://meskeia.com/mapa-dependencia-clientes',
+    url: 'https://meskeia.com/mapa-dependencia-clientes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

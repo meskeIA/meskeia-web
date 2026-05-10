@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Contador de Sílabas en Español - meskeIA',
     description: 'Cuenta y separa las sílabas de cualquier texto en español',
-    url: 'https://meskeia.com/contador-silabas',
+    url: 'https://meskeia.com/contador-silabas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

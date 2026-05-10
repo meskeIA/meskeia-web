@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Subredes IP - CIDR y Máscaras | meskeIA',
     description: 'Calcula subredes IP: máscara de red, broadcast, rango de hosts y más. Herramienta educativa con explicaciones paso a paso.',
-    url: 'https://meskeia.com/calculadora-subredes',
+    url: 'https://meskeia.com/calculadora-subredes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

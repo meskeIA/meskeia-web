@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Dependencia Tecnológica | meskeIA',
     description: '¿Podrías hacer tu trabajo si mañana no tuvieras IA? Test interactivo con diagnóstico visual.',
-    url: 'https://meskeia.com/test-dependencia-tecnologica',
+    url: 'https://meskeia.com/test-dependencia-tecnologica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

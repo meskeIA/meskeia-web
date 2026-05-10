@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lista de Tareas - Organiza tu Productividad',
     description: 'Gestiona tus tareas con prioridades y fechas. Sin registro, 100% privado.',
-    url: 'https://meskeia.com/lista-tareas',
+    url: 'https://meskeia.com/lista-tareas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

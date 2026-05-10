@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Sistema Inmune - Tu Ejército Invisible',
     description: 'Las 3 líneas de defensa, anticuerpos y memoria inmunológica explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-sistema-inmune',
+    url: 'https://meskeia.com/visualizador-sistema-inmune/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

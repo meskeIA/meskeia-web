@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador de Cartera de Inversión | meskeIA',
     description: 'Simula 1000 escenarios para tu cartera. Visualiza la evolución probable de tu patrimonio con análisis Monte Carlo.',
-    url: 'https://meskeia.com/estimador-cartera-inversion',
+    url: 'https://meskeia.com/estimador-cartera-inversion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

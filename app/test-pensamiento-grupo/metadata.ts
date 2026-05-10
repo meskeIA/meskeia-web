@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Pensamiento de Grupo | meskeIA',
     description: '¿Tu equipo debate o solo confirma? Test basado en Irving Janis (groupthink).',
-    url: 'https://meskeia.com/test-pensamiento-grupo',
+    url: 'https://meskeia.com/test-pensamiento-grupo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

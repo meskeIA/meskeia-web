@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Información del Tiempo - Pronóstico Meteorológico | meskeIA',
     description: 'Consulta el tiempo actual y pronóstico para cualquier ciudad del mundo.',
-    url: 'https://meskeia.com/informacion-tiempo',
+    url: 'https://meskeia.com/informacion-tiempo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Checklist de Segunda Opinión | meskeIA',
     description: '¿Has buscado razones para NO hacerlo? Test basado en el principio de red team.',
-    url: 'https://meskeia.com/checklist-segunda-opinion',
+    url: 'https://meskeia.com/checklist-segunda-opinion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

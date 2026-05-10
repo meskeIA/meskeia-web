@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Códigos de Barras Gratis - meskeIA',
     description: 'Crea códigos de barras EAN-13, UPC, Code128 y más. Descarga gratis en PNG.',
-    url: 'https://meskeia.com/generador-codigos-barras',
+    url: 'https://meskeia.com/generador-codigos-barras/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

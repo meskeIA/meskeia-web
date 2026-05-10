@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cara o Cruz - Lanzar Moneda Online | meskeIA',
     description: 'Lanza una moneda virtual con animación y estadísticas de probabilidad.',
-    url: 'https://meskeia.com/cara-o-cruz',
+    url: 'https://meskeia.com/cara-o-cruz/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

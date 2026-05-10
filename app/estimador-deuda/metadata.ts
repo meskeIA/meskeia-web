@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador de Deuda - Bola de Nieve vs Avalancha - meskeIA',
     description: 'Compara estrategias para eliminar deudas. Descubre cuál método te ahorra más tiempo y dinero.',
-    url: 'https://meskeia.com/estimador-deuda',
+    url: 'https://meskeia.com/estimador-deuda/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Afinador de Instrumentos Online Gratis - Cromático',
     description: 'Afinador cromático online gratuito. Detecta automáticamente la nota con precisión.',
-    url: 'https://meskeia.com/afinador-instrumentos',
+    url: 'https://meskeia.com/afinador-instrumentos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

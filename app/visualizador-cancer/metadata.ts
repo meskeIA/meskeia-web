@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'Cáncer: Biología Molecular — Oncogenes, Hallmarks e Inmunoterapia — meskeIA',
     description: 'Cómo las mutaciones en oncogenes y genes supresores llevan a la división descontrolada. Los 6 hallmarks y la inmunoterapia.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-cancer',
+    url: 'https://meskeia.com/visualizador-cancer/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

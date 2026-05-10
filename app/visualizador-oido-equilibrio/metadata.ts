@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Oído y Equilibrio - Anatomía, Audición y Sistema Vestibular',
     description: 'Anatomía del oído, transducción del sonido, equilibrio vestibular y pérdida auditiva. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-oido-equilibrio',
+    url: 'https://meskeia.com/visualizador-oido-equilibrio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

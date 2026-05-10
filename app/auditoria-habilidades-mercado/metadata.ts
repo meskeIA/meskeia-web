@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Auditoría de Habilidades vs Mercado | meskeIA',
     description: '¿Lo que sabes hacer es lo que el mercado necesita? Test interactivo de gap analysis profesional.',
-    url: 'https://meskeia.com/auditoria-habilidades-mercado',
+    url: 'https://meskeia.com/auditoria-habilidades-mercado/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

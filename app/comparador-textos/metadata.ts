@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Comparador de Textos Online - Diff',
     description: 'Compara dos textos lado a lado y encuentra todas las diferencias. Herramienta gratuita.',
-    url: 'https://meskeia.com/comparador-textos',
+    url: 'https://meskeia.com/comparador-textos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

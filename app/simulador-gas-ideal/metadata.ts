@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Simulador de Gas Ideal y Ciclos Termodinámicos | meskeIA',
     description:
       'Ley de gases, procesos termodinámicos y ciclos de Carnot, Otto, Diesel y Stirling con diagramas PV interactivos',
-    url: 'https://meskeia.com/simulador-gas-ideal',
+    url: 'https://meskeia.com/simulador-gas-ideal/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [

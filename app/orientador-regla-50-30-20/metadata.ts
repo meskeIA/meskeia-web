@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Regla 50/30/20 | meskeIA',
     description: 'Distribuye tus ingresos según la regla 50/30/20: necesidades, deseos y ahorro',
-    url: 'https://meskeia.com/orientador-regla-50-30-20',
+    url: 'https://meskeia.com/orientador-regla-50-30-20/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

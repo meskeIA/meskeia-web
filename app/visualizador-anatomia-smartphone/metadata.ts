@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Anatomía de un Smartphone - Componentes, Minerales y Coste Real',
     description: 'Qué hay dentro de tu móvil, de dónde vienen sus materiales, cuánto cuesta realmente fabricarlo y qué pasa cuando lo tiras.',
-    url: 'https://meskeia.com/visualizador-anatomia-smartphone',
+    url: 'https://meskeia.com/visualizador-anatomia-smartphone/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

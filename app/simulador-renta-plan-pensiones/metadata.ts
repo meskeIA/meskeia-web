@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador Plan de Pensiones IRPF | meskeIA',
     description: 'Ahorro fiscal hoy vs tributación al rescate — qué es lo realmente importante',
-    url: 'https://meskeia.com/simulador-renta-plan-pensiones',
+    url: 'https://meskeia.com/simulador-renta-plan-pensiones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }]

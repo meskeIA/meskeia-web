@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Declaración de la Renta de Persona Fallecida | meskeIA',
     description: 'Guía paso a paso para herederos: obligación de declarar, acceso al borrador, documentación y devoluciones.',
-    url: 'https://meskeia.com/declaracion-renta-fallecidos',
+    url: 'https://meskeia.com/declaracion-renta-fallecidos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

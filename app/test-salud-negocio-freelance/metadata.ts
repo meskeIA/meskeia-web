@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Salud de tu Negocio Freelance | meskeIA',
     description: 'Evalúa 5 dimensiones clave de tu negocio freelance y descubre dónde mejorar con recomendaciones personalizadas.',
-    url: 'https://meskeia.com/test-salud-negocio-freelance',
+    url: 'https://meskeia.com/test-salud-negocio-freelance/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

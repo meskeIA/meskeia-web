@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Termodinámica Química - ΔG, Equilibrio y Le Chatelier',
     description: 'Visualizador interactivo: perfil de entalpía, calculadora de Gibbs, equilibrio Kₑq y principio de Le Chatelier con animaciones.',
-    url: 'https://meskeia.com/visualizador-termodinamica-quimica',
+    url: 'https://meskeia.com/visualizador-termodinamica-quimica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

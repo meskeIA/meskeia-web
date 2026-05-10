@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Minerales y Gemas - Escala de Mohs y Piedras Preciosas',
     description: 'Los 10 minerales de Mohs, gemas cardinales, formación de diamantes y rubíes, y usos industriales vs joyería. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-minerales-gemas',
+    url: 'https://meskeia.com/visualizador-minerales-gemas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

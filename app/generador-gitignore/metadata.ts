@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de .gitignore - Plantillas para Git | meskeIA',
     description: 'Crea archivos .gitignore profesionales combinando plantillas para tus tecnologías. Node.js, Python, Java, React y más.',
-    url: 'https://meskeia.com/generador-gitignore',
+    url: 'https://meskeia.com/generador-gitignore/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

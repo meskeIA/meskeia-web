@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lo que Cuesta Enfermarse',
     description: 'Sanidad pública vs privada: costes reales de enfermarse en España y el mundo.',
-    url: 'https://meskeia.com/visualizador-coste-sanidad',
+    url: 'https://meskeia.com/visualizador-coste-sanidad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

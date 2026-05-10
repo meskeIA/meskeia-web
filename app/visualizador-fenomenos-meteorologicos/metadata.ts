@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Fenomenos Meteorologicos - Nubes, Precipitaciones, Rayos y Tormentas',
     description: 'Descubre que cuentan las nubes, como se forma la lluvia o la nieve, por que caen rayos y como nacen los huracanes. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-fenomenos-meteorologicos',
+    url: 'https://meskeia.com/visualizador-fenomenos-meteorologicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

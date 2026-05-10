@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo se Produce la Energía - Del Átomo al Enchufe',
     description: 'Nuclear, solar, eólica, gas, hidráulica y carbón: cómo funciona cada fuente de energía, cuánto cuesta y cuánto contamina.',
-    url: 'https://meskeia.com/visualizador-produccion-energia',
+    url: 'https://meskeia.com/visualizador-produccion-energia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

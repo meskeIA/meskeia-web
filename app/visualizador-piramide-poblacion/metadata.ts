@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: 'Pirámide de Población: España 1950-2100',
     description: 'Visualiza cómo envejece España con datos del INE y proyecciones hasta 2100.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-piramide-poblacion',
+    url: 'https://meskeia.com/visualizador-piramide-poblacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

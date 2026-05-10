@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Varietales de Vino | meskeIA',
     description: '45 varietales del mundo: tintos, blancos, espumosos y generosos. Notas de sabor, taninos, acidez y maridaje. Incluye uvas LATAM.',
-    url: 'https://meskeia.com/guia-varietales-vino',
+    url: 'https://meskeia.com/guia-varietales-vino/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

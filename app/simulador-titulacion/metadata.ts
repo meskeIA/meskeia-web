@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Titulación Ácido-Base | meskeIA',
     description: 'Titula gota a gota con curva de pH en tiempo real',
-    url: 'https://meskeia.com/simulador-titulacion',
+    url: 'https://meskeia.com/simulador-titulacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

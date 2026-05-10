@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Qué Pasa Cuando Duermes - Ciclos y Fases del Sueño',
     description: 'Fases del sueño, hipnograma, horas por edad y enemigos del descanso. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-ciclos-sueno',
+    url: 'https://meskeia.com/visualizador-ciclos-sueno/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

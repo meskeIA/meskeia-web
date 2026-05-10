@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Presupuestos Freelance | meskeIA',
     description: 'Crea presupuestos profesionales para tus clientes. Servicios, horas, materiales y descuentos. Exporta a PDF.',
-    url: 'https://meskeia.com/calculadora-presupuestos',
+    url: 'https://meskeia.com/calculadora-presupuestos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

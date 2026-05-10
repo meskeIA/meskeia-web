@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'ADN y Código Genético - Del Gen a la Proteína',
     description: 'El dogma central de la biología: cómo tu ADN se convierte en proteínas. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-adn-codigo-genetico',
+    url: 'https://meskeia.com/visualizador-adn-codigo-genetico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

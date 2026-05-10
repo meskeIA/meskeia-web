@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Álgebra Booleana con Karnaugh | meskeIA',
     description: 'Simplifica expresiones booleanas con mapas de Karnaugh. Tablas de verdad, forma mínima SOP/POS y visualización de agrupaciones.',
-    url: 'https://meskeia.com/calculadora-algebra-booleana',
+    url: 'https://meskeia.com/calculadora-algebra-booleana/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

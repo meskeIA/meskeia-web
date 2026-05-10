@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mapa de Decisiones Urgentes vs Importantes | meskeIA',
     description: '¿Vives apagando fuegos o construyendo futuro? Test interactivo basado en la Matriz Eisenhower.',
-    url: 'https://meskeia.com/mapa-decisiones-urgentes-importantes',
+    url: 'https://meskeia.com/mapa-decisiones-urgentes-importantes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

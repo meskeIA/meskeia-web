@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'Inflación: Por Qué Suben los Precios | meskeIA',
     description: 'La inflación tiene 3 causas distintas — y el BCE solo puede atacar una de ellas directamente.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-inflacion',
+    url: 'https://meskeia.com/visualizador-inflacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Imágenes OG para Redes Sociales',
     description: 'Crea imágenes Open Graph profesionales para compartir en redes sociales. Editor visual con plantillas.',
-    url: 'https://meskeia.com/generador-og-images',
+    url: 'https://meskeia.com/generador-og-images/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

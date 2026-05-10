@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Recortador de Audio Online - Sin Límites | meskeIA',
     description: 'Recorta y edita archivos de audio online gratis. Sin límites ni marcas de agua. 100% privado.',
-    url: 'https://meskeia.com/recortador-audio',
+    url: 'https://meskeia.com/recortador-audio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

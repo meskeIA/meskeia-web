@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Vitaminas y Minerales - Guía de 30 Nutrientes Esenciales',
     description: 'Guía de vitaminas y minerales: funciones, fuentes, dosis y síntomas de deficiencia. Información nutricional completa.',
-    url: 'https://meskeia.com/vitaminas-minerales',
+    url: 'https://meskeia.com/vitaminas-minerales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

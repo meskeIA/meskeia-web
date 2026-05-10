@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Viaje de un Paquete - Logística del E-commerce',
     description: 'Del click al timbre: todo lo que pasa entre que compras online y recibes tu paquete, explicado visualmente.',
-    url: 'https://meskeia.com/visualizador-viaje-paquete',
+    url: 'https://meskeia.com/visualizador-viaje-paquete/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

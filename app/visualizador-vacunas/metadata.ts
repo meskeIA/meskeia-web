@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona una Vacuna',
     description: 'Vacunas y sistema inmune explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-vacunas',
+    url: 'https://meskeia.com/visualizador-vacunas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

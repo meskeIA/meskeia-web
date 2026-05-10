@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona el GPS - Satélites, Trilateración y Relatividad',
     description: '31 satélites, la velocidad de la luz y la relatividad de Einstein: todo lo que hace posible que tu móvil sepa dónde estás.',
-    url: 'https://meskeia.com/visualizador-gps',
+    url: 'https://meskeia.com/visualizador-gps/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

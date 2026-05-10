@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Sudoku - Juego de Lógica y Números | meskeIA',
     description: 'Sudoku online con 3 niveles de dificultad. Entrena tu mente.',
-    url: 'https://meskeia.com/juego-sudoku',
+    url: 'https://meskeia.com/juego-sudoku/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

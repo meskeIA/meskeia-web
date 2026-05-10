@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Los Números Primos - Explicador Visual',
     description: 'Criba de Eratóstenes animada, espiral de Ulam y criptografía RSA. Tu tarjeta de crédito depende de los primos.',
-    url: 'https://meskeia.com/visualizador-numeros-primos',
+    url: 'https://meskeia.com/visualizador-numeros-primos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

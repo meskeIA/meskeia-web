@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Sistemas Circulatorios - Del Corazón de 2 al de 4 Cámaras',
     description: 'Evolución del sistema circulatorio animal: circulación abierta, cerrada, corazones y termorregulación explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-sistemas-circulatorios',
+    url: 'https://meskeia.com/visualizador-sistemas-circulatorios/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

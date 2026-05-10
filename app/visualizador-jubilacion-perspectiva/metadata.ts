@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tu Jubilación en Perspectiva - Timeline Visual',
     description: 'Timeline interactivo de tu vida laboral: años cotizados, porcentaje de pensión y edad de jubilación.',
-    url: 'https://meskeia.com/visualizador-jubilacion-perspectiva',
+    url: 'https://meskeia.com/visualizador-jubilacion-perspectiva/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

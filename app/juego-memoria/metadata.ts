@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Juego de Memoria - Encuentra las Parejas | meskeIA',
     description: 'Entrena tu memoria encontrando parejas de cartas.',
-    url: 'https://meskeia.com/juego-memoria',
+    url: 'https://meskeia.com/juego-memoria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

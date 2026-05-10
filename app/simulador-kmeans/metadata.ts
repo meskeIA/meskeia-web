@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de K-Means Clustering | meskeIA',
     description: 'Iteraciones de k-means animadas con método del codo',
-    url: 'https://meskeia.com/simulador-kmeans',
+    url: 'https://meskeia.com/simulador-kmeans/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

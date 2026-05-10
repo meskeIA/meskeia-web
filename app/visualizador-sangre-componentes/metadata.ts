@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Componentes de la Sangre - Tubo de Ensayo Visual',
     description: 'Plasma, glóbulos rojos, blancos y plaquetas explicados visualmente. Grupos ABO/Rh y coagulación.',
-    url: 'https://meskeia.com/visualizador-sangre-componentes',
+    url: 'https://meskeia.com/visualizador-sangre-componentes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

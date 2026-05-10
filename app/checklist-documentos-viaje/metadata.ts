@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Organizador de Documentos de Viaje | meskeIA',
     description: 'Checklist personalizable según destino. Nunca olvides un documento importante antes de viajar.',
-    url: 'https://meskeia.com/checklist-documentos-viaje',
+    url: 'https://meskeia.com/checklist-documentos-viaje/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

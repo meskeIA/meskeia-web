@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tectónica de Placas - La Tierra que se Mueve Bajo tus Pies',
     description: 'Placas, bordes, terremotos y volcanes: la geología del planeta explicada visualmente.',
-    url: 'https://meskeia.com/visualizador-tectonica-placas',
+    url: 'https://meskeia.com/visualizador-tectonica-placas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

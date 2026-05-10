@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Asistente Alta Autónomo - meskeIA',
     description: 'Darte de alta como autónomo paso a paso. Checklist, calculadora de cuota y todos los trámites necesarios.',
-    url: 'https://meskeia.com/asistente-alta-autonomo',
+    url: 'https://meskeia.com/asistente-alta-autonomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

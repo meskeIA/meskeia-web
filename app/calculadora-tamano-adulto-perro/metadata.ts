@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Tamaño Adulto para Cachorros',
     description: 'Predice cuánto pesará tu cachorro cuando sea adulto',
-    url: 'https://meskeia.com/calculadora-tamano-adulto-perro',
+    url: 'https://meskeia.com/calculadora-tamano-adulto-perro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

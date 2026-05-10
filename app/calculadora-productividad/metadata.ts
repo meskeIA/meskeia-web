@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Productividad Freelance | meskeIA',
     description: 'Calcula tu productividad real como freelance. Analiza ingresos por hora efectiva descontando tiempo no facturable.',
-    url: 'https://meskeia.com/calculadora-productividad',
+    url: 'https://meskeia.com/calculadora-productividad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

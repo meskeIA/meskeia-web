@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Series y Convergencia',
   description: 'Explora series de Taylor/Maclaurin con slider interactivo, criterios de convergencia animados y cálculo de π con series de Leibniz, Nilakantha y Wallis.',
-  url: 'https://meskeia.com/visualizador-series-convergencia',
+  url: 'https://meskeia.com/visualizador-series-convergencia/',
   features: [
     'Series de Taylor y Maclaurin con slider de términos (N=1–15)',
     'Gráfica función real vs aproximación polinómica en SVG',

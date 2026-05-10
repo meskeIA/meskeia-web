@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Diapasón Digital Online - La 440Hz',
     description: 'Diapasón digital gratuito con tono de referencia La 440Hz para afinar instrumentos.',
-    url: 'https://meskeia.com/diapason',
+    url: 'https://meskeia.com/diapason/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

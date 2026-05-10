@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Evaluador de Prompts | meskeIA',
     description: '¿Tus instrucciones a la IA son específicas o vagas? Test interactivo con diagnóstico visual.',
-    url: 'https://meskeia.com/evaluador-prompts',
+    url: 'https://meskeia.com/evaluador-prompts/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

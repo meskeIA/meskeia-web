@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Consumo de Combustible - meskeIA',
     description: 'Calcula el consumo de tu vehículo y el coste de tus viajes',
-    url: 'https://meskeia.com/calculadora-combustible',
+    url: 'https://meskeia.com/calculadora-combustible/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

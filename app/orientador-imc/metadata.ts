@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador IMC - Índice de Masa Corporal',
     description: 'Calcula tu IMC gratis y conoce tu clasificación según la OMS. Herramienta rápida y precisa.',
-    url: 'https://meskeia.com/orientador-imc',
+    url: 'https://meskeia.com/orientador-imc/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

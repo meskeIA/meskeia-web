@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Países del Mundo - Buscador Completo | meskeIA',
     description: 'Explora los 195 países del mundo con sus capitales, banderas, monedas, idiomas y más datos interesantes.',
-    url: 'https://meskeia.com/paises-del-mundo',
+    url: 'https://meskeia.com/paises-del-mundo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

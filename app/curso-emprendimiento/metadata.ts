@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Emprendimiento Práctico - meskeIA',
     description: 'Aprende a emprender paso a paso con metodología práctica. 6 capítulos + herramientas interactivas.',
-    url: 'https://meskeia.com/curso-emprendimiento',
+    url: 'https://meskeia.com/curso-emprendimiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

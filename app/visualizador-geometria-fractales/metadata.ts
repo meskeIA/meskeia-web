@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Geometría de Fractales - Koch, Sierpinski y Mandelbrot',
     description: 'Genera fractales paso a paso con sliders interactivos: Sierpinski, Koch, alfombra y Hilbert. Descubre la autosimilitud y la dimensión fractal.',
-    url: 'https://meskeia.com/visualizador-geometria-fractales',
+    url: 'https://meskeia.com/visualizador-geometria-fractales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

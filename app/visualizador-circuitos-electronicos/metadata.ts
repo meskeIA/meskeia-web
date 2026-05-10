@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Circuitos Electrónicos: R, L, C, Transistores y Puertas Lógicas — meskeIA',
     description: 'Explora la electrónica desde sus fundamentos. Visualiza componentes R/L/C, simula un transistor BJT, juega con puertas lógicas y descubre cómo 50.000 millones de transistores forman un procesador moderno.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-circuitos-electronicos',
+    url: 'https://meskeia.com/visualizador-circuitos-electronicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

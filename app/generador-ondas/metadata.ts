@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Ondas y Visualizador de Audio | meskeIA',
     description: 'Genera ondas sonoras, visualiza audio y aprende sobre frecuencias. Herramienta educativa interactiva.',
-    url: 'https://meskeia.com/generador-ondas',
+    url: 'https://meskeia.com/generador-ondas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Visualizador de Álgebra Lineal — Vectores, Transformaciones y Eigenvalores',
     description: '¿Qué es realmente una transformación lineal? Explora la geometría del álgebra lineal: vectores, matrices como transformaciones, el determinante como área y los eigenvalores como ejes invariantes.',
-    url: 'https://meskeia.com/visualizador-algebra-lineal',
+    url: 'https://meskeia.com/visualizador-algebra-lineal/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

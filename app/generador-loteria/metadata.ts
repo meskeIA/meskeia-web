@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Números de Lotería - Primitiva, Euromillones, Bonoloto',
     description: 'Genera combinaciones aleatorias para las principales loterías españolas. Gratis y sin registro.',
-    url: 'https://meskeia.com/generador-loteria',
+    url: 'https://meskeia.com/generador-loteria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

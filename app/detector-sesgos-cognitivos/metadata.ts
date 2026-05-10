@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Detector de Sesgos Cognitivos | meskeIA',
     description: '¿Qué sesgos afectan tus decisiones? Test basado en Kahneman (Sistema 1 y 2).',
-    url: 'https://meskeia.com/detector-sesgos-cognitivos',
+    url: 'https://meskeia.com/detector-sesgos-cognitivos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

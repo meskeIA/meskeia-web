@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cinética Química - Energía de Activación, Arrhenius y Órdenes de Reacción',
     description: 'Visualizador interactivo: perfil de energía con catalizador, gráfico de Arrhenius, órdenes de reacción 0/1/2 y factores que afectan la velocidad de reacción.',
-    url: 'https://meskeia.com/visualizador-cinetica-quimica',
+    url: 'https://meskeia.com/visualizador-cinetica-quimica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

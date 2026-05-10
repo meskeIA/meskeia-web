@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Especias | meskeIA',
     description: 'Consulta el perfil de 65 especias: sabor, intensidad, usos, origen y con qué combinan. Referencia culinaria práctica.',
-    url: 'https://meskeia.com/guia-especias',
+    url: 'https://meskeia.com/guia-especias/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

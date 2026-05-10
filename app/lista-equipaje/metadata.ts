@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Lista de Equipaje Inteligente - Checklist Personalizado',
     description: 'Genera tu lista de equipaje según destino, clima y duración. No olvides nada importante.',
-    url: 'https://meskeia.com/lista-equipaje',
+    url: 'https://meskeia.com/lista-equipaje/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

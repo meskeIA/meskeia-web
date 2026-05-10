@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Anatomía del Ojo Humano y la Visión',
     description: 'Córnea, cristalino, retina, conos y bastones: descubre cómo funciona la visión humana con diagramas interactivos.',
-    url: 'https://meskeia.com/visualizador-ojo-humano-vision',
+    url: 'https://meskeia.com/visualizador-ojo-humano-vision/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

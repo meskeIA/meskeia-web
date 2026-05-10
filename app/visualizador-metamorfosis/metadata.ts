@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Metamorfosis - La Transformación más Radical de la Naturaleza',
     description: 'De oruga a mariposa, de renacuajo a rana: la metamorfosis animal como nunca la habías visto.',
-    url: 'https://meskeia.com/visualizador-metamorfosis',
+    url: 'https://meskeia.com/visualizador-metamorfosis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Los Números de la Música - Matemáticas del Sonido y la Armonía',
     description: 'Frecuencias, ratios pitagóricos, acordes y ritmo: toda la música es matemáticas. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-matematicas-musica',
+    url: 'https://meskeia.com/visualizador-matematicas-musica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

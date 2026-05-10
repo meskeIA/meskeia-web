@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Cócteles Clásicos | meskeIA',
     description: '45 cócteles clásicos: ingredientes, método, copa, origen e historia. Sours, Highballs, Martinis, Tropicales, Spritz y sin alcohol.',
-    url: 'https://meskeia.com/guia-cocteles',
+    url: 'https://meskeia.com/guia-cocteles/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Enlaces Químicos - Cómo se Unen los Átomos',
     description: 'Los 3 tipos de enlaces químicos explicados con animaciones de electrones y ejemplos cotidianos.',
-    url: 'https://meskeia.com/visualizador-enlaces-quimicos',
+    url: 'https://meskeia.com/visualizador-enlaces-quimicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

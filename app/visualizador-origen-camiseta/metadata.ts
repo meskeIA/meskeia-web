@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'De dónde Viene tu Camiseta',
     description: 'El viaje global de una camiseta de 15€: algodón, hilado, tinte, confección, transporte y tienda. Costes reales por etapa.',
-    url: 'https://meskeia.com/visualizador-origen-camiseta',
+    url: 'https://meskeia.com/visualizador-origen-camiseta/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

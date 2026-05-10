@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Aves Comunes de España y Europa | meskeIA',
     description: '40 aves comunes con hábitat, alimentación, canto, tamaño, envergadura y estado de conservación. Filtros por hábitat, presencia y orden taxonómico.',
-    url: 'https://meskeia.com/guia-aves-comunes',
+    url: 'https://meskeia.com/guia-aves-comunes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

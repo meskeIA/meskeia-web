@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: '¿Estoy obligado a declarar la Renta 2025? — Test rápido',
     description: 'Test interactivo para saber si debes presentar la declaración de IRPF 2025. Umbrales actualizados, desempleo, IMV y más.',
-    url: 'https://meskeia.com/test-obligado-declarar-renta',
+    url: 'https://meskeia.com/test-obligado-declarar-renta/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

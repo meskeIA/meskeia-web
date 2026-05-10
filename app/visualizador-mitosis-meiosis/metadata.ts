@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Mitosis y Meiosis - La Danza de los Cromosomas',
     description: 'División celular explicada visualmente: fases, cromosomas y crossing-over paso a paso.',
-    url: 'https://meskeia.com/visualizador-mitosis-meiosis',
+    url: 'https://meskeia.com/visualizador-mitosis-meiosis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

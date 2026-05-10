@@ -40,7 +40,7 @@ export const jsonLd = {
   name: 'Generador de Contraseñas Seguras',
   description:
     'Herramienta gratuita para generar contraseñas seguras y aleatorias con opciones personalizables',
-  url: 'https://meskeia.com/generador-contrasenas',
+  url: 'https://meskeia.com/generador-contrasenas/',
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Any',
   offers: {

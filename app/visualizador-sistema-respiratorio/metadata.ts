@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Sistema Respiratorio - Del Aire al Oxígeno',
     description: 'Anatomía pulmonar, intercambio O₂/CO₂, espirometría y enfermedades respiratorias explicadas visualmente.',
-    url: 'https://meskeia.com/visualizador-sistema-respiratorio',
+    url: 'https://meskeia.com/visualizador-sistema-respiratorio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Célula por Dentro - Animal vs Vegetal',
     description: 'Orgánulos clickables, comparativa visual y datos fascinantes sobre las células.',
-    url: 'https://meskeia.com/visualizador-celula',
+    url: 'https://meskeia.com/visualizador-celula/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

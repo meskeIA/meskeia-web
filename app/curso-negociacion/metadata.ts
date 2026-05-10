@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Negociación Exitosa - meskeIA',
     description: 'Domina el arte de negociar: preparación estratégica, psicología, tácticas de persuasión, cierre de acuerdos y resolución de conflictos.',
-    url: 'https://meskeia.com/curso-negociacion',
+    url: 'https://meskeia.com/curso-negociacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

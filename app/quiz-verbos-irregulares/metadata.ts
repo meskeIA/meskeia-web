@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Quiz Verbos Irregulares en Inglés | meskeIA',
     description: 'Practica los verbos irregulares en inglés: 75 verbos de A1 a B2, opción múltiple, sin registro.',
-    url: 'https://meskeia.com/quiz-verbos-irregulares',
+    url: 'https://meskeia.com/quiz-verbos-irregulares/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

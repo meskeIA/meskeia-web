@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Auditoría de Propuesta de Valor | meskeIA',
     description: '¿Lo que ofreces encaja con lo que necesitan? Test basado en Osterwalder.',
-    url: 'https://meskeia.com/auditoria-propuesta-valor',
+    url: 'https://meskeia.com/auditoria-propuesta-valor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

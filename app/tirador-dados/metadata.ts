@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tirador de Dados Online - Dados Virtuales',
     description: 'Lanza dados virtuales para juegos de rol y mesa. D4, D6, D8, D10, D12, D20 y D100 con historial y suma automática.',
-    url: 'https://meskeia.com/tirador-dados',
+    url: 'https://meskeia.com/tirador-dados/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

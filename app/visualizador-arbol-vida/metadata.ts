@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Árbol de la Vida Animal - De las Esponjas a los Mamíferos',
     description: 'Explora los 12 grandes grupos del reino animal, sus características evolutivas y 540 millones de años de historia.',
-    url: 'https://meskeia.com/visualizador-arbol-vida',
+    url: 'https://meskeia.com/visualizador-arbol-vida/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

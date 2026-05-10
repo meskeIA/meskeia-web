@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso de Redacción Académica - Guía Práctica | meskeIA',
     description: 'Aprende a escribir textos académicos de calidad. Pautas prácticas para tu TFG, TFM, tesis o artículo científico.',
-    url: 'https://meskeia.com/curso-redaccion-academica',
+    url: 'https://meskeia.com/curso-redaccion-academica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

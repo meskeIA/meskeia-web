@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Luxómetro Online - Mide la Intensidad de Luz',
     description: 'Mide la luz ambiente con tu dispositivo. Recomendaciones fotográficas incluidas.',
-    url: 'https://meskeia.com/luxometro',
+    url: 'https://meskeia.com/luxometro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

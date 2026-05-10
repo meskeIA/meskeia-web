@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Razas de Perros - 40 razas con características | meskeIA',
     description: '40 razas de perros con temperamento, energía, peso, altura, mantenimiento y consejos para elegir la raza ideal. Filtros interactivos por tamaño, energía, apartamento y niños.',
-    url: 'https://meskeia.com/guia-razas-perros',
+    url: 'https://meskeia.com/guia-razas-perros/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

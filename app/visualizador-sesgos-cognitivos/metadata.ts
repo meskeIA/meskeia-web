@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona tu Cerebro al Decidir',
     description: 'Sesgos cognitivos que afectan tus decisiones sin que lo sepas. Mini-ejemplos interactivos.',
-    url: 'https://meskeia.com/visualizador-sesgos-cognitivos',
+    url: 'https://meskeia.com/visualizador-sesgos-cognitivos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

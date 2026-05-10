@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: '¿Qué vino elegir? | meskeIA',
     description: 'Asistente situacional de vinos: te ayuda a decidir según plato, ocasión, regalo o restaurante. Recomendaciones razonadas con alternativas.',
-    url: 'https://meskeia.com/que-vino-elegir',
+    url: 'https://meskeia.com/que-vino-elegir/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

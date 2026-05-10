@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía del Aceite de Oliva | meskeIA',
     description: '32 variedades de aceituna del mundo: perfil de sabor, aromas, notas de boca, acidez, usos ideales y D.O. Filtros por país y perfil.',
-    url: 'https://meskeia.com/guia-aceite-oliva',
+    url: 'https://meskeia.com/guia-aceite-oliva/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Fases de la Luna y Eclipses - La Danza Sol-Tierra-Luna',
     description: 'Fases lunares, eclipses solares y lunares, mareas y datos fascinantes. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-fases-luna-eclipses',
+    url: 'https://meskeia.com/visualizador-fases-luna-eclipses/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

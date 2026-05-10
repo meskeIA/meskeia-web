@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona un Banco (de Verdad)',
     description: 'De dónde sale el dinero que presta el banco. Reserva fraccionaria y multiplicador bancario explicados.',
-    url: 'https://meskeia.com/visualizador-como-funciona-banco',
+    url: 'https://meskeia.com/visualizador-como-funciona-banco/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

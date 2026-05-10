@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'La Evolución del Dinero - Del Trueque al Bitcoin',
     description: 'Timeline visual interactivo: cómo el dinero pasó de conchas y sal a criptomonedas y euros digitales.',
-    url: 'https://meskeia.com/visualizador-historia-dinero',
+    url: 'https://meskeia.com/visualizador-historia-dinero/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

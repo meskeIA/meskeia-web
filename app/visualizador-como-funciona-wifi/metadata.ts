@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona el WiFi - De las Ondas a tu Pantalla',
     description: 'Ondas, frecuencias, obstáculos y canales: todo sobre el WiFi explicado visualmente.',
-    url: 'https://meskeia.com/visualizador-como-funciona-wifi',
+    url: 'https://meskeia.com/visualizador-como-funciona-wifi/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Digestión y Nutrientes — De la Comida a la Célula',
     description: 'Carbohidratos→glucosa, proteínas→aminoácidos, grasas→ácidos grasos. Visión bioquímica de la digestión con vitaminas, minerales y datos del metabolismo.',
-    url: 'https://meskeia.com/visualizador-digestion-nutrientes',
+    url: 'https://meskeia.com/visualizador-digestion-nutrientes/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

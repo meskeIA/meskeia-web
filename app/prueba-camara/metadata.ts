@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Prueba de Cámara Web Online - Test Webcam Gratis',
     description: 'Verifica tu cámara web antes de videollamadas. Test completo con captura de fotos.',
-    url: 'https://meskeia.com/prueba-camara',
+    url: 'https://meskeia.com/prueba-camara/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

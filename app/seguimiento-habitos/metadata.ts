@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Seguimiento de Hábitos - meskeIA',
     description: 'Crea y sigue tus hábitos diarios con calendario visual, rachas y sistema de logros',
-    url: 'https://meskeia.com/seguimiento-habitos',
+    url: 'https://meskeia.com/seguimiento-habitos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

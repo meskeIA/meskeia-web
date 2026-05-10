@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Geometría Analítica: Cónicas Interactivas',
     description: 'Circunferencia, elipse, parábola e hipérbola explicadas visualmente con sliders y ecuaciones en tiempo real.',
-    url: 'https://meskeia.com/visualizador-geometria-analitica',
+    url: 'https://meskeia.com/visualizador-geometria-analitica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

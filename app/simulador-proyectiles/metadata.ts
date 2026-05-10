@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: 'Simulador de Proyectiles 2D | meskeIA',
     description:
       'Simulador interactivo de movimiento parabólico con resistencia del aire y diferentes gravedades planetarias',
-    url: 'https://meskeia.com/simulador-proyectiles',
+    url: 'https://meskeia.com/simulador-proyectiles/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [

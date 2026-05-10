@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Curso Decisiones de Inversión - Aprende a Invertir | meskeIA',
     description: 'Curso gratuito de inversión: 10 capítulos con herramientas interactivas y casos prácticos. Aprende asset allocation, gestión de riesgo y estrategias profesionales.',
-    url: 'https://meskeia.com/curso-decisiones-inversion',
+    url: 'https://meskeia.com/curso-decisiones-inversion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

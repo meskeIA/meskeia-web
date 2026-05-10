@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Anatomía de una Flor - De la Polinización al Fruto',
     description: 'Partes de la flor, tipos de polinización, formación de frutos y datos fascinantes. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-anatomia-flor',
+    url: 'https://meskeia.com/visualizador-anatomia-flor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

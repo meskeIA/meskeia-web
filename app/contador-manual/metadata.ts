@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Contador Manual Online - Tally Counter Digital',
     description: 'Contador manual digital gratuito. Cuenta personas, objetos, repeticiones o cualquier cosa.',
-    url: 'https://meskeia.com/contador-manual',
+    url: 'https://meskeia.com/contador-manual/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

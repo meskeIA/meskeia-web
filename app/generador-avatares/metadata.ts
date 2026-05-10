@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Avatares - Crea avatares únicos | meskeIA',
     description: 'Genera avatares únicos y personalizados a partir de tu nombre. 8 estilos, descarga PNG, 100% privado.',
-    url: 'https://meskeia.com/generador-avatares',
+    url: 'https://meskeia.com/generador-avatares/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Funciona una Pantalla - Tecnología de Displays',
     description: 'De CRT a MicroLED: subpíxeles RGB, resoluciones, luz azul y salud visual explicados de forma visual e interactiva.',
-    url: 'https://meskeia.com/visualizador-pantallas',
+    url: 'https://meskeia.com/visualizador-pantallas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

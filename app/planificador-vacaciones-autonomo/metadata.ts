@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Vacaciones para Autónomos | meskeIA',
     description: 'Calcula el impacto económico real de tomarte vacaciones como autónomo. Facturación perdida, compensación necesaria y mejores épocas.',
-    url: 'https://meskeia.com/planificador-vacaciones-autonomo',
+    url: 'https://meskeia.com/planificador-vacaciones-autonomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

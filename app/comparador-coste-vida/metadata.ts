@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Comparador de Coste de Vida | meskeIA',
     description: 'Alquiler, comida, transporte e internet en 55+ ciudades del mundo. Compara y decide dónde vivir.',
-    url: 'https://meskeia.com/comparador-coste-vida',
+    url: 'https://meskeia.com/comparador-coste-vida/',
     siteName: 'meskeIA',
     type: 'website',
     images: [{
@@ -37,7 +37,7 @@ export const jsonLd = {
   '@type': 'WebApplication',
   name: 'Comparador de Coste de Vida entre Ciudades',
   description: 'Compara el coste de vida entre más de 55 ciudades del mundo: alquiler, restaurantes, supermercado, transporte e internet.',
-  url: 'https://meskeia.com/comparador-coste-vida',
+  url: 'https://meskeia.com/comparador-coste-vida/',
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Any',
   offers: {

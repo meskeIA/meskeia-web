@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Sistema Nervioso - Neuronas, Sinapsis y Neurotransmisores',
     description: 'Neurona con partes clickables, SNC vs SNP, potencial de acción y neurotransmisores explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-sistema-nervioso',
+    url: 'https://meskeia.com/visualizador-sistema-nervioso/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

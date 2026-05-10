@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Germinación - De la Semilla a la Planta',
     description: 'El viaje de una semilla hasta convertirse en planta, explicado visualmente paso a paso.',
-    url: 'https://meskeia.com/visualizador-germinacion',
+    url: 'https://meskeia.com/visualizador-germinacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

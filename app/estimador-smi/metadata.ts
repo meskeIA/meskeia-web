@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador SMI 2026 — Neto, atrasos y comparativa provincial',
     description: 'SMI 2026: 1.221 €/mes. Calcula tu neto, los atrasos retroactivos y compara con el sueldo medio de tu provincia.',
-    url: 'https://meskeia.com/estimador-smi',
+    url: 'https://meskeia.com/estimador-smi/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

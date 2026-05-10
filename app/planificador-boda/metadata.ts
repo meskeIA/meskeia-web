@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Boda Gratis - Tu Wedding Planner Digital',
     description: 'Checklist completo, calculadora de presupuesto y timeline para organizar tu boda perfecta. Todo gratis y sin registro.',
-    url: 'https://meskeia.com/planificador-boda',
+    url: 'https://meskeia.com/planificador-boda/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

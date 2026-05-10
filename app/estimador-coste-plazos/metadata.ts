@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador Coste Real a Plazos - meskeIA',
     description: 'Descubre cuánto pagas realmente al financiar productos. Calcula TAE, intereses y coste total vs precio de contado.',
-    url: 'https://meskeia.com/estimador-coste-plazos',
+    url: 'https://meskeia.com/estimador-coste-plazos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

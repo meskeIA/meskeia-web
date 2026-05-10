@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Espectro Electromagnético - De Radio a Rayos Gamma',
     description: 'Explora las 7 bandas del espectro EM: radio, microondas, infrarrojo, visible, UV, rayos X y gamma. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-espectro-electromagnetico',
+    url: 'https://meskeia.com/visualizador-espectro-electromagnetico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

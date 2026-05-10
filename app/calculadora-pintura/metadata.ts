@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Pintura - Litros por m²',
     description: 'Calcula cuántos litros de pintura necesitas para tu proyecto. Considera capas, tipo de superficie y calcula el coste.',
-    url: 'https://meskeia.com/calculadora-pintura',
+    url: 'https://meskeia.com/calculadora-pintura/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

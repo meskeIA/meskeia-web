@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Notas - Guarda tus Ideas y Apuntes | meskeIA',
     description: 'Guarda tus notas organizadas por categorías con guardado automático.',
-    url: 'https://meskeia.com/notas',
+    url: 'https://meskeia.com/notas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

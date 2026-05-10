@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Glosario de Programación - Términos de Desarrollo Web',
     description: 'Diccionario completo de términos de programación en español. Más de 100 conceptos explicados de forma clara.',
-    url: 'https://meskeia.com/glosario-programacion',
+    url: 'https://meskeia.com/glosario-programacion/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

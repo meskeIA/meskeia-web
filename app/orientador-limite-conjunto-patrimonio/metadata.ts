@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Límite Conjunto IRPF-Patrimonio | meskeIA',
     description: 'Comprueba en 1 minuto si puedes beneficiarte de la reducción del Art. 31 Ley 19/1991 sobre la cuota del Impuesto de Patrimonio.',
-    url: 'https://meskeia.com/orientador-limite-conjunto-patrimonio',
+    url: 'https://meskeia.com/orientador-limite-conjunto-patrimonio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

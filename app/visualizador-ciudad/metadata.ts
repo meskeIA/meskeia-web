@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Anatomía de una Ciudad - Infraestructura Urbana',
     description: 'Las capas invisibles que hacen funcionar una ciudad: desde las tuberías bajo el suelo hasta el presupuesto municipal.',
-    url: 'https://meskeia.com/visualizador-ciudad',
+    url: 'https://meskeia.com/visualizador-ciudad/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

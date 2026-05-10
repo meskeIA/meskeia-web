@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Autómatas Finitos DFA y NFA | meskeIA',
     description: 'Editor visual de autómatas con animación de validación de cadenas',
-    url: 'https://meskeia.com/simulador-automatas-finitos',
+    url: 'https://meskeia.com/simulador-automatas-finitos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

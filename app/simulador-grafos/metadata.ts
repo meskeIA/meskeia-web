@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Grafos - BFS DFS Dijkstra A* | meskeIA',
     description: 'Algoritmos de grafos paso a paso con editor visual y estructuras auxiliares vivas',
-    url: 'https://meskeia.com/simulador-grafos',
+    url: 'https://meskeia.com/simulador-grafos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

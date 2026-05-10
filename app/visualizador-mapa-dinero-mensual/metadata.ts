@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Mapa de tu Dinero Mensual',
     description: '¿Adónde va tu sueldo? Visualiza el reparto mensual medio en España.',
-    url: 'https://meskeia.com/visualizador-mapa-dinero-mensual',
+    url: 'https://meskeia.com/visualizador-mapa-dinero-mensual/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

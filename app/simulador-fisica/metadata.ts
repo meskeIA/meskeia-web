@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Física Interactivo - meskeIA',
     description: 'Experimenta con física en tiempo real: caída libre, péndulos, ondas y proyectiles con animaciones visuales.',
-    url: 'https://meskeia.com/simulador-fisica',
+    url: 'https://meskeia.com/simulador-fisica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

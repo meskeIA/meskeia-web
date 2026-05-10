@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Auditoría de Energía Semanal | meskeIA',
     description: '¿Dónde gastas energía sin retorno? Test interactivo de gestión de energía.',
-    url: 'https://meskeia.com/auditoria-energia-semanal',
+    url: 'https://meskeia.com/auditoria-energia-semanal/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Ciclo de Vida de un Proyecto Freelance - Explicador Visual',
     description: 'Las 7 fases de un proyecto freelance explicadas visualmente: donde se pierde dinero, cuellos de botella y tiempos reales.',
-    url: 'https://meskeia.com/visualizador-ciclo-vida-freelance',
+    url: 'https://meskeia.com/visualizador-ciclo-vida-freelance/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

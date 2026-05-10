@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía Pensar Mejor — Reflexión Profesional | meskeIA',
     description: '14 herramientas interactivas para pensar mejor sobre tu carrera, tus decisiones y tu negocio.',
-    url: 'https://meskeia.com/guia/pensar-mejor',
+    url: 'https://meskeia.com/guia/pensar-mejor/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

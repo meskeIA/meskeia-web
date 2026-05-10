@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Quiz Países y Capitales del Mundo | meskeIA',
     description: 'Adivina capitales, identifica banderas y demuestra tus conocimientos de geografía. 195 países, sin registro.',
-    url: 'https://meskeia.com/quiz-paises-capitales',
+    url: 'https://meskeia.com/quiz-paises-capitales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

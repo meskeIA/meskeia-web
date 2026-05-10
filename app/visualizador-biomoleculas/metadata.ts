@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Biomoléculas - Los 4 Ingredientes de la Vida',
     description: 'Carbohidratos, lípidos, proteínas y ácidos nucleicos explicados de forma visual e interactiva.',
-    url: 'https://meskeia.com/visualizador-biomoleculas',
+    url: 'https://meskeia.com/visualizador-biomoleculas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

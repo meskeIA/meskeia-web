@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Generador de Códigos QR Gratis - meskeIA',
     description: 'Crea códigos QR para URLs, texto, WiFi y contactos. Descarga gratis en PNG.',
-    url: 'https://meskeia.com/generador-qr',
+    url: 'https://meskeia.com/generador-qr/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

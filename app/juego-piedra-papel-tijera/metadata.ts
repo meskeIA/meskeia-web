@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Piedra Papel Tijera - Juego Clásico | meskeIA',
     description: 'Juega al clásico Piedra, Papel o Tijera contra la computadora.',
-    url: 'https://meskeia.com/juego-piedra-papel-tijera',
+    url: 'https://meskeia.com/juego-piedra-papel-tijera/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

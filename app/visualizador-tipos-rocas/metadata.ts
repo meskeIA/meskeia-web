@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tipos de Rocas - El Ciclo que Nunca se Detiene',
     description: 'Ígneas, sedimentarias y metamórficas: las rocas del planeta explicadas visualmente con el ciclo que las transforma.',
-    url: 'https://meskeia.com/visualizador-tipos-rocas',
+    url: 'https://meskeia.com/visualizador-tipos-rocas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

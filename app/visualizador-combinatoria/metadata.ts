@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Combinatoria: Permutaciones, Combinaciones y Triángulo de Pascal — meskeIA',
     description: 'Aprende combinatoria con visualizaciones interactivas: árboles de permutaciones, triángulo de Pascal con patrones y binomio de Newton.',
-    url: 'https://meskeia.com/visualizador-combinatoria',
+    url: 'https://meskeia.com/visualizador-combinatoria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

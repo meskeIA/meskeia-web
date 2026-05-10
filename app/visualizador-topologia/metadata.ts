@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Visualizador de Topología — Superficies y Homeomorfismos',
     description: '¿Por qué una taza de café y un donut son lo mismo para las matemáticas? Explora topología: superficies, genus, nudos y la característica de Euler.',
-    url: 'https://meskeia.com/visualizador-topologia',
+    url: 'https://meskeia.com/visualizador-topologia/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

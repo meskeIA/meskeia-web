@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Oferta, Demanda y por qué Suben los Precios',
     description: '5 escenarios reales que explican cómo funcionan los mercados y por qué cambian los precios.',
-    url: 'https://meskeia.com/visualizador-oferta-demanda',
+    url: 'https://meskeia.com/visualizador-oferta-demanda/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

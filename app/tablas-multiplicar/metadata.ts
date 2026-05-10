@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Entrenador Tablas de Multiplicar | meskeIA',
     description: 'Aprende las tablas de multiplicar con este juego educativo. Niveles, puntos y medallas.',
-    url: 'https://meskeia.com/tablas-multiplicar',
+    url: 'https://meskeia.com/tablas-multiplicar/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

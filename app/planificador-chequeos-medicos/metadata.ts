@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Chequeos Médicos Preventivos según Edad | meskeIA',
     description: 'Filtra por edad y sexo y consulta qué revisiones médicas preventivas te recomiendan las guías clínicas españolas.',
-    url: 'https://meskeia.com/planificador-chequeos-medicos',
+    url: 'https://meskeia.com/planificador-chequeos-medicos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

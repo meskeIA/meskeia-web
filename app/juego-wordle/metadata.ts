@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Wordle en Español - Adivina la Palabra | meskeIA',
     description: 'Adivina la palabra de 5 letras en 6 intentos.',
-    url: 'https://meskeia.com/juego-wordle',
+    url: 'https://meskeia.com/juego-wordle/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

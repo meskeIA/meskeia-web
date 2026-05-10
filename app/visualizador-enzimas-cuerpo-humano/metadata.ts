@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Las Enzimas del Cuerpo Humano - Catalizadores de la Vida',
     description: 'Modelo llave-cerradura, enzimas digestivas y metabólicas, factores de actividad y cofactores esenciales.',
-    url: 'https://meskeia.com/visualizador-enzimas-cuerpo-humano',
+    url: 'https://meskeia.com/visualizador-enzimas-cuerpo-humano/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

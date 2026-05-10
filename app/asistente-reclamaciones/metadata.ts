@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Asistente de Reclamaciones al Consumidor - meskeIA',
     description: 'Guía interactiva para reclamar tus derechos como consumidor en España',
-    url: 'https://meskeia.com/asistente-reclamaciones',
+    url: 'https://meskeia.com/asistente-reclamaciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

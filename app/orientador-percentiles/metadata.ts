@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Percentiles Infantiles - meskeIA',
     description: 'Calcula el percentil de peso y talla de tu hijo según tablas OMS',
-    url: 'https://meskeia.com/orientador-percentiles',
+    url: 'https://meskeia.com/orientador-percentiles/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Eficiencia Energética | meskeIA',
     description: 'Calcula el ahorro y amortización de mejoras energéticas en tu hogar: aislamiento, ventanas y calefacción.',
-    url: 'https://meskeia.com/calculadora-eficiencia-energetica',
+    url: 'https://meskeia.com/calculadora-eficiencia-energetica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

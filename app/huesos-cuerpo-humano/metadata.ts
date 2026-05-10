@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Huesos del Cuerpo Humano - Guía Completa del Esqueleto',
     description: 'Explora los 206 huesos del esqueleto humano con información detallada sobre función, articulaciones y curiosidades.',
-    url: 'https://meskeia.com/huesos-cuerpo-humano',
+    url: 'https://meskeia.com/huesos-cuerpo-humano/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

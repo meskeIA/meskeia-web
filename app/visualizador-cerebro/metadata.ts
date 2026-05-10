@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Piensa tu Cerebro - Neuronas, Memoria y Neuroplasticidad',
     description: 'Tu cerebro explicado visualmente: neuronas, memoria, neuroplasticidad e ilusiones cognitivas.',
-    url: 'https://meskeia.com/visualizador-cerebro',
+    url: 'https://meskeia.com/visualizador-cerebro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'El Silicio: De la Arena al Chip',
     description: 'Cómo un semiconductor dopado con fósforo y boro hace posible toda la computación moderna',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-silicio',
+    url: 'https://meskeia.com/visualizador-silicio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

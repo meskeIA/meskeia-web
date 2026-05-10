@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Fosiles y Tiempo Geologico - 4.500 Ma en un Vistazo',
     description: 'Timeline interactivo de las eras geologicas, 5 grandes extinciones y metodos de datacion de fosiles.',
-    url: 'https://meskeia.com/visualizador-fosiles-tiempo-geologico',
+    url: 'https://meskeia.com/visualizador-fosiles-tiempo-geologico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

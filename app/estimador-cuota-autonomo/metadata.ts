@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estimador Cuota de Autónomo 2025 - Orientación RETA',
     description: 'Estima tu cuota de autónomo según tus ingresos reales. Tramos 2025, tarifa plana y bonificaciones.',
-    url: 'https://meskeia.com/estimador-cuota-autonomo',
+    url: 'https://meskeia.com/estimador-cuota-autonomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Checklist Pre-Mortem | meskeIA',
     description: 'Antes de lanzar algo: ¿por qué podría fallar? Test interactivo basado en Gary Klein.',
-    url: 'https://meskeia.com/checklist-pre-mortem',
+    url: 'https://meskeia.com/checklist-pre-mortem/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

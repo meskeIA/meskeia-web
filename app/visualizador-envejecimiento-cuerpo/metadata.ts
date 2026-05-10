@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo Envejece tu Cuerpo - Por Décadas',
     description: 'Qué cambia en tu metabolismo, músculos, huesos y corazón con cada década. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-envejecimiento-cuerpo',
+    url: 'https://meskeia.com/visualizador-envejecimiento-cuerpo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

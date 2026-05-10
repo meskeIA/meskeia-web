@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Tipos de Cliente Freelance - Explicador Visual',
     description: '6 tipos de relación cliente-freelance en España: ventajas, riesgos, facturación y señales de alerta. Incluye falso autónomo.',
-    url: 'https://meskeia.com/visualizador-tipos-cliente-freelance',
+    url: 'https://meskeia.com/visualizador-tipos-cliente-freelance/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Ruleta Aleatoria Online - Sorteos y Decisiones',
     description: 'Crea tu ruleta personalizada para sorteos y decisiones al azar. Gratis y sin registro.',
-    url: 'https://meskeia.com/ruleta-aleatoria',
+    url: 'https://meskeia.com/ruleta-aleatoria/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

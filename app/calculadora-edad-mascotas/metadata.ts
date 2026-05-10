@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Edad de Mascotas - meskeIA',
     description: 'Calcula la edad de tu perro o gato en años humanos',
-    url: 'https://meskeia.com/calculadora-edad-mascotas',
+    url: 'https://meskeia.com/calculadora-edad-mascotas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

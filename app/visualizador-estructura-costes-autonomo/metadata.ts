@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Estructura de Costes del Autónomo - Explicador Visual',
     description: 'De lo que facturas a lo que te queda: visualiza cada euro como autónomo. IVA, RETA, IRPF, gastos y neto real.',
-    url: 'https://meskeia.com/visualizador-estructura-costes-autonomo',
+    url: 'https://meskeia.com/visualizador-estructura-costes-autonomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

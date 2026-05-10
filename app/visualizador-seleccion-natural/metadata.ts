@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Selección Natural - El Motor de la Evolución',
     description: 'Los 4 pilares de Darwin, ejemplos clásicos, comparativa Darwin vs Lamarck y datos fascinantes. Explicador visual interactivo.',
-    url: 'https://meskeia.com/visualizador-seleccion-natural',
+    url: 'https://meskeia.com/visualizador-seleccion-natural/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

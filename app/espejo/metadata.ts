@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Espejo Digital Online - Espejo de Bolsillo',
     description: 'Espejo digital gratuito que usa la cámara frontal. Comprueba tu aspecto en cualquier momento.',
-    url: 'https://meskeia.com/espejo',
+    url: 'https://meskeia.com/espejo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

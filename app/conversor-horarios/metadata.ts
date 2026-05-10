@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Conversor de Horarios Mundial',
     description: 'Convierte horarios entre zonas horarias. Compara la hora en diferentes ciudades.',
-    url: 'https://meskeia.com/conversor-horarios',
+    url: 'https://meskeia.com/conversor-horarios/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

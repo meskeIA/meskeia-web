@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Planificador de Mascota - Cachorro y Gatito',
     description: 'Checklist completo, lista de compras y calendario de vacunas para preparar la llegada de tu nueva mascota',
-    url: 'https://meskeia.com/planificador-mascota',
+    url: 'https://meskeia.com/planificador-mascota/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

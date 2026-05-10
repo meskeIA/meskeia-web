@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Orientador Colesterol | meskeIA',
     description: 'Analiza tus niveles de colesterol: ratios, riesgo cardiovascular y recomendaciones personalizadas.',
-    url: 'https://meskeia.com/orientador-colesterol',
+    url: 'https://meskeia.com/orientador-colesterol/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

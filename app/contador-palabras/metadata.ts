@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Contador de Palabras y Caracteres Online',
     description: 'Analiza tu texto: cuenta palabras, caracteres, párrafos. Calcula tiempo de lectura y densidad de palabras clave.',
-    url: 'https://meskeia.com/contador-palabras',
+    url: 'https://meskeia.com/contador-palabras/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Estilo Parental - Autoconocimiento Educativo',
     description: 'Descubre tu tendencia educativa con este test gratuito de 16 preguntas basado en el modelo de Baumrind (1966). Sin registro ni datos personales.',
-    url: 'https://meskeia.com/test-estilo-parental',
+    url: 'https://meskeia.com/test-estilo-parental/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

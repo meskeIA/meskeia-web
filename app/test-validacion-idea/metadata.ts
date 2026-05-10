@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Test de Validación de Idea | meskeIA',
     description: '¿Tu idea resuelve un problema real? Test basado en Lean Startup.',
-    url: 'https://meskeia.com/test-validacion-idea',
+    url: 'https://meskeia.com/test-validacion-idea/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

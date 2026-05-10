@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Simulador de Equilibrio Químico | meskeIA',
     description: 'Aplica Le Chatelier de forma interactiva en 6 reacciones reversibles famosas',
-    url: 'https://meskeia.com/simulador-equilibrio-quimico',
+    url: 'https://meskeia.com/simulador-equilibrio-quimico/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{ url: 'https://meskeia.com/og-image.png', width: 1200, height: 630, alt: 'meskeIA' }],

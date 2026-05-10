@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cómo se Construye un Edificio - Fases, Oficios y Materiales',
     description: 'Las 7 fases de construcción, 15+ oficios y los números reales de un edificio de 30 viviendas en España.',
-    url: 'https://meskeia.com/visualizador-construccion-edificio',
+    url: 'https://meskeia.com/visualizador-construccion-edificio/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Reacciones Químicas - Cuando los Átomos Cambian de Pareja',
     description: 'Tipos de reacciones, balanceo de ecuaciones y química del día a día explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-reacciones-quimicas',
+    url: 'https://meskeia.com/visualizador-reacciones-quimicas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

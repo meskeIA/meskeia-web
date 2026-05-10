@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'Plegamiento de Proteínas: Estructura y Enfermedades — meskeIA',
     description: '4 niveles de estructura, funnel de plegamiento y enfermedades por mal plegamiento.',
     type: 'website',
-    url: 'https://meskeia.com/visualizador-proteinas-plegamiento',
+    url: 'https://meskeia.com/visualizador-proteinas-plegamiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

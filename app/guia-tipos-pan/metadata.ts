@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Guía de Tipos de Pan del Mundo | meskeIA',
     description: '35 tipos de pan del mundo: fermentación, harina, acompañamientos y curiosidades. Filtros por región y técnica.',
-    url: 'https://meskeia.com/guia-tipos-pan',
+    url: 'https://meskeia.com/guia-tipos-pan/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

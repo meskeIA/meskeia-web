@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Cartografía y Proyecciones',
     description: '5 proyecciones cartográficas explicadas visualmente',
-    url: 'https://meskeia.com/visualizador-cartografia-proyecciones',
+    url: 'https://meskeia.com/visualizador-cartografia-proyecciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{

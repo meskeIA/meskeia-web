@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'El Efecto Invernadero - Mecanismo, Gases y Cambio Climático',
     description: 'El mecanismo del efecto invernadero explicado visualmente: radiación solar e infrarroja, los 4 gases principales, natural vs antropogénico, y soluciones.',
-    url: 'https://meskeia.com/visualizador-efecto-invernadero',
+    url: 'https://meskeia.com/visualizador-efecto-invernadero/',
     siteName: 'meskeIA',
     locale: 'es_ES',
     images: [{
