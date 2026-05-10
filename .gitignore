@@ -65,3 +65,6 @@ scripts/cursos-generados/
 
 # Documentos estratégicos privados (no subir al repo público)
 _private/
+
+# Credenciales de service accounts (Google Cloud, etc.) - NUNCA subir al repo
+.credentials/
