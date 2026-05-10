@@ -446,6 +446,12 @@ export const implementedAppsUrls = [
   "/simulador-tabla-periodica-tendencias/",      // 118 elementos heatmap, 5 propiedades, hover tooltip, flechas tendencia
   "/simulador-estequiometria/",                  // 6 reacciones, reactivo limitante, barras moles, rendimiento configurable
 
+  // Simuladores educativos Biología — Lista B Sonnet (2026-05-10)
+  "/simulador-mitosis-meiosis/",                 // 6 fases mitosis + 8 meiosis, canvas 2D, crossing-over, autoplay 3 velocidades
+  "/simulador-fotosintesis-factores/",           // Ley Blackman: luz/CO₂/temp, factor limitante en tiempo real, burbujas O₂
+  "/simulador-punnett/",                         // Mono/dihíbrido, 4-16 celdas coloreadas, proporciones 3:1 y 9:3:3:1
+  "/simulador-ecosistema-trofico/",              // 4 ecosistemas, 5 eventos, cascada trófica, pirámide CSS animada
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto

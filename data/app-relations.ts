@@ -5033,6 +5033,32 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Visión humana', description: 'Bastones y conos: neuronas que NO disparan PA' },
   ],
 
+  // SIMULADORES BIOLOGÍA — Lista B Sonnet (2026-05-10)
+  'simulador-mitosis-meiosis': [
+    { url: '/simulador-punnett/', icon: '🧬', name: 'Cuadro de Punnett', description: 'La meiosis genera la variabilidad que Mendel estudió con el cuadro de Punnett' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'Célula animal y vegetal', description: 'Dónde ocurre la división: núcleo, centriolos, huso acromático' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'El ADN que se replica y divide en mitosis y meiosis' },
+    { url: '/simulador-potencial-accion/', icon: '⚡', name: 'Potencial de Acción', description: 'Otro simulador de Biología EBAU con animación celular' },
+  ],
+  'simulador-fotosintesis-factores': [
+    { url: '/simulador-ecosistema-trofico/', icon: '🌍', name: 'Ecosistema Trófico', description: 'Los productores que aquí simulamos son la base de la pirámide trófica' },
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'Fotosíntesis visual', description: 'Explicador completo: Calvin, fase oscura, cloroplasto' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'Célula vegetal', description: 'El cloroplasto donde ocurre la fotosíntesis' },
+    { url: '/visualizador-ecosistema/', icon: '🌱', name: 'Ecosistema', description: 'Ciclos biogeoquímicos y flujo de energía en el ecosistema' },
+  ],
+  'simulador-punnett': [
+    { url: '/simulador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'La meiosis genera los gametos con los alelos que combina el cuadro de Punnett' },
+    { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'Los alelos son secuencias de ADN en el mismo locus cromosómico' },
+    { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'Las mutaciones generan nuevos alelos que Mendel no podía predecir' },
+    { url: '/visualizador-adn-polimerasa/', icon: '🔬', name: 'ADN Polimerasa', description: 'La replicación del ADN que copia los alelos antes de la división' },
+  ],
+  'simulador-ecosistema-trofico': [
+    { url: '/simulador-fotosintesis-factores/', icon: '🌿', name: 'Fotosíntesis: Factores Limitantes', description: 'Los productores de la base de la pirámide fijan energía mediante fotosíntesis' },
+    { url: '/visualizador-ecosistema/', icon: '🌱', name: 'Ecosistema', description: 'Pirámide trófica, regla del 10% y ciclos biogeoquímicos explicados' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'Célula', description: 'La célula es la unidad de todos los organismos de la cadena trófica' },
+    { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'La evolución da forma a las relaciones depredador-presa del ecosistema' },
+  ],
+
   // SIMULADORES FÍSICA + QUÍMICA — Lista B Sonnet (2026-05-10)
   'simulador-movimiento-circular': [
     { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Otro sistema oscilatorio: a_c cambia, en MAS la aceleración varía linealmente' },

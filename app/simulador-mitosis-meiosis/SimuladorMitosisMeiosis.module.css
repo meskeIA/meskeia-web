@@ -1,0 +1,721 @@
+/* ============================================================
+   SimuladorMitosisMeiosis.module.css — meskeIA
+   ============================================================ */
+
+/* ---- Contenedor general ---- */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ---- Hero ---- */
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #ffffff;
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.88;
+}
+
+/* ---- Selector de tipo ---- */
+.tipoSelector {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 1.5rem 1rem 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tipoBtn {
+  padding: 0.6rem 2rem;
+  border-radius: 2rem;
+  border: 2px solid var(--primary, #2e86ab);
+  background: transparent;
+  color: var(--primary, #2e86ab);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tipoBtn:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tipoBtnActive {
+  background: var(--primary, #2e86ab);
+  color: #ffffff;
+}
+
+/* ---- Canvas ---- */
+.canvasWrapper {
+  max-width: 480px;
+  margin: 1.25rem auto 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(46, 134, 171, 0.12);
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---- Barra de fases ---- */
+.fasesBar {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1rem 1rem 0.25rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.fasPunto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.4rem;
+  transition: background 0.15s;
+}
+
+.fasPunto::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted, #999);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.fasPunto:hover::before {
+  background: var(--primary, #2e86ab);
+}
+
+.fasPuntoActivo::before {
+  background: var(--primary, #2e86ab);
+  transform: scale(1.4);
+}
+
+.faseNombre {
+  font-size: 0.65rem;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+}
+
+.fasPuntoActivo .faseNombre {
+  color: var(--primary, #2e86ab);
+  font-weight: 700;
+}
+
+/* ---- Descripción de la fase ---- */
+.faseDescripcion {
+  max-width: 640px;
+  margin: 1rem auto;
+  padding: 1rem 1.25rem;
+  background: var(--bg-card, #fff);
+  border-radius: 0.75rem;
+  border-left: 4px solid var(--primary, #2e86ab);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.faseDescripcion strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--primary, #2e86ab);
+  margin-bottom: 0.4rem;
+}
+
+.faseDescripcion p {
+  margin: 0;
+  color: var(--text-secondary, #666);
+}
+
+/* ---- Controles de navegación ---- */
+.navControls {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.navControls > div:first-child {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btnNav {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--primary, #2e86ab);
+  background: transparent;
+  color: var(--primary, #2e86ab);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.btnNav:hover:not(:disabled) {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.btnNav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btnAuto {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--secondary, #48a9a6);
+  background: transparent;
+  color: var(--secondary, #48a9a6);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnAuto:hover {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+.btnAutoActivo {
+  background: var(--secondary, #48a9a6);
+  color: #ffffff;
+}
+
+/* ---- Velocidad ---- */
+.velocidadBtns {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+}
+
+.velocidadBtn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 1rem;
+  border: 1.5px solid var(--text-muted, #999);
+  background: transparent;
+  color: var(--text-secondary, #666);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.velocidadBtn:hover {
+  border-color: var(--primary, #2e86ab);
+  color: var(--primary, #2e86ab);
+}
+
+.velocidadBtnActiva {
+  border-color: var(--primary, #2e86ab);
+  color: var(--primary, #2e86ab);
+  font-weight: 700;
+  background: rgba(46, 134, 171, 0.08);
+}
+
+/* ---- Badge resultado ---- */
+.resultadoCell {
+  max-width: 640px;
+  margin: 0.5rem auto 1.5rem;
+  padding: 0.6rem 1.25rem;
+  background: rgba(46, 134, 171, 0.1);
+  border: 1.5px solid var(--primary, #2e86ab);
+  border-radius: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary, #2e86ab);
+}
+
+/* ---- Sección educativa — subtítulos ---- */
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary, #2e86ab);
+  margin: 1.75rem 0 0.75rem;
+}
+
+/* ---- Tabla comparativa ---- */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabla th {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.12);
+  color: var(--text-secondary, #666);
+}
+
+.tabla tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* ---- Escenarios ---- */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.scenarioCard {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: var(--bg-card, #fff);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(46, 134, 171, 0.15);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.scenarioCard strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 0.3rem;
+}
+
+.scenarioCard p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+.scenarioIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* ---- FAQ ---- */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.faqItem {
+  padding: 0.9rem 1rem;
+  background: var(--bg-card, #fff);
+  border-radius: 0.65rem;
+  border-left: 3px solid var(--secondary, #48a9a6);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 0.35rem;
+}
+
+.faqItem p {
+  margin: 0 0 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.55;
+}
+
+.faqTip {
+  font-style: italic;
+  color: var(--secondary, #48a9a6) !important;
+  font-size: 0.82rem !important;
+}
+
+/* ---- Paso a paso ---- */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 0.2rem;
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+/* ---- Tips ---- */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.9rem;
+  background: var(--bg-card, #fff);
+  border-radius: 0.65rem;
+  border: 1px solid rgba(72, 169, 166, 0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 0.2rem;
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.81rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+/* ---- Warning box ---- */
+.warningBox {
+  background: rgba(220, 53, 69, 0.06);
+  border: 1.5px solid rgba(220, 53, 69, 0.3);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #dc3545;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+.warningList li strong {
+  color: var(--text-primary, #1a1a1a);
+}
+
+/* ---- Formula box (auxiliar) ---- */
+.formulaBox {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  color: var(--text-primary, #1a1a1a);
+}
+
+/* ============================================================
+   Dark Mode
+   ============================================================ */
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+}
+
+[data-theme='dark'] .hero {
+  background: #0f3050;
+}
+
+[data-theme='dark'] .canvasWrapper {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .faseDescripcion {
+  background: var(--bg-card);
+  border-left-color: var(--primary, #2e86ab);
+}
+
+[data-theme='dark'] .faseDescripcion p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .resultadoCell {
+  background: rgba(46, 134, 171, 0.15);
+  border-color: var(--accent, #7fb3d3);
+  color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .tabla th {
+  background: #1e4060;
+}
+
+[data-theme='dark'] .tabla td {
+  color: var(--text-secondary);
+  border-bottom-color: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tabla tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.07);
+}
+
+[data-theme='dark'] .scenarioCard {
+  background: var(--bg-card);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .scenarioCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .scenarioCard p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .faqItem strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .faqItem p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+[data-theme='dark'] .tipCard strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tipCard p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.35);
+}
+
+[data-theme='dark'] .warningList li {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .warningList li strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stepContent strong {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .stepContent p {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .tipoBtn {
+  color: var(--accent, #7fb3d3);
+  border-color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .tipoBtnActive {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  border-color: var(--primary, #2e86ab);
+}
+
+[data-theme='dark'] .btnNav {
+  color: var(--accent, #7fb3d3);
+  border-color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .btnNav:hover:not(:disabled) {
+  background: rgba(127, 179, 211, 0.1);
+}
+
+[data-theme='dark'] .btnAuto {
+  color: var(--secondary, #48a9a6);
+  border-color: var(--secondary, #48a9a6);
+}
+
+[data-theme='dark'] .btnAutoActivo {
+  background: var(--secondary, #48a9a6);
+  color: #fff;
+}
+
+[data-theme='dark'] .velocidadBtnActiva {
+  color: var(--accent, #7fb3d3);
+  border-color: var(--accent, #7fb3d3);
+  background: rgba(127, 179, 211, 0.08);
+}
+
+[data-theme='dark'] .velocidadBtn:hover {
+  color: var(--accent, #7fb3d3);
+  border-color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .faseNombre {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .fasPuntoActivo .faseNombre {
+  color: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .fasPunto::before {
+  background: #555;
+}
+
+[data-theme='dark'] .fasPunto:hover::before {
+  background: var(--accent, #7fb3d3);
+}
+
+[data-theme='dark'] .fasPuntoActivo::before {
+  background: var(--accent, #7fb3d3);
+}
+
+/* ============================================================
+   Animaciones accesibles
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .tipoBtn,
+  .btnNav,
+  .btnAuto,
+  .velocidadBtn,
+  .fasPunto,
+  .fasPunto::before {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 480px) {
+  .hero {
+    padding: 1.75rem 1rem 1.5rem;
+  }
+
+  .canvasWrapper {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .navControls > div:first-child {
+    gap: 0.4rem;
+  }
+
+  .btnNav,
+  .btnAuto {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
