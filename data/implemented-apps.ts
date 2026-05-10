@@ -431,6 +431,9 @@ export const implementedAppsUrls = [
   "/simulador-lentes-opticas/", // Trazado de 3 rayos principales en lentes convergente/divergente, imagen real o virtual
   "/simulador-cinetica-arrhenius/", // Maxwell-Boltzmann + Ea, recta Arrhenius, 5 reacciones reales, factor aceleración k(T₂)/k(T₁)
   "/simulador-fluidos-bernoulli/", // Tubería Venturi/desnivel/estenosis, partículas animadas, manómetros, continuidad + Bernoulli
+  "/simulador-teorema-bayes/", // Rectángulo proporcional + diagrama árbol, 5 escenarios médicos reales, VPP/VPN
+  "/simulador-termodinamica-carnot/", // Ciclo de Carnot animado en diagrama PV, η=1-Tf/Tc, comparación motores reales
+  "/simulador-potencial-accion/", // Hodgkin-Huxley simplificado, ley todo-o-nada, estímulo único o sostenido, trenes de PA
 
 
   // Creatividad y Diseño (1 implementada)

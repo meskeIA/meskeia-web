@@ -5014,6 +5014,24 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-corazon-ciclo-cardiaco/', icon: '❤️', name: 'Ciclo cardíaco', description: 'Bernoulli aplicada a la circulación humana' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'Sangre humana', description: 'El fluido más característico que estudia Bernoulli' },
   ],
+  'simulador-teorema-bayes': [
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Otra pieza clave del razonamiento probabilístico' },
+    { url: '/simulador-test-hipotesis/', icon: '🎯', name: 'Test de Hipótesis', description: 'Frecuentista vs bayesiano: dos visiones complementarias' },
+    { url: '/visualizador-probabilidad/', icon: '🎰', name: 'Probabilidad', description: 'Conceptos fundamentales con ejemplos' },
+    { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos cognitivos', description: 'La falacia bayesiana en la mente humana' },
+  ],
+  'simulador-termodinamica-carnot': [
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: '1.ª ley termodinámica (Carnot es 2.ª)' },
+    { url: '/visualizador-termodinamica/', icon: '🌡️', name: 'Termodinámica', description: 'Conducción, convección, radiación' },
+    { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'ΔG, ΔH y equilibrio químico' },
+    { url: '/visualizador-maquinas-simples/', icon: '⚙️', name: 'Máquinas simples', description: 'Palancas y poleas: motores no térmicos' },
+  ],
+  'simulador-potencial-accion': [
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Anatomía SNC/SNP, neuronas, sinapsis' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Cerebro humano', description: 'Áreas, lóbulos y funciones cognitivas' },
+    { url: '/visualizador-cerebro-emociones/', icon: '❤️', name: 'Cerebro y emociones', description: 'Amígdala, neurotransmisores, circuitos' },
+    { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Visión humana', description: 'Bastones y conos: neuronas que NO disparan PA' },
+  ],
 };
 
 /**
