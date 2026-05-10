@@ -4967,16 +4967,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
   ],
   'simulador-teorema-central-limite': [
+    { url: '/simulador-intervalos-confianza/', icon: '📏', name: 'Intervalos de Confianza', description: 'Aplicación directa del TCL: IC para μ' },
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Curva de Gauss interactiva' },
+    { url: '/simulador-test-hipotesis/', icon: '🎯', name: 'Test de Hipótesis', description: 'α, β, p-valor y potencia' },
     { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles, distribuciones' },
-    { url: '/simulador-regresion/', icon: '📉', name: 'Simulador Regresión', description: 'Lineal, polinómica y logística' },
-    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
   ],
   'simulador-integral-area': [
     { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: 'Pendiente de la tangente: el otro lado del cálculo' },
     { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
     { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Áreas bajo la curva de Gauss = probabilidades' },
+  ],
+  'simulador-intervalos-confianza': [
+    { url: '/simulador-test-hipotesis/', icon: '🎯', name: 'Test de Hipótesis', description: 'IC y test: dos caras de la misma moneda' },
+    { url: '/simulador-teorema-central-limite/', icon: '🎲', name: 'Teorema Central del Límite', description: 'La base teórica del IC para μ' },
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Z y áreas bajo la curva' },
+    { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles' },
+  ],
+  'simulador-test-hipotesis': [
+    { url: '/simulador-intervalos-confianza/', icon: '📏', name: 'Intervalos de Confianza', description: 'IC y test: dos caras de la misma moneda' },
+    { url: '/simulador-teorema-central-limite/', icon: '🎲', name: 'Teorema Central del Límite', description: 'Distribución muestral de X̄' },
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Z, p-valor, áreas bajo Gauss' },
+    { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles' },
   ],
 };
 
