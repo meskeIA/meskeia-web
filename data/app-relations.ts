@@ -5032,6 +5032,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cerebro-emociones/', icon: '❤️', name: 'Cerebro y emociones', description: 'Amígdala, neurotransmisores, circuitos' },
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Visión humana', description: 'Bastones y conos: neuronas que NO disparan PA' },
   ],
+
+  // SIMULADORES MATEMÁTICAS — Lista B Sonnet (2026-05-10)
+  'simulador-monty-hall': [
+    { url: '/simulador-teorema-bayes/', icon: '🎲', name: 'Teorema de Bayes', description: 'La probabilidad condicional detrás del problema' },
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Otra pieza clave del razonamiento probabilístico' },
+    { url: '/visualizador-probabilidad/', icon: '🎰', name: 'Probabilidad visual', description: 'Conceptos fundamentales con ejemplos interactivos' },
+    { url: '/simulador-trigonometria-circulo-unitario/', icon: '⭕', name: 'Círculo Trigonométrico', description: 'Otro simulador visual de Matemáticas Bachillerato' },
+  ],
+  'simulador-trigonometria-circulo-unitario': [
+    { url: '/simulador-funciones-transformaciones/', icon: '📉', name: 'Transformaciones de Funciones', description: 'Cómo a, b, c, d modifican sin, cos y otras bases' },
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: 'Pendiente de la tangente sobre funciones trigonométricas' },
+    { url: '/simulador-integral-area/', icon: '📐', name: 'Simulador Integrales', description: 'Área bajo sin(x) y cos(x) con sumas de Riemann' },
+    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Calculadora Trigonometría', description: 'Funciones, identidades y ecuaciones trigonométricas' },
+  ],
+  'simulador-funciones-transformaciones': [
+    { url: '/simulador-trigonometria-circulo-unitario/', icon: '⭕', name: 'Círculo Trigonométrico', description: 'Geometría de sin y cos antes de transformarlas' },
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: "Cómo las transformaciones afectan a f'(x)" },
+    { url: '/simulador-integral-area/', icon: '📐', name: 'Simulador Integrales', description: 'Área bajo la curva transformada' },
+    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
+  ],
 };
 
 /**

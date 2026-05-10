@@ -1,0 +1,889 @@
+/* Simulador del Problema de Monty Hall — meskeIA */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* ============================================
+   HERO
+============================================ */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.subtitle strong {
+  color: #A8D8EA;
+}
+
+/* ============================================
+   MODE SELECTOR
+============================================ */
+.modeSelector {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.modeBtn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.modeBtn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.modeBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.modeBtnActive {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+
+/* ============================================
+   MAIN CONTENT
+============================================ */
+.mainContent {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ============================================
+   INSTRUCCIÓN DINÁMICA
+============================================ */
+.instruccion {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+  min-height: 3rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+/* ============================================
+   DOORS GRID
+============================================ */
+.doorsGrid {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.door {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 160px;
+  min-height: 220px;
+  background: var(--bg-primary);
+  border: 3px solid var(--border);
+  border-radius: var(--radius-large);
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  padding: var(--spacing-md);
+}
+
+.door:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(46, 134, 171, 0.2);
+}
+
+.door:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.door:disabled {
+  cursor: default;
+}
+
+.doorSelected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.1);
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.25);
+}
+
+.doorRevealed {
+  border-color: var(--border);
+  background: rgba(0, 0, 0, 0.03);
+  opacity: 0.75;
+}
+
+.doorWin {
+  border-color: #27AE60;
+  background: rgba(39, 174, 96, 0.1);
+  box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
+  animation: pulseWin 0.5s ease;
+}
+
+.doorLose {
+  border-color: #E74C3C;
+  background: rgba(231, 76, 60, 0.08);
+}
+
+@keyframes pulseWin {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.doorNumber {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.doorEmoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.doorBadge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  background: var(--primary);
+  color: white;
+}
+
+.doorWin .doorBadge {
+  background: #27AE60;
+}
+
+.doorLose .doorBadge {
+  background: #E74C3C;
+}
+
+/* ============================================
+   ACTION BUTTONS
+============================================ */
+.actionButtons {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
+}
+
+.btnPrimary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btnPrimary:hover {
+  background: #2475a0;
+  transform: translateY(-2px);
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecondary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btnSecondary:hover {
+  border-color: var(--text-secondary);
+  transform: translateY(-2px);
+}
+
+.btnSecondary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   STATS ROW
+============================================ */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 540px) {
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-mono, monospace);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sesionHint {
+  margin-top: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.sesionHint strong {
+  color: var(--primary);
+}
+
+/* ============================================
+   SLIDER SECTION (modo automático)
+============================================ */
+.sliderSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sliderLabel {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.sliderLabel strong {
+  color: var(--primary);
+  font-size: 1.1rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  margin-bottom: var(--spacing-xs);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   BAR CHART
+============================================ */
+.barChart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 180px 1fr 80px;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 600px) {
+  .barRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.barLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.barTrack {
+  background: var(--bg-primary);
+  border-radius: 50px;
+  height: 32px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.barFillPrimary {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 50px;
+  transition: width 0.8s ease;
+}
+
+.barFillSecondary {
+  height: 100%;
+  background: #999;
+  border-radius: 50px;
+  transition: width 0.8s ease;
+}
+
+.barValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font-mono, monospace);
+  text-align: right;
+}
+
+/* ============================================
+   RESULTS GRID
+============================================ */
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.resultCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.resultValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-family: var(--font-mono, monospace);
+  line-height: 1;
+}
+
+.resultLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.resultSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono, monospace);
+}
+
+/* ============================================
+   FORMULA BOX
+============================================ */
+.formulaBox {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--radius);
+  font-family: var(--font-mono, monospace);
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--text-primary);
+  overflow-x: auto;
+}
+
+/* ============================================
+   EDUCATIVO — TABLA
+============================================ */
+.tablaWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.tabla thead {
+  background: var(--primary);
+  color: white;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* ============================================
+   EDUCATIVO — SCENARIOS
+============================================ */
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.scenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scenarioIcon {
+  font-size: 2rem;
+}
+
+.scenarioCard strong {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.scenarioCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================
+   EDUCATIVO — FAQ
+============================================ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+}
+
+.faqItem h4 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.faqItem p {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.faqTip {
+  background: rgba(72, 169, 166, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs) !important;
+}
+
+/* ============================================
+   EDUCATIVO — STEPS
+============================================ */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ============================================
+   EDUCATIVO — TIPS
+============================================ */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tipIcon {
+  font-size: 1.6rem;
+}
+
+.tipCard strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================
+   EDUCATIVO — WARNING BOX (v2.0)
+============================================ */
+.warningBox {
+  background: rgba(224, 122, 31, 0.08);
+  border-left: 4px solid #E07A1F;
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  color: #E07A1F;
+  font-size: 1.1rem;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.warningList li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningList li strong {
+  color: #E07A1F;
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+============================================ */
+[data-theme='dark'] .mainContent {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .modeBtnActive {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .instruccion {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .door {
+  background: #2A2A2A;
+  border-color: #444;
+}
+
+[data-theme='dark'] .doorSelected {
+  background: rgba(46, 134, 171, 0.2);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .doorRevealed {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: #444;
+}
+
+[data-theme='dark'] .doorWin {
+  background: rgba(39, 174, 96, 0.15);
+}
+
+[data-theme='dark'] .doorLose {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+[data-theme='dark'] .statItem {
+  background: #333;
+}
+
+[data-theme='dark'] .barTrack {
+  background: #333;
+  border-color: #555;
+}
+
+[data-theme='dark'] .barFillSecondary {
+  background: #666;
+}
+
+[data-theme='dark'] .resultCard {
+  background: #333;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .tabla tbody tr:hover {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 122, 31, 0.12);
+}
+
+[data-theme='dark'] .slider::-webkit-slider-thumb {
+  border-color: #2A2A2A;
+}
+
+[data-theme='dark'] .slider::-moz-range-thumb {
+  border-color: #2A2A2A;
+}
+
+[data-theme='dark'] .scenarioCard {
+  background: #333;
+}
+
+[data-theme='dark'] .faqItem {
+  background: #333;
+}
+
+[data-theme='dark'] .step {
+  background: #333;
+}
+
+[data-theme='dark'] .tipCard {
+  background: #333;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 720px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .doorsGrid {
+    gap: 1rem;
+  }
+
+  .door {
+    width: 120px;
+    min-height: 180px;
+  }
+
+  .doorNumber {
+    font-size: 1.6rem;
+  }
+
+  .doorEmoji {
+    font-size: 2.2rem;
+  }
+
+  .hero {
+    margin-top: 70px;
+    padding: var(--spacing-lg);
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD — Reduced motion
+============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .modeBtn,
+  .door,
+  .btnPrimary,
+  .btnSecondary,
+  .barFillPrimary,
+  .barFillSecondary {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .modeBtn:hover,
+  .door:hover:not(:disabled),
+  .btnPrimary:hover,
+  .btnSecondary:hover {
+    transform: none !important;
+  }
+
+  @keyframes pulseWin {
+    from { transform: none; }
+    to { transform: none; }
+  }
+}

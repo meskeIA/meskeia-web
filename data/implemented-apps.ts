@@ -435,6 +435,11 @@ export const implementedAppsUrls = [
   "/simulador-termodinamica-carnot/", // Ciclo de Carnot animado en diagrama PV, η=1-Tf/Tc, comparación motores reales
   "/simulador-potencial-accion/", // Hodgkin-Huxley simplificado, ley todo-o-nada, estímulo único o sostenido, trenes de PA
 
+  // Simuladores educativos Matemáticas — Lista B Sonnet (2026-05-10)
+  "/simulador-monty-hall/",                       // Modo manual + automático 10K simulaciones, barras CSS, P=2/3 vs 1/3
+  "/simulador-trigonometria-circulo-unitario/",   // Círculo unitario animado, proyecciones sin/cos, ángulos notables, toggle grados/rad
+  "/simulador-funciones-transformaciones/",       // f(x)=a·g(b·(x−c))+d, 5 bases, canvas dual base+transformada
+
 
   // Creatividad y Diseño (1 implementada)
   "/generador-avatares/",           // Genera avatares únicos desde nombre/texto
