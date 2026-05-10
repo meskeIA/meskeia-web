@@ -1,0 +1,654 @@
+/* SimuladorCifradoCesar.module.css */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ============================================================
+   PANEL
+   ============================================================ */
+.panel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.panelTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary);
+}
+
+[data-theme='dark'] .panel {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   CANVAS RUEDA
+   ============================================================ */
+.canvasWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.canvasEl {
+  border-radius: 12px;
+  background: #f8fafc;
+  max-width: 100%;
+}
+
+[data-theme='dark'] .canvasEl {
+  background: #1e2533;
+}
+
+/* ============================================================
+   CONTROLES SLIDER Y TOGGLE
+   ============================================================ */
+.controlsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.sliderGroup label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.sliderGroup input[type='range'] {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.sliderValue {
+  display: inline-block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.rot13Badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  background: var(--secondary);
+  color: #fff;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.toggleRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggleBtn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.toggleBtn:hover:not(.active) {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+/* ============================================================
+   SELECTOR TEXTOS PREDEFINIDOS
+   ============================================================ */
+.presetGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.presetBtn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--secondary);
+  background: transparent;
+  color: var(--secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.presetBtn:hover,
+.presetBtn.active {
+  background: var(--secondary);
+  color: #fff;
+}
+
+/* ============================================================
+   PANEL DE TEXTO
+   ============================================================ */
+.textGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .textGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.textGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.textGroup textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'Courier New', Courier, monospace;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.textGroup textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .textGroup textarea {
+  border-color: #374151;
+  background: #111827;
+}
+
+.textReadOnly {
+  background: #f3f8fb !important;
+  cursor: default;
+}
+
+[data-theme='dark'] .textReadOnly {
+  background: #0f1623 !important;
+}
+
+.copyBtn {
+  align-self: flex-end;
+  margin-top: 0.25rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.copyBtn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.copyBtnSuccess {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+/* ============================================================
+   HISTOGRAMA
+   ============================================================ */
+.histoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.attackBtn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.attackBtn:hover {
+  opacity: 0.88;
+}
+
+.attackBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.attackResult {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.histoWrap {
+  overflow-x: auto;
+}
+
+.histoBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+  padding-bottom: 20px;
+  position: relative;
+}
+
+.histoBar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 16px;
+}
+
+.histoBarInner {
+  width: 100%;
+  background: var(--secondary);
+  border-radius: 3px 3px 0 0;
+  transition: height 0.3s ease;
+  min-height: 2px;
+  position: relative;
+}
+
+.histoBarInner.histoBarMax {
+  background: var(--primary);
+}
+
+.histoBarLetter {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.histoBarPct {
+  font-size: 0.55rem;
+  color: var(--text-muted);
+  display: none;
+}
+
+.histoBarMax .histoBarPct {
+  display: block;
+}
+
+.histoHint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ============================================================
+   SECCIÓN EDUCATIVA
+   ============================================================ */
+.eduSubtitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.comparativaTable tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #1a5278;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.escenarioCard {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.escenarioCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.escenarioCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(72, 169, 166, 0.25);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border-left: 3px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+}
+
+.faqItem strong {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.faqItem p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faqTip {
+  margin-top: 0.35rem !important;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+[data-theme='dark'] .faqItem {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  font-size: 0.88rem;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.stepContent p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  background: rgba(72, 169, 166, 0.06);
+  border-radius: 10px;
+  padding: 0.9rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.tipCard p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(72, 169, 166, 0.09);
+}
+
+/* ============================================================
+   WARNING BOX (OBLIGATORIO v2.0)
+   ============================================================ */
+.warningBox {
+  background: #fff7ed;
+  border: 1.5px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.83rem;
+  color: #78350f;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.07);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+/* ============================================================
+   REDUCED MOTION (clases específicas, sin * puro)
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .histoBarInner {
+    transition: none;
+  }
+
+  .toggleBtn {
+    transition: none;
+  }
+
+  .presetBtn {
+    transition: none;
+  }
+
+  .copyBtn {
+    transition: none;
+  }
+
+  .attackBtn {
+    transition: none;
+  }
+}

@@ -5130,6 +5130,26 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-curva-phillips/', icon: '📉', name: 'Curva de Phillips', description: 'Más gasto → más PIB → menos desempleo → posiblemente más inflación' },
     { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Para verificar cálculos macroeconómicos del multiplicador' },
   ],
+
+  // SIMULADORES INFORMÁTICA — Lista B Sonnet (2026-05-10)
+  'simulador-hashing-colisiones': [
+    { url: '/visualizador-teoria-informacion/', icon: '📡', name: 'Teoría de la Información', description: 'Entropía y codificación: el contexto matemático de las funciones hash' },
+    { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'Los SO usan tablas hash internamente para gestión de procesos y ficheros' },
+    { url: '/simulador-cifrado-cesar/', icon: '🔐', name: 'Cifrado César', description: 'Otro concepto clave de criptografía e informática básica' },
+    { url: '/simulador-tcp-handshake/', icon: '🤝', name: 'Handshake TCP', description: 'Los protocolos de red usan hashing para verificación de integridad' },
+  ],
+  'simulador-cifrado-cesar': [
+    { url: '/simulador-hashing-colisiones/', icon: '🗂️', name: 'Hashing y Colisiones', description: 'Las funciones hash son la base de la criptografía moderna' },
+    { url: '/visualizador-logica-proposicional/', icon: '🔣', name: 'Lógica Proposicional', description: 'Los fundamentos matemáticos de la seguridad informática' },
+    { url: '/visualizador-teoria-informacion/', icon: '📡', name: 'Teoría de la Información', description: 'Entropía y cifrado: por qué la aleatoriedad es esencial en criptografía' },
+    { url: '/simulador-tcp-handshake/', icon: '🤝', name: 'Handshake TCP', description: 'TLS 1.3 usa AES-256 sobre TCP para proteger cada conexión HTTPS' },
+  ],
+  'simulador-tcp-handshake': [
+    { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'TCP/IP, DNS y routing: el contexto completo donde vive el handshake' },
+    { url: '/simulador-hashing-colisiones/', icon: '🗂️', name: 'Hashing y Colisiones', description: 'Los protocolos usan hashing (MD5, SHA) para verificación de integridad' },
+    { url: '/simulador-cifrado-cesar/', icon: '🔐', name: 'Cifrado César', description: 'Los fundamentos del cifrado que protege las conexiones TLS sobre TCP' },
+    { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'El SO gestiona los sockets TCP y el estado de las conexiones' },
+  ],
 };
 
 /**

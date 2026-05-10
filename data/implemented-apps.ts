@@ -1075,6 +1075,11 @@ export const implementedAppsUrls = [
   "/simulador-elasticidad-precio/",       // Curva demanda con pendiente elástica, rectángulos IT superpuestos, 6 bienes
   "/simulador-curva-phillips/",           // π vs u curva de Phillips, NAIRU, stagflation, 4 episodios históricos
   "/simulador-multiplicador-gasto/",      // k=1/(1−PMC·(1−t)+m), rondas CSS, gráfico barras comparativo, tabla 8 rondas
+
+  // Simuladores Informática — Lista B Sonnet (2026-05-10)
+  "/simulador-hashing-colisiones/",       // Tabla hash CSS grid, 3 funciones hash, encadenamiento+sondeo lineal, factor de carga α
+  "/simulador-cifrado-cesar/",            // Rueda del alfabeto Canvas 2D, slider k 0-25, histograma frecuencias, ataque automático
+  "/simulador-tcp-handshake/",            // Diagrama secuencia Canvas 2D, SYN→SYN-ACK→ACK, FIN 4-way, ISN configurables
 ];
 
 /**
