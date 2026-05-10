@@ -4955,16 +4955,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES EDUCATIVOS MATEMÁTICAS/ESTADÍSTICA (2026-05-10)
   'simulador-distribucion-normal': [
+    { url: '/simulador-teorema-central-limite/', icon: '🎲', name: 'Teorema Central del Límite', description: 'Por qué la normal aparece en todas partes' },
     { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: 'Pendiente de la tangente visual' },
     { url: '/simulador-regresion/', icon: '📉', name: 'Simulador Regresión', description: 'Lineal, polinómica y logística' },
     { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles, distribuciones' },
-    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
   ],
   'simulador-derivada-pendiente': [
+    { url: '/simulador-integral-area/', icon: '📐', name: 'Simulador Integrales', description: 'Área bajo la curva con sumas de Riemann' },
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Curva de Gauss interactiva' },
     { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
     { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
-    { url: '/simulador-regresion/', icon: '📉', name: 'Simulador Regresión', description: 'Ajuste de funciones a datos' },
+  ],
+  'simulador-teorema-central-limite': [
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Curva de Gauss interactiva' },
+    { url: '/calculadora-estadistica/', icon: '📊', name: 'Calculadora Estadística', description: 'Media, varianza, percentiles, distribuciones' },
+    { url: '/simulador-regresion/', icon: '📉', name: 'Simulador Regresión', description: 'Lineal, polinómica y logística' },
+    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
+  ],
+  'simulador-integral-area': [
+    { url: '/simulador-derivada-pendiente/', icon: '📈', name: 'Simulador Derivadas', description: 'Pendiente de la tangente: el otro lado del cálculo' },
+    { url: '/visualizador-calculo-visual/', icon: '🔬', name: 'Cálculo Visual', description: 'Límites, tangentes y áreas en canvas' },
+    { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
+    { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Áreas bajo la curva de Gauss = probabilidades' },
   ],
 };
 

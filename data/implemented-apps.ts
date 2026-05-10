@@ -423,6 +423,8 @@ export const implementedAppsUrls = [
   // Simuladores educativos Matemáticas/Estadística (2026-05-10) — escaparate Lista A Opus
   "/simulador-distribucion-normal/", // Curva de Gauss interactiva: μ y σ, P(X<a/X>a/a<X<b), regla 68-95-99.7, tipificación Z, 6 problemas tipo
   "/simulador-derivada-pendiente/",  // Derivada como pendiente de la tangente: 8 funciones, modo secante (límite), curva f'(x), clasificación de pendiente
+  "/simulador-teorema-central-limite/", // TCL Monte Carlo: 5 distribuciones, n y nº muestras configurables, comparación con N(μ, σ/√n) teórica
+  "/simulador-integral-area/", // Integral como suma de Riemann: 8 funciones, 4 métodos (izquierda/derecha/punto medio/trapecio), error vs valor exacto
 
 
   // Creatividad y Diseño (1 implementada)
