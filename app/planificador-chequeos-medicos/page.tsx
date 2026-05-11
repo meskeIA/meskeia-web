@@ -382,7 +382,7 @@ export default function PlanificadorChequeosMedicos() {
       <div className={styles.disclaimerWrapper}>
         <DisclaimerCard
           variant="medical"
-          severity="high"
+          severity="critical"
           title="Información orientativa — Consulta siempre a tu médico"
           collapsible={false}
         >

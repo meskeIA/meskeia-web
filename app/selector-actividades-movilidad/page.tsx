@@ -219,7 +219,7 @@ export default function SelectorActividadesMovilidadPage() {
 
         <LegalNotice />
 
-        <DisclaimerCard variant="medical" severity="high" context="selector-actividades-movilidad" />
+        <DisclaimerCard variant="medical" severity="critical" context="selector-actividades-movilidad" />
 
         {/* ── Test ── */}
         {!testTerminado ? (

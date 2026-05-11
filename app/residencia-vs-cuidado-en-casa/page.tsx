@@ -157,7 +157,7 @@ export default function ResidenciaVsCuidadoCasa() {
 
 
       <DisclaimerCard variant="financial"
-        severity="high">
+        severity="critical">
         <span>
           Los costes son <strong>estimaciones orientativas</strong> con medias nacionales 2025. Los precios reales varían significativamente por comunidad autónoma, calidad del servicio y situación personal.
           <br /><strong>No es</strong> asesoramiento financiero ni de servicios sociales personalizado.

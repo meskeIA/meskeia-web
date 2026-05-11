@@ -272,7 +272,7 @@ export default function CalculadoraFIREPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         context="estimador-fire"
         collapsible={false}
       />

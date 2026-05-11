@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-05-04
-> **Apps totales**: 766 | **Suites**: 13
+> **Última actualización**: 2026-05-11
+> **Apps totales**: 923 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -40,8 +40,10 @@
   - `test-tolerancia-riesgo-detallado` — 20 preguntas en 5 dimensiones, 5 perfiles con asignación activos (suite: finanzas)
   - `simulador-reacciones-quimicas` — Estequiometría + reactivo limitante para 20 reacciones reales (suites: estudiantes, tecnicas)
 
-- [ ] **npm audit: 14 vulnerabilidades** — 10 moderadas + 4 altas. Paquetes afectados: `dompurify` (XSS múltiple, via jspdf), `flatted` (DoS + Prototype Pollution, 4 HIGH), `@hono/node-server` (bypass middleware), `brace-expansion` (DoS), `uuid` via resend/svix. `npm audit fix` disponible pero puede añadir breaking changes. Sesión dedicada.
-  - *Detectado*: 2026-05-04
+- [x] **Disclaimers: 6 apps corregidas** — severity="high"→"critical" en: estimador-fire, optimizador-rentas-60, orientador-seguro-vida, planificador-chequeos-medicos, residencia-vs-cuidado-en-casa, selector-actividades-movilidad. `visualizador-cancer` se mantiene en critical intencionalmente (decisión del usuario). *(resuelto: 2026-05-11)*
+
+- [ ] **npm audit: 13 vulnerabilidades** — 8 moderadas + 5 altas. Incluye PostCSS XSS (via Next.js, `npm audit fix --force` requeriría downgrade a Next.js 9 — descartado). Sesión dedicada.
+  - *Detectado*: 2026-05-04 | *Actualizado*: 2026-05-11
 
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
@@ -60,6 +62,7 @@
     - ✅ Next.js 16.2.3 → 16.2.4, `@next/bundle-analyzer` + `@next/third-parties` + `eslint-config-next` → 16.2.4, `@tanstack/react-query` 5.99.0 → 5.99.2, `hls.js` 1.6.15 → 1.6.16, `baseline-browser-mapping` 2.10.18 → 2.10.20, `@axe-core/playwright` 4.11.1 → 4.11.2, `@anthropic-ai/sdk` 0.88.0 → 0.90.0. Build 535 apps OK. **completado** (2026-04-20).
     - ✅ `@anthropic-ai/sdk` 0.90.0 → 0.91.1, `@libsql/client` 0.17.2 → 0.17.3, `@tanstack/react-query` 5.99.2 → 5.100.5, `baseline-browser-mapping` 2.10.20 → 2.10.23. **completado** (2026-04-27).
     - ✅ `@anthropic-ai/sdk` 0.91.1 → 0.92.0, `@tanstack/react-query` 5.100.5 → 5.100.9, `@trpc/*` 11.16.0 → 11.17.0, `zod` 4.3.6 → 4.4.3, `baseline-browser-mapping` 2.10.23 → 2.10.27, `@axe-core/playwright` 4.11.2 → 4.11.3. Build OK. **completado** (2026-05-04).
+    - 🟡 Pendiente (detectado 2026-05-11): `next` 16.2.4→16.2.6, `@next/bundle-analyzer`+`eslint-config-next` 16.2.4→16.2.6, `react`+`react-dom` 19.2.5→19.2.6, `@anthropic-ai/sdk` 0.92.0→0.95.1, `resend` 6.12.2→6.12.3, `baseline-browser-mapping` 2.10.27→2.10.29, `@types/node` 22.19.17→22.19.18. Candidatos para actualización conjunta (bajo riesgo).
     - 🔴 `typescript` 5.9.3 → 6.0.3 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).

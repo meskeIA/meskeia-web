@@ -249,7 +249,7 @@ export default function OptimizadorRentas60() {
 
 
       <DisclaimerCard variant="financial"
-        severity="high">
+        severity="critical">
         <span>
           Esta herramienta es <strong>SOLO orientativa</strong>. El cálculo utiliza tipos estatales + autonómicos medios ponderados 2025 (Ley 35/2006 IRPF).
           <br />El IRPF real depende de la CCAA de residencia, deducciones personales/familiares, tratamiento de rentas irregulares y otras circunstancias individuales.

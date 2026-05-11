@@ -337,7 +337,7 @@ export default function CalculadoraSeguroVidaPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         context="orientador-seguro-vida"
       />
 
