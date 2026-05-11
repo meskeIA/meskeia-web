@@ -2064,6 +2064,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'contraste-colores': disenoColoresApps.filter(a => a.url !== '/contraste-colores/'),
   'simulador-baja-vision': disenoColoresApps.filter(a => a.url !== '/simulador-baja-vision/'),
   'simulador-daltonismo': disenoColoresApps.filter(a => a.url !== '/simulador-daltonismo/'),
+  'convertidor-subtitulos': [
+    { url: '/contraste-colores/', icon: '👁️', name: 'Contraste Colores', description: 'Accesibilidad WCAG' },
+    { url: '/simulador-daltonismo/', icon: '🌈', name: 'Simulador Daltonismo', description: '8 tipos visuales' },
+    { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador Baja Visión', description: 'Cataratas, presbicia' },
+    { url: '/conversor-braille/', icon: '⠃', name: 'Conversor Braille', description: 'Texto ↔ Braille' },
+    { url: '/conversor-formatos/', icon: '🔄', name: 'Conversor Formatos', description: 'JSON, CSV, Excel, XML' },
+  ],
   'generador-sombras': disenoExtraApps.filter(a => a.url !== '/generador-sombras/'),
   'generador-tipografias': disenoExtraApps.filter(a => a.url !== '/generador-tipografias/'),
   'calculadora-aspectos': [...disenoExtraApps.filter(a => a.url !== '/calculadora-aspectos/').slice(0, 2), ...imagenesApps.slice(0, 2)],
