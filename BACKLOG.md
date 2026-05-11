@@ -42,8 +42,7 @@
 
 - [x] **Disclaimers: 6 apps corregidas** — severity="high"→"critical" en: estimador-fire, optimizador-rentas-60, orientador-seguro-vida, planificador-chequeos-medicos, residencia-vs-cuidado-en-casa, selector-actividades-movilidad. `visualizador-cancer` se mantiene en critical intencionalmente (decisión del usuario). *(resuelto: 2026-05-11)*
 
-- [ ] **npm audit: 13 vulnerabilidades** — 8 moderadas + 5 altas. Incluye PostCSS XSS (via Next.js, `npm audit fix --force` requeriría downgrade a Next.js 9 — descartado). Sesión dedicada.
-  - *Detectado*: 2026-05-04 | *Actualizado*: 2026-05-11
+- [x] **npm audit: 11 vulnerabilidades transitivas resueltas** — `npm audit fix` (sin --force) limpió 10/13 (dompurify, flatted, minimatch, fast-uri, brace-expansion, picomatch, path-to-regexp, ip-address, hono, @hono/node-server, express-rate-limit). Solo `package-lock.json` modificado. Build OK. *(resuelto: 2026-05-11)*
 
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
@@ -66,8 +65,7 @@
     - 🔴 `typescript` 5.9.3 → 6.0.3 disponible (major, breaking changes potenciales). Requiere sesión dedicada. *(detectado: 2026-03-30)*
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
-    - 🟡 `dompurify` CVE moderado (XSS, GHSA-v2wj-7wpq-c8vv): afecta `jspdf` y `html2pdf.js`. `npm audit fix` añadiría 61 paquetes nuevos (riesgo breaking change). Requiere sesión dedicada para revisar si jspdf tiene nueva versión compatible. *(detectado: 2026-03-09)*
-    - 🟢 `minimatch` CVE alto (ReDoS): solo en dependencias de `eslint` (dev-only, sin impacto en producción). Pendiente `npm audit fix` en sesión dedicada junto con dompurify. *(detectado: 2026-03-09)*
+    - ✅ `dompurify` + `minimatch` + 8 vuln transitivas más resueltas con `npm audit fix` sin --force (2026-05-11). Solo `package-lock.json` modificado, build OK.
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
@@ -80,6 +78,49 @@
 - [x] **Disclaimers: 4 apps Suite Freelance corregidos** — severity="medium"→"high", eliminado collapsible={true} en calculadora-precio-por-proyecto, orientador-diversificacion-clientes, planificador-vacaciones-autonomo, simulador-colchon-emergencia-freelance. *(resuelto: 2026-04-20)*
 
 - [x] **Disclaimers: 21 visualizadores corregidos** — 18 médicos/farmacológicos (acetilcolina, adrenalina, analgesicos, anestesia, antibioticos, aspirina, cortisol, estrogenos, gaba, hierro, ibuprofeno, insulina-glucosa, magnesio, paracetamol, serotonina, tiroides, vitamina-b12, vitamina-d): severity="low"→"high", eliminado collapsible={true}. 3 financieros (deuda-publica, mercados-financieros, tipos-interes-bce): severity="medium"→"high", eliminado collapsible={true}. Re-auditoría: 3 urgentes restantes son severity=critical intencional (correcto). *(resuelto: 2026-04-27)*
+
+---
+
+## 🟠 DEUDA TÉCNICA ACEPTADA — No revisar en auditorías rutinarias
+
+> Items analizados estratégicamente y **conscientemente pospuestos**. NO reabrir hasta que cambien las condiciones documentadas más abajo. Esto evita reevaluarlos cada semana sin motivo.
+
+### 1. Vuln PostCSS / Next (3 vuln moderadas residuales en npm audit)
+
+- **CVE**: GHSA-qx2v-qp2m-jg93 — XSS via `</style>` no escapado en `CSS Stringify` de PostCSS.
+- **Estado**: `postcss@8.4.31` está pinned por Next.js 16.2.6. El único fix que ofrece `npm audit` sería downgrade a `next@9.3.3` (incompatible — no aplicable).
+- **Riesgo real para meskeIA**: **prácticamente cero**. PostCSS solo se ejecuta en build-time (servidor Vercel), procesando nuestros propios CSS Modules. No hay flujo donde un atacante pueda inyectar CSS que PostCSS procese. La vuln es runtime XSS, no build-time.
+- **Decisión (2026-05-11)**: **NO actuar**. Las 3 vuln se mantendrán en `npm audit` hasta que Next.js actualice su pinning de PostCSS.
+- **Condiciones para reabrir**:
+  - Next.js publica una versión que actualiza PostCSS a ≥8.5.10 → actualizar Next.js como siempre.
+  - Aparece un CVE de severidad **high/critical** en PostCSS, o bien
+  - meskeIA empieza a procesar CSS proveniente de usuarios (no es el caso ni se prevé).
+
+### 2. TypeScript 5.9.3 → 6.0.3 (major)
+
+- **Necesidad operacional**: ninguna. TS 5.9 compila los 923 apps sin errores. Next.js 16.2.6 funciona perfectamente con TS 5.9. No se usan features que requieran TS 6.
+- **Necesidad de seguridad**: ninguna (TypeScript no es un riesgo runtime).
+- **Riesgo si actualizamos ahora**:
+  - Cambios en inferencia de tipos sobre 923 apps con casts frágiles (`as never`, `as Float32Array<ArrayBuffer>`, jStat sin tipos…) → estimación: 50-200 errores nuevos.
+  - Reescribir typings custom en [types/](types/) (`algebrite.d.ts`, `jstat.d.ts`, `sql-js.d.ts`).
+  - Plugin `"next"` en `tsconfig.json` puede requerir versión de `eslint-config-next` que oficialmente soporte TS 6.
+  - Coste: 2-4 h en escenario optimista, 6-8 h si los typings custom dan guerra.
+- **Decisión (2026-05-11)**: **POSPONER indefinidamente**.
+- **Condiciones para reabrir**:
+  - Vercel/Next.js anuncia compatibilidad oficial de Next.js con TS 6 o lo requiere (no es el caso hoy).
+  - `eslint-config-next` o `@types/react` empieza a requerir TS 6.
+  - Salen features de TS 6 que necesitamos concretamente para algo del producto.
+  - Pasan ≥6 meses sin necesidad y se quiere consolidar la deuda en una sesión dedicada.
+
+### 3. ESLint 9 → 10 (suspendido desde 2026-03)
+
+- **Decisión vigente**: no actualizar hasta que `eslint-config-next` declare oficialmente compatibilidad con ESLint 10. Riesgo: el lint se rompe completamente.
+- **Condiciones para reabrir**: anuncio oficial de Vercel/Next.js o release notes de `eslint-config-next` confirmando soporte ESLint 10.
+
+### 4. `@types/node` v22 → v25
+
+- **Decisión vigente**: mantenerse en v22 (LTS). v25 no es LTS.
+- **Condiciones para reabrir**: nueva LTS de Node.js > 22 ampliamente disponible en Vercel.
 
 ---
 
