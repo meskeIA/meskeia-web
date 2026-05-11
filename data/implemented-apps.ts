@@ -293,6 +293,7 @@ export const implementedAppsUrls = [
   "/generador-sombras/",
   "/contraste-colores/",
   "/simulador-baja-vision/",
+  "/simulador-daltonismo/",
   "/creador-paletas/",
   "/generador-tipografias/",
   "/creador-thumbnails/",           // Creador de thumbnails para YouTube
