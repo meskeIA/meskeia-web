@@ -106,6 +106,7 @@ export const implementedAppsUrls = [
   "/estimador-complemento-minimos/",      // Estimador complemento a mínimos: pensiones mínimas SS por tipo, edad, situación
   "/estimador-costas-judiciales/",        // Estimador costas judiciales: abogado, procurador, tasas, peritos
   "/estimador-costes-divorcio/",          // Estimador costes divorcio: mutuo acuerdo vs contencioso
+  "/impuestos-divorcio/",                 // Orientador fiscal del divorcio: IRPF pensión compensatoria, mínimo descendientes, vivienda e hipoteca
   "/orientador-justicia-gratuita/",       // Orientador justicia gratuita: requisitos IPREM, prestaciones
   "/estimador-inversiones/",
   "/test-perfil-inversor/",

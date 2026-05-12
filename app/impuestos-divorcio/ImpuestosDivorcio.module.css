@@ -1,0 +1,806 @@
+/* ─── Layout base ─────────────────────────────────────────────────────────── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  color: #fff;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+  max-width: 620px;
+  margin-inline: auto;
+}
+
+/* ─── Main content ────────────────────────────────────────────────────────── */
+.mainContent {
+  max-width: 760px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── Wizard ─────────────────────────────────────────────────────────────── */
+.wizardContainer {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.progressBar {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.progressLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.wizardStep {
+  min-height: 280px;
+}
+
+.stepTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.stepDesc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.55;
+}
+
+/* ─── Form groups ─────────────────────────────────────────────────────────── */
+.formGroup {
+  margin-bottom: 1.75rem;
+}
+
+.fieldLabel {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.helpText {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0.4rem 0 0;
+  line-height: 1.4;
+}
+
+/* ─── Radio options ───────────────────────────────────────────────────────── */
+.radioOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.radioOption:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.radioOption input[type="radio"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+}
+
+.radioOption strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.radioDesc {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+.radioSelected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+/* ─── Bool buttons (Yes/No) ────────────────────────────────────────────────── */
+.boolButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.boolBtn {
+  padding: 0.65rem 1.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.boolBtn:hover {
+  border-color: var(--primary);
+}
+
+.boolSelected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─── Number buttons (1/2/3/4+) ───────────────────────────────────────────── */
+.numButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.numBtn {
+  width: 52px;
+  height: 52px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.numBtn:hover {
+  border-color: var(--primary);
+}
+
+.numSelected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ─── Wizard navigation ───────────────────────────────────────────────────── */
+.wizardNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e8e8e8;
+  gap: 1rem;
+}
+
+.btnPrimary {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btnSecundario:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Results ─────────────────────────────────────────────────────────────── */
+.resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.resultHeader {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resultHeader h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.resultHeader p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.resultCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-left-width: 4px;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.cardBenefit {
+  border-left-color: #22c55e;
+}
+
+.cardCost {
+  border-left-color: #ef4444;
+}
+
+.cardNeutral {
+  border-left-color: var(--primary);
+}
+
+.resultCardIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.resultCardBody {
+  flex: 1;
+}
+
+.resultCardBody h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.resultAmount {
+  font-size: 1rem;
+  margin: 0 0 0.4rem;
+  color: var(--text-primary);
+}
+
+.resultAmount strong {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.resultDetail {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Out of scope block ──────────────────────────────────────────────────── */
+.outOfScope {
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.outOfScope h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.outOfScopeList {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.outOfScopeList li {
+  font-size: 0.88rem;
+  color: #78350f;
+  margin-bottom: 0.4rem;
+  line-height: 1.45;
+}
+
+.outOfScopeNote {
+  font-size: 0.88rem;
+  color: #92400e;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ─── Educational section v2.0 ───────────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e8e8e8;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* ─── Scenarios ───────────────────────────────────────────────────────────── */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioHeader h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.escenarioIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.escenarioTip {
+  margin: 0;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── FAQ ─────────────────────────────────────────────────────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.faqItem h4 {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.faqItem p {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.faqTip {
+  background: rgba(46, 134, 171, 0.07);
+  border-left: 3px solid var(--primary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.86rem !important;
+  color: var(--text-secondary);
+}
+
+/* ─── Step guide ──────────────────────────────────────────────────────────── */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+  padding-top: 0.25rem;
+}
+
+.stepContent h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Tips grid ───────────────────────────────────────────────────────────── */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-top: 3px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Warning box ─────────────────────────────────────────────────────────── */
+.warningBox {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: #78350f;
+  line-height: 1.45;
+}
+
+/* ─── Dark mode ───────────────────────────────────────────────────────────── */
+[data-theme='dark'] .wizardContainer {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .progressBar {
+  background: #3a3a3a;
+}
+
+[data-theme='dark'] .radioOption {
+  border-color: #3a3a3a;
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .radioOption:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .radioSelected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .boolBtn {
+  border-color: #3a3a3a;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .numBtn {
+  border-color: #3a3a3a;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .wizardNav {
+  border-top-color: #3a3a3a;
+}
+
+[data-theme='dark'] .resultCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .resultHeader {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .outOfScope {
+  background: #2a1a00;
+  border-color: #78350f;
+}
+
+[data-theme='dark'] .outOfScope h3 {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .outOfScopeList li {
+  color: #fde68a;
+}
+
+[data-theme='dark'] .outOfScopeNote {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #3a3a3a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .faqItem {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tipCard {
+  background: var(--bg-card);
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #1a1200;
+  border-color: #78350f;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fde68a;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .mainContent {
+    padding: 0 1rem;
+    margin: 1.5rem auto;
+  }
+
+  .wizardContainer {
+    padding: 1.25rem;
+  }
+
+  .boolBtn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .wizardNav {
+    flex-direction: column-reverse;
+  }
+
+  .btnPrimary,
+  .btnSecundario {
+    width: 100%;
+    text-align: center;
+  }
+
+  .resultCard {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .resultCardIcon {
+    font-size: 1.4rem;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+  }
+}
+
+/* ─── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .progressFill {
+    transition: none;
+  }
+
+  .btnPrimary:hover:not(:disabled) {
+    transform: none;
+  }
+}

@@ -3179,9 +3179,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/asistente-reclamaciones/', icon: '⚖️', name: 'Reclamaciones', description: 'Guía para reclamar tus derechos' },
   ],
   'estimador-costes-divorcio': [
+    { url: '/impuestos-divorcio/', icon: '⚖️', name: 'Impuestos en el Divorcio', description: 'IRPF, vivienda, pensión y custodia' },
     { url: '/estimador-costas-judiciales/', icon: '⚖️', name: 'Costas Judiciales', description: 'Cuánto cuesta un juicio' },
     { url: '/orientador-justicia-gratuita/', icon: '🏛️', name: 'Justicia Gratuita', description: '¿Tienes derecho a abogado gratis?' },
     { url: '/plazos-legales/', icon: '⏱️', name: 'Plazos Legales', description: 'Prescripción y caducidad en España' },
+  ],
+  'impuestos-divorcio': [
+    { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes del Divorcio', description: 'Mutuo acuerdo, notarial o contencioso' },
+    { url: '/estimador-irpf/', icon: '📊', name: 'Estimador IRPF', description: 'Tu cuota orientativa 2025' },
+    { url: '/estimador-plusvalia-municipal/', icon: '🏙️', name: 'Plusvalía Municipal', description: 'Al vender o transmitir un inmueble' },
+    { url: '/orientador-justicia-gratuita/', icon: '🏛️', name: 'Justicia Gratuita', description: '¿Tienes derecho a abogado gratis?' },
   ],
   'orientador-justicia-gratuita': [
     { url: '/estimador-costas-judiciales/', icon: '⚖️', name: 'Costas Judiciales', description: 'Cuánto cuesta un juicio' },
