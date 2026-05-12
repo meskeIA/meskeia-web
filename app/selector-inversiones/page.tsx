@@ -547,7 +547,7 @@ export default function SelectorInversionesPage() {
           Los datos históricos sirven como referencia, no como garantía. A modo orientativo:
         </p>
         <ul>
-          <li><strong>Fondos indexados (renta variable global):</strong> ~7–10 % anual en horizontes de 10+ años (antes de inflación).</li>
+          <li><strong>Fondos indexados (renta variable global):</strong> ~7-10% para mercados desarrollados con dominancia EEUU; los mercados europeos puros (Euro Stoxx) han rendido históricamente ~5-7% nominal. En horizontes de 10+ años (antes de inflación, comisiones e impuestos).</li>
           <li><strong>Acciones directas:</strong> variable según selección; puede superar o quedar muy por debajo de los índices.</li>
           <li><strong>Renta fija (Letras del Tesoro, bonos):</strong> ~2–4 % en el entorno actual (2024–2025), sensible a los tipos del BCE.</li>
           <li><strong>Inmobiliario (alquiler + revalorización):</strong> ~4–7 % anual bruto en grandes ciudades españolas, antes de gastos.</li>

@@ -49,7 +49,7 @@ const PARTIDAS: PartidaPGE[] = [
     millones: 37799,
     icono: '💳',
     color: '#e74c3c',
-    explicacion: 'Pago de intereses de la deuda del Estado. No reduce el principal — solo cubre los intereses anuales.',
+    explicacion: 'Pago de intereses de los bonos del Estado en circulación. El principal se refinancia continuamente emitiendo nuevos bonos cuando los antiguos vencen — práctica estándar de todos los Estados solventes. Esta partida sube cuando suben los tipos de interés (BCE) o cuando la prima de riesgo aumenta.',
     detalle: 'España debe más de 1,6 billones de euros. Esta partida solo cubre los intereses, no el capital. Cuando suben los tipos de interés (como en 2023-2024), esta partida crece automáticamente.',
   },
   {
@@ -303,8 +303,8 @@ export default function VisualizadorViajeImpuestosPage() {
           <p>
             De cada <strong>100 € que recauda el Estado</strong>, aproximadamente {formatNumber((PARTIDAS[0].millones / TOTAL_PGE) * 100, 0)} € van a pensiones,
             {' '}{formatNumber((PARTIDAS[1].millones / TOTAL_PGE) * 100, 0)} € a pagar intereses de deuda
-            y {formatNumber((PARTIDAS[2].millones / TOTAL_PGE) * 100, 0)} € a desempleo. Sanidad y educación suman apenas
-            {' '}{formatNumber(((PARTIDAS[3].millones + PARTIDAS[4].millones) / TOTAL_PGE) * 100, 0)} € — porque la mayor parte la financian las CCAA con sus propios presupuestos.
+            y {formatNumber((PARTIDAS[2].millones / TOTAL_PGE) * 100, 0)} € a desempleo, y aproximadamente
+            {' '}{formatNumber(((PARTIDAS[3].millones + PARTIDAS[4].millones) / TOTAL_PGE) * 100, 0)} € a sanidad y educación a nivel estatal — la mayor parte de estas dos partidas la ejecutan las CCAA con sus propios presupuestos (~90.000 M€ en sanidad y ~60.000 M€ en educación a nivel nacional consolidado).
           </p>
         </div>
 
@@ -331,11 +331,12 @@ export default function VisualizadorViajeImpuestosPage() {
             {' '}y el educativo los <strong>60.000 millones</strong> contando todos los presupuestos autonómicos.
           </p>
 
-          <h3>La deuda: el coste de lo que ya gastamos</h3>
+          <h3>La deuda y sus intereses</h3>
           <p>
-            España paga ~38.000 millones al año solo en intereses de deuda — más que en defensa y
-            seguridad juntas. Y eso sin reducir un euro el capital debido. Cuando los tipos de interés
-            suben, esta partida crece automáticamente.
+            España paga ~38.000 millones al año en intereses de su deuda pública. La cifra crece cuando
+            los tipos del BCE suben (como en 2023-2024) y se reduce cuando bajan. El principal no se
+            amortiza neto: se refinancia con nuevas emisiones, igual que hacen Alemania, Francia, EE.UU.
+            o Japón.
           </p>
 
           <h3>¿De dónde sale el dinero?</h3>

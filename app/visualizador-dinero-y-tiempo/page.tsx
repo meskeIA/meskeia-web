@@ -201,7 +201,7 @@ function SeccionHipoteca() {
 
       <div className={styles.insight}>
         {mes <= 60 && (
-          <p>En los primeros 5 años, <strong>más de la mitad de cada cuota son intereses</strong>. Estás pagando al banco antes que a ti mismo.</p>
+          <p>En los primeros 5 años, <strong>más de la mitad de cada cuota corresponde a intereses sobre el capital pendiente</strong>. La amortización del principal — la parte que reduce tu deuda — pesa menos al principio porque la deuda pendiente todavía es alta.</p>
         )}
         {mes > 60 && mes <= 180 && (
           <p>A partir del año 5, la proporción empieza a equilibrarse. Cada mes amortizas un poco más de deuda real.</p>
@@ -540,7 +540,7 @@ function SeccionInflacion() {
       </div>
 
       <div className={styles.insight}>
-        <p>La inflación no te quita dinero del bolsillo — <strong>te quita lo que puedes comprar con él</strong>. A un 3,5% anual, en {anios} años tus {formatCurrency(dineroInicial)} comprarán lo que hoy comprarías con {formatCurrency(poderReal3pct)}.</p>
+        <p>La inflación no reduce los euros nominales que tienes, sino <strong>lo que puedes comprar con ellos</strong>. A un 3,5% anual, en {anios} años tus {formatCurrency(dineroInicial)} comprarán lo que hoy comprarías con {formatCurrency(poderReal3pct)}.</p>
       </div>
 
       <div className={styles.enlaceApp}>
@@ -814,18 +814,31 @@ export default function VisualizadorDineroYTiempoPage() {
 
           <h3>Por qué el tiempo importa más que la cantidad</h3>
           <p>
+            El 7% es una referencia histórica del mercado global a largo plazo (1900-2023). Pueden
+            producirse periodos de 10-20 años con rentabilidad muy inferior (o negativa). Las
+            rentabilidades pasadas no garantizan rentabilidades futuras.
+          </p>
+          <p>
             Una persona que invierte 200 €/mes desde los 25 hasta los 65 años al 7% acumula
             aproximadamente 528.000 €. Alguien que empieza a los 35 con la misma aportación y
             rentabilidad acumula ~243.000 €. Diez años menos = <strong>la mitad del resultado</strong>.
-            No es el dinero que metes — es el tiempo que le das para crecer.
+            No es el dinero que metes — es el tiempo que le das para crecer. Estos ejemplos ilustran
+            el efecto matemático del tiempo, pero asumen capacidad de ahorro continua durante 30-40 años,
+            algo no siempre realista. Empezar más tarde con cantidades menores sigue siendo válido —
+            lo importante es empezar cuando puedas, no compararte con un escenario ideal.
           </p>
 
-          <h3>La inflación: el impuesto invisible</h3>
+          <h3>La inflación y el poder adquisitivo</h3>
           <p>
             A diferencia de los impuestos, la inflación no aparece en ningún recibo. Pero es real:
             con un IPC medio del 3%, algo que hoy cuesta 100 € costará 134 € en 10 años y 181 € en 20.
-            Guardar dinero en la cuenta corriente no es &quot;no arriesgarse&quot; — es perder poder adquisitivo
-            de forma garantizada.
+          </p>
+          <p>
+            La inflación reduce el poder adquisitivo del dinero líquido a lo largo del tiempo. Esto
+            importa para horizontes largos (jubilación, ahorro a 10+ años), pero el ahorro a corto
+            plazo (fondo de emergencia, próximas compras) sigue teniendo valor: la liquidez también
+            es valor. Cualquier decisión de invertir debe considerar tu horizonte, tu tolerancia al
+            riesgo y tu situación personal.
           </p>
 
           <h3>Amortizar vs invertir: no hay respuesta universal</h3>

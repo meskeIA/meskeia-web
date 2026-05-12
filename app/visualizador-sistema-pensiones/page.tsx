@@ -59,20 +59,20 @@ const REFORMAS = [
   },
   {
     ano: 2011,
-    titulo: 'Reforma PP: retraso a 67 años',
+    titulo: 'Reforma 2011: retraso gradual a 67 años (Ley 27/2011, gobierno PSOE)',
     descripcion: 'Se retrasa la edad de jubilación ordinaria de 65 a 67 años (gradual hasta 2027). Se amplía el período de cómputo de 15 a 25 años y se exige cotizar 37 años para el 100%.',
     color: '#48A9A6',
   },
   {
     ano: 2013,
-    titulo: 'Factor de Sostenibilidad (Rajoy)',
+    titulo: 'Reforma 2013: Factor de Sostenibilidad (Ley 23/2013)',
     descripcion: 'Vincula la pensión inicial a la esperanza de vida. Aprobado pero suspendido antes de aplicarse en 2019 y finalmente derogado.',
     color: '#7FB3D3',
   },
   {
     ano: 2021,
     titulo: 'Derogación del Factor',
-    descripcion: 'El gobierno de coalición deroga el Factor de Sostenibilidad y garantiza la revalorización de pensiones con el IPC. Las pensiones no perderán poder adquisitivo.',
+    descripcion: 'Se deroga el Factor de Sostenibilidad. La Ley 21/2021 establece la revalorización de las pensiones con el IPC anual, manteniendo el poder adquisitivo bajo el marco normativo actual.',
     color: '#48A9A6',
   },
   {
@@ -131,7 +131,7 @@ export default function VisualizadorSistemaPensiones() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Sistema de Pensiones Español</h1>
         <p className={styles.subtitle}>
-          Cómo funciona el reparto, la presión demográfica y las reformas que han moldeado el sistema
+          Cómo funciona el reparto, qué factores influyen en su sostenibilidad y las reformas que lo han modelado
         </p>
       </header>
 
@@ -308,6 +308,7 @@ export default function VisualizadorSistemaPensiones() {
                 <li>Sin solidaridad: quienes cotizaron poco, cobran poco</li>
                 <li>La transición desde el reparto es muy costosa</li>
                 <li>Alta dependencia de comisiones de gestoras privadas</li>
+                <li>Las pensiones dependen del momento concreto de jubilación (riesgo de secuencia). En Chile, gran parte de las pensiones del sistema AFP quedan por debajo del salario mínimo.</li>
               </ul>
             </div>
           </div>
@@ -322,7 +323,7 @@ export default function VisualizadorSistemaPensiones() {
       <section className={styles.seccion}>
         <h2 className={styles.seccionTitulo}>La presión demográfica</h2>
         <p className={styles.seccionSubtitulo}>
-          El corazón del problema: cada año hay menos trabajadores financiando cada pensión
+          Un indicador clave: la ratio entre trabajadores cotizando y pensionistas. Su evolución es uno de los factores que condiciona la sostenibilidad del sistema, junto con productividad, salarios e inmigración.
         </p>
 
         <div className={styles.sliderZona}>
@@ -509,9 +510,8 @@ export default function VisualizadorSistemaPensiones() {
         <div className={styles.insightBox}>
           <p>
             La AIREF proyecta que el gasto en pensiones alcanzará el{' '}
-            <strong>15–17% del PIB en 2050</strong> si no hay reformas adicionales. Para referencia,
-            el gasto en <strong>defensa es del ~1,2%</strong> y en{' '}
-            <strong>educación del ~4,2%</strong> del PIB.
+            <strong>15–17% del PIB en 2050</strong> si no hay reformas. Para contexto:{' '}
+            <strong>Italia y Grecia ya están en torno al 15-16% del PIB</strong>. Es un peso fiscal alto pero sostenible si va acompañado de ingresos correspondientes (cotizaciones, productividad, aportaciones del Estado).
           </p>
         </div>
       </section>

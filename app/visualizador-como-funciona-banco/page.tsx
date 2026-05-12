@@ -286,8 +286,8 @@ function SeccionBCE() {
       icono: '🖨️',
       nombre: 'Compra de deuda (QE)',
       valor: 'Billones de € desde 2015',
-      explicacion: 'El BCE compra bonos de los gobiernos europeos, inyectando dinero directamente en el sistema. Es el famoso "imprimir dinero" (aunque no imprime billetes físicos).',
-      efecto: 'Se usó masivamente en la crisis de 2012, la pandemia (2020) y la crisis energética. Inyecta liquidez pero puede generar inflación a largo plazo.',
+      explicacion: 'Compra masiva de bonos públicos en el mercado secundario (Quantitative Easing). Aumenta la base monetaria sin emitir billetes físicos.',
+      efecto: 'Se usó en la crisis de 2012, la pandemia (2020) y la crisis energética para abaratar el crédito. Su efecto sobre la inflación depende de si el dinero creado llega a la economía real o se mantiene como reservas bancarias (debate académico abierto).',
     },
     {
       icono: '💶',
@@ -432,7 +432,7 @@ export default function VisualizadorComoFuncionaBancoPage() {
 
         <header className={styles.hero}>
           <h1 className={styles.title}>Cómo Funciona un Banco</h1>
-          <p className={styles.subtitle}>De verdad — no lo que te cuentan en los anuncios</p>
+          <p className={styles.subtitle}>Cómo funciona realmente: del depósito al multiplicador, del BCE al pánico bancario</p>
         </header>
 
         <LegalNotice />
@@ -469,7 +469,7 @@ export default function VisualizadorComoFuncionaBancoPage() {
         </div>
 
         <EducationalSection
-          title="Lo que el sistema bancario no te enseña"
+          title="Conceptos clave del sistema bancario"
           subtitle="Conceptos clave para entender tu dinero en el banco"
           defaultOpen={false}
         >

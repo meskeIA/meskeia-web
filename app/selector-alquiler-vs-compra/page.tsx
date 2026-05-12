@@ -108,9 +108,9 @@ const PREGUNTAS: Pregunta[] = [
     icono: '📊',
     texto: '¿Cómo te sientes respecto a tener una hipoteca?',
     opciones: [
-      { valor: 'ansiedad', etiqueta: 'Me genera ansiedad, prefiero evitarla', descripcion: 'El peso psicológico importa', puntos: -3 },
+      { valor: 'ansiedad', etiqueta: 'Me incomoda asumir una deuda grande y prolongada', descripcion: 'Esa preferencia es legítima y conviene tenerla en cuenta', puntos: -3 },
       { valor: 'acepta', etiqueta: 'La acepto si los números tienen sentido', descripcion: 'Visión pragmática y razonada', puntos: 1 },
-      { valor: 'normal', etiqueta: 'La veo como una herramienta normal', descripcion: 'Cómodo/a con el endeudamiento', puntos: 3 },
+      { valor: 'normal', etiqueta: 'La veo como un instrumento financiero que estoy dispuesto a usar', descripcion: 'Mayor disposición a usar palanca financiera', puntos: 3 },
       { valor: 'liquidez', etiqueta: 'Prefiero mantener liquidez', descripcion: 'El ahorro accesible te da más tranquilidad', puntos: -2 },
     ],
   },
@@ -144,8 +144,8 @@ const PREGUNTAS: Pregunta[] = [
     icono: '🎯',
     texto: '¿Qué es lo más importante para ti en esta decisión?',
     opciones: [
-      { valor: 'patrimonio', etiqueta: 'Construir patrimonio a largo plazo', descripcion: 'La vivienda como inversión y activo', puntos: 3 },
-      { valor: 'libertad', etiqueta: 'Flexibilidad y libertad de movimiento', descripcion: 'No atarse a un lugar', puntos: -3 },
+      { valor: 'patrimonio', etiqueta: 'Construir patrimonio a largo plazo', descripcion: 'Tener vivienda en propiedad como objetivo', puntos: 3 },
+      { valor: 'libertad', etiqueta: 'Flexibilidad y libertad de movimiento', descripcion: 'Poder cambiar de ciudad, zona o tamaño sin penalizaciones', puntos: -3 },
       { valor: 'estabilidad', etiqueta: 'Estabilidad y echar raíces', descripcion: 'Un hogar propio donde construir vida', puntos: 2 },
       { valor: 'gasto', etiqueta: 'Optimizar el gasto mensual', descripcion: 'Lo que más compense financieramente mes a mes', puntos: 0 },
     ],
@@ -209,7 +209,7 @@ const VEREDICTOS: Record<VeredictoKey, {
       'Tu estabilidad laboral y permanencia prevista justifican la inversión',
       'Tu capacidad económica te permite afrontar la entrada y los gastos iniciales',
       'El factor tiempo juega a tu favor: cuanto antes compres, antes amortizas',
-      'Tu situación personal favorece tener un hogar propio y estable',
+      'Tu situación personal favorece tener vivienda en propiedad para esta etapa vital.',
     ],
     proximosPasos: [
       'Usa la calculadora de alquiler vs compra para validar los números de tu caso concreto',
@@ -530,7 +530,7 @@ export default function SelectorAlquilerVsCompra() {
               <li>Estabilidad laboral sólida (indefinido o autónomo consolidado +3 años).</li>
               <li>Horizonte temporal de más de 7-10 años en la misma zona.</li>
               <li>Ahorro suficiente para la entrada sin agotar el colchón de emergencia.</li>
-              <li>Cuota hipotecaria por debajo del 35% de los ingresos netos.</li>
+              <li>Cuota hipotecaria razonable respecto a tus ingresos netos (como referencia orientativa, los bancos suelen exigir que no supere el 30-35%, pero esta cifra varía según tu perfil completo de ingresos y gastos).</li>
               <li>Mercado donde el alquiler es proporcionalmente más caro que la hipoteca equivalente.</li>
             </ul>
 

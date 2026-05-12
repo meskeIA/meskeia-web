@@ -103,7 +103,7 @@ const DATOS_IMPACTANTES = [
     titulo: 'Desde 2020, los multimillonarios han visto su riqueza crecer',
     valor: '3×',
     subtitulo: 'más rápido que la inflación',
-    fuente: 'Oxfam 2024',
+    fuente: 'WID.world / Credit Suisse Global Wealth Report 2024',
   },
 ];
 
@@ -375,9 +375,11 @@ export default function VisualizadorDesigualdadRiqueza() {
         </div>
 
         <div className={styles.warningBox}>
-          <strong>Efecto r &gt; g (Thomas Piketty):</strong> Cuando la rentabilidad del capital (r)
-          supera el crecimiento económico (g), los propietarios de capital ven crecer su riqueza más
-          rápido que el resto de la economía, aumentando la desigualdad de forma estructural.
+          <strong>Efecto r &gt; g (Thomas Piketty, 2013):</strong> Piketty argumenta que cuando la
+          rentabilidad del capital supera al crecimiento económico, la riqueza tiende a concentrarse.
+          Es una tesis muy citada pero también muy debatida — economistas como Matt Rognlie han
+          mostrado que gran parte del efecto en Piketty se debe al precio de la vivienda, no al
+          rendimiento financiero general. Sigue siendo un debate abierto.
         </div>
       </section>
 
@@ -417,8 +419,10 @@ export default function VisualizadorDesigualdadRiqueza() {
         </div>
 
         <p className={styles.mensajeClave}>
-          <strong>Conclusión clave:</strong> La desigualdad de mercado es similar en muchos países;
-          las diferencias provienen de impuestos y transferencias sociales.
+          <strong>Conclusión clave:</strong> la desigualdad final de cada país depende tanto de su
+          desigualdad de mercado (estructura productiva, regulación laboral, salarios) como de su
+          política redistributiva (impuestos + transferencias). Los países más igualitarios suelen
+          actuar sobre ambos canales.
         </p>
       </section>
 

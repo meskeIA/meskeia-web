@@ -23,7 +23,7 @@ export default function CalculadoraFIREPage() {
   const [ingresoAnual, setIngresoAnual] = useState('');
   const [patrimonioActual, setPatrimonioActual] = useState('');
   const [rentabilidadEsperada, setRentabilidadEsperada] = useState('7');
-  const [tasaRetiro, setTasaRetiro] = useState('4');
+  const [tasaRetiro, setTasaRetiro] = useState('3,5');
   const [resultado, setResultado] = useState<Resultado | null>(null);
 
   const calcularFIRE = () => {
@@ -156,7 +156,7 @@ export default function CalculadoraFIREPage() {
               onChange={setRentabilidadEsperada}
               label="Rentabilidad anual esperada (%)"
               placeholder="7"
-              helperText="Histórico S&P 500 ajustado inflación: ~7%"
+              helperText="Rentabilidad real histórica de carteras diversificadas globales: 3-6% es un rango razonable. El 7% del S&P 500 es un techo histórico USA en el siglo XX y no está garantizado en el futuro."
               min={0}
               max={20}
             />
@@ -166,7 +166,7 @@ export default function CalculadoraFIREPage() {
               onChange={setTasaRetiro}
               label="Tasa de retiro segura (%)"
               placeholder="4"
-              helperText="Regla del 4% (Trinity Study). Conservador: 3,5%"
+              helperText="La regla del 4% proviene del Trinity Study (carteras USA, 30 años). Para horizontes mayores o carteras europeas, varios estudios recomiendan 3-3,5%."
               min={2}
               max={6}
             />
@@ -210,7 +210,7 @@ export default function CalculadoraFIREPage() {
                   value={`${resultado.anosParaFIRE} años`}
                   variant={resultado.anosParaFIRE <= 10 ? 'success' : resultado.anosParaFIRE <= 20 ? 'info' : 'default'}
                   icon={resultado.anosParaFIRE <= 10 ? '🚀' : resultado.anosParaFIRE <= 20 ? '📈' : '🐢'}
-                  description={resultado.anosParaFIRE <= 10 ? '¡Vas muy bien!' : resultado.anosParaFIRE <= 20 ? 'Buen ritmo' : 'Considera aumentar tu tasa de ahorro'}
+                  description={`Tu objetivo FIRE estaría disponible en ${resultado.anosParaFIRE} años con los parámetros actuales. Ajustar tasa de ahorro o gastos modifica ese plazo.`}
                 />
               )}
 
@@ -259,9 +259,7 @@ export default function CalculadoraFIREPage() {
                 <div className={styles.consejoCard}>
                   <h4>Consejo</h4>
                   <p>
-                    Tu tasa de ahorro es del {formatNumber(resultado.tasaAhorro, 0)}%.
-                    Para acelerar tu FIRE, intenta llegar al 50% o más.
-                    Cada punto porcentual extra puede ahorrarte años de trabajo.
+                    Tu tasa actual es del {formatNumber(resultado.tasaAhorro, 0)}%. Tasas más altas reducen los años hasta FIRE, pero la capacidad de ahorro depende de tu estructura de ingresos y gastos. No todos los perfiles pueden alcanzar tasas del 50%.
                   </p>
                 </div>
               )}
@@ -392,9 +390,7 @@ export default function CalculadoraFIREPage() {
             <div className={styles.faqItem}>
               <dt className={styles.faqPregunta}>¿Es realista un 7% de rentabilidad anual?</dt>
               <dd className={styles.faqRespuesta}>
-                El S&P 500 ha rentado históricamente ~10% nominal (~7% real descontando inflación).
-                Un fondo indexado global como MSCI World ha dado resultados similares en periodos largos.
-                Usar 6-7% real es un supuesto conservador y razonable, aunque el pasado no garantiza el futuro.
+                El S&P 500 ha rentado ~7% real en periodos largos (con caveats sobre supervivencia y selección). El MSCI World ha dado en torno al 5-6% real en 30 años. Las gestoras institucionales (Vanguard, BlackRock) estiman 4-6% real para la próxima década. Usar 5% real es un supuesto razonable; 7% es optimista.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -417,8 +413,8 @@ export default function CalculadoraFIREPage() {
               <dt className={styles.faqPregunta}>¿Qué inversiones usar para FIRE?</dt>
               <dd className={styles.faqRespuesta}>
                 La estrategia más popular son los fondos indexados de bajo coste (Vanguard, iShares,
-                Amundi). En España, son accesibles a través de brokers como Indexa Capital, MyInvestor
-                o DEGIRO. Diversifica entre acciones globales y algo de renta fija según tu horizonte.
+                Amundi). En España, son accesibles a través de plataformas reguladas por CNMV.
+                Diversifica entre acciones globales y algo de renta fija según tu horizonte.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -477,7 +473,7 @@ export default function CalculadoraFIREPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Construye y automatiza tu cartera inversora</strong>
-                <p>Fondos indexados globales de bajo coste (TER &lt; 0,2%) a través de brokers como MyInvestor, Indexa Capital o Trade Republic. Automatiza las aportaciones mensuales.</p>
+                <p>Fondos indexados globales de bajo coste (TER &lt; 0,2%) a través de plataformas reguladas por CNMV. Automatiza las aportaciones mensuales.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -538,6 +534,11 @@ export default function CalculadoraFIREPage() {
               <strong>Define el &quot;por qué&quot; antes del número</strong>
               <p>FIRE no es solo dejar de trabajar. Define qué harás con tu tiempo. Tener un propósito claro reduce el riesgo de &quot;one more year syndrome&quot; (posponer el retiro indefinidamente).</p>
             </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon}>⚖️</span>
+              <strong>FIRE no es para todos</strong>
+              <p>Trabajar hasta la jubilación ordinaria es una opción tan válida como la independencia financiera temprana, especialmente si tu trabajo te aporta más allá del salario.</p>
+            </div>
           </div>
         </section>
 
@@ -574,8 +575,7 @@ export default function CalculadoraFIREPage() {
         <section className={styles.guideSection}>
           <h2>¿Qué es FIRE?</h2>
           <p className={styles.introParagraph}>
-            FIRE (Financial Independence, Retire Early) es un movimiento que busca alcanzar la libertad
-            financiera lo antes posible mediante un alto ahorro e inversión inteligente.
+            FIRE (Financial Independence, Retire Early) es un movimiento originado en EEUU que propone alcanzar la independencia económica respecto del trabajo asalariado lo antes posible, mediante tasas de ahorro elevadas e inversión a largo plazo. Es una opción de vida entre varias posibles, con beneficios y costes.
           </p>
 
           <div className={styles.contentGrid}>
@@ -613,6 +613,7 @@ export default function CalculadoraFIREPage() {
                 <li><strong>75%:</strong> ~7 años</li>
               </ul>
               <p>La tasa de ahorro es el factor más importante.</p>
+              <p><small>La capacidad de ahorro depende de los ingresos disponibles, costes fijos y estructura familiar. Tasas superiores al 30-40% son inalcanzables para muchos hogares españoles con salarios medios. Además, en España la pensión pública cubre parcialmente el objetivo FIRE a partir de los 65-67 años.</small></p>
             </div>
 
             <div className={styles.contentCard}>

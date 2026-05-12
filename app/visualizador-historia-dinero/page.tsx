@@ -98,6 +98,14 @@ function SeccionTrueque() {
         <span className={styles.preguntaIcono} aria-hidden="true">🤔</span>
         <p>Todos estos &quot;dineros&quot; funcionaban, pero tenían un problema: su valor dependía de la oferta natural. Si llegaba un cargamento enorme de conchas, la &quot;moneda&quot; perdía valor. Hacía falta algo <strong>más controlable</strong>.</p>
       </div>
+
+      <div className={styles.insight}>
+        <p>
+          <strong>Nota académica:</strong> la idea de que el dinero surgió del trueque proviene de Adam Smith.
+          Antropólogos modernos (como David Graeber) sostienen que las sociedades pre-monetarias usaban más
+          bien sistemas de crédito y registro de deudas comunitarias. El debate sigue abierto.
+        </p>
+      </div>
     </div>
   );
 }
@@ -134,8 +142,8 @@ function SeccionMonedas() {
       epoca: '1821-1971',
       lugar: 'Reino Unido → mundial',
       descripcion: 'Cada billete representaba una cantidad fija de oro guardada en un banco central. Podías ir al banco y cambiar tus billetes por oro real.',
-      innovacion: 'Estabilidad total: el dinero tenía un valor objetivo y medible. Los gobiernos no podían "imprimir" sin respaldo.',
-      dato: 'El patrón oro colapsó porque los gobiernos necesitaban gastar más de lo que tenían en oro — especialmente durante guerras mundiales.',
+      innovacion: 'Vincular el valor del dinero a un activo físico. Limitó la discrecionalidad monetaria, pero también la capacidad de los bancos centrales para responder a crisis. Hubo deflaciones severas bajo patrón oro (Gran Depresión 1929-33).',
+      dato: 'El patrón oro se abandonó progresivamente durante el siglo XX porque limitaba la respuesta a crisis económicas y guerras. La mayoría de economistas considera el sistema fiat actual más flexible, aunque exige bancos centrales independientes y creíbles.',
     },
     {
       icono: '💵',
@@ -240,7 +248,7 @@ function SeccionDigital() {
 
       <div className={styles.insight}>
         <p>
-          El dinero invisible es más rápido, más cómodo y más rastreable. Pero también es más vulnerable: un fallo informático, un ciberataque o una decisión política pueden <strong>congelar tus fondos en segundos</strong>. La comodidad tiene un precio.
+          El dinero digital es más rápido, cómodo y rastreable, pero depende de infraestructura tecnológica: un fallo informático o un ciberataque puede impedir transacciones temporalmente. También permite a las autoridades aplicar sanciones financieras o medidas judiciales (anti-blanqueo, antiterrorismo) con mayor eficacia.
         </p>
       </div>
     </div>
@@ -352,7 +360,7 @@ function SeccionFuturo() {
 
       <div className={styles.preguntaCard}>
         <span className={styles.preguntaIcono} aria-hidden="true">🤔</span>
-        <p>La gran pregunta no es técnica, sino política: <strong>¿quién debe controlar el dinero?</strong> Los gobiernos (CBDC), los algoritmos (cripto), o los ciudadanos (efectivo). La respuesta definirá las próximas décadas.</p>
+        <p>La gran pregunta es <strong>institucional</strong>: qué combinación de dinero físico (efectivo), dinero bancario (depósitos), dinero del banco central (CBDC) y activos privados descentralizados (criptomonedas) tendrá cada sociedad. La mayoría de bancos centrales apuesta por un sistema mixto con efectivo + CBDC + dinero bancario tradicional, con la cripto como categoría regulada de activos privados.</p>
       </div>
     </div>
   );

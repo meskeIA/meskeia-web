@@ -716,8 +716,10 @@ export default function CalculadoraInversionesPage() {
             <div className={styles.contentCard}>
               <h4>📈 Renta Variable</h4>
               <p>
-                Acciones y fondos de renta variable. Mayor potencial de rentabilidad pero más volatilidad.
-                Históricamente ~7-10% anual a largo plazo. Ideal para horizontes largos (+10 años).
+                Acciones y fondos de renta variable. Mayor potencial pero también caídas históricas del 30-55% en crisis.
+                Rentabilidad histórica nominal: ~5-7% anual en mercados desarrollados ex-USA, ~7-10% en el S&amp;P 500 (1926-2023).
+                Hay décadas en las que la renta variable no ha batido a la inflación (Japón 1990-2020, EEUU 1966-1982).
+                Adecuada solo si puedes mantener la inversión 10+ años.
               </p>
             </div>
             <div className={styles.contentCard}>
@@ -767,6 +769,10 @@ export default function CalculadoraInversionesPage() {
               </p>
             </div>
           </div>
+          <p style={{ marginTop: '1rem', fontSize: '0.9em', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+            Nota: esta heurística orientativa de la tradición anglosajona ignora factores clave como pensión pública española,
+            patrimonio inmobiliario, situación familiar y tolerancia emocional real. No la apliques sin evaluar tu situación completa.
+          </p>
         </section>
 
         {/* Tabla Comparativa de Tipos de Activos */}
@@ -789,12 +795,17 @@ export default function CalculadoraInversionesPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Rentabilidad esperada</strong></td>
+                  <td><strong>Rentabilidad histórica nominal (referencia, no garantía)</strong></td>
                   <td>7–10%</td>
                   <td>3–5%</td>
                   <td>5–8%</td>
                   <td>2–5%</td>
                   <td>2–4%</td>
+                </tr>
+                <tr>
+                  <td colSpan={6} style={{ fontSize: '0.85em', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                    Las rentabilidades futuras pueden ser sustancialmente menores.
+                  </td>
                 </tr>
                 <tr>
                   <td><strong>Volatilidad anual</strong></td>
@@ -907,8 +918,10 @@ export default function CalculadoraInversionesPage() {
               </div>
               <p className={styles.eduEscenarioTip}>
                 <strong>Distribución: 15% RV · 60% RF · 20% Liquidez · 5% Alt.</strong> Objetivo:
-                preservar capital y generar rentas. La regla del 4% permite retirar 12.000€/año
-                manteniendo el patrimonio a largo plazo.
+                preservar capital y generar rentas. Algunos estudios sugieren tasas de retirada del 3-4% anual
+                sobre el capital inicial; este rango depende fuertemente de la composición de cartera y de la inflación.
+                Para carteras muy conservadoras (15% RV), la tasa sostenible histórica es más cercana al 2,5-3%.
+                Consulta a un asesor antes de planificar retiradas.
               </p>
             </div>
           </div>

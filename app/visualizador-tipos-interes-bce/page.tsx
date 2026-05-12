@@ -105,7 +105,7 @@ const CICLOS_HISTORICOS: CicloHistorico[] = [
   {
     periodo: '2011–2014',
     contexto: 'Crisis de deuda soberana europea. España, Italia, Grecia en el foco. Prima de riesgo histórica.',
-    decisionBce: 'Subida preventiva al 1,5% en 2011 (error de política). Corrección rápida: vuelta al 0,25% en nov. 2013.',
+    decisionBce: 'Subida al 1,5% en abril-julio 2011, considerada en retrospectiva por gran parte de los economistas (incluido el propio BCE en revisiones posteriores) como prematura ante una recuperación frágil. Corrección rápida: vuelta al 0,25% en nov. 2013.',
     euribor: 'Subió brevemente al 2,1% en 2011, luego cayó al 0,5% en 2014',
     hipotecas: 'Volatilidad: cuotas subieron con la subida de 2011, luego bajaron gradualmente desde 2012.',
     colorClase: 'crisis',

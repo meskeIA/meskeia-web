@@ -95,7 +95,7 @@ const CAUSAS: CausaInflacion[] = [
       'La teoría cuantitativa del dinero establece: M × V = P × Q. Si la oferta monetaria (M) crece más rápido que la producción real (Q), los precios (P) deben subir. Pero no es automático: también importa la velocidad de circulación (V) y si el dinero nuevo llega a la economía real o se queda en reservas bancarias.',
     factores: [
       'Expansión cuantitativa (QE) del banco central',
-      'Monetización del déficit público ("la máquina de imprimir")',
+      'Monetización directa del déficit público (prohibida al BCE por el art. 123 TFUE, pero presente en otros países con bancos centrales menos independientes)',
       'Pérdida de confianza en la moneda',
       'Velocidad de circulación del dinero alta',
     ],
@@ -521,7 +521,8 @@ export default function VisualizadorInflacion() {
                 <p className={styles.sesgoP}>
                   Un hogar de renta baja destina un 40% a alimentación y energía (bienes que más suben).
                   Un hogar de renta alta gasta proporcionalmente más en viajes y restaurantes. El IPC es
-                  un promedio: la inflación real de los pobres es mayor que la de los ricos.
+                  un promedio: la inflación real soportada por los hogares de renta baja suele ser mayor
+                  que la de los hogares de renta alta cuando suben energía y alimentos básicos.
                 </p>
               </div>
             </div>

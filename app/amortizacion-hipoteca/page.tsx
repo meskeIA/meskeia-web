@@ -632,8 +632,8 @@ export default function AmortizacionHipotecaPage() {
                 <h3>💡 Recomendación</h3>
                 {resultado.ahorroInteresesPlazo > resultado.ahorroInteresesCuota ? (
                   <p>
-                    <strong>Reducir plazo</strong> te ahorra <strong>{formatCurrency(resultado.ahorroInteresesPlazo - resultado.ahorroInteresesCuota)}</strong> más en intereses.
-                    Es la mejor opción si puedes mantener la cuota actual.
+                    <strong>Reducir plazo</strong> implica <strong>{formatCurrency(resultado.ahorroInteresesPlazo - resultado.ahorroInteresesCuota)}</strong> menos en intereses totales si puedes mantener la cuota actual.
+                    Reducir cuota aporta margen de liquidez mensual desde ya, útil si prevés cambios en tus ingresos o necesitas mayor flexibilidad.
                   </p>
                 ) : (
                   <p>
@@ -839,7 +839,7 @@ export default function AmortizacionHipotecaPage() {
             <h3>⏱️ Reducir plazo</h3>
             <p>
               Mantienes la misma cuota pero terminas antes.
-              <strong> Genera más ahorro en intereses</strong> porque reduces el tiempo que el dinero está prestado.
+              <strong> Genera más ahorro en intereses totales</strong> porque reduces el tiempo durante el que el dinero está prestado. A cambio, mantienes la misma cuota mensual y no recuperas margen de liquidez.
             </p>
           </div>
           <div className={styles.infoCard}>
@@ -1046,7 +1046,7 @@ export default function AmortizacionHipotecaPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Compara con alternativas de inversión</strong>
-                <p>Si tu hipoteca está al 2-3%, calcula si invertir ese dinero en fondos indexados (rentabilidad media histórica 6-8% anual) puede ser más rentable a largo plazo.</p>
+                <p>Si tu hipoteca está al 2-3%, compara con la rentabilidad esperada de otras alternativas (fondos indexados, depósitos, letras del Tesoro). Los fondos indexados de renta variable ofrecen históricamente rendimientos medios anuales del 6-8% nominal en plazos de 10+ años, pero con volatilidad significativa y sin garantía de comportamiento futuro. Amortizar la hipoteca es un &quot;rendimiento&quot; libre de riesgo equivalente al tipo de tu préstamo.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -1089,8 +1089,8 @@ export default function AmortizacionHipotecaPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>💡</span>
-              <strong>Prioriza reducir plazo vs. cuota</strong>
-              <p>A igualdad de ahorro total, reducir plazo siempre genera un mayor ahorro en intereses. Solo elige reducir cuota si necesitas liquidez mensual urgentemente.</p>
+              <strong>Reducir plazo vs. cuota: dos lógicas distintas</strong>
+              <p>Reducir plazo minimiza intereses totales pero mantiene la presión mensual. Reducir cuota libera liquidez recurrente, útil si tu situación es variable o prevés gastos crecientes (familia, formación, salud). Ninguna opción es objetivamente superior.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🛡️</span>
@@ -1125,7 +1125,7 @@ export default function AmortizacionHipotecaPage() {
                 <strong>Amortizar y quedarse sin liquidez.</strong> Si surge un imprevisto (paro, enfermedad) y no tienes ahorros, puedes tener problemas para pagar la cuota ordinaria. La hipoteca es un préstamo a muy largo plazo.
               </li>
               <li>
-                <strong>Olvidar comparar con la rentabilidad de invertir.</strong> Con tipos hipotecarios bajos (2-3%), históricamente ha sido más rentable invertir en índices bursátiles. Esta calculadora no sustituye ese análisis.
+                <strong>Olvidar comparar con alternativas.</strong> Con tipos hipotecarios bajos (2-3%), la rentabilidad esperada de algunos activos de inversión puede superar el coste de la hipoteca, pero implica asumir riesgo y horizonte largo. Amortizar es un retorno seguro y libre de riesgo; invertir aspira a más rentabilidad asumiendo volatilidad. La decisión depende de tu perfil de riesgo, no de un cálculo aislado.
               </li>
               <li>
                 <strong>No pedir confirmación escrita al banco.</strong> Siempre solicita un documento o justificante de la amortización realizada con el nuevo cuadro de amortización actualizado.

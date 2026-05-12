@@ -178,7 +178,7 @@ export default function InteresCompuestoPage() {
               value={tasaInteres}
               onChange={(e) => setTasaInteres(parseFloat(e.target.value))}
             />
-            <span className={styles.helpText}>Histórico S&P500: ~7-10% anual</span>
+            <span className={styles.helpText}>Referencia histórica: S&P 500 ~7-10%, Euro Stoxx 600 ~5-7% (en EUR, dividendos brutos). Para planificación realista descuenta ~2,5% de inflación y comisiones.</span>
           </div>
 
           <div className={styles.sliderGroup}>
@@ -393,7 +393,7 @@ export default function InteresCompuestoPage() {
                 <span className={styles.escenarioIcon}>🏖️</span>
                 <strong>Ahorro para la jubilación (30 años)</strong>
               </div>
-              <p className={styles.eduEscenarioExample}>Invertir 200 €/mes desde los 30 años al 7% anual: a los 65 años tendrás ~284.000 €. Si empiezas a los 40, solo llegas a ~122.000 €. 10 años de diferencia = 162.000 € menos.</p>
+              <p className={styles.eduEscenarioExample}>Si pudieras aportar 200 €/mes desde los 30 años al 7% nominal, a los 65 tendrías ~284.000 € nominales (~140.000 € en poder adquisitivo de hoy con inflación 2,5%). Este ejemplo asume capacidad de ahorro constante, algo que no siempre es posible — invierte solo lo que tu situación te permita sin comprometer gastos esenciales.</p>
               <span className={styles.eduEscenarioTip}>Empieza cuanto antes, aunque sea poco</span>
             </div>
             <div className={styles.escenarioCard}>
@@ -417,8 +417,8 @@ export default function InteresCompuestoPage() {
                 <span className={styles.escenarioIcon}>📈</span>
                 <strong>Inversión en fondo indexado (largo plazo)</strong>
               </div>
-              <p className={styles.eduEscenarioExample}>Un fondo indexado al S&amp;P 500 ha rentado históricamente ~10% anual (7% descontando inflación). 300 €/mes durante 25 años al 7%: ~243.000 €. Aportado real: 90.000 €. Interés compuesto: 153.000 €.</p>
-              <span className={styles.eduEscenarioTip}>Tiempo + constancia = riqueza real</span>
+              <p className={styles.eduEscenarioExample}>Históricamente el S&amp;P 500 ha rentado ~7-10% anual en USD (1926-2023). Para un inversor en euros, descontando comisiones y retención fiscal sobre dividendos, la rentabilidad real efectiva ha sido más cercana al 5-7% nominal. La constancia ayuda, pero el resultado real depende de muchos factores fuera de tu control.</p>
+              <span className={styles.eduEscenarioTip}>La constancia ayuda; los resultados reales varían</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>

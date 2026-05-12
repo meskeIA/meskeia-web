@@ -219,7 +219,7 @@ export default function VisualizadorSueldoNetoPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>Tu Sueldo al Desnudo</h1>
+          <h1 className={styles.title}>Tu Sueldo Bruto a Neto, Paso a Paso</h1>
           <p className={styles.subtitle}>Visualiza cómo se transforma tu bruto en neto — cada euro, paso a paso</p>
         </header>
 
@@ -383,6 +383,14 @@ export default function VisualizadorSueldoNetoPage() {
           )}
         </div>
 
+        <div className={styles.insight}>
+          <p>
+            Las cotizaciones a la Seguridad Social financian pensiones, prestaciones por desempleo, baja por
+            enfermedad y formación profesional. El IRPF financia sanidad, educación, infraestructuras y el
+            resto de servicios públicos. No es dinero perdido — es contribución al sistema.
+          </p>
+        </div>
+
         {/* Gráfico comparativo */}
         <div className={styles.chartContainer}>
           <h3 className={styles.chartTitulo}>Comparativa: ¿cómo cambia el reparto según el sueldo?</h3>
@@ -396,7 +404,7 @@ export default function VisualizadorSueldoNetoPage() {
         </div>
 
         <EducationalSection
-          title="Lo que tu nómina no te explica"
+          title="Lo que conviene saber sobre tu nómina"
           subtitle="Entiende cada descuento de tu sueldo"
           defaultOpen={false}
         >
@@ -418,7 +426,9 @@ export default function VisualizadorSueldoNetoPage() {
           <p>
             Por cada 100 € de sueldo bruto que recibes, tu empresa paga aproximadamente 130 €. Esos 30 €
             extra cubren la cotización empresarial a la Seguridad Social: contingencias comunes (23,6%),
-            desempleo (5,5%), formación (0,6%), FOGASA (0,2%) y accidentes de trabajo (variable).
+            desempleo (5,5%), formación (0,6%), FOGASA (0,2%) y accidentes de trabajo (variable). Esta
+            cotización forma parte del coste laboral total y financia las prestaciones que recibirás en el
+            futuro (pensión, paro, baja por enfermedad).
           </p>
 
           <h3>Las pagas extras: ¿mejor prorrateadas?</h3>

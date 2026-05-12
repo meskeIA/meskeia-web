@@ -431,9 +431,10 @@ export default function ControlGastosPage() {
             <div className={styles.contentCard}>
               <h4>💡 Gastos Hormiga</h4>
               <p>
-                Los pequeños gastos diarios (café, suscripciones, compras impulsivas)
-                pueden sumar cientos de euros al mes. Identifícalos y decide
-                conscientemente cuáles merecen la pena.
+                Los pequeños gastos recurrentes (café, suscripciones, compras pequeñas)
+                suman cientos de euros al año aunque por sí solos parezcan invisibles.
+                Revisarlos no significa eliminarlos: significa elegir conscientemente
+                cuáles forman parte de tu vida.
               </p>
             </div>
             <div className={styles.contentCard}>
@@ -640,8 +641,7 @@ export default function ControlGastosPage() {
                 La referencia más extendida es el 20 % (regla 50/30/20). Sin embargo, cualquier
                 porcentaje positivo es un buen comienzo. Si ahora ahorras 0 %, empezar por el 5 %
                 y aumentar un 1 % cada mes es más sostenible que intentar el 20 % desde el día uno.
-                El objetivo mínimo recomendado en España es un 10 % para llegar a la jubilación
-                con una pensión complementaria suficiente.
+                Como referencia, ahorrar un 10% sostenido a lo largo de la vida laboral puede generar una pensión complementaria notable. Si tu situación no permite ese porcentaje ahora, empezar con cantidades menores y aumentar cuando suba el ingreso también funciona.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -839,9 +839,7 @@ export default function ControlGastosPage() {
               <span className={styles.tipIcon}>🤖</span>
               <h4>Automatiza el ahorro</h4>
               <p>
-                Transfiere el 10-20 % de tu nómina el mismo día que cobres. Si no lo ves
-                en tu cuenta corriente, no lo gastas. El ahorro automático multiplica por
-                3 la tasa de ahorro real frente al método &quot;guardo lo que sobra&quot;.
+                Si tu situación lo permite, transfiere automáticamente un porcentaje fijo de tu nómina el día de cobro (el rango 10-20% es una referencia; lo importante es que sea sostenible). Cualquier cantidad estable funciona si se mantiene en el tiempo.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -899,10 +897,7 @@ export default function ControlGastosPage() {
                 mensual sin que te des cuenta.
               </li>
               <li>
-                <strong>Confundir necesidad con deseo.</strong> El modelo de iPhone más reciente,
-                la suscripción premium o el coche de gama alta no son necesidades: son deseos
-                legítimos que deben caber dentro del presupuesto de deseos (30 %), no del
-                de necesidades (50 %).
+                <strong>Confundir necesidad con deseo.</strong> Tener claro qué es necesidad y qué es deseo para ti. Productos premium (móvil de gama alta, suscripciones de pago, coche más caro de lo que necesitarías) son perfectamente legítimos si entran en tu categoría de deseos; el problema es etiquetarlos como necesidades para que el presupuesto cuadre.
               </li>
               <li>
                 <strong>Ignorar los gastos extraordinarios.</strong> Vacaciones, regalos de Navidad,

@@ -207,7 +207,7 @@ const PREGUNTAS: Pregunta[] = [
         pesos: { individual: 2, empleo: 2, epsv: 2, diversificar: 2 },
       },
       {
-        texto: 'Simplemente no depender de la pensión pública',
+        texto: 'Complementar la pensión pública con una fuente propia',
         pesos: { individual: 1, empleo: 1, diversificar: 3 },
       },
     ],
@@ -243,7 +243,7 @@ const PREGUNTAS: Pregunta[] = [
         pesos: { individual: 3, empleo: 3, epsv: 3, diversificar: 2 },
       },
       {
-        texto: 'No confío en la pensión pública',
+        texto: 'Quiero asegurarme un complemento independiente del sistema público',
         pesos: { individual: 2, diversificar: 3 },
       },
       {
@@ -335,7 +335,7 @@ const RECOMENDACIONES: Record<RecomendacionKey, Recomendacion> = {
       'Tu perfil —ya sea porque valoras la liquidez, tienes cartera propia o quieres maximizar a largo plazo— se beneficia de combinar un plan de pensiones (por la deducción fiscal) con fondos indexados o ETFs (por flexibilidad, rentabilidad histórica superior y liquidez inmediata). No son excluyentes.',
     ventajas: [
       'Liquidez en los fondos indexados y ETFs',
-      'Rentabilidades históricas de índices globales (7-10% anual nominal)',
+      'Rentabilidades nominales históricas de índices globales: 6-9% anual (descontada inflación: ~4-6% real). El pasado no garantiza resultados futuros.',
       'Deducción fiscal aprovechada con aportaciones mínimas al plan',
       'Mayor control y personalización de la cartera',
     ],
@@ -658,7 +658,7 @@ export default function SelectorPlanPensiones() {
             <strong> inferior a la de los índices globales</strong>. Según datos de
             Inverco, la rentabilidad media a 10 años de los planes de pensiones del
             sistema individual ronda el 3-5% anual, mientras que un fondo indexado al
-            MSCI World ha rendido históricamente en torno al 7-10% anual nominal.
+            MSCI World ha rendido históricamente en torno al 7-8% anual nominal en USD (variable según divisa de referencia).
             Sin embargo, la ventaja fiscal puede compensar esta diferencia si tu tramo
             de IRPF es alto.
           </p>

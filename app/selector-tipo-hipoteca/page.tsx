@@ -61,7 +61,7 @@ const PREGUNTAS: Pregunta[] = [
       },
       {
         texto: 'No me preocuparía, puedo absorber la variación sin problemas',
-        icono: '😎',
+        icono: '📊',
         pesos: { variable: 5 },
       },
     ],
@@ -646,7 +646,7 @@ export default function SelectorTipoHipotecaPage() {
           externo afecta a lo que pagas cada mes. Históricamente era más cara que la variable,
           pero tras el ciclo de subidas de tipos iniciado en 2022, muchas entidades han ajustado
           sus tipos fijos a niveles más competitivos. Es la opción preferida por quienes valoran
-          la tranquilidad por encima del ahorro potencial.
+          la estabilidad de la cuota frente a la posibilidad de un menor coste medio.
         </p>
 
         <h3>Hipoteca variable: vinculada al euríbor</h3>

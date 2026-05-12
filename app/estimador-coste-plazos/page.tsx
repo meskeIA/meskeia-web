@@ -285,8 +285,8 @@ export default function CalculadoraCostePlazosPage() {
                   <ul className={styles.consejoLista}>
                     {resultado.taeAproximada > 20 && (
                       <li className={styles.consejoAlerta}>
-                        <strong>TAE muy alta ({formatNumber(resultado.taeAproximada, 1)}%)</strong>:
-                        Considera ahorrar y comprar al contado.
+                        <strong>TAE alta ({formatNumber(resultado.taeAproximada, 1)}%)</strong>:
+                        si la compra puede aplazarse, considera ahorrar primero. Si es urgente, compara con un préstamo personal de tu banco habitual o con tarjeta de débito a plazos, que suelen ofrecer TAE más bajas.
                       </li>
                     )}
                     {resultado.taeAproximada > 0 && resultado.taeAproximada <= 20 && (
@@ -513,7 +513,7 @@ export default function CalculadoraCostePlazosPage() {
             <li><strong>Fijarse solo en la cuota mensual:</strong> Una cuota baja puede implicar un plazo muy largo y un coste total muy alto.</li>
             <li><strong>Asumir que &quot;0% intereses&quot; es gratis:</strong> Comprueba siempre si el precio de contado es menor que el total a plazos.</li>
             <li><strong>No leer sobre seguros obligatorios:</strong> Algunos contratos incluyen seguros que incrementan el coste real significativamente.</li>
-            <li><strong>Financiar artículos de capricho:</strong> Si puedes esperar 2-3 meses y ahorrar, evitarás pagar intereses innecesarios.</li>
+            <li><strong>Financiar compras aplazables:</strong> si la compra puede esperar 2-3 meses, ahorrar y pagar al contado te evita los intereses. Reserva la financiación para gastos urgentes o cuando la TAE sea genuinamente 0%.</li>
             <li><strong>Ignorar la penalización por cancelación:</strong> Antes de amortizar anticipadamente, verifica si hay coste por hacerlo.</li>
           </ul>
         </div>

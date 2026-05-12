@@ -521,7 +521,7 @@ export default function PlanificadorAhorroJubilacionPage() {
                 <strong>30 años, empleado con IRPF alto</strong>
               </div>
               <p className={styles.casoExample}>Salario 45.000 €, pensión ~65% del sueldo. 35 años por delante.</p>
-              <p className={styles.casoTip}>💡 Con 300 €/mes al 5% anual durante 35 años acumula ~280.000 €. Plan de empresa + fondos indexados.</p>
+              <p className={styles.casoTip}>💡 Con 300 €/mes al 5% anual nominal durante 35 años acumula ~280.000 € nominales (~145.000 € de poder adquisitivo actual si la inflación promedia 2%). Plan de empresa + fondos indexados.</p>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -704,7 +704,7 @@ export default function PlanificadorAhorroJubilacionPage() {
             </div>
             <ul className={styles.warningList}>
               <li><strong>No calcular la brecha hasta los 50-55 años:</strong> Cuando se calcula tarde, la brecha es enorme y el tiempo muy corto.</li>
-              <li><strong>Confiar solo en la pensión pública:</strong> La tasa de sustitución bajará en las próximas décadas.</li>
+              <li><strong>Confiar exclusivamente en la pensión pública:</strong> las proyecciones de la AIREF apuntan a una posible caída de la tasa de sustitución en las próximas décadas, aunque depende de futuras reformas legislativas. Diversificar fuentes reduce el riesgo de cualquier cambio adverso.</li>
               <li><strong>Ignorar la inflación:</strong> 1.500 € hoy no tendrán el mismo poder adquisitivo en 30 años.</li>
               <li><strong>Rescatar el plan como capital único:</strong> Puede disparar el tipo marginal al 45-47%. El rescate en renta es más eficiente.</li>
               <li><strong>Sobreestimar la rentabilidad:</strong> Calcular con 8-10% puede llevar a ahorrar menos de lo necesario. Usa estimaciones conservadoras (3-5%).</li>

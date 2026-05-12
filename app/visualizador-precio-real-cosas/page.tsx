@@ -31,7 +31,7 @@ const OBJETOS: Objeto[] = [
   // Diarios
   { nombre: 'Café con leche', precio: 1.80, icono: '☕', categoria: 'diario', nota: 'Precio medio en bar de barrio' },
   { nombre: 'Menú del día', precio: 13, icono: '🍽️', categoria: 'diario', nota: 'Restaurante zona oficinas' },
-  { nombre: 'Pack tabaco', precio: 6.50, icono: '🚬', categoria: 'diario', nota: 'Precio medio 2025' },
+  { nombre: 'Helado o snack', precio: 3.50, icono: '🍦', categoria: 'diario', nota: 'Precio medio 2025' },
   { nombre: 'Taxi al trabajo (5 km)', precio: 9, icono: '🚕', categoria: 'diario', nota: 'Tarifa media ciudad' },
   { nombre: 'Cena para dos', precio: 55, icono: '🍷', categoria: 'diario', nota: 'Restaurante medio, con vino' },
 
@@ -108,7 +108,7 @@ export default function VisualizadorPrecioRealCosasPage() {
 
         <header className={styles.hero}>
           <h1 className={styles.title}>El Precio Real de las Cosas</h1>
-          <p className={styles.subtitle}>¿Cuántas horas de tu vida cuesta cada compra? Cambia tu perspectiva sobre el dinero</p>
+          <p className={styles.subtitle}>¿Cuántas horas de trabajo cuesta cada compra? Una forma de pensar el dinero en otra escala.</p>
         </header>
 
         <LegalNotice />
@@ -197,9 +197,9 @@ export default function VisualizadorPrecioRealCosasPage() {
               </p>
             </div>
             <div className={styles.compCard}>
-              <span className={styles.compIcono} aria-hidden="true">🚬</span>
+              <span className={styles.compIcono} aria-hidden="true">☕</span>
               <p className={styles.compTexto}>
-                Fumar un paquete al día un año: <strong>{formatCurrency(6.50 * 365)}</strong> → <strong>{formatHoras((6.50 * 365) / sueldoHora)}</strong> de trabajo
+                Café diario en cafetería un año: <strong>{formatCurrency(1.80 * 365)}</strong> → <strong>{formatHoras((1.80 * 365) / sueldoHora)}</strong> de trabajo
               </p>
             </div>
             <div className={styles.compCard}>
@@ -244,8 +244,9 @@ export default function VisualizadorPrecioRealCosasPage() {
           <h3>Ganar más no siempre significa ser más libre</h3>
           <p>
             Si con un sueldo mayor subes tu nivel de vida proporcionalmente, sigues necesitando las
-            mismas horas para mantenerlo. La verdadera libertad financiera llega cuando la diferencia
-            entre lo que ganas y lo que necesitas crece — no cuando ganas más.
+            mismas horas para mantenerlo. Si al subir el sueldo sube proporcionalmente el nivel de vida,
+            el margen de maniobra (ahorro, opciones) no mejora. Algunas personas priorizan ese margen;
+            otras prefieren disfrutar de mayor consumo. Ambas opciones son legítimas.
           </p>
 
           <div className={styles.warningBox}>

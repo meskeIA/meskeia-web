@@ -111,13 +111,13 @@ export default function CalculadoraFondoEmergenciaPage() {
   const getNivelTexto = (nivel: Resultado['nivelActual']) => {
     switch (nivel) {
       case 'insuficiente':
-        return 'Insuficiente - Prioriza ahorrar';
+        return 'Por debajo del mínimo (3 meses)';
       case 'minimo':
-        return 'Mínimo cubierto - Sigue ahorrando';
+        return 'Cobertura mínima alcanzada';
       case 'adecuado':
-        return 'Adecuado - Buen trabajo';
+        return 'Cobertura adecuada';
       case 'excelente':
-        return 'Excelente - Puedes invertir el exceso';
+        return 'Cobertura amplia — el exceso puede invertirse si lo deseas';
     }
   };
 
@@ -236,7 +236,7 @@ export default function CalculadoraFondoEmergenciaPage() {
                   <h4>Consejo</h4>
                   <p>
                     Te faltan <strong>{formatCurrency(resultado.fondoRecomendado - parseSpanishNumber(ahorroActual))}</strong> para
-                    alcanzar tu objetivo. Intenta ahorrar al menos el 20% de tus ingresos hasta completarlo.
+                    alcanzar tu objetivo. Considera apartar el porcentaje de ingresos que te resulte sostenible —idealmente un 10-20%, pero cualquier cantidad constante construye el colchón con el tiempo.
                   </p>
                 </div>
               )}
@@ -347,7 +347,7 @@ export default function CalculadoraFondoEmergenciaPage() {
                 <span className={styles.escenarioIcon}>💼</span>
                 <strong>Autónomo / freelance</strong>
               </div>
-              <p className={styles.escenarioExample}>Ingresos variables. Un mes sin clientes puede ser devastador. Necesitas el colchón más amplio.</p>
+              <p className={styles.escenarioExample}>Ingresos variables. El colchón recomendado es mayor que para empleados (idealmente 9-12 meses). Construirlo lleva tiempo: empieza por un mínimo de 3 meses y amplía gradualmente.</p>
               <span className={styles.escenarioTip}>Fondo: 9-12 meses de gastos</span>
             </div>
             <div className={styles.escenarioCard}>
@@ -415,7 +415,7 @@ export default function CalculadoraFondoEmergenciaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿La inflación reduce el valor de mi fondo?</h4>
-              <p>Sí, si está en una cuenta sin rentabilidad. Por eso se recomienda guardarlo en cuentas de ahorro remuneradas o fondos monetarios que ofrezcan un rendimiento cercano a la inflación. Revisa las opciones periódicamente.</p>
+              <p>En periodos de inflación alta, el poder adquisitivo del dinero quieto se reduce. Para el fondo de emergencia esto es asumible: priorizar liquidez es legítimo. Si quieres mitigarlo, una cuenta remunerada o fondo monetario ofrecen rendimiento sin perder acceso.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuándo puedo considerar que el fondo está "completo"?</h4>

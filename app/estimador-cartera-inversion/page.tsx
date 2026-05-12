@@ -638,6 +638,12 @@ export default function SimuladorCarteraPage() {
           <p className={styles.simulacionInfo}>
             {NUM_SIMULACIONES} escenarios Monte Carlo
           </p>
+
+          <p style={{ marginTop: '0.75rem', fontSize: '0.8em', color: 'var(--text-secondary)', lineHeight: 1.5, fontStyle: 'italic' }}>
+            <strong>Nota sobre rentabilidad esperada:</strong> El motor de simulación usa una rentabilidad esperada del 7% nominal
+            para renta variable, basada en el histórico del MSCI World en USD. Los rendimientos futuros pueden ser sustancialmente menores;
+            gestoras institucionales como Vanguard o BlackRock proyectan 4-6% real para la próxima década.
+          </p>
         </div>
 
         {/* Panel de Resultados */}
@@ -882,6 +888,11 @@ export default function SimuladorCarteraPage() {
                   <td>Alta (14-18%)</td>
                   <td>Largo plazo (&gt;15 años)</td>
                   <td>Maximizar crecimiento, jóvenes, alta tolerancia al riesgo</td>
+                </tr>
+                <tr>
+                  <td colSpan={6} style={{ fontSize: '0.85em', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                    Caída máxima histórica (drawdown) para una cartera 80/15/5: ~-50% en la crisis 2008.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1194,8 +1205,8 @@ export default function SimuladorCarteraPage() {
                   • <strong>Agresivo:</strong> 80% RV, 15% RF, 5% Liquidez
                 </p>
                 <p>
-                  <strong>Regla de oro:</strong> Tu % de RV = 100 - tu edad (o 120 - tu edad si eres agresivo).
-                  Ej: 40 años → 60% RV máximo.
+                  <strong>Heurística orientativa anglosajona (no aplicable mecánicamente):</strong> % RV ≈ 100-edad.
+                  Ej: 40 años → 60% RV. No sustituye la evaluación profesional MiFID II de tu situación.
                 </p>
               </div>
             </div>
@@ -1288,7 +1299,7 @@ export default function SimuladorCarteraPage() {
               <h4>Minimiza costes: busca TER &lt; 0.3% anual</h4>
               <p>
                 Un fondo con TER 0.2% vs uno con 1.5% puede costarte decenas de miles de euros en 20 años. Ejemplo: 50.000 € a 20 años con 6% rentabilidad
-                → con TER 0.2% acabas con ~157.000 €, con TER 1.5% acabas con ~139.000 € (18.000 € de diferencia solo en comisiones).
+                → con TER 0.2% acabas con ~157.000 €, con TER 1.5% acabas con ~139.000 € (18.000 € de diferencia solo en comisiones) (asumiendo rentabilidad constante teórica del 6% — los mercados reales tienen volatilidad).
               </p>
             </div>
 

@@ -201,7 +201,7 @@ export default function EstimadorTiempoAhorroPage() {
                     {resultado.meses <= 3 && '¡Casi lo tienes! Solo un poco más de constancia y lo conseguirás.'}
                     {resultado.meses > 3 && resultado.meses <= 6 && 'Buen objetivo a medio plazo. La constancia es la clave: no te desanimes.'}
                     {resultado.meses > 6 && resultado.meses <= 12 && 'Es un objetivo ambicioso pero alcanzable. Márcate hitos intermedios para mantener la motivación.'}
-                    {resultado.meses > 12 && 'Objetivo a largo plazo. Considera si puedes aumentar tu ahorro mensual o buscar ingresos extra.'}
+                    {resultado.meses > 12 && 'Es un objetivo de largo recorrido. Si te encaja con tu ritmo actual, mantenerlo es perfectamente válido; si quieres acelerarlo y tu situación te lo permite, puedes ajustar el ahorro mensual.'}
                   </p>
                 </div>
               </div>
@@ -217,8 +217,8 @@ export default function EstimadorTiempoAhorroPage() {
             <h2>5 formas de ahorrar más cada mes</h2>
             <div className={styles.consejosGrid}>
               <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">🔄</span><strong>Revisa suscripciones</strong><p>¿Usas todas? Cancela las que no. Netflix, Spotify, gimnasio...</p></div>
-              <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">🍱</span><strong>Cocina en casa</strong><p>Comer fuera cuesta 3-5× más. Cocinar y llevar tupper ahorra mucho.</p></div>
-              <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">🛍️</span><strong>Lista de compras</strong><p>No vayas al súper sin lista. Las compras impulsivas son el enemigo.</p></div>
+              <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">🍱</span><strong>Cocina en casa</strong><p>Si comes fuera cada día por inercia, cocinar más en casa puede liberar margen; pero las comidas fuera con propósito (sociales, descanso real) no son lo mismo que un gasto automático.</p></div>
+              <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">🛍️</span><strong>Lista de compras</strong><p>Ir al súper con lista reduce mucho el gasto no planificado: hace que decidas en frío en vez de en caliente.</p></div>
               <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">💡</span><strong>Ingresos extra</strong><p>Vende lo que no uses, da clases particulares, trabajos puntuales.</p></div>
               <div className={styles.consejoCard}><span className={styles.consejoIcono} aria-hidden="true">⏰</span><strong>Regla de las 24h</strong><p>Antes de comprar algo caro, espera un día. Si sigues queriéndolo, adelante.</p></div>
             </div>
@@ -229,7 +229,7 @@ export default function EstimadorTiempoAhorroPage() {
                 <strong>El poder del hábito</strong>
               </div>
               <ul className={styles.warningList}>
-                <li>Ahorrar 5 € al día son 150 €/mes y 1.800 €/año</li>
+                <li>Si puedes apartar 5 € al día, son 1.800 € al año. Si tu margen es menor, el efecto acumulado funciona igual a tu escala: lo importante es la constancia, no la cantidad.</li>
                 <li>Automatiza: programa una transferencia el día que cobres</li>
                 <li>Celebra los hitos: cada 25% completado es un logro</li>
               </ul>

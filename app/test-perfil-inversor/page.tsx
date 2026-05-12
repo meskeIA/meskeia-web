@@ -237,7 +237,7 @@ const PROFILES: Record<ProfileType, Profile> = {
       'ETFs 100% renta variable global',
       'Exposición significativa a mercados emergentes',
       'Factor investing (small value, momentum)',
-      'Considerar apalancamiento moderado a largo plazo',
+      'Mantener disciplina de aportación periódica incluso en mercados volátiles.',
     ],
   },
 };
@@ -460,12 +460,17 @@ export default function TestPerfilInversorPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>Rentabilidad esperada anual</strong></td>
+                    <td><strong>Rentabilidad histórica orientativa</strong></td>
+                    <td>1–3%</td>
                     <td>2–4%</td>
-                    <td>4–6%</td>
-                    <td>6–8%</td>
-                    <td>8–10%</td>
-                    <td>10–12%+</td>
+                    <td>3–6%</td>
+                    <td>4–7%</td>
+                    <td>5–9%</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={6} style={{ fontSize: '0.85em', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                      Rentabilidades históricas nominales medias antes de inflación, comisiones e impuestos. Pasadas, no futuras.
+                    </td>
                   </tr>
                   <tr>
                     <td><strong>Volatilidad máxima</strong></td>
@@ -629,8 +634,9 @@ export default function TestPerfilInversorPage() {
                   suficiente: también necesitas la estabilidad financiera para no vender en pánico durante caídas.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 La regla de &quot;110 menos tu edad&quot; da el porcentaje máximo en renta variable. Con 30 años:
-                  un 70–80% en bolsa sería razonable para un horizonte largo.
+                  💡 La regla orientativa anglosajona de &quot;110 menos edad&quot; es una heurística simplificada,
+                  no una recomendación MiFID II. Tu porcentaje real depende de tu situación completa: pensión pública,
+                  patrimonio inmobiliario, ingresos y tolerancia emocional al riesgo.
                 </p>
               </div>
 

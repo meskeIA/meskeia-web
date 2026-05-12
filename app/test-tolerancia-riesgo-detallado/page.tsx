@@ -240,7 +240,7 @@ const PREGUNTAS: Pregunta[] = [
     opciones: [
       { texto: 'Entre 1% y 3% (depósito seguro)', valor: 1 },
       { texto: 'Entre 3% y 5% (ligeramente por encima de la inflación)', valor: 2 },
-      { texto: 'Entre 5% y 8% (rentabilidad histórica del mercado)', valor: 3 },
+      { texto: 'Entre 5% y 8% (rentabilidad histórica media de la renta variable global a largo plazo; el resultado real puede variar mucho)', valor: 3 },
       { texto: 'Más del 8% anual (acepto más riesgo)', valor: 4 },
     ],
   },
@@ -711,7 +711,7 @@ export default function TestToleranciaRiesgoDetallado() {
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <div>
                 <strong>Piensa en décadas</strong>
-                <p>El mercado de valores ha subido el 100% de los periodos de 20 años históricos. El tiempo es tu aliado más poderoso.</p>
+                <p>El S&amp;P 500 ha cerrado en positivo en todos los períodos de 20 años desde 1926. Otros mercados (Nikkei 1989-2024, mercados emergentes) han tenido décadas perdidas. La diversificación global y un horizonte largo reducen el riesgo, pero no lo eliminan.</p>
               </div>
             </div>
             <div className={styles.tipCard}>

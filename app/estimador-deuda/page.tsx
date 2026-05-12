@@ -483,11 +483,11 @@ export default function CalculadoraDeudaPage() {
                       <div className={styles.veredicto}>
                         <span className={styles.veredictoIcono}>💡</span>
                         <p>
-                          El método <strong>{resultados.mejorMetodo}</strong> te ahorra{' '}
-                          <strong>{formatCurrency(resultados.diferencia)}</strong> en intereses.
+                          El método <strong>{resultados.mejorMetodo}</strong> implica{' '}
+                          <strong>{formatCurrency(resultados.diferencia)}</strong> menos en intereses pagados.
                           {resultados.mejorMetodo === 'Bola de Nieve'
-                            ? ' Aunque matemáticamente es ligeramente peor, las victorias rápidas pueden motivarte más.'
-                            : ' Es la opción matemáticamente óptima.'}
+                            ? ' Aunque Avalancha genera un ahorro algo mayor en intereses, las victorias tempranas de Bola de Nieve ayudan a sostener el plan a largo plazo.'
+                            : ' Avalancha minimiza intereses si mantienes la disciplina durante todo el plan.'}
                         </p>
                       </div>
                     )}
@@ -550,7 +550,7 @@ export default function CalculadoraDeudaPage() {
       >
         <div className={styles.guideContent}>
           <section className={styles.guideSection}>
-            <h3>⚪ Método Bola de Nieve (Dave Ramsey)</h3>
+            <h3>⚪ Método Bola de Nieve</h3>
             <div className={styles.guideGrid}>
               <div className={styles.guideCard}>
                 <h4>Cómo funciona</h4>
@@ -623,7 +623,7 @@ export default function CalculadoraDeudaPage() {
             <h3>💡 Consejos Adicionales</h3>
             <ul className={styles.consejosList}>
               <li>
-                <strong>Crea un fondo de emergencia primero:</strong> 1.000€ mínimo antes de atacar deudas agresivamente.
+                <strong>Asegura un colchón mínimo de liquidez:</strong> antes de destinar todo el excedente a deuda, conviene tener disponible al menos 1 mes de gastos fijos (alquiler/hipoteca, suministros, alimentación). En situaciones de mayor incertidumbre laboral, 3-6 meses suelen ser una referencia razonable.
               </li>
               <li>
                 <strong>No acumules más deuda:</strong> Congela o cancela tarjetas mientras pagas.
@@ -635,7 +635,7 @@ export default function CalculadoraDeudaPage() {
                 <strong>Negocia tasas de interés:</strong> Llama a tus acreedores y pide reducción.
               </li>
               <li>
-                <strong>Considera consolidación:</strong> Si tienes buen crédito, un préstamo a menor tasa puede ayudar.
+                <strong>Considera la reunificación de deudas:</strong> si no figuras en ficheros de morosos (ASNEF, RAI) y tienes ingresos estables, un préstamo único a menor tipo puede reducir intereses. Compara siempre la TAE final, no solo la cuota.
               </li>
             </ul>
           </section>
@@ -697,7 +697,7 @@ export default function CalculadoraDeudaPage() {
               <div className={styles.casoCard}>
                 <span className={styles.casoIcono} aria-hidden="true">💳</span>
                 <h4>Joven con 3 tarjetas</h4>
-                <p>María tiene 3 tarjetas con saldos de 500€, 1.200€ y 3.000€ al 20% TAE. Elige Bola de Nieve y liquida la primera en 3 meses. La victoria inmediata le da energía para continuar.</p>
+                <p>María tiene 3 tarjetas con saldos de 500 €, 1.200 € y 3.000 €, todas al 20% TAE. Como las tasas son iguales, Bola de Nieve y Avalancha producen el mismo orden de pago: liquida la de 500 € en pocos meses y avanza a la siguiente. El refuerzo psicológico de cerrar la primera cuenta puede ayudar a mantener el plan.</p>
               </div>
               <div className={styles.casoCard}>
                 <span className={styles.casoIcono} aria-hidden="true">🏠</span>
@@ -727,7 +727,7 @@ export default function CalculadoraDeudaPage() {
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Incluyo la hipoteca en la calculadora?</h4>
-                <p>No es recomendable. La hipoteca tiene tasas bajas (Euribor + diferencial) y beneficios fiscales. Está diseñada para ser deuda a largo plazo. Prioriza las deudas de consumo con tasas altas.</p>
+                <p>Por lo general no, porque su TAE suele ser muy inferior a la de las deudas de consumo (5-15 puntos menos) y su plazo es mucho mayor. El criterio para incluirla sería puramente matemático: si su TAE supera al de tus otras deudas, tendría sentido considerarla. La deducción por vivienda habitual solo aplica si compraste antes de 2013.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Debo cancelar la tarjeta al pagarla?</h4>

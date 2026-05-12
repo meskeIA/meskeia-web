@@ -58,15 +58,15 @@ export default function CalculadoraRegla503020Page() {
     const consejos: string[] = [];
 
     if (diferencias.necesidades > ingreso * 0.1) {
-      consejos.push('Tus gastos en necesidades superan lo recomendado. Revisa si puedes reducir alquiler, suministros o transporte.');
+      consejos.push('Tus gastos en necesidades superan el 50% del ingreso. En zonas con alquileres altos esto es habitual. Si puedes negociar suministros o transporte, ahí suele haber margen; el alquiler es más estructural y suele requerir cambios mayores.');
     }
 
     if (diferencias.deseos > ingreso * 0.05) {
-      consejos.push('Gastas más de lo recomendado en deseos. Considera reducir ocio, suscripciones o compras impulsivas.');
+      consejos.push("Gastas más del 30% de referencia en la categoría 'deseos'. Si lo notas estructural, revisar suscripciones puede ser un buen punto de entrada; si responde a decisiones conscientes que valoras, no hay nada que ajustar.");
     }
 
     if (diferencias.ahorro < 0) {
-      consejos.push('No estás ahorrando lo suficiente. El 20% de ahorro es clave para tu seguridad financiera futura.');
+      consejos.push('Tu ahorro está por debajo del 20% de referencia. Cualquier porcentaje constante construye seguridad financiera con el tiempo; el 20% es un objetivo orientativo, no un mínimo necesario.');
     }
 
     if (diferencias.ahorro > ingreso * 0.1) {
@@ -116,7 +116,7 @@ export default function CalculadoraRegla503020Page() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Orientador Regla 50/30/20</h1>
         <p className={styles.subtitle}>
-          Distribuye tus ingresos: 50% necesidades, 30% deseos, 20% ahorro
+          Una referencia popular para repartir tus ingresos: 50% necesidades, 30% deseos, 20% ahorro. Funciona como guía orientativa; muchos casos reales requieren adaptaciones.
         </p>
       </header>
 
@@ -383,7 +383,7 @@ export default function CalculadoraRegla503020Page() {
                 <span className={styles.escenarioIcon}>🎓</span>
                 <strong>Joven sin cargas (25-30 años)</strong>
               </div>
-              <p className={styles.escenarioExample}>Viviendo en casa familiar o con compañeros. Gastos básicos reducidos. Oportunidad de oro para maximizar ahorro e inversión antes de tener más responsabilidades.</p>
+              <p className={styles.escenarioExample}>Viviendo en casa familiar o con compañeros, los gastos fijos son menores. Si te interesa adelantarte en ahorro o inversión, es un momento favorable; si prefieres priorizar otras experiencias en esta etapa, también es una decisión legítima.</p>
               <span className={styles.escenarioTip}>Objetivo: 40/20/40</span>
             </div>
             <div className={styles.escenarioCard}>
@@ -467,7 +467,7 @@ export default function CalculadoraRegla503020Page() {
               <span className={styles.stepNumber}>2</span>
               <div className={styles.stepContent}>
                 <strong>Registra todos tus gastos durante un mes</strong>
-                <p>Sin cambiar nada todavía. Apunta cada gasto y clasifícalo: necesidad (no puedo evitarlo), deseo (podría prescindir de él) o ahorro/inversión.</p>
+                <p>Sin cambiar nada todavía. Apunta cada gasto y clasifícalo: necesidades (gastos fijos esenciales: vivienda, alimentación, transporte), deseos (gastos que mejoran tu calidad de vida sin ser estrictamente imprescindibles) o ahorro/inversión. La línea entre &apos;necesidad&apos; y &apos;deseo&apos; la dibujas tú según tu situación y valores.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -554,7 +554,7 @@ export default function CalculadoraRegla503020Page() {
           <ul className={styles.warningList}>
             <li>Calcular los porcentajes sobre el salario bruto en lugar del neto</li>
             <li>Clasificar los deseos como necesidades para que los números cuadren</li>
-            <li>Reducir el ahorro en meses difíciles en lugar de reducir los deseos</li>
+            <li>Reducir sistemáticamente el ahorro en lugar de revisar el resto del presupuesto. Un mes puntual de menor ahorro por un motivo real no es un error; el problema es si se vuelve regla.</li>
             <li>No tener una cuenta de ahorro separada (mezclar ahorro con gastos diarios)</li>
             <li>Obsesionarse con cumplir exactamente el 50/30/20 en lugar de usarlo como guía</li>
             <li>No revisar los gastos fijos periódicamente (seguros, suministros, suscripciones)</li>

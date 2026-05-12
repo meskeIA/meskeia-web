@@ -482,8 +482,8 @@ export default function SelectorTipoAhorro() {
               riesgo, con penalización si se rescata antes.
             </li>
             <li>
-              <strong>Fondo indexado global (MSCI World):</strong> ~7-10% de rentabilidad media anual a largo plazo,
-              históricamente. Con riesgo de mercado: puede bajar temporalmente.
+              <strong>Fondo indexado global (MSCI World):</strong> ~5-8% de rentabilidad media anual nominal a largo plazo
+              (en EUR neto). Con caídas máximas históricas del 50-55% en 2008-2009.
             </li>
           </ul>
 
