@@ -61,7 +61,7 @@ const arroces: TipoArroz[] = [
     platosTipicos: ['Biryani', 'Pulao indio', 'Curry de pollo'],
     caracteristicas: ['Aromático', 'Granos sueltos', 'Se alarga al cocer'],
     descripcion:
-      "El 'rey de los arroces'. Granos largos, finos y muy aromáticos que se alargan hasta el doble al cocer. Cultivado tradicionalmente en el Himalaya indio.",
+      "Uno de los arroces aromáticos más prestigiosos del subcontinente indio. Granos largos, finos y muy aromáticos que se alargan hasta el doble al cocer. Cultivado tradicionalmente en el Himalaya indio.",
     curiosidad:
       "El nombre significa 'la fragancia' en sánscrito. India produce el 70% mundial",
   },
@@ -129,7 +129,7 @@ const arroces: TipoArroz[] = [
     platosTipicos: ['Riso Venere', 'Black rice salad', 'Postres asiáticos'],
     caracteristicas: ['Color negro intenso', 'Rico en antocianinas', 'Sabor a frutos secos'],
     descripcion:
-      "Variedad de arroz integral negro originaria de China. Antiguamente reservada para el emperador (de ahí 'forbidden rice'). Rica en antioxidantes (más que los arándanos).",
+      "Variedad de arroz integral negro originaria de China, llamado hēi mǐ (黑米). En el comercio occidental se vende como 'forbidden rice' aludiendo a una tradición según la cual estaba reservado para el emperador — una leyenda popularizada por los importadores estadounidenses en los años 90. Rica en antioxidantes (más que los arándanos).",
     curiosidad:
       'En la China imperial se castigaba con la muerte a los plebeyos que lo cultivaban sin permiso',
   },
@@ -374,7 +374,7 @@ const arroces: TipoArroz[] = [
     descripcion:
       "Variedad histórica de Carolina del Sur, casi extinta y revivida en los años 80. Base de la cocina 'Lowcountry' de Charleston. Aromático y nutritivo.",
     curiosidad:
-      'El cultivo se basaba en el conocimiento de los esclavos del oeste de África — auténtica herencia afroamericana',
+      'El cultivo del Carolina Gold se desarrolló gracias al conocimiento técnico de personas esclavizadas procedentes de la Costa del Arroz africana (Senegambia, Sierra Leona, Liberia), que ya cultivaban Oryza glaberrima en sus regiones de origen. Su trabajo forzado fue el motor del sistema rizícola sureño y uno de los ejemplos más documentados de transferencia técnica desde África al continente americano',
   },
   {
     nombre: 'Arroz Calrose',

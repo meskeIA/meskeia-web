@@ -350,7 +350,7 @@ const VINAGRES: Vinagre[] = [
       'Verduras salteadas',
     ],
     descripcion:
-      'Vinagre negro chino con DOP de Zhenjiang. Hecho con arroz glutinoso fermentado y envejecido. Mucho más complejo y umami que los vinagres occidentales.',
+      'Vinagre negro chino con DOP de Zhenjiang. Hecho con arroz glutinoso fermentado y envejecido. Tiene un perfil complejo y umami: notas a soja, malta y ahumado que solo aparecen en este estilo asiático de fermentación larga con arroz glutinoso.',
     curiosidad:
       'Se considera el equivalente chino del balsámico de Módena — ambos tienen DOP equivalente.',
   },
@@ -654,7 +654,7 @@ const VINAGRES: Vinagre[] = [
     descripcion:
       'Vinagre artesanal de Normandía hecho con sidra real (no zumo de manzana). Más complejo y aromático que el vinagre de manzana americano.',
     curiosidad:
-      'La diferencia con el apple cider americano es radical: el francés es un producto gastronómico de alta gama.',
+      'Se elabora con sidra real fermentada en barrica (no zumo de manzana acidificado, como ocurre con muchos "apple cider vinegar" industriales). Es más complejo y aromático en su versión artesanal.',
   },
   {
     nombre: 'Vinagre de kombucha',
@@ -1427,10 +1427,10 @@ export default function GuiaVinagresMundo() {
           <h4>⚠️ Errores comunes que conviene evitar</h4>
           <ul>
             <li>
-              <strong>Confundir IGP con DOP de Módena</strong>: pagar precio
-              de tradizionale DOP (cientos de euros) por una botella IGP
-              (que cuesta 5-30€) o, peor, usar tradizionale DOP para
-              cocinar.
+              <strong>Diferencia entre IGP y DOP de Módena</strong>: el IGP
+              (5-30 €) es el balsámico de uso cotidiano. El DOP Tradizionale
+              (cientos de euros la botella pequeña) es un producto gourmet
+              que se usa gota a gota; no tiene sentido emplearlo para cocinar.
             </li>
             <li>
               <strong>Hervir balsámico viejo</strong>: las altas

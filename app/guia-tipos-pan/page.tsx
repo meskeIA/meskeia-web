@@ -125,7 +125,7 @@ const PANES: TipoPan[] = [
     acompañamientos: ['Mantequilla', 'Mermelada', 'Café'],
     usosComunes: ['Desayuno', 'Merienda', 'Sándwich'],
     descripcion: 'Pan de hojaldre laminado con mantequilla, de origen austriaco (Kipferl) y popularizado en Francia. Crujiente por fuera, suave y hojaldrado por dentro.',
-    curiosidad: 'El croissant en forma de media luna rinde homenaje a la derrota del Imperio Otomano en Viena en 1683.',
+    curiosidad: 'El croissant es la evolución francesa del Kipferl austríaco, un panecillo en forma de media luna documentado desde el siglo XIII. Una leyenda popular vincula la forma con el asedio otomano de Viena de 1683, pero no hay evidencia histórica que la respalde.',
   },
   {
     nombre: 'Vollkornbrot', nombreOriginal: 'Vollkornbrot',
@@ -206,7 +206,7 @@ const PANES: TipoPan[] = [
     acompañamientos: ['Mantequilla', 'Miel', 'Chili'],
     usosComunes: ['BBQ americano', 'Sopas', 'Guarnición'],
     descripcion: 'Pan americano del sur hecho con harina de maíz y leudado con bicarbonato. Textura arenosa y sabor dulce. Rápido de preparar.',
-    curiosidad: 'Los Nativos Americanos llevaban milenios haciendo pan de maíz antes de la llegada de los europeos.',
+    curiosidad: 'El pan de maíz tiene milenios de tradición entre los pueblos indígenas de Norteamérica (Cherokee, Muscogee, Wabanaki). El cornbread sureño actual es una síntesis de esa base indígena, técnicas europeas (uso de leche, levadura química) y herencia culinaria afroamericana.',
   },
   // ORIENTE MEDIO (3)
   {
@@ -317,7 +317,7 @@ const PANES: TipoPan[] = [
     acompañamientos: ['Café brasileño', 'Mantequilla', 'Requeijão'],
     usosComunes: ['Desayuno', 'Merienda', 'Aperitivo'],
     descripcion: 'Bolita brasileña de almidón de tapioca y queso minas, sin gluten. Exterior crujiente, interior ultra esponjoso y elástico.',
-    curiosidad: 'Originalmente era comida de esclavos que usaban los restos del queso y la tapioca — hoy es el desayuno nacional.',
+    curiosidad: 'Se originó en las cocinas afrobrasileñas durante el periodo colonial: las personas esclavizadas en Minas Gerais aprovechaban los restos de tapioca y queso minas que la población blanca desechaba. La técnica, refinada durante generaciones, pasó al recetario nacional brasileño.',
   },
   // ÁFRICA (2)
   {

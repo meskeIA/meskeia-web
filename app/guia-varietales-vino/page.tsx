@@ -132,7 +132,7 @@ const VARIETALES: Varietal[] = [
     maridaje: ['Cochinillo', 'Costillas BBQ', 'Queso manchego', 'Tapenade', 'Cordero especiado'],
     dosDestacadas: ['D.O.Q. Priorat', 'A.O.C. Châteauneuf-du-Pape', 'D.O. Campo de Borja'],
     descripcion: 'La Garnacha es la uva española más extendida internacionalmente. En Priorat, sobre suelos de llicorella (pizarra), produce vinos de concentración excepcional. En Châteauneuf-du-Pape es el corazón de los legendarios blends del Ródano sur. En Cerdeña (Cannonau) tiene miles de años de historia y se asocia con la longevidad de los sardos.',
-    curiosidad: 'Cerdeña tiene el mayor número de centenarios per cápita del mundo, y la Garnacha (Cannonau) que producen y consumen en cantidades moderadas es uno de los factores estudiados. El Cannonau sardo tiene el doble de resveratrol que el Pinot Noir de Borgoña. Los investigadores del Blue Zone de Dan Buettner lo señalan como parte del "triángulo de la longevidad" sardo.',
+    curiosidad: 'El Cannonau sardo tiene un contenido elevado de resveratrol y antocianos. Estudios antiguos relacionaron esto con la longevidad de los sardos, aunque investigaciones recientes (WHO 2023) cuestionan los presuntos beneficios saludables del alcohol y señalan que es carcinógeno Grupo 1 (IARC), sin nivel de consumo seguro establecido.',
   },
   {
     nombre: 'Nebbiolo', nombreOriginal: 'Nebbiolo', tipo: 'Tinto', origen: 'Italia (Piamonte)',
@@ -242,7 +242,7 @@ const VARIETALES: Varietal[] = [
     maridaje: ['Foie gras', 'Cassoulet', 'Carne de caza', 'Queso Roquefort', 'Asado uruguayo'],
     dosDestacadas: ['A.O.C. Madiran', 'D.O. Uruguay'],
     descripcion: 'El Tannat es la uva con más taninos de todas las variedades conocidas, lo que le da una astringencia brutal en su juventud. En Madiran se usan técnicas de micro-oxigenación para suavizarlos. En Uruguay —donde llegó con inmigrantes vascos en el siglo XIX— se ha convertido en la uva nacional y produce vinos más redondos por el clima oceánico.',
-    curiosidad: 'Estudios cardiológicos de la Universidad de Montevideo demostraron que el Tannat uruguayo contiene el doble de procianidinas (antioxidantes) que cualquier otro vino del mundo. La "paradoja francesa" (baja tasa cardíaca en Gascuña pese a la dieta rica en grasas) se atribuye parcialmente al consumo de Tannat de Madiran.',
+    curiosidad: 'El Tannat tiene un contenido elevado de procianidinas (compuestos polifenólicos). En el pasado se asoció con la "paradoja francesa", una hipótesis sobre los presuntos beneficios cardiovasculares del vino tinto en Gascuña. Investigaciones recientes (WHO 2023) cuestionan esos presuntos beneficios y recuerdan que el alcohol es carcinógeno Grupo 1, sin nivel de consumo seguro establecido.',
   },
   {
     nombre: 'Carménère', nombreOriginal: 'Carménère', tipo: 'Tinto', origen: 'Francia (Burdeos) → Chile',
@@ -1102,9 +1102,10 @@ export default function GuiaVarietalesVinoPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>Pedir "vino de la casa" sin preguntar el varietal:</strong> el vino de la casa
-                puede ser cualquier cosa, desde un Tempranillo decente hasta una mezcla anónima. Pregunta
-                siempre qué uva es y de dónde viene; un buen restaurante lo sabrá responder.
+                <strong>Pedir "vino de la casa" sin preguntar el varietal:</strong> si te interesa
+                saber qué bebes, pregunta al camarero qué uva es y de dónde viene; un buen
+                restaurante lo sabrá responder. Pero un vino de la casa decente es perfectamente
+                válido para acompañar una comida cotidiana.
               </li>
               <li>
                 <strong>Servir el tinto demasiado caliente:</strong> a 22 °C el alcohol del vino

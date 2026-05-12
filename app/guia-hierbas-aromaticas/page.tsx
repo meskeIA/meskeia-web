@@ -81,7 +81,7 @@ const HIERBAS: HierbaAromatica[] = [
     cuandoAnadir: 'Al final de la cocción para preservar aroma',
     conservacion: 'Fresca: tallo en agua. Seca: pierde aroma rápido',
     descripcion:
-      'La hierba reina del Mediterráneo. Originaria de la India pero icono de la cocina italiana. Variedades: genovesa (pesto), tailandesa (anís), morada (decorativa).',
+      'Originaria de la India, donde se cultiva desde hace 5.000 años y es planta sagrada en el hinduismo (tulsi). Hoy es central en la cocina italiana (pesto, caprese), tailandesa (3 variedades: thai sweet, holy, lemon) y vietnamita.',
     curiosidad: "En Génova solo el cultivar 'genovese DOP' puede usarse en pesto auténtico",
   },
   {
@@ -396,7 +396,7 @@ const HIERBAS: HierbaAromatica[] = [
     cuandoAnadir: 'Al final, fresco picado',
     conservacion: 'Fresco 1 semana en nevera con tallo en agua',
     descripcion:
-      'La hierba más universal del mundo. Variedades: liso (italiano, mejor sabor) y rizado (decorativo). Imprescindible en gremolata, chimichurri, tabulé.',
+      'Una de las hierbas más extendidas del Mediterráneo, Europa y Oriente Medio. Variedades: liso (italiano, mejor sabor) y rizado (decorativo). Imprescindible en gremolata, chimichurri, tabulé. En cocinas asiáticas y latinoamericanas su lugar lo ocupan otras hierbas como el cilantro, la albahaca thai o el epazote.',
     curiosidad:
       'Los antiguos griegos no lo comían — lo consideraban planta sagrada de Perséfone, diosa del inframundo',
   },

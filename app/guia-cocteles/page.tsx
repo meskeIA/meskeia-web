@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
 import {
@@ -9,6 +8,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaCocteles.module.css';
@@ -186,7 +186,7 @@ const COCTELES: Coctel[] = [
     origen: 'La Habana, Cuba',
     decada: 'Siglo XVI (versión moderna: años 1920)',
     descripcion: 'El Mojito es el cóctel más pedido en España y uno de los más populares del mundo. Se construye directamente en el vaso: menta, lima y azúcar se muddlan ligeramente (sin machacar en exceso, o se amargaría), se añade ron y se termina con soda. El hielo debe ser abundante.',
-    curiosidad: 'El Mojito tiene sus raíces en el "El Draque", un remedio medicinal del siglo XVI a base de aguardiente de caña, lima, menta y azúcar que los marineros ingleses de Francis Drake tomaban para las enfermedades tropicales. La versión moderna con ron blanco cubano se popularizó en los años 20 en La Habana.',
+    curiosidad: 'El Mojito tiene sus raíces en el "El Draque", una bebida del siglo XVI a base de aguardiente de caña, lima, menta y azúcar consumida en La Habana colonial. La industria del ron caribeña sobre la que se construyó esta tradición se desarrolló a partir de la caña de azúcar cultivada por personas esclavizadas africanas. La versión moderna con ron blanco cubano se popularizó en los años 20 en La Habana.',
   },
   {
     nombre: 'Gin Tonic',
@@ -748,6 +748,7 @@ export default function GuiaCocteles() {
       </header>
 
       <LegalNotice />
+      <DisclaimerCard variant="alcohol" severity="high" collapsible={false} />
 
       <main className={styles.main}>
         {/* ── CONTROLES ──────────────────────────────────────────── */}
@@ -869,6 +870,9 @@ export default function GuiaCocteles() {
         subtitle="Del speakeasy de los años 20 al bar de autor del siglo XXI"
       >
         <p>
+          La coctelería caribeña tiene su raíz en la industria del ron, que durante los siglos XVII-XIX se construyó sobre el trabajo de personas africanas esclavizadas en las plantaciones de caña de azúcar del Caribe. Reconocer este origen no resta valor cultural a los cócteles cubanos, jamaicanos o puertorriqueños, pero contextualiza por qué son patrimonio inmaterial complejo.
+        </p>
+        <p>
           La coctelería clásica es el resultado de siglos de experimentación, creatividad
           y cultura. Cada cóctel clásico es un artefacto cultural que lleva incorporado
           el contexto histórico de su creación: la Margarita y la frontera México-EE.UU.,
@@ -961,7 +965,7 @@ export default function GuiaCocteles() {
             <strong>🫐 Opciones sin alcohol</strong>
             <p>
               Virgin Mojito, Arnold Palmer, Cucumber Cooler o Virgin Mary. Los mocktails
-              modernos son tan complejos y satisfactorios como los originales. La Virgin Mary
+              modernos son tan complejos y satisfactorios por derecho propio. La Virgin Mary
               es especialmente recomendada para brunch; el Cucumber Cooler para cenas elegantes.
             </p>
           </div>
@@ -1190,6 +1194,14 @@ export default function GuiaCocteles() {
             </li>
           </ul>
         </div>
+
+        <p>
+          <strong>Consumo responsable:</strong> en España una unidad de alcohol equivale
+          a 10 g de etanol (aprox. 100 ml de vino, 250 ml de cerveza o 30 ml de destilado).
+          Los cócteles con destilados suelen superar las 2 unidades por copa. El alcohol
+          está clasificado como carcinógeno Grupo 1 IARC; la WHO (2023) establece que no
+          existe nivel seguro de consumo. Evítalo en embarazo, lactancia y al conducir.
+        </p>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('guia-cocteles')} />

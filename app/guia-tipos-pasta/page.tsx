@@ -86,7 +86,7 @@ const pastas: TipoPasta[] = [
     ],
     dificultadCasera: 'Avanzada',
     descripcion:
-      'Pasta plana al huevo de Emilia-Romaña. La auténtica boloñesa se sirve siempre con tagliatelle, no con spaghetti.',
+      'Pasta plana al huevo de Emilia-Romaña. En Bolonia, el ragù se sirve tradicionalmente con tagliatelle; el binomio "spaghetti boloñesa" es una adaptación internacional, no una receta original de la región.',
     curiosidad:
       'Hay un tagliatelle de oro en la Cámara de Comercio de Bolonia que define el ancho oficial: 8mm',
   },
@@ -549,7 +549,7 @@ const pastas: TipoPasta[] = [
     descripcion:
       "Láminas planas de pasta al huevo intercaladas con relleno y horneadas. La 'lasagna alla bolognese' lleva pasta verde (con espinacas), ragù y bechamel.",
     curiosidad:
-      'La lasagna verde de Bolonia es la versión auténtica — la pasta amarilla con queso es americana',
+      'La lasagna verde de Bolonia (con pasta de espinacas, ragù y bechamel) es la versión codificada por la DOP boloñesa; la variante con pasta amarilla y abundante queso muzzarella es la adaptación ítalo-americana, hoy plato propio con su propia tradición',
   },
   {
     nombre: 'Cannelloni',
@@ -653,7 +653,7 @@ const pastas: TipoPasta[] = [
     platosClasicos: ['Couscous alla trapanese', 'Couscous con pesce', 'Couscous bel ghraïef'],
     dificultadCasera: 'Media',
     descripcion:
-      'Pequeñas bolitas de sémola al vapor, tradicionalmente magrebíes pero adoptadas en Trápani (Sicilia) por la influencia árabe. Festival anual en Trapani.',
+      'Pequeñas bolitas de sémola al vapor, originario del Magreb amazigh (bereber), donde sigue siendo plato nacional en Marruecos, Argelia, Túnez y Libia; adoptado en Trápani por influencia árabe medieval. Festival anual en Trapani.',
     curiosidad:
       'El Cous Cous Fest de San Vito Lo Capo (Sicilia) reúne chefs de todo el Mediterráneo cada septiembre',
   },
@@ -771,10 +771,11 @@ export default function GuiaTiposPastaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>Guía de Tipos de Pasta Italiana</h1>
+        <h1 className={styles.heroTitle}>Guía de Tipos de Pasta — tradición italiana</h1>
         <p className={styles.heroSubtitle}>
-          40 formas de pasta con su región, tiempo de cocción y salsa ideal. La referencia
-          definitiva para cocinar pasta como en Italia.
+          40 formas de pasta con su región, tiempo de cocción y salsa ideal. Esta guía se centra
+          en la tradición italiana, la más codificada en Europa; pasta como categoría existe
+          también en China, Japón, Mediterráneo oriental, mundo árabe e India.
         </p>
       </header>
 
@@ -1062,12 +1063,12 @@ export default function GuiaTiposPastaPage() {
                 </p>
               </div>
               <div className={styles.casoCard}>
-                <h4>Italianófilo purista</h4>
+                <h4>Cocina italiana clásica</h4>
                 <p>
-                  Aprende las parejas tradicionales: <strong>tagliatelle al ragù</strong> (no
-                  spaghetti), <strong>bucatini all'amatriciana</strong>, <strong>trofie al pesto</strong>,{' '}
-                  <strong>orecchiette con cime di rapa</strong>. Cada formato fue diseñado para una
-                  salsa específica de su región.
+                  Aprende las parejas tradicionales más documentadas: <strong>tagliatelle al ragù</strong>,{' '}
+                  <strong>bucatini all'amatriciana</strong>, <strong>trofie al pesto</strong>,{' '}
+                  <strong>orecchiette con cime di rapa</strong>. Cada formato evolucionó junto a las
+                  salsas de su región.
                 </p>
               </div>
               <div className={styles.casoCard}>
@@ -1211,9 +1212,10 @@ export default function GuiaTiposPastaPage() {
                 salsa se adhiera. La pasta queda resbaladiza.
               </li>
               <li>
-                <strong>Servir la pasta y poner la salsa encima.</strong> Error americano: la pasta
-                debe mezclarse con la salsa en la sartén durante 30-60 segundos antes de servir,
-                para que se impregne el sabor.
+                <strong>Servir la pasta y poner la salsa encima como si fuera un topping.</strong> La
+                técnica italiana clásica es mezclar pasta y salsa en la sartén durante 30-60 segundos
+                antes de emplatar: el almidón residual de la pasta y la salsa se funden creando una
+                capa cremosa imposible de conseguir si se vierten por separado.
               </li>
               <li>
                 <strong>Usar pasta muy pasada o muy dura.</strong> Pasada absorbe toda la salsa y

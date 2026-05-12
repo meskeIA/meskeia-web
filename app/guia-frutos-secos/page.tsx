@@ -134,7 +134,7 @@ const FRUTOS_SECOS: FrutoSeco[] = [
       'Salud del corazón',
     ],
     descripcion:
-      'El fruto seco con mayor contenido de Omega-3 vegetal. Su forma se parece a un cerebro humano (y resulta que beneficia al cerebro). Llamada "la nuez del rey" en latín.',
+      'El fruto seco con mayor contenido de Omega-3 vegetal. Su forma se parece a un cerebro humano; los estudios muestran beneficios cardiovasculares y cognitivos asociados al consumo moderado. Llamada "la nuez del rey" en latín.',
     curiosidad:
       'Su forma simétrica al cerebro humano sirvió en la antigüedad como prueba de la "doctrina de las signaturas".',
   },
@@ -442,7 +442,7 @@ const FRUTOS_SECOS: FrutoSeco[] = [
       'Energía sostenida',
     ],
     descripcion:
-      'Semilla mexicana superalimentaria, base de la dieta de los aztecas y mayas. Forma gel al contacto con agua (10x su volumen), excelente para hidratación y saciedad.',
+      'Semilla mexicana de alto valor nutricional, base de la dieta de los aztecas y mayas. Forma gel al contacto con agua (10x su volumen), excelente para hidratación y saciedad.',
     curiosidad:
       'Los guerreros aztecas se alimentaban con 1 cucharada de chía al día durante largas marchas — los llamaban "corredores chía".',
   },
@@ -1141,6 +1141,8 @@ export default function GuiaFrutosSecosPage() {
           title="Guía de Frutos Secos y Semillas"
           subtitle="Descubre 30 frutos secos y semillas: nutrición, beneficios, conservación y usos culinarios"
         >
+          <p>Las indicaciones de beneficios para la salud son orientativas y proceden de estudios nutricionales generales. No sustituyen el consejo médico personalizado, especialmente en caso de alergias, diabetes, embarazo o tratamientos médicos.</p>
+
           <h3>Tabla comparativa nutricional</h3>
           <p>
             Los frutos secos varían enormemente en su perfil nutricional. Estos

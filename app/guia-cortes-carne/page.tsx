@@ -222,7 +222,7 @@ const CORTES: CorteCarne[] = [
     precioAproximado: 'Económico',
     descripcion: 'La panceta es alternancia de capas de carne magra y grasa. Curada y ahumada se convierte en bacon. Fresca al horno a baja temperatura, produce la famosa "pork belly" de la cocina asiática y americana. Su grasa, al fundirse, es el aceite de cocina más aromático que existe.',
     consejoCocina: 'Para pork belly perfecto: 12 horas a 80 °C seguidas de 10 minutos a 220 °C para conseguir la piel crujiente y el interior meloso.',
-    curiosidad: 'El bacon es, estadísticamente, el alimento con mayor capacidad de romper dietas vegetarianas en EEUU. Estudios sobre recaídas vegetarianas muestran que el bacon es el "tentador número 1" mencionado por ex-vegetarianos. Existe un perfume llamado "Bacon" (J&D Foods) y velas aromáticas de bacon que son un fenómeno de mercado.',
+    curiosidad: 'El bacon americano (panceta curada y ahumada) se popularizó en Estados Unidos en los siglos XIX-XX. Hoy existen versiones premium con maderas de manzano, nogal o haya que aportan perfiles ahumados muy distintos.',
   },
   {
     nombre: 'Lomo de cerdo', nombreAlternativo: 'Pork loin / Cinta de lomo',
@@ -543,6 +543,8 @@ export default function GuiaCortesCarne() {
           title="El mundo de los cortes de carne: técnicas, temperaturas y tradición"
           subtitle="De la parrilla argentina al horno segoviano: guía completa para elegir y cocinar el corte perfecto"
         >
+          <p>Esta guía es técnica y culinaria. Conviene recordar que el consumo de carne tiene un impacto ambiental documentado (huella de carbono, uso de agua y suelo) y que las condiciones de cría varían enormemente entre sistemas intensivos y extensivos. Si te importa el origen, busca etiquetas como ecológico, extensivo, IGP/DOP o certificaciones de bienestar animal.</p>
+
           {/* Tabla comparativa de animales */}
           <h3>Comparativa por animal</h3>
           <div className={styles.tableWrapper}>

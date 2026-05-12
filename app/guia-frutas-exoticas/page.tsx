@@ -86,7 +86,7 @@ const frutas: FrutaExotica[] = [
     descripcion:
       "Conocida como la 'reina de las frutas'. Pulpa blanca y jugosa con sabor a litchi mezclado con melocotón. Su corteza es difícil de abrir y mancha permanentemente.",
     curiosidad:
-      'La reina Victoria ofreció 100 libras (de la época) a quien le trajera una fresca a Inglaterra',
+      'Llamada "reina de las frutas" en Tailandia, Indonesia y Malasia, donde forma parte de la cocina y la cultura cotidiana desde hace siglos. Su delicadeza para el transporte explica por qué llegó tarde a otros continentes',
   },
   {
     nombre: 'Rambután',
@@ -244,7 +244,7 @@ const frutas: FrutaExotica[] = [
     beneficios: ['Vitamina C', 'Vitamina B6', 'Magnesio'],
     formaConsumo: ['Cruda', 'Helado', 'Smoothie'],
     descripcion:
-      "Fruta cremosa con piel verde escamosa y pulpa blanca dulce. Sabor entre piña, plátano y vainilla. Mark Twain la llamó 'la fruta más deliciosa conocida por el hombre'.",
+      "Fruta cremosa con piel verde escamosa y pulpa blanca dulce. Sabor entre piña, plátano y vainilla. Cultivada desde hace más de 5.000 años en los Andes, donde aparece representada en cerámicas mochica y nazca. Mark Twain, al probarla en Madeira en 1866, la describió como 'la fruta más deliciosa conocida por el hombre'.",
     curiosidad:
       'España es el mayor productor europeo y mundial fuera de los Andes — Granada y Málaga la cultivan desde el siglo XVI',
   },
@@ -297,7 +297,7 @@ const frutas: FrutaExotica[] = [
     descripcion:
       'Fruta tropical con cáscara naranja y pulpa naranja-rosada con muchas semillas negras comestibles. Sabor suave y dulce, ligeramente terroso.',
     curiosidad:
-      "Cristóbal Colón la llamó 'la fruta de los ángeles' al probarla por primera vez en el Caribe",
+      "Los pueblos tainos y caribes la cultivaban desde mucho antes de 1492. Cristóbal Colón, al probarla, dejó escrito que era 'la fruta de los ángeles' — uno de los primeros registros europeos de esta fruta americana",
   },
   {
     nombre: 'Chirimoya peruana',
@@ -495,7 +495,7 @@ const frutas: FrutaExotica[] = [
     beneficios: ['Antioxidantes', 'Fibra', 'Magnesio'],
     formaConsumo: ['Cruda', 'Mermelada', 'Licor'],
     descripcion:
-      'Fruta del nopal mexicano. Cáscara espinosa y pulpa naranja, roja o blanca llena de semillas comestibles. Originario de México pero icono del Mediterráneo.',
+      'Fruta del nopal mexicano. Cáscara espinosa y pulpa naranja, roja o blanca llena de semillas comestibles. Originaria de México (donde aparece en el escudo nacional) y planta sagrada para los pueblos del Anáhuac. Tras la colonización se aclimató con éxito en el Mediterráneo, donde hoy también se cultiva con peso (Sicilia, Andalucía, norte de África).',
     curiosidad:
       'Aparece en el escudo nacional de México sobre un águila comiéndose una serpiente',
   },
@@ -778,10 +778,11 @@ export default function GuiaFrutasExoticasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>Guía de Frutas Exóticas del Mundo</h1>
+        <h1>Guía de Frutas Tropicales y Subtropicales del Mundo</h1>
         <p>
-          40 frutas tropicales y raras: origen, temporada, sabor, beneficios y
-          formas de consumo
+          40 frutas con su origen, temporada, sabor y formas de consumo. Algunas
+          son cotidianas en sus regiones de origen y poco conocidas en Europa;
+          otras viajan hoy globalmente.
         </p>
       </header>
 
@@ -964,12 +965,15 @@ export default function GuiaFrutasExoticasPage() {
       >
         <h3>Introducción</h3>
         <p>
-          Las frutas exóticas son ventanas a otros climas, culturas y
-          biodiversidades. Desde el durian malayo, prohibido en aviones, hasta
-          el yuzu japonés que perfuma la alta cocina, cada una tiene una
-          historia botánica, cultural y nutricional propia. Esta guía reúne 40
-          frutas representativas de seis grandes regiones del mundo, con
-          información práctica para identificarlas, comprarlas y disfrutarlas.
+          Estas frutas son ventanas a otros climas, culturas y biodiversidades.
+          Lo que para una persona es "exótico" para otra es cotidiano: mango es
+          fruta de mercado para una persona en India, chirimoya lo es en Lima,
+          durian en Manila. La etiqueta "exótico" depende siempre de la
+          perspectiva. Desde el durian del Sudeste Asiático, prohibido en
+          aviones, hasta el yuzu japonés que perfuma la alta cocina, cada una
+          tiene una historia botánica, cultural y nutricional propia. Esta guía
+          reúne 40 frutas representativas de seis grandes regiones del mundo,
+          con información práctica para identificarlas, comprarlas y disfrutarlas.
         </p>
 
         <h3>Tabla comparativa por región</h3>
@@ -1027,11 +1031,11 @@ export default function GuiaFrutasExoticasPage() {
         <h3>Casos de uso</h3>
         <ol>
           <li>
-            <strong>Curiosos gastronómicos:</strong> Quien quiere explorar
-            sabores nuevos sin moverse de Europa puede empezar por las
-            disponibles en grandes superficies (pitaya, lichi, maracuyá,
-            persimón) y avanzar después a especialidades (mangostán, rambután,
-            cherimoya).
+            <strong>Curiosos gastronómicos:</strong> Lector con poca experiencia
+            con frutas tropicales: comienza con las más accesibles en
+            supermercado convencional (pitaya, lichi, maracuyá, mango, papaya);
+            avanza después a especialidades de tienda asiática o latina
+            (mangostán, rambután, cherimoya).
           </li>
           <li>
             <strong>Viajeros:</strong> Antes de viajar al sudeste asiático,
@@ -1200,6 +1204,18 @@ export default function GuiaFrutasExoticasPage() {
             </li>
           </ul>
         </div>
+
+        <h3>Impacto ecológico y social del consumo de frutas tropicales</h3>
+        <p>
+          Las frutas tropicales que llegan a Europa tienen costes ecológicos y
+          sociales que no aparecen en la etiqueta: transporte (durian malasio en
+          avión = mucha huella de CO₂/kg fruta), agua (1 kg de aguacate consume
+          ~2.000 litros), comercio (precios al productor son fracción del precio
+          final). Buscar etiquetas de comercio justo y consumir frutas tropicales
+          cultivadas en España (cherimoya de Granada, mango y aguacate de Málaga,
+          persimón de Valencia) cuando estén disponibles reduce considerablemente
+          el impacto.
+        </p>
       </EducationalSection>
 
       <RelatedApps apps={getRelatedApps('guia-frutas-exoticas')} />

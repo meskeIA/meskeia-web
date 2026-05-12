@@ -478,7 +478,7 @@ const QUESOS: Queso[] = [
     maridaje: ['Tlayudas oaxaqueñas', 'Quesillo derretido', 'Mole negro', 'Chile pasilla'],
     denominacionOrigen: 'Sin DOP (producto regional)',
     descripcion: 'El "quesillo" oaxaqueño es la versión mexicana de la pasta hilada italiana (mozzarella). Se elabora con leche cruda de vaca y se forma en largas tiras que se enrollan en bola. Es el ingrediente imprescindible de las tlayudas, los tetelas y los memelas de la gastronomía oaxaqueña, y funde de forma espectacular.',
-    curiosidad: 'Se cuenta que el Queso Oaxaca fue creado por accidente en el siglo XIX cuando una joven quesera de Reyes Etla dejó caer cuajada caliente en agua y descubrió que se volvía elástica y filable. La técnica llegó con los monjes agustinos que enseñaron a los indígenas zapotecos técnicas europeas de quesería, adaptadas a las condiciones locales.',
+    curiosidad: 'Se cuenta que el Queso Oaxaca fue creado por accidente en el siglo XIX cuando una joven quesera de Reyes Etla dejó caer cuajada caliente en agua y descubrió que se volvía elástica y filable. Surgió en el siglo XIX como adaptación zapoteca de las técnicas de pasta hilada que llegaron con monjes agustinos. La innovación quesera de las comunidades de Reyes Etla (Oaxaca) sobre esa base europea es lo que dio al quesillo su forma y técnica actuales, ya plenamente mexicanas.',
   },
   {
     nombre: 'Cotija', pais: 'México', region: 'Michoacán (Sierra de Cotija)', continente: 'América',
@@ -486,7 +486,7 @@ const QUESOS: Queso[] = [
     corteza: 'Dura, seca', notasDeSabor: ['Salado intenso', 'Seco', 'Umami', 'Láctico concentrado'],
     maridaje: ['Elote (maíz) con chile y limón', 'Tacos', 'Enchiladas', 'Mezcal añejo'],
     denominacionOrigen: 'Sin DOP (reconocimiento regional)',
-    descripcion: 'El "Parmigiano mexicano": un queso seco, salado e intenso que se usa rallado o desmenuzado como condimento. Originario de la sierra michoacana, hoy se produce en varios estados. Su función en la cocina mexicana es parecida al queso rallado italiano: aportador de sal, umami y textura.',
+    descripcion: 'Queso seco, salado e intenso de la sierra michoacana, usado rallado o desmenuzado como condimento sobre elotes, frijoles, tacos y enchiladas. Su función gastronómica (aportador de sal, umami y textura) es comparable a la del Parmigiano italiano, aunque su origen, leche y técnica son independientes.',
     curiosidad: 'El Cotija es uno de los pocos quesos americanos con verdadera tradición de maduración larga, heredada directamente de los técnicos queseros españoles del periodo colonial. En Cotija de la Paz (Michoacán), el queso se sigue produciendo con métodos que cambiaron poco desde el siglo XVII, usando las mismas cuevas naturales para la maduración.',
   },
   {
@@ -495,7 +495,7 @@ const QUESOS: Queso[] = [
     corteza: 'Sin corteza', notasDeSabor: ['Láctico neutro', 'Suave', 'Muy ligero', 'Absorbe especias'],
     maridaje: ['Palak Paneer', 'Curry de verduras', 'Tandoori', 'Garam masala'],
     denominacionOrigen: 'Sin DOP',
-    descripcion: 'El único queso de la India, cuajado con ácido cítrico o zumo de limón en lugar de cuajo animal. No se funde al calentarse, lo que lo hace perfecto para frituras, salteados y curries. Es la principal fuente de proteínas lácteas en la cocina vegetariana india del norte y uno de los alimentos más versátiles de la gastronomía del subcontinente.',
+    descripcion: 'El queso indio más extendido fuera de Asia del Sur, cuajado con ácido cítrico o zumo de limón en lugar de cuajo animal. Comparte tradición con otros quesos del subcontinente: chhena, channa, kalari, bandel. No se funde al calentarse, lo que lo hace perfecto para frituras, salteados y curries. Es la principal fuente de proteínas lácteas en la cocina vegetariana india del norte y uno de los alimentos más versátiles de la gastronomía del subcontinente.',
     curiosidad: 'El paneer es el queso que demuestra que se puede hacer queso sin cuajo animal: el ácido (limón, vinagre o suero acidificado) corta la proteína de la misma manera. Esta técnica, independiente de la tradición europea, se desarrolló en la India hace siglos en contextos culturales donde el uso de cuajo animal era problemático por razones religiosas.',
   },
   {
@@ -556,7 +556,7 @@ export default function GuiaQuesos() {
 
       <header className={styles.hero}>
         <h1>Guía de Quesos</h1>
-        <p>55 quesos del mundo: leche, maduración, notas de sabor y maridaje</p>
+        <p>55 quesos: amplia selección europea y referencias del mundo. Leche, maduración, notas de sabor y maridaje</p>
       </header>
 
       <LegalNotice />
@@ -828,7 +828,7 @@ export default function GuiaQuesos() {
             <li><strong>Confundir "Parmesan" industrial con Parmigiano Reggiano:</strong> son productos radicalmente distintos. El industrial puede ser mezcla de quesos, celulosa y sal. Leer la etiqueta.</li>
             <li><strong>Cortar el Stilton o Cabrales mal:</strong> los quesos azules deben cortarse preservando las venas. Cortar en cuñas desde el exterior hacia el centro, nunca en rodajas horizontales.</li>
             <li><strong>Mezclar todos los quesos en el mismo envase:</strong> los azules contaminan con Penicillium a los quesos cercanos. Guardar siempre por separado.</li>
-            <li><strong>Comprar "Feta" o "Manchego" sin verificar la DOP:</strong> las imitaciones pueden ser buenos quesos, pero no son el producto auténtico. La DOP es la única garantía de autenticidad.</li>
+            <li><strong>Comprar "Feta" o "Manchego" sin verificar la DOP:</strong> estos nombres están legalmente reservados en la UE a productos de zonas y métodos específicos. Las imitaciones pueden ser buenos quesos, pero comprarlos con DOP es lo único que garantiza que se trata del producto original protegido.</li>
           </ul>
         </div>
       </EducationalSection>

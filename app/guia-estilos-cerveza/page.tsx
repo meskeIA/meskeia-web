@@ -380,7 +380,7 @@ const ESTILOS: EstiloCerveza[] = [
     maridaje: ['Tarta de chocolate', 'Helado de vainilla', 'Frutas del bosque'],
     marcasDestacadas: ['Left Hand Milk Stout Nitro', 'Mackeson\'s'],
     descripcion: 'Stout dulce elaborada con lactosa (azúcar de la leche) no fermentable. El resultado es una cerveza cremosa, dulce y con cuerpo sedoso.',
-    curiosidad: 'Se vendía en farmacias británicas del siglo XIX como bebida reconstituyente para madres lactantes',
+    curiosidad: 'Se vendía en farmacias británicas del siglo XIX como bebida reconstituyente para madres lactantes — una recomendación obsoleta: actualmente se desaconseja el consumo de alcohol durante la lactancia',
   },
   {
     nombre: 'Oatmeal Stout',
@@ -533,7 +533,7 @@ const ESTILOS: EstiloCerveza[] = [
     notasDeSabor: ['Cereal suave', 'Maíz leve', 'Limpio', 'Agua'],
     maridaje: ['Nachos', 'Pizza', 'Alitas de pollo'],
     marcasDestacadas: ['Budweiser', 'Coors Light'],
-    descripcion: 'La cerveza más consumida del mundo. Muy ligera, refrescante y sin carácter complejo. Perfecta para grandes eventos y calor.',
+    descripcion: 'La cerveza más consumida del mundo. Ligera, muy refrescante y de perfil neutro: pensada para beberse fría en grandes cantidades. Sin la complejidad de los estilos craft, pero con un papel social y económico enorme.',
     curiosidad: 'Budweiser vende más de 40 millones de barriles al año en todo el mundo',
   },
   {
@@ -1061,6 +1061,8 @@ export default function GuiaEstilosCerveza() {
           subtitle="Aprende sobre los principales estilos cerveceros del mundo: historia, elaboracion y maridaje"
           icon="🍺"
         >
+          <p>Esta guía cubre los estilos occidentales (europeos y americanos) por ser los más estandarizados internacionalmente. Existen tradiciones cerveceras milenarias no europeas elaboradas con cereales y técnicas distintas, igualmente válidas como categoría: la chicha andina (maíz fermentado), el bouza egipcio (cebada), el umqombothi sudafricano (sorgo) y el huangjiu chino (arroz).</p>
+
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -1226,7 +1228,7 @@ export default function GuiaEstilosCerveza() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <h4>Cada region, un caracter</h4>
-              <p>La cerveza refleja su territorio: las cervezas belgas son especiadas y complejas, las alemanas son precisas y tecnicas, las americanas son audaces y lupuladas.</p>
+              <p>Cada tradición cervecera tiene rasgos característicos: las belgas suelen destacar por sus levaduras especiadas y su diversidad, las alemanas por su tradición y precisión técnica (Reinheitsgebot), las americanas por la innovación craft. Pero dentro de cada país hay enorme diversidad.</p>
             </div>
           </div>
 
