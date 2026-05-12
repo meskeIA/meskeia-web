@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './ComparadorFormasJuridicas.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -70,7 +70,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     desventajas: [
       'Responsabilidad ilimitada (patrimonio personal)',
       'IRPF puede ser alto con beneficios altos',
-      'Menos credibilidad ante grandes empresas',
+      'En contratos con grandes empresas o licitaciones públicas, algunas exigen forma societaria; revisar contrato a contrato',
       'Dificultad para acceder a financiación',
       'No puedes tener socios',
     ],
@@ -494,6 +494,8 @@ export default function ComparadorFormasJuridicasPage() {
           Descubre qué estructura legal se adapta mejor a tu proyecto: autónomo, sociedad, cooperativa o asociación
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
 
       <DisclaimerCard variant="financial" severity="critical" />
 

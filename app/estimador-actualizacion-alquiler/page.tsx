@@ -572,7 +572,7 @@ export default function EstimadorActualizacionAlquilerPage() {
               <span className={styles.tipIcon}>📉</span>
               <div>
                 <strong>El propietario puede aplicar menos del índice máximo</strong>
-                <p>Propietarios que mantengan buena relación con inquilinos de larga duración a veces aplican un porcentaje menor al permitido para evitar rotación y los costes que conlleva (período vacío, obra, nueva agencia). Económicamente puede ser más rentable.</p>
+                <p>El IRAV/IPC es un máximo, no una obligación. Muchos propietarios aplican un porcentaje menor o renuncian a la actualización con inquilinos estables, ya sea por relación personal o porque la rotación de inquilinos también tiene costes (períodos sin alquilar, gastos de gestión y posibles reparaciones).</p>
               </div>
             </div>
             <div className={styles.tipCard}>
@@ -586,7 +586,7 @@ export default function EstimadorActualizacionAlquilerPage() {
               <span className={styles.tipIcon}>💬</span>
               <div>
                 <strong>El inquilino puede negociar</strong>
-                <p>El IRAV es el techo legal, pero nada impide que el inquilino negocie con el propietario una subida menor o nula, especialmente si lleva años en el piso sin incidencias. Un buen inquilino tiene valor económico real: no hay periodo de vacíos, sin gastos de agencia, sin reparaciones de entrada.</p>
+                <p>El IRAV es el techo legal, pero la actualización puede negociarse. Inquilinos con varios años en el inmueble y sin incidencias suelen tener margen para acordar una subida menor, ya que la rotación implica costes para el propietario (períodos sin alquilar, gestiones, reparaciones de entrada).</p>
               </div>
             </div>
           </div>

@@ -77,7 +77,7 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
       costeMax: residenciaMax,
       factores: [
         { icono: '✅', texto: 'Atención 24 horas garantizada' },
-        { icono: '✅', texto: 'Sin carga para la familia' },
+        { icono: '✅', texto: 'Libera al cuidador familiar de la dedicación 24h' },
         { icono: '✅', texto: 'Socialización y actividades' },
         { icono: '✅', texto: 'Atención sanitaria integrada' },
         { icono: '❌', texto: 'La persona abandona su hogar' },
@@ -317,8 +317,8 @@ export default function ResidenciaVsCuidadoCasa() {
             </tr>
             <tr>
               <td>Apoyo para cuidador familiar</td>
-              <td>Cuidador descanso total</td>
-              <td>Cuidador sobrecargado (riesgo burnout)</td>
+              <td>Cuidador familiar sin dedicación directa</td>
+              <td>Cuidador familiar con dedicación significativa (riesgo de sobrecarga sin apoyos suficientes)</td>
             </tr>
           </tbody>
         </table>
@@ -396,9 +396,8 @@ export default function ResidenciaVsCuidadoCasa() {
           <p>Sistemas que van más allá del botón de emergencia: sensores de movimiento, detección de caídas, alertas médicas, videollamada. Permite mayor seguridad con mayor autonomía en casa.</p>
         </div>
         <div className={styles.faqItem}>
-          <strong>¿Cómo afecta esta decisión a la herencia?</strong>
-          <p>La residencia consume el patrimonio más rápido. En algunas CCAA, el Estado puede exigir reintegro de prestaciones del SAAD con cargo a la herencia. Consultar con un abogado antes.</p>
-          <div className={styles.faqTip}>💡 Planificar con un notario puede proteger ciertos activos dentro de los límites legales.</div>
+          <strong>¿Cómo afecta esta decisión al patrimonio familiar?</strong>
+          <p>Las residencias privadas tienen costes mensuales altos. Por otra parte, las prestaciones del SAAD pueden generar derechos de reintegro contra la herencia en algunas CCAA. Si el patrimonio familiar es una preocupación relevante (por ejemplo, una vivienda que es el hogar de otros familiares), conviene consultar con un trabajador social y, si procede, con un abogado, para entender las implicaciones de cada opción.</p>
         </div>
       </div>
 
@@ -436,8 +435,8 @@ export default function ResidenciaVsCuidadoCasa() {
         <div className={styles.step}>
           <div className={styles.stepNumber}>5</div>
           <div className={styles.stepContent}>
-            <strong>Incluye a la persona dependiente en la decisión</strong>
-            <p>Siempre que sea posible, la persona mayor debe participar en la decisión. Sus preferencias son importantes aunque no siempre determinantes por razones de seguridad.</p>
+            <strong>Incluye a la persona en la decisión</strong>
+            <p>Siempre que su capacidad cognitiva lo permita, la persona afectada debe participar en la decisión sobre su propio cuidado. Sus preferencias son centrales, aunque pueden verse limitadas por razones objetivas de seguridad, viabilidad económica o disponibilidad familiar.</p>
           </div>
         </div>
         <div className={styles.step}>

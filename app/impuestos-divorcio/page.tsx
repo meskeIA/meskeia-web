@@ -256,7 +256,7 @@ export default function ImpuestosDivorcioPage() {
 
   const custodiaOpciones: { value: Custodia; label: string; desc: string }[] = [
     { value: 'exclusiva-tengo', label: 'Custodia exclusiva — yo tengo la custodia', desc: 'Los hijos conviven principalmente conmigo' },
-    { value: 'exclusiva-otro', label: 'Custodia exclusiva — el otro progenitor tiene la custodia', desc: 'Yo pago pensión de alimentos y tengo derecho de visita' },
+    { value: 'exclusiva-otro', label: 'Custodia exclusiva — el otro progenitor tiene la custodia', desc: 'Yo no tengo la custodia. Habitualmente esto implica régimen de comunicación y estancias con los hijos, y, en función de las rentas, pensión de alimentos a su favor' },
     { value: 'compartida', label: 'Custodia compartida', desc: 'Los hijos conviven con ambos progenitores de forma equitativa' },
   ];
 
@@ -830,7 +830,7 @@ export default function ImpuestosDivorcioPage() {
                 <h3>Pensión compensatoria alta + IRPF alto</h3>
               </div>
               <p className={styles.escenarioTip}>
-                Cuanto mayor es el tipo marginal del pagador, mayor es el ahorro fiscal. Una pensión de 1.000 €/mes con tipo marginal del 37% supone un ahorro de ~4.440 €/año en IRPF. La persona que la cobra, si tiene rentas bajas, puede no pagar apenas impuestos sobre ella.
+                Cuanto mayor es el tipo marginal del pagador, mayor es el ahorro fiscal. Una pensión de 1.000 €/mes con tipo marginal del 37% supone un ahorro de ~4.440 €/año en IRPF. La persona que la cobra, si tiene rentas bajas, puede no pagar apenas impuestos sobre ella. Esto es un efecto colateral del diseño fiscal; el importe debe fijarse según el desequilibrio económico real, no como herramienta de planificación.
               </p>
             </div>
           </div>
@@ -915,12 +915,12 @@ export default function ImpuestosDivorcioPage() {
 
         {/* Mejores prácticas */}
         <section>
-          <h2>Consejos para minimizar el impacto fiscal</h2>
+          <h2>Consejos para gestionar correctamente la fiscalidad del divorcio</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>⚖️</span>
-              <h4>Negocia la pensión compensatoria con criterio fiscal</h4>
-              <p>El pagador ahorra en IRPF según su tipo marginal. Si tiene ingresos altos, una pensión compensatoria puede ser fiscalmente ventajosa frente a otras compensaciones económicas.</p>
+              <h4>Considera el efecto fiscal de la pensión compensatoria</h4>
+              <p>El pagador reduce su base imponible y quien la cobra tributa por ella como rendimiento del trabajo. Tener en cuenta este efecto al cuantificarla puede ayudar a evitar sorpresas, pero la cuantía debe responder al desequilibrio económico real, no a una optimización tributaria.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🏠</span>

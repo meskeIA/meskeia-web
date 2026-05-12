@@ -515,7 +515,7 @@ export default function EstimadorCuotaAutonomoPage() {
       {/* Contenido educativo colapsable */}
       <EducationalSection
         title="¿Quieres aprender más sobre la cotización de autónomos?"
-        subtitle="Entiende el sistema de cotización por ingresos reales, cómo se calcula tu cuota y estrategias para optimizarla"
+        subtitle="Entiende el sistema de cotización por ingresos reales, cómo se calcula tu cuota y cómo ajustarla a tu situación (cuota mínima legal vs prestaciones futuras)."
         icon="📚"
       >
         <section className={styles.guideSection}>
@@ -976,7 +976,7 @@ export default function EstimadorCuotaAutonomoPage() {
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon}>⚠️</span>
-              <h3>6 Errores que Cuestan Dinero a los Autónomos</h3>
+              <h3>6 errores frecuentes en la gestión de la cuota de autónomo</h3>
             </div>
             <ul className={styles.warningList}>
               <li>

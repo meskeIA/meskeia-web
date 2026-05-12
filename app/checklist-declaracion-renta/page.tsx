@@ -662,7 +662,7 @@ export default function ChecklistDeclaracionRentaPage() {
               <span className={styles.tipIcon}>🎁</span>
               <div>
                 <strong>Donaciones a ONGs</strong>
-                <p>Las donaciones a entidades acogidas a la Ley 49/2002 tienen hasta un 80% de deducción para los primeros 150 €. Muchos contribuyentes no las declaran porque creen que el importe es pequeño — es un error: 150 € donados = 120 € de menos en la declaración.</p>
+                <p>Las donaciones a entidades acogidas a la Ley 49/2002 tienen una deducción del 80 % en los primeros 150 € y del 35 % en el resto. Si donaste a ONGs en 2025, consérvalos justificantes: la deducción se aplica automáticamente si la entidad ha informado a la AEAT, pero conviene revisar el borrador.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
@@ -715,10 +715,10 @@ export default function ChecklistDeclaracionRentaPage() {
                 <strong>Confirmar el borrador sin revisarlo.</strong> El borrador es solo un punto de partida. Si no añades tus deducciones y gastos, pagarás más de lo que corresponde — o perderás una devolución a la que tienes derecho.
               </li>
               <li>
-                <strong>No declarar las rentas del alquiler pensando que Hacienda no lo sabe.</strong> La AEAT cruza datos con el catastro, los depósitos de fianza en las CCAA y las declaraciones de los inquilinos. Las sanciones por ocultar rentas del alquiler alcanzan el 150% de la cuota defraudada.
+                <strong>No declarar las rentas del alquiler.</strong> La AEAT cruza información del catastro, los depósitos de fianza autonómicos y las declaraciones de los inquilinos. La regularización posterior incluye cuota, intereses de demora y, en su caso, sanciones.
               </li>
               <li>
-                <strong>Olvidar declarar las cuentas en el extranjero (Modelo 720).</strong> Si en algún momento del año tuviste activos en el extranjero superiores a 50.000 €, estás obligado a presentar el Modelo 720. Las sanciones son de hasta el 150% del valor no declarado.
+                <strong>Olvidar declarar las cuentas en el extranjero (Modelo 720).</strong> Si en algún momento del año tuviste activos en el extranjero superiores a 50.000 €, estás obligado a presentar el Modelo 720. Las sanciones son de hasta el 150% del valor no declarado. (NOTA: las sanciones del régimen del Modelo 720 fueron declaradas contrarias al Derecho de la UE por la STJUE de 27/01/2022 y modificadas por la Ley 5/2022; consulta el régimen vigente en la AEAT.)
               </li>
               <li>
                 <strong>Deducir gastos del alquiler que no son deducibles.</strong> Solo son deducibles los gastos vinculados directamente al inmueble alquilado. Los gastos de reformas de mejora (no reparación) no son deducibles directamente — se amortizan. Las multas de la comunidad de propietarios tampoco lo son.

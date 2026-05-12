@@ -126,7 +126,7 @@ export default function AdaptacionHogar() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">🏠</span>
         <h1 className={styles.title}>Adaptación del Hogar</h1>
-        <p className={styles.subtitle}>Checklist de accesibilidad para mayores · Costes orientativos y ayudas públicas</p>
+        <p className={styles.subtitle}>Checklist de accesibilidad para mayores y personas con discapacidad · Costes orientativos y ayudas públicas</p>
       </header>
 
       <DisclaimerCard variant="general"
@@ -458,6 +458,11 @@ export default function AdaptacionHogar() {
           <div className={styles.tipIcon}>🏦</div>
           <strong>Considera el ICO para financiar si hay espera</strong>
           <p>Mientras tramitas las ayudas, existe financiación ICO específica para obras de accesibilidad con condiciones ventajosas. Consulta con tu banco.</p>
+        </div>
+        <div className={styles.tipCard}>
+          <div className={styles.tipIcon}>🤝</div>
+          <strong>Recursos si el coste sigue siendo inasumible</strong>
+          <p>Si el coste sigue siendo inasumible incluso con todas las ayudas, los Servicios Sociales municipales pueden valorar ayudas excepcionales por emergencia social, y existen ayudas técnicas de préstamo (Bancos de Productos de Apoyo) gestionadas por algunas CCAA o entidades como Cruz Roja para soluciones temporales sin coste.</p>
         </div>
       </div>
 

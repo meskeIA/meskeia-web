@@ -778,7 +778,7 @@ export default function EstimadorIRPFPage() {
 
         {/* ── SECCIÓN 5: Mejores prácticas ──────────────────────────────── */}
         <section className={styles.guideSection}>
-          <h2>6 consejos para optimizar tu declaración</h2>
+          <h2>6 consejos para cumplimentar correctamente tu declaración</h2>
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
@@ -801,7 +801,7 @@ export default function EstimadorIRPFPage() {
               <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <h4>Aporta al plan de pensiones antes del 31 de diciembre</h4>
               <p>
-                Las aportaciones reducen la base imponible directamente: con tipo marginal del 30 %, cada 1.000 € aportados suponen <strong>300 € menos de IRPF</strong>. El límite individual es 1.500 €/año. Si tu empresa también aporta, el límite conjunto es 10.000 €. Las aportaciones del cónyuge (hasta 1.000 €) también reducen tu base si sus rentas son inferiores a 8.000 €.
+                Las aportaciones reducen la base imponible directamente: con tipo marginal del 30 %, cada 1.000 € aportados suponen <strong>300 € menos de IRPF</strong>. El límite individual es 1.500 €/año. Si tu empresa también aporta, el límite conjunto es 10.000 €. Las aportaciones del cónyuge (hasta 1.000 €) también reducen tu base si sus rentas son inferiores a 8.000 €. Importante: el plan de pensiones difiere la tributación, no la elimina. Al rescatar, el importe tributa íntegro como rendimiento del trabajo. El ahorro real depende de la diferencia entre tu tipo marginal actual y el de la jubilación.
               </p>
             </div>
 
@@ -844,7 +844,7 @@ export default function EstimadorIRPFPage() {
                 <strong>Confirmar el borrador sin revisarlo.</strong> El borrador puede incluir rendimientos de ejercicios anteriores imputados erróneamente, inmuebles vendidos que siguen generando imputación de renta, o retenciones mal cuantificadas. Confirmarlo sin revisar implica aceptar posibles errores como propios.
               </li>
               <li>
-                <strong>Olvidar declarar cuentas o inmuebles en el extranjero.</strong> Si tienes cuentas bancarias, inmuebles o valores en el extranjero con saldo superior a 50.000 €, estás obligado a presentar el <strong>modelo 720</strong>. Las sanciones por incumplimiento son de las más severas del sistema tributario español: multas del 150 % del valor no declarado en casos graves.
+                <strong>Olvidar declarar cuentas o inmuebles en el extranjero.</strong> Si tienes cuentas bancarias, inmuebles o valores en el extranjero con saldo superior a 50.000 €, debes presentar el modelo 720. Tras la STJUE de 27/01/2022 y la Ley 5/2022, el régimen sancionador se ajustó al régimen general de la LGT; consulta el detalle vigente en la AEAT.
               </li>
               <li>
                 <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino declara el alquiler como gasto y tú no declaras los ingresos, Hacienda detectará la discrepancia. La regularización incluye cuota + intereses de demora + recargo del 15–20 % si es voluntaria tardía, o sanción si es inspeccionada.

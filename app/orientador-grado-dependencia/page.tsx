@@ -140,7 +140,7 @@ function estimarGrado(marcados: Set<string>): Resultado {
     pasosAdicionales = [
       { icono: '🚨', texto: 'Solicita la valoración con carácter de urgencia. Con Grado III el sistema tiene la obligación de ofrecer una prestación o servicio en plazo reducido.' },
       { icono: '💊', texto: 'Coordina con el médico y, si hay demencia u otras patologías, con el especialista (neurólogo, geriatra) para el informe clínico.' },
-      { icono: '👨‍👩‍👧', texto: 'La carga del cuidador familiar es muy alta en Grado III. Infórmate sobre respiro familiar, grupos de apoyo y gestión de la prestación.' },
+      { icono: '👨‍👩‍👧', texto: 'La exigencia del cuidado en Grado III es muy alta para el cuidador familiar. Infórmate sobre servicios de respiro, grupos de apoyo y gestión de la prestación.' },
       { icono: '⚖️', texto: 'Si la persona tiene deterioro cognitivo, considera iniciar los trámites de curatela o poder notarial preventivo para gestionar sus asuntos.' },
     ];
   }
@@ -366,13 +366,13 @@ export default function OrientadorGradoDependencia() {
             <span className={styles.escenarioIcon}>♿</span>
             <strong>Persona joven con discapacidad severa</strong>
           </div>
-          <p>30 años con parálisis cerebral. Puede tener Grado III y acceder a servicios de apoyo a la autonomía, asistencia personal y centros especializados de atención.</p>
+          <p>30 años con parálisis cerebral que requiere apoyos para las actividades básicas diarias. Si la valoración resulta en Grado III, el SAAD ofrece asistencia personal (orientada a mantener vida activa, estudios o trabajo), servicios de apoyo a la autonomía y centros especializados.</p>
           <div className={styles.escenarioExample}>Grado III → asistencia personal (horas) + centro ocupacional + apoyo familiar</div>
           <div className={styles.escenarioTip}>💡 El SAAD no es solo para mayores: aplica a cualquier persona con dependencia, independientemente de la edad.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>💔</span>
+            <span className={styles.escenarioIcon}>🩺</span>
             <strong>Persona tras accidente o enfermedad grave</strong>
           </div>
           <p>Ictus con hemiplejia. Dependencia sobrevenida. Puede solicitarse durante la rehabilitación. El proceso puede ser más rápido en situaciones de urgencia o riesgo vital.</p>

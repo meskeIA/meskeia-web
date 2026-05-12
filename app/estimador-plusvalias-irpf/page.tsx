@@ -695,11 +695,11 @@ export default function EstimadorPlusvalidasIRPFPage() {
 
         {/* ── 5. Mejores Prácticas ─────────────────────────────────────────── */}
         <section className={styles.guideSection}>
-          <h2>Mejores prácticas para optimizar la tributación</h2>
+          <h2>Aspectos prácticos al declarar plusvalías</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⏳</span>
-              <p><strong>Espera al año en activos con ganancia</strong> si la fecha del año natural se acerca. Pasar de base general (hasta 47%) a base del ahorro (19–30%) puede suponer un ahorro de hasta 10 puntos porcentuales sobre la ganancia. Con una ganancia de 20.000 €, el ahorro puede ser superior a 2.000 €.</p>
+              <p>El plazo de tenencia determina la base aplicable. Los activos con más de 1 año tributan en la base del ahorro (19–30 %); por debajo, en la base general (hasta 47 %). Antes de adelantar o retrasar una venta solo por motivos fiscales, valora también el riesgo de variación del precio del activo.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📉</span>
@@ -742,7 +742,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 <strong>Compensar pérdidas de acciones recomprando los mismos títulos en los 2 meses siguientes.</strong> La Agencia Tributaria invalida la compensación de esa pérdida, que queda diferida hasta la venta definitiva. El plazo es 2 meses tanto antes como después de la venta con pérdida.
               </li>
               <li>
-                <strong>Confundir base del ahorro con base general.</strong> Activos con tenencia inferior a 1 año tributan al tipo marginal de la escala general (hasta 47%), no a los tipos de la base del ahorro (19–30%). Esta diferencia puede ser enorme: una ganancia de 30.000 € puede costar 9.000 € más si tributa en base general.
+                <strong>Confundir base del ahorro con base general.</strong> Activos con tenencia inferior a 1 año tributan al tipo marginal de la base general (hasta 47 %); con tenencia superior, en la base del ahorro (19–30 %). La diferencia de cuota entre ambos regímenes puede ser significativa: por ejemplo, sobre una ganancia de 30.000 €, la cuota varía aproximadamente en 9.000 € según el régimen aplicable.
               </li>
               <li>
                 <strong>No declarar la venta de un inmueble aunque genere pérdida.</strong> Hacienda detecta las transmisiones inmobiliarias a través del Registro de la Propiedad y del modelo 600 (ITP). La omisión puede dar lugar a una liquidación paralela con recargo e intereses de demora.

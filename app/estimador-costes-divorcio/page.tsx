@@ -304,7 +304,7 @@ export default function EstimadorCostesDivorcioPage() {
 
         <EducationalSection
           title="📚 Todo sobre los costes del divorcio"
-          subtitle="Tipos, requisitos y cómo ahorrar"
+          subtitle="Tipos, requisitos y cómo reducir costes innecesarios"
         >
           <section className={styles.guideSection}>
             <h2>¿Qué tipo de divorcio me conviene?</h2>

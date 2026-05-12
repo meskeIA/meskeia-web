@@ -835,7 +835,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
             <details className={styles.faqItem}>
               <summary>¿Puedo usar el dinero de la cuenta del fallecido para pagar gastos?</summary>
-              <p>No. Las cuentas bancarias quedan <strong>bloqueadas automáticamente</strong> cuando el banco tiene constancia del fallecimiento. Retirar fondos antes de la adjudicación formal puede constituir un delito de apropiación indebida, incluso para el cónyuge superviviente en las cuentas privativas. La excepción: algunos bancos permiten sacar hasta 3.000 – 6.000 € para gastos de sepelio acreditados con factura.</p>
+              <p>No. Las cuentas bancarias quedan <strong>bloqueadas automáticamente</strong> cuando el banco tiene constancia del fallecimiento. Retirar fondos antes de la adjudicación formal puede generar responsabilidad frente a los demás herederos (acción de reintegración) y, si se hace con ocultación, eventualmente derivar en consecuencias penales. En cuentas conjuntas, el cotitular conserva su parte; en cuentas exclusivas del fallecido, debe esperarse a la adjudicación. La excepción: algunos bancos permiten sacar hasta 3.000 – 6.000 € para gastos de sepelio acreditados con factura.</p>
             </details>
 
             <details className={styles.faqItem}>
@@ -997,7 +997,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <ul className={styles.warningList}>
               <li>
                 <strong>Retirar dinero de la cuenta del fallecido antes de la adjudicación.</strong>{' '}
-                Aunque seas el único heredero o estés autorizado en la cuenta, extraer fondos antes de presentar la escritura de adjudicación y el justificante del IS puede constituir apropiación indebida. El banco bloqueará la cuenta al tener constancia del fallecimiento.
+                Aunque seas heredero o estés autorizado, hacerlo antes de presentar la escritura de adjudicación y el justificante del IS puede dar lugar a responsabilidades civiles frente a los demás herederos y, en casos de mala fe, a consecuencias penales. El banco bloquea las cuentas en cuanto tiene constancia del fallecimiento.
               </li>
               <li>
                 <strong>No pedir prórroga del IS antes del mes 5.</strong>{' '}

@@ -501,7 +501,7 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <tr><td>La Rioja</td><td><strong>99%</strong></td><td>También Grupo III</td></tr>
                 <tr><td>Castilla-La Mancha</td><td><strong>95%</strong></td><td>Requiere escritura</td></tr>
                 <tr><td>Baleares</td><td><strong>93%</strong></td><td>Grupos I y II</td></tr>
-                <tr><td>Valencia</td><td><strong>75%</strong></td><td>Más baja del régimen común</td></tr>
+                <tr><td>Valencia</td><td><strong>75%</strong></td><td>Bonificación moderada (Gr I/II)</td></tr>
                 <tr><td>Aragón</td><td><strong>65%</strong></td><td>Menor que en sucesiones</td></tr>
                 <tr><td>Asturias</td><td><strong>99%</strong></td><td>A diferencia de sucesiones</td></tr>
               </tbody>
@@ -659,8 +659,8 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <strong> Cuota final: ≈ 22.108 €</strong> (27,6% de tipo efectivo).
               </p>
               <p className={styles.escenarioTip}>
-                El Grupo III es el más penalizado. La tarifa progresiva más el coeficiente multiplicador
-                pueden elevar el tipo efectivo al 25%–30%. La Rioja es la excepción: aplica bonificación
+                El Grupo III soporta la tributación más alta. La tarifa progresiva combinada con el coeficiente multiplicador
+                puede elevar el tipo efectivo al 25%–30%. La Rioja es la excepción: aplica bonificación
                 del 99% también para el Grupo III.
               </p>
             </div>
@@ -890,7 +890,7 @@ export default function EstimadorImpuestoDonacionesPage() {
 
         {/* ── 5. Mejores Prácticas ─────────────────────────────────── */}
         <section className={styles.guideSection}>
-          <h2>6 estrategias para optimizar la carga fiscal de una donación</h2>
+          <h2>6 buenas prácticas al planificar y declarar una donación</h2>
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
@@ -911,7 +911,7 @@ export default function EstimadorImpuestoDonacionesPage() {
                 La diferencia entre CCAA puede suponer miles de euros. Una donación de 100.000 €
                 a un hijo puede costar ≈ 100 € en Madrid (99% bonificación) y más de
                 8.000 € en Valencia (75% bonificación) o 17.000 € en Extremadura (0% bonificación).
-                Planificar con 5+ años de antelación si se contempla un cambio de residencia real.
+                Planificar con 5+ años de antelación si se contempla un cambio de residencia real. Solo procede planificar un cambio de residencia si responde a un proyecto vital real y duradero; el traslado meramente fiscal es perseguido como fraude.
               </p>
             </div>
 

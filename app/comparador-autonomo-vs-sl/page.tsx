@@ -426,11 +426,12 @@ export default function ComparadorAutonomoVsSLPage() {
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>💡 El truco del salario en SL</h4>
+              <h4>💡 Salario del administrador en SL</h4>
               <p>
                 El administrador puede cobrar un salario de la SL (si consta en estatutos), que es gasto deducible
-                para la sociedad y tributará en su IRPF. Esto permite repartir la carga fiscal optimizando
-                el beneficio que queda en la sociedad.
+                para la sociedad y tributa en el IRPF del perceptor. Permite distribuir el beneficio entre IS y IRPF,
+                siempre que el salario sea de mercado y esté documentado (la AEAT puede impugnar salarios desviados
+                del valor razonable).
               </p>
             </div>
           </div>
@@ -486,8 +487,8 @@ export default function ComparadorAutonomoVsSLPage() {
                 </tr>
                 <tr>
                   <td>Imagen ante clientes</td>
-                  <td>Profesional individual</td>
-                  <td>Empresa formal — facilita contratos y licitaciones</td>
+                  <td>Persona física con NIF, válida para la mayoría de contratos B2B y B2C en España</td>
+                  <td>Persona jurídica, suele exigirse en licitaciones públicas y algunos contratos B2B internacionales</td>
                 </tr>
               </tbody>
             </table>

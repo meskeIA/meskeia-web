@@ -481,7 +481,7 @@ export default function EstimadorLegitimas() {
           <li><strong>Cónyuge</strong>: no es heredero forzoso en sentido estricto, pero tiene derecho a un usufructo viudal garantizado.</li>
         </ul>
         <h3>¿Por qué varía la legítima entre CCAA?</h3>
-        <p>España tiene una pluralidad de sistemas civiles. El Código Civil (Derecho Común) aplica en la mayoría de comunidades, pero Cataluña, Aragón, Navarra, País Vasco, Galicia y Baleares tienen derechos civiles propios con normas de legítima diferentes — en algunos casos mucho más favorables a la libertad de testar.</p>
+        <p>España tiene una pluralidad de sistemas civiles. El Código Civil (Derecho Común) aplica en la mayoría de comunidades, pero Cataluña, Aragón, Navarra, País Vasco, Galicia y Baleares tienen derechos civiles propios con normas de legítima diferentes — en algunos casos otorgan más margen al testador (Navarra, Aragón, Cataluña) y en otros se acercan al modelo de cuota más amplia para los descendientes.</p>
         <h3>¿Qué derecho civil aplica a mi herencia?</h3>
         <p>El derecho civil aplicable lo determina la vecindad civil del fallecido, no su domicilio. La vecindad civil se adquiere por nacimiento, residencia continuada o inscripción en el Registro Civil. Una persona nacida en Navarra que lleva 10 años en Madrid puede seguir siendo de vecindad civil navarra si no ha declarado cambio.</p>
         <h3>¿Qué es el tercio de mejora?</h3>
@@ -526,7 +526,7 @@ export default function EstimadorLegitimas() {
               <td>Navarra</td>
               <td>Legítima formal (5 sueldos)</td>
               <td>Usufructo de fidelidad</td>
-              <td>Prácticamente total (mayor del mundo)</td>
+              <td>Prácticamente total (legítima simbólica de 5 sueldos febles)</td>
             </tr>
             <tr>
               <td>Aragón</td>
@@ -556,7 +556,7 @@ export default function EstimadorLegitimas() {
           </div>
           <p>La legítima catalana (1/4) se paga en metálico, no necesariamente con el inmueble. Más libertad para transmitir la vivienda familiar íntegra a quien el testador quiera.</p>
           <div className={styles.escenarioExample}>Caudal 400.000 €: legítima 100.000 € en metálico, 300.000 € libres para el heredero elegido</div>
-          <div className={styles.escenarioTip}>💡 La legítima catalana al 1/4 da mucha más flexibilidad que el derecho común para planificar la herencia.</div>
+          <div className={styles.escenarioTip}>💡 La legítima catalana al 1/4 permite al testador disponer libremente de hasta 3/4 del patrimonio, frente al 1/3 del derecho común.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -678,7 +678,7 @@ export default function EstimadorLegitimas() {
         <div className={styles.tipCard}>
           <div className={styles.tipIcon}>💡</div>
           <strong>Aprovecha el tercio de mejora</strong>
-          <p>En derecho común, el tercio de mejora permite favorecer a un hijo cuidador, con discapacidad o que ha contribuido más a la familia, dentro de los límites legales.</p>
+          <p>En derecho común, el tercio de mejora permite al testador asignar una porción adicional a uno o varios descendientes —típicamente para compensar situaciones como discapacidad, dedicación al cuidado o circunstancias particulares— dentro de los límites legales. La conveniencia depende de cada caso familiar.</p>
         </div>
         <div className={styles.tipCard}>
           <div className={styles.tipIcon}>🏦</div>

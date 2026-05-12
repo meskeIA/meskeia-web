@@ -702,9 +702,9 @@ export default function EstimadorImpuestoSucesionesPage() {
           <h3>Diferencias entre CCAA</h3>
           <p>
             Madrid y Canarias tienen bonificaciones del 99% y 99,9% respectivamente para los grupos
-            de parentesco más cercanos, haciendo el impuesto prácticamente cero. Asturias, en cambio,
-            no tiene bonificación en cuota (solo una reducción adicional en base), siendo la más
-            costosa del régimen común.
+            de parentesco más cercanos, haciendo el impuesto prácticamente cero. Asturias mantiene
+            una bonificación menor (con reducción adicional en base), por lo que resulta la CCAA
+            con mayor recaudación efectiva del régimen común para herencias entre familiares directos.
           </p>
 
           <h3>Grupos de parentesco</h3>
@@ -849,8 +849,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <p><strong>Cuota final estimada: ~17.200 €</strong> (21,5% del valor heredado)</p>
               </div>
               <div className={styles.escenarioTip}>
-                Asturias es la CCAA más onerosa del régimen común para colaterales.
-                Un sobrino puede pagar más del 20% de lo heredado.
+                Asturias es la CCAA del régimen común con menor bonificación para colaterales (Grupo III).
+                Un sobrino sin reducción autonómica adicional tributa aprox. al 20% sobre lo heredado, frente al 0%–1% de CCAA como Madrid o Canarias.
               </div>
             </div>
 
@@ -1103,7 +1103,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
         {/* ── Sección 5: Mejores prácticas ─────────────────────────── */}
         <section className={styles.guideSection}>
-          <h2>6 acciones clave para optimizar el impuesto legalmente</h2>
+          <h2>6 buenas prácticas para liquidar correctamente el impuesto y aplicar los beneficios fiscales previstos por la norma</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>⏰</span>

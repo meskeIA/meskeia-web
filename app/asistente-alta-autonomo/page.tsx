@@ -1022,8 +1022,8 @@ export default function AsistenteAltaAutonomoPage() {
                     </tr>
                     <tr>
                       <td>Fiscalidad</td>
-                      <td>IRPF (hasta 47%)</td>
-                      <td className={styles.ventaja}>IS (25% fijo)</td>
+                      <td>IRPF progresivo (19-47%, efectivo bajo en ingresos pequeños-medios)</td>
+                      <td>IS fijo (25%, ventajoso solo con beneficios altos)</td>
                     </tr>
                     <tr>
                       <td>Cuota Seg. Social</td>

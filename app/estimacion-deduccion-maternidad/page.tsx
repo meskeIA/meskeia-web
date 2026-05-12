@@ -148,7 +148,7 @@ export default function EstimacionDeduccionMaternidadPage() {
         <span className={styles.heroIcon} aria-hidden="true">&#x1F469;&#x200D;&#x1F467;</span>
         <h1 className={styles.title}>Estimacion de Deduccion por Maternidad IRPF</h1>
         <p className={styles.subtitle}>
-          Estima la deduccion por maternidad: {formatCurrency(1200)}/ano por hijo menor de 3 anos + guarderia
+          Estima la deduccion por maternidad o paternidad asimilada: {formatCurrency(1200)}/ano por hijo menor de 3 anos + guarderia
         </p>
       </header>
 
@@ -178,6 +178,13 @@ export default function EstimacionDeduccionMaternidadPage() {
             <span aria-hidden="true">&#x1F4CB;</span> Datos de la situacion
           </h2>
 
+          <div className={styles.resultNote} role="note" style={{ marginBottom: '1rem' }}>
+            <span aria-hidden="true">&#x2139;&#xFE0F;</span>
+            <p>
+              Esta deduccion tambien aplica a padres viudos, con guarda exclusiva, adoptantes o tutores.
+            </p>
+          </div>
+
           {/* Numero de hijos */}
           <div className={styles.formGroup}>
             <label className={styles.label} htmlFor="numHijos">
@@ -199,7 +206,7 @@ export default function EstimacionDeduccionMaternidadPage() {
           {/* Alta en SS */}
           <fieldset className={styles.formGroup}>
             <legend className={styles.label}>
-              ¿Estas dada de alta en la Seguridad Social o Mutualidad?
+              ¿Estas dada/o de alta en la Seguridad Social o Mutualidad?
             </legend>
             <div className={styles.radioGroup}>
               <label className={styles.radioLabel}>
@@ -416,7 +423,7 @@ export default function EstimacionDeduccionMaternidadPage() {
         <h3>Requisitos en detalle</h3>
         <p>Para poder aplicar la deduccion por maternidad debes cumplir <strong>todos</strong> estos requisitos:</p>
         <ul>
-          <li><strong>Ser madre trabajadora</strong> (o padre viudo/tutor legal del menor).</li>
+          <li><strong>Ser madre trabajadora</strong> (o padre con guarda y custodia exclusiva, viudo o tutor).</li>
           <li><strong>Estar dada de alta</strong> en la Seguridad Social o Mutualidad alternativa al menos 1 dia del mes.</li>
           <li><strong>Tener hijos menores de 3 anos</strong>. La deduccion se aplica desde el mes de nacimiento hasta el mes en que el hijo cumple 3 anos (inclusive).</li>
           <li><strong>Realizar una actividad por cuenta propia o ajena</strong>. Las desempleadas con prestacion (sin cotizacion) no pueden aplicarla.</li>

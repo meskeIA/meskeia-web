@@ -177,7 +177,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
         <p>
           Desde la sentencia del Tribunal Constitucional de noviembre de 2021, puedes elegir entre
           el <strong>método objetivo</strong> (basado en coeficientes legales) o el <strong>método real</strong>
-          (basado en el incremento de valor real). Puedes aplicar el que resulte <em>más favorable</em> para ti.
+          (basado en el incremento de valor real). Puedes aplicar el que resulte en una cuota menor, según establece el RDL 26/2021.
         </p>
       </div>
 
@@ -635,8 +635,8 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <dt>¿Puedo elegir el método que más me convenga?</dt>
               <dd>
                 Sí. Desde el RDL 26/2021 el contribuyente puede optar por el método objetivo o el método real
-                en el momento de autoliquidar. El Ayuntamiento no puede imponerte el método menos favorable.
-                Calcula ambos y declara por el que resulte menor.
+                en el momento de autoliquidar. La elección del método corresponde al contribuyente en la autoliquidación, no al Ayuntamiento.
+                Calcula ambos y opta por el que resulte de menor cuota.
               </dd>
             </div>
 
@@ -798,14 +798,14 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
         {/* ── 5. Mejores prácticas ── */}
         <section className={styles.guideSection}>
-          <h2>6 prácticas para optimizar tu plusvalía municipal</h2>
+          <h2>6 prácticas para calcular correctamente tu plusvalía municipal</h2>
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>⚖️</span>
               <div>
                 <strong>Calcula siempre los dos métodos</strong>
-                <p>Nunca autoliquides sin comparar método objetivo y real. La diferencia puede superar los 3.000 € en transmisiones habituales.</p>
+                <p>Nunca autoliquides sin comparar método objetivo y real. La diferencia entre ambos métodos puede ser de varios miles de euros en transmisiones habituales.</p>
               </div>
             </div>
 

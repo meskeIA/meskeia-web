@@ -181,7 +181,7 @@ export default function OrientadorGastosDeduciblesPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>💰 Orientador de Gastos Deducibles</h1>
         <p className={styles.subtitle}>
-          Descubre qué gastos puedes deducir como autónomo y oriéntate sobre tu ahorro fiscal potencial en IRPF e IVA
+          Descubre qué gastos puedes deducir legalmente como autónomo y calcula su impacto en IRPF e IVA. Un autónomo con 30.000€ de ingresos suele declarar entre 2.000€ y 4.000€ en gastos deducibles reales según su actividad.
         </p>
       </header>
 
@@ -195,7 +195,7 @@ export default function OrientadorGastosDeduciblesPage() {
         <h3>¿Por qué es importante conocer los gastos deducibles?</h3>
         <p>
           <strong>Cada euro que deduces correctamente reduce tu base imponible</strong> y te permite recuperar IVA soportado.
-          Un autónomo con 30.000€ de ingresos puede ahorrar entre <strong>2.000€ - 4.000€ anuales</strong> optimizando sus deducciones.
+          Un autónomo con 30.000€ de ingresos suele declarar entre <strong>2.000€ y 4.000€</strong> en gastos deducibles reales según su actividad.
         </p>
       </div>
 
@@ -490,7 +490,7 @@ export default function OrientadorGastosDeduciblesPage() {
             </div>
           </div>
 
-          <h3>Gastos que los autónomos suelen olvidar</h3>
+          <h3>Gastos habituales que algunos autónomos no contabilizan correctamente — revisa si los tuyos están reflejados con factura completa</h3>
           <ul className={styles.tipsList}>
             <li><strong>Cuota de autónomos:</strong> 100% deducible, muchos lo olvidan</li>
             <li><strong>Formación profesional:</strong> Cursos, libros técnicos, certificaciones</li>

@@ -85,7 +85,7 @@ const PREGUNTAS: PreguntaFuncional[] = [
       { etiqueta: 'Afecta significativamente a mi trabajo, estudio o vida diaria', puntos: 2 },
       { etiqueta: 'Necesito supervisión o ayuda constante para tomar decisiones', puntos: 3 },
     ],
-    notaAyuda: 'Incluye condiciones como daño cerebral adquirido, deterioro cognitivo o dificultades de aprendizaje graves.',
+    notaAyuda: 'Incluye condiciones como daño cerebral adquirido, deterioro cognitivo, trastornos del neurodesarrollo (autismo, TDAH severo) o dificultades de aprendizaje graves.',
   },
   {
     id: 'saludmental',
@@ -95,9 +95,9 @@ const PREGUNTAS: PreguntaFuncional[] = [
       { etiqueta: 'No, no tengo condición de salud mental diagnosticada', puntos: 0 },
       { etiqueta: 'Sí, pero está controlada y llevo una vida normal', puntos: 1 },
       { etiqueta: 'Sí, y limita significativamente mis relaciones o actividades', puntos: 2 },
-      { etiqueta: 'Sí, y necesito apoyo continuo o estoy incapacitado/a para trabajar', puntos: 3 },
+      { etiqueta: 'Sí, y necesito apoyo continuo o tengo reconocida incapacidad laboral permanente', puntos: 3 },
     ],
-    notaAyuda: 'Por ejemplo: trastorno bipolar, esquizofrenia, depresión mayor crónica, trastornos de ansiedad graves, autismo, etc.',
+    notaAyuda: 'Por ejemplo: trastorno bipolar, esquizofrenia, depresión mayor crónica, trastornos de ansiedad graves, TOC, TEPT, etc.',
   },
   {
     id: 'enfermedad',
@@ -497,7 +497,7 @@ export default function OrientadorDiscapacidadPage() {
               <tbody>
                 <tr>
                   <td><strong>≥ 33%</strong></td>
-                  <td>Persona con discapacidad</td>
+                  <td>Reconocimiento administrativo de discapacidad</td>
                   <td>Cuota de reserva laboral, adaptación de puesto, deducciones IRPF, acceso a centros especiales de empleo, pensión no contributiva (si se cumplen ingresos), descuentos transporte, etc.</td>
                 </tr>
                 <tr>

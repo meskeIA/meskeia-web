@@ -570,8 +570,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             <span className={styles.tipIcon} aria-hidden="true">📋</span>
             <h4>Solicita la revisión de grado</h4>
             <p>
-              Si la discapacidad ha empeorado, solicita la revisión. Pasar del 64% al 65%
-              triplica el mínimo (de {formatCurrency(3000)} a {formatCurrency(9000)}).
+              Si tu situación funcional ha empeorado significativamente, tienes derecho a solicitar
+              la revisión del grado. Si pasaras del tramo 33-64% al ≥65%, el mínimo fiscal aplicable
+              pasa de {formatCurrency(3000)} a {formatCurrency(9000)}.
             </p>
           </div>
         </div>

@@ -302,7 +302,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
             <h2><span aria-hidden="true">🎯</span> 4 situaciones frecuentes</h2>
 
             <h3>1. Soy propietario y quiero alquilar habitaciones en Barcelona</h3>
-            <p>Cataluña tiene la regulación más estricta (Ley 11/2025, SERPAVI). La suma de rentas de todas las habitaciones no puede superar el precio SERPAVI del piso completo. Si superas el techo en más del 30%, la multa puede llegar a 900.000 €.</p>
+            <p>Cataluña tiene la regulación más estricta (Ley 11/2025, SERPAVI). La suma de rentas de todas las habitaciones no puede superar el precio SERPAVI del piso completo. Las sanciones por incumplimiento pueden ser muy elevadas, especialmente para grandes tenedores en infracciones graves reiteradas. La tabla siguiente resume los rangos legales.</p>
 
             <h3>2. Soy inquilino y creo que me cobran de más</h3>
             <p>Comprueba si tu municipio es zona tensionada. Si lo es, pide al propietario que acredite el contrato anterior o el valor SERPAVI. Si la suma de rentas de todas las habitaciones supera ese techo, puedes reclamar la devolución del exceso.</p>
@@ -328,9 +328,9 @@ export default function OrientadorAlquilerHabitacionesPage() {
             <p>Sí. Todos los contratos (incluidos los de habitaciones) deben registrarse en la Ventanilla Única Digital. Es requisito para poder deducirlos en IRPF.</p>
 
             <h3>¿Qué pasa con los contratos de temporada?</h3>
-            <p>Desde enero de 2026, cualquier contrato se presume de residencia habitual salvo que el propietario documente la causa de temporalidad (estudios, trabajo temporal, tratamiento médico). Esto cierra el abuso de los contratos «de temporada» para eludir los topes.</p>
+            <p>Desde enero de 2026, cualquier contrato se presume de residencia habitual salvo que el propietario documente la causa de temporalidad (estudios, trabajo temporal, tratamiento médico). Esto cierra la vía de usar contratos «de temporada» para situaciones de residencia habitual que de otro modo quedarían sujetas a los topes.</p>
 
-            <h3>¿Hay incentivos fiscales por alquilar barato?</h3>
+            <h3>¿Hay incentivos fiscales por bajar la renta?</h3>
             <p>Sí. Los propietarios en zona tensionada que bajen la renta al menos un 5% respecto al contrato anterior pueden acceder a una deducción de hasta el 90% en IRPF sobre los rendimientos del alquiler.</p>
 
             <h3>¿Qué es el SERPAVI?</h3>
