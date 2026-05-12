@@ -71,6 +71,8 @@ const PREGUNTAS: Pregunta[] = [
       { valor: 'cardio', etiqueta: 'Mejorar la resistencia cardiovascular', descripcion: 'Corazón y pulmones más fuertes', pesos: { gimnasio: 1, running: 3, natacion: 3, ciclismo: 3, 'yoga-pilates': 1, 'entrenamiento-casa': 1 } },
       { valor: 'bienestar', etiqueta: 'Reducir estrés y mejorar el bienestar mental', descripcion: 'Equilibrio mental y físico', pesos: { gimnasio: 1, running: 2, natacion: 2, ciclismo: 2, 'yoga-pilates': 3, 'entrenamiento-casa': 2 } },
       { valor: 'flexibilidad', etiqueta: 'Ganar flexibilidad y movilidad', descripcion: 'Articulaciones y músculos más ágiles', pesos: { gimnasio: 1, running: 0, natacion: 2, ciclismo: 0, 'yoga-pilates': 3, 'entrenamiento-casa': 2 } },
+      { valor: 'mantener', etiqueta: 'Mantener mi estado físico actual', descripcion: 'Conservar la forma sin un objetivo de cambio', pesos: { gimnasio: 2, running: 2, natacion: 2, ciclismo: 2, 'yoga-pilates': 2, 'entrenamiento-casa': 2 } },
+      { valor: 'disfrutar', etiqueta: 'Disfrutar y desconectar (sin objetivo de cambio)', descripcion: 'Mover el cuerpo como placer, no como obligación', pesos: { gimnasio: 1, running: 2, natacion: 2, ciclismo: 3, 'yoga-pilates': 3, 'entrenamiento-casa': 1 } },
     ],
   },
   {

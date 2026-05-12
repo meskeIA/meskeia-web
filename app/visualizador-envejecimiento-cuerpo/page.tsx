@@ -168,6 +168,21 @@ export default function VisualizadorEnvejecimientoCuerpoPage() {
 
         <LegalNotice />
 
+        <div
+          role="note"
+          style={{
+            background: 'var(--bg-card)',
+            border: '2px solid #f39c12',
+            borderRadius: '12px',
+            padding: '1rem 1.25rem',
+            margin: '1rem 0',
+            fontSize: '0.95rem',
+            color: 'var(--text-primary)',
+          }}
+        >
+          <strong>⚠️ Aviso:</strong> Las cifras son aproximaciones ilustrativas para visualizar tendencias generales. Los valores reales varían enormemente entre individuos y no proceden de un estudio único.
+        </div>
+
         {/* Selector de década */}
         <div className={styles.decadaNav}>
           {DECADAS.map((d, i) => (

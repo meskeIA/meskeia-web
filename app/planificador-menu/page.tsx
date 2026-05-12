@@ -332,7 +332,7 @@ export default function PlanificadorMenuPage() {
             <li><strong>Base diaria</strong>: Verduras (2+ raciones), frutas (3+ piezas), legumbres (al menos 2x/semana), cereales integrales, aceite de oliva virgen extra, agua.</li>
             <li><strong>Varias veces a la semana</strong>: Pescado (2-3x), aves sin piel (2x), huevos (2-4 unidades), lácteos fermentados (yogur, queso en moderación).</li>
             <li><strong>Ocasionalmente</strong>: Carne roja (máx. 2x/semana), embutidos curados con moderación.</li>
-            <li><strong>Mínimo o nada</strong>: Ultraprocesados, azúcares añadidos, bollería industrial, refrescos azucarados.</li>
+            <li><strong>De forma ocasional y en cantidades moderadas</strong>: Ultraprocesados, azúcares añadidos, bollería industrial, refrescos azucarados.</li>
           </ul>
         </section>
 
@@ -351,8 +351,8 @@ export default function PlanificadorMenuPage() {
         <section>
           <h4>Estructura de las comidas: la importancia del horario</h4>
           <ul>
-            <li><strong>🌅 Desayuno</strong>: No saltarlo. Activa el metabolismo. Aportar proteína (huevo, yogur) + hidratos complejos (avena, pan integral) + fruta. Evitar azúcares simples en ayunas.</li>
-            <li><strong>☀️ Almuerzo (la comida principal)</strong>: En España, el almuerzo es la ingesta más importante del día. Debe ser completa: proteína + verduras + hidratos. Comer antes de las 15h mejora el control glucémico.</li>
+            <li><strong>🌅 Desayuno</strong>: si tienes hambre al despertar, prioriza proteína (huevo, yogur), hidratos complejos (avena, pan integral) y fruta. Saltar el desayuno no es perjudicial si tu ingesta total y calidad del día son adecuadas.</li>
+            <li><strong>☀️ Almuerzo (la comida principal)</strong>: En España, el almuerzo es la ingesta más importante del día. Debe ser completa: proteína + verduras + hidratos. Algunos estudios preliminares sugieren que adelantar la comida principal puede ayudar al control glucémico en algunas personas.</li>
             <li><strong>🌙 Cena (ligera y temprana)</strong>: Cenar ligero y al menos 2h antes de acostarse. Priorizar verduras, huevos y pescado blanco sobre carnes pesadas o pasta abundante.</li>
           </ul>
         </section>

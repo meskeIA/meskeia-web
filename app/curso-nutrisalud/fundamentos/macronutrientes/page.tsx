@@ -29,7 +29,7 @@ export default function MacronutrientesPage() {
           <div className={styles.highlightBox}>
             <p>
               <strong>🔬 Realidad metabólica:</strong> 100 calorías de glucosa pura
-              producen un pico de insulina 10 veces mayor que 100 calorías de almendras,
+              producen un pico de insulina mucho mayor que 100 calorías de almendras,
               aunque ambas aporten la misma energía. La diferencia no está en las calorías,
               sino en cómo cada macronutriente interactúa con tu sistema hormonal.
             </p>

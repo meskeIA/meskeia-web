@@ -227,7 +227,7 @@ export default function VisualizadorMicrobiomaPage() {
                   <strong>Nervio vago:</strong> ruta principal; transporta señales electroquímicas del intestino al tronco cerebral en milisegundos.
                 </li>
                 <li>
-                  <strong>Serotonina:</strong> el 90% se produce en el intestino, no en el cerebro. Las bacterias influyen directamente en su síntesis.
+                  <strong>Serotonina:</strong> cerca del 90% de la serotonina del cuerpo se sintetiza en el intestino (células enterocromafines) y actúa principalmente sobre la motilidad intestinal. Esta serotonina no cruza la barrera hematoencefálica, por lo que su relación con el ánimo cerebral es indirecta y aún en investigación.
                 </li>
                 <li>
                   <strong>Metabolitos bacterianos:</strong> los ácidos grasos de cadena corta (propionato, butirato) cruzan la barrera hematoencefálica y modulan la inflamación neuronal.
@@ -309,7 +309,7 @@ export default function VisualizadorMicrobiomaPage() {
         <div className={styles.warningBox} role="note">
           <span aria-hidden="true">💡</span>
           <div>
-            <strong>Diversidad = salud:</strong> los microbiomas más diversos se asocian a mejor salud metabólica, inmunitaria y mental. La dieta variada rica en fibra vegetal es el factor modificable más potente para mejorar la diversidad microbiana.
+            <strong>Diversidad y salud:</strong> mayor diversidad suele asociarse a buena salud metabólica e inmunitaria en estudios observacionales, aunque no es una regla universal. La relación con la salud mental sigue en investigación. La dieta variada rica en fibra vegetal es el factor modificable más potente para mejorar la diversidad microbiana.
           </div>
         </div>
 
@@ -392,7 +392,7 @@ export default function VisualizadorMicrobiomaPage() {
               </details>
               <details className={styles.faqItem}>
                 <summary className={styles.faqQuestion}>¿El estrés afecta realmente al intestino?</summary>
-                <p className={styles.faqAnswer}>Sí. El eje intestino-cerebro es bidireccional y el estrés crónico altera la composición del microbioma. El cortisol aumenta la permeabilidad intestinal ("intestino permeable"), lo que puede provocar inflamación sistémica. No es solo "nervios en el estómago": es una respuesta fisiológica medible.</p>
+                <p className={styles.faqAnswer}>Sí. El eje intestino-cerebro es bidireccional y el estrés crónico altera la composición del microbioma. El cortisol puede aumentar la permeabilidad de la pared intestinal. La traducción clínica de esto en personas sanas sigue siendo objeto de investigación; el término popular "intestino permeable" no corresponde a un diagnóstico médico reconocido. No es solo "nervios en el estómago": es una respuesta fisiológica medible.</p>
               </details>
             </div>
           </section>

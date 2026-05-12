@@ -956,8 +956,9 @@ export default function GuiaAceiteOliva() {
             <strong>🍞 Pan con aceite: el desayuno mediterráneo</strong>
             <p>
               Un AOVE frutado verde intenso (Picual, Koroneiki, Coratina) sobre tostada con sal
-              es el desayuno más polifenólico posible. El picor en garganta es señal de oleocanthal:
-              aprécialo, no lo rehúyas. Es literalmente antiinflamatorio natural.
+              es el desayuno más polifenólico posible. El picor en garganta es señal de oleocantal,
+              un compuesto con propiedades antiinflamatorias estudiadas in vitro, aunque su efecto
+              a las dosis dietéticas habituales no es comparable al de un fármaco.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -1036,9 +1037,9 @@ export default function GuiaAceiteOliva() {
             <p>
               Sí, y es preferible. El AOVE tiene un punto de humo de 190-220°C, superior a
               muchos aceites de semillas. Su alto contenido en ácido oleico (monoinsaturado)
-              y polifenoles lo hace muy estable al calor. Estudios de la CSIC (España) demuestran
-              que las patatas fritas en AOVE son nutritivamente superiores a las fritas en girasol
-              refinado.
+              y polifenoles lo hace muy estable al calor. Estudios del CSIC y otros centros han
+              observado que el AOVE genera menos compuestos polares en fritura prolongada que el
+              girasol refinado, manteniendo mejor su perfil graso.
             </p>
           </li>
           <li className={styles.faqItem}>

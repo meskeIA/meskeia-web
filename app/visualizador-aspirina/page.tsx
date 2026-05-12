@@ -95,7 +95,7 @@ const EFECTOS: EfectoAspirina[] = [
     icono: '🩸',
     nombre: 'Antiagregante',
     mecanismo:
-      'Inhibe TXA2 en plaquetas irreversiblemente. Como las plaquetas no tienen núcleo, no pueden sintetizar nueva COX: el bloqueo dura toda su vida (~7-10 días). El endotelio sí regenera COX y mantiene PGI2 antiagregante.',
+      'Inhibe TXA2 en plaquetas irreversiblemente. Como las plaquetas no tienen núcleo, no pueden sintetizar nueva COX: el bloqueo dura toda su vida (~7-10 días). El endotelio sí regenera COX y mantiene PGI2 antiagregante. Indicación clínica: prevención cardiovascular secundaria (post-infarto/ictus). En prevención primaria, las guías USPSTF (2022) y ESC ya no la recomiendan de rutina por balance beneficio-riesgo de sangrado.',
     dosis: '75-100 mg/día (baja dosis)',
     color: '#48A9A6',
   },

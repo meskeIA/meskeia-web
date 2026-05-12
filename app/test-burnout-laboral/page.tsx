@@ -640,9 +640,10 @@ export default function TestBurnoutLaboralPage() {
             <div className={styles.faqItem}>
               <h3>¿El burnout tiene tratamiento?</h3>
               <p>
-                Sí. El burnout responde bien a intervenciones terapéuticas como la psicoterapia cognitivo-conductual,
-                técnicas de mindfulness, reestructuración laboral y, en algunos casos, apoyo farmacológico. Es
-                fundamental acudir a un profesional de salud mental.
+                Sí. El burnout responde bien a la psicoterapia (especialmente cognitivo-conductual), a intervenciones
+                organizacionales y a la reestructuración laboral. Las técnicas de mindfulness pueden ser un complemento
+                útil. Cuando hay depresión o ansiedad asociadas, el tratamiento farmacológico pautado por un profesional
+                puede ser parte importante del abordaje. Es fundamental acudir a un profesional de salud mental.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -765,6 +766,11 @@ export default function TestBurnoutLaboralPage() {
               <span aria-hidden="true">📋</span>
               <h3>Pide apoyo profesional</h3>
               <p>Un psicólogo o terapeuta puede ayudarte a desarrollar estrategias personalizadas antes de llegar al límite.</p>
+            </div>
+            <div className={styles.consejoCard}>
+              <span aria-hidden="true">🏢</span>
+              <h3>Identifica las condiciones laborales que generan desgaste</h3>
+              <p>Si la carga de trabajo, la falta de autonomía o el trato son la fuente principal, las estrategias individuales no bastan. Documenta lo que ocurre, habla con representantes sindicales o RRHH y, si procede, solicita evaluación de riesgos psicosociales (Ley 31/1995).</p>
             </div>
           </div>
         </section>

@@ -117,7 +117,7 @@ const SUPERALIMENTOS: Superalimento[] = [
     cantidadOrientativa: '1–3 g/día de curcumina (o ½–1 cucharadita de polvo con pimienta)',
     contraindicaciones: 'No recomendada en dosis altas en embarazo. Puede interferir con anticoagulantes. No suministrar sola sin pimienta negra (biodisponibilidad mínima).',
     combinaBien: ['Pimienta negra', 'Jengibre', 'Aceite de coco', 'Leche vegetal'],
-    descripcion: 'La cúrcuma es la raíz dorada de la medicina ayurvédica con más de 4.000 años de uso. La curcumina, su principio activo, tiene propiedades antiinflamatorias equiparables en algunos estudios a antiinflamatorios farmacológicos, sin sus efectos secundarios. El problema: su absorción sin pimienta negra es prácticamente nula.',
+    descripcion: 'La cúrcuma es la raíz dorada de la medicina ayurvédica con más de 4.000 años de uso. La curcumina, su principio activo, ha mostrado propiedades antiinflamatorias en estudios in vitro y algunos ensayos clínicos pequeños, aunque su biodisponibilidad oral es limitada. No es equivalente a un medicamento antiinflamatorio.',
     curiosidad: 'La piperina de la pimienta negra aumenta la absorción de curcumina en un 2.000% (veinte veces). Los sistemas culinarios de India y Asia siempre combinaron ambas especias intuitivamente durante milenios, mucho antes de que la ciencia explicara el porqué bioquímico de esa combinación.',
   },
   {
@@ -249,7 +249,7 @@ const SUPERALIMENTOS: Superalimento[] = [
     cantidadOrientativa: '100 g de pulpa o 1 cucharada de polvo',
     contraindicaciones: 'El açaí con azúcar añadido (versión industrial) pierde sus beneficios. Elegir siempre pulpa pura sin azúcar. Puede interactuar con quimioterapia (consultar médico).',
     combinaBien: ['Plátano', 'Granola', 'Arándanos', 'Cacao', 'Leche de coco'],
-    descripcion: 'El açaí es la baya con mayor capacidad antioxidante medida por ORAC (Oxygen Radical Absorbance Capacity): más del doble que los arándanos. Es la baya del árbol palmito amazónico, fundamental en la dieta de las poblaciones ribereñas del Amazonas durante milenios. Su popularización global comenzó en Brasil en los años 90.',
+    descripcion: 'El açaí contiene una alta concentración de antocianinas y polifenoles, antioxidantes potentes en pruebas in vitro. Es la baya del árbol palmito amazónico, fundamental en la dieta de las poblaciones ribereñas del Amazonas durante milenios. Su popularización global comenzó en Brasil en los años 90.',
     curiosidad: 'El 90% del açaí que se exporta del Brasil se consume en el propio país. Los estados brasileños de Pará y Amazonas son los mayores productores. En Belém do Pará, el açaí es un alimento básico diario, no un superalimento premium: se vende en mercados locales por centavos de euro el kilo.',
   },
   {
@@ -333,7 +333,7 @@ const SUPERALIMENTOS: Superalimento[] = [
     cantidadOrientativa: '3–5 g/día',
     contraindicaciones: 'Puede interactuar con anticoagulantes por vitamina K. Iniciar con dosis bajas (reacción de desintoxicación inicial posible). Comprar de calidad certificada (posible contaminación de cultivos).',
     combinaBien: ['Limón', 'Mango', 'Menta', 'Spirulina'],
-    descripcion: 'La clorela es el organismo fotosintético con mayor concentración de clorofila conocida. Su CGF (Chlorella Growth Factor), un complejo de ácidos nucleicos y péptidos, estimula la reparación celular y el crecimiento de tejidos. Estudios japoneses la utilizan en quelación de metales pesados (mercurio, plomo) del organismo.',
+    descripcion: 'La clorela es el organismo fotosintético con mayor concentración de clorofila conocida. Su CGF (Chlorella Growth Factor), un complejo de ácidos nucleicos y péptidos, estimula la reparación celular y el crecimiento de tejidos. Algunos estudios preliminares sugieren que podría unirse a ciertos compuestos en el intestino, pero no es un sustituto de la quelación médica supervisada cuando esta es necesaria.',
     curiosidad: 'La NASA y la Agencia Espacial Europea estudian la clorela como posible fuente de alimento y oxígeno en misiones de larga duración. En un espacio de 1 m², la clorela puede producir tanta proteína como 1.000 m² de soja, mientras absorbe CO₂ y libera O₂: el sistema de soporte vital perfecto para el espacio.',
   },
   {
@@ -429,7 +429,7 @@ const SUPERALIMENTOS: Superalimento[] = [
     cantidadOrientativa: '1–2 g de extracto/día',
     contraindicaciones: 'No en embarazo. Puede interactuar con anticoagulantes e inmunosupresores. Preferir extractos estandarizados sobre polvo de seta entera (mejor biodisponibilidad).',
     combinaBien: ['Café', 'Cacao', 'Leche de avena', 'Miel'],
-    descripcion: 'El reishi ("seta del año 10.000") es el hongo medicinal más estudiado en inmunooncología. Sus beta-glucanos modulan el sistema inmune (activando células NK y macrófagos) y sus triterpenos tienen propiedades adaptogénicas. En China y Japón, el extracto de reishi está aprobado como coadyuvante oncológico.',
+    descripcion: 'El reishi ("seta del año 10.000") es el hongo medicinal más estudiado en inmunooncología. Sus beta-glucanos modulan el sistema inmune (activando células NK y macrófagos) y sus triterpenos tienen propiedades adaptogénicas. En China y Japón se ha usado tradicionalmente como complemento en pacientes oncológicos, aunque la evidencia clínica de eficacia es todavía limitada y no sustituye los tratamientos médicos.',
     curiosidad: 'El reishi era tan raro y valorado en la China antigua que en los tratados medicinales se describía como disponible solo para los emperadores. Para el Imperio Tang (s. VII-X d.C.), encontrar un reishi silvestre era un presagio de reinado próspero y larga vida. Las pinturas chinas de longevidad siempre incluyen un reishi junto al sabio anciano.',
   },
   {
@@ -453,7 +453,7 @@ const SUPERALIMENTOS: Superalimento[] = [
     cantidadOrientativa: '1–2 g de extracto/día',
     contraindicaciones: 'Muy alto en oxalatos: no recomendado en insuficiencia renal o cálculos renales. Puede interactuar con anticoagulantes y antidiabéticos. No durante embarazo.',
     combinaBien: ['Café', 'Cacao', 'Canela', 'Regaliz'],
-    descripcion: 'El chaga es un parásito del abedul que crece durante décadas formando una masa negra en el exterior del árbol. Tiene el ORAC (capacidad antioxidante) más alto de cualquier alimento conocido: 1.104 unidades por gramo, comparado con las 24 de los arándanos. Los pueblos siberianos lo han usado como tónico durante siglos.',
+    descripcion: 'El chaga es un parásito del abedul que crece durante décadas formando una masa negra en el exterior del árbol. Contiene una alta concentración de antioxidantes en pruebas de laboratorio, aunque el índice ORAC ya no se utiliza como métrica de salud porque no predice efectos reales en el organismo. Los pueblos siberianos lo han usado como tónico durante siglos.',
     curiosidad: 'Alexander Solzhenitsyn mencionó el chaga en su novela "Pabellón del cáncer" (1968): describe a campesinos siberianos del siglo XIX que bebían infusión de chaga en lugar de té por ser más económico y porque parecían tener mejor salud. La novela generó el primer interés científico occidental por el chaga.',
   },
   {
@@ -870,8 +870,9 @@ export default function GuiaSuperalimentosPage() {
             <div className={styles.faqItem}>
               <p className={styles.faqPregunta}>¿Por que los fermentados son tan importantes para la salud?</p>
               <p className={styles.faqRespuesta}>
-                La investigacion del microbioma intestinal (2010-2025) ha revelado que el 70% del sistema inmune
-                vive en el intestino y que la microbiota afecta desde el estado de animo hasta el metabolismo.
+                La investigacion del microbioma intestinal (2010-2025) ha revelado que una parte muy importante
+                del tejido inmunitario se encuentra en el intestino, y la microbiota podría influir en el metabolismo,
+                el estado de ánimo y otros procesos, aunque muchos mecanismos están aún por aclarar.
                 Los fermentados son la forma mas eficaz de introducir bacterias beneficiosas vivas. Esta categoria
                 ha pasado de ser "folklore tradicional" a tener respaldo cientifico solido en dos decadas.
               </p>

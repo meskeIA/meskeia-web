@@ -501,8 +501,8 @@ export default function VisualizadorMelatoninaPage() {
 
       <DisclaimerCard
         variant="medical"
-        severity="low"
-        collapsible={true}
+        severity="high"
+        collapsible={false}
       />
 
       <BloqueCircadiano />
@@ -533,17 +533,18 @@ export default function VisualizadorMelatoninaPage() {
           <li><strong>N-acetilserotonina → Melatonina</strong> (enzima HIOMT en la pineal)</li>
         </ol>
         <p>
-          Esto explica por qué el sueño mejora con dietas ricas en triptófano (pavo, lácteos, nueces, semillas de calabaza)
-          y por qué la luz nocturna interrumpe la cadena en el paso 3.
+          El triptófano de la dieta es precursor remoto de la melatonina, pero su impacto real sobre el sueño en
+          personas sanas con dieta normal es modesto: compite con otros aminoácidos por la barrera hematoencefálica
+          y los estudios no muestran un efecto clínicamente relevante. La luz nocturna, en cambio, sí interrumpe
+          claramente la cadena en el paso 3.
         </p>
 
         <h3>Melatonina y antioxidación: un rol menos conocido</h3>
         <p>
-          La melatonina es uno de los antioxidantes más potentes que produce el cuerpo. A diferencia de la mayoría de antioxidantes,
-          <strong>atraviesa todas las barreras biológicas</strong>: membrana celular, barrera hematoencefálica, mitocondria.
-          Los estudios in vitro muestran que neutraliza radicales libres directamente y activa enzimas antioxidantes endógenas.
-          Este rol antioxidante podría explicar parte de su efecto protector sobre el envejecimiento celular,
-          aunque la investigación en humanos todavía está en curso.
+          Estudios in vitro muestran que la melatonina tiene capacidad antioxidante y, por su pequeño tamaño y
+          solubilidad, puede acceder a compartimentos celulares como la mitocondria. La traducción de esto a
+          efectos clínicos en humanos —incluida la suplementación con fines &ldquo;antiaging&rdquo;— no está
+          establecida y los ensayos clínicos disponibles son limitados.
         </p>
 
         <h3>¿Qué dice la ciencia sobre los suplementos de melatonina?</h3>

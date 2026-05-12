@@ -549,7 +549,7 @@ export default function CalculadoraPorcionesPage() {
           </div>
           <ul className={styles.warningList}>
             <li>Confundir la ración del etiquetado del envase con la porción saludable real: son referencias comerciales, no nutricionales.</li>
-            <li>Medir solo los alimentos &quot;prohibidos&quot; (pasta, arroz) e ignorar las grasas saludables, que también suman calorías.</li>
+            <li>Vigilar solo los alimentos que se consideran &quot;engordantes&quot; (pasta, arroz) e ignorar las grasas saludables, que también suman calorías.</li>
             <li>Creer que &quot;light&quot;, &quot;0% grasa&quot; o &quot;sin azúcar&quot; significa comer sin límite. Revisa siempre el etiquetado completo.</li>
             <li>Obsesionarse con la báscula diaria: el peso fluctúa 1–2 kg al día por agua, digestión y retención. Usa medias semanales.</li>
           </ul>

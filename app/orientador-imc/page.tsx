@@ -26,7 +26,7 @@ const clasificaciones: Record<string, Clasificacion> = {
   normal: {
     texto: 'Peso normal',
     color: '#27ae60',
-    descripcion: 'IMC entre 18,5 y 24,9. Peso saludable según la OMS.',
+    descripcion: 'IMC entre 18,5 y 24,9. Rango IMC estándar según OMS. La salud no se determina por el IMC aisladamente: composición corporal, perímetro abdominal y analíticas son indicadores complementarios imprescindibles.',
     icono: '✅',
   },
   sobrepeso: {
@@ -397,25 +397,25 @@ export default function CalculadoraIMCPage() {
 
               <div className={styles.resultCards}>
                 <ResultCard
-                  title="Peso ideal"
+                  title="Rango IMC estándar OMS"
                   value={`${formatNumber(resultado.pesoIdeal.min, 1)} - ${formatNumber(resultado.pesoIdeal.max, 1)}`}
                   unit="kg"
                   variant="info"
                   icon="🎯"
-                  description="Rango de peso saludable para tu altura"
+                  description="Rango de peso correspondiente al IMC estándar OMS para tu altura"
                 />
 
                 {resultado.diferencia !== 0 && (
                   <ResultCard
-                    title={resultado.diferencia > 0 ? 'Exceso de peso' : 'Peso a ganar'}
+                    title={resultado.diferencia > 0 ? 'Diferencia sobre rango IMC estándar OMS' : 'Diferencia bajo rango IMC estándar OMS'}
                     value={formatNumber(Math.abs(resultado.diferencia), 1)}
                     unit="kg"
                     variant={resultado.diferencia > 0 ? 'warning' : 'info'}
                     icon={resultado.diferencia > 0 ? '📉' : '📈'}
                     description={
                       resultado.diferencia > 0
-                        ? 'Kilos por encima del peso ideal máximo'
-                        : 'Kilos por debajo del peso ideal mínimo'
+                        ? 'Kilos por encima del rango IMC estándar OMS máximo'
+                        : 'Kilos por debajo del rango IMC estándar OMS mínimo'
                     }
                   />
                 )}
@@ -552,7 +552,7 @@ export default function CalculadoraIMCPage() {
                     className={`${styles.resumenCard} ${perfil.esSaludable ? styles.cardSaludable : ''}`}
                   >
                     {perfil.esSaludable && (
-                      <span className={styles.badgeSaludable}>✅ Peso saludable</span>
+                      <span className={styles.badgeSaludable}>IMC en rango estándar OMS</span>
                     )}
                     <h4>{perfil.nombre}</h4>
                     <div className={styles.resumenPeso}>{formatNumber(perfil.peso, 0)} kg</div>
@@ -583,7 +583,7 @@ export default function CalculadoraIMCPage() {
               {/* Info peso ideal */}
               <div className={styles.pesoIdealInfo}>
                 <p>
-                  🎯 <strong>Peso ideal para {formatNumber(parseSpanishNumber(alturaComparador), 0)} cm:</strong>{' '}
+                  🎯 <strong>Rango IMC estándar OMS para {formatNumber(parseSpanishNumber(alturaComparador), 0)} cm:</strong>{' '}
                   {formatNumber(datosComparador.pesoIdealRango.min, 1)} - {formatNumber(datosComparador.pesoIdealRango.max, 1)} kg
                 </p>
               </div>

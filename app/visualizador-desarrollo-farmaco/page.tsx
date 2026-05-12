@@ -430,7 +430,7 @@ function SeccionDespues() {
         `Coste medio de desarrollo: ${formatCurrency(1500000000)} – ${formatCurrency(2500000000)}`,
         'Por cada fármaco aprobado, el laboratorio invirtió en decenas que fracasaron',
         'La patente (20 años) es el incentivo para asumir ese riesgo',
-        'Sin patentes, no habría inversión; sin genéricos, no habría acceso universal',
+        'En el sistema actual, las patentes proveen el incentivo principal a la inversión privada y los genéricos amplían el acceso al expirar. Existen modelos alternativos en debate (premios de innovación, financiación pública directa, alianzas público-privadas) especialmente para enfermedades olvidadas',
       ],
     },
   ];

@@ -270,7 +270,7 @@ export default function DiarioEmocionalPage() {
               <div className={styles.statCard}>
                 <span className={styles.statIcono} aria-hidden="true">📊</span>
                 <div className={styles.statValor}>{promedioNivel.toFixed(1)} / 5</div>
-                <div className={styles.statLabel}>bienestar promedio</div>
+                <div className={styles.statLabel}>nivel promedio registrado</div>
               </div>
             </div>
           </div>
@@ -282,10 +282,16 @@ export default function DiarioEmocionalPage() {
         >
           <section className={styles.guideSection}>
             <h2>Beneficios del registro emocional</h2>
+            <p className={styles.notaIntro}>
+              <strong>Nota:</strong> Las emociones no son buenas ni malas. Una semana con muchas emociones difíciles
+              puede ser una respuesta sana a lo que está pasando en tu vida — el diario sirve para entenderte, no
+              para puntuarte.
+            </p>
             <p>
-              La psicología ha demostrado que <strong>nombrar y registrar emociones</strong> (affect labeling)
-              reduce su intensidad negativa. Escribir sobre cómo te sientes activa la corteza prefrontal y
-              regula la amígdala, ayudándote a procesar mejor las experiencias.
+              Investigaciones en psicología sugieren que <strong>nombrar y registrar emociones</strong> (affect labeling)
+              puede reducir su intensidad. Hay estudios de neuroimagen que asocian este acto a una mayor activación
+              de la corteza prefrontal y menor activación de la amígdala, aunque el mecanismo exacto aún se está
+              investigando.
             </p>
 
             <div className={styles.beneficiosGrid}>
@@ -307,7 +313,7 @@ export default function DiarioEmocionalPage() {
               <div className={styles.beneficioCard}>
                 <span aria-hidden="true">🧘</span>
                 <strong>Regulación</strong>
-                <p>El simple acto de registrar reduce la intensidad de emociones difíciles</p>
+                <p>Para muchas personas, registrar lo que sienten ayuda a regularse y procesar mejor lo que pasa</p>
               </div>
             </div>
 

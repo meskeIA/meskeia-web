@@ -227,6 +227,9 @@ export default function CalculadoraCaloriasPage() {
                     </div>
                   ))}
                 </div>
+                <p style={{ marginTop: '1rem', fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                  Las equivalencias son orientativas. El ejercicio y la alimentación son procesos independientes, no compensatorios.
+                </p>
               </div>
 
               <div className={styles.formulaBox}>
@@ -423,7 +426,7 @@ export default function CalculadoraCaloriasPage() {
                 Mujer de 68 años, 62kg. Natación 45 min (MET=8): ~325 kcal. Caminar 30 min diarios: ~160 kcal. Total semanal: ~1.600 kcal ejercicio. Objetivo: mantener masa muscular y salud cardiovascular.
                 <br /><strong>El objetivo no es quemar calorías sino preservar función muscular y calidad de vida.</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 La pérdida de músculo (sarcopenia) tras los 60 es el factor de salud más importante. Prioriza fuerza sobre cardio.</p>
+              <p className={styles.escenarioTip}>💡 La pérdida de masa muscular (sarcopenia) tras los 60 es uno de los factores clave para mantener la autonomía funcional. Prioriza fuerza sobre cardio.</p>
             </div>
           </div>
         </section>
@@ -444,7 +447,7 @@ export default function CalculadoraCaloriasPage() {
               <p>
                 Cardio quema más calorías durante el ejercicio (500-700 kcal/hora vs 300-500 de pesas). Pero las pesas generan mayor EPOC (quema extra 24-48h después), aumentan la masa muscular (que eleva el metabolismo basal permanentemente) y son más efectivas a largo plazo. La combinación óptima para pérdida de grasa: 2-3 sesiones de fuerza + 2-3 de cardio semanal. Solo cardio sin fuerza lleva a pérdida de músculo junto con la grasa.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Evidencia:</strong> Estudios muestran que añadir 2 sesiones de fuerza semanales a un programa de cardio acelera la pérdida de grasa un 20-30% más que solo cardio.</p>
+              <p className={styles.faqTip}>💡 <strong>Evidencia:</strong> Diversos estudios sugieren que añadir entrenamiento de fuerza a un programa de cardio mejora la composición corporal y preserva masa muscular durante el déficit calórico, lo que se asocia con resultados más sostenibles a largo plazo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>❓ ¿Puedo confiar en las calorías que marca mi smartwatch o pulsómetro?</h4>
@@ -465,7 +468,7 @@ export default function CalculadoraCaloriasPage() {
               <p>
                 El NEAT (Non-Exercise Activity Thermogenesis) es el gasto calórico de todas las actividades físicas que no son ejercicio estructurado: caminar al trabajo, subir escaleras, gesticular, limpiar la casa, hacer recados. Puede representar entre 200 y 800 kcal/día según el estilo de vida. Personas activas en su vida diaria (NEAT alto) pueden quemar hasta 600 kcal/día más que personas sedentarias, aunque ambas hagan la misma sesión de gimnasio.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Hack fácil:</strong> Un podómetro o app de pasos con objetivo de 8.000-10.000 pasos diarios puede añadir 300-400 kcal de gasto extra sin esfuerzo percibido. El NEAT acumulado supera en muchos casos al gasto del gimnasio.</p>
+              <p className={styles.faqTip}>💡 <strong>Hack fácil:</strong> Aumentar pasos diarios (NEAT) tiene beneficios medibles. La evidencia muestra mejoras de mortalidad ya a partir de 4.400 pasos, con plateau de beneficio alrededor de 7.500-8.000. El objetivo de 10.000 pasos popular proviene de una campaña publicitaria, no de un umbral fisiológico.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>❓ ¿Qué es el efecto meseta y cómo romperlo?</h4>

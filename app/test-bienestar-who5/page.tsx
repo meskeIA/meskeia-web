@@ -51,7 +51,7 @@ function evaluar(respuestas: number[]): Resultado {
       descripcion: 'Tu bienestar subjetivo es alto. Te sientes generalmente bien en tu día a día.',
       recomendaciones: [
         'Sigue manteniendo los hábitos que te hacen sentir bien',
-        'Comparte tu bienestar: ayudar a otros también mejora el propio',
+        'Si te apetece, compartir tiempo con personas cercanas suele asociarse a mayor bienestar',
         'Repite el test dentro de unas semanas para hacer seguimiento',
       ],
     };
@@ -77,7 +77,7 @@ function evaluar(respuestas: number[]): Resultado {
       descripcion: 'Tu bienestar es bajo. Merece la pena prestarle atención y buscar formas de mejorarlo.',
       recomendaciones: [
         'Hablar con alguien de confianza (amigo, familiar, profesional) puede ayudar mucho',
-        'El ejercicio físico regular, incluso caminar 20 minutos, tiene efecto demostrado sobre el ánimo',
+        'El ejercicio físico regular, como caminar 20-30 minutos al día, suele tener un efecto positivo sobre el ánimo según la mayoría de estudios',
         'Considera consultar con tu médico de cabecera — puede orientarte hacia recursos de ayuda',
         'Recuerda: pedir ayuda es un acto de valentía, no de debilidad',
       ],
@@ -294,7 +294,7 @@ export default function TestBienestarWho5Page() {
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Qué puedo hacer para mejorar mi bienestar?</summary>
-                <p>La evidencia científica apoya: ejercicio regular, sueño de calidad, conexión social, actividades con propósito, tiempo en la naturaleza y, si es necesario, ayuda profesional.</p>
+                <p>La evidencia apoya hábitos como ejercicio regular, sueño de calidad, conexión social, actividades con propósito y tiempo en la naturaleza. Cuando el malestar es persistente o intenso, el tratamiento psicológico o farmacológico pautado por un profesional es la vía principal, no un último recurso.</p>
               </details>
             </div>
 

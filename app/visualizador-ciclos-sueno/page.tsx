@@ -172,7 +172,7 @@ const GRUPOS_EDAD: GrupoEdad[] = [
   { grupo: 'Niño pequeño', edad: '1-5 años', icono: '🧒', horasMin: 10, horasMax: 14, color: '#3B82F6', nota: 'Transición de 2 siestas a 1, y luego a ninguna hacia los 5' },
   { grupo: 'Niño', edad: '6-13 años', icono: '📚', horasMin: 9, horasMax: 11, color: '#2E86AB', nota: 'Sueño profundo abundante; fundamental para crecimiento y aprendizaje' },
   { grupo: 'Adolescente', edad: '14-17 años', icono: '🎮', horasMin: 8, horasMax: 10, color: '#48A9A6', nota: 'Reloj biológico retrasado 2h; se duermen tarde por biología, no por pereza' },
-  { grupo: 'Adulto', edad: '18-64 años', icono: '💼', horasMin: 7, horasMax: 9, color: '#34D399', nota: '<1% tiene el gen DEC2 que permite funcionar con 6h; el resto necesita 7+' },
+  { grupo: 'Adulto', edad: '18-64 años', icono: '💼', horasMin: 7, horasMax: 9, color: '#34D399', nota: '7-9h en la mayoría de personas, aunque la variabilidad individual es amplia. Algunas personas funcionan bien con 6,5h sin signos de privación crónica. El mejor indicador propio: cómo te sientes durante el día, no el número exacto de horas.' },
   { grupo: 'Mayor', edad: '65+ años', icono: '👴', horasMin: 7, horasMax: 8, color: '#FBBF24', nota: 'Menos sueño profundo; más despertares nocturnos; las siestas compensan' },
 ];
 
@@ -197,7 +197,7 @@ const ENEMIGOS: EnemigoSueno[] = [
     impacto: 5,
     colorImpacto: '#EF4444',
     descripcion: 'Las pantallas emiten luz azul (450-490 nm) que tu cerebro interpreta como luz diurna.',
-    ciencia: 'La luz azul suprime la producción de melatonina hasta un 50%. Retrasa el inicio del sueño entre 30-60 minutos y reduce la duración del REM.',
+    ciencia: 'Algunas pantallas emiten luz azul que puede reducir la producción de melatonina y retrasar el inicio del sueño, aunque la magnitud del efecto varía según la intensidad, el tiempo de exposición y la sensibilidad individual.',
     consejo: 'Activar modo noche 2h antes de dormir. Mejor aún: dejar las pantallas 1h antes de acostarte y leer en papel o libro electrónico sin retroiluminación.',
   },
   {
@@ -555,9 +555,9 @@ function SeccionNecesitas() {
 
       <div className={styles.insight}>
         <p>
-          Si necesitas una alarma para despertarte, probablemente no duermes lo suficiente.
-          El <strong>test definitivo</strong>: si pudieras dormir sin alarma durante 2 semanas,
-          el número de horas al que se estabiliza tu sueño es tu necesidad real.
+          El uso de despertador es habitual en sociedades laborales modernas y no es por sí solo
+          signo de falta de sueño. Si quieres una referencia personal: si pudieras dormir sin alarma
+          durante 2 semanas, el número de horas al que se estabiliza tu sueño es tu necesidad real.
         </p>
       </div>
     </div>

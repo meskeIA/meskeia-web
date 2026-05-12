@@ -478,7 +478,7 @@ export default function VisualizadorMagnesio() {
               <span className={styles.nmdaCardIcon}>😰</span>
               <div>
                 <strong>Ansiedad y estrés</strong>
-                <p>El déficit de Mg reduce el bloqueo del NMDA → hiperexcitabilidad neuronal → mayor reactividad al estrés.</p>
+                <p>En modelos animales y algunos estudios humanos, el déficit de Mg se ha asociado con mayor reactividad al estrés. La evidencia sobre la suplementación como tratamiento de ansiedad en personas sin déficit es limitada y de baja calidad.</p>
               </div>
             </div>
             <div className={styles.nmdaCard}>
@@ -508,10 +508,12 @@ export default function VisualizadorMagnesio() {
 
       {/* ── Sección 4: La deficiencia silenciosa ── */}
       <section className={`${styles.section} ${styles.sectionAlt}`}>
-        <h2 className={styles.sectionTitle}>La deficiencia silenciosa</h2>
+        <h2 className={styles.sectionTitle}>Limitaciones del análisis de sangre</h2>
         <p className={styles.sectionSubtitle}>
-          El 60-65% del Mg corporal está en los huesos. El suero sanguíneo contiene solo el 1% →
-          los análisis de sangre son poco sensibles y la deficiencia pasa desapercibida durante años.
+          Solo el 1% del Mg corporal circula en sangre; el resto está en hueso y células. Eso hace
+          que el Mg sérico no sea un marcador sensible de déficit moderado, aunque sí detecta la
+          hipomagnesemia clínicamente relevante. Si tu médico sospecha déficit funcional, puede
+          valorar Mg eritrocitario o pruebas más específicas.
         </p>
 
         <div className={styles.deficiencyBanner}>
@@ -609,9 +611,10 @@ export default function VisualizadorMagnesio() {
         <p>
           El magnesio sérico solo representa el 1% del magnesio corporal total. El cuerpo tiene
           mecanismos homeostáticos muy eficaces para mantener el Mg sérico estable (0,75–0,95 mmol/L)
-          incluso cuando las reservas intracelulares y óseas están agotadas. En la práctica, el
-          suero puede ser "normal" mientras el músculo cardíaco, el sistema nervioso y el tejido
-          muscular esquelético sufren déficit funcional.
+          incluso cuando las reservas intracelulares y óseas están agotadas. En la práctica, el Mg
+          sérico puede ser normal cuando las reservas intracelulares están reducidas. La existencia
+          y la relevancia clínica de un "déficit funcional" subclínico es objeto de investigación y
+          no está estandarizada como diagnóstico en medicina convencional.
         </p>
         <p>
           Una prueba más fiable sería el Mg eritrocitario (en glóbulos rojos) o el Mg intracelular

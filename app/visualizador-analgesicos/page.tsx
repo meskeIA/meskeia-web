@@ -91,7 +91,7 @@ const FARMACOS: Record<Farmaco, DatoFarmaco> = {
     colorDark: '#0a1f12',
     icono: '🧠',
     mecanismo:
-      'Su mecanismo exacto no está del todo esclarecido, lo cual refleja honestidad científica importante. Hipótesis principal: actúa en el SNC potenciando las vías descendentes serotoninérgicas que inhiben el dolor, e inhibe débilmente una variante central de COX (COX-3). NO inhibe las COX periféricas de forma relevante → no es antiinflamatorio en tejidos.',
+      'Su mecanismo exacto no está del todo esclarecido. Hipótesis principal: actúa en el SNC potenciando las vías descendentes serotoninérgicas que inhiben el dolor, e inhibe débilmente una variante central de COX (COX-3). NO inhibe las COX periféricas de forma relevante → no es antiinflamatorio en tejidos.',
     lugar: 'Central (SNC, hipotálamo para la fiebre)',
     esAntinflamatorio: false,
     esAntiagregante: '❌ No',
@@ -320,10 +320,10 @@ const ESCENARIOS: Escenario[] = [
   },
   {
     icono: '❤️',
-    situacion: 'Prevención cardiovascular (uso crónico)',
-    orientacion: 'Aspirina a dosis baja (100 mg) — solo bajo indicación médica',
+    situacion: 'Prevención cardiovascular secundaria (tras infarto/ictus)',
+    orientacion: 'Aspirina a dosis baja bajo indicación médica',
     detalle:
-      'Antiagregante irreversible. Efecto plaquetario durante 7-10 días. No indicada para analgesia general a estas dosis.',
+      'Antiagregante irreversible. Efecto plaquetario durante 7-10 días. En prevención primaria, las guías de 2022 (USPSTF, ESC) ya no la recomiendan de forma rutinaria por riesgo de sangrado. No indicada para analgesia general a estas dosis.',
   },
   {
     icono: '🤰',
@@ -691,7 +691,7 @@ export default function VisualizadorAnalgesicos() {
             que los salicilatos interfieren con el metabolismo mitocondrial en presencia de ciertos
             virus. Tras la epidemia de gripe de 1976-1978, la FDA emitió advertencias y el uso de
             aspirina en niños con fiebre viral cayó drásticamente — y también lo hizo la incidencia del
-            síndrome de Reye. Hoy está contraindicada en menores de 18 años con procesos víricos.
+            síndrome de Reye. Hoy está contraindicada en menores de 16 años con procesos víricos.
           </p>
 
           <h3 className={styles.eduTitulo}>Los inhibidores selectivos de COX-2: un caso de libro</h3>

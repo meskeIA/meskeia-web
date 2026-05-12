@@ -133,7 +133,7 @@ const TIPOS_VACUNAS: TipoVacuna[] = [
     mecanismo: 'Inyecta instrucciones genéticas (ARNm) para que tus propias células fabriquen una proteína del virus (ej: espícula). El sistema inmune responde a esa proteína.',
     ejemplos: 'COVID-19 (Pfizer-BioNTech, Moderna)',
     ventajas: ['Desarrollo ultrarrápido', 'No usa virus real', 'Fácil de adaptar a variantes'],
-    desventajas: ['Requiere ultracongelación (-70 °C para Pfizer)', 'Tecnología relativamente nueva', 'Necesita refuerzos'],
+    desventajas: ['Requiere ultracongelación (-70 °C para Pfizer)', 'Aplicación masiva en humanos reciente (la investigación base lleva más de 30 años)', 'Necesita refuerzos'],
     color: '#f1c40f',
   },
   {

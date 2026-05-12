@@ -50,7 +50,7 @@ const CATEGORIAS = [
 // Logros
 const LOGROS: Logro[] = [
   { id: 'racha_7', icono: '🏅', titulo: '7 Días', descripcion: 'Racha de 7 días', dias: 7 },
-  { id: 'racha_21', icono: '🌟', titulo: '21 Días', descripcion: 'Hábito en formación', dias: 21 },
+  { id: 'racha_21', icono: '🌟', titulo: '21 Días', descripcion: 'Primer mes en marcha (hito popular, los estudios estiman 2-8 meses para consolidar un hábito)', dias: 21 },
   { id: 'racha_30', icono: '🔥', titulo: '30 Días', descripcion: 'Un mes completo', dias: 30 },
   { id: 'racha_66', icono: '💎', titulo: '66 Días', descripcion: 'Hábito consolidado', dias: 66 },
   { id: 'racha_100', icono: '🎯', titulo: '100 Días', descripcion: 'Centenario', dias: 100 },

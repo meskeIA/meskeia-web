@@ -306,8 +306,9 @@ export default function VisualizadorAntibioticos() {
           <p className={styles.heroSubtitle}>5 mecanismos de acción y la crisis de la resistencia antibiótica</p>
           <p className={styles.heroDesc}>
             Los antibióticos atacan estructuras que las bacterias tienen y nosotros no: pared celular, ribosomas
-            bacterianos, ADN girasas. Pero las bacterias evolucionan. La resistencia antibiótica mata ya{' '}
-            <strong>700.000 personas al año</strong>.
+            bacterianos, ADN girasas. Pero las bacterias evolucionan. La resistencia antimicrobiana se asoció a{' '}
+            <strong>~4,95 millones de muertes en 2019</strong> (Murray et al., Lancet 2022), de las cuales 1,27 M
+            atribuibles directamente. Las proyecciones a 2050 (hasta 10 millones, informe O&apos;Neill 2016) varían según el modelo.
           </p>
         </div>
       </header>
@@ -488,20 +489,20 @@ export default function VisualizadorAntibioticos() {
         {/* Cifras OMS */}
         <div className={styles.cifrasGrid}>
           <div className={styles.cifraBox}>
-            <span className={styles.cifraNumero}>700.000</span>
-            <span className={styles.cifraEtiqueta}>muertes/año actualmente por resistencia</span>
+            <span className={styles.cifraNumero}>~4,95 M</span>
+            <span className={styles.cifraEtiqueta}>muertes asociadas a resistencia antimicrobiana en 2019 (Murray et al., Lancet 2022); 1,27 M atribuibles directamente</span>
           </div>
           <div className={styles.cifraBox}>
-            <span className={styles.cifraNumero}>10.000.000</span>
-            <span className={styles.cifraEtiqueta}>muertes proyectadas en 2050 si no se actúa (OMS)</span>
+            <span className={styles.cifraNumero}>Hasta 10 M</span>
+            <span className={styles.cifraEtiqueta}>muertes proyectadas en 2050 según el informe O&apos;Neill (2016); las proyecciones varían según el modelo</span>
           </div>
           <div className={styles.cifraBox}>
             <span className={styles.cifraNumero}>80%</span>
-            <span className={styles.cifraEtiqueta}>de los antibióticos mundiales se usan en ganadería</span>
+            <span className={styles.cifraEtiqueta}>~70% del uso mundial total de antimicrobianos se destina a animales (FAO/OMS); en EE. UU. la cifra ha llegado al 80%</span>
           </div>
           <div className={styles.cifraBox}>
             <span className={styles.cifraNumero}>50%</span>
-            <span className={styles.cifraEtiqueta}>de las prescripciones humanas son innecesarias (estimación OMS)</span>
+            <span className={styles.cifraEtiqueta}>Hasta el 50% de las prescripciones ambulatorias podrían ser innecesarias o subóptimas (CDC, 2016; estimaciones similares de la OMS para varios países)</span>
           </div>
         </div>
       </section>
@@ -566,7 +567,7 @@ export default function VisualizadorAntibioticos() {
             <li><strong>E</strong>nterococcus faecium — resistente a vancomicina (VRE)</li>
             <li><strong>S</strong>taphylococcus aureus — resistente a meticilina (SARM)</li>
             <li><strong>K</strong>lebsiella pneumoniae — BLEE y carbapenemasas (KPC)</li>
-            <li><strong>A</strong>cinetobacter baumannii — últimos rescursos: solo colistina</li>
+            <li><strong>A</strong>cinetobacter baumannii — último recurso: solo colistina</li>
             <li><strong>P</strong>seudomonas aeruginosa — bombas de eflujo múltiples</li>
             <li><strong>E</strong>nterobacter spp. — AmpC β-lactamasas inducibles</li>
           </ul>

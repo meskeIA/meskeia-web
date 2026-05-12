@@ -260,7 +260,7 @@ export default function CalculadoraHidratacionPage() {
               <div className={styles.tipsSection}>
                 <h3>💡 Consejos de hidratación</h3>
                 <ul className={styles.tipsList}>
-                  <li>Bebe un vaso de agua al despertar para activar el metabolismo</li>
+                  <li>Bebe un vaso de agua al despertar para rehidratarte tras las horas de sueño</li>
                   <li>No esperes a tener sed; cuando la sientes, ya hay deshidratación leve</li>
                   <li>Aumenta la ingesta durante el ejercicio (150-250ml cada 15-20 min)</li>
                   <li>El color de la orina indica hidratación: amarillo claro es óptimo</li>
@@ -391,7 +391,7 @@ export default function CalculadoraHidratacionPage() {
           <h2>Cómo hidratarte correctamente en 7 pasos</h2>
           <div className={styles.stepGuide}>
             <div className={styles.eduStep}><div className={styles.stepNumber}>1</div><div className={styles.stepContent}><strong>Calcula tu necesidad base</strong><p>Multiplica tu peso en kg × 35 ml. Ejemplo: 70 kg × 35 ml = 2.450 ml/día como base. Ajusta según actividad, clima y condición de salud usando esta calculadora.</p></div></div>
-            <div className={styles.eduStep}><div className={styles.stepNumber}>2</div><div className={styles.stepContent}><strong>Empieza el día con agua</strong><p>Un vaso de 250–300 ml al despertar rehidrata tras 7–8 horas sin beber, activa el metabolismo y mejora la concentración matutina. Hazlo antes del café.</p></div></div>
+            <div className={styles.eduStep}><div className={styles.stepNumber}>2</div><div className={styles.stepContent}><strong>Empieza el día con agua</strong><p>Un vaso de 250–300 ml al despertar rehidrata tras 7–8 horas sin beber y puede ayudar a la concentración matutina. Hazlo antes del café.</p></div></div>
             <div className={styles.eduStep}><div className={styles.stepNumber}>3</div><div className={styles.stepContent}><strong>Distribuye la ingesta a lo largo del día</strong><p>No bebas todo de golpe. Lo ideal es beber regularmente cada 1–2 horas. Un truco: lleva una botella de 500 ml y complétala 4 veces al día. El cuerpo absorbe mejor agua distribuida que en grandes cantidades.</p></div></div>
             <div className={styles.eduStep}><div className={styles.stepNumber}>4</div><div className={styles.stepContent}><strong>Ajusta según el ejercicio</strong><p>Bebe 500 ml en las 2h previas al ejercicio, 150–200 ml cada 15–20 min durante, y rehidrata después: 1,5 L por cada kg de peso perdido durante el ejercicio (pésate antes y después si haces ejercicio intenso).</p></div></div>
             <div className={styles.eduStep}><div className={styles.stepNumber}>5</div><div className={styles.stepContent}><strong>Monitoriza el color de tu orina</strong><p>Establece el hábito de comprobar el color una vez al día. Amarillo pálido = bien. Amarillo oscuro = bebe más. Adapta tu ingesta diaria según esta señal natural del cuerpo.</p></div></div>
@@ -404,7 +404,7 @@ export default function CalculadoraHidratacionPage() {
           <h2>Trucos para beber más agua sin esfuerzo</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}><span className={styles.tipIcon}>🍋</span><strong>Aromatiza tu agua</strong><p>Añade rodajas de limón, pepino, menta o jengibre. El sabor suave hace que bebas más sin añadir azúcar ni calorías. Infusiones frías también cuentan.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📱</span><strong>Apps de recordatorio</strong><p>Usa WaterMinder, Hydro Coach o simplemente alarmas en el móvil cada 1–2 horas. Los primeros 21 días necesitas el recordatorio; luego se convierte en hábito.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>📱</span><strong>Apps de recordatorio</strong><p>Usa WaterMinder, Hydro Coach o simplemente alarmas en el móvil cada 1–2 horas. Los primeros días son los más difíciles; con el tiempo se convierte en un hábito automático (los estudios estiman entre 2 y 8 meses de media para consolidar un hábito nuevo).</p></div>
             <div className={styles.tipCard}><span className={styles.tipIcon}>🫙</span><strong>Botella visible en tu mesa</strong><p>El principio de "lo que ves, lo haces". Una botella de 1L en tu escritorio que vacíes dos veces al día es más efectiva que cualquier app.</p></div>
             <div className={styles.tipCard}><span className={styles.tipIcon}>🍽️</span><strong>Agua antes de cada comida</strong><p>Un vaso de agua 15–20 min antes de comer mejora la hidratación y reduce ligeramente el apetito. Crea un ritual automático ligado a algo que ya haces.</p></div>
             <div className={styles.tipCard}><span className={styles.tipIcon}>🫧</span><strong>Agua con gas si no te gusta la natural</strong><p>El agua carbonatada hidrata igual que el agua plana. Si el agua natural te parece aburrida, el agua con gas (sin azúcar) es una alternativa perfectamente válida.</p></div>

@@ -188,7 +188,7 @@ const FACTORES: FactorAmplificador[] = [
   {
     icono: '💊',
     titulo: 'Microbioma alterado',
-    mecanismo: 'La disbiosis intestinal aumenta la permeabilidad de la pared intestinal ("intestino permeable"). Fragmentos de bacterias (LPS, lipopolisacárido) pasan a sangre y activan receptores TLR4 en macrófagos, generando inflamación sistémica de bajo grado.',
+    mecanismo: 'La disbiosis intestinal puede aumentar la permeabilidad de la pared intestinal. Algunos estudios sugieren que el paso de fragmentos bacterianos (LPS, lipopolisacárido) podría contribuir a inflamación sistémica de bajo grado, aunque la magnitud clínica del fenómeno en humanos sanos sigue debatiéndose.',
   },
 ];
 

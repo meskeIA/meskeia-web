@@ -272,7 +272,9 @@ function BloqueCicloMetilacion() {
 
       <div className={styles.insightBox}>
         <strong>Clave diagnóstica:</strong> Si no hay suficiente B12, la homocisteína se acumula.
-        Niveles &gt;15 µmol/L aumentan el riesgo cardiovascular y se asocian con deterioro cognitivo acelerado.
+        Niveles elevados de homocisteína (&gt;15 µmol/L) se asocian estadísticamente con mayor riesgo cardiovascular
+        y deterioro cognitivo. Sin embargo, los ensayos clínicos que han reducido la homocisteína con vitaminas B no han
+        mostrado reducción de eventos cardiovasculares, por lo que la relación parece más marcador que causa directa.
         El ácido metilmalónico (AMM) elevado es incluso más específico de deficiencia de B12.
       </div>
     </section>

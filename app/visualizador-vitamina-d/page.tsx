@@ -153,7 +153,7 @@ const NIVELES: NivelVitaminaD[] = [
   { etiqueta: 'Deficiencia', rango: '10–20 ng/mL', color: '#E74C3C', valor: 20 },
   { etiqueta: 'Insuficiencia', rango: '20–30 ng/mL', color: '#F39C12', valor: 30 },
   { etiqueta: 'Suficiencia', rango: '30–50 ng/mL', color: '#27AE60', valor: 50 },
-  { etiqueta: 'Óptimo', rango: '40–60 ng/mL', color: '#1E8449', valor: 60 },
+  { etiqueta: 'Recomendado por algunos autores (controvertido, no en guías oficiales)', rango: '40–60 ng/mL', color: '#1E8449', valor: 60 },
   { etiqueta: 'Toxicidad posible', rango: '> 100 ng/mL', color: '#922B21', valor: 100 },
 ];
 
@@ -332,9 +332,11 @@ function BloqueNiveles() {
 
       <div className={styles.insightBox}>
         <p>
-          La zona &ldquo;óptima&rdquo; (40–60 ng/mL) es debatida: algunas guías consideran suficiente 30 ng/mL, mientras
-          que investigadores como Holick defienden 40–60 ng/mL. La toxicidad es rara por exposición solar
-          (la piel degrada el exceso), pero sí puede ocurrir con suplementación excesiva prolongada.
+          El umbral &ldquo;óptimo&rdquo; es objeto de debate. Las recomendaciones oficiales del Institute of Medicine
+          (IOM) consideran suficiente ≥20 ng/mL para la salud ósea; la Endocrine Society sube el umbral a 30 ng/mL en
+          grupos de riesgo. Cifras superiores (40–60 ng/mL) son defendidas por algunos investigadores pero no forman parte
+          del consenso clínico actual. La toxicidad es rara por exposición solar (la piel degrada el exceso), pero sí puede
+          ocurrir con suplementación excesiva prolongada.
         </p>
       </div>
     </section>
@@ -366,8 +368,10 @@ function BloqueParadoja() {
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>La Paradoja Española del Sol</h2>
       <p className={styles.sectionDesc}>
-        España tiene más horas de sol que el norte de Europa, pero el 40–80% de la población española
-        presenta insuficiencia o deficiencia de vitamina D en invierno. ¿Por qué?
+        España tiene más horas de sol que el norte de Europa, pero un porcentaje significativo de la población
+        presenta niveles bajos de 25-OH vitamina D en invierno. Las cifras (entre 20% y 80% según estudios)
+        varían enormemente según el umbral utilizado: lo que algunas guías consideran &ldquo;insuficiencia&rdquo;
+        (20–30 ng/mL), otras lo consideran suficiente. ¿Por qué?
       </p>
 
       <div className={styles.paradoxSection}>
@@ -401,9 +405,11 @@ function BloqueParadoja() {
             <span aria-hidden="true">⏱️</span> Tiempo de exposición solar necesario
           </h3>
           <p>
-            Para sintetizar vitamina D eficazmente: <strong>15–30 minutos</strong> al mediodía solar (12:00–15:00 h),
-            con <strong>brazos y piernas al descubierto</strong>, sin protector solar, en verano en latitud española.
-            La piel produce entonces unas 10.000–25.000 IU en una sesión. En invierno, aunque se haga lo mismo,
+            Para que la piel produzca vitamina D eficazmente bastan exposiciones breves
+            (<strong>10–20 minutos</strong>) en horas de UVB suficiente, con <strong>manos, brazos y cara al
+            descubierto</strong>. La AEDV y la OMS recomiendan usar fotoprotección en las horas centrales: el balance
+            entre síntesis de vitamina D y riesgo de cáncer cutáneo debe valorarlo cada persona con su médico.
+            En verano, la piel produce entonces unas 10.000–25.000 IU en una sesión. En invierno, aunque se haga lo mismo,
             la producción cae a prácticamente cero.
           </p>
         </div>

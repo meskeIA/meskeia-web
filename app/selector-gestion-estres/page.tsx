@@ -308,7 +308,7 @@ const RESULTADOS: Record<
     emoji: '🧘',
     titulo: 'Meditación y Mindfulness',
     descripcion:
-      'Tu perfil apunta a que la clave está en calmar la mente: aprender a observar los pensamientos sin engancharte a ellos, cultivar la respiración consciente y desarrollar una mayor tolerancia a la incertidumbre. El mindfulness puede ayudarte a romper el ciclo de la rumia y a recuperar perspectiva.',
+      'Tu perfil apunta a que la clave está en calmar la mente: aprender a observar los pensamientos sin engancharte a ellos, cultivar la respiración consciente y desarrollar una mayor tolerancia a la incertidumbre. El mindfulness puede ayudarte a romper el ciclo de la rumia y a recuperar perspectiva. Si la rumia es muy persistente o intrusiva, conviene consultar con un profesional antes de afrontarla solo con mindfulness.',
     consejos: [
       'Empieza con 5-10 minutos al día de respiración diafragmática',
       'Prueba apps guiadas como Insight Timer o Calm (hay versiones gratuitas)',
@@ -576,8 +576,8 @@ export default function SelectorGestionEstresPage() {
             El estrés es una respuesta fisiológica y psicológica ante situaciones percibidas como
             amenazas o exigencias. En dosis pequeñas y puntuales puede ser útil (nos activa y nos
             hace rendir), pero cuando se vuelve crónico deteriora la salud física, mental y
-            relacional. En España, según el IV Barómetro del COP, el 59% de la población afirma
-            sentir estrés con frecuencia.
+            relacional. Según el Barómetro del COP (Consejo General de la Psicología) de 2023, un
+            porcentaje significativo de la población española afirma sentir estrés con frecuencia.
           </p>
           <p>
             La clave no es eliminar el estrés, sino gestionarlo: desarrollar recursos propios para
@@ -591,18 +591,21 @@ export default function SelectorGestionEstresPage() {
 
           <h3>🧘 Meditación y Mindfulness</h3>
           <p>
-            El mindfulness entrena la atención para estar en el presente sin juzgar. Reduce la
-            actividad de la amígdala (centro del miedo), mejora el sueño y disminuye la rumia. Con
-            solo 8 semanas de práctica regular hay cambios medibles en el cerebro (programa MBSR,
-            Kabat-Zinn). Ideal para quienes tienen muchos pensamientos intrusivos o insomnio.
+            El mindfulness entrena la atención para estar en el presente sin juzgar. Las prácticas
+            de mindfulness se han asociado a reducción de la rumia y mejora del sueño en varios
+            estudios. Programas estructurados como MBSR (8 semanas) son los que tienen más respaldo.
+            Es útil para muchas personas, pero no para todas: si tienes antecedentes de trauma o
+            episodios disociativos, consulta con un profesional antes de empezar una práctica
+            intensiva. Ideal para quienes tienen muchos pensamientos intrusivos o insomnio.
           </p>
 
           <h3>🏃 Ejercicio Físico</h3>
           <p>
             El movimiento libera endorfinas, serotonina y BDNF (factor neurotrófico que protege las
-            neuronas). Reduce el cortisol acumulado y mejora la calidad del sueño. Estudios del
-            Journal of Psychiatry muestran que 30 minutos de cardio moderado 3 veces por semana son
-            tan eficaces como un antidepresivo de baja dosis para la ansiedad leve-moderada.
+            neuronas). Reduce el cortisol acumulado y mejora la calidad del sueño. Hay evidencia
+            consistente de que el ejercicio aeróbico regular reduce los síntomas de ansiedad y
+            depresión leve-moderada y se recomienda como parte del tratamiento. No sustituye al
+            tratamiento psicológico ni farmacológico cuando un profesional los considera indicados.
           </p>
 
           <h3>🛋️ Terapia Psicológica</h3>
@@ -625,10 +628,10 @@ export default function SelectorGestionEstresPage() {
           <h3>🌿 Desconexión Digital y Naturaleza</h3>
           <p>
             El exceso de notificaciones, información y comparación social en redes mantiene el sistema
-            nervioso en alerta constante. Investigaciones de la Universidad de Sussex muestran que
-            pasar 20 minutos en un entorno natural reduce los marcadores biológicos de estrés. El
-            concepto japonés "shinrin-yoku" (baño de bosque) tiene protocolo médico en Japón y
-            Corea del Sur.
+            nervioso en alerta constante. Estudios recientes (Hunter et al., 2019, Universidad de
+            Michigan) sugieren que pasar al menos 20 minutos en un entorno natural se asocia a una
+            reducción del cortisol salival. En Japón, el shinrin-yoku ("baño de bosque") tiene
+            reconocimiento oficial como práctica de salud preventiva.
           </p>
         </section>
 

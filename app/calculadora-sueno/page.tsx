@@ -156,9 +156,10 @@ export default function CalculadoraSuenoPage() {
           <div className={styles.infoBox}>
             <h3>💡 ¿Por qué 90 minutos?</h3>
             <p>
-              Un ciclo de sueño completo dura aproximadamente 90 minutos e incluye todas las fases:
-              sueño ligero, profundo y REM. Despertar al final de un ciclo te hace sentir más
-              descansado que hacerlo a mitad de uno.
+              Un ciclo de sueño dura entre 80 y 110 minutos (promedio: 90). Esta calculadora usa el
+              promedio como aproximación, pero tu ciclo real puede diferir. Despertar entre ciclos
+              suele asociarse con menor inercia del sueño, aunque la calidad global importa más que
+              el momento exacto del despertar.
             </p>
           </div>
         </div>
@@ -365,7 +366,7 @@ export default function CalculadoraSuenoPage() {
           <h2>Hábitos de los que duermen bien</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}><span className={styles.tipIcon}>🌡️</span><strong>Temperatura ideal: 18-20°C</strong><p>El cuerpo necesita bajar su temperatura central para iniciar el sueño. Una habitación fresca facilita este proceso de forma natural.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>⏰</span><strong>Despertador en múltiplo de 90 min</strong><p>Calcula desde tu hora de dormirte, no de acostarte. Despertarse al final de un ciclo reduce la inercia del sueño y la sensación de atontamiento.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon}>⏰</span><strong>Despertador en múltiplo de 90 min</strong><p>Algunas personas notan menos inercia del sueño si se despiertan al final de un ciclo aproximado de 90 minutos, aunque la evidencia es mixta. La regularidad del horario tiene mayor respaldo científico.</p></div>
             <div className={styles.tipCard}><span className={styles.tipIcon}>📵</span><strong>Sin pantallas 1h antes</strong><p>Sustituye por lectura física, podcast relajante o meditación. El cerebro no distingue entre contenido relajante e intenso en pantalla — la luz azul siempre suprime melatonina.</p></div>
             <div className={styles.tipCard}><span className={styles.tipIcon}>🧘</span><strong>Técnica 4-7-8 para conciliar</strong><p>Inhala 4 seg, retén 7 seg, exhala 8 seg. Activa el sistema parasimpático y reduce la frecuencia cardíaca, facilitando la transición al sueño.</p></div>
             <div className={styles.tipCard}><span className={styles.tipIcon}>☀️</span><strong>Luz solar al despertar</strong><p>10-15 min de luz natural nada más levantarte sincroniza el ritmo circadiano, mejora el estado de ánimo y facilita dormir mejor esa noche.</p></div>

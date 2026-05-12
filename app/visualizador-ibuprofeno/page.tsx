@@ -143,7 +143,7 @@ const SITUACIONES_USO: SituacionUso[] = [
     mecanismo:
       'La inflamación muscular post-ejercicio implica PGE2 elevada. El ibuprofeno la reduce, disminuyendo dolor e hinchazón.',
     nota:
-      'Controversia: inhibe parte de la adaptación muscular al ejercicio en uso crónico.',
+      'El uso crónico y a dosis altas puede atenuar la adaptación muscular al ejercicio (síntesis proteica, hipertrofia). No relevante en uso puntual.',
   },
   {
     icono: '🦷',
@@ -594,16 +594,18 @@ export default function VisualizadorIbuprofeno() {
             <p>
               El ibuprofeno comercial es una mezcla racémica de dos enantiómeros (R y S). Solo el
               enantiómero S(+) es farmacológicamente activo e inhibe las COX. El cuerpo convierte
-              parcialmente el R en S mediante una isomerasa hepática. El dexibuprofeno, que solo contiene
-              el enantiómero S activo, requiere la mitad de la dosis convencional para el mismo efecto.
+              parcialmente el R en S mediante una isomerasa hepática. El dexibuprofeno permite usar una dosis
+              menor (≈400 mg dexibuprofeno ≈ 600 mg ibuprofeno racémico) para un efecto comparable, gracias a
+              evitar la pérdida del enantiómero inactivo.
             </p>
           </div>
 
           <div className={styles.eduBloque}>
             <h3 className={styles.eduTitulo}>🤰 Ibuprofeno y embarazo</h3>
             <p>
-              En el primer trimestre, algunos estudios asocian el uso de ibuprofeno con mayor riesgo de
-              aborto espontáneo. En el tercer trimestre está contraindicado: puede cerrar prematuramente
+              Algunos estudios observacionales asocian (sin establecer causalidad de forma concluyente) el uso
+              de ibuprofeno en el primer trimestre con mayor riesgo de aborto. Por prudencia, las guías recomiendan
+              evitarlo salvo necesidad. En el tercer trimestre está contraindicado: puede cerrar prematuramente
               el ductus arterioso fetal, un vaso necesario para la circulación fetal. El segundo
               trimestre es el período menos problemático, aunque se recomienda evitar salvo necesidad
               médica justificada.

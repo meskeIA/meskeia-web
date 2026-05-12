@@ -44,12 +44,12 @@ const CATEGORIES: Category[] = [
     questions: [
       {
         id: 'h1',
-        text: '¿Cuántos vasos de agua (o líquidos saludables) bebes al día aproximadamente?',
+        text: '¿Cómo es tu hidratación general (incluyendo agua, infusiones, fruta, sopas, alimentos acuosos)?',
         options: [
-          { text: 'Menos de 4 vasos', score: 1 },
-          { text: '4-6 vasos', score: 2 },
-          { text: '6-8 vasos', score: 3 },
-          { text: 'Más de 8 vasos', score: 4 },
+          { text: 'Rara vez bebo y orina muy oscura', score: 1 },
+          { text: 'Orina oscura frecuente', score: 2 },
+          { text: 'Orina amarilla habitual', score: 3 },
+          { text: 'Orina mayormente pálida la mayor parte del día', score: 4 },
         ],
       },
       {
@@ -305,10 +305,10 @@ const CATEGORIES: Category[] = [
 ];
 
 const getLevel = (percentage: number): string => {
-  if (percentage >= 80) return 'Excelente';
-  if (percentage >= 60) return 'Bueno';
-  if (percentage >= 40) return 'Mejorable';
-  return 'A trabajar';
+  if (percentage >= 80) return 'Frecuente';
+  if (percentage >= 60) return 'Ocasional';
+  if (percentage >= 40) return 'Poco frecuente';
+  return 'Casi nunca';
 };
 
 const getSuggestion = (categoryId: string, percentage: number): string => {
@@ -663,7 +663,7 @@ export default function TestHabitosPage() {
               </tr>
               <tr>
                 <td><strong>Hidratación</strong></td>
-                <td>1,5-2 L agua/día</td>
+                <td>Total recomendado EFSA: ~2 L (mujeres) / 2,5 L (hombres) contando alimentos y bebidas — variable según clima y actividad</td>
                 <td>Concentración, piel, riñones</td>
                 <td>24-48 horas</td>
               </tr>

@@ -101,6 +101,8 @@ const PREGUNTAS: Pregunta[] = [
       { texto: 'Mejorar flexibilidad y movilidad', pesos: { yoga_pilates: 3, aire_libre: 1 } },
       { texto: 'Reducir el estrés y mejorar el bienestar', pesos: { yoga_pilates: 3, aire_libre: 2 } },
       { texto: 'Aumentar la resistencia cardiovascular', pesos: { aire_libre: 3, crossfit_funcional: 2, gimnasio_tradicional: 1 } },
+      { texto: 'Mantener mi forma física actual', pesos: { gimnasio_tradicional: 2, aire_libre: 2, casa: 2, yoga_pilates: 1 } },
+      { texto: 'Diversión y socializar', pesos: { crossfit_funcional: 2, aire_libre: 2, gimnasio_tradicional: 1, yoga_pilates: 1 } },
     ],
   },
   {

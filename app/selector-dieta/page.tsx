@@ -222,7 +222,7 @@ const DIETAS: Record<DietaKey, DietaInfo> = {
     icono: '🥩',
     nombre: 'Dieta Cetogénica',
     perfil: 'Baja en carbohidratos · Rápida en resultados · Restrictiva',
-    descripcion: 'Muy baja en carbohidratos (< 50g/día), alta en grasas. Pone al cuerpo en cetosis, usando grasa como combustible. Muy eficaz para pérdida de peso rápida y control glucémico, pero exigente.',
+    descripcion: 'Muy baja en carbohidratos (< 50g/día), alta en grasas. Pone al cuerpo en cetosis, usando grasa como combustible. Suele producir pérdida de peso rápida a corto plazo y mejora del control glucémico en personas con resistencia a la insulina, aunque a largo plazo los resultados se igualan con otras estrategias.',
     macros: '70-75% grasas · 20-25% proteínas · 5% carbohidratos',
     dificultad: 'Alta — exige contar carbohidratos con precisión',
     coste: 'Moderada a alta — carne, pescado y grasas de calidad',
@@ -252,7 +252,7 @@ const DIETAS: Record<DietaKey, DietaInfo> = {
     coste: 'Económico — en general se come menos',
     alimentosClave: ['Cualquier alimento saludable dentro de la ventana', 'Proteínas saciantes para aguantar el ayuno', 'Verduras y fibra para controlar el hambre', 'Agua, café e infusiones (sin azúcar) en el ayuno', 'Grasas saludables para la saciedad'],
     aLimitar: ['Calorías fuera de la ventana de alimentación', 'Ultraprocesados (derrotan el propósito)', 'Bebidas calóricas durante el ayuno', 'Exceso de comida compulsiva al romper el ayuno'],
-    consejos: ['Empieza con 12h de ayuno y aumenta gradualmente', 'El café solo o té sin azúcar no rompe el ayuno metabólicamente', 'No es adecuado si tienes historial de trastornos alimentarios', 'Mantén la calidad de lo que comes dentro de la ventana'],
+    consejos: ['Empieza con 12h de ayuno y aumenta gradualmente', 'El café solo o el té sin azúcar suelen considerarse compatibles con el ayuno, aunque el efecto exacto sobre la insulina puede variar entre personas', 'No es adecuado si tienes historial de trastornos alimentarios', 'Mantén la calidad de lo que comes dentro de la ventana'],
   },
 };
 
