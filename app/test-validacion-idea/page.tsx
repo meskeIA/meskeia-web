@@ -214,10 +214,11 @@ export default function TestValidacionIdeaPage() {
           <section className={styles.guideSection}>
             <h2>El ciclo Build-Measure-Learn</h2>
             <p>Eric Ries propuso en 2011 un ciclo iterativo para emprender: <strong>Construir</strong> una versión mínima (MVP), <strong>Medir</strong> cómo responde el mercado, y <strong>Aprender</strong> para decidir si pivotar o perseverar. La clave es que el ciclo sea lo más corto posible.</p>
+            <p><em>Lean Startup es un marco influyente pensado originalmente para startups tecnológicas con potencial de escalado. Para muchos negocios locales (consultoría, comercio, oficios, servicios profesionales), validar a través de conversaciones y un MVP rudimentario sigue siendo útil, pero el énfasis en pivotar rápido y escalar puede no aplicarse igual.</em></p>
             <h2>El MVP: Producto Mínimo Viable</h2>
             <p>El MVP no es &quot;el producto a medias&quot; — es la versión más pequeña de tu idea que permite aprender algo real del mercado. Puede ser una landing page, una encuesta, un prototipo en papel o incluso un servicio manual que simule el producto.</p>
             <h2>Product-Market Fit</h2>
-            <p>Marc Andreessen definió el product-market fit como &quot;estar en un buen mercado con un producto que satisface ese mercado&quot;. Antes de tenerlo, todo es experimentación. Después de tenerlo, todo es escalado. <strong>El error más caro es escalar antes de tener fit.</strong></p>
+            <p>Andreessen acuñó este término en el contexto de startups de capital riesgo, donde el escalado es el objetivo. En negocios sin vocación de escalado (servicios profesionales, comercio local, oficios), el equivalente útil es &quot;encaje cliente-oferta sostenido&quot;: tu trabajo cubre una necesidad real y te permite vivir de ello con calidad. <strong>Escalar es una opción, no una obligación.</strong></p>
             <h3>Lecturas recomendadas</h3>
             <ul>
               <li>Ries, E. (2011). <em>The Lean Startup</em>. Crown Business.</li>

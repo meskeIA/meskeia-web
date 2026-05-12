@@ -591,7 +591,10 @@ export default function TestSaludNegocioFreelance() {
             <p>
               Depender de un solo cliente es el riesgo más común del freelance. Si ese cliente
               desaparece, tu negocio se hunde. Lo ideal es que ningún cliente represente más
-              del 25% de tus ingresos y tener al menos 3-5 clientes activos.
+              del 25% de tus ingresos y tener al menos 3-5 clientes activos. Hay modelos viables
+              (mantenimiento estable, exclusividades pactadas) donde tener un cliente principal
+              es una elección razonable. Lo importante es que sea consciente y, si es posible,
+              contractualmente protegido.
             </p>
             <p>
               <strong>Consejo clave</strong>: No esperes a perder un cliente para buscar más.
@@ -613,9 +616,16 @@ export default function TestSaludNegocioFreelance() {
 
             <h2><span aria-hidden="true">⚖️</span> Equilibrio Vida-Trabajo</h2>
             <p>
+              Trabajar muchas horas en fase de arranque o en sectores intensivos es normal. La pregunta
+              sobre horas no diagnostica si <strong>es bueno o malo en absoluto</strong>, sino si
+              a estas alturas es sostenible para ti.
+            </p>
+            <p>
               El freelance ofrece libertad horaria, pero muchos acaban trabajando más que
-              como empleados. Sin vacaciones, sin desconexión y con jornadas interminables,
-              el burnout está garantizado. Un negocio que te agota no es sostenible a largo plazo.
+              como empleados. Trabajar muchas horas durante semanas o meses puntuales es habitual y
+              manejable. El problema aparece cuando es la norma todo el año durante años: el
+              agotamiento crónico afecta la calidad del trabajo, la salud y, eventualmente, la
+              viabilidad del negocio.
             </p>
             <p>
               <strong>Consejo clave</strong>: Planifica tus vacaciones como planificas los
@@ -625,15 +635,10 @@ export default function TestSaludNegocioFreelance() {
 
             <h2><span aria-hidden="true">📈</span> Crecimiento Profesional</h2>
             <p>
-              Un negocio que no crece se estanca. Subir tarifas regularmente (al menos con la
-              inflación), invertir en formación y tener un plan a 1-2 años vista son señales
-              de un negocio con futuro. Si llevas años cobrando lo mismo, estás perdiendo
-              poder adquisitivo.
-            </p>
-            <p>
-              <strong>Consejo clave</strong>: Sube tus tarifas un mínimo del 5-10% cada año.
-              Los clientes que solo te eligen por precio no son clientes sostenibles. Invierte
-              en especializarte y podrás cobrar más por menos horas.
+              Actualizar tarifas al menos con la inflación es importante para no perder poder
+              adquisitivo. Si tu modelo es de crecimiento, también es razonable subirlas algo
+              más cada año. Si tu modelo es de estabilidad (carga de trabajo constante, vida
+              que ya te encaja), basta con seguir la inflación.
             </p>
           </section>
         </EducationalSection>

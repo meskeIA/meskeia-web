@@ -62,7 +62,7 @@ function obtenerPerfil(automatismo: number, deliberacion: number): Perfil {
     return {
       nombre: 'Pensador Híbrido',
       emoji: '🧩',
-      descripcion: 'Reconoces que operas mucho en piloto automático PERO también tienes capacidad de deliberar cuando importa. Kahneman diría que eres consciente de tu Sistema 1 y sabes cuándo activar el Sistema 2. Esta combinación es valiosa — la clave es no confiar en que siempre sabrás cuándo cambiar de modo.',
+      descripcion: 'Reconoces que operas mucho en piloto automático PERO también tienes capacidad de deliberar cuando importa. En términos del modelo de Kahneman, este perfil sugiere conciencia del Sistema 1 y capacidad de activar el Sistema 2 cuando lo reconoces necesario. Esta combinación es valiosa — la clave es no confiar en que siempre sabrás cuándo cambiar de modo.',
       fortalezas: [
         'Conciencia de tus propios automatismos',
         'Capacidad de deliberar cuando lo reconoces necesario',
@@ -99,7 +99,7 @@ function obtenerPerfil(automatismo: number, deliberacion: number): Perfil {
       acciones: [
         'Para la próxima decisión importante, ESPERA 24 horas antes de actuar — el mero paso del tiempo reduce muchos sesgos',
         'Antes de decidir, escribe en un papel 3 razones POR las que podrías estar equivocado — si no se te ocurren, estás en sesgo',
-        'Lee "Pensar rápido, pensar despacio" de Kahneman — conocer los sesgos no los elimina, pero sí reduce su impacto',
+        'Lee "Pensar rápido, pensar despacio" de Kahneman — entender los sesgos no garantiza evitarlos, pero te da vocabulario para identificarlos cuando aparecen',
       ],
     };
   }
@@ -190,7 +190,7 @@ function obtenerPerfil(automatismo: number, deliberacion: number): Perfil {
     acciones: [
       'Fortalece tu Sistema 2 con prácticas regulares: lectura profunda, debates, escritura reflexiva',
       'Cuando notes que estás decidiendo "con la tripa", no lo reprimas — pero compruébalo después con datos',
-      'Reduce la exposición a estímulos diseñados para activar el Sistema 1: menos scrolling, menos titulares, más lectura larga',
+      'Reduce la exposición a estímulos diseñados para activar reacciones rápidas (scroll continuo, titulares alarmantes) cuando estás tomando decisiones importantes',
     ],
   };
 }
@@ -262,8 +262,9 @@ export default function DetectorSesgosCognitivosPage() {
 
         <section className={styles.contextCard}>
           <p>
-            Daniel Kahneman, Premio Nobel de Economía, demostró que el cerebro humano opera con
-            dos sistemas: el <strong>Sistema 1</strong> (rápido, intuitivo, automático) y el
+            Daniel Kahneman, Premio Nobel de Economía 2002, popularizó un modelo influyente para
+            describir la toma de decisiones: el cerebro funciona —de forma simplificada— como si
+            tuviera dos sistemas: el <strong>Sistema 1</strong> (rápido, intuitivo, automático) y el
             <strong> Sistema 2</strong> (lento, analítico, deliberado).
           </p>
           <p>

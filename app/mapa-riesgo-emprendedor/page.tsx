@@ -53,7 +53,7 @@ function obtenerPerfil(exposicion: number, preparacion: number): Perfil {
     return {
       nombre: 'Todo o Nada',
       emoji: '🎰',
-      descripcion: 'Alta exposición sin preparación: estás jugando a todo o nada. No es que seas valiente — es que no has pensado en el escenario de fracaso. Y el escenario de fracaso existe: según datos del INE, el 50% de los negocios en España no sobreviven los primeros 5 años. Prepararse no es pesimismo — es responsabilidad.',
+      descripcion: 'Tienes alta exposición sin red de seguridad. A veces esto es por falta de previsión, pero a menudo es porque la circunstancia (paro, despido, falta de ahorros) no daba margen para preparar más. Reconocer dónde estás te permite tomar decisiones desde la realidad, no desde el ideal. Y el escenario de fracaso existe: según datos del INE, el 50% de los negocios en España no sobreviven los primeros 5 años. Prepararse no es pesimismo — es responsabilidad.',
       fortalezas: ['Compromiso total con el proyecto', 'La presión puede ser un motor si la gestionas', 'Reconocer la situación es el primer paso para protegerte'],
       riesgos: ['Ruina financiera si el proyecto no funciona', 'Decisiones desesperadas por falta de alternativas', 'Impacto en salud mental y relaciones por presión sin válvula de escape'],
       acciones: ['URGENTE: calcula cuántos meses puedes sostenerte al ritmo actual sin ingresos del proyecto. Si el número te asusta, necesitas actuar ya.', 'Busca una fuente de ingresos mínima que no comprometa el proyecto pero que te dé oxígeno (freelance parcial, consultoría, clases)', 'Define tu "línea roja": el punto en el que paras, pivotas o buscas empleo. Tenerla definida ANTES de necesitarla es lo que separa el riesgo del kamikaze.'],
@@ -99,7 +99,7 @@ function obtenerPerfil(exposicion: number, preparacion: number): Perfil {
     descripcion: 'Tu preparación supera ligeramente a tu exposición. Buena dirección: tienes más red de seguridad que riesgo asumido. El reto es no quedarte indefinidamente en esta posición — en algún momento, emprender requiere dar un paso adelante.',
     fortalezas: ['Buena base de seguridad', 'Preparación superior al riesgo', 'Posición desde la que puedes escalar el compromiso'],
     riesgos: ['La prudencia puede convertirse en inacción', 'El proyecto puede necesitar más energía de la que estás dispuesto a dar', 'Otros con más exposición pueden avanzar más rápido'],
-    acciones: ['Define las condiciones que te harían dar el siguiente paso — y sé honesto sobre si esas condiciones son alcanzables o son excusas', 'Habla con emprendedores que estén un paso por delante tuyo — ver que se puede hacer ayuda a reducir el miedo', 'Recuerda: el riesgo de no hacer nada también tiene un coste — oportunidad perdida, experiencia no adquirida, años pasados'],
+    acciones: ['Define las condiciones que te harían dar el siguiente paso — y sé honesto sobre si esas condiciones son alcanzables o son excusas', 'Habla con emprendedores que estén un paso por delante tuyo — ver que se puede hacer ayuda a reducir el miedo', 'Si emprender es lo que quieres, en algún momento toca dar el paso — pero también es legítimo concluir que tu situación actual te conviene más. La prudencia eterna solo es problema si te frustra; si estás bien, no es un problema'],
   };
 }
 
@@ -203,12 +203,12 @@ export default function MapaRiesgoEmprendedorPage() {
         <EducationalSection title="📚 Gestión de riesgo para emprendedores" subtitle="Arriesgar bien no es arriesgar mucho">
           <section className={styles.guideSection}>
             <h2>El mito del emprendedor temerario</h2>
-            <p>La narrativa popular presenta a los emprendedores exitosos como visionarios que &quot;lo apostaron todo&quot;. Pero la investigación cuenta una historia diferente: según un estudio de la Universidad de Wisconsin, <strong>los emprendedores que mantienen su empleo mientras lanzan su negocio tienen un 33% más de probabilidades de éxito</strong> que los que lo dejan todo.</p>
+            <p>La narrativa popular presenta a los emprendedores exitosos como visionarios que &quot;lo apostaron todo&quot;. Pero la investigación cuenta una historia diferente: estudios como el de Raffiee y Feng (<em>Academy of Management Journal</em>, 2014) sugieren que <strong>los emprendedores que combinan inicialmente el empleo con su proyecto tienen mejores tasas de supervivencia que los que dejan el empleo bruscamente</strong>, especialmente en sectores intensivos en conocimiento.</p>
             <h2>La estrategia barbell de Taleb</h2>
             <p>Nassim Taleb propone la <strong>estrategia barbell</strong>: combinar una posición muy segura (ahorros, empleo, habilidades transferibles) con una posición de alto riesgo (tu proyecto emprendedor). La clave es que la posición segura te protege de la ruina mientras la arriesgada te da la oportunidad de ganar grande.</p>
             <h2>Las señales de alarma</h2>
             <ul>
-              <li><strong>No tienes colchón financiero</strong>: Si un mes sin ingresos te pone en apuros, tu exposición es demasiado alta.</li>
+              <li><strong>No tienes colchón financiero</strong>: Tener colchón financiero es ideal — pero muchas personas emprenden sin tenerlo. Si no es tu caso, eso no significa que no puedas emprender: significa que necesitas más urgencia en validar ingresos rápidos, mantener una fuente parcial de trabajo o explorar microempresa con baja inversión inicial.</li>
               <li><strong>No has pensado en el fracaso</strong>: Si no puedes describir qué harías si el proyecto fracasa, no tienes plan B.</li>
               <li><strong>Tus relaciones sufren</strong>: Si tu pareja, familia o amigos expresan preocupación repetidamente, escucha.</li>
               <li><strong>No tienes deadline</strong>: Si no hay una fecha en la que decidas si el proyecto es viable, puedes quedar atrapado indefinidamente.</li>

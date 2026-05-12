@@ -93,7 +93,7 @@ function obtenerPerfil(vision: number, filtro: number): Perfil {
         'Equipo o entorno que confía en tu capacidad resolutiva',
       ],
       riesgos: [
-        'Adicción a la urgencia: la adrenalina del "lo resuelvo ya" es adictiva',
+        'Recompensa inmediata de resolver: el alivio del "lo resuelvo ya" refuerza el hábito reactivo, aunque lo resuelto no fuera lo más importante',
         'Proyectos estratégicos que se posponen indefinidamente',
         'Sensación de estar siempre ocupado pero sin avanzar en lo que importa',
       ],
@@ -277,6 +277,12 @@ export default function MapaDecisionesUrgentesImportantesPage() {
             —planificar, aprender, construir relaciones, pensar a largo plazo— puede esperar.
             Y por eso, casi siempre espera.
             <strong> Este diagnóstico mide las dos dimensiones que determinan cómo gestionas tu tiempo.</strong>
+          </p>
+          <p>
+            Este marco está pensado para personas con cierto grado de control sobre su agenda. Si tu trabajo
+            o tu situación vital implica responder constantemente a urgencias impuestas por otros (cuidados,
+            atención al cliente, urgencias sanitarias, jerarquías rígidas), el diagnóstico te servirá más como
+            mapa de a qué aspirar cuando ganes margen que como autodiagnóstico de productividad personal.
           </p>
         </section>
 
@@ -473,16 +479,9 @@ export default function MapaDecisionesUrgentesImportantesPage() {
 
             <h2>La adicción a la urgencia</h2>
             <p>
-              El neurocientífico Daniel Levitin ha documentado que responder a urgencias genera
-              dopamina — la misma recompensa que nos dan las notificaciones del móvil. Resolver
-              algo urgente produce satisfacción inmediata, aunque lo que hayas resuelto no fuera
-              realmente importante.
-            </p>
-            <p>
-              El resultado es un ciclo perverso: cuantas más urgencias resuelves, más recompensa
-              obtienes, y menos atractivo resulta el trabajo estratégico (que no produce dopamina
-              hasta mucho después). <strong>La urgencia es la comida rápida de la productividad:
-              satisface al instante pero no nutre.</strong>
+              Resolver algo urgente produce satisfacción inmediata, mientras que el trabajo estratégico
+              tarda en dar frutos visibles. Eso explica que, sin esfuerzo consciente, lo urgente
+              acabe ganando casi siempre.
             </p>
 
             <h2>Las dos dimensiones de este diagnóstico</h2>

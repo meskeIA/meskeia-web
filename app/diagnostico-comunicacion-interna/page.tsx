@@ -116,9 +116,7 @@ function obtenerPerfil(velocidad: number, profundidad: number): Perfil {
         'Cultura de reflexión antes de actuar',
       ],
       riesgos: [
-        'Personas que trabajan con información desactualizada',
-        'Frustración por lentitud en la coordinación operativa',
-        'Decisiones buenas que llegan tarde y pierden impacto',
+        'En entornos donde la calidad pesa más que la velocidad operativa (legal, sanitario, investigación), este perfil puede ser deseable. En entornos comerciales o de operaciones con cambios rápidos, la lentitud puede generar fricción',
       ],
       acciones: [
         'Separar la comunicación en dos carriles: un canal rápido para urgencias operativas y otro para discusiones profundas — y respetar ambos',
@@ -479,6 +477,12 @@ export default function DiagnosticoComunicacionInternaPage() {
               usarla solo cuando es necesaria: temas emocionales, decisiones urgentes, brainstorming.
               Todo lo demás —actualizaciones, decisiones documentadas, contexto— funciona mejor de
               forma asincrónica.
+            </p>
+            <p>
+              Los modelos asincrónicos populares (Basecamp, GitLab, Doist) son culturalmente anglosajones
+              y muy adaptados a equipos remotos distribuidos. En equipos pequeños con contexto compartido
+              y proximidad física, la comunicación oral puede sustituir parte de la documentación sin
+              pérdida real. El óptimo depende del tamaño, la dispersión y la cultura del equipo.
             </p>
 
             <h2>Las dos dimensiones de este test</h2>

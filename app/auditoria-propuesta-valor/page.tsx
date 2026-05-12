@@ -89,7 +89,7 @@ function obtenerPerfil(encaje: number, comunicacion: number): Perfil {
       descripcion: 'Tu oferta encaja mejor de lo que la comunicas. Hay más valor del que el cliente percibe. Es una buena base: el producto funciona, pero la narrativa necesita trabajo. El marketing no es "decorar" — es hacer visible lo que ya es valioso.',
       fortalezas: ['Base de encaje real', 'Clientes existentes probablemente contentos', 'Mejora de comunicación dará resultados rápidos'],
       riesgos: ['Crecimiento frenado por mala comunicación', 'Oportunidades perdidas porque el mercado no te conoce', 'Competidores más visibles pueden parecer mejores aunque no lo sean'],
-      acciones: ['Dedica 2 horas a escribir 3 versiones de "qué hago y para quién" — pide a 3 personas que elijan la más clara', 'Crea 3 casos de éxito con clientes reales: problema → solución → resultado. Los casos venden mejor que las descripciones.', 'Invierte en tu web/LinkedIn/materiales: el primer contacto es visual, y tu valor debe ser evidente en 5 segundos'],
+      acciones: ['Dedica 2 horas a escribir 3 versiones de "qué hago y para quién" — pide a 3 personas que elijan la más clara', 'Crea 3 casos de éxito con clientes reales: problema → solución → resultado. Los casos venden mejor que las descripciones.', 'Invierte en el canal de captación que usan tus clientes reales — para algunos será web y LinkedIn, para otros boca a boca, derivaciones de colegas o presencia local. Identifica cuál es el tuyo antes de invertir.'],
     };
   }
 
@@ -208,6 +208,7 @@ export default function AuditoriaPropuestaValorPage() {
             </ul>
             <h2>El error de la &quot;solución en busca de problema&quot;</h2>
             <p>El error más frecuente es empezar por la solución (&quot;tengo esta tecnología/habilidad/idea&quot;) y buscar un problema que justifique su existencia. Los negocios más sólidos hacen lo contrario: <strong>empiezan por el problema del cliente y diseñan la solución alrededor</strong>.</p>
+            <p>Mejorar la comunicación tiene dos efectos: facilitar el crecimiento si lo buscas, o permitirte subir precios y trabajar menos manteniendo ingresos. La segunda opción es igualmente válida.</p>
             <h3>Lecturas recomendadas</h3>
             <ul>
               <li>Osterwalder, A. et al. (2014). <em>Value Proposition Design</em>. John Wiley &amp; Sons.</li>

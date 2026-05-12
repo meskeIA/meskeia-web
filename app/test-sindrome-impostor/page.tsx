@@ -88,7 +88,7 @@ function obtenerPerfil(autoexigencia: number, reconocimiento: number): Perfil {
       descripcion: 'Te exiges mucho y no reconoces tus logros. Esta es la combinación clásica del síndrome del impostor, descrita por Pauline Clance en 1978: sensación persistente de fraude a pesar de evidencia objetiva de competencia. No es un trastorno — es un patrón de pensamiento que se puede cambiar.',
       fortalezas: [
         'Tu exigencia demuestra que te importa hacer las cosas bien',
-        'Probablemente eres más competente de lo que crees — la brecha entre percepción y realidad es el núcleo del impostor',
+        'En la mayoría de los casos, las personas con este patrón son más competentes de lo que creen — la brecha entre percepción y realidad suele ser el núcleo del impostor. Si tu duda viene de un puesto nuevo o un cambio reciente, también puede ser prudencia legítima mientras te asientas.',
         'Reconocer este patrón es el primer paso para cambiarlo',
       ],
       riesgos: [
@@ -145,7 +145,7 @@ function obtenerPerfil(autoexigencia: number, reconocimiento: number): Perfil {
       acciones: [
         'Pregúntate honestamente: "¿Este trabajo me importa?" — la respuesta orienta las siguientes acciones',
         'Busca UNA cosa en tu trabajo actual que te haga sentir algo (orgullo, curiosidad, satisfacción) y amplíala',
-        'Si llevas tiempo en esta situación, considera hablar con un profesional — la desconexión sostenida puede ser señal de algo más profundo',
+        'Si llevas tiempo en esta situación y te genera malestar, considera hablar con un profesional o coach. A veces la desconexión es señal de que el trabajo no encaja contigo, y otras veces hay algo más que merece atención.',
       ],
     };
   }
@@ -264,9 +264,10 @@ export default function TestSindromeImpostorPage() {
         <section className={styles.contextCard}>
           <p>
             En 1978, las psicólogas <strong>Pauline Clance y Suzanne Imes</strong> describieron un fenómeno
-            que afecta al 70% de las personas en algún momento de su vida: la sensación persistente de que
-            <strong> tus logros no son merecidos</strong> y de que en cualquier momento descubrirán que
-            no eres tan competente como creen.
+            que afecta a un porcentaje significativo de las personas en algún momento de su vida (las
+            estimaciones varían entre el 9% y el 82% según el contexto y la metodología de estudio):
+            la sensación persistente de que <strong>tus logros no son merecidos</strong> y de que en
+            cualquier momento descubrirán que no eres tan competente como creen.
           </p>
           <p>
             No es un trastorno — es un patrón de pensamiento. Y tiene solución.

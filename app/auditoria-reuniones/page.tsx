@@ -122,7 +122,7 @@ function obtenerPerfil(eficiencia: number, cultura: number): Perfil {
       ],
       acciones: [
         'Implantar la regla de los 3 elementos: toda reunión necesita objetivo, agenda escrita y responsable de cierre con próximos pasos',
-        'Limitar reuniones a 25 o 50 minutos (no 30 o 60) para forzar concreción y dejar margen de transición',
+        'Cuando puedas controlar la duración, probar 25 o 50 min en lugar de 30 o 60 para forzar concreción y dejar margen de transición',
         'Asignar un "guardián del tiempo" rotativo que avise cuando la reunión se desvía del tema',
       ],
     };
@@ -251,7 +251,7 @@ export default function AuditoriaReunionesPage() {
         <header className={styles.hero}>
           <h1 className={styles.title}>📋 Auditoría de Reuniones</h1>
           <p className={styles.subtitle}>
-            ¿Cuántas de tus reuniones podrían ser un email?
+            ¿Tus reuniones aportan lo que deberían?
             <br />
             Analiza la eficiencia y la cultura de reuniones de tu equipo
           </p>
@@ -267,7 +267,7 @@ export default function AuditoriaReunionesPage() {
         {/* Contexto breve */}
         <section className={styles.contextCard}>
           <p>
-            Según varios estudios, los profesionales pasan entre un <strong>35% y un 50% de su jornada laboral</strong> en
+            Según varios estudios sobre mandos y oficinas corporativas, este perfil de profesionales pasa entre un <strong>35% y un 50% de su jornada laboral</strong> en
             reuniones. Sin embargo, el <strong>71% de los managers</strong> considera que la mayoría de esas reuniones
             son improductivas o innecesarias.
           </p>
@@ -452,6 +452,13 @@ export default function AuditoriaReunionesPage() {
               resolver conflictos. Pero también cumplen funciones ocultas menos productivas: demostrar
               ocupación, evitar responsabilidad individual (&quot;lo decidimos en grupo&quot;), o simplemente
               llenar el calendario porque &quot;así se hacen las cosas aquí&quot;.
+            </p>
+            <p>
+              Las reuniones tienen funciones legítimas más allá de la decisión y la información:
+              cohesión del equipo, transmisión oral, validación colectiva, ritual. Estas funciones
+              varían según sector y cultura — un equipo sanitario, un claustro educativo o un
+              servicio público las usan de forma distinta a un equipo remoto de software. La eficiencia
+              se mide en relación al objetivo real de la reunión, no en un estándar único.
             </p>
             <p>
               Steven Rogelberg, autor de <em>The Surprising Science of Meetings</em>, estima que el

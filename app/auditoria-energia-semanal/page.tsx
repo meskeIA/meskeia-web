@@ -131,16 +131,16 @@ function obtenerPerfil(desgaste: number, recarga: number): Perfil {
     return {
       nombre: 'Modo Bajo Consumo',
       emoji: '😶',
-      descripcion: 'Ni te desgastas mucho ni te recargas activamente. Puede indicar que tu semana tiene poca intensidad en ambos sentidos: ni mucho esfuerzo ni mucha satisfacción. No es necesariamente malo, pero puede ser señal de desconexión o de una etapa de transición.',
+      descripcion: 'Ni te desgastas mucho ni te recargas activamente. Para algunas personas y momentos vitales esto es exactamente lo apropiado: calma, ritmo bajo, sin necesidad de gran intensidad. Para otras puede ser señal de desconexión o de una etapa de transición. La diferencia está en cómo te sientes con ello, no en el patrón en sí.',
       fortalezas: [
         'No estás quemado — no hay déficit urgente',
         'Espacio disponible para diseñar tu semana como quieras',
         'Buen momento para introducir cambios sin presión',
       ],
       riesgos: [
-        'La baja intensidad puede ser apatía disfrazada de calma',
-        'Sin actividades que te recarguen, la motivación tiende a caer',
-        'Riesgo de estancamiento vital si se prolonga',
+        'Si lo vives como apatía o desconexión, conviene atenderlo',
+        'Si no hay actividades que te recarguen y eso te pesa, la motivación tiende a caer',
+        'Si te genera malestar prolongado, valora si necesitas un cambio más profundo',
       ],
       acciones: [
         'Pregúntate: ¿estoy en calma o estoy desconectado? — la diferencia importa',
@@ -190,7 +190,7 @@ function obtenerPerfil(desgaste: number, recarga: number): Perfil {
     acciones: [
       'Identifica qué tipo de recarga te funciona mejor (física, social, creativa, soledad) y asegúrate de incluir la más efectiva',
       'Cuando llegue un periodo de más carga, decide de antemano qué actividad de recarga NO sacrificarás',
-      'Revisa si tu recarga es genuina o es solo "no hacer nada" — el descanso pasivo recupera menos que la recarga activa',
+      'Identifica qué tipo de descanso te funciona mejor. A veces "no hacer nada" recupera tanto o más que una actividad de recarga estructurada — depende de la persona y del tipo de cansancio.',
     ],
   };
 }
@@ -263,11 +263,11 @@ export default function AuditoriaEnergiaSemanalPage() {
         <section className={styles.contextCard}>
           <p>
             Jim Loehr y Tony Schwartz, en su libro <em>The Power of Full Engagement</em>, propusieron
-            una idea revolucionaria: <strong>la gestión del tiempo es un error — lo que deberías
-            gestionar es tu energía</strong>.
+            un marco distinto al de la gestión del tiempo: <strong>gestionar la energía</strong>. Su idea:
+            puedes tener 8 horas libres pero, si tu energía está agotada, esas horas rinden menos.
+            Es un enfoque útil para algunas situaciones, no una verdad universal.
           </p>
           <p>
-            Puedes tener 8 horas libres, pero si tu energía está agotada, esas horas no sirven de nada.
             Este test evalúa las dos caras de la ecuación: cuánto desgaste hay en tu semana
             y cuánta recarga real consigues.
           </p>
@@ -465,9 +465,10 @@ export default function AuditoriaEnergiaSemanalPage() {
               la capacidad de moverse entre gasto de energía y recuperación de forma deliberada.
             </p>
             <p>
-              El problema de la vida moderna es que la oscilación se ha roto: vivimos en
-              gasto constante de media intensidad, sin picos de rendimiento real ni valles
-              de recuperación profunda. Ni rendimos al máximo ni descansamos de verdad.
+              Loehr y Schwartz argumentan que una causa frecuente de fatiga moderna es operar siempre
+              en intensidad media, sin picos claros ni descansos profundos. No todo el mundo necesita
+              esta alternancia — para algunas personas la intensidad estable es preferible. Pero si te
+              identificas con el patrón, restaurar la oscilación puede ayudar.
             </p>
 
             <h3>Lecturas recomendadas</h3>

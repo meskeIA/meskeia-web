@@ -85,14 +85,13 @@ function obtenerPerfil(urgencia: number, presencia: number): Perfil {
     return {
       nombre: 'Modo Urgencia Permanente',
       emoji: '🏃',
-      descripcion: 'Vives en un estado de urgencia continua sin momentos reales de pausa. Todo parece importante, todo parece urgente, y el freno no funciona. Es el perfil más común en la sociedad actual — y también el que más desgasta. No es cuestión de fuerza de voluntad: tu sistema nervioso está en modo "lucha o huida" crónico.',
+      descripcion: 'Vives a un ritmo muy alto y con poca pausa real. A veces es una etapa vital (hijos pequeños, emprendimiento, temporada profesional intensa) y es razonable. A veces es un patrón estructural que conviene revisar. La diferencia importa: una etapa pasa; un patrón hay que cambiarlo.',
       fortalezas: [
         'Capacidad de respuesta rápida ante problemas',
         'Alta productividad aparente a corto plazo',
         'Reconocer este patrón es el primer paso para cambiarlo',
       ],
       riesgos: [
-        'Burnout progresivo: el cuerpo y la mente no están diseñados para urgencia constante',
         'Deterioro de relaciones personales por falta de presencia',
         'Paradoja de la productividad: ir más rápido no siempre produce mejores resultados',
       ],
@@ -108,7 +107,7 @@ function obtenerPerfil(urgencia: number, presencia: number): Perfil {
     return {
       nombre: 'Ritmo Sostenible',
       emoji: '🌿',
-      descripcion: 'Has encontrado un ritmo de vida que combina baja urgencia con alta capacidad de estar presente. Este es el perfil más saludable según la investigación sobre bienestar y cronobiología. No significa que seas lento o improductivo — significa que tu velocidad es elegida, no impuesta.',
+      descripcion: 'Has encontrado un ritmo bajo en urgencia y alto en presencia. Para muchas personas es muy saludable; para algunas etapas vitales (carrera intensa, hijos pequeños, etapa creativa) puede sentirse insuficiente. No hay un ritmo universalmente óptimo: hay uno que encaja contigo en este momento.',
       fortalezas: [
         'Ritmo de vida sostenible a largo plazo',
         'Capacidad de disfrutar el proceso, no solo el resultado',
@@ -262,14 +261,10 @@ export default function TestRitmoVitalPage() {
 
         <section className={styles.contextCard}>
           <p>
-            En los Países Bajos existe un concepto llamado <strong>kletskassa</strong>: cajas de supermercado
-            donde la gente va <em>a propósito</em> para ir más lento y charlar con el cajero. En una cultura
-            que premia la velocidad, elegir ir despacio es un acto de resistencia.
-          </p>
-          <p>
-            La cronobiología demuestra que nuestro cuerpo tiene ritmos naturales que no coinciden
-            con la agenda. <strong>Vivir en urgencia permanente no es productividad — es una forma
-            de estrés crónico disfrazado de eficiencia.</strong>
+            Cada persona tiene un ritmo natural distinto. Algunos prosperan con intensidad, otros
+            necesitan calma. El problema no es ir rápido ni ir lento — es vivir a un ritmo que no
+            es el tuyo, impuesto por agenda externa o ansiedad. Este test te ayuda a observar tu
+            ritmo actual y preguntarte si lo has elegido.
           </p>
         </section>
 
@@ -455,10 +450,10 @@ export default function TestRitmoVitalPage() {
 
             <h2>La paradoja de la productividad</h2>
             <p>
-              Múltiples estudios (incluyendo investigación de Stanford sobre horas de trabajo)
-              demuestran que la productividad <strong>cae en picado después de 50 horas semanales</strong>
-              y es prácticamente nula después de 55. Trabajar 70 horas produce casi los mismos
-              resultados que trabajar 55, pero con un coste enorme en salud y bienestar.
+              Estudios sobre horas trabajadas (Pencavel, Stanford 2014) muestran rendimientos
+              decrecientes claros después de 50h semanales en trabajos físicos repetitivos. La
+              evidencia en trabajo cognitivo moderno es más matizada. Lo que sí es robusto:
+              trabajar más horas no escala linealmente — el rendimiento por hora baja.
             </p>
             <p>
               La sensación de urgencia permanente no es un indicador de productividad — es un

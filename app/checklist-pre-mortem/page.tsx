@@ -78,6 +78,7 @@ function obtenerPerfil(anticipacion: number, accion: number): Perfil {
         'Establecer un límite de tiempo para el análisis pre-mortem (máximo 1 hora) — después, lanzar con lo que tengas',
         'Priorizar riesgos por impacto × probabilidad: no todos merecen un plan B, solo los que tienen alto impacto Y alta probabilidad',
         'Equilibrar el mensaje: al equipo, comunicar tanto los riesgos identificados como las razones por las que el proyecto puede funcionar',
+        'Recuerda: el pre-mortem reduce errores evitables, pero no todos los fracasos lo son. Si algo sale mal pese a haber anticipado, no significa que el análisis fuera defectuoso — algunos factores son inevitables.',
       ],
     };
   }
@@ -130,8 +131,8 @@ function obtenerPerfil(anticipacion: number, accion: number): Perfil {
 
   if (anticipacion < umbralBajo && accion < umbralBajo) {
     return {
-      nombre: 'Optimismo Ciego',
-      emoji: '🎰',
+      nombre: 'Lanzamiento sin Red',
+      emoji: '⚠️',
       descripcion: 'Ni anticipas riesgos ni preparas planes de contingencia. Los proyectos se lanzan confiando en que todo saldrá bien, y cuando algo falla, se improvisa sobre la marcha. No es necesariamente mala intención — a menudo es presión de tiempo, cultura de "hacedores" o simplemente no haber aprendido a hacer pre-mortems.',
       fortalezas: [
         'Margen de mejora enorme: un solo pre-mortem cambiará la dinámica',
@@ -266,9 +267,10 @@ export default function ChecklistPreMortemPage() {
         <section className={styles.contextCard}>
           <p>
             En un <em>post-mortem</em> analizas por qué algo falló. En un <strong>pre-mortem</strong>,
-            imaginas que ya ha fallado y trabajas hacia atrás para descubrir por qué. Gary Klein,
-            psicólogo cognitivo, demostró que esta técnica <strong>aumenta un 30% la capacidad de
-            identificar riesgos</strong> frente al análisis convencional.
+            imaginas que ya ha fallado y trabajas hacia atrás para descubrir por qué. Estudios sobre
+            esta técnica sugieren que <strong>aumenta la capacidad del equipo de identificar riesgos</strong>
+            respecto al análisis convencional —Klein cita un incremento aproximado del 30% en un
+            estudio original sobre prospective hindsight—.
           </p>
           <p>
             Pero identificar riesgos no basta — hay que actuar sobre ellos. Este test mide las
@@ -342,7 +344,7 @@ export default function ChecklistPreMortemPage() {
                   <span>🛡️ Prevención Activa</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🎰 Optimismo Ciego</span>
+                  <span>⚠️ Lanzamiento sin Red</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span>🏃 Acción sin Mapa</span>
@@ -454,10 +456,12 @@ export default function ChecklistPreMortemPage() {
               El pre-mortem funciona porque neutraliza dos sesgos cognitivos muy potentes:
             </p>
             <p>
-              El <strong>sesgo de optimismo</strong>: tendemos a sobrestimar las probabilidades de éxito
-              y subestimar los riesgos. Cuando el éxito se da por sentado, nadie quiere ser &quot;el
-              pesimista&quot;. El pre-mortem invierte la premisa: el fracaso ya ha ocurrido, así que
-              analizarlo no es pesimismo, es investigación.
+              El llamado <strong>sesgo de optimismo</strong>: cierta literatura en psicología sugiere
+              que tendemos a sobrestimar las probabilidades de éxito y subestimar los riesgos
+              —especialmente cuando estamos implicados emocionalmente en el proyecto—. Cuando el
+              éxito se da por sentado, nadie quiere ser &quot;el pesimista&quot;. El pre-mortem
+              invierte la premisa: el fracaso ya ha ocurrido, así que analizarlo no es pesimismo,
+              es investigación.
             </p>
             <p>
               El <strong>pensamiento de grupo</strong> (<em>groupthink</em>): en equipos donde hay presión

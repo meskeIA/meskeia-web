@@ -83,7 +83,7 @@ function obtenerPerfil(fragmentacion: number, foco: number): Perfil {
 
   if (fragmentacion >= umbralAlto && foco < umbralBajo) {
     return {
-      nombre: 'Fragmentación Tóxica',
+      nombre: 'Alta Fragmentación',
       emoji: '💥',
       descripcion: 'Alta fragmentación y bajo foco: tu atención está dispersa la mayor parte del tiempo. La investigación es clara: cada cambio de contexto tiene un coste cognitivo de 15-25 minutos para recuperar la concentración plena. Si cambias 10 veces al día, estás perdiendo entre 2,5 y 4 horas en "cambio de marchas" invisible.',
       fortalezas: [
@@ -94,7 +94,7 @@ function obtenerPerfil(fragmentacion: number, foco: number): Perfil {
       riesgos: [
         'Productividad real muy por debajo de lo que sientes que haces',
         'Estrés crónico por sensación de "nunca terminar nada"',
-        'Deterioro progresivo de la capacidad de concentración (el cerebro se "entrena" en distracción)',
+        'Cuando este patrón se vuelve crónico y no es por elección, suele asociarse a más estrés y peor sensación de avance',
       ],
       acciones: [
         'MAÑANA: silencia TODAS las notificaciones durante 2 horas y trabaja en UNA sola cosa. Observa la diferencia.',
@@ -108,7 +108,7 @@ function obtenerPerfil(fragmentacion: number, foco: number): Perfil {
     return {
       nombre: 'Concentración Profunda',
       emoji: '🎯',
-      descripcion: 'Poca fragmentación y alto foco: dominas el arte de la concentración profunda. Cal Newport llamaría a esto "deep work" — la capacidad de trabajar en tareas cognitivamente exigentes sin distracción. En un mundo diseñado para fragmentar la atención, esto es un superpoder.',
+      descripcion: 'Poca fragmentación y alto foco: dominas la concentración sostenida — algo cada vez más valioso en trabajos que requieren profundidad cognitiva (programar, escribir, investigar, diseñar).',
       fortalezas: [
         'Capacidad de producir trabajo de alta calidad',
         'Menor estrés por no estar en modo reactivo constante',
@@ -131,7 +131,7 @@ function obtenerPerfil(fragmentacion: number, foco: number): Perfil {
     return {
       nombre: 'Baja Activación',
       emoji: '😶',
-      descripcion: 'Ni mucha fragmentación ni mucho foco. Puede indicar que tu carga de trabajo es baja, que estás en un momento de poca demanda, o que no encuentras motivación para concentrarte en nada. No es un problema de productividad — puede ser un problema de propósito.',
+      descripcion: 'Ni mucha fragmentación ni mucho foco. Puede indicar que tu carga de trabajo es baja, que estás en un momento de poca demanda, o que no encuentras motivación para concentrarte en nada. No tiene por qué ser un problema. Puede coincidir con un momento de descanso, transición vital, recuperación o baja demanda — solo merece atención si esta sensación de poca activación se prolonga y te genera malestar.',
       fortalezas: [
         'No tienes el hábito tóxico de la multitarea compulsiva',
         'Espacio disponible para construir buenos hábitos de foco',
@@ -263,8 +263,10 @@ export default function DiagnosticoMultitareaPage() {
         <section className={styles.contextCard}>
           <p>
             La investigación en neurociencia es contundente: <strong>el cerebro humano no hace multitarea
-            — hace cambio de contexto rápido</strong>. Cada vez que pasas de una tarea a otra,
-            tu cerebro necesita entre 15 y 25 minutos para recuperar la concentración plena.
+            — hace cambio de contexto rápido</strong>. En trabajos que requieren concentración sostenida
+            (programar, escribir, analizar), cada cambio de contexto puede costar 15-25 minutos de recuperación.
+            En otras profesiones (sanidad, docencia, atención directa), la alternancia rápida es parte del
+            oficio y no se aplica el mismo análisis.
           </p>
           <p>
             Esto no significa que toda multitarea sea mala. Hay tareas que pueden combinarse
@@ -341,7 +343,7 @@ export default function DiagnosticoMultitareaPage() {
                   <span>😶 Baja Activación</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>💥 Fragmentación Tóxica</span>
+                  <span>💥 Alta Fragmentación</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />

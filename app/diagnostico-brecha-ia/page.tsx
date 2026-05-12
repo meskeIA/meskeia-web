@@ -93,9 +93,9 @@ function obtenerPerfil(criterio: number, aprovechamiento: number): Perfil {
         'Capacidad de profundizar sin atajos',
       ],
       riesgos: [
-        'Brecha de productividad creciente con quienes sí aprovechan la IA',
+        'Brecha de productividad con quienes sí usan IA — si tu sector valora esa velocidad. En sectores donde el criterio humano es el producto (terapia, artesanía, oficios), esta "brecha" puede no existir o incluso ser una ventaja reputacional.',
         'Oportunidades perdidas: ideas, perspectivas y eficiencias que la IA podría aportar',
-        'Riesgo de que la resistencia a la IA se convierta en resistencia al cambio en general',
+        'Conviene revisar de vez en cuando si tu no-uso es una decisión informada o una rutina heredada — ambas son válidas, pero distintas',
       ],
       acciones: [
         'Elegir UNA tarea repetitiva de tu semana y probar a hacerla con IA — no para sustituirte, sino para comparar el resultado',

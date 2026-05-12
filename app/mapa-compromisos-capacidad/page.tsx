@@ -35,7 +35,7 @@ interface Perfil {
 
 const PREGUNTAS: Pregunta[] = [
   { id: 1, texto: 'Tengo más tareas pendientes de las que puedo completar esta semana', dimension: 'carga' },
-  { id: 6, texto: 'Sé decir "no" a peticiones que no puedo asumir sin sentirme culpable', dimension: 'capacidad' },
+  { id: 6, texto: 'Cuando rechazo peticiones que no puedo asumir, soy capaz de hacerlo con claridad (aunque sienta algo de incomodidad)', dimension: 'capacidad' },
   { id: 2, texto: 'He aceptado compromisos recientes que en el fondo sé que no debería haber aceptado', dimension: 'carga' },
   { id: 7, texto: 'Tengo claridad sobre cuáles son mis 3 prioridades principales en este momento', dimension: 'capacidad' },
   { id: 3, texto: 'Mi calendario tiene tan poco margen que un imprevisto me genera estrés', dimension: 'carga' },
@@ -85,7 +85,7 @@ function obtenerPerfil(carga: number, capacidad: number): Perfil {
     return {
       nombre: 'Sobrecarga',
       emoji: '🫠',
-      descripcion: 'Has dicho sí a más de lo que puedes gestionar. Esto no es un juicio — es la situación más común del mundo profesional moderno. Decir "sí" se siente bien en el momento, pero cada "sí" consume un recurso finito: tu tiempo, tu energía y tu capacidad de hacer las cosas bien.',
+      descripcion: 'Tienes más compromisos de los que puedes gestionar. A veces esto viene de aceptar demasiado — pero a menudo la sobrecarga es estructural: cuidado de familia, necesidad económica, jerarquía laboral que no admite negarse. El test no distingue entre estas situaciones, pero las soluciones sí son diferentes según el origen.',
       fortalezas: [
         'Probablemente eres una persona generosa y comprometida',
         'La gente confía en ti (por eso te piden cosas)',
@@ -98,7 +98,7 @@ function obtenerPerfil(carga: number, capacidad: number): Perfil {
       ],
       acciones: [
         'ESTA SEMANA: lista TODOS tus compromisos actuales. Todos. El acto de verlos en papel suele ser revelador.',
-        'Elige 3 compromisos que puedas cancelar, posponer o renegociar — y hazlo HOY, no "cuando pueda"',
+        'Identifica qué compromisos sí puedes cancelar, posponer o renegociar (no todos lo son — el cuidado de familia o las obligaciones económicas suelen ser intocables). De los que sí dependen de ti, elige 1-3 y actúa esta semana.',
         'La próxima vez que te pidan algo, prueba a decir: "Déjame comprobarlo y te contesto mañana" — comprar tiempo reduce las decisiones impulsivas',
       ],
     };
@@ -452,10 +452,11 @@ export default function MapaCompromisosCapacidadPage() {
 
             <h2>Estrategias para gestionar compromisos</h2>
             <p>
-              Greg McKeown, en <em>Essentialism</em>, propone un marco simple: si algo no es
-              un &quot;sí rotundo&quot;, es un &quot;no&quot;. Esto puede parecer extremo, pero funciona
-              como filtro: cuando tu criterio para aceptar es alto, lo que queda en tu lista
-              es genuinamente importante.
+              Greg McKeown, en <em>Essentialism</em>, propone un filtro: si algo no es un
+              &quot;sí rotundo&quot;, es un &quot;no&quot;. Puede ser útil para quienes tienen
+              margen real de decisión sobre sus compromisos (autónomos, perfiles senior, gestión de
+              proyectos propios). Para quien tiene obligaciones no negociables, el marco se aplica
+              solo a la parte de la agenda donde sí hay elección.
             </p>
             <p>
               Otra estrategia es el <strong>presupuesto de compromisos</strong>: igual que no

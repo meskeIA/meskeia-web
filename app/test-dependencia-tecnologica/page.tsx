@@ -93,9 +93,7 @@ function obtenerPerfil(autonomia: number, adaptabilidad: number): Perfil {
         'Profundidad de conocimiento en tu campo',
       ],
       riesgos: [
-        'Brecha de productividad creciente con quienes adoptan nuevas herramientas',
-        'Riesgo de obsolescencia percibida (aunque tus habilidades sean valiosas)',
-        'Oportunidades perdidas que las nuevas herramientas podrían abrir',
+        'Tus habilidades base te dan valor; en sectores donde la artesanía es el producto, la "brecha de productividad" es secundaria. En sectores donde la velocidad determina el mercado, sí conviene revisar.',
       ],
       acciones: [
         'Elegir UNA herramienta nueva y dedicar 1 hora esta semana a explorarla sin presión — no para reemplazar lo que haces, sino para ver si lo complementa',
@@ -448,6 +446,11 @@ export default function TestDependenciaTecnologicaPage() {
               extensivamente pierden capacidad de vuelo manual. Los médicos que dependen de
               sistemas de diagnóstico asistido reducen su intuición clínica. <strong>No es que la
               tecnología sea mala — es que delegar sin consciencia tiene un coste invisible.</strong>
+            </p>
+            <p>
+              Algunas habilidades delegadas no merecen recuperarse (calcular a mano, recordar teléfonos).
+              Otras sí. La clave no es luchar contra el deskilling como regla, sino decidir conscientemente
+              qué habilidades quieres mantener vivas y cuáles aceptas perder.
             </p>
 
             <h2>Autonomía vs adaptabilidad: dos cosas diferentes</h2>

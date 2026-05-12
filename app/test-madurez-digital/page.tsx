@@ -83,7 +83,7 @@ const PERFILES: Record<string, PerfilMadurez> = {
   analogica: {
     nombre: 'Empresa Analógica',
     emoji: '🏭',
-    descripcion: 'Tu empresa opera principalmente con procesos tradicionales y tiene una adopción digital mínima. La digitalización aún no es una prioridad real o hay resistencias importantes al cambio.',
+    descripcion: 'Tu empresa opera principalmente con procesos tradicionales. Las razones pueden ser muchas: el sector no lo requiere, el ROI no compensa para tu tamaño, los clientes valoran el trato analógico, o aún no se ha planteado como prioridad. Si te interesa explorar, aquí tienes opciones; si tu negocio funciona así, no es necesariamente un problema.',
     recomendaciones: [
       { titulo: 'Empieza por lo básico', desc: 'Adopta una suite de colaboración en la nube (Microsoft 365 o Google Workspace). Es el primer paso con mayor retorno.' },
       { titulo: 'Forma al equipo', desc: 'Organiza sesiones básicas de formación digital. La cultura es el mayor obstáculo en empresas analógicas.' },
@@ -340,7 +340,7 @@ export default function TestMadurezDigitalPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">📊</span>
               <h3>Ventaja competitiva real</h3>
-              <p>Según McKinsey, las empresas líderes digitales generan un 45% más de ingresos y tienen costes 35% menores que las analógicas. La digitalización no es opcional a largo plazo.</p>
+              <p>Estudios de McKinsey sugieren que en grandes empresas digitalizadas la rentabilidad es mayor (45% más ingresos, 35% menos costes en su muestra). El efecto varía mucho según sector y tamaño: en pequeño comercio o servicios artesanos el impacto es menor o nulo.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🌍</span>
@@ -414,6 +414,9 @@ export default function TestMadurezDigitalPage() {
         {/* Warning */}
         <section className={styles.warningBox}>
           <h2>⚠️ Sobre este test de madurez digital</h2>
+          <p>
+            La &quot;madurez digital&quot; óptima depende del sector. Hay negocios artesanos, profesionales y de servicios donde la digitalización avanzada aporta poco valor real. No interpretes &quot;baja puntuación&quot; como problema automático — interprétalo como dato sobre el grado de digitalización, no sobre la calidad del negocio.
+          </p>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'Es orientativo, no una auditoría profesional', desc: 'Este test ofrece una aproximación rápida basada en tu percepción. No sustituye a una auditoría digital profesional con acceso a datos reales de la empresa.' },

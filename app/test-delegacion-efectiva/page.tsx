@@ -86,7 +86,7 @@ function obtenerPerfil(acompanamiento: number, autonomia: number): Perfil {
     return {
       nombre: 'Microgestión con Cariño',
       emoji: '🔍',
-      descripcion: 'Acompañas bien — das contexto, haces seguimiento, ofreces feedback — pero no sueltas el control. La persona recibe mucho soporte pero poco espacio para decidir. Hersey y Blanchard lo describirían como un estilo "directivo" que puede ser apropiado para personas muy junior, pero limitante si se aplica siempre.',
+      descripcion: 'Acompañas bien — das contexto, haces seguimiento, ofreces feedback — pero no sueltas el control. La persona recibe mucho soporte pero poco espacio para decidir. Hersey y Blanchard lo describirían como un estilo "directivo" que puede ser apropiado para personas muy junior, pero limitante si se aplica siempre. En algunos contextos (formación inicial, trabajos críticos en seguridad, equipos muy nuevos) este estilo no solo es válido sino necesario. El problema surge cuando se aplica por defecto a todo el mundo y a toda tarea.',
       fortalezas: [
         'Alto nivel de soporte y estructura para el equipo',
         'Errores detectados pronto gracias al seguimiento cercano',
@@ -266,6 +266,12 @@ export default function TestDelegacionEfectivaPage() {
 
         {/* Contexto breve */}
         <section className={styles.contextCard}>
+          <p>
+            Este test está pensado para personas que coordinan a otras: mandos, responsables de equipo,
+            autónomos que subcontratan, o cualquiera que reparta tareas en un grupo (incluso familiar o
+            de voluntariado). Si no es tu caso, te puede servir para reflexionar sobre cómo te gustaría
+            que delegaran contigo.
+          </p>
           <p>
             Delegar no es repartir tareas. <strong>Delegar bien requiere dos cosas que casi nunca
             van juntas</strong>: dar soporte suficiente (contexto, seguimiento, feedback) y al mismo
@@ -452,6 +458,11 @@ export default function TestDelegacionEfectivaPage() {
               la idea de que existe un estilo de liderazgo &quot;mejor&quot;. Su propuesta: el mejor
               estilo depende de la <strong>madurez</strong> de la persona a la que diriges — su
               combinación de competencia (sabe hacerlo) y compromiso (quiere hacerlo).
+            </p>
+            <p>
+              El modelo es influyente pero discutido — su validez empírica se ha cuestionado y existen
+              versiones rivales. Útil como vocabulario y mapa heurístico, no como descripción literal
+              del liderazgo.
             </p>
             <p>
               El modelo define cuatro estilos, cada uno apropiado para un nivel de madurez diferente:

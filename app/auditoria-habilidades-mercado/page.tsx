@@ -85,7 +85,7 @@ function obtenerPerfil(relevancia: number, actualizacion: number): Perfil {
     return {
       nombre: 'Viviendo de las Rentas',
       emoji: '⏳',
-      descripcion: 'Tus habilidades actuales son relevantes, pero no estás invirtiendo en actualizarte. Esto funciona... hasta que deja de funcionar. En sectores que evolucionan rápido, la ventana puede ser de 2-3 años. En sectores más estables, quizá 5-7. Pero la erosión es inevitable si no actúas.',
+      descripcion: 'Tus habilidades actuales son relevantes, pero no estás invirtiendo en actualizarte. Si tu horizonte profesional es largo, esta estrategia tiene fecha de caducidad: la ventana puede ser de 2-3 años en sectores rápidos, 5-7 en más estables. Si tu horizonte es corto (cambio vital cercano, jubilación), puede ser una decisión razonable.',
       fortalezas: [
         'Competencias con demanda actual — tienes margen',
         'Experiencia acumulada que te da credibilidad',
@@ -97,7 +97,7 @@ function obtenerPerfil(relevancia: number, actualizacion: number): Perfil {
         'Pérdida de confianza cuando descubras que algo que sabías ya no se usa',
       ],
       acciones: [
-        'Bloquea 2 horas semanales en tu agenda para aprendizaje — trátalo como una reunión con cliente que no puedes cancelar',
+        'Si puedes, bloquea un tiempo semanal regular para aprendizaje (aunque sean 30 minutos) — la constancia importa más que la cantidad.',
         'Pregunta a 3 personas de tu sector que admires: "¿Qué debería estar aprendiendo ahora mismo?"',
         'Mira 5 ofertas de trabajo de tu nivel y lista las habilidades que piden — compáralas con las que tienes',
       ],
@@ -129,8 +129,8 @@ function obtenerPerfil(relevancia: number, actualizacion: number): Perfil {
 
   if (relevancia < umbralBajo && actualizacion < umbralBajo) {
     return {
-      nombre: 'Señal de Alerta',
-      emoji: '🔴',
+      nombre: 'Desactualización Activa',
+      emoji: '⚠️',
       descripcion: 'Tus habilidades actuales no están bien alineadas con el mercado y tampoco estás actualizándote activamente. No es un juicio — puede ser que estés en un momento vital complicado, que no hayas tenido claridad sobre qué aprender, o que tu sector haya cambiado sin que te dieras cuenta. Pero es una situación que requiere acción.',
       fortalezas: [
         'Reconocer la situación es el primer paso — la mayoría no hace ni este test',
@@ -262,9 +262,11 @@ export default function AuditoriaHabilidadesMercadoPage() {
 
         <section className={styles.contextCard}>
           <p>
-            El mercado laboral cambia más rápido de lo que la mayoría de profesionales actualiza
-            sus habilidades. Según estudios del World Economic Forum, <strong>el 44% de las habilidades
-            de los trabajadores necesitarán actualizarse en los próximos 5 años</strong>.
+            Para quienes se mueven en mercados laborales activos, mantener las habilidades al día es clave.
+            Según el <strong>World Economic Forum</strong>, el 44% de las habilidades laborales necesitarán
+            actualizarse en los próximos 5 años. Si estás en otra etapa profesional (cerca de jubilación,
+            en transición a actividades no laborales, o en un sector estable), el ritmo de actualización
+            puede ser otro.
           </p>
           <p>
             Este test evalúa dos cosas: si lo que sabes hacer hoy tiene demanda real en el mercado,
@@ -338,7 +340,7 @@ export default function AuditoriaHabilidadesMercadoPage() {
                   <span>🏆 Profesional en Forma</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🔴 Señal de Alerta</span>
+                  <span>⚠️ Desactualización Activa</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span>⏳ Viviendo de las Rentas</span>

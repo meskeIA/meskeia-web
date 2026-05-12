@@ -93,9 +93,9 @@ function obtenerPerfil(explotacion: number, exploracion: number): Perfil {
         'Equipo disciplinado y orientado a objetivos',
       ],
       riesgos: [
-        'Vulnerabilidad ante cambios del mercado o la tecnología',
-        'Dificultad para atraer y retener talento creativo',
-        'Riesgo de obsolescencia progresiva ("trampa del éxito")',
+        'En sectores muy cambiantes, vulnerabilidad ante cambios del mercado o la tecnología',
+        'Dificultad para atraer personas que buscan variedad en su trabajo',
+        'Riesgo de obsolescencia progresiva ("trampa del éxito") en mercados que evolucionan rápido',
       ],
       acciones: [
         'Reservar un 15-20% del tiempo de al menos una persona del equipo para explorar ideas sin presión de resultados',
@@ -140,8 +140,7 @@ function obtenerPerfil(explotacion: number, exploracion: number): Perfil {
       ],
       riesgos: [
         'Parálisis por análisis o falta de dirección',
-        'Pérdida de competitividad frente a organizaciones más activas',
-        'Desmotivación del equipo por falta de propósito claro',
+        'Si la pausa se alarga sin decisión consciente, puede derivar en desmotivación del equipo o pérdida de dirección',
       ],
       acciones: [
         'Decidir UNA prioridad clara para los próximos 90 días: ¿optimizar algo existente o probar algo nuevo?',
@@ -272,9 +271,10 @@ export default function DiagnosticoExplotacionExploracionPage() {
             o a <strong>explorar</strong> nuevas posibilidades (innovación, aprendizaje, adaptación futura).
           </p>
           <p>
-            Las organizaciones que solo explotan se vuelven eficientes pero frágiles.
-            Las que solo exploran generan ideas pero no resultados.
-            <strong> El equilibrio entre ambas es lo que marca la diferencia a largo plazo.</strong>
+            Las organizaciones que solo explotan se vuelven eficientes pero pueden quedarse rígidas.
+            Las que solo exploran generan ideas pero a veces no resultados.
+            <strong> El equilibrio entre ambas suele ser determinante en entornos competitivos y cambiantes.</strong>
+            {' '}En contextos más estables o de servicio público, lo razonable puede inclinarse claramente hacia uno de los dos lados.
           </p>
         </section>
 

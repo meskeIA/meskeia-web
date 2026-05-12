@@ -41,7 +41,7 @@ const PREGUNTAS: Pregunta[] = [
   { id: 3, texto: 'Sé exactamente quién es mi cliente ideal y cómo llegar a él', dimension: 'propuesta' },
   { id: 8, texto: 'Tengo más de una fuente de ingresos o más de un tipo de cliente', dimension: 'sostenibilidad' },
   { id: 4, texto: 'Mis clientes entienden rápidamente el valor de lo que ofrezco sin necesitar mucha explicación', dimension: 'propuesta' },
-  { id: 9, texto: 'Mi negocio podría funcionar aunque yo dedique menos horas (tiene cierto grado de escalabilidad)', dimension: 'sostenibilidad' },
+  { id: 9, texto: 'Si yo no pudiera trabajar durante un mes (enfermedad, viaje), el negocio seguiría generando algo de ingreso', dimension: 'sostenibilidad' },
   { id: 5, texto: 'Si un cliente me compara con la competencia, sé por qué debería elegirme a mí', dimension: 'propuesta' },
   { id: 10, texto: 'He revisado y ajustado mi modelo de ingresos en el último año', dimension: 'sostenibilidad' },
 ];
@@ -268,7 +268,7 @@ export default function DiagnosticoModeloNegocioPage() {
             resuelves y para quién) y <strong>la sostenibilidad</strong> (cómo generas ingresos de forma consistente).
           </p>
           <p>
-            Un negocio con buena propuesta pero sin modelo viable es un hobby caro.
+            Un negocio que no genera ingresos sostenibles no se sostiene como negocio — aunque pueda seguir teniendo valor como proyecto, vocación o actividad complementaria.
             Un negocio con modelo pero sin propuesta clara es frágil.
             <strong> Necesitas ambos.</strong>
           </p>

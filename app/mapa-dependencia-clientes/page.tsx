@@ -264,7 +264,9 @@ export default function MapaDependenciaClientesPage() {
         <section className={styles.contextCard}>
           <p>
             En el mundo del freelance y los negocios, hay una regla no escrita: <strong>si un solo cliente
-            representa más del 30% de tus ingresos, no eres un proveedor — eres un empleado sin contrato</strong>.
+            representa más del 30% de tus ingresos, conviene tratar la relación con cuidado: tienes menos margen
+            de negociación y más exposición de la que parece. Algunos profesionales eligen esta situación temporalmente;
+            el problema aparece cuando se vuelve permanente sin haberlo decidido</strong>.
           </p>
           <p>
             La concentración de clientes es uno de los riesgos más comunes y menos visibles para profesionales

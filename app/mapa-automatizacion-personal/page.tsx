@@ -470,14 +470,14 @@ export default function MapaAutomatizacionPersonalPage() {
             <h2>El coste oculto de automatizar lo incorrecto</h2>
             <p>
               Cuando automatizas una tarea creativa, ganas velocidad pero pierdes algo más difícil
-              de medir: la práctica de una habilidad. Cal Newport lo llama &quot;deep work&quot;: el
-              trabajo profundo y concentrado que produce los resultados de mayor valor. Si delegas
+              de medir: la práctica de una habilidad. El trabajo profundo y concentrado suele
+              producir resultados de mayor valor en muchas tareas creativas o analíticas. Si delegas
               eso a una máquina, la máquina produce el output pero tú pierdes la capacidad.
             </p>
             <p>
-              Al revés: cuando haces manualmente una tarea rutinaria, no estás &quot;siendo
-              riguroso&quot; — estás malgastando tiempo que podrías dedicar a lo que realmente
-              te necesita.
+              Cuando haces manualmente una tarea rutinaria, puede ser por una buena razón: ritual,
+              placer, ejercicio de paciencia, calidad superior. O puede ser inercia. La pregunta no
+              es si automatizas o no, sino si tu elección es consciente.
             </p>
 
             <h2>La regla de los 3 criterios</h2>

@@ -62,7 +62,7 @@ function obtenerPerfil(certeza: number, cuestionamiento: number): Perfil {
     return {
       nombre: 'Convicciones Testadas',
       emoji: '🛡️',
-      descripcion: 'Tienes convicciones fuertes Y las cuestionas activamente. Es la combinación más madura: no eres indeciso (tienes posiciones claras) ni dogmático (las sometes a escrutinio). El pensador Charlie Munger lo resumía: "Nunca tengas una opinión fuerte que no hayas intentado destruir primero".',
+      descripcion: 'Tienes convicciones fuertes Y las cuestionas activamente. Es la combinación más madura: no eres indeciso (tienes posiciones claras) ni dogmático (las sometes a escrutinio). Hay una idea clásica —presente desde Sócrates hasta inversores como Charlie Munger— de que la mejor forma de fortalecer una posición es someterla al escrutinio más severo posible antes de defenderla.',
       fortalezas: [
         'Convicciones sólidas respaldadas por escrutinio propio',
         'Capacidad de mantener una posición y cambiarla si hay evidencia',
@@ -77,6 +77,7 @@ function obtenerPerfil(certeza: number, cuestionamiento: number): Perfil {
         'Mantén el hábito pero vigila que sea genuino: ¿buscas contraargumentos de verdad o solo los que sabes que no te convencerán?',
         'Lleva un registro de las veces que cambiaste de opinión en el último año — si son pocas, tu cuestionamiento puede ser más ritual que real',
         'Busca a alguien que piense radicalmente diferente a ti y tengan una conversación honesta — no para convencer, para entender',
+        'Date permiso para sostener convicciones sin cuestionarlas constantemente cuando ya las has testado lo suficiente — el cuestionamiento útil tiene un punto de saturación',
       ],
     };
   }
@@ -99,7 +100,7 @@ function obtenerPerfil(certeza: number, cuestionamiento: number): Perfil {
       acciones: [
         'La próxima vez que estés 100% seguro de algo, escribe 3 razones por las que podrías estar equivocado. Si no se te ocurren, preocúpate más.',
         'Pide a alguien de confianza que sea tu "red team personal": su trabajo es encontrar fallos en tu razonamiento, y tú tienes que escuchar sin defenderte',
-        'Lee sobre errores famosos causados por exceso de certeza (Kodak ignorando la fotografía digital, Nokia descartando los smartphones) — la certeza no protege del error',
+        'Recuerda casos donde la certeza ha llevado al error — desde errores médicos por diagnósticos asumidos demasiado rápido, hasta decisiones empresariales conocidas (Kodak con la fotografía digital, Nokia con los smartphones). La certeza no protege del error',
       ],
     };
   }

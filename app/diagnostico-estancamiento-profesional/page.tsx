@@ -109,7 +109,7 @@ function obtenerPerfil(desafio: number, habilidad: number): Perfil {
     return {
       nombre: 'Zona de Confort',
       emoji: '😴',
-      descripcion: 'Tus habilidades superan ampliamente los desafíos que enfrentas. Csikszentmihalyi llamó a esto la zona de aburrimiento o confort: dominas lo que haces, pero ya no aprendes. Puede sentirse cómodo a corto plazo, pero erosiona la motivación y el crecimiento a largo plazo.',
+      descripcion: 'Tus habilidades superan ampliamente los desafíos que enfrentas. Csikszentmihalyi llamó a esto la zona de aburrimiento o confort: dominas lo que haces. Para algunas etapas vitales esto es exactamente lo que necesitas (cuidado de familia, recuperación, prioridades fuera del trabajo). Para otras, puede sentirse cómodo a corto plazo pero limitar el crecimiento si tu objetivo es desarrollarte profesionalmente. Solo tú sabes qué necesitas ahora.',
       fortalezas: [
         'Dominio sólido de tu área — eres competente y fiable',
         'Baja presión, lo que te da margen para planificar un cambio',
@@ -118,11 +118,11 @@ function obtenerPerfil(desafio: number, habilidad: number): Perfil {
       riesgos: [
         'Pérdida progresiva de motivación y sentido del trabajo',
         'Tus habilidades pueden quedar obsoletas si no las actualizas',
-        'Riesgo de que otros te perciban como "acomodado" aunque seas competente',
+        'Si tu entorno laboral valora especialmente la progresión visible, conviene comunicar el valor que aportas aunque no busques cambiar de rol.',
       ],
       acciones: [
         'Busca un proyecto paralelo o un reto voluntario que te saque de la rutina (un 15-20% de tu tiempo)',
-        'Pregúntate: "¿Qué haría si supiera que no puedo fallar?" — la respuesta suele ser lo que deberías estar intentando',
+        'Si te interesa explorar, pregúntate: "¿Qué haría si supiera que no puedo fallar?" — la respuesta puede señalarte una dirección que no te habías permitido considerar.',
         'Plantea a tu responsable asumir una responsabilidad nueva, no más de lo mismo',
       ],
     };
@@ -140,7 +140,7 @@ function obtenerPerfil(desafio: number, habilidad: number): Perfil {
       ],
       riesgos: [
         'Cronificación: cuanto más tiempo en apatía, más cuesta salir',
-        'Impacto en la salud mental: la falta de propósito afecta al bienestar',
+        'Si tu propósito vital estaba vinculado al trabajo, esta desconexión puede afectar al bienestar. Si tu sentido viene de otros ámbitos (familia, comunidad, intereses fuera del trabajo), la apatía profesional puede ser más manejable.',
         'Riesgo de tomar decisiones impulsivas por querer salir rápido',
       ],
       acciones: [
@@ -187,7 +187,7 @@ function obtenerPerfil(desafio: number, habilidad: number): Perfil {
     riesgos: [
       'El confort se normaliza y se convierte en zona permanente',
       'Tus habilidades se oxidan si no las usas al máximo',
-      'Otros que se retan más pueden adelantarte profesionalmente',
+      'Si trabajas en un entorno con progresión jerárquica explícita y eso te importa, el confort prolongado puede afectar a tus oportunidades de promoción.',
     ],
     acciones: [
       'Busca un proyecto que te obligue a usar una habilidad que tienes pero no aplicas en tu día a día',

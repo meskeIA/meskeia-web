@@ -62,7 +62,7 @@ function obtenerPerfil(paralisis: number, prudencia: number): Perfil {
     return {
       nombre: 'Analista Ansioso',
       emoji: '🔄',
-      descripcion: 'Analizas mucho Y te bloqueas mucho. Tienes las herramientas para decidir bien (prudencia), pero el miedo a equivocarte las convierte en una trampa. El análisis que debería darte claridad te genera más dudas. Bezos diría que estás tratando todas las puertas como tipo 1 cuando muchas son tipo 2.',
+      descripcion: 'Analizas mucho Y te bloqueas mucho. Tienes las herramientas para decidir bien (prudencia), pero el miedo a equivocarte las convierte en una trampa. El análisis que debería darte claridad te genera más dudas. En términos del marco de Bezos, podrías estar tratando todas las puertas como tipo 1 cuando muchas son tipo 2.',
       fortalezas: [
         'Capacidad de análisis profundo',
         'Baja probabilidad de decisiones impulsivas graves',
@@ -99,7 +99,7 @@ function obtenerPerfil(paralisis: number, prudencia: number): Perfil {
       acciones: [
         'Empieza con "microdecisiones": cada día, toma UNA decisión pequeña en menos de 10 segundos sin darle más vueltas. Entrena el músculo.',
         'Cuando te bloquees, pregúntate: "¿Qué es lo peor que puede pasar?" y luego: "¿Podría vivir con eso?" — si la respuesta es sí, decide.',
-        'Si el bloqueo es persistente, considera si hay ansiedad detrás — un profesional puede ayudar con herramientas específicas.',
+        'Si el bloqueo es persistente y te causa malestar significativo, considera si hay ansiedad u otros factores detrás — hablarlo con un profesional puede ayudar a separar lo que es temperamento de lo que conviene trabajar.',
       ],
     };
   }
@@ -108,7 +108,7 @@ function obtenerPerfil(paralisis: number, prudencia: number): Perfil {
     return {
       nombre: 'Decisor Estratégico',
       emoji: '♟️',
-      descripcion: 'Baja parálisis y alta prudencia: decides con agilidad las cosas pequeñas y con profundidad las grandes. Este es el perfil que Bezos describe como ideal: tratar las puertas tipo 2 (reversibles) con rapidez y las tipo 1 (irreversibles) con cuidado. No desperdicias energía donde no hace falta.',
+      descripcion: 'Baja parálisis y alta prudencia: decides con agilidad las cosas pequeñas y con profundidad las grandes. Este perfil encaja con el ideal que Bezos describe para entornos empresariales: tratar las puertas tipo 2 con rapidez y las tipo 1 con cuidado. Trasladado a la vida personal, recuerda que la velocidad de decisión no es un valor en sí mismo — solo es útil cuando la situación la pide. No desperdicias energía donde no hace falta.',
       fortalezas: [
         'Excelente calibración entre velocidad y profundidad',
         'Energía decisional bien distribuida',
@@ -271,6 +271,12 @@ export default function AnalisisDecisionReversiblePage() {
             Esto paraliza organizaciones y personas. La mayoría de decisiones son tipo 2 —
             puedes probar, aprender y ajustar. Reservar el análisis profundo para las tipo 1
             es la clave de la velocidad con calidad.
+          </p>
+          <p>
+            Este marco viene del mundo empresarial y funciona bien para decisiones operativas.
+            Aplicado a la vida personal tiene un matiz: una decisión técnicamente reversible
+            (un cambio de ciudad, dejar un trabajo) puede tener costes emocionales o
+            relacionales difíciles de revertir. Úsalo como herramienta, no como receta.
           </p>
         </section>
 

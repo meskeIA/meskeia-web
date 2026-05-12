@@ -85,7 +85,7 @@ function obtenerPerfil(conformidad: number, disidencia: number): Perfil {
     return {
       nombre: 'Groupthink Activo',
       emoji: '🫧',
-      descripcion: 'Tu equipo muestra signos claros de pensamiento de grupo (groupthink). Las decisiones se toman por consenso rápido, la disidencia se desalienta y hay una ilusión colectiva de invulnerabilidad. Janis documentó que este patrón ha causado desastres como la invasión de Bahía de Cochinos o el accidente del Challenger.',
+      descripcion: 'Tu equipo muestra signos claros de pensamiento de grupo (groupthink). Las decisiones se toman por consenso rápido, la disidencia se desalienta y hay una ilusión colectiva de invulnerabilidad. Janis identificó este patrón en decisiones que terminaron mal, como la invasión de Bahía de Cochinos. Investigaciones posteriores han matizado algunos de sus casos —en varios había más disidencia interna de la que Janis describió— pero el concepto general sigue siendo útil como herramienta de diagnóstico.',
       fortalezas: [
         'Alta cohesión del grupo (aunque mal dirigida)',
         'Velocidad en la toma de decisiones',
@@ -108,7 +108,7 @@ function obtenerPerfil(conformidad: number, disidencia: number): Perfil {
     return {
       nombre: 'Debate Saludable',
       emoji: '💚',
-      descripcion: 'Baja conformidad y alta disidencia constructiva: tu equipo debate de verdad, cuestiona suposiciones y escucha perspectivas diferentes. Este es el perfil más resistente a errores grupales. Janis lo consideraba el antídoto contra el groupthink.',
+      descripcion: 'Baja conformidad y alta disidencia constructiva: tu equipo debate de verdad, cuestiona suposiciones y escucha perspectivas diferentes. Este perfil reduce significativamente el riesgo de groupthink. Janis lo consideraba la dirección correcta, aunque el debate constante también tiene costes (fatiga, retrasos) que conviene gestionar.',
       fortalezas: [
         'Decisiones de alta calidad por diversidad de perspectivas',
         'Cultura de confianza que permite el desacuerdo sin represalias',
@@ -140,7 +140,7 @@ function obtenerPerfil(conformidad: number, disidencia: number): Perfil {
       riesgos: [
         'Las decisiones se toman sin verdadera deliberación grupal',
         'Falta de compromiso con las decisiones (si no participé, no me comprometo)',
-        'El equipo puede no funcionar realmente como equipo',
+        'El grupo puede operar más como conjunto de individuos que como equipo deliberante, lo cual no siempre es un problema dependiendo del contexto',
       ],
       acciones: [
         'Pregúntate si tu equipo realmente necesita decidir en grupo o si cada uno puede decidir por su cuenta — a veces la indiferencia es señal de que la estructura no encaja',
