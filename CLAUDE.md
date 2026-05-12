@@ -276,6 +276,34 @@ Toda app nueva DEBE incluir Schema.org JSON-LD para que Google y las IAs (ChatGP
 
 **Apps existentes sin JSON-LD**: NO retrofit masivo. Solo añadir si una app concreta empieza a tener tráfico relevante (>15-20 visitas/mes).
 
+### 1.quinquies Neutralidad editorial (OBLIGATORIO desde 2026-05-12)
+
+Tras revisión global de 189 apps en 2026-05-12 (~400 correcciones aplicadas en historia, salud, finanzas, reflexión, legal-fiscal y gastronomía), estos son los **antipatrones editoriales** más frecuentes. Al generar o modificar apps, evítalos desde el origen:
+
+1. **Cifras populares sin fuente verificable**. Ej: "10.000 pasos", "regla del 4%", "70% impostor", "33% Universidad de Wisconsin", "una copa al día es saludable". Si citas una cifra, atribuye fuente y año concretos; sospecha de las cifras redondas que circulan en blogs.
+
+2. **Asunción de privilegio en el destinatario**. Ej: "ahorra el 20%", "fondo de 6 meses", "bloquea 2h semanales", "compra de gama media", "delega tareas". Pregúntate si el consejo excluye implícitamente a parte del público (rentas justas, jornadas no flexibles, sin patrimonio, sin equipo).
+
+3. **"Demostró/documentó"** para marcos académicos discutidos (Kahneman, Janis, Csikszentmihalyi). Usa "propuso", "identificó", "popularizó". Los marcos son herramientas, no leyes.
+
+4. **Lenguaje moralizador sobre elecciones legítimas**. Ej: "alimentos prohibidos", "carga del cuidador", "Optimismo Ciego", "deuda buena/mala", "vivir despacio = acto de resistencia". Evita adjetivos valorativos cuando hay opciones legítimas distintas.
+
+5. **Bias EEUU/anglosajón sin matiz**. Ej: Ramsey, Cal Newport, FIRE, Trinity Study, S&P 500 como referencia universal, "regla 100-edad". Reconoce el origen cultural del marco; diversifica fuentes y referencias para el público hispanohablante.
+
+6. **Asimetría territorial valorativa**. Ej: "Madrid favorable / Asturias onerosa" (ISD), "la auténtica / la versión americana", "vinos europeos clásicos / alternativas del Nuevo Mundo". Las diferencias geográficas son hechos; no las califiques como mejor/peor.
+
+7. **"Optimizar X"** en títulos fiscales. Sustituye por "cumplimentar correctamente", "calcular con precisión", "aplicar las deducciones aplicables".
+
+8. **Contexto colonial/histórico omitido** cuando es relevante (especias, ron caribeño, arroz Carolina, esclavitud en plantaciones). Una línea de contexto evita el tono romántico/folklórico; no se trata de convertir cada guía en libro de historia.
+
+9. **Glamourización del alcohol como saludable** ("paradoja francesa", "vino cardioprotector", "una copa al día"). Refutado por WHO 2023; el alcohol es carcinógeno Grupo 1 IARC. Si aparece como dato histórico, matizar inmediatamente.
+
+10. **Disclaimer incoherente con el riesgo real**. Ej: melatonina con `severity="low"` (es medicamento >1,9mg en España); guía de cócteles sin DisclaimerCard de alcohol cuando vino y cerveza sí lo tienen. Antes de decidir severity, releer `DISCLAIMER-POLICY.md`.
+
+**Cómo usarlo**: autocontrol al generar contenido. No es checklist obligatorio sino señales de alerta. Si algún antipatrón aplica al texto que estás escribiendo, formúlalo de forma neutra desde el inicio — es más fácil que corregirlo después.
+
+**Revisión anual recomendada**: auditoría completa de neutralidad cada ~12 meses (similar a la de 2026-05-12) para detectar regresiones a medida que se añaden apps nuevas. Documento de referencia: este apartado del CLAUDE.md.
+
 ### 2. Ciclo de creación de nueva app (2 fases obligatorias)
 
 Las nuevas apps se crean **siempre en dos fases**. La fase 2 es inmediata, no opcional.
