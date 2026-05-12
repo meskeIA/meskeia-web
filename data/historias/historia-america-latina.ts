@@ -174,7 +174,7 @@ export const historiaAmericaLatina: HistoriaData = {
       nombre: 'La Guerra Fría Latinoamericana',
       desde: 1945,
       hasta: 1980,
-      icono: '☭',
+      icono: '⚔️',
       hitosDestacados: ['Dictaduras de la Guerra Fría', 'Cuba, las Guerrillas y el Che'],
       eventos: [
         'CIA derroca al gobierno democrático de Jacobo Árbenz en Guatemala (1954)',

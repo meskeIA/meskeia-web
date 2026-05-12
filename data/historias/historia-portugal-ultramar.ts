@@ -146,7 +146,7 @@ export const historiaPortugalUltramar: HistoriaData = {
       descripcion:
         'El 25 de abril de 1974, los militares derrocan la dictadura de Caetano (sucesor de Salazar): la Revolución de los Claveles, la más pacífica del siglo XX. La descolonización rápida (1974-1975): Angola, Mozambique, Guinea-Bissau independientes. Macao devuelta a China en 1999. El Imperio termina, pero la lengua portuguesa vincula a 260 millones de personas en 9 países.',
       obraIconica:
-        'Revolución de los Claveles — 25 abril 1974. Los soldados ponen claveles en los cañones: la revolución más hermosa del siglo XX',
+        'La Revolución de los Claveles, 25 de abril de 1974',
       paises: ['Portugal', 'Angola', 'Mozambique', 'Brasil', 'Macao', 'China'],
     },
   ],
@@ -252,7 +252,7 @@ export const historiaPortugalUltramar: HistoriaData = {
 
   educativo: {
     intro:
-      'Portugal es la mayor paradoja de la historia: el país más pequeño de la Península Ibérica construyó el primer Imperio verdaderamente global de la historia, conectó por primera vez todos los continentes y mantuvo colonias durante 560 años (1415-1975). Vasco da Gama, Bartolomeu Dias y Álvares Cabral cambiaron la economía mundial más que ningún otro explorador. Y la Revolución de los Claveles (1974) fue la más pacífica y hermosa del siglo XX.',
+      'Portugal es la mayor paradoja de la historia: el país más pequeño de la Península Ibérica construyó el primer Imperio verdaderamente global de la historia, conectó por primera vez todos los continentes y mantuvo colonias durante 560 años (1415-1975). Vasco da Gama, Bartolomeu Dias y Álvares Cabral cambiaron la economía mundial más que ningún otro explorador. Y la Revolución de los Claveles (1974) fue una de las transiciones más pacíficas del siglo XX, con mínimo derramamiento de sangre.',
 
     tablaComparativa: [
       {

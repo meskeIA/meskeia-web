@@ -123,7 +123,7 @@ export const historiaRusia: HistoriaData = {
       anioFin: 9999,
       color: '#DC2626',
       categoria: 'contemporaneo',
-      descripcion: 'La "terapia de choque" de Yeltsin hundió el PIB un 40% y creó una oligarquía de enriquecimiento rápido. Vladimir Putin, excoronel del KGB, llegó al poder en 2000 prometiendo estabilidad y utilizando los ingresos del petróleo para consolidar un régimen autoritario. Las guerras de Chechenia, la invasión de Georgia (2008) y la anexión de Crimea (2014) marcaron la nueva política exterior agresiva. La invasión a gran escala de Ucrania (24 febrero 2022) supuso el mayor conflicto bélico en Europa desde 1945, con consecuencias geopolíticas y económicas globales todavía en desarrollo.',
+      descripcion: 'La "terapia de choque" de Yeltsin hundió el PIB un 40% y creó una oligarquía de enriquecimiento rápido. Vladimir Putin, excoronel del KGB, llegó al poder en 2000 prometiendo estabilidad y utilizando los ingresos del petróleo para consolidar un régimen autoritario. Las guerras de Chechenia, la invasión de Georgia (2008) y la anexión de Crimea (2014) marcaron la política exterior de afirmación de influencia regional y confrontación con Occidente. La invasión a gran escala de Ucrania (24 febrero 2022) supuso el mayor conflicto bélico en Europa desde 1945, con consecuencias geopolíticas y económicas globales todavía en desarrollo.',
       obraIconica: 'Disolución de la URSS (1991) e invasión de Ucrania (2022)',
       paises: ['Rusia', 'Ucrania', 'Chechenia', 'Georgia', 'Europa'],
     },
@@ -209,7 +209,7 @@ export const historiaRusia: HistoriaData = {
       eventos: [
         'Yeltsin y la "terapia de choque": colapso económico y surgimiento de oligarcas (1991-1999)',
         'Putin llega al poder prometiendo estabilidad; uso de los ingresos del petróleo (2000)',
-        'Invasión de Georgia y anexión de Crimea: nueva política exterior agresiva (2008, 2014)',
+        'Invasión de Georgia y anexión de Crimea: política exterior de afirmación de influencia regional y confrontación con Occidente (2008, 2014)',
         'Invasión a gran escala de Ucrania: mayor conflicto bélico en Europa desde 1945 (2022)',
       ],
     },
@@ -240,7 +240,7 @@ export const historiaRusia: HistoriaData = {
   disclaimer: 'exempt',
 
   educativo: {
-    intro: 'La historia de Rusia es, en esencia, una oscilación constante entre la atracción hacia Occidente y el repliegue hacia el aislamiento y la autocracia. Desde Rurik y los varegos escandinavos hasta Vladimir Putin, cada gran reforma —Pedro el Grande occidentalizando por la fuerza, Lenin construyendo el primer Estado socialista del mundo, Gorbachov abriendo el sistema con glasnost y perestroika— ha generado una contrarreforma igualmente poderosa. El resultado es un país que ha dado al mundo a Tolstói, Dostoievski y Chéjov, que envió al primer humano al espacio, que derrotó a Napoleón y a Hitler, y que también produjo el Gulag, el Holodomor y la guerra más destructiva en Europa desde 1945.',
+    intro: 'La historia de Rusia es, en esencia, una oscilación constante entre períodos de apertura e integración con Europa occidental y períodos de centralización política y afirmación de identidad propia. Desde Rurik y los varegos escandinavos hasta Vladimir Putin, cada gran reforma —Pedro el Grande occidentalizando por la fuerza, Lenin construyendo el primer Estado socialista del mundo, Gorbachov abriendo el sistema con glasnost y perestroika— ha generado una contrarreforma igualmente poderosa. El resultado es un país que ha dado al mundo a Tolstói, Dostoievski y Chéjov, que envió al primer humano al espacio, que derrotó a Napoleón y a Hitler, y que también produjo el Gulag, el Holodomor y la guerra más destructiva en Europa desde 1945.',
 
     tablaComparativa: [
       { hito: 'Rus de Kiev', periodo: '862-1240', categoria: 'Era Medieval', personaje: 'Rurik / Vladimir I / Yaroslav el Sabio', aportacion: 'Fundación del Estado eslavo, adopción del Cristianismo Ortodoxo y alianza cultural con Bizancio' },

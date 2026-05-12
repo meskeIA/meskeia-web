@@ -120,7 +120,7 @@ export const espanaBorbones: HistoriaData = {
       color: '#E65100',
       categoria: 'politica',
       descripcion:
-        'Carlos IV, monarca incompetente, entrega el poder a Manuel Godoy, presunto amante de la reina. La Revolución Francesa alarma a la Corte: guillotinan al primo Luis XVI. España primero guerrea contra Francia (1793), luego se alía con Napoleón (1796). Goya retrata la decadencia cortesana.',
+        'Carlos IV, monarca que delegó el poder efectivo en Manuel Godoy, presunto amante de la reina. La Revolución Francesa alarma a la Corte: guillotinan al primo Luis XVI. España primero guerrea contra Francia (1793), luego se alía con Napoleón (1796). Goya retrata la decadencia cortesana.',
       obraIconica:
         'La Familia de Carlos IV — Goya, 1800. El retrato más despiadado de la historia: la corte en descomposición',
       paises: ['España', 'Francia'],

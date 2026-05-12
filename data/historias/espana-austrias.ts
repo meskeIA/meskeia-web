@@ -441,7 +441,7 @@ export const espanaAustrias: HistoriaData = {
       {
         titulo: 'Creer que la Inquisición mató a millones',
         cuerpo:
-          'La "leyenda negra" anglosajona y protestante exageró enormemente las cifras. Los historiadores actuales, con acceso a los archivos de la Inquisición, estiman entre 3.000 y 5.000 ejecuciones en 350 años de actividad. Fue cruel, fue un instrumento de control social devastador para el pensamiento libre, pero no fue el genocidio que la propaganda protestante describió. Los tribunales civiles europeos de la época ejecutaban a muchas más personas.',
+          'La "leyenda negra" fue amplificada por la propaganda anglosajona y protestante, pero las críticas incluían también fuentes internas —Las Casas en el ámbito colonial, humanistas españoles en el metropolitano— y no pueden reducirse solo a propaganda exterior. Los historiadores actuales, con acceso a los archivos de la Inquisición, estiman entre 3.000 y 5.000 ejecuciones en 350 años de actividad. Fue cruel e instrumento de control social devastador para el pensamiento libre, aunque los tribunales civiles europeos de la época ejecutaban a muchas más personas.',
       },
       {
         titulo: 'Creer que el Siglo de Oro fue solo literatura',

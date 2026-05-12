@@ -41,7 +41,7 @@ export const historiaAlemania: HistoriaData = {
     },
     {
       id: 'primera-guerra-mundial',
-      nombre: 'Primera Guerra Mundial: El Gran Sacrificio',
+      nombre: 'Alemania en la Primera Guerra Mundial (1914-1918)',
       anioInicio: 1914,
       anioFin: 1918,
       color: '#B71C1C',
@@ -138,7 +138,7 @@ export const historiaAlemania: HistoriaData = {
       hitosDestacados: [
         'El Segundo Reich de Bismarck',
         'La Era Guillermina y el Camino a la Guerra',
-        'Primera Guerra Mundial: El Gran Sacrificio',
+        'Alemania en la Primera Guerra Mundial (1914-1918)',
       ],
       eventos: [
         'Proclamación del Imperio en Versalles (18 enero 1871)',
@@ -268,7 +268,7 @@ export const historiaAlemania: HistoriaData = {
         periodo: '1945-1970',
         categoria: 'División y Guerra Fría',
         personaje: 'Adenauer / Ulbricht',
-        aportacion: 'Dos estados alemanes: la RFA democrática y la RDA soviética. El Wirtschaftswunder',
+        aportacion: 'Dos estados alemanes: la RFA (Alemania Occidental) y la RDA (Alemania Oriental). El Wirtschaftswunder',
       },
       {
         hito: 'El Muro y la Distensión',

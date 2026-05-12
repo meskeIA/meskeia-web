@@ -78,7 +78,7 @@ export const primeraGuerraMundial: HistoriaData = {
       color: '#B22222',
       categoria: 'crisis',
       descripcion: 'El año 1916 fue el más sangriento de la guerra. La batalla de Verdún (febrero-diciembre 1916) fue ideada por el general alemán Falkenhayn para "sangrar a Francia hasta morir": diez meses de combate entre las mismas colinas, con cerca de 700.000 bajas entre ambos bandos. El general Pétain se hizo legendario: "Ils ne passeront pas". Para aliviar Verdún, los aliados lanzaron la batalla del Somme (julio-noviembre 1916): el primer día, el 1 de julio, el ejército británico sufrió 57.470 bajas —el día más sangriento de su historia—. La batalla costó un millón de bajas y apenas avanzó unos kilómetros. Fue en el Somme donde los británicos emplearon por primera vez los tanques, sin éxito decisivo.',
-      obraIconica: 'Batalla de Verdún (1916): símbolo del sacrificio absurdo y de la resistencia francesa',
+      obraIconica: 'Campo de batalla de Verdún (1916): donde murieron más de 700.000 soldados de ambos bandos; símbolo del coste humano de la guerra de trincheras',
       paises: ['Francia', 'Alemania', 'Gran Bretaña'],
     },
     {

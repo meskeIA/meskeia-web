@@ -4,7 +4,7 @@ export const espanaContemporanea: HistoriaData = {
   slug: 'espana-contemporanea',
   titulo: 'España Contemporánea: De las Guerras Napoleónicas a la Democracia',
   subtitulo:
-    'Dos siglos de liberalismo y carlismo, República y Guerra Civil, franquismo y la Transición democrática más admirada del mundo',
+    'Dos siglos de liberalismo y carlismo, República y Guerra Civil, franquismo y la Transición democrática española, estudiada como modelo comparado',
   descripcionSEO:
     'Cronología interactiva de la España contemporánea: de la Guerra de Independencia y la Constitución de Cádiz (1808-1812) a la democracia actual. Segunda República, Guerra Civil, franquismo, Transición y España en Europa en 10 hitos y 6 eras.',
   keywords: [
@@ -94,7 +94,7 @@ export const espanaContemporanea: HistoriaData = {
       descripcion:
         'Alfonso XIII marcha al exilio (14 abril 1931) sin abdicar. La República trae reformas radicales: separación Iglesia-Estado, autonomías (Estatuto catalán 1932), reforma agraria, educación laica. Pero la polarización es extrema: CEDA y Frente Popular en los extremos. Las elecciones de febrero 1936 dan el poder al Frente Popular. Cinco meses después, el golpe.',
       obraIconica:
-        'Proclamación de la República — 14 abril 1931. "Se fueron los Borbones". El día más esperanzador de la historia española moderna',
+        'La proclamación de la Segunda República, 14 de abril de 1931',
       paises: ['España'],
     },
     {
@@ -133,7 +133,7 @@ export const espanaContemporanea: HistoriaData = {
       descripcion:
         'Juan Carlos I, coronado rey, elige a Adolfo Suárez para pilotar la Transición. La Ley para la Reforma Política (1976). Legalización del PCE (abril 1977). Elecciones del 15 de junio de 1977. La Constitución de 1978 (aprobada con el 88% de apoyo). Los Pactos de la Moncloa. El 23-F (1981): Tejero fracasa. La Transición, modelo mundial de cambio democrático.',
       obraIconica:
-        'Adolfo Suárez y los líderes políticos redactan la Constitución — 1978. La mayor obra colectiva de la democracia española',
+        'La Constitución española de 1978',
       paises: ['España'],
     },
     {
@@ -259,7 +259,7 @@ export const espanaContemporanea: HistoriaData = {
 
   educativo: {
     intro:
-      'La España contemporánea es una historia de extremos y reconciliaciones: la primera constitución liberal de Europa (1812), tres guerras civiles, la Segunda República más avanzada de su tiempo, la dictadura más larga de Europa occidental, y la Transición democrática más admirada del mundo. En dos siglos, España recorrió el camino que otros países tardaron cuatro en completar.',
+      'La España contemporánea es una historia de extremos y reconciliaciones: la primera constitución liberal de Europa (1812), tres guerras civiles, la Segunda República más avanzada de su tiempo, la dictadura más larga de Europa occidental, y la Transición democrática española, estudiada como modelo comparado. En dos siglos, España recorrió el camino que otros países tardaron cuatro en completar.',
 
     tablaComparativa: [
       {

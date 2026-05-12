@@ -112,7 +112,7 @@ export const historiaGuerraFria: HistoriaData = {
       anioFin: 1985,
       color: '#6D28D9',
       categoria: 'tension',
-      descripcion: 'Reagan relanzó la carrera armamentista: el presupuesto militar pasó de 303.000 a 456.000 millones de dólares en cuatro años. La Iniciativa de Defensa Estratégica ("Guerra de las Galaxias", 1983) amenazó con hacer obsoleto el arsenal nuclear soviético. Los euromisiles Pershing II en Europa Occidental y la respuesta soviética SS-20 elevaron la tensión a niveles de la crisis de Cuba. El derribo del avión civil coreano KAL 007 por la URSS (1983) y el ejercicio "Able Archer 83" (que la URSS confundió con un ataque real) llevaron al mundo al borde del conflicto. La presión económica y tecnológica era insoportable para la maltrecha economía soviética.',
+      descripcion: 'Reagan relanzó la carrera armamentista: el presupuesto militar pasó de 303.000 a 456.000 millones de dólares en cuatro años. La Iniciativa de Defensa Estratégica ("Guerra de las Galaxias", 1983) amenazó con hacer obsoleto el arsenal nuclear soviético. Los euromisiles Pershing II en Europa Occidental y la respuesta soviética SS-20 elevaron la tensión a niveles de la crisis de Cuba. El derribo del avión civil coreano KAL 007 por la URSS (1983) y el ejercicio "Able Archer 83" (que la URSS confundió con un ataque real) llevaron al mundo al borde del conflicto. La presión económica y tecnológica era insoportable para la economía soviética en crisis de estancamiento.',
       obraIconica: 'Iniciativa de Defensa Estratégica (1983): Reagan propone "La Guerra de las Galaxias"',
       paises: ['EE.UU.', 'URSS', 'Europa Occidental', 'Polonia'],
     },
@@ -244,7 +244,7 @@ export const historiaGuerraFria: HistoriaData = {
       { hito: 'Plan Marshall y la OTAN', periodo: '1947-1950', categoria: 'Construcción Institucional', personaje: 'Truman / Bevin / Vandenberg', aportacion: 'Reconstrucción de Europa Occidental y primera alianza militar permanente transatlántica' },
       { hito: 'Carrera Nuclear y Guerra de Corea', periodo: '1949-1953', categoria: 'Conflicto Militar', personaje: 'MacArthur / Mao / Kim Il-sung', aportacion: 'Establecimiento de la lógica de guerras proxy y el equilibrio del terror nuclear mutual' },
       { hito: 'Crisis de los Misiles de Cuba', periodo: '1962-1963', categoria: 'Crisis Nuclear', personaje: 'Kennedy / Jrushchov / Castro', aportacion: 'Momento más cercano a la guerra nuclear; origen del teléfono rojo y los tratados de control de armas' },
-      { hito: 'La Carrera Espacial', periodo: '1957-1969', categoria: 'Carrera Tecnológica', personaje: 'Gagarin / Armstrong / Von Braun', aportacion: 'Demostración tecnológica e ideológica: conquista de la Luna como símbolo de la superioridad del sistema capitalista' },
+      { hito: 'La Carrera Espacial', periodo: '1957-1969', categoria: 'Carrera Tecnológica', personaje: 'Gagarin / Armstrong / Von Braun', aportacion: 'Demostración tecnológica e ideológica: conquista de la Luna como símbolo de la victoria estadounidense en la carrera espacial' },
       { hito: 'Gorbachov y la Caída del Muro', periodo: '1985-1989', categoria: 'Fin de la Guerra Fría', personaje: 'Gorbachov / Reagan / Walesa', aportacion: 'Implosión pacífica del bloque soviético y reunificación del mundo dividido por el Telón de Acero' },
     ],
 

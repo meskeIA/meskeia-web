@@ -3,7 +3,7 @@ import type { HistoriaData } from './types';
 export const historiaConquistaAmerica: HistoriaData = {
   slug: 'historia-conquista-america',
   titulo: 'La Conquista de América: Choque de Civilizaciones y Nacimiento del Mundo Moderno',
-  subtitulo: 'Un siglo que transformó para siempre a Europa, América y el mundo: el Encuentro que dividió la historia',
+  subtitulo: 'La conquista y colonización de América, 1492-1600',
   descripcionSEO: 'Cronología interactiva de la Conquista de América: de Cristóbal Colón (1492) a la consolidación de los virreinatos (1600). Primer viaje, Tratado de Tordesillas, conquista de México y Perú, Potosí, catástrofe demográfica y nacimiento del mestizaje en 10 hitos y 6 eras.',
   keywords: [
     'conquista america cronología interactiva',
@@ -368,7 +368,7 @@ export const historiaConquistaAmerica: HistoriaData = {
       },
       {
         icono: '📚',
-        texto: 'La "Leyenda Negra" (imagen de España como especialmente cruel) fue una campaña de propaganda de potencias rivales (Inglaterra, Holanda) basada en los textos de Las Casas. Las atrocidades fueron reales, pero otras potencias coloniales (Portugal, Inglaterra, Francia) fueron igualmente brutales. La singularidad española es un mito propagandístico.',
+        texto: 'La "Leyenda Negra" fue amplificada por potencias rivales (Inglaterra, Holanda) pero también se nutría de testimonios internos como los de Las Casas. Los historiadores distinguen entre exageración propagandística y violencias documentadas. Otras potencias coloniales (Portugal, Inglaterra, Francia) fueron igualmente brutales, pero eso no invalida el análisis crítico de las violencias específicamente documentadas en la colonización española.',
       },
       {
         icono: '🏙️',

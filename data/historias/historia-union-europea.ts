@@ -107,12 +107,12 @@ export const historiaUnionEuropea: HistoriaData = {
     },
     {
       id: 'brexit',
-      nombre: 'Brexit y la Primera Gran Salida',
+      nombre: 'El referéndum del Brexit y sus consecuencias',
       anioInicio: 2016,
       anioFin: 2021,
       color: '#FF6600',
       categoria: 'crisis',
-      descripcion: 'Referéndum del Brexit (2016): Reino Unido vota Leave (52%). Cuatro años de negociaciones traumáticas. UK sale definitivamente el 31 enero 2020. Primer Estado en abandonar la UE en 70 años. Lección sobre las consecuencias del euroescepticismo.',
+      descripcion: 'El referéndum del Brexit (2016): Reino Unido vota Leave (52%). Cuatro años de negociaciones traumáticas. UK sale definitivamente el 31 enero 2020. Primer Estado en abandonar la UE en 70 años. La victoria respondió a demandas de soberanía e inmigración que movilizaron al electorado, además de mensajes controvertidos de la campaña Leave.',
       obraIconica: 'Referéndum Brexit — 23 junio 2016. La primera salida de la historia europea',
       paises: ['Reino Unido'],
     },
@@ -183,7 +183,7 @@ export const historiaUnionEuropea: HistoriaData = {
       desde: 2010,
       hasta: 2021,
       icono: '⚡',
-      hitosDestacados: ['Crisis del Euro y la Gran Recesión', 'Brexit y la Primera Gran Salida'],
+      hitosDestacados: ['Crisis del Euro y la Gran Recesión', 'El referéndum del Brexit y sus consecuencias'],
       eventos: [
         'Crisis de deuda griega: primer rescate (2010)',
         'Draghi: \'whatever it takes\' (2012)',
@@ -281,7 +281,7 @@ export const historiaUnionEuropea: HistoriaData = {
         icono: '🇬🇧',
         titulo: 'El Brexit: ¿qué falló?',
         perfil: 'Análisis de por qué UK abandonó la UE',
-        texto: 'El Brexit combinó soberanismo (recuperar el control de leyes y fronteras), descontento con la inmigración intraeuropea, crisis de representación política (la UE se percibió como lejana y tecnocrática) y una campaña de desinformación efectiva. La paradoja: UK nunca estuvo en el euro ni en Schengen, pero muchos ciudadanos votaron contra unas restricciones que no existían. El coste económico fue significativo, especialmente para el sector servicios.',
+        texto: 'El Brexit combinó soberanismo (recuperar el control de leyes y fronteras), descontento con la inmigración intraeuropea, crisis de representación política (la UE se percibió como lejana y tecnocrática) y una campaña marcada por mensajes controvertidos y por demandas de soberanía que movilizaron al electorado. La paradoja: UK nunca estuvo en el euro ni en Schengen, pero muchos ciudadanos votaron contra unas restricciones que no existían. El coste económico fue significativo, especialmente para el sector servicios.',
       },
       {
         icono: '🌍',

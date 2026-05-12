@@ -237,7 +237,7 @@ export const historiaIslamClasico: HistoriaData = {
   disclaimer: 'exempt',
 
   educativo: {
-    intro: 'Entre los siglos VII y XIII, la civilización islámica fue el centro del mundo intelectual: preservó y expandió el conocimiento griego, persa e indio cuando Europa vivía su Edad Oscura. El álgebra, los algoritmos, la óptica moderna, la medicina clínica y la filosofía aristotélica llegaron a Europa medieval a través de los traductores árabes. Sin la Edad de Oro islámica, el Renacimiento europeo habría tardado siglos más.',
+    intro: 'Entre los siglos VII y XIII, la civilización islámica fue el centro del mundo intelectual: preservó y expandió el conocimiento griego, persa e indio cuando Europa vivía el período altomedieval. El álgebra, los algoritmos, la óptica moderna, la medicina clínica y la filosofía aristotélica llegaron a Europa medieval a través de los traductores árabes. Sin la Edad de Oro islámica, el Renacimiento europeo habría tardado siglos más.',
 
     tablaComparativa: [
       {
