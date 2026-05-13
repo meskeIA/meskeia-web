@@ -48,6 +48,7 @@ const jubilacionApps: RelatedApp[] = [
   { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2025' },
   { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro y plan de pensiones' },
   { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
+  { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: '36,90 €/mes por hijo en tu pensión' },
 ];
 
 // ==========================================
@@ -3123,8 +3124,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...jubilacionApps.filter(a => a.url !== '/estimador-pension-viudedad/').slice(0, 4),
   ],
   'estimador-complemento-minimos': [
-    ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 4),
+    { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: '36,90 €/mes por hijo en tu pensión' },
+    ...jubilacionApps.filter(a => a.url !== '/estimador-complemento-minimos/').slice(0, 3),
     { url: '/estimacion-prestaciones-dependencia/', icon: '💶', name: 'Prestaciones Dependencia', description: 'Cuantías SAAD según grado' },
+  ],
+  'verificador-complemento-brecha-genero': [
+    { url: '/estimador-complemento-minimos/', icon: '🏛️', name: 'Complemento a Mínimos', description: 'Pensión mínima garantizada SS' },
+    { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
+    { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2026' },
+    { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
+    { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro y plan de pensiones' },
   ],
   'diario-emocional': [
     { url: '/test-bienestar-who5/', icon: '🌱', name: 'Test Bienestar WHO-5', description: 'Evalúa tu bienestar en 5 preguntas' },

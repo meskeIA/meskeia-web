@@ -310,3 +310,39 @@ export const COMPLEMENTO_MINIMOS_LIMITES_2026 = {
   /** Con cónyuge a cargo: ingresos anuales máximos (pensionista + cónyuge) */
   conConyuge: 10047,
 };
+
+// ─── Complemento por Brecha de Género 2026 (art. 60 LGSS) ─────────────────────
+// Fuente: RD-Ley 3/2021 + RD-Ley 3/2026 (cuantía 2026)
+// Doctrina: TJUE 15-may-2025 + TS 9-jul-2025 (igualdad de trato H/M)
+// Verificado: 2026-05-13
+// URL oficial SS: https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963
+//
+// Sustituyó al antiguo complemento de maternidad (vigente desde 4-feb-2021).
+// Se abona junto con la pensión en 14 pagas. NO computa para el límite máximo
+// de pensiones públicas (LIMITES_PENSION_2025.maximaMensual).
+
+export const COMPLEMENTO_BRECHA_GENERO_META = {
+  fuente: 'Art. 60 LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026',
+  verificado: '2026-05-13',
+  vigencia: '2026',
+  urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963',
+  doctrina: 'STJUE C-623/23 (15-may-2025) y STS 9-jul-2025: igualdad de trato hombre/mujer',
+  nota: 'El complemento es incompatible con que lo perciba el otro progenitor por los mismos hijos. En caso de concurrencia, se reconoce al progenitor con pensión pública de menor cuantía.',
+};
+
+export const COMPLEMENTO_BRECHA_GENERO_2026 = {
+  /** Importe mensual por hijo/a (€/mes, 14 pagas) — fijado por RDL 3/2026 */
+  cuantiaPorHijoMensual: 36.90,
+  /** Número máximo de hijos computables */
+  maxHijos: 4,
+  /** Importe mensual máximo (4 hijos × 36,90 €) */
+  maxMensual: 147.60,
+  /** Importe anual máximo (147,60 × 14 pagas) */
+  maxAnual: 2066.40,
+  /** Fecha mínima del hecho causante para tener derecho (4-feb-2021) */
+  fechaMinimaHechoCausante: '2021-02-04',
+  /** Nº de pagas anuales en que se abona */
+  pagasAnuales: 14,
+  /** Pensiones contributivas a las que se puede añadir el complemento */
+  pensionesElegibles: ['jubilacion', 'incapacidad_permanente', 'viudedad'] as const,
+};

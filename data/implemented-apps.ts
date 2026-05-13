@@ -104,6 +104,7 @@ export const implementedAppsUrls = [
   "/quiz-conceptos-financieros/",          // Quiz 15 preguntas: ahorro, inflación, inversión, deuda, presupuesto
   "/selector-actividades-movilidad/",      // Selector actividades según movilidad: test 8 preguntas, 20 actividades, 4 niveles
   "/estimador-complemento-minimos/",      // Estimador complemento a mínimos: pensiones mínimas SS por tipo, edad, situación
+  "/verificador-complemento-brecha-genero/", // Verificador complemento brecha género 2026: 5 preguntas + cálculo 36,90 €/hijo (art. 60 LGSS, doctrina TJUE/TS 2025)
   "/estimador-costas-judiciales/",        // Estimador costas judiciales: abogado, procurador, tasas, peritos
   "/estimador-costes-divorcio/",          // Estimador costes divorcio: mutuo acuerdo vs contencioso
   "/impuestos-divorcio/",                 // Orientador fiscal del divorcio: IRPF pensión compensatoria, mínimo descendientes, vivienda e hipoteca
