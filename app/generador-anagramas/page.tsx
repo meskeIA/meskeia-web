@@ -1,28 +1,20 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
-// Diccionario español básico (palabras comunes de 2-8 letras)
-// En producción se podría cargar un diccionario más extenso
-const spanishWords = [
-  // 2 letras
-  'al', 'de', 'el', 'en', 'es', 'ha', 'ir', 'la', 'le', 'lo', 'me', 'mi', 'no', 'oh', 'os', 'se', 'si', 'su', 'te', 'tu', 'un', 'va', 'ya', 'yo',
-  // 3 letras
-  'ajo', 'ala', 'ama', 'ano', 'ara', 'asa', 'ave', 'bar', 'boa', 'bus', 'cal', 'can', 'col', 'dar', 'día', 'don', 'dos', 'eco', 'ego', 'eje', 'era', 'eso', 'fin', 'gas', 'gel', 'gol', 'hoy', 'ida', 'ira', 'ley', 'luz', 'mal', 'mar', 'mas', 'mes', 'mil', 'mis', 'muy', 'nao', 'ojo', 'ola', 'ora', 'oro', 'osa', 'oso', 'pan', 'par', 'paz', 'pie', 'por', 'pro', 'pus', 'que', 'red', 'res', 'rey', 'rio', 'rol', 'ron', 'ropa', 'sal', 'sed', 'ser', 'sin', 'sol', 'son', 'sos', 'sur', 'tan', 'tía', 'tío', 'tus', 'una', 'uno', 'uso', 'uva', 'van', 'ver', 'vez', 'vía', 'vid', 'ven', 'voz',
-  // 4 letras
-  'abre', 'acre', 'acto', 'agua', 'aire', 'algo', 'alma', 'alto', 'amor', 'anís', 'ante', 'arco', 'área', 'asco', 'aseo', 'asno', 'auto', 'azul', 'baja', 'bajo', 'bala', 'base', 'beso', 'bien', 'boca', 'boda', 'bola', 'bono', 'buey', 'cabo', 'cada', 'café', 'caja', 'cama', 'cana', 'caña', 'cara', 'casi', 'caso', 'cava', 'cebo', 'cena', 'cero', 'cine', 'cita', 'codo', 'cola', 'como', 'copa', 'coro', 'cosa', 'cubo', 'dado', 'dama', 'dato', 'dedo', 'dice', 'dios', 'duda', 'echa', 'edad', 'ella', 'ello', 'ellos', 'enea', 'ente', 'eres', 'esta', 'este', 'euro', 'fama', 'fase', 'fea', 'feo', 'fila', 'filo', 'fina', 'fino', 'foco', 'foto', 'gala', 'gana', 'gato', 'gema', 'giro', 'gota', 'gris', 'guía', 'haba', 'hace', 'hada', 'hago', 'hija', 'hijo', 'hilo', 'hora', 'idea', 'idos', 'isla', 'jefe', 'juez', 'joya', 'kilo', 'lado', 'lago', 'lana', 'lata', 'lava', 'leal', 'león', 'leva', 'lima', 'lino', 'liso', 'loba', 'lobo', 'loco', 'lodo', 'lomo', 'lona', 'losa', 'lote', 'luna', 'lujo', 'mago', 'malo', 'mama', 'mano', 'mapa', 'masa', 'mata', 'mayo', 'meco', 'mesa', 'meta', 'miel', 'mina', 'moda', 'modo', 'mono', 'moro', 'mudo', 'mula', 'muro', 'nabo', 'nada', 'nata', 'nave', 'niño', 'niña', 'nido', 'nodo', 'nube', 'obra', 'odio', 'once', 'onda', 'orar', 'orca', 'oso', 'otra', 'otro', 'paga', 'pago', 'pala', 'palo', 'papa', 'paro', 'pasa', 'paso', 'pata', 'pato', 'pavo', 'peca', 'pena', 'pero', 'pesa', 'peso', 'pico', 'piel', 'pino', 'pipa', 'piso', 'poco', 'polo', 'pone', 'poro', 'poza', 'pozo', 'puma', 'puro', 'rabo', 'raja', 'rama', 'rana', 'raro', 'rasa', 'rata', 'raza', 'real', 'reja', 'remo', 'rico', 'rima', 'rito', 'rizo', 'roca', 'rojo', 'roma', 'ropa', 'rosa', 'roto', 'rudo', 'ruta', 'saca', 'saco', 'sala', 'sano', 'sapo', 'seda', 'seis', 'seno', 'seta', 'sido', 'siga', 'silo', 'soga', 'sola', 'solo', 'sopa', 'subo', 'suma', 'sumo', 'taco', 'tajo', 'tapa', 'taza', 'tema', 'teme', 'tena', 'tics', 'tina', 'tino', 'tipo', 'tira', 'tiro', 'toda', 'todo', 'toma', 'tomo', 'tono', 'tope', 'toro', 'tres', 'tubo', 'tuya', 'tuyo', 'unas', 'unos', 'urna', 'vaca', 'vago', 'vale', 'vano', 'vaso', 'vela', 'vena', 'vera', 'veta', 'vida', 'vino', 'viva', 'vivo', 'yema', 'yoga', 'zona',
-  // 5 letras
-  'abajo', 'abeja', 'abril', 'abrir', 'acaba', 'acero', 'actúa', 'acude', 'adobe', 'afán', 'agrio', 'aguja', 'ahora', 'ajeno', 'aldea', 'algún', 'almas', 'almeja', 'altas', 'altos', 'amaba', 'amada', 'amado', 'amigo', 'ancho', 'andes', 'angel', 'antes', 'apoyo', 'arbol', 'arena', 'armas', 'arroz', 'asado', 'atado', 'atlas', 'atras', 'avena', 'aviso', 'ayuda', 'baila', 'baile', 'bajar', 'bajos', 'banca', 'banco', 'banda', 'bando', 'barba', 'barco', 'barra', 'barro', 'bases', 'basta', 'bella', 'bello', 'bicho', 'blusa', 'bocas', 'bolsa', 'bolso', 'bomba', 'borde', 'brasa', 'brazo', 'breve', 'brisa', 'bruja', 'bruto', 'buena', 'bueno', 'bufón', 'burla', 'burro', 'busca', 'busco', 'cabal', 'cable', 'cabra', 'cacho', 'caída', 'cajas', 'calle', 'calma', 'calor', 'calvo', 'camas', 'campo', 'canal', 'canto', 'cañón', 'capaz', 'carga', 'cargo', 'carne', 'carta', 'casas', 'casos', 'causa', 'cavar', 'cazar', 'ceder', 'celda', 'celos', 'cenas', 'cerca', 'cerdo', 'cerro', 'chica', 'chico', 'chile', 'china', 'chino', 'chivo', 'choza', 'ciega', 'ciego', 'cielo', 'cifra', 'cinco', 'cinta', 'circo', 'clara', 'claro', 'clase', 'clave', 'clavo', 'clima', 'cloro', 'cobra', 'cobre', 'cocer', 'coche', 'cocoa', 'cocos', 'colas', 'color', 'comer', 'comía', 'común', 'conde', 'conga', 'copia', 'coral', 'corre', 'corta', 'corte', 'corto', 'cosas', 'costa', 'crece', 'creen', 'crema', 'cría', 'cruce', 'cruda', 'crudo', 'cruel', 'cuadro', 'cuajo', 'cuál', 'cualquier', 'cubos', 'cubre', 'cuero', 'cueva', 'cuida', 'culpa', 'cumbre', 'cumplo', 'cuota', 'curas', 'curso', 'curva', 'damas', 'danza', 'datos', 'deber', 'decir', 'dedos', 'dejar', 'demos', 'denso', 'desde', 'deseo', 'dicho', 'diego', 'diente', 'dieta', 'digno', 'disco', 'dolor', 'donde', 'dorar', 'dosis', 'droga', 'ducha', 'dudas', 'dulce', 'duque', 'duras', 'duro', 'echar', 'echan', 'ellas', 'ellos', 'emite', 'enano', 'enero', 'enojo', 'entra', 'entre', 'envía', 'época', 'error', 'escala', 'esas', 'esos', 'español', 'espía', 'estar', 'estas', 'estos', 'etapa', 'evita', 'exacta', 'éxito', 'fácil', 'falda', 'falla', 'falsa', 'falso', 'falta', 'famas', 'fauna', 'favor', 'fecha', 'feliz', 'feria', 'fibra', 'fideo', 'fiesta', 'fiera', 'fiero', 'fijas', 'fijos', 'filas', 'finca', 'firma', 'firme', 'flaco', 'flama', 'flauta', 'flecha', 'floja', 'flojo', 'flora', 'flujo', 'fonda', 'fondo', 'forma', 'forro', 'fotos', 'frase', 'fresa', 'fresco', 'frío', 'fruta', 'fuego', 'fuera', 'fuerte', 'fuerza', 'fumar', 'funda', 'fusil', 'gafas', 'gallo', 'gamas', 'ganas', 'ganso', 'garza', 'gasto', 'gatos', 'gemir', 'genio', 'gente', 'gesto', 'globo', 'golfo', 'golpe', 'gomas', 'gorda', 'gordo', 'gorra', 'gorro', 'gotas', 'gozar', 'gramo', 'grano', 'grasa', 'grave', 'gripe', 'grita', 'grito', 'gruesa', 'grueso', 'grupo', 'guapo', 'gusto', 'había', 'habla', 'hacer', 'hacia', 'hacha', 'hadas', 'halcón', 'hambre', 'harto', 'hasta', 'hecho', 'hielo', 'hierba', 'hierro', 'hijas', 'hijos', 'hilos', 'hogar', 'hojas', 'holla', 'hombre', 'honor', 'horas', 'horno', 'hotel', 'hueco', 'hueso', 'huevo', 'huida', 'huir', 'humor', 'ideal', 'ideas', 'igual', 'imagen', 'imita', 'india', 'indio', 'infiel', 'inútil', 'invita', 'islas', 'jamás', 'jamón', 'jardín', 'jaula', 'jefes', 'joven', 'joyas', 'juega', 'juego', 'jueza', 'jugada', 'jugar', 'jugo', 'juicio', 'julio', 'junio', 'junta', 'junto', 'jurado', 'jurar', 'justo', 'labio', 'labor', 'ladra', 'ladrón', 'lagos', 'lámina', 'lanza', 'lapso', 'larga', 'largo', 'latas', 'latir', 'lavar', 'lazos', 'leche', 'lecho', 'legal', 'lejos', 'lento', 'leña', 'letra', 'libre', 'libro', 'líder', 'lidia', 'ligar', 'ligero', 'lima', 'limón', 'linea', 'lindo', 'lista', 'listo', 'litro', 'llama', 'llano', 'llanta', 'llave', 'llega', 'llena', 'lleno', 'lleva', 'llorar', 'llueve', 'lluvia', 'lobos', 'local', 'locos', 'lodos', 'logra', 'logro', 'lomas', 'lotes', 'lucha', 'lucir', 'lugar', 'lujos', 'lunar', 'lunes', 'macho', 'madre', 'magia', 'magos', 'maíz', 'manda', 'mando', 'manga', 'mango', 'manía', 'manos', 'manta', 'mañana', 'mapa', 'marca', 'marco', 'marea', 'mares', 'marte', 'marzo', 'masas', 'matar', 'mayor', 'media', 'medio', 'mejor', 'menos', 'menta', 'mente', 'menú', 'meras', 'meros', 'mesas', 'meses', 'metas', 'meter', 'metro', 'miedo', 'minas', 'misas', 'misma', 'mismo', 'mitos', 'modal', 'modas', 'molde', 'moler', 'molino', 'momia', 'monos', 'monte', 'moños', 'moral', 'moras', 'morir', 'mortal', 'mosca', 'motor', 'mover', 'móvil', 'muchas', 'mucho', 'muela', 'muere', 'mujer', 'mulas', 'mundo', 'muñeca', 'mural', 'muros', 'música', 'mutuo', 'nacer', 'nació', 'nadar', 'nadie', 'naipe', 'nalga', 'naranja', 'nariz', 'natas', 'naves', 'negro', 'nenes', 'nidos', 'nieta', 'nieto', 'nieva', 'niñas', 'niñez', 'niños', 'nivel', 'noble', 'noche', 'nombra', 'norma', 'norte', 'notas', 'novia', 'novio', 'nubes', 'nubla', 'nuera', 'nueva', 'nuevo', 'nunca', 'nutrir', 'obras', 'obvio', 'ocaso', 'océano', 'odiar', 'odios', 'oeste', 'oferta', 'oídos', 'ojalá', 'ondas', 'opción', 'opera', 'optar', 'oreja', 'orden', 'órgano', 'orilla', 'orina', 'otorga', 'otras', 'otros', 'pacer', 'padre', 'pagas', 'pagos', 'país', 'pajar', 'pájaro', 'palas', 'palos', 'palpa', 'panda', 'panel', 'panes', 'pantera', 'papas', 'papel', 'pared', 'pares', 'parte', 'parto', 'pasar', 'pasea', 'paseo', 'pasos', 'pasta', 'patas', 'patio', 'patos', 'pausa', 'pecho', 'pedal', 'pedir', 'pegar', 'peine', 'pelea', 'pelos', 'penas', 'pensar', 'peña', 'peón', 'peor', 'peras', 'perder', 'perla', 'perro', 'pesar', 'pesca', 'pesos', 'pican', 'picos', 'pieda', 'piedra', 'piensa', 'pierde', 'pies', 'pieza', 'pilas', 'pinos', 'pinta', 'piojo', 'pique', 'pisar', 'pisas', 'pisos', 'pista', 'pizza', 'placa', 'plana', 'plano', 'plata', 'plato', 'playa', 'plaza', 'plazo', 'pleno', 'plomo', 'pluma', 'pobre', 'pocas', 'pocos', 'poder', 'podía', 'poema', 'poeta', 'polar', 'polen', 'pollo', 'polvo', 'poner', 'pongo', 'ponme', 'poros', 'porta', 'posar', 'posee', 'poste', 'potro', 'pozos', 'prado', 'precio', 'prensa', 'presa', 'prima', 'primo', 'prisa', 'probar', 'pronto', 'propia', 'propio', 'prueba', 'puede', 'puerta', 'puerto', 'pulga', 'pulir', 'pulpo', 'pulso', 'punta', 'punto', 'puños', 'puras', 'puros', 'queda', 'queja', 'quema', 'queso', 'quien', 'quinto', 'quita', 'rabia', 'rabos', 'racha', 'radar', 'radio', 'raíz', 'rajas', 'ramas', 'ranas', 'rango', 'raras', 'raros', 'rasca', 'rasgo', 'raspa', 'ratas', 'ratón', 'ratos', 'rayas', 'rayos', 'razas', 'razón', 'reacción', 'reales', 'rebaja', 'recibe', 'recién', 'recta', 'recto', 'redes', 'refrán', 'regla', 'reina', 'reino', 'rejas', 'reloj', 'remas', 'remos', 'renal', 'renta', 'repasa', 'repite', 'repta', 'resta', 'resto', 'retar', 'reúne', 'rezar', 'ricos', 'riega', 'rigor', 'rimas', 'rinde', 'riñón', 'risas', 'ritmo', 'ritos', 'rizos', 'robar', 'robos', 'rocas', 'rodar', 'rodea', 'rodillas', 'rogar', 'rojas', 'rojos', 'rollos', 'rompe', 'ropas', 'rosas', 'rosca', 'rotar', 'rotos', 'rubio', 'rueda', 'ruega', 'ruido', 'ruina', 'rumbo', 'rumor', 'rural', 'rusas', 'rusos', 'rutas', 'saber', 'sabia', 'sabio', 'sabor', 'sacar', 'sacos', 'sagrado', 'salas', 'salgo', 'salir', 'salón', 'salsa', 'salta', 'salto', 'salud', 'salva', 'salvo', 'sanas', 'sanos', 'santa', 'santo', 'sapos', 'secas', 'secos', 'sedas', 'según', 'selva', 'señal', 'señas', 'señor', 'separa', 'serie', 'serlo', 'setas', 'sido', 'siega', 'siete', 'siglo', 'signo', 'sigue', 'silla', 'sirve', 'sitio', 'sobra', 'sobre', 'socia', 'socio', 'sofá', 'sogas', 'solas', 'solos', 'soltar', 'sombra', 'somos', 'sonar', 'sonido', 'sopas', 'sopla', 'soplo', 'sorda', 'sordo', 'sorna', 'suave', 'subir', 'sucio', 'sudar', 'sudor', 'suegra', 'suegro', 'suela', 'suelo', 'sueña', 'sueño', 'suero', 'suerte', 'suma', 'sumar', 'sumo', 'super', 'surco', 'surge', 'susto', 'suyas', 'suyos', 'tabaco', 'tabla', 'tacos', 'tales', 'talla', 'tallo', 'talón', 'tamal', 'tango', 'tanta', 'tanto', 'tapas', 'tapia', 'tapón', 'tarde', 'tarea', 'tazas', 'techo', 'tejado', 'tejer', 'telas', 'tema', 'temas', 'temer', 'temor', 'templo', 'tener', 'tengo', 'tenía', 'tenis', 'tenso', 'teoría', 'tercer', 'tercera', 'tercio', 'termina', 'terna', 'termo', 'tesoro', 'texto', 'tibio', 'tiempo', 'tienda', 'tiene', 'tierra', 'tigre', 'tinas', 'tinto', 'tipos', 'tirar', 'tiras', 'tiros', 'título', 'tocan', 'todas', 'todos', 'tomar', 'tomas', 'tomos', 'tonos', 'tonta', 'tonto', 'topes', 'toque', 'torcida', 'torneo', 'torno', 'toros', 'torre', 'torta', 'total', 'tóxico', 'traba', 'traer', 'traga', 'trago', 'traje', 'trama', 'tramo', 'trampa', 'trata', 'trato', 'traza', 'trazo', 'trece', 'trenza', 'trepar', 'tribu', 'trigo', 'tripa', 'triste', 'trono', 'tropa', 'trova', 'trozo', 'truco', 'trueno', 'tubo', 'tubos', 'tumba', 'tumor', 'túnel', 'turba', 'turno', 'tuyas', 'tuyos', 'unida', 'unido', 'unión', 'único', 'unir', 'uno', 'unos', 'urbes', 'urnas', 'usado', 'usar', 'usted', 'útil', 'uvas', 'vacas', 'vacía', 'vacío', 'vagos', 'valer', 'valga', 'valor', 'valsa', 'vamos', 'vapor', 'varas', 'varia', 'vario', 'varón', 'vasos', 'vasto', 'veces', 'vecino', 'velas', 'vello', 'venas', 'vence', 'venda', 'vendo', 'venga', 'vengo', 'venir', 'venta', 'venus', 'vera', 'verano', 'verde', 'verlo', 'verso', 'verte', 'vestir', 'viaje', 'vidas', 'video', 'vieja', 'viejo', 'viene', 'vigor', 'vimos', 'vinos', 'viola', 'virtud', 'virus', 'visa', 'visión', 'vista', 'visto', 'viuda', 'viudo', 'vivan', 'vivas', 'viven', 'vives', 'vivir', 'vivos', 'vocal', 'voces', 'volar', 'volcán', 'votar', 'votos', 'vuelo', 'vuelta', 'yegua', 'yemas', 'yerno', 'zanja', 'zonal', 'zonas', 'zorra', 'zorro',
-  // 6+ letras comunes
-  'abuela', 'abuelo', 'acabar', 'aceite', 'acerca', 'acercar', 'activo', 'actual', 'además', 'adentro', 'afecto', 'afuera', 'agosto', 'agrega', 'ahorro', 'ajuste', 'alarma', 'alcance', 'alegre', 'alerta', 'alguno', 'aliado', 'alimento', 'altura', 'amable', 'amante', 'amistad', 'amplio', 'animal', 'anoche', 'antiguo', 'anuncio', 'apenas', 'aplicar', 'aprender', 'aquel', 'aquella', 'aquello', 'arriba', 'asegurar', 'asiento', 'asunto', 'ataque', 'atender', 'atrás', 'aumentar', 'aunque', 'avance', 'barrio', 'bastante', 'blanco', 'bonito', 'brazo', 'brillar', 'buscar', 'caballo', 'cabeza', 'cadena', 'caer', 'calidad', 'caliente', 'cambia', 'cambiar', 'cambio', 'caminar', 'camino', 'campaña', 'canción', 'capital', 'captar', 'carrera', 'centavo', 'centro', 'cercano', 'cerrar', 'cierto', 'cliente', 'código', 'colegio', 'colocar', 'comenzar', 'comida', 'compañía', 'comprar', 'comprender', 'común', 'concierto', 'conducir', 'conocer', 'conseguir', 'consejo', 'construir', 'contar', 'contento', 'contra', 'control', 'convertir', 'corazón', 'correcto', 'correr', 'cortar', 'costumbre', 'crecer', 'creer', 'cuadro', 'cuenta', 'cuerpo', 'cuidar', 'cultura', 'cumplir', 'dar', 'debate', 'deber', 'decir', 'dejar', 'delante', 'demás', 'dentro', 'derecha', 'derecho', 'desde', 'desear', 'deseo', 'después', 'detalle', 'detener', 'día', 'difícil', 'dinero', 'directo', 'director', 'dirigir', 'diseño', 'distrito', 'doble', 'doctor', 'domingo', 'dormir', 'durante', 'economía', 'edificio', 'educar', 'efecto', 'ejemplo', 'ejercicio', 'elegir', 'elemento', 'empezar', 'empleo', 'empresa', 'encontrar', 'energía', 'enfermo', 'enorme', 'enseñar', 'entender', 'entonces', 'entrada', 'equipo', 'escalera', 'escapar', 'escribir', 'escuela', 'esfuerzo', 'espacio', 'especial', 'esperar', 'espíritu', 'estado', 'estilo', 'estrella', 'estudio', 'eterno', 'evento', 'evitar', 'exacto', 'exigir', 'existir', 'éxito', 'experiencia', 'explicar', 'expresar', 'familia', 'famoso', 'feliz', 'femenino', 'figura', 'fijar', 'final', 'firmar', 'física', 'fondo', 'formar', 'fortuna', 'francés', 'frente', 'fresco', 'frontera', 'fuerte', 'función', 'futuro', 'ganar', 'general', 'gente', 'gobierno', 'grande', 'gracias', 'grado', 'guerra', 'gustar', 'haber', 'hablar', 'hacer', 'hacia', 'hasta', 'hermano', 'hermana', 'hermoso', 'historia', 'hombre', 'hospital', 'humano', 'iglesia', 'imagen', 'imaginar', 'importante', 'incluir', 'indicar', 'industria', 'información', 'inglés', 'inicio', 'inmediato', 'interior', 'internacional', 'internet', 'invitar', 'izquierda', 'jardín', 'joven', 'juego', 'jueves', 'jugar', 'junto', 'justo', 'lanzar', 'largo', 'lejos', 'lengua', 'lento', 'letra', 'levantar', 'libre', 'libro', 'ligero', 'limpio', 'línea', 'lista', 'llamar', 'llegar', 'llenar', 'llevar', 'llover', 'local', 'lograr', 'luchar', 'lugar', 'lunes', 'madre', 'maestro', 'mañana', 'manera', 'mantener', 'máquina', 'marcar', 'marido', 'martes', 'materia', 'mayor', 'medicina', 'medida', 'medio', 'mejor', 'memoria', 'menor', 'menos', 'mensaje', 'mente', 'mercado', 'mes', 'método', 'miembro', 'mientras', 'militar', 'millón', 'ministro', 'minuto', 'mirar', 'mismo', 'modelo', 'moderno', 'momento', 'moneda', 'montaña', 'morir', 'mostrar', 'motivo', 'mover', 'mucho', 'muerte', 'mujer', 'mundo', 'música', 'nacional', 'natural', 'necesario', 'necesitar', 'negocio', 'negro', 'ninguno', 'niño', 'nivel', 'noche', 'nombre', 'normal', 'norte', 'noticia', 'noviembre', 'nuevo', 'número', 'nunca', 'objetivo', 'objeto', 'obligar', 'obtener', 'octubre', 'ocupar', 'ocurrir', 'oficial', 'ofrecer', 'opinión', 'oportunidad', 'orden', 'organizar', 'origen', 'oscuro', 'padre', 'pagar', 'página', 'país', 'palabra', 'papel', 'parecer', 'pareja', 'parte', 'partido', 'partir', 'pasado', 'pasar', 'paso', 'paz', 'película', 'peligro', 'pensar', 'pequeño', 'perder', 'perfecto', 'periódico', 'permitir', 'pero', 'perro', 'persona', 'peso', 'piedra', 'pierna', 'pieza', 'planta', 'plata', 'plaza', 'pleno', 'población', 'pobre', 'poco', 'poder', 'policía', 'política', 'político', 'poner', 'popular', 'porque', 'posible', 'posición', 'positivo', 'precio', 'preferir', 'pregunta', 'preguntar', 'preparar', 'presencia', 'presentar', 'presente', 'presidente', 'presión', 'primero', 'principal', 'principio', 'privado', 'problema', 'proceso', 'producir', 'producto', 'profesor', 'programa', 'prometer', 'pronto', 'propio', 'proponer', 'proteger', 'proyecto', 'prueba', 'público', 'pueblo', 'puerta', 'puesto', 'punto', 'quedar', 'querer', 'quien', 'quitar', 'rápido', 'razón', 'real', 'realidad', 'realizar', 'realmente', 'recibir', 'reconocer', 'recordar', 'recorrer', 'recurso', 'reducir', 'referir', 'régimen', 'región', 'regresar', 'relación', 'religión', 'repetir', 'representar', 'resolver', 'respecto', 'responder', 'respuesta', 'resto', 'resultado', 'reunir', 'rico', 'riesgo', 'romper', 'ropa', 'saber', 'sacar', 'salir', 'salud', 'sangre', 'secreto', 'sector', 'seguir', 'segundo', 'seguridad', 'seguro', 'semana', 'sentar', 'sentido', 'sentir', 'señalar', 'señor', 'separar', 'serie', 'servicio', 'servir', 'siempre', 'siguiente', 'simple', 'sino', 'sistema', 'sitio', 'situación', 'sobre', 'sociedad', 'soldado', 'solo', 'solución', 'sombra', 'sonar', 'sonreír', 'sostener', 'subir', 'suceder', 'suelo', 'sueño', 'sufrir', 'suponer', 'taller', 'también', 'tampoco', 'tanto', 'tarde', 'tarea', 'técnica', 'técnico', 'teléfono', 'televisión', 'tema', 'temer', 'temprano', 'tender', 'tener', 'teoría', 'tercero', 'terminar', 'término', 'tierra', 'tiempo', 'tienda', 'tipo', 'tirar', 'título', 'tocar', 'todavía', 'todo', 'tomar', 'tono', 'total', 'trabajar', 'trabajo', 'tradición', 'traer', 'tratar', 'través', 'tres', 'triste', 'único', 'unir', 'universidad', 'utilizar', 'vacación', 'valer', 'valor', 'varios', 'vecino', 'vender', 'venir', 'ventana', 'verde', 'verdad', 'verdadero', 'vestir', 'viaje', 'viejo', 'viento', 'viernes', 'violencia', 'visita', 'visitar', 'vista', 'vivir', 'volver', 'votar', 'vuelta', 'ya', 'zona'
-];
+/**
+ * Diccionario español basado en el Lemario General del Español
+ * de Ismael Olea (dominio público): https://github.com/olea/lemarios
+ * Procesado y servido como archivo estático desde /data/diccionario-es.txt
+ */
+const DICT_URL = '/data/diccionario-es.txt';
+const DICT_CACHE_KEY = 'meskeia_dict_es_v1';
 
-// Crear Set para búsqueda rápida
-const wordSet = new Set(spanishWords.map(w => w.toLowerCase()));
+type DictStatus = 'loading' | 'ready' | 'error';
 
 export default function GeneradorAnagramasPage() {
   const [letters, setLetters] = useState('');
@@ -31,17 +23,55 @@ export default function GeneradorAnagramasPage() {
   const [mustContain, setMustContain] = useState('');
   const [results, setResults] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [dictionary, setDictionary] = useState<string[]>([]);
+  const [dictStatus, setDictStatus] = useState<DictStatus>('loading');
 
-  // Función para verificar si una palabra puede formarse con las letras disponibles
+  useEffect(() => {
+    const cached = typeof window !== 'undefined' ? sessionStorage.getItem(DICT_CACHE_KEY) : null;
+    if (cached) {
+      setDictionary(cached.split('\n'));
+      setDictStatus('ready');
+      return;
+    }
+
+    fetch(DICT_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((text) => {
+        const words = text.split('\n').filter(Boolean);
+        setDictionary(words);
+        setDictStatus('ready');
+        try {
+          sessionStorage.setItem(DICT_CACHE_KEY, text);
+        } catch {
+          // sessionStorage lleno: silencioso, no es crítico
+        }
+      })
+      .catch(() => {
+        setDictStatus('error');
+      });
+  }, []);
+
+  // Indexar diccionario por longitud para búsquedas más rápidas
+  const wordsByLength = useMemo(() => {
+    const index: { [key: number]: string[] } = {};
+    for (const word of dictionary) {
+      const len = word.length;
+      if (!index[len]) index[len] = [];
+      index[len].push(word);
+    }
+    return index;
+  }, [dictionary]);
+
   const canFormWord = (word: string, availableLetters: string): boolean => {
     const letterCount: { [key: string]: number } = {};
 
-    // Contar letras disponibles
     for (const letter of availableLetters.toLowerCase()) {
       letterCount[letter] = (letterCount[letter] || 0) + 1;
     }
 
-    // Verificar cada letra de la palabra
     for (const letter of word.toLowerCase()) {
       if (!letterCount[letter] || letterCount[letter] === 0) {
         return false;
@@ -67,20 +97,19 @@ export default function GeneradorAnagramasPage() {
       const found: string[] = [];
       const mustContainLower = mustContain.toLowerCase();
 
-      for (const word of spanishWords) {
-        // Filtrar por longitud
-        if (word.length < minLength || word.length > maxLength) continue;
+      // Iterar solo sobre las longitudes válidas para acelerar
+      for (let len = minLength; len <= maxLength; len++) {
+        const bucket = wordsByLength[len];
+        if (!bucket) continue;
 
-        // Filtrar por letra obligatoria
-        if (mustContainLower && !word.includes(mustContainLower)) continue;
-
-        // Verificar si la palabra puede formarse
-        if (canFormWord(word, normalizedLetters)) {
-          found.push(word);
+        for (const word of bucket) {
+          if (mustContainLower && !word.includes(mustContainLower)) continue;
+          if (canFormWord(word, normalizedLetters)) {
+            found.push(word);
+          }
         }
       }
 
-      // Ordenar por longitud (más largas primero) y luego alfabéticamente
       found.sort((a, b) => {
         if (b.length !== a.length) return b.length - a.length;
         return a.localeCompare(b);
@@ -88,7 +117,7 @@ export default function GeneradorAnagramasPage() {
 
       setResults(found);
       setIsSearching(false);
-    }, 100);
+    }, 50);
   };
 
   const handleClear = () => {
@@ -97,7 +126,6 @@ export default function GeneradorAnagramasPage() {
     setResults([]);
   };
 
-  // Agrupar resultados por longitud
   const groupedResults = useMemo(() => {
     const groups: { [key: number]: string[] } = {};
     for (const word of results) {
@@ -115,6 +143,11 @@ export default function GeneradorAnagramasPage() {
     { letters: 'corazon', label: 'corazon' },
   ];
 
+  const formattedDictSize = useMemo(
+    () => dictionary.length.toLocaleString('es-ES'),
+    [dictionary.length]
+  );
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -129,15 +162,44 @@ export default function GeneradorAnagramasPage() {
       <LegalNotice />
 
       <div className={styles.mainContent}>
+        {dictStatus === 'loading' && (
+          <div
+            className={`${styles.dictStatus} ${styles.dictStatusLoading}`}
+            role="status"
+            aria-live="polite"
+          >
+            <span className={styles.dictSpinner} aria-hidden="true" />
+            <span>Cargando diccionario español…</span>
+          </div>
+        )}
+        {dictStatus === 'ready' && (
+          <div className={`${styles.dictStatus} ${styles.dictStatusReady}`}>
+            <span aria-hidden="true">✓</span>
+            <span>Diccionario cargado: {formattedDictSize} palabras del español</span>
+          </div>
+        )}
+        {dictStatus === 'error' && (
+          <div
+            className={`${styles.dictStatus} ${styles.dictStatusError}`}
+            role="alert"
+          >
+            <span aria-hidden="true">⚠️</span>
+            <span>No se pudo cargar el diccionario. Recarga la página para reintentar.</span>
+          </div>
+        )}
+
         <div className={styles.inputSection}>
-          <label className={styles.label}>Introduce tus letras:</label>
+          <label className={styles.label} htmlFor="anagram-letters">Introduce tus letras:</label>
           <input
+            id="anagram-letters"
             type="text"
             className={styles.input}
             value={letters}
             onChange={(e) => setLetters(e.target.value)}
             placeholder="Ej: amorpls"
             maxLength={15}
+            autoComplete="off"
+            inputMode="text"
           />
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Probar:</span>
@@ -146,6 +208,7 @@ export default function GeneradorAnagramasPage() {
                 key={ex.letters}
                 className={styles.exampleBtn}
                 onClick={() => setLetters(ex.letters)}
+                type="button"
               >
                 {ex.label}
               </button>
@@ -155,8 +218,9 @@ export default function GeneradorAnagramasPage() {
 
         <div className={styles.filtersSection}>
           <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Longitud mínima:</label>
+            <label className={styles.filterLabel} htmlFor="anagram-min">Longitud mínima:</label>
             <select
+              id="anagram-min"
               className={styles.select}
               value={minLength}
               onChange={(e) => setMinLength(Number(e.target.value))}
@@ -168,8 +232,9 @@ export default function GeneradorAnagramasPage() {
           </div>
 
           <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Longitud máxima:</label>
+            <label className={styles.filterLabel} htmlFor="anagram-max">Longitud máxima:</label>
             <select
+              id="anagram-max"
               className={styles.select}
               value={maxLength}
               onChange={(e) => setMaxLength(Number(e.target.value))}
@@ -181,14 +246,16 @@ export default function GeneradorAnagramasPage() {
           </div>
 
           <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Debe contener:</label>
+            <label className={styles.filterLabel} htmlFor="anagram-contain">Debe contener:</label>
             <input
+              id="anagram-contain"
               type="text"
               className={styles.filterInput}
               value={mustContain}
               onChange={(e) => setMustContain(e.target.value)}
               placeholder="Opcional"
               maxLength={3}
+              autoComplete="off"
             />
           </div>
         </div>
@@ -197,11 +264,12 @@ export default function GeneradorAnagramasPage() {
           <button
             onClick={findAnagrams}
             className={styles.btnPrimary}
-            disabled={letters.length < 2 || isSearching}
+            disabled={letters.length < 2 || isSearching || dictStatus !== 'ready'}
+            type="button"
           >
             {isSearching ? 'Buscando...' : 'Buscar palabras'}
           </button>
-          <button onClick={handleClear} className={styles.btnSecondary}>
+          <button onClick={handleClear} className={styles.btnSecondary} type="button">
             Limpiar
           </button>
         </div>
@@ -231,7 +299,7 @@ export default function GeneradorAnagramasPage() {
           </div>
         )}
 
-        {results.length === 0 && letters.length >= 2 && !isSearching && (
+        {results.length === 0 && letters.length >= 2 && !isSearching && dictStatus === 'ready' && (
           <div className={styles.noResults}>
             <p>No se encontraron palabras con esas letras.</p>
             <p className={styles.hint}>Prueba añadiendo más letras o reduciendo los filtros.</p>
@@ -336,15 +404,15 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cómo funciona el algoritmo de búsqueda de anagramas?</summary>
-              <p className={styles.eduFaqAnswer}>El algoritmo más eficiente usa <strong>conteo de frecuencias de letras</strong>: para cada letra del diccionario, verifica si su frecuencia en la palabra candidata no supera la frecuencia disponible. Con un diccionario de 50.000 palabras y letras de entrada de longitud N, la complejidad es O(D×N) donde D es el tamaño del diccionario. La variante con firma (ordenar letras y comparar hashes) es O(D×N×log N) pero permite precalcular índices.</p>
+              <p className={styles.eduFaqAnswer}>El algoritmo más eficiente usa <strong>conteo de frecuencias de letras</strong>: para cada letra del diccionario, verifica si su frecuencia en la palabra candidata no supera la frecuencia disponible. Esta herramienta usa además un <strong>índice por longitud</strong> que evita revisar palabras fuera del rango de letras solicitado, lo que multiplica la velocidad de búsqueda sobre los ~87.000 lemas del diccionario.</p>
             </details>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqQuestion}>¿Por qué no aparecen todas las palabras que conozco?</summary>
-              <p className={styles.eduFaqAnswer}>Esta herramienta usa un diccionario de ~5.000 palabras comunes en español. Un diccionario completo de la RAE contiene más de 93.000 entradas. Las palabras técnicas, términos regionales, plurales irregulares o conjugaciones verbales poco comunes pueden no estar incluidas. Para uso competitivo en Scrabble, se recomienda consultar el diccionario oficial de la FISE (Federación Internacional de Scrabble en Español).</p>
+              <summary className={styles.eduFaqQuestion}>¿Qué diccionario utiliza esta herramienta?</summary>
+              <p className={styles.eduFaqAnswer}>Esta herramienta utiliza el <strong>Lemario General del Español</strong> de Ismael Olea (<a href="https://github.com/olea/lemarios" target="_blank" rel="noopener noreferrer">github.com/olea/lemarios</a>), publicado en dominio público. Contiene aproximadamente <strong>87.000 lemas</strong> del español estándar y se usa también en correctores ortográficos libres (LibreOffice, Firefox vía RLA-ES). Para uso competitivo en Scrabble, se recomienda complementar con el diccionario oficial de la FISE (Federación Internacional de Scrabble en Español).</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Las tildes cuentan como letras diferentes?</summary>
-              <p className={styles.eduFaqAnswer}>En español, las letras acentuadas (á, é, í, ó, ú, ü) son variantes ortográficas de las vocales base. En Scrabble oficial, <strong>sí cuentan como fichas distintas</strong>. En esta herramienta, puedes introducir vocales con y sin tilde y el sistema las trata correctamente. La Ñ es una letra completamente independiente del abecedario español con su propia ficha en Scrabble.</p>
+              <p className={styles.eduFaqAnswer}>En español, las letras acentuadas (á, é, í, ó, ú, ü) son variantes ortográficas de las vocales base. En Scrabble oficial, <strong>sí cuentan como fichas distintas</strong>. En esta herramienta, el diccionario conserva las tildes originales, así que si una palabra lleva acento (por ejemplo &quot;árbol&quot;) deberás introducir las letras con tilde para que aparezca. La Ñ es una letra completamente independiente del abecedario español con su propia ficha en Scrabble.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué es el &quot;bingo&quot; en Scrabble?</summary>
@@ -445,10 +513,10 @@ export default function GeneradorAnagramasPage() {
           <div className={styles.warningBox}>
             <span className={styles.warningIcon}>⚠️</span>
             <div>
-              <strong>Limitaciones importantes del generador</strong>
+              <strong>Sobre el diccionario utilizado</strong>
               <ul>
-                <li><strong>Diccionario limitado</strong>: Esta herramienta usa ~5.000 palabras comunes. El diccionario oficial de la RAE contiene 93.000+ entradas. Palabras válidas en Scrabble pueden no aparecer aquí.</li>
-                <li><strong>Sin conjugaciones completas</strong>: No están incluidas todas las formas verbales conjugadas. Por ejemplo, puede aparecer &quot;comer&quot; pero no &quot;comiéramos&quot;.</li>
+                <li><strong>Fuente</strong>: Lemario General del Español de Ismael Olea (<a href="https://github.com/olea/lemarios" target="_blank" rel="noopener noreferrer">github.com/olea/lemarios</a>), distribuido en dominio público. Aproximadamente 87.000 lemas del español estándar.</li>
+                <li><strong>Lemas, no flexiones completas</strong>: El diccionario contiene formas base y flexiones frecuentes, pero puede no incluir todas las conjugaciones verbales raras o regionalismos muy específicos.</li>
                 <li><strong>No es árbitro oficial</strong>: Para partidas competitivas de Scrabble, usa siempre el diccionario oficial de la FISE. Este generador es una herramienta de práctica y aprendizaje.</li>
                 <li><strong>Sensibilidad a tildes</strong>: El sistema distingue entre letras con y sin tilde. Si no encuentras una palabra, prueba con y sin acentos en las vocales.</li>
               </ul>
