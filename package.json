@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npx kill-port 3050 || exit 0",
     "dev": "next dev -p 3050",
-    "build": "node scripts/generate-llm-index.js && next build",
+    "build": "node scripts/generate-llm-index.js && next build --turbopack",
     "start": "next start -p 3050",
     "lint": "eslint",
     "test": "npx playwright test",
