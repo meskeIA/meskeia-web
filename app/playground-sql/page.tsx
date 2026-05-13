@@ -59,7 +59,7 @@ export default function PlaygroundSQLPage() {
       // Cargar sql.js dinámicamente
       const initSqlJs = (await import('sql.js')).default;
       const SQL: SqlJsStatic = await initSqlJs({
-        locateFile: (file: string) => `https://sql.js.org/dist/${file}`
+        locateFile: (file: string) => `/wasm/${file}`
       });
 
       // Crear nueva base de datos
