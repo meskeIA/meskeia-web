@@ -2027,17 +2027,23 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-markdown-html': [...textoApps.slice(0, 2), ...webDevApps.slice(0, 2)],
   'generador-lorem-ipsum': textoApps,
   'generador-anagramas': [
-    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos para crucigramas' },
     { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
     { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Palabras y caracteres' },
-    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+  ],
+  'buscador-palabras-patron': [
+    { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Palabras con letras sueltas' },
+    { url: '/juego-wordle/', icon: '🔤', name: 'Wordle', description: 'Adivina la palabra del día' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+    { url: '/conjugador-verbos/', icon: '🔁', name: 'Conjugador Verbos', description: 'Conjugaciones del español' },
   ],
   'detector-idioma': textoApps,
   'conjugador-verbos': [
+    { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos' },
     { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+    { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Reordena letras' },
     { url: '/detector-idioma/', icon: '🌍', name: 'Detector Idioma', description: 'Identifica el idioma' },
-    { url: '/contador-palabras/', icon: '🔢', name: 'Contador Palabras', description: 'Cuenta palabras y caracteres' },
-    { url: '/generador-anagramas/', icon: '🔀', name: 'Generador Anagramas', description: 'Reordena letras' },
   ],
   'tablas-multiplicar': [
     { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora Notas', description: 'Calcula tu nota media' },
