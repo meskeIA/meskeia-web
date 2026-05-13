@@ -1,87 +1,27 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './JuegoWordle.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
-// Palabras de 5 letras en español (sin tildes para simplificar)
-const PALABRAS = [
-  'ABRIL', 'ACTOR', 'ADIOS', 'AGUAS', 'AIRES', 'ALBUM', 'ALDEA', 'ALGAS',
-  'ALMAS', 'ALTAR', 'AMIGO', 'ANEXO', 'ANGEL', 'ANIMO', 'ANTES', 'ANZOL',
-  'ARBOL', 'ARMAS', 'AROMA', 'ARROZ', 'ATLAS', 'AVION', 'AYUDA', 'AZOTE',
-  'AZUCAR', 'BAILE', 'BARCO', 'BARRO', 'BELLO', 'BICHO', 'BINGO', 'BLUSA',
-  'BOCAS', 'BOLSA', 'BONUS', 'BRAZO', 'BRISA', 'BROMA', 'BUENO', 'BURRO',
-  'CABLE', 'CACAO', 'CAJAS', 'CALOR', 'CAMAS', 'CAMPO', 'CANAL', 'CARAS',
-  'CARNE', 'CARTA', 'CASAS', 'CASOS', 'CAZAR', 'CELOS', 'CERCA', 'CERDO',
-  'CEROS', 'CHICA', 'CHILE', 'CHINA', 'CINCO', 'CITAS', 'CLASE', 'CLAVE',
-  'CLIMA', 'COBRE', 'COCHE', 'COCOA', 'CODOS', 'COFRE', 'COLAS', 'COLOR',
-  'COMER', 'COPAS', 'CORAL', 'CORTO', 'COSTA', 'CREMA', 'CRUEL', 'CUERO',
-  'DATOS', 'DEBER', 'DEBUT', 'DEDOS', 'DELTA', 'DEUDA', 'DISCO', 'DOLOR',
-  'DONAR', 'DOSIS', 'DRAMA', 'DUCHA', 'DUELO', 'DULCE', 'DURAR', 'EFECTO',
-  'ELITE', 'EMAIL', 'ENERO', 'ENVIO', 'EPOCA', 'ERROR', 'EUROS', 'EXITO',
-  'FALDA', 'FALLA', 'FALSO', 'FAMAS', 'FANGO', 'FAVOR', 'FECHA', 'FERIA',
-  'FIBRA', 'FICHA', 'FICUS', 'FIESTA', 'FINAL', 'FIRMA', 'FLACO', 'FLASH',
-  'FLORA', 'FLUJO', 'FOCOS', 'FONDO', 'FORMA', 'FORRO', 'FORTE', 'FRASE',
-  'FRENO', 'FRESA', 'FRUTA', 'FUEGO', 'FUERA', 'FUNDA', 'GAFAS', 'GALLO',
-  'GANAS', 'GANGA', 'GASES', 'GASTO', 'GATAS', 'GATOS', 'GENIO', 'GENTE',
-  'GLOBO', 'GOLFO', 'GOLPE', 'GOMAS', 'GORDO', 'GORRO', 'GOTAS', 'GRADO',
-  'GRANO', 'GRAVE', 'GREMIO', 'GRIPE', 'GRISES', 'GRUPO', 'GUAPO', 'GUIAS',
-  'HABER', 'HABLA', 'HACER', 'HACIA', 'HALLAR', 'HASTA', 'HIELO', 'HIERRO',
-  'HOGAR', 'HOJAS', 'HONGO', 'HONOR', 'HORAS', 'HOTEL', 'HUECO', 'HUESO',
-  'HUEVO', 'HUMOR', 'IDEAL', 'IDEAS', 'IGUAL', 'INDIO', 'ISLAS', 'JABON',
-  'JAMON', 'JARRA', 'JEFES', 'JESUS', 'JOKER', 'JOVEN', 'JOYAS', 'JUEGO',
-  'JUEVES', 'JUGAR', 'JUGOS', 'JULIO', 'JUNIO', 'JUNTO', 'JURAR', 'LABOR',
-  'LADOS', 'LAGO', 'LAPIZ', 'LARGO', 'LASER', 'LATIN', 'LATIR', 'LAVAR',
-  'LAZOS', 'LECHE', 'LEER', 'LEGAL', 'LEJOS', 'LEMAS', 'LENTO', 'LETRA',
-  'LEYES', 'LIBRE', 'LICOR', 'LIMON', 'LINEA', 'LISTA', 'LITRO', 'LLAMA',
-  'LLAVE', 'LLENO', 'LLUVIA', 'LOCAL', 'LOCOS', 'LOGRO', 'LOTES', 'LUCES',
-  'LUGAR', 'LUJOS', 'LUNAR', 'LUNES', 'MADRE', 'MAFIA', 'MAGIA', 'MALOS',
-  'MANGO', 'MANOS', 'MANTO', 'MAPAS', 'MARCA', 'MARCO', 'MAREA', 'MARES',
-  'MARZO', 'MASAS', 'MAYOR', 'MEDIA', 'MEDIO', 'MEJOR', 'MELON', 'MENOS',
-  'MENTE', 'MENUS', 'MESAS', 'METAL', 'METRO', 'MEZCLA', 'MICRO', 'MIEDO',
-  'MINAS', 'MISION', 'MISMO', 'MITOS', 'MODA', 'MODELO', 'MOLER', 'MONOS',
-  'MONTE', 'MORAL', 'MORRO', 'MOTOS', 'MOTOR', 'MOVIL', 'MUCHO', 'MUELA',
-  'MUNDO', 'MUSAS', 'MUSEO', 'NACER', 'NACIO', 'NADAR', 'NADIE', 'NARIZ',
-  'NAVES', 'NEGRO', 'NENES', 'NIEVE', 'NIVEL', 'NOBLE', 'NOCHE', 'NOTAS',
-  'NOVIO', 'NUBES', 'NUEVA', 'NUEVO', 'NUEVE', 'NUNCA', 'OBRAS', 'OCASO',
-  'OCIOS', 'ODIAR', 'OESTE', 'OJALA', 'OLIVO', 'ONDAS', 'OPERA', 'ORDEN',
-  'OTROS', 'PADRE', 'PAGAR', 'PAGOS', 'PALAS', 'PALCO', 'PANES', 'PAPEL',
-  'PARDO', 'PARES', 'PARTE', 'PASAR', 'PASTA', 'PATAS', 'PATIO', 'PAUSA',
-  'PECHO', 'PELOS', 'PENAS', 'PERRO', 'PESAS', 'PESOS', 'PIANO', 'PICAR',
-  'PICOS', 'PIEZA', 'PILAS', 'PINOS', 'PINTA', 'PISAR', 'PISOS', 'PISTA',
-  'PIZZA', 'PLANO', 'PLATA', 'PLATO', 'PLAYA', 'PLAZA', 'PLENO', 'PLOMO',
-  'PLUMA', 'POBRES', 'PODER', 'POEMA', 'POETA', 'POKER', 'POLAR', 'POLLO',
-  'POLVO', 'PONER', 'PORTA', 'POSAR', 'PRADO', 'PRECIO', 'PRESA', 'PRIMA',
-  'PRIMO', 'PRISA', 'PROBAR', 'PROPIA', 'PRUEBA', 'PUNTO', 'QUESO', 'QUIEN',
-  'QUINTO', 'RADAR', 'RADIO', 'RAROS', 'RATON', 'RAYAS', 'RAYOS', 'RAZAS',
-  'RAZON', 'REAL', 'REDES', 'REINA', 'REJAS', 'RELOJ', 'REMOS', 'RENTA',
-  'RESTO', 'RETOS', 'REYES', 'REZAR', 'RICOS', 'RIEGO', 'RIESGO', 'RITMO',
-  'RIVAL', 'ROCAS', 'RODAR', 'RODEO', 'ROJAS', 'ROJOS', 'ROLES', 'ROLLO',
-  'ROMAN', 'RONDA', 'ROPAS', 'ROSAS', 'RUBIO', 'RUEDA', 'RUIDO', 'RUMBO',
-  'RURAL', 'RUSAS', 'RUTAS', 'SABER', 'SABOR', 'SACAR', 'SALIR', 'SALON',
-  'SALSA', 'SALTO', 'SALUD', 'SANTO', 'SAUCE', 'SAUNA', 'SAVIA', 'SECAS',
-  'SECOS', 'SEDES', 'SELVA', 'SEÑAL', 'SEÑOR', 'SERIA', 'SERIO', 'SEXTO',
-  'SILBA', 'SILLA', 'SOBRE', 'SOCIA', 'SOCIO', 'SOLAR', 'SOLOS', 'SOLTAR',
-  'SONAR', 'SOÑAR', 'SOPAS', 'SORDO', 'SUAVE', 'SUBIR', 'SUCIO', 'SUDAR',
-  'SUELO', 'SUEÑO', 'SUITE', 'SUIZA', 'SUMA', 'SUPER', 'SURCO', 'SURGIR',
-  'TABLA', 'TACOS', 'TALLA', 'TANGO', 'TAPAR', 'TAPAS', 'TARDA', 'TARDE',
-  'TAREA', 'TARRO', 'TAXIS', 'TAZAS', 'TECHO', 'TELAS', 'TEMAS', 'TEMOR',
-  'TEMPO', 'TENIS', 'TENOR', 'TENSA', 'TENSO', 'TERCO', 'TEXTO', 'TIBIA',
-  'TIBIO', 'TIGRE', 'TINTA', 'TIPOS', 'TIRAR', 'TIROS', 'TITAN', 'TOCAR',
-  'TODOS', 'TOMAR', 'TONAL', 'TONOS', 'TONTO', 'TOPES', 'TOQUE', 'TOROS',
-  'TORRE', 'TORTA', 'TOTAL', 'TOXICO', 'TRAER', 'TRAJE', 'TRAMO', 'TRECE',
-  'TREN', 'TRIGO', 'TRIPA', 'TRISTE', 'TROZO', 'TRUCO', 'TUMBA', 'TUNEL',
-  'TURCO', 'TURNO', 'ULTRA', 'UNION', 'UNIR', 'USAR', 'USTED', 'UVAS',
-  'VACAS', 'VACIO', 'VALER', 'VALOR', 'VAPOR', 'VARIA', 'VARIO', 'VARON',
-  'VASOS', 'VECINO', 'VELAS', 'VENAS', 'VENTA', 'VERDE', 'VERSO', 'VIDEO',
-  'VIEJO', 'VINO', 'VIRAL', 'VIRUS', 'VISTA', 'VITAL', 'VIUDA', 'VIVIR',
-  'VOLAR', 'VOTAR', 'VOTOS', 'VUELO', 'YATES', 'YOGUR', 'ZANJA', 'ZARPA',
-  'ZONAS', 'ZORRO',
-].filter(p => p.length === 5);
+/**
+ * Pool de palabras del día (~530 palabras curadas) y diccionario completo de
+ * validación (~87k lemas, Lemario General del Español de Ismael Olea, dominio
+ * público — https://github.com/olea/lemarios) servidos como archivos estáticos.
+ */
+const POOL_URL = '/data/palabras-wordle.txt';
+const DICT_URL = '/data/diccionario-es.txt';
+const POOL_CACHE_KEY = 'meskeia_wordle_pool_v1';
+const DICT_CACHE_KEY = 'meskeia_dict_es_v1';
+
+// Normaliza para comparar: mayúsculas + sin tildes (el wordle juega sin tildes)
+const normalizar = (s: string): string =>
+  s.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
 
 type Estado = 'correcto' | 'presente' | 'ausente' | 'vacio';
 
@@ -89,14 +29,6 @@ interface Letra {
   char: string;
   estado: Estado;
 }
-
-// Obtener palabra del día (basada en fecha)
-const getPalabraDelDia = (): string => {
-  const inicio = new Date('2024-01-01').getTime();
-  const hoy = new Date().setHours(0, 0, 0, 0);
-  const dias = Math.floor((hoy - inicio) / (1000 * 60 * 60 * 24));
-  return PALABRAS[dias % PALABRAS.length];
-};
 
 // Evaluar intento
 const evaluarIntento = (intento: string, palabra: string): Letra[] => {
@@ -144,13 +76,85 @@ const TECLADO = [
 ];
 
 export default function JuegoWordlePage() {
-  const [palabra] = useState(getPalabraDelDia);
+  const [palabra, setPalabra] = useState('');
   const [intentos, setIntentos] = useState<Letra[][]>([]);
   const [intentoActual, setIntentoActual] = useState('');
   const [ganado, setGanado] = useState(false);
   const [perdido, setPerdido] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [estadoTeclas, setEstadoTeclas] = useState<Record<string, Estado>>({});
+  const [palabrasPool, setPalabrasPool] = useState<string[]>([]);
+  const [dictionarySet, setDictionarySet] = useState<Set<string> | null>(null);
+  const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+
+  // Cargar pool de palabras del día desde /data/palabras-wordle.txt
+  useEffect(() => {
+    const cached = sessionStorage.getItem(POOL_CACHE_KEY);
+    if (cached) {
+      setPalabrasPool(cached.split('\n').filter(Boolean));
+      return;
+    }
+    fetch(POOL_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((text) => {
+        const arr = text.split('\n').filter(Boolean);
+        setPalabrasPool(arr);
+        try { sessionStorage.setItem(POOL_CACHE_KEY, text); } catch { /* sessionStorage lleno */ }
+      })
+      .catch(() => setLoadStatus('error'));
+  }, []);
+
+  // Cargar diccionario completo (~87k lemas) para validación del input
+  useEffect(() => {
+    const procesar = (text: string): Set<string> => {
+      const set = new Set<string>();
+      for (const word of text.split('\n')) {
+        if (word.length === 5) set.add(normalizar(word));
+      }
+      return set;
+    };
+
+    const cached = sessionStorage.getItem(DICT_CACHE_KEY);
+    if (cached) {
+      setDictionarySet(procesar(cached));
+      return;
+    }
+    fetch(DICT_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then((text) => {
+        setDictionarySet(procesar(text));
+        try { sessionStorage.setItem(DICT_CACHE_KEY, text); } catch { /* sessionStorage lleno */ }
+      })
+      .catch(() => {
+        // Si el diccionario falla, el juego sigue funcionando sin validación
+        setDictionarySet(new Set());
+      });
+  }, []);
+
+  // Calcular palabra del día cuando el pool está cargado
+  useEffect(() => {
+    if (palabrasPool.length === 0) return;
+    const inicio = new Date('2024-01-01').getTime();
+    const hoy = new Date().setHours(0, 0, 0, 0);
+    const dias = Math.floor((hoy - inicio) / (1000 * 60 * 60 * 24));
+    setPalabra(palabrasPool[dias % palabrasPool.length]);
+    setLoadStatus('ready');
+  }, [palabrasPool]);
+
+  // Set combinado: pool ∪ diccionario. El pool contiene plurales (CASAS, AGUAS)
+  // que no aparecen como lemas en el diccionario pero son palabras válidas.
+  const palabrasValidas = useMemo(() => {
+    if (!dictionarySet || dictionarySet.size === 0) return null;
+    const set = new Set(dictionarySet);
+    for (const p of palabrasPool) set.add(p);
+    return set;
+  }, [dictionarySet, palabrasPool]);
 
   // Cargar estado guardado
   useEffect(() => {
@@ -192,6 +196,12 @@ export default function JuegoWordlePage() {
       return;
     }
 
+    // Validar que el intento existe como palabra del español
+    if (palabrasValidas && !palabrasValidas.has(intentoActual)) {
+      mostrarMensaje('Esa palabra no está en el diccionario');
+      return;
+    }
+
     const resultado = evaluarIntento(intentoActual, palabra);
     const nuevosIntentos = [...intentos, resultado];
     setIntentos(nuevosIntentos);
@@ -217,11 +227,12 @@ export default function JuegoWordlePage() {
     }
 
     setIntentoActual('');
-  }, [intentoActual, palabra, intentos, estadoTeclas, mostrarMensaje]);
+  }, [intentoActual, palabra, intentos, estadoTeclas, mostrarMensaje, palabrasValidas]);
 
   // Manejar tecla
   const handleTecla = useCallback((tecla: string) => {
     if (ganado || perdido) return;
+    if (loadStatus !== 'ready') return;
 
     if (tecla === 'ENTER') {
       enviarIntento();
@@ -230,7 +241,7 @@ export default function JuegoWordlePage() {
     } else if (tecla.length === 1 && /[A-ZÑ]/.test(tecla) && intentoActual.length < 5) {
       setIntentoActual(prev => prev + tecla);
     }
-  }, [ganado, perdido, enviarIntento, intentoActual]);
+  }, [ganado, perdido, enviarIntento, intentoActual, loadStatus]);
 
   // Teclado físico
   useEffect(() => {
@@ -294,6 +305,18 @@ export default function JuegoWordlePage() {
       <LegalNotice />
 
       <div className={styles.mainContent}>
+        {/* Indicador de carga */}
+        {loadStatus === 'loading' && (
+          <div className={styles.loadingBanner} role="status" aria-live="polite">
+            Cargando palabra del día…
+          </div>
+        )}
+        {loadStatus === 'error' && (
+          <div className={styles.errorBanner} role="alert">
+            No se pudo cargar el juego. Recarga la página para reintentar.
+          </div>
+        )}
+
         {/* Mensaje */}
         {mensaje && (
           <div className={styles.mensaje}>{mensaje}</div>
