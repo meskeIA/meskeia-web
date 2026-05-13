@@ -13,6 +13,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    // Ubicado en .next/cache/ porque Vercel cachea esa carpeta entre builds.
+    // En la raíz del proyecto el archivo se regenera en cada deploy.
     "tsBuildInfoFile": ".next/cache/tsconfig.tsbuildinfo",
     "plugins": [
       {
