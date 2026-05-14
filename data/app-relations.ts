@@ -5186,8 +5186,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-fotografia': [
     { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'Compara lado a lado 14/24/50/85/200 mm: la otra mitad de la decisión fotográfica' },
     { url: '/simulador-balance-blancos/', icon: '🌡️', name: 'Balance de Blancos', description: 'Slider Kelvin sobre 3 escenas: cierra los pilares del control creativo' },
+    { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'Calcula DoF e hiperfocal: el efecto técnico de tu apertura sobre la nitidez' },
     { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Calcula la mejor luz natural para fotografiar en tu ubicación' },
-    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Lentes Ópticas', description: 'Cómo forman imagen las lentes: la base óptica del objetivo de tu cámara' },
   ],
   'visualizador-focales-fotografia': [
     { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'ISO, apertura y velocidad: el otro pilar de toda decisión fotográfica' },
@@ -5198,8 +5198,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-balance-blancos': [
     { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'ISO, apertura, velocidad: la otra mitad del control creativo en cámara' },
     { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: '14/24/50/85/200 mm lado a lado: completa los pilares de la fotografía' },
+    { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'Calcula la zona de nitidez e hiperfocal con visualización en regla' },
     { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'La hora dorada tiene ~3500K: usa esto para entender por qué se ve cálida' },
-    { url: '/visualizador-historia/fotografia/', icon: '📸', name: 'Historia de la Fotografía', description: 'Cómo evolucionó la captura del color del Autochrome al sensor digital' },
+  ],
+  'calculadora-profundidad-campo': [
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'La apertura controla DoF y exposición a la vez: aquí ves ambos efectos' },
+    { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'La focal cambia el encuadre y la DoF: ve los 5 valores clásicos lado a lado' },
+    { url: '/simulador-balance-blancos/', icon: '🌡️', name: 'Balance de Blancos', description: 'Completa los 4 pilares del control fotográfico con la temperatura de color' },
+    { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Combina la luz ideal con la DoF correcta para clavar el paisaje' },
   ],
 };
 
