@@ -2479,7 +2479,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
   'sonometro': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
   'luxometro': [{ url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Hora dorada y azul' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/conversor-colores/', icon: '🎨', name: 'Conversor Colores', description: 'HEX, RGB, HSL' }],
-  'golden-hour': [{ url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
+  'golden-hour': [{ url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
   'mi-ip': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
   'metronomo': [{ url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' }, { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica de productividad' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }],
   'calculadora-inflacion': finanzasPersonalesApps,
@@ -3986,10 +3986,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/teatro/', icon: '🎭', name: 'Historia del Teatro', description: 'Stanislavski y el método de actuación aplican psicología; Freud usó el drama griego (Edipo) para construir su teoría' },
   ],
   'visualizador-historia-fotografia': [
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'De la teoría histórica a la práctica: triángulo de exposición ISO/apertura/velocidad con escenas interactivas' },
     { url: '/visualizador-historia/cine/', icon: '🎬', name: 'Historia del Cine', description: 'La cronofotografía de Muybridge y Marey fue el paso previo al cine; ambos medios comparten soportes, técnica y revolución digital' },
     { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Internet transformó la fotografía: JPEG, compartición digital, Instagram y la IA generativa son imposibles sin la red' },
     { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La fotografía inspiró y fue inspirada por el impresionismo, el surrealismo y el pop art; Warhol usó la serigrafía fotográfica' },
-    { url: '/visualizador-historia/moda/', icon: '👗', name: 'Historia de la Moda', description: 'La fotografía de moda transformó cómo se percibe la moda: de los retratos de Worth a las campañas de Instagram' },
   ],
   'visualizador-historia-teatro': [
     { url: '/visualizador-historia/danza/', icon: '💃', name: 'Historia de la Danza', description: 'Teatro y danza han estado unidos desde los coros griegos: el Tanztheater de Pina Bausch y el teatro-danza son inseparables' },
@@ -5028,7 +5028,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-fuerzas-invisibles/', icon: '🧲', name: 'Fuerzas Invisibles', description: 'Las fuerzas que actúan sobre los objetos' },
   ],
   'simulador-lentes-opticas': [
-    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Otro pilar de la física de Bachillerato' },
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'El objetivo de la cámara es una lente convergente: aplica aquí la óptica al triángulo de exposición' },
     { url: '/visualizador-optica/', icon: '🌈', name: 'Óptica visual', description: 'Reflexión, refracción, lentes y prismas' },
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Cómo funciona el ojo', description: 'El cristalino: una lente convergente biológica' },
     { url: '/visualizador-optica-ondulatoria/', icon: '🌊', name: 'Óptica ondulatoria', description: 'Difracción, interferencia y polarización' },
@@ -5180,6 +5180,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-hashing-colisiones/', icon: '🗂️', name: 'Hashing y Colisiones', description: 'Los protocolos usan hashing (MD5, SHA) para verificación de integridad' },
     { url: '/simulador-cifrado-cesar/', icon: '🔐', name: 'Cifrado César', description: 'Los fundamentos del cifrado que protege las conexiones TLS sobre TCP' },
     { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'El SO gestiona los sockets TCP y el estado de las conexiones' },
+  ],
+
+  // FOTOGRAFÍA (2026-05-14)
+  'simulador-fotografia': [
+    { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Calcula la mejor luz natural para fotografiar en tu ubicación' },
+    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Lentes Ópticas', description: 'Cómo forman imagen las lentes: la base óptica del objetivo de tu cámara' },
+    { url: '/visualizador-optica/', icon: '🌈', name: 'Óptica', description: 'Reflexión, refracción y prisma: cómo viaja la luz hasta el sensor' },
+    { url: '/visualizador-historia/fotografia/', icon: '📸', name: 'Historia de la Fotografía', description: 'Del daguerrotipo a la IA generativa: 200 años de imagen' },
   ],
 };
 

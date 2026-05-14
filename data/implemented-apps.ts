@@ -1085,6 +1085,9 @@ export const implementedAppsUrls = [
   "/simulador-hashing-colisiones/",       // Tabla hash CSS grid, 3 funciones hash, encadenamiento+sondeo lineal, factor de carga α
   "/simulador-cifrado-cesar/",            // Rueda del alfabeto Canvas 2D, slider k 0-25, histograma frecuencias, ataque automático
   "/simulador-tcp-handshake/",            // Diagrama secuencia Canvas 2D, SYN→SYN-ACK→ACK, FIN 4-way, ISN configurables
+
+  // Fotografía (2026-05-14)
+  "/simulador-fotografia/",               // Triángulo de exposición: ISO/apertura/velocidad, 3 escenas SVG con bokeh+ruido+motion blur, modo libre/compensado
 ];
 
 /**
