@@ -1089,6 +1089,7 @@ export const implementedAppsUrls = [
   // Fotografía (2026-05-14)
   "/simulador-fotografia/",               // Triángulo de exposición: ISO/apertura/velocidad, 3 escenas SVG con bokeh+ruido+motion blur, modo libre/compensado
   "/visualizador-focales-fotografia/",    // Comparativa lado a lado 14/24/50/85/200 mm, toggle Full Frame/APS-C/M4/3 con equivalente FF
+  "/simulador-balance-blancos/",          // Slider Kelvin 2500-10000K, 3 escenas (tungsteno/nublado/atardecer), indicador WB correcto, presets de cámara
 ];
 
 /**
