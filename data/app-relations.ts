@@ -5187,7 +5187,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'Compara lado a lado 14/24/50/85/200 mm: la otra mitad de la decisión fotográfica' },
     { url: '/simulador-balance-blancos/', icon: '🌡️', name: 'Balance de Blancos', description: 'Slider Kelvin sobre 3 escenas: cierra los pilares del control creativo' },
     { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'Calcula DoF e hiperfocal: el efecto técnico de tu apertura sobre la nitidez' },
-    { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Calcula la mejor luz natural para fotografiar en tu ubicación' },
+    { url: '/calculadora-regla-500-npf-astrofoto/', icon: '🌌', name: 'Regla 500 y NPF Astrofoto', description: 'Tiempo máximo de exposición sin estelas: el caso extremo del triángulo' },
   ],
   'visualizador-focales-fotografia': [
     { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'ISO, apertura y velocidad: el otro pilar de toda decisión fotográfica' },
@@ -5204,8 +5204,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-profundidad-campo': [
     { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'La apertura controla DoF y exposición a la vez: aquí ves ambos efectos' },
     { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'La focal cambia el encuadre y la DoF: ve los 5 valores clásicos lado a lado' },
-    { url: '/simulador-balance-blancos/', icon: '🌡️', name: 'Balance de Blancos', description: 'Completa los 4 pilares del control fotográfico con la temperatura de color' },
-    { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Combina la luz ideal con la DoF correcta para clavar el paisaje' },
+    { url: '/calculadora-regla-500-npf-astrofoto/', icon: '🌌', name: 'Regla 500 y NPF Astrofoto', description: 'Tiempo máximo de exposición para Vía Láctea sin estelas de estrellas' },
+    { url: '/simulador-balance-blancos/', icon: '🌡️', name: 'Balance de Blancos', description: 'Completa los pilares del control fotográfico con la temperatura de color' },
+  ],
+  'calculadora-regla-500-npf-astrofoto': [
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'En astrofoto el triángulo es crítico: apertura máxima, ISO alto y tiempo NPF' },
+    { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'En astrofoto enfocas al infinito: aquí entiendes por qué todo sale nítido' },
+    { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'Para Vía Láctea, 14-24 mm. Compara las focales lado a lado' },
+    { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Planifica cuándo dispara: hora azul y crepúsculo astronómico' },
   ],
 };
 
