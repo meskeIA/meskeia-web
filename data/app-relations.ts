@@ -5184,10 +5184,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // FOTOGRAFÍA (2026-05-14)
   'simulador-fotografia': [
+    { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'Compara lado a lado 14/24/50/85/200 mm: la otra mitad de la decisión fotográfica' },
     { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Calcula la mejor luz natural para fotografiar en tu ubicación' },
     { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Lentes Ópticas', description: 'Cómo forman imagen las lentes: la base óptica del objetivo de tu cámara' },
-    { url: '/visualizador-optica/', icon: '🌈', name: 'Óptica', description: 'Reflexión, refracción y prisma: cómo viaja la luz hasta el sensor' },
     { url: '/visualizador-historia/fotografia/', icon: '📸', name: 'Historia de la Fotografía', description: 'Del daguerrotipo a la IA generativa: 200 años de imagen' },
+  ],
+  'visualizador-focales-fotografia': [
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'ISO, apertura y velocidad: el otro pilar de toda decisión fotográfica' },
+    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Lentes Ópticas', description: 'La óptica detrás de cada distancia focal: cómo el cristal forma la imagen' },
+    { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Combina la mejor luz con la focal adecuada para clavar la foto' },
+    { url: '/visualizador-historia/fotografia/', icon: '📸', name: 'Historia de la Fotografía', description: 'Cómo evolucionaron los objetivos del daguerrotipo a las lentes modernas' },
   ],
 };
 
