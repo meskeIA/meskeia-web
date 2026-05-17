@@ -524,9 +524,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ...finanzasInversionApps.filter(a => a.url !== '/test-perfil-inversor/').slice(0, 1),
   ],
   'test-perfil-inversor': [
+    { url: '/visualizador-tipos-activos/', icon: '📊', name: 'Clases de Activos', description: 'Qué es cada activo antes de invertir' },
     { url: '/estimador-cartera-inversion/', icon: '💼', name: 'Cartera según tu Perfil', description: 'Asignación de activos personalizada' },
-    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Cuánto crecerá tu inversión' },
     { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Evita errores cognitivos al invertir' },
+    { url: '/test-tolerancia-riesgo-detallado/', icon: '📊', name: 'Test Riesgo Detallado', description: 'Evaluación profunda en 5 dimensiones' },
+  ],
+  'visualizador-tipos-activos': [
+    { url: '/test-perfil-inversor/', icon: '🎯', name: 'Test Perfil Inversor', description: 'Descubre qué perfil de riesgo eres' },
+    { url: '/estimador-cartera-inversion/', icon: '💼', name: 'Simulador de Cartera', description: 'Monte Carlo con las clases que elijas' },
+    { url: '/simulador-sesgos-inversor/', icon: '🧠', name: 'Sesgos del Inversor', description: 'Los errores cognitivos que destrozan carteras' },
     { url: '/test-tolerancia-riesgo-detallado/', icon: '📊', name: 'Test Riesgo Detallado', description: 'Evaluación profunda en 5 dimensiones' },
   ],
   'simulador-cartera-inversion': finanzasInversionApps.filter(a => a.url !== '/estimador-cartera-inversion/'),

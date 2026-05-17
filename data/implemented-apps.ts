@@ -1095,6 +1095,7 @@ export const implementedAppsUrls = [
   "/visualizador-reino-vegetal/",         // Árbol interactivo criptógamas/fanerógamas, 16 grupos, tabla comparativa y ciclos de vida
   "/visualizador-adaptaciones-plantas/",  // 6 hábitats extremos, 8 mecanismos adaptativos, 5 géneros carnívoras
   "/quiz-tipos-plantas/",                 // 40 organismos, 6 grupos taxonómicos, 3 modos de juego
+  "/visualizador-tipos-activos/",         // 6 clases de activos, matriz correlación 6×6, 4 carteras tipo
 ];
 
 /**
