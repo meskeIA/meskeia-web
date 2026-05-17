@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-05-11
-> **Apps totales**: 923 | **Suites**: 13
+> **Última actualización**: 2026-05-17
+> **Apps totales**: 925 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -43,6 +43,8 @@
 - [x] **Disclaimers: 6 apps corregidas** — severity="high"→"critical" en: estimador-fire, optimizador-rentas-60, orientador-seguro-vida, planificador-chequeos-medicos, residencia-vs-cuidado-en-casa, selector-actividades-movilidad. `visualizador-cancer` se mantiene en critical intencionalmente (decisión del usuario). *(resuelto: 2026-05-11)*
 
 - [x] **npm audit: 11 vulnerabilidades transitivas resueltas** — `npm audit fix` (sin --force) limpió 10/13 (dompurify, flatted, minimatch, fast-uri, brace-expansion, picomatch, path-to-regexp, ip-address, hono, @hono/node-server, express-rate-limit). Solo `package-lock.json` modificado. Build OK. *(resuelto: 2026-05-11)*
+
+- [x] **npm audit: brace-expansion reapareció** — Nueva vuln moderate en `brace-expansion` detectada en auditoría 2026-05-17. Corregida con `npm audit fix` sin --force. Quedan 2 moderate (postcss vía next — deuda aceptada). *(resuelto: 2026-05-17)*
 
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
