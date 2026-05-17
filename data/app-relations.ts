@@ -1110,10 +1110,28 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
   ],
   'visualizador-germinacion': [
+    { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Clasificación completa: criptógamas y fanerógamas' },
     { url: '/visualizador-anatomia-flor/', icon: '🌸', name: 'Anatomía de una Flor', description: 'Polinización y frutos' },
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
     { url: '/visualizador-transporte-plantas/', icon: '🌱', name: 'Transporte en Plantas', description: 'Xilema y floema' },
-    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Célula vegetal' },
+  ],
+  'visualizador-reino-vegetal': [
+    { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida Animal', description: 'Clasificación del reino animal — el espejo vegetal' },
+    { url: '/visualizador-adaptaciones-plantas/', icon: '🌵', name: 'Adaptaciones de las Plantas', description: 'Hábitats extremos y plantas carnívoras' },
+    { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales' },
+    { url: '/visualizador-germinacion/', icon: '🌱', name: 'Germinación', description: 'De la semilla a la planta' },
+  ],
+  'visualizador-adaptaciones-plantas': [
+    { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Clasificación: criptógamas y fanerógamas' },
+    { url: '/visualizador-biomas-terrestres/', icon: '🌍', name: 'Biomas Terrestres', description: 'Cada bioma define qué adaptaciones son necesarias' },
+    { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'CAM y C4 son variantes adaptativas de la fotosíntesis' },
+    { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Pon a prueba tu clasificación botánica' },
+  ],
+  'quiz-tipos-plantas': [
+    { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Árbol interactivo de clasificación' },
+    { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos de la Naturaleza', description: '43 organismos sorprendentes' },
+    { url: '/visualizador-anatomia-flor/', icon: '🌸', name: 'Anatomía de una Flor', description: 'Polinización y frutos' },
+    { url: '/visualizador-adaptaciones-plantas/', icon: '🌵', name: 'Adaptaciones de las Plantas', description: 'Hábitats extremos y carnívoras' },
   ],
   'visualizador-sistemas-circulatorios': [
     { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida', description: 'Clasificación animal' },
@@ -2338,8 +2356,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/conjugador-verbos/', icon: '📖', name: 'Conjugador Verbos', description: 'Verbos en español' },
   ],
   'quiz-reinos-naturaleza': [
-    { url: '/quiz-figuras-retoricas/', icon: '✍️', name: 'Quiz Figuras Retóricas', description: 'Identifica recursos literarios' },
-    { url: '/quiz-verbos-irregulares/', icon: '📝', name: 'Quiz Verbos Inglés', description: 'Past simple A1-B2' },
+    { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales en 6 grupos' },
+    { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Árbol interactivo de clasificación botánica' },
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
     { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Capitales y banderas del mundo' },
   ],

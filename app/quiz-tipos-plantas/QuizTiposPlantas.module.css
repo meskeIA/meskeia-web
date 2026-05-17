@@ -1,0 +1,1066 @@
+/* ============================================================================
+   QuizTiposPlantas.module.css — meskeIA
+   Paleta oficial: --primary #2E86AB, --secondary #48A9A6, --hero-bg #1a5278
+   ============================================================================ */
+
+/* --------------------------------------------------------------------------
+   LAYOUT GENERAL
+   -------------------------------------------------------------------------- */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #fafafa);
+  color: var(--text-primary, #1a1a1a);
+}
+
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* --------------------------------------------------------------------------
+   MODO SELECCIÓN (INICIO)
+   -------------------------------------------------------------------------- */
+
+.selectorModo {
+  background: var(--bg-card, #fff);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.selectorTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.selectorSubtitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  margin: 1.75rem 0 1rem;
+  text-align: center;
+}
+
+/* Modos principales */
+.modosPrincipales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.btnModo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.25rem 1rem;
+  border: 2px solid var(--primary, #2e86ab);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--primary, #2e86ab);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+}
+
+.btnModo:hover,
+.btnModo:focus-visible {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.btnModoDestacado {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+}
+
+.btnModoDestacado:hover,
+.btnModoDestacado:focus-visible {
+  background: #236d8f;
+}
+
+.modoIcono {
+  font-size: 2rem;
+}
+
+.modoNombre {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.modoDetalle {
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+/* Botones por grupo */
+.gruposGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.btnGrupo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 0.75rem;
+  border: 2px solid var(--grupo-color, #2e86ab);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary, #1a1a1a);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+  text-align: center;
+}
+
+.btnGrupo:hover,
+.btnGrupo:focus-visible {
+  background: var(--grupo-color, #2e86ab);
+  color: #fff;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.grupoEmoji {
+  font-size: 1.5rem;
+}
+
+.grupoNombre {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.grupoDescripcion {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  line-height: 1.3;
+}
+
+.grupoConteo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   VISTA PREVIA DE GRUPOS (INICIO)
+   -------------------------------------------------------------------------- */
+
+.vistaGrupos {
+  margin-bottom: 2rem;
+}
+
+.vistaGruposTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.vistaGruposGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.vistaGrupoCard {
+  background: var(--bg-card, #fff);
+  border-top: 4px solid;
+  border-radius: 8px;
+  padding: 0.9rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666);
+}
+
+.vistaGrupoEmoji {
+  font-size: 1.8rem;
+}
+
+.vistaGrupoCard strong {
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1a1a);
+}
+
+/* --------------------------------------------------------------------------
+   WRAPPER DEL QUIZ (jugando / feedback)
+   -------------------------------------------------------------------------- */
+
+.quizWrapper {
+  min-height: 100vh;
+  background: var(--bg-primary, #fafafa);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 3rem;
+}
+
+/* Barra de progreso */
+.barraProgreso {
+  width: 100%;
+  height: 5px;
+  background: #e0e0e0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.barraRelleno {
+  height: 100%;
+  background: var(--primary, #2e86ab);
+  transition: width 0.3s ease;
+}
+
+/* Cabecera quiz */
+.quizCabecera {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0 auto;
+}
+
+.contadorPregunta {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.puntuacion {
+  font-size: 0.9rem;
+  color: #2e7d32;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.btnSalir {
+  background: transparent;
+  border: 1px solid var(--text-muted, #999);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btnSalir:hover,
+.btnSalir:focus-visible {
+  background: #f5f5f5;
+  color: var(--text-primary, #1a1a1a);
+  outline: none;
+}
+
+/* Tarjeta de pregunta */
+.tarjetaPregunta {
+  width: 100%;
+  max-width: 600px;
+  margin: 0.5rem auto 0;
+  background: var(--bg-card, #fff);
+  border-radius: 14px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.plantaEmoji {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.plantaNombreComun {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.25rem;
+}
+
+.plantaNombreCientifico {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 0.75rem;
+}
+
+.plantaPista {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  background: var(--bg-primary, #fafafa);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.preguntaTexto {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 1rem;
+}
+
+/* Grid de opciones */
+.opcionesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.btnOpcion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 0.5rem;
+  border: 2px solid var(--primary, #2e86ab);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary, #1a1a1a);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.12s;
+  text-align: center;
+}
+
+.btnOpcion:hover:not(:disabled),
+.btnOpcion:focus-visible:not(:disabled) {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.btnOpcion:disabled {
+  cursor: default;
+}
+
+.btnCorrecto {
+  background: #e8f5e9 !important;
+  border-color: #2e7d32 !important;
+  color: #1b5e20 !important;
+}
+
+.btnIncorrecto {
+  background: #ffebee !important;
+  border-color: #c62828 !important;
+  color: #b71c1c !important;
+}
+
+.btnDesactivado {
+  opacity: 0.45;
+}
+
+.opcionEmoji {
+  font-size: 1.3rem;
+}
+
+.opcionLabel {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.opcionDescripcion {
+  font-size: 0.72rem;
+  opacity: 0.8;
+  line-height: 1.3;
+}
+
+/* Panel de feedback */
+.feedbackPanel {
+  width: 100%;
+  max-width: 600px;
+  margin: 1rem auto 0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+
+.feedbackCorrecto {
+  background: #e8f5e9;
+  border: 2px solid #2e7d32;
+}
+
+.feedbackIncorrecto {
+  background: #ffebee;
+  border: 2px solid #c62828;
+}
+
+.feedbackTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.feedbackCorrecto .feedbackTitulo {
+  color: #1b5e20;
+}
+
+.feedbackIncorrecto .feedbackTitulo {
+  color: #b71c1c;
+}
+
+.feedbackExplicacion {
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+
+.btnSiguiente {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+}
+
+.btnSiguiente:hover,
+.btnSiguiente:focus-visible {
+  background: #236d8f;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   RESULTADOS
+   -------------------------------------------------------------------------- */
+
+.resultadosPanel {
+  background: var(--bg-card, #fff);
+  border-radius: 14px;
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.resultadoEmoji {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.resultadoTitulo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.25rem;
+}
+
+.resultadoPorcentaje {
+  font-size: 1.1rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 1.5rem;
+}
+
+/* Stats por grupo */
+.statsGrupos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.statGrupo {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 2.5rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statEmoji {
+  font-size: 1rem;
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.statConteo {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666);
+  text-align: right;
+}
+
+.statBarra {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.statBarraRelleno {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Lista de errores */
+.errorList {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.errorListTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.75rem;
+}
+
+.errorItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  background: #fff3f3;
+  border-radius: 8px;
+  border-left: 3px solid #c62828;
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.errorRespuestaUsuario {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.errorRespuestaCorrecta {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.errorExplicacion {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #666);
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+}
+
+.resultadosBotones {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btnPrimario {
+  padding: 0.75rem 2rem;
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+}
+
+.btnPrimario:hover,
+.btnPrimario:focus-visible {
+  background: #236d8f;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   SECCIÓN EDUCATIVA
+   -------------------------------------------------------------------------- */
+
+.eduIntro {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 1.5rem;
+}
+
+.eduSubtitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary, #2e86ab);
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid var(--primary, #2e86ab);
+}
+
+/* Tabla comparativa */
+.tablaComparativa {
+  margin-bottom: 1rem;
+}
+
+.filaTabla {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 0.5rem;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  font-size: 0.88rem;
+  align-items: start;
+}
+
+.filaTabla:last-child {
+  border-bottom: none;
+}
+
+.celdaCaracteristica {
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.celdaValor {
+  color: var(--primary, #2e86ab);
+  font-weight: 600;
+}
+
+.celdaDetalle {
+  color: var(--text-secondary, #666);
+  line-height: 1.4;
+}
+
+/* Pasos */
+.pasos {
+  margin-bottom: 1rem;
+}
+
+.paso {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.pasoNumero {
+  min-width: 2rem;
+  height: 2rem;
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.paso strong {
+  display: block;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 0.2rem;
+}
+
+.paso p {
+  margin: 0;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+/* Escenarios */
+.escenarios {
+  margin-bottom: 1rem;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.escenario {
+  background: var(--bg-primary, #fafafa);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.88rem;
+}
+
+.escenarioIcono {
+  font-size: 1.5rem;
+}
+
+.escenario strong {
+  color: var(--text-primary, #1a1a1a);
+  font-size: 0.9rem;
+}
+
+.escenario p {
+  margin: 0;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faq {
+  margin-bottom: 1rem;
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.5rem 0;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqPregunta {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  cursor: pointer;
+  padding: 0.25rem 0;
+  list-style: none;
+}
+
+.faqPregunta::marker,
+.faqPregunta::-webkit-details-marker {
+  display: none;
+}
+
+.faqPregunta::before {
+  content: '▶ ';
+  color: var(--primary, #2e86ab);
+}
+
+details[open] .faqPregunta::before {
+  content: '▼ ';
+}
+
+.faqRespuesta {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+  margin: 0.4rem 0 0 1rem;
+}
+
+/* Tips */
+.tips {
+  margin-bottom: 1rem;
+}
+
+.tipsList {
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.tip {
+  font-size: 0.88rem;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.6;
+  margin-bottom: 0.4rem;
+}
+
+.tip::marker {
+  color: var(--secondary, #48a9a6);
+}
+
+/* Errores comunes */
+.erroresComunes {
+  margin-bottom: 1rem;
+}
+
+.erroresList {
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.errorComunItem {
+  font-size: 0.88rem;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.6;
+  margin-bottom: 0.4rem;
+}
+
+.errorComunItem::marker {
+  color: #c62828;
+}
+
+/* Warning box — requisito v2.0 */
+.warningBox {
+  background: #fff8e1;
+  border-left: 4px solid #f9a825;
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1rem;
+  font-size: 0.87rem;
+  color: #4a3800;
+  line-height: 1.6;
+  margin-top: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   DARK MODE
+   -------------------------------------------------------------------------- */
+
+[data-theme='dark'] .container,
+[data-theme='dark'] .quizWrapper {
+  background-color: var(--bg-primary, #1a1a1a);
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .selectorModo,
+[data-theme='dark'] .tarjetaPregunta,
+[data-theme='dark'] .resultadosPanel,
+[data-theme='dark'] .vistaGrupoCard {
+  background: var(--bg-card, #2a2a2a);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .selectorTitulo,
+[data-theme='dark'] .selectorSubtitulo,
+[data-theme='dark'] .plantaNombreComun,
+[data-theme='dark'] .preguntaTexto,
+[data-theme='dark'] .resultadoTitulo,
+[data-theme='dark'] .vistaGrupoCard strong {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .plantaNombreCientifico,
+[data-theme='dark'] .resultadoPorcentaje,
+[data-theme='dark'] .contadorPregunta,
+[data-theme='dark'] .vistaGrupoCard,
+[data-theme='dark'] .grupoDescripcion {
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .plantaPista {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .btnModo {
+  color: var(--primary, #2e86ab);
+}
+
+[data-theme='dark'] .btnModo:hover,
+[data-theme='dark'] .btnModo:focus-visible {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+}
+
+[data-theme='dark'] .btnGrupo {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .btnGrupo:hover,
+[data-theme='dark'] .btnGrupo:focus-visible {
+  color: #fff;
+}
+
+[data-theme='dark'] .btnOpcion {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .btnOpcion:hover:not(:disabled),
+[data-theme='dark'] .btnOpcion:focus-visible:not(:disabled) {
+  color: #fff;
+}
+
+[data-theme='dark'] .btnCorrecto {
+  background: #1b5e20 !important;
+  border-color: #4caf50 !important;
+  color: #c8e6c9 !important;
+}
+
+[data-theme='dark'] .btnIncorrecto {
+  background: #7f0000 !important;
+  border-color: #ef5350 !important;
+  color: #ffcdd2 !important;
+}
+
+[data-theme='dark'] .feedbackCorrecto {
+  background: #1b5e20;
+  border-color: #4caf50;
+}
+
+[data-theme='dark'] .feedbackCorrecto .feedbackTitulo {
+  color: #c8e6c9;
+}
+
+[data-theme='dark'] .feedbackIncorrecto {
+  background: #7f0000;
+  border-color: #ef5350;
+}
+
+[data-theme='dark'] .feedbackIncorrecto .feedbackTitulo {
+  color: #ffcdd2;
+}
+
+[data-theme='dark'] .feedbackExplicacion {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .barraProgreso {
+  background: #444;
+}
+
+[data-theme='dark'] .btnSalir {
+  border-color: #555;
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .btnSalir:hover {
+  background: #333;
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .errorItem {
+  background: #3e1a1a;
+  border-color: #ef5350;
+}
+
+[data-theme='dark'] .filaTabla {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .celdaCaracteristica {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .celdaDetalle {
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .paso p {
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .escenario {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .escenario strong {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .escenario p {
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .faqPregunta {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .faqRespuesta {
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .faqItem {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .tip,
+[data-theme='dark'] .errorComunItem {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2000;
+  border-left-color: #f9a825;
+  color: #ffe082;
+}
+
+[data-theme='dark'] .statLabel {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .statConteo {
+  color: var(--text-secondary, #b0b0b0);
+}
+
+[data-theme='dark'] .statBarra {
+  background: #444;
+}
+
+[data-theme='dark'] .errorListTitulo {
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .puntuacion {
+  color: #66bb6a;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+  .opcionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filaTabla {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .modosPrincipales {
+    grid-template-columns: 1fr;
+  }
+
+  .estatGrupo {
+    grid-template-columns: 1.5rem 1fr 2.5rem;
+  }
+}
+
+/* Preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .btnModo,
+  .btnGrupo,
+  .btnOpcion,
+  .btnSiguiente,
+  .btnPrimario,
+  .barraRelleno,
+  .statBarraRelleno {
+    transition: none;
+    animation: none;
+  }
+}

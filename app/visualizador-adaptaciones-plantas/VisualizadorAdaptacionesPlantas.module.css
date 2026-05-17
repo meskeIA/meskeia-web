@@ -1,0 +1,986 @@
+/* ─────────────────────────────────────────────
+   Visualizador Adaptaciones Plantas — meskeIA
+   ───────────────────────────────────────────── */
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary, #fafafa);
+  color: var(--text-primary, #1a1a1a);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ── */
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  opacity: 0.9;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Main ── */
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+/* ── Navegación por tabs ── */
+.tabNav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e5e5;
+  padding-bottom: 0.75rem;
+}
+
+.tabBtn {
+  padding: 0.5rem 1.1rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 20px;
+  background: var(--bg-card, #fff);
+  color: var(--text-secondary, #666);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabBtn:hover {
+  border-color: var(--primary, #2e86ab);
+  color: var(--primary, #2e86ab);
+}
+
+.tabBtnActivo {
+  background: var(--primary, #2e86ab);
+  border-color: var(--primary, #2e86ab);
+  color: #fff;
+}
+
+.tabContent {
+  min-height: 300px;
+}
+
+/* ── Tarjeta de sección ── */
+.sectionCard {
+  background: var(--bg-card, #fff);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  border: 1px solid #eee;
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.4rem;
+}
+
+.sectionDesc {
+  color: var(--text-secondary, #666);
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+/* ── Tab 1: Hábitats ── */
+.habitatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 700px) {
+  .habitatsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .habitatsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.habitatCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 0.75rem 0.75rem;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  background: var(--bg-card, #fff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.habitatCard:hover {
+  border-color: var(--primary, #2e86ab);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.habitatCardActivo {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.habitatIcono {
+  font-size: 2rem;
+  display: block;
+}
+
+.habitatNombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  line-height: 1.3;
+}
+
+.habitatIndicador {
+  display: block;
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  margin-top: 0.2rem;
+}
+
+/* Panel de detalle del hábitat */
+.habitatPanel {
+  border-left: 4px solid var(--primary, #2e86ab);
+  border-radius: 0 10px 10px 0;
+  background: var(--bg-card, #fff);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  animation: panelEntrada 0.25s ease;
+}
+
+@keyframes panelEntrada {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.habitatPanelHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.habitatPanelIcono {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.habitatPanelTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.3rem;
+}
+
+.habitatPanelCondicion {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Lista de adaptaciones */
+.adaptacionesLista {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  padding: 0 1.5rem 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .adaptacionesLista {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adaptacionItem {
+  padding: 0.9rem;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+}
+
+.adaptacionItem:nth-child(even) {
+  border-right: none;
+}
+
+.adaptacionTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.adaptacionDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Ejemplos */
+.ejemplosZona {
+  padding: 1rem 1.5rem 1.5rem;
+  background: #f8f9fa;
+}
+
+[data-theme='dark'] .ejemplosZona {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ejemplosTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.6rem;
+}
+
+.ejemplosList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ejemplosItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+}
+
+.ejemplosBullet {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.seleccionHint {
+  text-align: center;
+  color: var(--text-muted, #999);
+  font-size: 0.9rem;
+  padding: 2rem 0;
+  font-style: italic;
+}
+
+/* ── Tab 2: Mecanismos ── */
+.mecanismosGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mecanismoCardWrapper {
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.mecanismoCardWrapper:has(.mecanismoCardActivo) {
+  border-color: var(--primary, #2e86ab);
+}
+
+.mecanismoCard {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--bg-card, #fff);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.mecanismoCard:hover {
+  background: #f5f9fc;
+}
+
+[data-theme='dark'] .mecanismoCard:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.mecanismoCardActivo {
+  background: #eaf4f8;
+}
+
+[data-theme='dark'] .mecanismoCardActivo {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.mecanismoIcono {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.mecanismoTexto {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mecanismoNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.mecanismoResumen {
+  font-size: 0.83rem;
+  color: var(--text-secondary, #666);
+}
+
+.mecanismoChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999);
+  flex-shrink: 0;
+}
+
+.mecanismoDetalle {
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid #e5e5e5;
+  background: #f8f9fa;
+  animation: panelEntrada 0.2s ease;
+}
+
+[data-theme='dark'] .mecanismoDetalle {
+  background: rgba(255, 255, 255, 0.04);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.mecanismoDetalleTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ── Tab 3: Carnívoras ── */
+.carnivorasLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.carnivoraItem {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.carnivoraHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card, #fff);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.carnivoraHeader:hover {
+  background: #f5f9fc;
+}
+
+[data-theme='dark'] .carnivoraHeader:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.carnivoraHeaderActivo {
+  background: #eaf4f8;
+  border-bottom: 1px solid var(--primary, #2e86ab);
+}
+
+[data-theme='dark'] .carnivoraHeaderActivo {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.carnivoraIcono {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.carnivoraTitulos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.carnivoraNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.carnivoraCientifico {
+  font-size: 0.82rem;
+  color: var(--text-muted, #999);
+  font-style: italic;
+}
+
+.carnivoraTrampa {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--secondary, #48a9a6);
+  background: rgba(72, 169, 166, 0.1);
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 500px) {
+  .carnivoraTrampa {
+    display: none;
+  }
+}
+
+.carnivoraChevron {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999);
+  flex-shrink: 0;
+}
+
+.carnivoraDetalle {
+  padding: 1.25rem;
+  background: #f8f9fa;
+  animation: panelEntrada 0.2s ease;
+}
+
+[data-theme='dark'] .carnivoraDetalle {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.carnivoraGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.carnivoraFila {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.carnivoraEtiqueta {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary, #2e86ab);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.carnivoraValor {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.carnivoraCuriosidad {
+  background: rgba(46, 134, 171, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem;
+  border-left: 3px solid var(--primary, #2e86ab);
+}
+
+/* ── Sección educativa — contenido ── */
+.eduIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+}
+
+.eduSubtitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 1.75rem 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--secondary, #48a9a6);
+  display: inline-block;
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: var(--primary, #2e86ab);
+  color: #fff;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid #eee;
+  color: var(--text-secondary, #666);
+  vertical-align: top;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: #f8f9fa;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.valorBadge {
+  display: inline-block;
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary, #2e86ab);
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+/* Escenarios */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.escenarioCard {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  background: var(--bg-card, #fff);
+}
+
+.escenarioIcono {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.escenarioTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.35rem;
+}
+
+.escenarioDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faqLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.faqItem {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.faqItem[open] {
+  border-color: var(--primary, #2e86ab);
+}
+
+.faqPregunta {
+  list-style: none;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  cursor: pointer;
+  background: var(--bg-card, #fff);
+  transition: background 0.2s ease;
+}
+
+.faqPregunta::-webkit-details-marker { display: none; }
+.faqPregunta::before {
+  content: '▶ ';
+  font-size: 0.7rem;
+  color: var(--primary, #2e86ab);
+}
+
+.faqItem[open] .faqPregunta::before { content: '▼ '; }
+
+.faqPregunta:hover {
+  background: #f5f9fc;
+}
+
+[data-theme='dark'] .faqPregunta:hover {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.faqRespuesta {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid #e5e5e5;
+  line-height: 1.65;
+  background: #f8f9fa;
+}
+
+[data-theme='dark'] .faqRespuesta {
+  background: rgba(255, 255, 255, 0.04);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Pasos */
+.pasosList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 0 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.pasosItem {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.55;
+}
+
+.pasosTitulo {
+  color: var(--primary, #2e86ab);
+}
+
+.pasosDesc {
+  color: var(--text-secondary, #666);
+}
+
+/* Tips */
+.tipsList {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipsItem {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+  background: rgba(72, 169, 166, 0.06);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+}
+
+.tipsBullet {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+/* Errores */
+.erroresList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.errorItem {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  background: #fff8e1;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid #f59e0b;
+}
+
+[data-theme='dark'] .errorItem {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.errorIcono {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.errorTexto {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Warning box (requerido v2.0) ── */
+.warningBox {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 8px;
+  background: #fff3cd;
+  border: 1px solid #ffd060;
+  font-size: 0.85rem;
+  color: #856404;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+   ───────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary, #1a1a1a);
+  color: var(--text-primary, #e5e5e5);
+}
+
+[data-theme='dark'] .hero {
+  background: #0f3248;
+}
+
+[data-theme='dark'] .tabBtn {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .tabBtn:hover {
+  border-color: var(--primary, #2e86ab);
+  color: var(--primary, #2e86ab);
+}
+
+[data-theme='dark'] .tabBtnActivo {
+  background: var(--primary, #2e86ab);
+  border-color: var(--primary, #2e86ab);
+  color: #fff;
+}
+
+[data-theme='dark'] .tabNav {
+  border-bottom-color: #444;
+}
+
+[data-theme='dark'] .sectionCard {
+  background: #2a2a2a;
+  border-color: #444;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .sectionTitle {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .sectionDesc {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .habitatCard {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .habitatCard:hover {
+  border-color: var(--primary, #2e86ab);
+}
+
+[data-theme='dark'] .habitatNombre {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .habitatPanel {
+  background: #2a2a2a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .habitatPanelTitulo {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .habitatPanelCondicion {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .adaptacionItem {
+  border-bottom-color: #3a3a3a;
+  border-right-color: #3a3a3a;
+}
+
+[data-theme='dark'] .adaptacionDesc {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #1a5278;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #3a3a3a;
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .mecanismoCard {
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .mecanismoNombre {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .mecanismoResumen {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .mecanismoDetalleTexto {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .carnivoraHeader {
+  background: #2a2a2a;
+}
+
+[data-theme='dark'] .carnivoraNombre {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .carnivoraCientifico {
+  color: #888;
+}
+
+[data-theme='dark'] .carnivoraValor {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .carnivoraItem {
+  border-color: #444;
+}
+
+[data-theme='dark'] .mecanismoCardWrapper {
+  border-color: #444;
+}
+
+[data-theme='dark'] .eduIntro {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .eduSubtitulo {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+[data-theme='dark'] .escenarioTitulo {
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .escenarioDesc {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: #444;
+}
+
+[data-theme='dark'] .faqPregunta {
+  background: #2a2a2a;
+  color: #e5e5e5;
+}
+
+[data-theme='dark'] .seleccionHint {
+  color: #888;
+}
+
+[data-theme='dark'] .pasosDesc {
+  color: #b0b0b0;
+}
+
+[data-theme='dark'] .errorTexto {
+  color: #b0b0b0;
+}
+
+/* Animaciones respetuosas */
+@media (prefers-reduced-motion: reduce) {
+  .habitatPanel,
+  .mecanismoDetalle,
+  .carnivoraDetalle {
+    animation: none;
+  }
+
+  .habitatCard:hover,
+  .habitatCardActivo {
+    transform: none;
+  }
+}

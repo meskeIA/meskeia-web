@@ -1092,6 +1092,9 @@ export const implementedAppsUrls = [
   "/simulador-balance-blancos/",          // Slider Kelvin 2500-10000K, 3 escenas (tungsteno/nublado/atardecer), indicador WB correcto, presets de cámara
   "/calculadora-profundidad-campo/",      // DoF + hiperfocal + Dn/Df, 4 sensores, regla SVG logarítmica, 5 presets típicos
   "/calculadora-regla-500-npf-astrofoto/", // Tiempo máximo sin estelas: regla 500 + NPF con declinación, visualización de cielo con estrellas/estelas
+  "/visualizador-reino-vegetal/",         // Árbol interactivo criptógamas/fanerógamas, 16 grupos, tabla comparativa y ciclos de vida
+  "/visualizador-adaptaciones-plantas/",  // 6 hábitats extremos, 8 mecanismos adaptativos, 5 géneros carnívoras
+  "/quiz-tipos-plantas/",                 // 40 organismos, 6 grupos taxonómicos, 3 modos de juego
 ];
 
 /**
