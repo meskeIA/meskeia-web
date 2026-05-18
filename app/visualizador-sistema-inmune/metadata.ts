@@ -1,50 +1,37 @@
-import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
-export const metadata: Metadata = {
-  title: 'El Sistema Inmune - Tu Ejército Invisible | meskeIA',
-  description: 'Entiende cómo funciona tu sistema inmunitario: las 3 líneas de defensa, anticuerpos, memoria inmunológica, tipos de vacunas e inmunidad de grupo.',
-  keywords: 'sistema inmune, inmunidad innata, inmunidad adaptativa, anticuerpos, linfocitos, vacunas, memoria inmunológica, explicador visual',
-  authors: [{ name: 'meskeIA' }],
-  creator: 'meskeIA',
-  publisher: 'meskeIA',
-  robots: 'index, follow',
+export const metadata = {
+  title: 'El Sistema Inmune - Defensas, Anticuerpos y Vacunas | meskeIA',
+  description:
+    'Explora el sistema inmune: 3 líneas de defensa, células guardianas, anticuerpos en Y, tipos de vacunas e inmunidad de rebaño. Visual e interactivo.',
+  keywords: [
+    'sistema inmune',
+    'anticuerpos',
+    'vacunas',
+    'linfocitos',
+    'inmunidad innata',
+    'inmunidad adaptativa',
+    'biología',
+  ],
   openGraph: {
-    type: 'website',
-    title: 'El Sistema Inmune - Tu Ejército Invisible',
-    description: 'Las 3 líneas de defensa, anticuerpos y memoria inmunológica explicados visualmente.',
-    url: 'https://meskeia.com/visualizador-sistema-inmune/',
-    siteName: 'meskeIA',
-    locale: 'es_ES',
-    images: [{
-      url: 'https://meskeia.com/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'meskeIA',
-    }]
+    title: 'El Sistema Inmune — Defensas, Anticuerpos y Vacunas | meskeIA',
+    description:
+      'Visualizador interactivo del sistema inmune: 3 líneas de defensa, 6 células guardianas, anticuerpos IgG-IgA-IgM-IgE-IgD, 5 tipos de vacunas e inmunidad de rebaño.',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'El Sistema Inmune - Tu Ejército Invisible',
-    description: 'Barreras, inmunidad innata vs adaptativa, anticuerpos y vacunas.',
-    images: ['https://meskeia.com/og-image.png']
-  },
-  other: { 'application-name': 'Sistema Inmune meskeIA' },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'El Sistema Inmune - Tu Ejército Invisible',
-  description: 'Explicador visual interactivo del sistema inmunitario humano: las 3 líneas de defensa, anticuerpos en forma de Y, memoria inmunológica, tipos de vacunas y datos fascinantes.',
+  name: 'Visualizador del Sistema Inmune',
+  description:
+    'Explora el sistema inmune de forma interactiva: las 3 líneas de defensa (barrera física, inmunidad innata e inmunidad adaptativa), las 6 células guardianas, la estructura del anticuerpo en Y con los 5 isotipos y los 5 tipos de vacunas.',
   url: 'https://meskeia.com/visualizador-sistema-inmune/',
   category: 'EducationalApplication',
   features: [
-    'Las 3 líneas de defensa explicadas paso a paso',
-    'Diagrama interactivo de anticuerpos',
-    'Gráfico de respuesta primaria vs secundaria',
-    '4 tipos de vacunas comparados',
-    'Datos fascinantes del sistema inmune',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    '3 líneas de defensa: barrera, inmunidad innata e inmunidad adaptativa',
+    '6 células guardianas: neutrófilos, macrófagos, NK, linfocitos T y B',
+    'Estructura del anticuerpo en Y y los 5 isotipos (IgG, IgA, IgM, IgE, IgD)',
+    '5 tipos de vacunas: ARNm, atenuadas, inactivadas, subunitarias, vectoriales',
+    'Inmunidad de rebaño: umbrales por enfermedad',
+    'Gratuito, sin registro, en español',
   ],
 });

@@ -1125,7 +1125,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-arbol-vida/', icon: '🌳', name: 'El Árbol de la Vida Animal', description: 'Clasificación del reino animal — el espejo vegetal' },
     { url: '/visualizador-adaptaciones-plantas/', icon: '🌵', name: 'Adaptaciones de las Plantas', description: 'Hábitats extremos y plantas carnívoras' },
     { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales' },
-    { url: '/visualizador-germinacion/', icon: '🌱', name: 'Germinación', description: 'De la semilla a la planta' },
+    { url: '/visualizador-reino-fungi/', icon: '🍄', name: 'El Reino Fungi', description: 'Hongos: el tercer reino — ni plantas ni animales' },
+  ],
+  'visualizador-reino-fungi': [
+    { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Plantas: el contraste directo con los hongos' },
+    { url: '/visualizador-reino-animal/', icon: '🦁', name: 'El Reino Animal', description: 'Vertebrados e invertebrados: completa la trilogía de reinos' },
+    { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos de la Naturaleza', description: 'Pon a prueba tus conocimientos de clasificación' },
+    { url: '/visualizador-microbiologia/', icon: '🦠', name: 'Microbiología', description: 'Bacterias, levaduras y los 3 dominios de la vida' },
   ],
   'visualizador-adaptaciones-plantas': [
     { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Clasificación: criptógamas y fanerógamas' },
@@ -2364,8 +2370,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'quiz-reinos-naturaleza': [
     { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales en 6 grupos' },
     { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Árbol interactivo de clasificación botánica' },
+    { url: '/visualizador-reino-fungi/', icon: '🍄', name: 'El Reino Fungi', description: 'Ascomicetos, basidiomicetos y ciclo de vida del hongo' },
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Aprende la tabla periódica' },
-    { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Capitales y banderas del mundo' },
   ],
   'quiz-tabla-periodica': [
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de 85 elementos' },

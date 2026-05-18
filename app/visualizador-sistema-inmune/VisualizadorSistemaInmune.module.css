@@ -1,0 +1,1041 @@
+/* VisualizadorSistemaInmune.module.css - meskeIA */
+
+/* ============================================================
+   VARIABLES Y LAYOUT GENERAL
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero {
+  background: var(--hero-bg);
+  color: #ffffff;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroIcono {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #ffffff;
+}
+
+.subtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+.tabNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem;
+  border-bottom: 2px solid var(--bg-card);
+  padding-bottom: 0;
+}
+
+.tabBtn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s;
+  border-radius: 4px 4px 0 0;
+}
+
+.tabBtn:hover {
+  color: var(--primary);
+}
+
+.tabBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tabBtnActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
+.tabContent {
+  padding: 1.5rem 0;
+}
+
+/* ============================================================
+   LAS 3 LÍNEAS DE DEFENSA
+   ============================================================ */
+
+.defensasGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.defensaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card);
+  border-left: 5px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.defensaCard:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.defensaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.defensaNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+.defensaCardActiva {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.defensaCardRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.defensaEmoji {
+  font-size: 1.4rem;
+}
+
+.defensaCardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.lineaDetalle {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 5px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .lineaDetalle {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.lineaTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+}
+
+.lineaDesc {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.introText {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+}
+
+[data-theme='dark'] .introText {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.subTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.defensaTipo {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0 0 0.5rem;
+}
+
+.defensaDesc {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.componentesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.componenteCard {
+  background: var(--bg-primary);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+[data-theme='dark'] .componenteCard {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.componenteHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.componenteDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ============================================================
+   CÉLULAS GUARDIANAS
+   ============================================================ */
+
+.celulasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.celulaCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+[data-theme='dark'] .celulaCard {
+  border-color: rgba(255, 255, 255, 0.06);
+  border-top-color: var(--primary);
+}
+
+.celulaCard:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.celulaIcon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.celulaNombre {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.celulaTipo {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.6rem;
+}
+
+.celulaFuncion {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+}
+
+.celulaCardActiva {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.celulaDetalle {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: left;
+}
+
+[data-theme='dark'] .celulaDetalle {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.celulaDato {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.1);
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  display: inline-block;
+}
+
+/* ============================================================
+   ANTICUERPOS
+   ============================================================ */
+
+.anticuerpoWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.anticuerpoFigura {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+[data-theme='dark'] .anticuerpoFigura {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.anticuerpoSvg {
+  width: 260px;
+  flex-shrink: 0;
+  height: auto;
+  color: var(--text-primary);
+}
+
+.anticuerpoLeyenda {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.anticuerpoLeyenda p {
+  margin: 0.4rem 0;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+}
+
+.tableCaption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  padding-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.isotipoLoc {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.isotiposTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.isotiposTable thead {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.isotiposTable th {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.isotiposTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+[data-theme='dark'] .isotiposTable td {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.isotiposTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.isotiposTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.isotipoBadge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #ffffff;
+}
+
+/* ============================================================
+   VACUNAS E INMUNIDAD
+   ============================================================ */
+
+.vacunasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.vacunaCard {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+[data-theme='dark'] .vacunaCard {
+  border-color: rgba(255, 255, 255, 0.06);
+  border-left-color: var(--primary);
+}
+
+.vacunaCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.vacunaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.vacunaCardActiva {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.vacunaDetalle {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .vacunaDetalle {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.vacunaHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.vacunaIcono {
+  font-size: 1.4rem;
+}
+
+.vacunaNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.vacunaMecanismo {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.vacunaEjemplos {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.rebanoSection {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .rebanoSection {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.rebanoDesc {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.rebanoTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.rebanoChart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rebanoFila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rebanoEnfermedad {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.rebanoTrack {
+  flex: 1;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme='dark'] .rebanoTrack {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rebanoFill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding-left: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   INSIGHT Y WARNING BOX
+   ============================================================ */
+
+.insight {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.06) 0%, rgba(72, 169, 166, 0.06) 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.insight p {
+  margin: 0;
+}
+
+.warningBox {
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #92400E;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #422006;
+  border-color: #B45309;
+  color: #FDE68A;
+}
+
+/* ============================================================
+   SECCIÓN EDUCATIVA - ESTILOS AUXILIARES
+   ============================================================ */
+
+.eduSubtitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+/* Sección base v2.0 */
+.guideSection {
+  margin-bottom: 2rem;
+}
+
+.guideSection h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+/* Tabla comparativa */
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  background: var(--bg-card);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: linear-gradient(135deg, #1a6080, #2a7070);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #444;
+}
+
+/* Casos de uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform 0.2s;
+}
+
+.escenarioCard:hover {
+  transform: translateY(-2px);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+}
+
+.escenarioCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioTip {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #444;
+}
+
+/* FAQ v2.0 */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.faqTip {
+  font-size: 0.85rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: #444;
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* Paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  min-width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .stepContent {
+  border-color: #444;
+}
+
+/* Tips grid */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #444;
+}
+
+/* Warning header v2.0 */
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #92400E;
+  margin: 0;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #FDE68A;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  color: #92400E;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #FDE68A;
+}
+
+/* Clases legacy (mantenidas por compatibilidad) */
+.tipsList {
+  padding-left: 1.25rem;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipsList li {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.erroresList {
+  padding-left: 1.25rem;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.erroresList li {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.faqPregunta {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqRespuesta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .celulasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vacunasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .anticuerpoFigura {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .anticuerpoSvg {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .componentesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rebanoEnfermedad {
+    width: 110px;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .celulasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabBtn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .defensaCard,
+  .celulaCard,
+  .vacunaCard,
+  .tabBtn {
+    transition-duration: 0.01ms !important;
+  }
+}

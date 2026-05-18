@@ -1,8 +1,7 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState } from 'react';
-import styles from './SistemaNervioso.module.css';
+import styles from './VisualizadorSistemaNervioso.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -10,10 +9,10 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -875,93 +874,274 @@ export default function VisualizadorSistemaNerviosoPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <div className={styles.container}>
+      <MeskeiaLogo />
 
-      <div className={styles.container}>
-        <MeskeiaLogo />
+      <header className={styles.hero}>
+        <h1 className={styles.title}>El Sistema Nervioso</h1>
+        <p className={styles.subtitle}>Neuronas, sinapsis y neurotransmisores — tu red de comunicación interna</p>
+      </header>
 
-        <header className={styles.hero}>
-          <h1 className={styles.title}>El Sistema Nervioso</h1>
-          <p className={styles.subtitle}>Neuronas, sinapsis y neurotransmisores — tu red de comunicación interna</p>
-        </header>
+      <LegalNotice />
 
-        <LegalNotice />
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
-        {/* Navegación */}
-        <nav className={styles.navSecciones} aria-label="Secciones del explicador">
-          {SECCIONES.map(s => (
-            <button
-              key={s.id}
-              type="button"
-              className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
-              onClick={() => setSeccionActiva(s.id)}
-              aria-pressed={seccionActiva === s.id}
-            >
-              <span className={styles.navIcono} aria-hidden="true">{s.icono}</span>
-              <span className={styles.navTexto}>{s.titulo}</span>
-            </button>
-          ))}
-        </nav>
+      {/* Navegación */}
+      <nav className={styles.navSecciones} aria-label="Secciones del explicador">
+        {SECCIONES.map(s => (
+          <button
+            key={s.id}
+            type="button"
+            className={`${styles.navBtn} ${seccionActiva === s.id ? styles.navActivo : ''}`}
+            onClick={() => setSeccionActiva(s.id)}
+            aria-pressed={seccionActiva === s.id}
+          >
+            <span className={styles.navIcono} aria-hidden="true">{s.icono}</span>
+            <span className={styles.navTexto}>{s.titulo}</span>
+          </button>
+        ))}
+      </nav>
 
-        {/* Cabecera sección */}
-        <div className={styles.seccionHeader}>
-          <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
-            {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
-          </h2>
-          <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
-        </div>
-
-        {renderSeccion()}
-
-        <EducationalSection
-          title="Más sobre el sistema nervioso"
-          subtitle="Preguntas frecuentes y conceptos clave"
-          defaultOpen={false}
-        >
-          <h3>¿Qué es la plasticidad neuronal?</h3>
-          <p>
-            Es la capacidad del cerebro para <strong>reorganizar sus conexiones</strong>. Cuando aprendes algo nuevo,
-            se forman nuevas sinapsis. Si practicas algo repetidamente, esas conexiones se fortalecen (potenciación
-            a largo plazo). Es la base biológica del aprendizaje y la memoria.
-          </p>
-
-          <h3>¿Las neuronas se regeneran?</h3>
-          <p>
-            Durante mucho tiempo se creyó que no. Hoy sabemos que hay <strong>neurogénesis</strong> (nacimiento de nuevas
-            neuronas) en algunas regiones, como el hipocampo (memoria). Pero la mayoría de neuronas adultas no se
-            reemplazan, por eso las lesiones cerebrales pueden ser permanentes.
-          </p>
-
-          <h3>¿Qué pasa cuando falla la mielina?</h3>
-          <p>
-            En enfermedades como la <strong>esclerosis múltiple</strong>, el sistema inmune ataca la vaina de mielina.
-            Sin aislamiento, los impulsos se ralentizan o se pierden. Síntomas: debilidad muscular, problemas de
-            coordinación, fatiga, alteraciones visuales.
-          </p>
-
-          <h3>¿Por qué las drogas afectan al cerebro?</h3>
-          <p>
-            Muchas drogas imitan o interfieren con neurotransmisores naturales. La cocaína bloquea la recaptación
-            de dopamina (exceso de placer), los opioides imitan endorfinas, el alcohol potencia GABA (inhibición).
-            Esto altera el equilibrio químico normal del cerebro.
-          </p>
-
-          <div className={styles.warningBox}>
-            <strong>Nota:</strong> este explicador simplifica conceptos de neurociencia con fines educativos.
-            El sistema nervioso real es enormemente más complejo. Para decisiones sobre salud neurológica,
-            consulta siempre con profesionales sanitarios.
-          </div>
-        </EducationalSection>
-
-        <RelatedApps apps={getRelatedApps('visualizador-sistema-nervioso')} />
-        <ShareCard appName="visualizador-sistema-nervioso" />
-        <Footer appName="visualizador-sistema-nervioso" />
+      {/* Cabecera sección */}
+      <div className={styles.seccionHeader}>
+        <h2 className={styles.seccionTitulo}>
+          {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+          {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
+        </h2>
+        <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
       </div>
-    </>
+
+      {renderSeccion()}
+
+      <EducationalSection
+        title="Más sobre el sistema nervioso"
+        subtitle="Preguntas frecuentes y conceptos clave"
+        defaultOpen={false}
+      >
+        {/* 1. Tabla Comparativa — SNC vs SNP */}
+        <section className={styles.guideSection}>
+          <h2>SNC vs SNP — Comparativa</h2>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Aspecto</th>
+                  <th>Sistema Nervioso Central</th>
+                  <th>Sistema Nervioso Periférico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Componentes</strong></td>
+                  <td>Encéfalo + Médula espinal</td>
+                  <td>Nervios, ganglios, receptores</td>
+                </tr>
+                <tr>
+                  <td><strong>Protección</strong></td>
+                  <td>Cráneo, vértebras, meninges, LCR</td>
+                  <td>Solo envolturas de tejido conjuntivo</td>
+                </tr>
+                <tr>
+                  <td><strong>Función</strong></td>
+                  <td>Integra y procesa información</td>
+                  <td>Transmite señales hacia/desde el SNC</td>
+                </tr>
+                <tr>
+                  <td><strong>Regeneración</strong></td>
+                  <td>Muy limitada</td>
+                  <td>Mayor capacidad de regeneración</td>
+                </tr>
+                <tr>
+                  <td><strong>Control</strong></td>
+                  <td>Voluntario e inconsciente</td>
+                  <td>Somático (voluntario) + Autónomo (involuntario)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 2. Casos de Uso — Neurociencia en el día a día */}
+        <section className={styles.guideSection}>
+          <h2>Neurociencia en el día a día</h2>
+          <div className={styles.escenariosGrid}>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧠</span>
+                <h3>Aprendizaje y Memoria</h3>
+              </div>
+              <p className={styles.escenarioTip}>
+                Cuando memorizas algo, las sinapsis se refuerzan (LTP). La repetición espaciada
+                aprovecha este principio biológico para consolidar el conocimiento de forma más eficaz.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">😴</span>
+                <h3>Sueño y Rendimiento</h3>
+              </div>
+              <p className={styles.escenarioTip}>
+                Durante el sueño profundo, el cerebro consolida memorias y elimina desechos metabólicos
+                (sistema glinfático). Dormir mal debilita las sinapsis y reduce la capacidad de aprendizaje.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
+                <h3>Ejercicio y Neuroplasticidad</h3>
+              </div>
+              <p className={styles.escenarioTip}>
+                El ejercicio aeróbico aumenta el BDNF (factor de crecimiento nervioso), favorece la
+                neurogénesis en el hipocampo y mejora la concentración y la memoria a largo plazo.
+              </p>
+            </div>
+            <div className={styles.escenarioCard}>
+              <div className={styles.escenarioHeader}>
+                <span className={styles.escenarioIcon} aria-hidden="true">😰</span>
+                <h3>Estrés y Sistema Autónomo</h3>
+              </div>
+              <p className={styles.escenarioTip}>
+                El estrés activa el simpático (&quot;lucha o huida&quot;): taquicardia, cortisol, inhibición
+                digestiva. La respiración profunda activa el nervio vago (parasimpático) y frena la respuesta.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. FAQ — 5 preguntas frecuentes */}
+        <section className={styles.guideSection}>
+          <h2>Preguntas Frecuentes</h2>
+          <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Cuántas neuronas tiene el cerebro humano?</h4>
+              <p>
+                Aproximadamente 86.000 millones (Azevedo et al., 2009). Hay un número similar de
+                neuronas y células gliales — la idea de que hay 10 veces más gliales es un mito
+                que fue corregido por estudios de recuento celular más rigurosos.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿A qué velocidad viaja un impulso nervioso?</h4>
+              <p>
+                Depende de la mielina: las fibras mielinizadas A-alfa alcanzan 70-120 m/s, mientras
+                que las fibras C sin mielina (responsables del dolor lento) solo llegan a 0,5-2 m/s.
+                La mielina actúa como aislante y permite la conducción saltatoria, mucho más rápida.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Por qué la cocaína produce euforia?</h4>
+              <p>
+                Bloquea el transportador de recaptación de dopamina (DAT), provocando acumulación
+                de dopamina en la hendidura sináptica. La euforia es la consecuencia del exceso de
+                dopamina en el circuito de recompensa del núcleo accumbens.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Qué ocurre en la esclerosis múltiple?</h4>
+              <p>
+                El sistema inmune ataca la mielina (desmielinización). Sin aislamiento, los impulsos
+                se ralentizan o se pierden, causando debilidad, problemas de coordinación y fatiga.
+                Es una enfermedad autoinmune crónica con fases de brote y remisión.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <h4>❓ ¿Se pueden crear nuevas neuronas siendo adulto?</h4>
+              <p>
+                Sí. Hay neurogénesis adulta especialmente en el hipocampo (memoria) y el bulbo
+                olfatorio. El ejercicio aeróbico y el aprendizaje la favorecen, mientras que el
+                estrés crónico y el alcohol en exceso la inhiben.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Guía Paso a Paso — Cómo mejorar tu salud neurológica */}
+        <section className={styles.guideSection}>
+          <h2>Cómo mejorar tu salud neurológica</h2>
+          <div className={styles.stepGuide}>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>1</div>
+              <div className={styles.stepContent}>
+                <h4>Duerme 7-9 horas</h4>
+                <p>El sueño consolida sinapsis y elimina beta-amiloide mediante el sistema glinfático. La privación crónica acelera el deterioro cognitivo.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>2</div>
+              <div className={styles.stepContent}>
+                <h4>Practica ejercicio aeróbico 150 min/semana</h4>
+                <p>Aumenta el BDNF y favorece la neurogénesis hipocampal. Con 20-30 min de ejercicio moderado ya se producen efectos mensurables en la concentración.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>3</div>
+              <div className={styles.stepContent}>
+                <h4>Aprende algo nuevo cada semana</h4>
+                <p>Cada habilidad nueva crea sinapsis y densifica la reserva cognitiva. La variedad (idiomas, música, ajedrez) activa circuitos distintos y potencia la plasticidad.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>4</div>
+              <div className={styles.stepContent}>
+                <h4>Gestiona el estrés crónico</h4>
+                <p>El cortisol en exceso daña neuronas hipocampales y reduce la neurogénesis. Técnicas como meditación, respiración diafragmática y tiempo en naturaleza lo reducen.</p>
+              </div>
+            </div>
+            <div className={styles.step}>
+              <div className={styles.stepNumber}>5</div>
+              <div className={styles.stepContent}>
+                <h4>Nutre tu cerebro</h4>
+                <p>Omega-3 (DHA), vitamina B12 y colina son esenciales para la mielina y los neurotransmisores. El cerebro es el órgano con mayor consumo de glucosa: los picos y caídas de azúcar afectan la concentración.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Tips */}
+        <section className={styles.guideSection}>
+          <h2>Mejores prácticas</h2>
+          <div className={styles.tipsGrid}>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
+              <h4>Aprende antes de dormir</h4>
+              <p>La consolidación de memoria ocurre principalmente durante el sueño REM. Repasar antes de acostarte potencia la retención.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🏃</span>
+              <h4>Ejercítate antes de estudiar</h4>
+              <p>20 min de ejercicio aeróbico previo aumenta el BDNF y mejora la concentración durante las siguientes 1-2 horas.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">😮‍💨</span>
+              <h4>Respira profundo ante el estrés</h4>
+              <p>La respiración diafragmática lenta activa el nervio vago y el sistema parasimpático, frenando la respuesta de alerta.</p>
+            </div>
+            <div className={styles.tipCard}>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
+              <h4>Practica con intervalos espaciados</h4>
+              <p>La repetición distribuida refuerza las sinapsis más que la sesión intensiva. El olvido controlado es parte del proceso de consolidación.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Warning Box v2.0 */}
+        <div className={styles.warningBox}>
+          <div className={styles.warningHeader}>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
+            <h3>Errores Comunes sobre el Sistema Nervioso</h3>
+          </div>
+          <ul className={styles.warningList}>
+            <li><strong>❌ &quot;Solo usamos el 10% del cerebro&quot;:</strong> Mito sin base científica. Todas las regiones cerebrales tienen funciones conocidas y las neuroimágenes muestran actividad distribuida en todo el cerebro.</li>
+            <li><strong>❌ &quot;Las neuronas no se regeneran nunca&quot;:</strong> Hay neurogénesis adulta en el hipocampo y el bulbo olfatorio. No es tan extensa como en otros tejidos, pero existe y puede estimularse.</li>
+            <li><strong>❌ &quot;El alcohol mata neuronas permanentemente&quot;:</strong> El alcohol interfiere con la sinapsis y puede causar déficits de tiamina (síndrome de Wernicke), pero no destruye neuronas directamente en consumo moderado ocasional.</li>
+            <li><strong>❌ &quot;Más dopamina = más felicidad&quot;:</strong> Un exceso de dopamina puede causar psicosis o comportamientos compulsivos. El equilibrio, no el exceso, es la clave del bienestar neurológico.</li>
+          </ul>
+        </div>
+      </EducationalSection>
+
+      <RelatedApps apps={getRelatedApps('visualizador-sistema-nervioso')} />
+      <ShareCard appName="visualizador-sistema-nervioso" />
+      <Footer appName="visualizador-sistema-nervioso" />
+    </div>
   );
 }

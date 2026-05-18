@@ -1,0 +1,878 @@
+/* VisualizadorReinoFungi.module.css - meskeIA */
+
+/* ============================================================
+   LAYOUT GENERAL
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero {
+  background: var(--hero-bg);
+  color: #ffffff;
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.heroIcono {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.heroTitulo {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #ffffff;
+}
+
+.heroSubtitulo {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  margin: 0 0 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.heroDesc {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+.tabNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem;
+  border-bottom: 2px solid var(--bg-card);
+  padding-bottom: 0;
+}
+
+.tabBtn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: color 0.2s, background 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tabBtn:hover {
+  color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+.tabBtnActive {
+  color: var(--primary);
+  font-weight: 600;
+  border-bottom-color: var(--primary);
+  background: transparent;
+}
+
+.tabContent {
+  padding: 1.5rem 0;
+}
+
+/* ============================================================
+   TAB 1: CLASIFICACIÓN
+   ============================================================ */
+
+.divisionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.divisionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1.25rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-align: center;
+}
+
+.divisionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.divisionCardActive {
+  box-shadow: 0 4px 16px rgba(46, 134, 171, 0.2);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.divisionIcon {
+  font-size: 2rem;
+}
+
+.divisionNombre {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.divisionCientifico {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.divisionEspecies {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.badgeArtificial {
+  font-size: 0.7rem;
+  background: rgba(142, 142, 147, 0.15);
+  color: #8E8E93;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  margin-top: 0.25rem;
+}
+
+/* Panel detalle de la división */
+.divisionDetalle {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1.75rem;
+}
+
+.divisionDetalleHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.divisionDetalleNombre {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.divisionDetalleCientifico {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.divisionDetalleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .divisionDetalleGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.divisionDetalleBloque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detalleSectionTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0.25rem;
+}
+
+.detalleParrafo {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.detalleList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.detalleList li {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.detalleList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+
+.ejemplosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.ejemploCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem;
+  background: rgba(46, 134, 171, 0.04);
+  border-radius: 8px;
+  border: 1px solid rgba(46, 134, 171, 0.12);
+}
+
+.ejemploComun {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.ejemploCientifico {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.ejemploUso {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.curiosidadBox {
+  background: rgba(46, 134, 171, 0.06);
+  border-left: 3px solid var(--primary);
+  padding: 0.9rem 1.1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   TAB 2: COMPARATIVA PLANTA VS HONGO
+   ============================================================ */
+
+.comparativaWrapper {
+  max-width: 900px;
+}
+
+.comparativaIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.tableCaption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.comparativaTable th {
+  background: var(--bg-card);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+}
+
+.thPlantas {
+  color: #2E7D32 !important;
+}
+
+.thHongos {
+  color: #8E4B00 !important;
+}
+
+.comparativaTable td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  vertical-align: top;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.tableRow:hover td {
+  background: rgba(46, 134, 171, 0.03);
+}
+
+.tdCaracteristica {
+  min-width: 130px;
+  color: var(--text-primary);
+}
+
+.tdPlantas {
+  color: var(--text-primary);
+}
+
+.tdHongos {
+  color: var(--text-primary);
+}
+
+.warningBox {
+  background: rgba(224, 123, 57, 0.08);
+  border-left: 3px solid #E07B39;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+/* ============================================================
+   TAB 3: CICLO DE VIDA
+   ============================================================ */
+
+.cicloIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 750px;
+  margin-bottom: 2rem;
+}
+
+.cicloGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 680px;
+}
+
+.cicloStep {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+}
+
+.cicloStepHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.cicloStepNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.cicloStepEmoji {
+  font-size: 1.3rem;
+}
+
+.cicloStepTitulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cicloStepDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cicloFlecha {
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--primary);
+  padding: 0.2rem 0;
+  line-height: 1;
+}
+
+/* ============================================================
+   TAB 4: IMPORTANCIA ECOLÓGICA
+   ============================================================ */
+
+.ecologiaIntro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 750px;
+  margin-bottom: 1.75rem;
+}
+
+.ecologiaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.ecologiaCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  border-top: 4px solid var(--primary);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ecologiaCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ecologiaEmoji {
+  font-size: 1.6rem;
+}
+
+.ecologiaTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.ecologiaDesc {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ecologiaEjemplos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ecologiaEjemplos li {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  padding-left: 1rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.ecologiaEjemplos li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--secondary);
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+[data-theme='dark'] .container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .divisionCard {
+  background: var(--bg-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .divisionCardActive {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+[data-theme='dark'] .divisionDetalle {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .ejemploCard {
+  background: rgba(46, 134, 171, 0.08);
+  border-color: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .curiosidadBox {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: var(--bg-card);
+  border-bottom-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme='dark'] .tableRow:hover td {
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 123, 57, 0.12);
+}
+
+[data-theme='dark'] .cicloStep {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .ecologiaCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .badgeArtificial {
+  background: rgba(142, 142, 147, 0.25);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .divisionGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ecologiaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .main {
+    padding: 1.25rem 1rem;
+  }
+
+  .divisionDetalle {
+    padding: 1.25rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .divisionCard {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   EDUCATIONAL SECTION v2.0
+   ============================================================ */
+
+.guideSection {
+  margin-bottom: 2rem;
+}
+
+.guideSection h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+/* Casos de Uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform 0.2s;
+}
+
+.escenarioCard:hover {
+  transform: translateY(-2px);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioIcon {
+  font-size: 1.75rem;
+}
+
+.escenarioCard h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.escenarioExample {
+  background: var(--bg-primary);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  padding: 0.75rem;
+  margin: 0.75rem 0;
+  font-size: 0.875rem;
+}
+
+.escenarioTip {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+[data-theme='dark'] .escenarioCard {
+  border-color: #444;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: #1a1a1a;
+  border-left-color: var(--primary);
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.faqTip {
+  font-size: 0.85rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .faqItem {
+  border-color: #444;
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+/* Guía Paso a Paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  min-width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+[data-theme='dark'] .stepContent {
+  border-color: #444;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+[data-theme='dark'] .tipCard {
+  border-color: #444;
+}
+
+/* Warning Header (v2.0) */
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  padding-left: 0;
+}
+
+[data-theme='dark'] .warningList li {
+  color: var(--text-primary);
+}
