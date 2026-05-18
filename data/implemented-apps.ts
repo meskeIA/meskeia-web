@@ -102,6 +102,7 @@ export const implementedAppsUrls = [
   "/juego-presupuesto-mensual/",           // Juego presupuesto mensual: 3 perfiles, 6 escenarios, lecciones financieras
   "/estimador-tiempo-ahorro/",             // ¿Cuánto tardo en ahorrar?: objetivo + ahorro mensual = plazo
   "/quiz-conceptos-financieros/",          // Quiz 15 preguntas: ahorro, inflación, inversión, deuda, presupuesto
+  "/quiz-conceptos-inversion/",            // Quiz 25 preguntas nivel intermedio: Sharpe, beta, duration, TER, rebalanceo, valoración
   "/selector-actividades-movilidad/",      // Selector actividades según movilidad: test 8 preguntas, 20 actividades, 4 niveles
   "/estimador-complemento-minimos/",      // Estimador complemento a mínimos: pensiones mínimas SS por tipo, edad, situación
   "/verificador-complemento-brecha-genero/", // Verificador complemento brecha género 2026: 5 preguntas + cálculo 36,90 €/hijo (art. 60 LGSS, doctrina TJUE/TS 2025)

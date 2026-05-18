@@ -3221,11 +3221,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Haz crecer tu ahorro' },
     { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero', description: '¿Cuánto sabes de dinero?' },
   ],
+  'quiz-conceptos-inversion': [
+    { url: '/visualizador-tipos-activos/', icon: '📊', name: 'Clases de Activos', description: 'Renta fija, variable, alternativos y más' },
+    { url: '/visualizador-ciclo-economico/', icon: '🔄', name: 'Ciclo Económico', description: 'Cómo afecta el ciclo a cada activo' },
+    { url: '/estimador-cartera-inversion/', icon: '💼', name: 'Simulador de Cartera', description: 'Construye y proyecta tu cartera' },
+    { url: '/quiz-conceptos-financieros/', icon: '🧠', name: 'Quiz Financiero Básico', description: 'El nivel anterior a este quiz' },
+  ],
   'quiz-conceptos-financieros': [
     { url: '/simulador-paga-ahorro/', icon: '🐷', name: 'Simulador de Paga', description: 'Gestiona tu paga y ahorra' },
     { url: '/juego-presupuesto-mensual/', icon: '🎮', name: 'Juego de Presupuesto', description: '¿Llegas a fin de mes?' },
     { url: '/estimador-tiempo-ahorro/', icon: '🎯', name: '¿Cuánto tardo en ahorrar?', description: 'Plazo para tu objetivo' },
-    { url: '/estimador-interes-compuesto/', icon: '📈', name: 'Interés Compuesto', description: 'Haz crecer tu ahorro' },
+    { url: '/quiz-conceptos-inversion/', icon: '📈', name: 'Quiz Inversión Intermedio', description: 'El siguiente nivel — Sharpe, beta, TER' },
   ],
   'estimador-costas-judiciales': [
     { url: '/estimador-costes-divorcio/', icon: '📝', name: 'Costes de Divorcio', description: 'Mutuo acuerdo vs contencioso' },

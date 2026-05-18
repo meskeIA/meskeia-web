@@ -1,0 +1,419 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: var(--hero-bg);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.75rem;
+}
+.subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.85);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.main {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+/* ── Pantalla inicio ── */
+.inicio {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.modoSelector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.modoBtn {
+  background: var(--bg-card);
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: border-color 0.18s, background 0.18s;
+  text-align: left;
+}
+.modoBtn span {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+.modoBtnActivo {
+  border-color: var(--primary);
+  background: rgba(46,134,171,0.06);
+}
+
+.catLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.catGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.catBtn {
+  background: var(--bg-card);
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+  text-align: left;
+}
+.catBtnActivo {
+  background: rgba(46,134,171,0.05);
+}
+
+.categoriasList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.catInfo {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid;
+  border-radius: 0 8px 8px 0;
+  padding: 0.5rem 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+.catCount {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+.btnIniciar {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  align-self: center;
+}
+.btnIniciar:hover { opacity: 0.9; }
+
+.nivelNote {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Quiz panel ── */
+.quizPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quizHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.categoriaBadge {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+.contador {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.progreso {
+  height: 5px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progresoRelleno {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.3s;
+}
+
+.pregunta {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.opcion {
+  background: var(--bg-card);
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1.45;
+}
+.opcion:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(46,134,171,0.04);
+}
+.opcion:disabled { cursor: default; }
+.opcionCorrecta {
+  border-color: #27AE60;
+  background: rgba(39,174,96,0.08);
+}
+.opcionIncorrecta {
+  border-color: #E74C3C;
+  background: rgba(231,76,60,0.08);
+}
+.opcionLetra {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  background: var(--bg-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.feedback {
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid;
+}
+.feedbackOk {
+  background: rgba(39,174,96,0.08);
+  border-color: rgba(39,174,96,0.3);
+}
+.feedbackFail {
+  background: rgba(231,76,60,0.08);
+  border-color: rgba(231,76,60,0.3);
+}
+.feedbackTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.feedbackExplicacion {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+.btnSiguiente {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btnSiguiente:hover { opacity: 0.9; }
+
+/* ── Resultado ── */
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.resultadoTarjeta {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+}
+.resultadoIcono { font-size: 3rem; }
+.resultadoPuntuacion {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0.5rem 0 0.25rem;
+}
+.resultadoPct {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+.resultadoClasif {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.desglose {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.desglose h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+.desgloseItem {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+}
+.desgloseBar {
+  width: 100px;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.desgloseRelleno {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+.desgloseScore {
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 28px;
+  text-align: right;
+}
+
+.btnReiniciar {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  border-radius: 10px;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: center;
+  transition: background 0.15s, color 0.15s;
+}
+.btnReiniciar:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── EducationalSection ── */
+.tableWrapper { overflow-x: auto; }
+.glosarioTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.glosarioTable th {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+.glosarioTable td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+.glosarioTable tbody tr:hover { background: rgba(46,134,171,0.04); }
+
+/* ── Dark mode ── */
+[data-theme='dark'] .modoBtn,
+[data-theme='dark'] .catBtn,
+[data-theme='dark'] .catInfo,
+[data-theme='dark'] .opcion,
+[data-theme='dark'] .resultadoTarjeta,
+[data-theme='dark'] .desglose {
+  border-color: #444;
+}
+[data-theme='dark'] .modoBtnActivo,
+[data-theme='dark'] .catBtnActivo {
+  background: rgba(46,134,171,0.12);
+}
+[data-theme='dark'] .progreso { background: #444; }
+[data-theme='dark'] .desgloseBar { background: #444; }
+[data-theme='dark'] .opcionCorrecta { background: rgba(39,174,96,0.12); }
+[data-theme='dark'] .opcionIncorrecta { background: rgba(231,76,60,0.12); }
+[data-theme='dark'] .glosarioTable th {
+  background: linear-gradient(135deg, #1a6080, #2a7070);
+}
+[data-theme='dark'] .glosarioTable td { border-bottom-color: #444; }
+[data-theme='dark'] .opcionLetra { background: #333; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .modoSelector { grid-template-columns: 1fr; }
+  .catGrid { grid-template-columns: 1fr; }
+  .desgloseItem { grid-template-columns: 1fr auto; }
+  .desgloseBar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progresoRelleno,
+  .desgloseRelleno,
+  .opcion,
+  .btnIniciar,
+  .modoBtn { transition: none; }
+}
