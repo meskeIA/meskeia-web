@@ -4271,9 +4271,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/mesopotamia/', icon: '🏺', name: 'Historia de Mesopotamia', description: 'Mayas y sumerios inventaron la escritura de forma independiente: el paralelo entre la escritura cuneiforme (-3200 a.C.) y los jeroglíficos mayas muestra la universalidad del pensamiento humano' },
     { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'La pirámide del Sol en Teotihuacán y el Templo Mayor azteca son arquitectura monumental comparable a las pirámides egipcias: el arte precolombino merece su propio lugar en la historia del arte universal' },
   ],
+  'visualizador-historia-espana-antigua': [
+    { url: '/visualizador-historia/espana-medieval/', icon: '🏰', name: 'La España Medieval', description: 'El período que arranca exactamente donde termina la España Antigua: los visigodos (409) dan paso a Al-Ándalus y los reinos cristianos hasta 1492' },
+    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'Roma es el protagonista principal de la España Antigua: la conquista, la romanización y el colapso del Imperio enmarcan más de 600 años de historia peninsular' },
+    { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Los íberos y sus contemporáneos americanos son civilizaciones que Roma nunca conoció: el paralelo entre culturas que evolucionaron sin contacto es fascinante' },
+    { url: '/quiz-historia-espana/', icon: '🧠', name: 'Quiz Historia de España', description: '81 preguntas sobre toda la historia española — incluyendo el período romano y prerromano' },
+  ],
   'visualizador-historia-espana-medieval': [
+    { url: '/visualizador-historia/espana-antigua/', icon: '🏺', name: 'La España Antigua', description: 'El período anterior: íberos, celtas, Cartago y la Hispania Romana hasta el 409 que da inicio a la España Medieval' },
     { url: '/visualizador-historia/civilizaciones-precolombinas/', icon: '🌽', name: 'Civilizaciones Precolombinas', description: 'Los Reyes Católicos enviaron a Colón justo al cerrar la Edad Media: el mundo precolombino al que llegaron en 1492 era tan complejo y avanzado como la propia Europa medieval' },
-    { url: '/visualizador-historia/roma/', icon: '🦅', name: 'Historia de la Antigua Roma', description: 'La Hispania romana es el punto de partida de la historia medieval española: el latín, el derecho romano y la estructura viaria romana son la herencia sobre la que se construye todo lo demás' },
     { url: '/visualizador-historia/otomano/', icon: '🌙', name: 'Historia del Imperio Otomano', description: 'Al-Ándalus y el Imperio Otomano son los dos grandes proyectos de civilización islámica en Europa: contemporáneos y complementarios, con el Imperio Otomano tomando el relevo cultural cuando Al-Ándalus cae' },
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Averroes (Córdoba, 1126) y Maimónides (Córdoba, 1138) nacieron en Al-Ándalus: sin la España medieval islámica, la filosofía griega no habría llegado a la Europa cristiana medieval' },
   ],

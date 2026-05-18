@@ -12,6 +12,7 @@ import { chinaDinastias } from './china-dinastias';
 import { primeraGuerraMundial } from './primera-guerra-mundial';
 import { segundaGuerraMundial } from './segunda-guerra-mundial';
 import { civilizacionesPrecolombinas } from './civilizaciones-precolombinas';
+import { espanaAntigua } from './espana-antigua';
 import { espanaMedieval } from './espana-medieval';
 import { edadMediaEuropea } from './edad-media-europea';
 import { renacimiento } from './renacimiento';
@@ -150,6 +151,7 @@ const registry: Record<string, HistoriaData> = {
   'primera-guerra-mundial': primeraGuerraMundial,
   'segunda-guerra-mundial': segundaGuerraMundial,
   'civilizaciones-precolombinas': civilizacionesPrecolombinas,
+  'espana-antigua': espanaAntigua,
   'espana-medieval': espanaMedieval,
   'edad-media-europea': edadMediaEuropea,
   renacimiento,
