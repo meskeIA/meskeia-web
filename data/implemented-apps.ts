@@ -382,6 +382,7 @@ export const implementedAppsUrls = [
 
   // Tanda 1 simuladores Bachillerato/Universidad (2026-05-07)
   "/simulador-proyectiles/",        // Movimiento parabólico 2D: alcance, altura máx, tiempo de vuelo. Gravedades planetarias, resistencia aire
+  "/simulador-colisiones/",         // Colisiones 1D: elásticas/inelásticas, sliders masa+velocidad+e, animación SVG, momento y Ek
   "/simulador-pendulo/",            // Péndulo simple y MAS: T, f, ω, energía cinética/potencial, modos pequeños ángulos vs no lineal
   "/simulador-equilibrio-quimico/", // Le Chatelier interactivo: 6 reacciones reversibles, perturbaciones, Q vs Kc, van't Hoff
   "/simulador-lotka-volterra/",     // Modelo depredador-presa: oscilaciones, diagrama de fases, RK4, modo logístico, 4 presets

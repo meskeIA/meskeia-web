@@ -2593,6 +2593,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-movimiento/', icon: '🚀', name: 'Cinemática', description: 'MRU, MRUA y caída libre' },
     { url: '/calculadora-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Funciones, identidades y ecuaciones' },
   ],
+  'simulador-colisiones': [
+    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Caída libre, proyectiles, ondas y MAS' },
+    { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'La 3ª ley explica la fuerza en el choque' },
+    { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo y MAS', description: 'Energía cinética y potencial en oscilaciones' },
+    { url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora Movimiento', description: 'MRU, MRUA y cinemática' },
+  ],
   'simulador-pendulo': [
     { url: '/simulador-proyectiles/', icon: '🎯', name: 'Proyectiles 2D', description: 'Movimiento parabólico interactivo' },
     { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Más simulaciones de física' },
