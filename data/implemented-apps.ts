@@ -554,6 +554,7 @@ export const implementedAppsUrls = [
   "/selector-seguro-salud/",                 // Test 10 preguntas: sanidad pública, complementario o seguro completo
   "/selector-alquiler-vs-compra/",           // Test 10 preguntas: situación vital, estabilidad, horizonte — ¿alquilar o comprar?
   "/selector-dieta/",                        // Test 10 preguntas: mediterránea, vegetariana, vegana, cetogénica, DASH, ayuno
+  "/calculadora-zonas-entrenamiento/",       // 5 zonas FC: FCmáx (220−edad) o Karvonen, rango pulsaciones, beneficios por zona
   "/selector-ejercicio/",                    // Test 10 preguntas: gimnasio, running, natación, ciclismo, yoga, casa
   "/selector-seguro-hogar/",                 // Test 10 preguntas: cobertura básica, estándar o completa
   "/selector-zona-residencia/",              // Test 10 preguntas: ciudad grande, ciudad media, rural o costa

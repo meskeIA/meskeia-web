@@ -147,6 +147,7 @@ const fiscalApps: RelatedApp[] = [
 // FAMILIA: SALUD Y BIENESTAR
 // ==========================================
 const saludApps: RelatedApp[] = [
+  { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento', description: '5 zonas de FC: FCmáx y Karvonen' },
   { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
   { url: '/orientador-tension-arterial/', icon: '🩺', name: 'Tensión Arterial', description: 'Clasifica tu presión (ESH/ESC)' },
   { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Índice de masa corporal' },
@@ -1934,11 +1935,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tus hábitos de vida' },
     { url: '/orientador-tension-arterial/', icon: '🩺', name: 'Orientador Tensión Arterial', description: 'Interpreta tus cifras de tensión' },
   ],
+  'calculadora-zonas-entrenamiento': saludApps.filter(a => a.url !== '/calculadora-zonas-entrenamiento/').slice(0, 4),
   'selector-ejercicio': [
+    { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento', description: 'Calcula tus 5 zonas de FC para entrenar mejor' },
     { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: '¿Qué tipo de alimentación te conviene?' },
     { url: '/orientador-imc/', icon: '⚖️', name: 'Orientador IMC', description: 'Calcula tu índice de masa corporal' },
     { url: '/test-habitos-saludables/', icon: '💚', name: 'Test Hábitos Saludables', description: 'Evalúa tus hábitos de vida' },
-    { url: '/orientador-colesterol/', icon: '🩺', name: 'Orientador Colesterol', description: 'Interpreta tus niveles de colesterol' },
   ],
   'selector-vehiculo': [
     { url: '/selector-smartphone/', icon: '📱', name: 'Selector de Smartphone', description: '¿Qué móvil te conviene?' },
