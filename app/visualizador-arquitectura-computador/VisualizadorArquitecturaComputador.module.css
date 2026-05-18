@@ -1,0 +1,807 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Hero */
+.hero {
+  background: var(--hero-bg);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.75rem;
+}
+.subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Tabs */
+.tabNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid #e0e0e0;
+  justify-content: center;
+}
+.tabBtn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.tabBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.tabBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Tab content */
+.tabContent {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2rem;
+}
+.tabIntro {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Tab 1: Von Neumann ── */
+.diagramaWrapper {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+.diagramaSvg {
+  width: 100%;
+  max-width: 440px;
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: default;
+}
+.svgBloque {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.svgBloque:hover rect {
+  opacity: 0.85;
+}
+.detallePanel {
+  flex: 1;
+  min-height: 200px;
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.detalleTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.detalleDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+.detalleList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.detalleList li {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  padding-left: 1rem;
+  position: relative;
+}
+.detalleList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+.detallePlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  height: 100%;
+  min-height: 160px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.detallePlaceholder span {
+  font-size: 2rem;
+}
+.detallePlaceholder p {
+  font-size: 0.875rem;
+  margin: 0;
+  max-width: 200px;
+}
+.vnBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+}
+.vnBox h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+.vnBox ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.vnBox li {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  padding-left: 1rem;
+  position: relative;
+}
+.vnBox li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+
+/* ── Tab 2: CPU ── */
+.cpuGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.cpuCard {
+  background: var(--bg-card);
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: transform 0.18s, border-color 0.18s;
+}
+.cpuCard:hover {
+  transform: translateY(-2px);
+}
+.cpuCardActive {
+  background: rgba(46, 134, 171, 0.05);
+}
+.cpuIcono {
+  font-size: 1.5rem;
+}
+.cpuSigla {
+  font-size: 1rem;
+  font-weight: 800;
+}
+.cpuNombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.cpuFuncion {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.cpuDetalle {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid;
+  border-radius: 0 10px 10px 0;
+  padding: 1.1rem 1.25rem;
+  margin-top: 0.5rem;
+}
+.cpuDetalle h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.cpuDetalle p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Tab 3: FDE ── */
+.fdeProgreso {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+.fdeProgresoPunto {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.fdeProgresoPunto:hover {
+  transform: scale(1.25);
+}
+.fdeProgresoPuntoActivo {
+  transform: scale(1.4);
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+.fdeProgresoPuntoVisto {
+  opacity: 0.7;
+}
+.fdePaso {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-top: 4px solid;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.fdeFaseBadge {
+  display: inline-block;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+.fdePasoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+.fdePasoDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+.fdeRegistros h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.fdeRegistrosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.fdeRegistro {
+  background: var(--bg-primary);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.fdeRegistroNombre {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.fdeRegistroValor {
+  font-size: 0.875rem;
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.fdeControles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.fdeBtn {
+  padding: 0.5rem 1.25rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.fdeBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.fdePasoContador {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.fdeReinicio {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+.fdeBtnReinicio {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.fdeLeyenda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+}
+.fdeLeyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.fdeLeyendaColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Tab 4: Memoria ── */
+.memoriaPiramide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.memoriaFila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.memoriaBarraWrapper {
+  min-width: 30px;
+  transition: width 0.3s;
+}
+.memoriaBarra {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.memoriaBarraIcono {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.memoriaBarraNombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.memoriaInfo {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.775rem;
+  flex-wrap: wrap;
+}
+.memoriaLatencia {
+  font-weight: 700;
+  min-width: 70px;
+}
+.memoriaTamano {
+  color: var(--text-secondary);
+  min-width: 90px;
+}
+.memoriaCoste {
+  color: var(--text-muted);
+}
+.memoriaEtiquetas {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 1.25rem;
+}
+.memoriaBox {
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+}
+.memoriaBox h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+.memoriaBox p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── EducationalSection v2.0 ── */
+.guideSection {
+  margin-bottom: 2rem;
+}
+.guideSection h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 1rem;
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 0;
+}
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.comparativaTable th {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+.comparativaTable tbody tr:hover {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+/* Casos de uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: transform 0.18s;
+}
+.escenarioCard:hover {
+  transform: translateY(-2px);
+}
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.escenarioIcon {
+  font-size: 1.75rem;
+}
+.escenarioCard h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.escenarioTip {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+}
+.faqItem h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.5rem;
+}
+.faqItem p {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+  line-height: 1.55;
+}
+.faqTip {
+  font-size: 0.83rem;
+  background: rgba(46, 134, 171, 0.08);
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Paso a paso */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.stepNumber {
+  min-width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.stepContent {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  flex: 1;
+}
+.stepContent h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+.stepContent p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.tipIcon {
+  font-size: 1.5rem;
+}
+.tipCard h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Warning box v2.0 */
+.warningBox {
+  background: rgba(224, 123, 57, 0.08);
+  border: 1px solid rgba(224, 123, 57, 0.3);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+}
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.warningIcon {
+  font-size: 1.4rem;
+}
+.warningHeader h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c0621a;
+  margin: 0;
+}
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.warningList li {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ── Dark mode ── */
+[data-theme='dark'] .tabNav {
+  border-bottom-color: #333;
+}
+[data-theme='dark'] .tabBtn {
+  border-color: #555;
+  color: var(--text-secondary);
+}
+[data-theme='dark'] .tabBtnActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+[data-theme='dark'] .diagramaSvg {
+  border-color: #333;
+}
+[data-theme='dark'] .detallePanel {
+  border-color: #333;
+}
+[data-theme='dark'] .vnBox {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+[data-theme='dark'] .cpuCard {
+  border-color: #444;
+}
+[data-theme='dark'] .cpuDetalle {
+  border-color: #444;
+}
+[data-theme='dark'] .fdePaso {
+  border-color: #333;
+}
+[data-theme='dark'] .fdeRegistro {
+  border-color: #444;
+}
+[data-theme='dark'] .fdeLeyenda {
+  border-color: #333;
+}
+[data-theme='dark'] .memoriaBox {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.25);
+}
+[data-theme='dark'] .comparativaTable th {
+  background: linear-gradient(135deg, #1a6080, #2a7070);
+}
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #444;
+}
+[data-theme='dark'] .escenarioCard {
+  border-color: #444;
+}
+[data-theme='dark'] .faqItem {
+  border-color: #444;
+}
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.15);
+}
+[data-theme='dark'] .stepContent {
+  border-color: #444;
+}
+[data-theme='dark'] .tipCard {
+  border-color: #444;
+}
+[data-theme='dark'] .warningBox {
+  background: rgba(224, 123, 57, 0.12);
+  border-color: rgba(224, 123, 57, 0.25);
+}
+[data-theme='dark'] .warningHeader h3 {
+  color: #e09060;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .diagramaWrapper {
+    flex-direction: column;
+  }
+  .diagramaSvg {
+    max-width: 100%;
+  }
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+  .cpuGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .memoriaInfo {
+    gap: 0.5rem;
+  }
+  .fdeControles {
+    gap: 0.5rem;
+  }
+  .fdeBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cpuCard,
+  .escenarioCard,
+  .tabBtn {
+    transition: none;
+  }
+}

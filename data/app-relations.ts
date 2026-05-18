@@ -379,6 +379,7 @@ const webDevApps: RelatedApp[] = [
 // FAMILIA: INFORMÁTICA Y PROGRAMACIÓN
 // ==========================================
 const informaticaApps: RelatedApp[] = [
+  { url: '/visualizador-arquitectura-computador/', icon: '🖥️', name: 'Arquitectura Computador', description: 'Von Neumann, CPU y ciclo FDE' },
   { url: '/visualizador-algoritmos/', icon: '📊', name: 'Visualizador Algoritmos', description: 'Ordenación paso a paso' },
   { url: '/playground-sql/', icon: '🗃️', name: 'Playground SQL', description: 'Editor SQL interactivo' },
   { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales' },
@@ -2557,6 +2558,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // INFORMÁTICA Y PROGRAMACIÓN
+  'visualizador-arquitectura-computador': informaticaApps.filter(a => a.url !== '/visualizador-arquitectura-computador/'),
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
   'playground-sql': informaticaApps.filter(a => a.url !== '/playground-sql/'),
   'simulador-puertas-logicas': informaticaApps.filter(a => a.url !== '/simulador-puertas-logicas/'),
