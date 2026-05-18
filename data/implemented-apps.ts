@@ -841,6 +841,7 @@ export const implementedAppsUrls = [
   "/visualizador-crispr-cas9/",           // Mecanismo slider 6 pasos SVG, NHEJ vs HDR, 6 enfermedades, bioética He Jiankui
   "/visualizador-biomas-terrestres/",     // 7 biomas selector, climograma Walter-Lieth, latitudinal, conservación
   // EJE E — Tecnología y computación (Roadmap v4, 2026-04-30)
+  "/quiz-complejidad-algoritmos/",          // 25 preguntas Big O: notación, ordenación, estructuras, análisis código, comparativa
   "/visualizador-arquitectura-computador/", // Von Neumann SVG, CPU ALU+registros, ciclo FDE animado, jerarquía memoria
   "/visualizador-logica-proposicional/",  // Tablas de verdad AND/OR/NOT/XOR, evaluador fórmulas, Karnaugh SVG, FNC/FND
   "/visualizador-teoria-informacion/",    // Entropía Shannon sliders, Huffman animado, Shannon-Hartley, compresión formatos
@@ -1095,6 +1096,7 @@ export const implementedAppsUrls = [
   "/calculadora-regla-500-npf-astrofoto/", // Tiempo máximo sin estelas: regla 500 + NPF con declinación, visualización de cielo con estrellas/estelas
   "/visualizador-reino-vegetal/",         // Árbol interactivo criptógamas/fanerógamas, 16 grupos, tabla comparativa y ciclos de vida
   "/visualizador-adaptaciones-plantas/",  // 6 hábitats extremos, 8 mecanismos adaptativos, 5 géneros carnívoras
+  "/quiz-biologia-molecular/",            // 30 preguntas: ADN/ARN, replicación, transcripción, traducción, mutaciones
   "/quiz-tipos-plantas/",                 // 40 organismos, 6 grupos taxonómicos, 3 modos de juego
   "/visualizador-reino-fungi/",           // 4 divisiones: Ascomycota, Basidiomycota, Zygomycota, Deuteromycota + diferencias con plantas
   "/visualizador-tipos-activos/",         // 6 clases de activos, matriz correlación 6×6, 4 carteras tipo

@@ -380,6 +380,7 @@ const webDevApps: RelatedApp[] = [
 // ==========================================
 const informaticaApps: RelatedApp[] = [
   { url: '/visualizador-arquitectura-computador/', icon: '🖥️', name: 'Arquitectura Computador', description: 'Von Neumann, CPU y ciclo FDE' },
+  { url: '/quiz-complejidad-algoritmos/', icon: '⏱️', name: 'Quiz Complejidad', description: 'Big O, ordenación y estructuras' },
   { url: '/visualizador-algoritmos/', icon: '📊', name: 'Visualizador Algoritmos', description: 'Ordenación paso a paso' },
   { url: '/playground-sql/', icon: '🗃️', name: 'Playground SQL', description: 'Editor SQL interactivo' },
   { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales' },
@@ -1127,6 +1128,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adaptaciones-plantas/', icon: '🌵', name: 'Adaptaciones de las Plantas', description: 'Hábitats extremos y plantas carnívoras' },
     { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales' },
     { url: '/visualizador-reino-fungi/', icon: '🍄', name: 'El Reino Fungi', description: 'Hongos: el tercer reino — ni plantas ni animales' },
+  ],
+  'quiz-biologia-molecular': [
+    { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos y Punnett' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Neuronas y neurotransmisores' },
+    { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Orgánulos y biología celular' },
+    { url: '/visualizador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'División celular' },
   ],
   'visualizador-reino-fungi': [
     { url: '/visualizador-reino-vegetal/', icon: '🌿', name: 'El Reino Vegetal', description: 'Plantas: el contraste directo con los hongos' },
@@ -2558,6 +2565,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // INFORMÁTICA Y PROGRAMACIÓN
+  'quiz-complejidad-algoritmos': informaticaApps.filter(a => a.url !== '/quiz-complejidad-algoritmos/'),
   'visualizador-arquitectura-computador': informaticaApps.filter(a => a.url !== '/visualizador-arquitectura-computador/'),
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
   'playground-sql': informaticaApps.filter(a => a.url !== '/playground-sql/'),
