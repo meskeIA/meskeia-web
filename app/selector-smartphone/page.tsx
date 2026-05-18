@@ -34,13 +34,6 @@ interface Pregunta {
   opciones: Opcion[];
 }
 
-interface ModeloRef {
-  nombre: string;
-  precio: string;
-  nota: string;
-  icon: string;
-}
-
 interface GamaInfo {
   nombre: string;
   icon: string;
@@ -53,7 +46,7 @@ interface Resultado {
   gama: GamaKey;
   razones: string[];
   consejos: string[];
-  modelos: ModeloRef[];
+  caracteristicas: string[];
 }
 
 // ─────────────────────────────────────────────
@@ -88,52 +81,6 @@ const GAMAS: Record<GamaKey, GamaInfo> = {
     precioOrientativo: '900 – 1.500+ €',
     descripcion:
       'Lo mejor de la tecnología actual: zoom óptico avanzado, pantallas de 120 Hz, procesadores de última generación y actualizaciones garantizadas durante años.',
-  },
-};
-
-// ─────────────────────────────────────────────
-// Modelos de referencia por OS y gama
-// ─────────────────────────────────────────────
-
-const MODELOS: Record<SistemaOS, Record<GamaKey, ModeloRef[]>> = {
-  ios: {
-    basica: [
-      { nombre: 'iPhone SE (3ª gen)', precio: '~499 €', nota: 'Compacto, potente, pero cámara única', icon: '📱' },
-    ],
-    media: [
-      { nombre: 'iPhone 14', precio: '~649 €', nota: 'Muy sólido, amplio soporte futuro', icon: '📲' },
-      { nombre: 'iPhone 15', precio: '~799 €', nota: 'USB-C, cámara mejorada', icon: '📲' },
-    ],
-    alta: [
-      { nombre: 'iPhone 15 Plus', precio: '~899 €', nota: 'Pantalla grande, batería excepcional', icon: '🌟' },
-      { nombre: 'iPhone 16', precio: '~859 €', nota: 'Chip A18, funciones de IA', icon: '🌟' },
-    ],
-    pro: [
-      { nombre: 'iPhone 16 Pro', precio: '~1.229 €', nota: 'Cámara de nivel profesional', icon: '🏆' },
-      { nombre: 'iPhone 16 Pro Max', precio: '~1.469 €', nota: 'Máxima autonomía y pantalla', icon: '🏆' },
-    ],
-  },
-  android: {
-    basica: [
-      { nombre: 'Xiaomi Redmi 13C', precio: '~130 €', nota: 'Gran pantalla, batería grande', icon: '📱' },
-      { nombre: 'Samsung Galaxy A15', precio: '~160 €', nota: 'Pantalla AMOLED, soporte 4 años', icon: '📱' },
-      { nombre: 'Motorola Moto G54', precio: '~180 €', nota: 'Buen rendimiento, 5G', icon: '📱' },
-    ],
-    media: [
-      { nombre: 'Samsung Galaxy A55', precio: '~380 €', nota: 'AMOLED, IP67, 4 años soporte', icon: '📲' },
-      { nombre: 'Google Pixel 8a', precio: '~549 €', nota: 'IA de Google, 7 años soporte', icon: '📲' },
-      { nombre: 'Nothing Phone (2a)', precio: '~340 €', nota: 'Diseño original, rendimiento sólido', icon: '📲' },
-    ],
-    alta: [
-      { nombre: 'Samsung Galaxy S24', precio: '~799 €', nota: '7 años soporte, IA Galaxy', icon: '🌟' },
-      { nombre: 'Google Pixel 9', precio: '~899 €', nota: 'Mejor cámara nocturna', icon: '🌟' },
-      { nombre: 'OnePlus 12', precio: '~799 €', nota: 'Carga rápida récord, Snapdragon 8 Gen 3', icon: '🌟' },
-    ],
-    pro: [
-      { nombre: 'Samsung Galaxy S24 Ultra', precio: '~1.349 €', nota: 'S Pen, zoom 10x óptico', icon: '🏆' },
-      { nombre: 'Google Pixel 9 Pro XL', precio: '~1.149 €', nota: 'Gemini IA, 7 años soporte', icon: '🏆' },
-      { nombre: 'OnePlus 12 Pro', precio: '~1.099 €', nota: 'Hasselblad, carga 100W', icon: '🏆' },
-    ],
   },
 };
 
@@ -271,6 +218,7 @@ function calcularResultado(respuestas: Record<number, string>): Resultado {
   let puntosGamaAlta = 0;
   const razones: string[] = [];
   const consejos: string[] = [];
+  const caracteristicas: string[] = [];
 
   // ─ Sistema operativo ─
   if (respuestas[4] === 'si_muchos') { puntosiOS += 3; }
@@ -322,7 +270,7 @@ function calcularResultado(respuestas: Record<number, string>): Resultado {
 
   if (gama === 'pro') {
     razones.push('Tu perfil de uso intenso o de fotografía avanzada justifica la inversión en un flagship.');
-    razones.push('Los móviles pro reciben soporte extendido (7 años en Google y Samsung), amortizando el coste.');
+    razones.push('Los móviles pro reciben soporte extendido (7 años en algunos fabricantes), amortizando el coste.');
   } else if (gama === 'alta') {
     razones.push('La gama alta te ofrece cámaras con teleobjetivo, pantallas de 120 Hz y rendimiento sólido sin llegar al precio máximo.');
   } else if (gama === 'media') {
@@ -332,30 +280,98 @@ function calcularResultado(respuestas: Record<number, string>): Resultado {
   }
 
   if (respuestas[7] === 'largo') {
-    razones.push('Buscar modelos con 4+ años de actualizaciones garantizadas prolonga la vida útil del dispositivo.');
+    razones.push('Buscar modelos con varios años de actualizaciones garantizadas prolonga la vida útil del dispositivo.');
   }
 
   // ─ Consejos ─
   if (respuestas[10] === 'si' || respuestas[10] === 'quizas') {
-    consejos.push('💡 Un modelo reacondicionado certificado (Amazon Renewed, Back Market) puede ahorrarte un 30-40% con garantía incluida.');
+    consejos.push('💡 Un dispositivo reacondicionado certificado puede ahorrarte un 30-40 % con garantía incluida; comprueba el estado de la batería antes de comprar.');
   }
   if (respuestas[7] === 'largo') {
-    consejos.push('📅 Prioriza marcas con larga política de actualizaciones: Google (7 años), Samsung (7 años), Apple (6-7 años).');
+    consejos.push('📅 Comprueba en la ficha técnica exacta cuántos años de actualizaciones de SO garantiza el fabricante, no solo parches de seguridad.');
   }
   if (respuestas[8] === 'resistente') {
     consejos.push('💧 Verifica que el modelo elegido tenga certificación IP67 o IP68 antes de comprarlo.');
   }
   if (respuestas[9] === 'medio' || respuestas[9] === 'bajo') {
-    consejos.push('🛒 Los mejores precios aparecen en el Black Friday (noviembre), Prime Day (julio) y tras el lanzamiento de la generación siguiente.');
+    consejos.push('🛒 Los mejores precios suelen aparecer tras el lanzamiento de la generación siguiente del modelo que te interesa.');
   }
   if (respuestas[6] === 'camara') {
-    consejos.push('📷 Revisa comparativas de cámara en DxOMark o GSMArena antes de decidirte. La ficha técnica no lo dice todo.');
+    consejos.push('📷 El tamaño del sensor y la apertura importan más que los megapíxeles; busca comparativas de fotografía independientes.');
   }
   consejos.push('🔋 Comprueba siempre la capacidad de batería (mAh) y si admite carga rápida — muchos modelos de gama media superan a los flagship en autonomía.');
 
-  const modelos = MODELOS[os][gama];
+  // ─ Características a buscar ─
 
-  return { os, gama, razones, consejos, modelos };
+  // Actualizaciones (siempre, umbral según duración esperada)
+  if (respuestas[7] === 'largo') {
+    caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 5 años desde la compra');
+  } else if (gama === 'pro' || gama === 'alta') {
+    caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 4 años');
+  } else {
+    caracteristicas.push('🔄 Actualizaciones del sistema operativo garantizadas: mínimo 3 años');
+  }
+
+  // Batería según intensidad de uso y prioridad declarada
+  if (respuestas[3] === 'extremo' || respuestas[6] === 'bateria') {
+    caracteristicas.push('🔋 Batería ≥ 5.000 mAh con carga rápida ≥ 45 W');
+  } else if (respuestas[3] === 'mucho') {
+    caracteristicas.push('🔋 Batería ≥ 4.500 mAh con carga rápida ≥ 30 W');
+  } else {
+    caracteristicas.push('🔋 Batería ≥ 4.000 mAh (suficiente para un día completo de uso moderado)');
+  }
+
+  // Cámara según prioridad declarada y uso principal
+  if (respuestas[1] === 'foto' || respuestas[6] === 'camara') {
+    if (gama === 'pro') {
+      caracteristicas.push('📷 Sistema de triple cámara con teleobjetivo óptico (≥ 3×) y sensor principal de gran formato (≥ 1/1,3\'\')');
+    } else if (gama === 'alta') {
+      caracteristicas.push('📷 Doble o triple cámara con teleobjetivo óptico y modo noche avanzado');
+    } else {
+      caracteristicas.push('📷 Cámara principal con apertura ≤ f/1,9 y modo noche incluido');
+    }
+  }
+
+  // Procesador y pantalla según gaming o rendimiento
+  if (respuestas[2] === 'intenso' || respuestas[6] === 'rendimiento') {
+    caracteristicas.push('⚡ Procesador de gama alta de la generación más reciente disponible');
+    caracteristicas.push('🖥️ Pantalla con tasa de refresco ≥ 120 Hz');
+    if (gama === 'pro' || gama === 'alta') {
+      caracteristicas.push('💾 RAM ≥ 8 GB');
+    }
+  } else if (respuestas[2] === 'medio') {
+    caracteristicas.push('⚡ Procesador de gama media-alta con pantalla a ≥ 90 Hz');
+  }
+
+  // Diseño y resistencia
+  if (respuestas[8] === 'resistente') {
+    caracteristicas.push('💧 Certificación de resistencia al agua y polvo: IP67 como mínimo, IP68 preferible');
+  }
+  if (respuestas[8] === 'pequeno') {
+    caracteristicas.push('📐 Formato compacto: pantalla ≤ 6,2\'\' (evita las variantes "Plus", "XL" o "Ultra")');
+  }
+  if (respuestas[8] === 'grande') {
+    caracteristicas.push('📐 Pantalla ≥ 6,5\'\' con tecnología AMOLED o equivalente');
+  }
+
+  // NFC a partir de gama media
+  if (gama !== 'basica') {
+    caracteristicas.push('📡 NFC para pagos sin contacto (verifica disponibilidad en tu región)');
+  }
+
+  // Almacenamiento según gama
+  if (gama === 'pro' || gama === 'alta') {
+    caracteristicas.push('💾 Almacenamiento interno ≥ 256 GB (o ≥ 128 GB con ranura microSD)');
+  } else {
+    caracteristicas.push('💾 Almacenamiento interno ≥ 128 GB');
+  }
+
+  // 5G a partir de gama media
+  if (gama !== 'basica') {
+    caracteristicas.push('📶 Conectividad 5G');
+  }
+
+  return { os, gama, razones, consejos, caracteristicas };
 }
 
 // ─────────────────────────────────────────────
@@ -446,7 +462,7 @@ export default function SelectorSmartphone() {
             <ul className={styles.introFeatures} aria-label="Qué obtendrás">
               <li><span aria-hidden="true">✅</span> iOS o Android según tu ecosistema</li>
               <li><span aria-hidden="true">✅</span> Gama recomendada con precio orientativo</li>
-              <li><span aria-hidden="true">✅</span> Modelos de referencia concretos</li>
+              <li><span aria-hidden="true">✅</span> Características técnicas a buscar según tu perfil</li>
               <li><span aria-hidden="true">✅</span> Consejos de compra personalizados</li>
               <li><span aria-hidden="true">✅</span> Sin marcas patrocinadas, solo tu perfil real</li>
             </ul>
@@ -553,23 +569,14 @@ export default function SelectorSmartphone() {
             ))}
           </div>
 
-          {/* Modelos de referencia */}
-          <div className={styles.modelosSection}>
-            <p className={styles.modelosTitulo}>
-              Modelos de referencia — {osInfo.nombre} · {GAMAS[resultado.gama].nombre}
+          {/* Características a buscar */}
+          <div className={styles.caracteristicasSection}>
+            <p className={styles.caracteristicasTitulo}>
+              Qué buscar en tu próximo smartphone
             </p>
-            <p className={styles.modelosNota}>
-              Orientativo. Los precios varían según tienda, operador y fecha de compra.
-            </p>
-            <div className={styles.modelosGrid}>
-              {resultado.modelos.map((m, i) => (
-                <div key={i} className={styles.modeloItem}>
-                  <span className={styles.modeloIcon} aria-hidden="true">{m.icon}</span>
-                  <div className={styles.modeloInfo}>
-                    <p className={styles.modeloNombre}>{m.nombre} · {m.precio}</p>
-                    <p className={styles.modeloDesc}>{m.nota}</p>
-                  </div>
-                </div>
+            <div className={styles.caracteristicasGrid}>
+              {resultado.caracteristicas.map((c, i) => (
+                <div key={i} className={styles.caracteristicaItem}>{c}</div>
               ))}
             </div>
           </div>
