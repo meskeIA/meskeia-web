@@ -1,0 +1,197 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Fotografía Técnica",
+    "description": "Calculadoras técnicas de fotografía: profundidad de campo, exposición sin estelas para astrofotografía (regla 500 y NPF) y triángulo de exposición equivalente.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://meskeia.com" }
+  ],
+  "paths": {
+    "/api/chatgpt/profundidad-campo": {
+      "post": {
+        "operationId": "calcularProfundidadCampo",
+        "summary": "Calcula DoF, hiperfocal y zona de nitidez",
+        "description": "Calcula la profundidad de campo (DoF), distancia hiperfocal, límite cercano (Dn) y lejano (Df) de nitidez a partir de focal, apertura, distancia al sujeto y tipo de sensor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["focal_mm", "apertura", "distancia_m"],
+                "properties": {
+                  "focal_mm": {
+                    "type": "number",
+                    "description": "Focal real del objetivo en milímetros (ej: 50, 85, 135)."
+                  },
+                  "apertura": {
+                    "type": "number",
+                    "description": "Número f de apertura (ej: 1.4, 2.8, 5.6, 11)."
+                  },
+                  "distancia_m": {
+                    "type": "number",
+                    "description": "Distancia al sujeto en metros (ej: 1.5, 3, 10)."
+                  },
+                  "sensor": {
+                    "type": "string",
+                    "enum": ["ff", "apsc15", "apsc16", "m43"],
+                    "description": "Tipo de sensor: ff=Full Frame, apsc15=APS-C Nikon/Sony, apsc16=APS-C Canon, m43=Micro 4/3. Por defecto ff."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado del cálculo de profundidad de campo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sensor_usado": { "type": "string" },
+                    "coc_mm": { "type": "number" },
+                    "hiperfocal_m": { "type": "number" },
+                    "dn_m": { "type": "number" },
+                    "df_m": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
+                    "dof_m": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
+                    "clasificacion": { "type": "string" },
+                    "aviso": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/astrofoto-exposicion": {
+      "post": {
+        "operationId": "calcularAstrofotoExposicion",
+        "summary": "Tiempo máximo sin estelas (regla 500, NPF)",
+        "description": "Calcula el tiempo máximo de exposición para que las estrellas salgan como puntos (no estelas), usando la regla 500 clásica y la fórmula NPF más precisa que considera apertura, pixel pitch y declinación celeste.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["focal_mm", "apertura"],
+                "properties": {
+                  "focal_mm": {
+                    "type": "number",
+                    "description": "Focal real del objetivo en mm (ej: 14, 24, 35)."
+                  },
+                  "apertura": {
+                    "type": "number",
+                    "description": "Número f de apertura (ej: 1.8, 2.8, 4)."
+                  },
+                  "sensor": {
+                    "type": "string",
+                    "enum": ["ff", "apsc15", "apsc16", "m43"],
+                    "description": "Tipo de sensor. Por defecto ff (Full Frame)."
+                  },
+                  "megapixeles": {
+                    "type": "number",
+                    "description": "Megapíxeles del sensor (ej: 24, 36, 45, 61). Por defecto 24."
+                  },
+                  "declinacion_grados": {
+                    "type": "number",
+                    "description": "Declinación celeste en grados (0=ecuador celeste/Orión, 30=Vía Láctea típica, 60=Casiopea, 85=cerca de Polaris). Por defecto 0."
+                  },
+                  "tiempo_elegido_s": {
+                    "type": "number",
+                    "description": "Tiempo de exposición que el usuario quiere usar, en segundos. Se evalúa si produce estelas. Por defecto 20."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tiempos máximos y veredicto sobre el tiempo elegido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tiempo_maximo_npf_s": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
+                    "tiempo_maximo_500_s": { "type": "number" },
+                    "tiempo_maximo_300_s": { "type": "number" },
+                    "pixel_pitch_um": { "type": "number" },
+                    "veredicto": { "type": "string" },
+                    "descripcion": { "type": "string" },
+                    "recomendacion": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/exposicion-equivalente": {
+      "post": {
+        "operationId": "calcularExposicionEquivalente",
+        "summary": "Calcula exposición equivalente (triángulo ISO/apertura/obturador)",
+        "description": "Dado un triángulo de exposición base (ISO, apertura, velocidad de obturación), calcula la exposición equivalente al cambiar uno de los parámetros, ajustando automáticamente otro para mantener el mismo valor de exposición (EV).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["iso_base", "apertura_base", "obturador_base_s", "parametro_fijo", "nuevo_valor"],
+                "properties": {
+                  "iso_base": {
+                    "type": "number",
+                    "description": "ISO de partida (ej: 100, 400, 1600)."
+                  },
+                  "apertura_base": {
+                    "type": "number",
+                    "description": "Apertura f de partida (ej: 2.8, 5.6, 11)."
+                  },
+                  "obturador_base_s": {
+                    "type": "number",
+                    "description": "Velocidad de obturación base en segundos (ej: 0.01 para 1/100, 0.001 para 1/1000, 2 para 2 s)."
+                  },
+                  "parametro_fijo": {
+                    "type": "string",
+                    "enum": ["iso", "apertura", "obturador"],
+                    "description": "Qué parámetro se cambia: iso (ajusta apertura), apertura (ajusta obturador), obturador (ajusta ISO)."
+                  },
+                  "nuevo_valor": {
+                    "type": "number",
+                    "description": "Nuevo valor del parámetro elegido (ej: si parametro_fijo=apertura y quieres f/1.4, nuevo_valor=1.4)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exposición equivalente calculada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exposicion_original": { "type": "object" },
+                    "exposicion_equivalente": { "type": "object" },
+                    "valores_en_pasos": { "type": "object" },
+                    "nota": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
