@@ -208,6 +208,8 @@ Las 3 tools de fotografía creadas el 2026-05-19 están disponibles para ChatGPT
 
 **Beneficio**: desde Claude Desktop se podrá preguntar directamente _"¿cuánto tiempo máximo sin estelas con 14mm f/2,8 en Full Frame 24MP?"_ y Claude llamará a la tool en lugar de aproximar.
 
+> ⚠️ **Nota importante**: mientras no se haga este cambio, las tools de fotografía **tampoco aparecerán en los directorios MCP** (mcp.so, Smithery, PulseMCP, Glama). Cualquier IA que consuma el servidor MCP no las verá. Solo son accesibles desde el GPT de ChatGPT.
+
 ---
 
 *Documento generado en sesión 2026-05-19. Retomar en nueva sesión con este archivo como contexto.*
