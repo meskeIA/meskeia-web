@@ -1,0 +1,30 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card/v1.0",
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "serverInfo": {
+    "name": "meskeia-mcp",
+    "title": "meskeIA MCP",
+    "version": "1.0.0",
+    "description": "160+ calculadoras fiscales, financieras, laborales y de salud en español. Cubre IRPF, autónomos, hipotecas, sucesiones, nóminas, inversiones, IMC y más. Sin registro, sin API key.",
+    "homepage": "https://meskeia.com/developers/"
+  },
+  "description": "Servidor MCP público de meskeIA con 160+ herramientas especializadas en fiscalidad española, finanzas, derecho laboral y salud. Compatible con Claude Desktop, Cursor, Windsurf y cualquier cliente MCP estándar. Gratuito, sin registro, sin API key. Cada respuesta incluye aviso legal sobre el carácter orientativo del resultado.",
+  "iconUrl": "https://meskeia.com/icon-512x512.png",
+  "documentationUrl": "https://meskeia.com/developers/",
+  "termsOfServiceUrl": "https://meskeia.com/developers/terminos/",
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://meskeia.com/api/mcp"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  },
+  "authentication": {
+    "required": false,
+    "schemes": []
+  },
+  "tags": ["finance", "fiscal", "legal", "health", "spanish", "tax", "utilities"]
+}
