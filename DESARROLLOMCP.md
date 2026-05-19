@@ -113,7 +113,7 @@
 
 ---
 
-### ⏳ Paso 2 — Términos de Uso de la API
+### ✅ Paso 2 — Términos de Uso de la API (completado 2026-05-19)
 
 **Objetivo**: Página legal que transfiere responsabilidad al integrador.
 
@@ -273,3 +273,4 @@ El MCP es el canal correcto para que las IAs usen meskeIA.
 | 2026-05-19 | Documento creado. Plan definido en 4 pasos |
 | 2026-05-19 | Paso 1 Fase 1A: avisos aplicados a 15 tools críticas |
 | 2026-05-19 | Paso 1 Fase 1B: avisos aplicados a 132 returns en el resto de tools — Paso 1 COMPLETADO |
+| 2026-05-19 | Paso 2: página /developers/terminos creada — 12 secciones, exención de responsabilidad, obligaciones del integrador |
