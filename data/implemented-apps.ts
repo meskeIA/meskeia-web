@@ -1104,6 +1104,7 @@ export const implementedAppsUrls = [
   "/quiz-tipos-plantas/",                 // 40 organismos, 6 grupos taxonómicos, 3 modos de juego
   "/visualizador-reino-fungi/",           // 4 divisiones: Ascomycota, Basidiomycota, Zygomycota, Deuteromycota + diferencias con plantas
   "/visualizador-tipos-activos/",         // 6 clases de activos, matriz correlación 6×6, 4 carteras tipo
+  "/developers/",                         // Guía integración servidor MCP: 160+ calculadoras vía protocolo MCP, snippets Claude Desktop/Cursor/Windsurf
 ];
 
 /**

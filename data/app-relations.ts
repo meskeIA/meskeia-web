@@ -5273,6 +5273,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'Para Vía Láctea, 14-24 mm. Compara las focales lado a lado' },
     { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Planifica cuándo dispara: hora azul y crepúsculo astronómico' },
   ],
+
+  'developers': [
+    { url: '/calculadora-irpf/', icon: '🏛️', name: 'Calculadora IRPF', description: 'Ejemplo de herramienta fiscal disponible vía MCP' },
+    { url: '/calculadora-hipoteca/', icon: '🏦', name: 'Simulador de Hipoteca', description: 'Ejemplo de herramienta financiera disponible vía MCP' },
+    { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Ejemplo de herramienta laboral disponible vía MCP' },
+    { url: '/developers/terminos/', icon: '⚖️', name: 'Términos de Uso MCP', description: 'Condiciones legales para integradores del servidor MCP' },
+  ],
 };
 
 /**
