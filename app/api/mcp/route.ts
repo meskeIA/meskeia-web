@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Servidor MCP (Model Context Protocol) de meskeIA
  *
  * Expone las herramientas de meskeIA como tools MCP consumibles por
@@ -223,6 +223,31 @@ async function registrarUsoMCP(tool: string, aiCaller: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Avisos legales — se añaden al final de respuestas según categoría de riesgo
+// ---------------------------------------------------------------------------
+const AVISO_FISCAL =
+  '\n\n---\n⚠️ *Aviso legal: resultado orientativo generado automáticamente. ' +
+  'No constituye asesoramiento fiscal ni jurídico. meskeIA no asume responsabilidad ' +
+  'por decisiones tomadas en base a estos datos. Consulte a un asesor fiscal colegiado ' +
+  'o a la Agencia Tributaria (aeat.es) para su caso concreto.*';
+
+const AVISO_FINANCIERO =
+  '\n\n---\n⚠️ *Aviso legal: resultado orientativo generado automáticamente. ' +
+  'No constituye asesoramiento financiero ni de inversión. meskeIA no asume ' +
+  'responsabilidad por decisiones económicas tomadas en base a estos datos. ' +
+  'Consulte a un profesional financiero antes de actuar.*';
+
+const AVISO_SALUD =
+  '\n\n---\n⚠️ *Aviso legal: resultado orientativo generado automáticamente. ' +
+  'No constituye diagnóstico ni consejo médico. meskeIA no asume responsabilidad ' +
+  'por decisiones de salud tomadas en base a estos datos. ' +
+  'Consulte a un profesional sanitario para su caso concreto.*';
+
+function conAviso(texto: string, aviso: string) {
+  return { content: [{ type: 'text' as const, text: texto + aviso }] };
+}
+
+// ---------------------------------------------------------------------------
 // Función para crear el servidor MCP con todas sus herramientas
 // ---------------------------------------------------------------------------
 function crearServidorMCP(): McpServer {
@@ -437,7 +462,7 @@ function crearServidorMCP(): McpServer {
 
       lineas.push('', '⚕️ *Este resultado es orientativo. Consulta con un profesional sanitario para una valoración completa.*');
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_SALUD);
     }
   );
 
@@ -487,7 +512,7 @@ function crearServidorMCP(): McpServer {
         '💡 *Resultado orientativo. No constituye asesoramiento financiero. Consulta con un asesor antes de invertir.*',
       ].filter((l) => l !== undefined);
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -735,7 +760,7 @@ function crearServidorMCP(): McpServer {
         '⚖️ *Estimación orientativa basada en normativa 2025 (Ley 29/1987 ISD). No constituye asesoramiento fiscal. Plazo de autoliquidación: 1 mes desde la donación (Modelo 651). Consulta con un asesor fiscal.*',
       );
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -780,7 +805,7 @@ function crearServidorMCP(): McpServer {
         `💶 Total con IVA: **${fmt(r.totalConIVA)} €**`,
       ].join('\n');
 
-      return { content: [{ type: 'text', text: texto }] };
+      return conAviso(texto, AVISO_FISCAL);
     }
   );
 
@@ -851,7 +876,7 @@ function crearServidorMCP(): McpServer {
         `📚 Fuente: ${r.fuenteDatos}`,
       );
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -925,7 +950,7 @@ function crearServidorMCP(): McpServer {
         `📚 Fuente: ${r.fuenteDatos}`,
       );
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1048,7 +1073,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
       );
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1137,7 +1162,7 @@ function crearServidorMCP(): McpServer {
         `⚖️ *${r.nota}*`,
       );
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1206,7 +1231,7 @@ function crearServidorMCP(): McpServer {
 
       lineas.push('', `✅ ${r.ventajas}`);
 
-      return { content: [{ type: 'text', text: lineas.filter(l => l !== '').join('\n') }] };
+      return conAviso(lineas.filter(l => l !== '').join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1315,7 +1340,7 @@ function crearServidorMCP(): McpServer {
         `⚖️ *Estimación orientativa. Los aranceles de notaría y registro dependen de la operación exacta. Consulta con un gestor o notario antes de firmar.*`,
       );
 
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1379,7 +1404,7 @@ function crearServidorMCP(): McpServer {
         `ℹ️ Intereses totales sin amortizar: ${fmt(r.totalInteresesSinAmortizar)} €`,
         `⚖️ *Cálculo orientativo con sistema francés. Consulta con tu banco las condiciones exactas.*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1437,7 +1462,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Estimación orientativa. La pensión real la calcula la Seguridad Social según tu historial de cotización.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1491,7 +1516,7 @@ function crearServidorMCP(): McpServer {
         '',
         `💰 Total retornos (sin descontar): ${fmt(r.totalRetornos)} € | Rentabilidad bruta: ${r.rentabilidadBruta.toFixed(1).replace('.', ',')}%`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -1552,7 +1577,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Cálculo orientativo. La rentabilidad real varía. No incluye inflación ni impuestos sobre plusvalías.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -1610,7 +1635,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚖️ *Estimación orientativa. La SS calcula la pensión real a partir del historial completo de cotización del causante.*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1669,7 +1694,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Estimación orientativa. Consulta con notaría para tu situación concreta.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -1748,7 +1773,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Estimación orientativa. El tipo de IRPF real depende de tu renta total anual. Consulta con gestoría.*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -1799,7 +1824,7 @@ function crearServidorMCP(): McpServer {
         `💡 Por cada 100 € de precio, pagas **${(100 + r.porcentajeExtra).toFixed(1).replace('.', ',')} €** a plazos.`,
         `⚖️ *La TAE es aproximada. Compara siempre la TAE oficial que debe indicar el vendedor/financiador.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -1853,7 +1878,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *ROI = (Beneficio / Inversión) × 100. ROAS = Ingresos / Inversión. CAC = Inversión / Clientes captados.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -2093,7 +2118,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Estimación orientativa. Resultado muy sensible a la revalorización de la vivienda (${revalorizacionPct ?? 3}%) y la rentabilidad de la inversión alternativa (${rentabilidadInversionPct ?? 5}%). Ajusta estos parámetros a tu situación.*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -2165,7 +2190,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚖️ *La reducción es permanente y vitalicia. La SS calculará el resultado real a partir de tu historial exacto.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2231,7 +2256,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚖️ *Cálculo mensual orientativo. Los costes variables y fijos son estimaciones — verifica con tu contabilidad.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -2287,7 +2312,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ *Estimación orientativa. El tipo real varía según CCAA, deducciones específicas y modelo 145. Verificar en la Agencia Tributaria.*`,
         `📚 ${r.fuenteDatos}`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2362,7 +2387,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ *Estimación con tipos estatal + autonómico medio. La declaración real incluye deducciones autonómicas y circunstancias adicionales.*`,
         `📚 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2416,7 +2441,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ *El rendimiento neto real se calcula anualmente y puede requerir regularización al cierre del año. Verificar en la Sede Electrónica de la SS.*`,
         `📚 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2486,7 +2511,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ *Estimación orientativa. No incluye ajustes por homogeneización, coeficientes de abatimiento (acciones adquiridas antes de 1994) ni deducciones autonómicas.*`,
         `📚 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2625,7 +2650,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *Estimación orientativa basada en datos promedio. Consultar con dietista-nutricionista para un plan personalizado.*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_SALUD);
     }
   );
 
@@ -2745,7 +2770,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Estimación orientativa. El tipo exacto de AT/EP depende del CNAE de la empresa. No incluye otros costes variables (formación, EPI, dietas, etc.).*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2823,7 +2848,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Cálculo orientativo. El finiquito exacto depende del convenio colectivo, pactos individuales y sentencia judicial si hay conflicto. Consultar con asesor laboral.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2860,7 +2885,7 @@ function crearServidorMCP(): McpServer {
       const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
       if (!r.tieneDerechoPrestacion) {
-        return { content: [{ type: 'text', text: `❌ **Sin derecho a prestación contributiva**\n\n${r.motivoSinDerecho}\n\n💡 Con menos de 360 días puedes acceder al **subsidio por desempleo** si cumples los requisitos (agotamiento de prestación, rentas insuficientes, etc.). Consultar con el SEPE.` }] };
+        return conAviso(`❌ **Sin derecho a prestación contributiva**\n\n${r.motivoSinDerecho}\n\n💡 Con menos de 360 días puedes acceder al **subsidio por desempleo** si cumples los requisitos (agotamiento de prestación, rentas insuficientes, etc.). Consultar con el SEPE.`, AVISO_FISCAL);
       }
 
       const lineas = [
@@ -2885,7 +2910,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *La prestación tributa como rendimiento del trabajo en el IRPF. El SEPE calcula la cuantía exacta a partir de tu historial de cotización. Solicitar en el SEPE en los 15 días hábiles siguientes al cese.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -2970,7 +2995,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *La plusvalía municipal usa el tipo máximo orientativo del 25%. Consultar con tu Ayuntamiento el tipo exacto. El IRPF puede variar si tienes pérdidas patrimoniales a compensar.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3049,7 +3074,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Estimación orientativa. No incluye la plusvalía municipal sobre inmuebles (usar calcular_venta_inmueble para eso). El reparto real debe hacerse con notario/abogado. El impuesto se liquida en la CCAA del causante.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3128,7 +3153,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *Estimación metodología DINK ajustada. El capital real depende de tu situación familiar, gastos reales y expectativa de vida. Consultar con un corredor de seguros.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -3200,7 +3225,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ *La SL tiene costes adicionales: constitución (~3.000-5.000 €), contabilidad obligatoria (~1.500-3.000 €/año), modelo 200, etc. El umbral real de rentabilidad es mayor que el fiscal.*`,
         `📚 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3279,7 +3304,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Estimación con tipos estatal + autonómico medio. No incluye deducciones autonómicas ni circunstancias específicas. Verificar con Renta Web de la AEAT.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3332,7 +3357,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *Estimación con tramos estatales + autonómicos medios sin deducciones personales.*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -3394,7 +3419,7 @@ function crearServidorMCP(): McpServer {
         `📅 Fecha límite de presentación: **${r.fechaLimite}**`,
         `📚 Fuente: LIRPF art. 99 + RD 439/2007 art. 110 — Modelo 130 AEAT`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3450,7 +3475,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ *El subsidio no está sujeto a cotización SS durante la baja, pero sí tributa en el IRPF.*`,
         `📚 Fuente: LGSS arts. 169-176`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3510,7 +3535,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *La carencia alivia la carga a corto plazo pero incrementa el coste total del préstamo.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3586,7 +3611,7 @@ function crearServidorMCP(): McpServer {
         ].filter(l => l !== '').join('\n');
       }
 
-      return { content: [{ type: 'text', text: texto }] };
+      return conAviso(texto, AVISO_FISCAL);
     }
   );
 
@@ -3640,7 +3665,7 @@ function crearServidorMCP(): McpServer {
         r.tasaPorPeriodo !== r.tasaAnual ? `📈 Tasa por período (${r.periodicidad}): ${r.tasaPorPeriodo.toFixed(4).replace('.', ',')}%` : '',
         valorPresenteConocido && r.valorFuturo ? `\n🔮 Valor futuro de ${fmt(valorPresenteConocido)} € en ${periodos} años: **${fmt(r.valorFuturo)} €**` : '',
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -3701,7 +3726,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ ${r.advertenciaRescate}`,
         `📚 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3766,7 +3791,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *El renting incluye seguro y mantenimiento (comparación no directa). Coste neto para autónomos/empresas incluye ahorro fiscal estimado (IVA + IS/IRPF).*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -3827,7 +3852,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *Rentabilidad antes de IRPF. Usa calcular_retencion_alquiler para el impacto fiscal.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -3887,7 +3912,7 @@ function crearServidorMCP(): McpServer {
         '',
         `💡 Ambos métodos con ${pagoExtraMensual ? `${fmt(pagoExtraMensual)} € de pago extra` : 'el pago mínimo'} ahorran ${fmt(Math.min(r.avalancha.ahorroVsMinimo, r.bolaNieve.ahorroVsMinimo))} €+ en intereses vs pagar solo los mínimos.`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -3954,7 +3979,7 @@ function crearServidorMCP(): McpServer {
         `📚 Fuente: Banco de España — Guía de acceso al crédito hipotecario`,
         `⚠️ *Capacidad estimada. Los bancos aplican sus propios criterios de concesión.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4017,7 +4042,7 @@ function crearServidorMCP(): McpServer {
               r.rentabilidadAnual > 0 ? `💹 Rentabilidad generada: ${fmt(r.rentabilidadGenerada)} €` : '',
             ].join('\n'),
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -4084,7 +4109,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *Rentabilidades históricas no garantizan rendimientos futuros.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -4214,7 +4239,7 @@ function crearServidorMCP(): McpServer {
         '',
         `⚠️ *Estimación orientativa. Consulta con un asesor financiero para un plan personalizado.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4290,7 +4315,7 @@ function crearServidorMCP(): McpServer {
         `📚 ${r.fuenteDatos}`,
         `⚠️ *Estimación con tramos estatales + autonómicos medios. No incluye deducciones autonómicas ni otras fuentes de renta complejas.*`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4433,7 +4458,7 @@ function crearServidorMCP(): McpServer {
         `⚠️ ${r.advertencia}`,
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4514,7 +4539,7 @@ function crearServidorMCP(): McpServer {
         '',
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4580,7 +4605,7 @@ function crearServidorMCP(): McpServer {
         '',
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4649,7 +4674,7 @@ function crearServidorMCP(): McpServer {
         '',
         `💡 ${r.interpretacion}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -4726,7 +4751,7 @@ function crearServidorMCP(): McpServer {
         `📅 Fecha límite de presentación: **${r.fechaLimite}**`,
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4797,7 +4822,7 @@ function crearServidorMCP(): McpServer {
         '',
         `💡 ${r.interpretacion}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -4861,7 +4886,7 @@ function crearServidorMCP(): McpServer {
         '',
         `💡 ${r.interpretacion}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -4921,7 +4946,7 @@ function crearServidorMCP(): McpServer {
         `💡 ${r.consejo}`,
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -4972,7 +4997,7 @@ Encadenable con: calcular_irpf, calcular_autonomo, calcular_irpf_devolucion.`,
         `⚠️ ${r.advertencia}`,
         `📎 ${r.fuenteDatos}`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5021,7 +5046,7 @@ Encadenable con: calcular_cuota_autonomo, calcular_baja_medica, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5086,7 +5111,7 @@ Encadenable con: calcular_hipoteca, calcular_irpf, calcular_devolucion_irpf.`,
           `📎 ${r.fuenteDatos}`,
         ];
       }
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5135,7 +5160,7 @@ Encadenable con: calcular_plusvalias_irpf, calcular_reequilibrio_cartera.`,
         '',
         `📝 ${r.interpretacion}`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -5191,7 +5216,7 @@ Encadenable con: calcular_fire, calcular_plusvalias_irpf, calcular_rendimiento_b
         '',
         `💡 ${r.interpretacion}`,
       ].filter(l => l !== undefined);
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -5244,7 +5269,7 @@ Encadenable con: calcular_irpf, calcular_modelo_303, calcular_interes_demora.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5296,7 +5321,7 @@ Encadenable con: calcular_sueldo_neto, calcular_baja_medica, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5362,7 +5387,7 @@ Encadenable con: calcular_irpf, calcular_devolucion_irpf, calcular_plusvalias_ir
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5413,7 +5438,7 @@ Encadenable con: calcular_finiquito, calcular_pension_publica, calcular_baja_med
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5463,7 +5488,7 @@ Encadenable con: calcular_finiquito, calcular_pension_desempleo, calcular_irpf.`
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5516,7 +5541,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5579,7 +5604,7 @@ Encadenable con: calcular_irpf, calcular_sueldo_neto, calcular_coste_empleado.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5624,7 +5649,7 @@ Encadenable con: calcular_baja_medica, calcular_permiso_parental, calcular_sueld
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5671,7 +5696,7 @@ Encadenable con: calcular_plusvalias_irpf, calcular_retencion_alquiler, calcular
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5725,7 +5750,7 @@ Encadenable con: calcular_irpf, calcular_cuota_autonomo, calcular_modelo_303.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5786,7 +5811,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5838,7 +5863,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5892,7 +5917,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5947,7 +5972,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -5991,7 +6016,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6060,7 +6085,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6114,7 +6139,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6164,7 +6189,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6219,7 +6244,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6286,7 +6311,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6339,7 +6364,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6393,7 +6418,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6450,7 +6475,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6492,7 +6517,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6546,7 +6571,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6614,7 +6639,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6656,7 +6681,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6703,7 +6728,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6737,7 +6762,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6777,7 +6802,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6817,7 +6842,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6851,7 +6876,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6888,7 +6913,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6932,7 +6957,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -6978,7 +7003,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7021,7 +7046,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7055,7 +7080,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7099,7 +7124,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7131,7 +7156,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7170,7 +7195,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ];
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7206,7 +7231,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7247,7 +7272,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7283,7 +7308,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7305,7 +7330,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_regimen_impatriados', aiCaller);
       const resultado = calcularRegimenImpatriados(args as Parameters<typeof calcularRegimenImpatriados>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7325,7 +7350,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_recargo_equivalencia', aiCaller);
       const resultado = calcularRecargoEquivalencia(args as Parameters<typeof calcularRecargoEquivalencia>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7344,7 +7369,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_reduccion_irregular_irpf', aiCaller);
       const resultado = calcularReduccionIrregularIRPF(args as Parameters<typeof calcularReduccionIrregularIRPF>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7365,7 +7390,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_exencion_reinversion_vivienda', aiCaller);
       const resultado = calcularExencionReinversionVivienda(args as Parameters<typeof calcularExencionReinversionVivienda>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7385,7 +7410,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_jubilacion_parcial', aiCaller);
       const resultado = calcularJubilacionParcial(args as Parameters<typeof calcularJubilacionParcial>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7410,7 +7435,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_movilidad_geografica', aiCaller);
       const resultado = calcularMovilidadGeografica(args as Parameters<typeof calcularMovilidadGeografica>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7428,7 +7453,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_derechos_autor_irpf', aiCaller);
       const resultado = calcularDerechosAutorIRPF(args as Parameters<typeof calcularDerechosAutorIRPF>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7449,7 +7474,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_coeficientes_abatimiento', aiCaller);
       const resultado = calcularCoeficientesAbatimiento(args as Parameters<typeof calcularCoeficientesAbatimiento>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7475,7 +7500,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_ganancia_criptomonedas', aiCaller);
       const resultado = calcularGananciaCriptomonedas(args as Parameters<typeof calcularGananciaCriptomonedas>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7498,7 +7523,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_bonificacion_contratacion', aiCaller);
       const resultado = calcularBonificacionContratacion(args as Parameters<typeof calcularBonificacionContratacion>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7522,7 +7547,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_deduccion_idi', aiCaller);
       const resultado = calcularDeduccionIdi(args as Parameters<typeof calcularDeduccionIdi>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7549,7 +7574,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_prorrata_iva', aiCaller);
       const resultado = calcularProrrataIVA(args as Parameters<typeof calcularProrrataIVA>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7575,7 +7600,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_modelo_347', aiCaller);
       const resultado = calcularModelo347(args as Parameters<typeof calcularModelo347>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7605,7 +7630,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_empresa_familiar_isd', aiCaller);
       const resultado = calcularEmpresaFamiliarISD(args as Parameters<typeof calcularEmpresaFamiliarISD>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7636,7 +7661,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_retribucion_especie', aiCaller);
       const resultado = calcularRetribucionEspecie(args as Parameters<typeof calcularRetribucionEspecie>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7655,7 +7680,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_impuesto_grandes_fortunas', aiCaller);
       const resultado = calcularImpuestoGrandesFortunas(args as Parameters<typeof calcularImpuestoGrandesFortunas>[0]);
-      return { content: [{ type: 'text', text: JSON.stringify(resultado, null, 2) }] };
+      return conAviso(JSON.stringify(resultado, null, 2), AVISO_FISCAL);
     }
   );
 
@@ -7693,7 +7718,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7737,7 +7762,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7780,7 +7805,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7828,7 +7853,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7874,7 +7899,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7928,7 +7953,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -7977,7 +8002,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -8029,7 +8054,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
     }
   );
 
@@ -8069,7 +8094,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8122,7 +8147,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8166,7 +8191,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8200,7 +8225,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8246,7 +8271,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8286,7 +8311,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8342,7 +8367,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8387,7 +8412,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8444,7 +8469,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8497,7 +8522,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8572,7 +8597,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8623,7 +8648,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8671,7 +8696,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8734,7 +8759,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8788,7 +8813,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
@@ -8848,7 +8873,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         '',
         `*Fuente: ${resultado.fuenteDatos}*`,
       ].filter(l => l !== null && l !== '');
-      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+      return conAviso(lineas.join('\n'), AVISO_FISCAL);
     }
   );
 
