@@ -189,4 +189,25 @@ Igual que Fotografía Técnica:
 
 ---
 
+## Pendiente técnico: añadir Fotografía al servidor MCP
+
+**Estado**: lógica ya implementada, pendiente registrar en el MCP.
+
+Las 3 tools de fotografía creadas el 2026-05-19 están disponibles para ChatGPT pero **NO para Claude Desktop vía MCP**.
+
+**Lo que hay que hacer** (tarea corta, ~30 min):
+1. Abrir `app/api/mcp/route.ts`
+2. Registrar las 3 tools reutilizando `lib/calculadoras/fotografia.ts`:
+   - `calcular_profundidad_campo` — `calcularProfundidadCampo()`
+   - `calcular_astrofoto_exposicion` — `calcularAstrofoto()` (regla 500 + NPF)
+   - `calcular_exposicion_equivalente` — `calcularExposicionEquivalente()`
+3. Añadir `conAviso()` en los returns con `AVISO_TECNICO` (sin implicación fiscal/médica)
+4. Build + push → reiniciar Claude Desktop
+
+**Referencia**: el patrón de las tools de vehículos (Lote U, inline en route.ts) o cualquier tool existente en `app/api/mcp/route.ts`.
+
+**Beneficio**: desde Claude Desktop se podrá preguntar directamente _"¿cuánto tiempo máximo sin estelas con 14mm f/2,8 en Full Frame 24MP?"_ y Claude llamará a la tool en lugar de aproximar.
+
+---
+
 *Documento generado en sesión 2026-05-19. Retomar en nueva sesión con este archivo como contexto.*
