@@ -168,17 +168,21 @@
 
 ---
 
-### ⏳ Paso 4 — Distribución en directorios MCP
+### ✅ Paso 4 — Distribución en directorios MCP (completado 2026-05-19)
 
 **Objetivo**: Hacer descubrible el servidor MCP a desarrolladores de todo el mundo.
 
-| Directorio | URL envío | Prioridad |
-|-----------|-----------|-----------|
-| **mcp.so** | mcp.so/submit | Alta |
-| **Smithery.ai** | smithery.ai | Alta |
-| **Glama.ai** | glama.ai/mcp | Media |
-| **PulseMCP** | pulsemcp.com | Media |
+| Directorio | URL pública | Estado |
+|-----------|-----------|--------|
+| **mcp.so** | mcp.so/server/meskeia-mcp/meskeIA | ✅ Publicado |
+| **Smithery.ai** | smithery.ai/servers/meskeia/apps | ✅ Publicado (tools no escaneadas — ver nota) |
+| **Glama.ai** | glama.ai/mcp/servers | ✅ Enviado — pendiente de revisión editorial |
+| **PulseMCP** | pulsemcp.com | ✅ Email enviado a hello@pulsemcp.com — procesan semanalmente desde el Registro Oficial MCP |
 | GitHub repo público | github.com/new | Opcional |
+
+**Cuenta mcp.so**: login con GitHub (@meskeIA), email meskeia@proton.me
+**Cuenta Smithery.ai**: login con GitHub (@meskeIA) — slug: meskeia/apps
+**Nota Smithery**: "No capabilities found" porque Smithery no pudo auto-escanear las tools. Fix pendiente: añadir `/.well-known/mcp/server-card.json` al servidor meskeIA para que Smithery descubra las herramientas sin necesidad de conexión directa.
 
 **Información necesaria para el envío**:
 - Nombre: meskeIA MCP
@@ -275,3 +279,4 @@ El MCP es el canal correcto para que las IAs usen meskeIA.
 | 2026-05-19 | Paso 1 Fase 1B: avisos aplicados a 132 returns en el resto de tools — Paso 1 COMPLETADO |
 | 2026-05-19 | Paso 2: página /developers/terminos creada — 12 secciones, exención de responsabilidad, obligaciones del integrador |
 | 2026-05-19 | Paso 3: página /developers creada — hero, quick start con tabs, 6 categorías, 3 pasos, registrada en applications.ts |
+| 2026-05-19 | Paso 4 COMPLETADO: mcp.so ✅ + Smithery.ai ✅ + PulseMCP (email) ✅ + Glama.ai (revisión) ✅ |
