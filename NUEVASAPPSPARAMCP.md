@@ -222,25 +222,21 @@ GPT: **meskeIA — Fotografía y Videografía Técnica** (ampliado en sesión 20
 
 ---
 
-### 🔜 TANDA 3 — Cocina Técnica (pendiente, nueva sesión)
+### ✅ TANDA 3 — Cocina Técnica (2026-05-20, commit pendiente)
 
-**Decisión**: Reformas domésticas y Energía Solar descartadas para MCP (AI los resuelve bien / variabilidad de precios). Electrónica básica: apps web existentes suficientes, no justifica MCP.
+8 apps web + 8 tools MCP + 8 endpoints ChatGPT + nuevo GPT:
+- `calculadora-porcentaje-panadero` — Baker's percentage con detección automática de hidratación
+- `calculadora-hidratacion-pan` — hidratación bidireccional: agua→% y %→agua
+- `calculadora-masa-madre` — sustitución levadura fresca/seca/instantánea por masa madre + ajuste receta
+- `calculadora-temperatura-masa` — DDT: temperatura agua = DDT×3 − ambiente − harina − fricción
+- `calculadora-puntos-azucar` — 9 fases de cocción del azúcar por temperatura (100–200°C)
+- `calculadora-gelatina` — conversión entre hojas bloom 120/160/200/250, polvo y agar-agar
+- `calculadora-ganache` — ratios chocolate:nata por tipo (negro_extra/negro/semi_fondant/leche/blanco) y textura
+- `escalador-recetas` — escala no lineal para levadura/impulsores/especias, redondeo práctico por unidad
 
-**Cocina Técnica sí pasa los 4 filtros** — audiencia masiva, universal España+LATAM, fórmulas que la IA equivoca:
-
-| Tool candidata | Fórmula / por qué la IA falla |
-|---------------|-------------------------------|
-| `calcularBakersPercentage` | Confunde % de harina vs % de masa total |
-| `calcularHidratacionPan` | Bidireccional: agua→% y %→agua |
-| `calcularSustitucionMasaMadre` | Ajuste agua+harina según hidratación del fermento |
-| `calcularDDT` | Desired Dough Temperature — la IA desconoce la fórmula |
-| `calcularPuntosAzucar` | Brix/temperatura → fase (bola blanda, caramelo...) |
-| `calcularSustitucionGelatina` | Hojas vs polvo vs agar según bloom strength |
-| `calcularGanache` | Ratio chocolate/nata según % cacao para cada textura |
-| `escalarReceta` | Escalado con redondeos prácticos (levadura, temperatura, tiempo) |
-
-**GPT propuesto**: "meskeIA — Cocina Técnica" (nuevo GPT)
-**Referencia de implementación**: mismo patrón que Deporte y Videografía
+**Librería**: `lib/calculadoras/cocina.ts`
+**Schema**: `chatgpt-schema-cocina.json` — 8 paths OpenAPI 3.1
+**GPT**: "meskeIA — Cocina Técnica" (nuevo GPT pendiente de publicar en ChatGPT)
 
 ---
 
@@ -261,4 +257,10 @@ Apps identificadas en sesión 2026-05-20 que tienen valor de catálogo web pero 
 
 ---
 
-*Última actualización: 2026-05-20. Retomar Tanda 3 en nueva sesión con este archivo como contexto.*
+---
+
+### 🔜 TANDA 4 — Pendiente de definir
+
+Las 3 categorías restantes (Reformas domésticas, Energía Solar, Electrónica) no pasan el filtro MCP (ver criterios arriba). Las apps web de Reformas y Electrónica sin MCP siguen pendientes como catálogo web.
+
+*Última actualización: 2026-05-20. Tanda 3 completada en esta sesión.*

@@ -1,0 +1,746 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 0;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  margin-bottom: 30px;
+}
+
+/* Sección de raciones */
+.racionesSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.racionesGrid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.racionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.racionLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.racionInput {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 2rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.racionInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.factorIndicador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.factorFlecha {
+  font-size: 2rem;
+  color: var(--primary);
+  font-weight: 300;
+}
+
+.factorValor {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* Sección de ingredientes */
+.ingredientesSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.seccionTitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.leyendaCategorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.leyendaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.badgeNoLineal {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tabla de ingredientes (edición) */
+.tablaIngredientes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 600px;
+}
+
+.tablaIngredientes th {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.tablaIngredientes td {
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tablaIngredientes tbody tr:hover {
+  background: var(--hover);
+}
+
+.filaNoLineal {
+  background: color-mix(in srgb, #f59e0b 5%, var(--bg-card));
+}
+
+.inputTabla {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.15s;
+}
+
+.inputTabla:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputCantidad {
+  width: 90px;
+}
+
+.inputUnidad {
+  width: 70px;
+}
+
+.selectCategoria {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.selectCategoria:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.btnEliminar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.15s;
+}
+
+.btnEliminar:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #f87171;
+  color: #ef4444;
+}
+
+.btnEliminar:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+[data-theme='dark'] .btnEliminar:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444 20%, var(--bg-card));
+}
+
+.btnAnadir {
+  margin-top: 12px;
+  padding: 10px 20px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnAnadir:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-card));
+}
+
+.btnAnadir:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Botones de acción */
+.botonesAccion {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btnCalcular {
+  flex: 1;
+  padding: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btnCalcular:hover:not(:disabled) {
+  background: var(--secondary);
+}
+
+.btnCalcular:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnCalcular:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnReset {
+  padding: 16px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnReset:hover {
+  border-color: var(--text-secondary);
+  background: var(--hover);
+}
+
+.btnReset:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Resultado */
+.resultadoSection {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.resultadoTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.factorBadge {
+  background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
+  color: var(--primary);
+  font-size: 0.9rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.advertenciasBox {
+  background: color-mix(in srgb, #f59e0b 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.advertencia {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+}
+
+/* Tabla resultado */
+.tablaResultado {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 500px;
+}
+
+.tablaResultado th {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.tablaResultado td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tablaResultado tbody tr:hover {
+  background: var(--hover);
+}
+
+.filaNoLinealResultado {
+  background: color-mix(in srgb, #f59e0b 5%, var(--bg-card)) !important;
+}
+
+.celNombre {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.celNueva {
+  font-size: 1.05rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badgeAjustado {
+  color: #f59e0b;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.categoriaBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.categoriaBadgeNoLineal {
+  background: color-mix(in srgb, #f59e0b 12%, var(--bg-card));
+  color: #92400e;
+  border-color: color-mix(in srgb, #f59e0b 40%, transparent);
+}
+
+[data-theme='dark'] .categoriaBadgeNoLineal {
+  color: #fbbf24;
+  background: color-mix(in srgb, #f59e0b 15%, var(--bg-card));
+}
+
+.notasBox {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 0.88rem;
+}
+
+.notasBox strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.notasList {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.notasList li {
+  margin-bottom: 4px;
+}
+
+.notaHornoBox {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--secondary) 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--secondary) 25%, transparent);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 16px;
+  font-size: 0.88rem;
+}
+
+.notaHornoBox strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.notaHornoBox p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Educational Section ─────────────────────────────────────────────────── */
+
+.educationalContent {
+  padding: 8px 0;
+}
+
+.conceptoSection {
+  margin-bottom: 40px;
+}
+
+.conceptoSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.conceptoSection p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.tipCard h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.tipIcon {
+  display: block;
+  font-size: 1.7rem;
+  margin-bottom: 8px;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-top: 12px;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTable th {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.escenarioIcon {
+  font-size: 1.4rem;
+}
+
+.escenarioHeader strong {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.escenarioExample {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.escenarioTip {
+  font-size: 0.78rem;
+  color: var(--secondary);
+  font-style: italic;
+}
+
+.warningBox {
+  background: color-mix(in srgb, #f59e0b 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 8px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningHeader strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 14px;
+  border-left: 3px solid color-mix(in srgb, #f59e0b 50%, transparent);
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ─── Dark Mode ───────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .racionInput,
+[data-theme='dark'] .inputTabla,
+[data-theme='dark'] .selectCategoria {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tipCard,
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .notasBox {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .filaNoLineal,
+[data-theme='dark'] .filaNoLinealResultado {
+  background: color-mix(in srgb, #f59e0b 8%, var(--bg-card)) !important;
+}
+
+[data-theme='dark'] .warningBox {
+  background: color-mix(in srgb, #f59e0b 10%, var(--bg-card));
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 28px 20px;
+    margin-top: 70px;
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .racionesGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    justify-items: center;
+  }
+
+  .racionInput {
+    font-size: 1.5rem;
+    padding: 10px;
+  }
+
+  .factorIndicador {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .factorFlecha {
+    font-size: 1.5rem;
+  }
+
+  .botonesAccion {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .racionInput,
+  .inputTabla,
+  .btnCalcular,
+  .btnAnadir,
+  .btnEliminar {
+    transition: none;
+  }
+}

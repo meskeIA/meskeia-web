@@ -5362,6 +5362,56 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Ejemplo de herramienta laboral disponible vía MCP' },
     { url: '/developers/terminos/', icon: '⚖️', name: 'Términos de Uso MCP', description: 'Condiciones legales para integradores del servidor MCP' },
   ],
+
+  // ── Cocina Técnica (Tanda 3 MCP — 2026-05-20) ──────────────────────────────
+  'calculadora-porcentaje-panadero': [
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Calcula o convierte el porcentaje de agua de tu masa' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura comercial a masa madre con ajuste de receta' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta tu fórmula de pan a más o menos piezas' },
+    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'Temperatura del agua para controlar la fermentación' },
+  ],
+  'calculadora-hidratacion-pan': [
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Expresa cada ingrediente como % del peso de harina' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura a fermento natural con ajuste de agua' },
+    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'La temperatura del agua afecta la hidratación percibida' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta todos los ingredientes al número de panes que quieres' },
+  ],
+  'calculadora-masa-madre': [
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Entiende la receta original en formato profesional' },
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Ajusta la hidratación total tras añadir la masa madre' },
+    { url: '/calculadora-temperatura-masa/', icon: '🌡️', name: 'Temperatura de la Masa (DDT)', description: 'Controla la fermentación con la temperatura del agua' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Escala toda la receta de pan, incluida la masa madre' },
+  ],
+  'calculadora-temperatura-masa': [
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'La temperatura afecta cómo se integra el agua en la masa' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema profesional para formular cualquier receta de pan' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'El preferment a temperatura correcta mejora la fermentación' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'La DDT no cambia al escalar, pero otros ingredientes sí' },
+  ],
+  'calculadora-puntos-azucar': [
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas según tipo de chocolate y textura' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de azúcar y demás ingredientes' },
+    { url: '/calculadora-gelatina/', icon: '🟡', name: 'Sustitución de Gelatina', description: 'Para recetas que combinan caramelo y gelificación' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema de porcentajes para otras preparaciones de pastelería' },
+  ],
+  'calculadora-gelatina': [
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones de chocolate y nata para entremets y mousses' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Temperatura del almíbar para glasas y caramelos con gelatina' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta la gelatina y demás ingredientes a más raciones' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema de proporciones para pastelería profesional' },
+  ],
+  'calculadora-ganache': [
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Temperatura para glasas y caramelos con los que combinar el ganache' },
+    { url: '/calculadora-gelatina/', icon: '🟡', name: 'Sustitución de Gelatina', description: 'Añade firmeza a mousses y bavarois de chocolate' },
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las proporciones a la cantidad total que necesitas' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Aplica el mismo sistema de proporciones a otras preparaciones' },
+  ],
+  'escalador-recetas': [
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema de proporciones para escalar recetas de pan sin errores' },
+    { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Verifica la hidratación tras escalar tu masa' },
+    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura a masa madre al reescalar recetas' },
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas para cualquier cantidad de ganache' },
+  ],
 };
 
 /**

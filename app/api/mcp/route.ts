@@ -201,6 +201,24 @@ import { calcularProfundidadCampo, calcularAstrofoto, calcularExposicionEquivale
 import { calcularPrediccionRunning, calcularZonasCardiacas, calcular1RM, calcularPotenciaCiclismo, calcularPaceRunning, calcularSWOLF } from '@/lib/calculadoras/deporte';
 // ── Videografía:
 import { calcularRegla180, calcularCamaraLenta, calcularFiltroNDVideo, calcularBitrateVideo, calcularFOVVideo, type TipoResolucionVideo, type TipoCodecVideo } from '@/lib/calculadoras/videografia';
+// ── Cocina Técnica:
+import {
+  calcularBakersPercentage,
+  calcularHidratacionPan,
+  calcularSustitucionMasaMadre,
+  calcularDDT,
+  calcularPuntosAzucar,
+  calcularSustitucionGelatina,
+  calcularGanache,
+  escalarReceta,
+  type ModoHidratacion,
+  type TipoLevaduraOrigen,
+  type TipoAmasadora,
+  type TipoGelatina,
+  type TipoChocolate,
+  type TexturaGanache,
+  type CategoriaIngrediente,
+} from '@/lib/calculadoras/cocina';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -9716,6 +9734,331 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         ``,
         `📊 **Comparativa de sensores con ${focal_mm}mm:**`,
         ...r.comparativa.map(c => `   ${c.nombre.padEnd(28)} ${c.fov_h}° horizontal (equiv. ${c.focal_eq_ff}mm FF)`),
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOLS: Cocina Técnica
+  // ------------------------------------------------------------------
+
+  // TOOL: calcular_porcentaje_panadero
+  servidor.tool(
+    'calcular_porcentaje_panadero',
+    "Calcula el porcentaje del panadero (baker's percentage) para una receta. " +
+    'La harina siempre es 100%; cada ingrediente se expresa como % de su peso. ' +
+    'Detecta el agua automáticamente para calcular la hidratación.',
+    {
+      harina_g: z.number().positive()
+        .describe('Peso de la harina en gramos (siempre 100% en el sistema del panadero).'),
+      ingredientes: z.array(z.object({
+        nombre: z.string().describe('Nombre del ingrediente (agua, sal, levadura, mantequilla...).'),
+        gramos: z.number().positive().describe('Peso del ingrediente en gramos.'),
+      })).describe('Lista de ingredientes además de la harina.'),
+      peso_porcion_g: z.number().positive().optional()
+        .describe('Peso de cada pieza/porción en gramos. Opcional: calcula el número de porciones.'),
+    },
+    async ({ harina_g, ingredientes, peso_porcion_g }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_porcentaje_panadero', aiCaller);
+
+      const r = calcularBakersPercentage(harina_g, ingredientes, peso_porcion_g);
+
+      const lineas = [
+        `🥖 **Porcentaje del Panadero — ${harina_g}g harina (100%)**`,
+        ``,
+        `📊 **Ingredientes:**`,
+        ...r.ingredientes.map(i => `   ${i.nombre.padEnd(22)} ${i.gramos}g = **${i.porcentajePanadero}%**`),
+        ``,
+        `💧 **Hidratación: ${r.hidratacion_pct}%** (agua/harina)`,
+        `⚖️ Peso total de masa: ${r.pesoMasa_g}g`,
+        ...(r.rendimiento_porciones !== undefined ? [`🍞 Porciones (~${peso_porcion_g}g/ud.): **${r.rendimiento_porciones}**`] : []),
+        ``,
+        `ℹ️ El % del panadero siempre usa la harina como 100% — no el peso total de la masa.`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // TOOL: calcular_hidratacion_pan
+  servidor.tool(
+    'calcular_hidratacion_pan',
+    'Calcula la hidratación de una masa de pan o los gramos de agua necesarios para una hidratación objetivo. ' +
+    'Bidireccional: agua→% o %→agua. Clasifica la hidratación y da ejemplos de panes típicos.',
+    {
+      modo: z.enum(['calcular_porcentaje', 'calcular_agua']).optional()
+        .describe('calcular_porcentaje: da harina_g + agua_g → devuelve %. calcular_agua: da harina_g + hidratacion_pct → devuelve gramos de agua. Por defecto calcular_porcentaje.'),
+      harina_g: z.number().positive().describe('Peso de la harina en gramos.'),
+      agua_g: z.number().positive().optional().describe('Gramos de agua. Requerido si modo=calcular_porcentaje.'),
+      hidratacion_pct: z.number().positive().optional().describe('Porcentaje de hidratación objetivo. Requerido si modo=calcular_agua.'),
+    },
+    async ({ modo, harina_g, agua_g, hidratacion_pct }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_hidratacion_pan', aiCaller);
+
+      const modoEfectivo: ModoHidratacion = modo ?? 'calcular_porcentaje';
+      const valorInput = modoEfectivo === 'calcular_porcentaje' ? (agua_g ?? 0) : (hidratacion_pct ?? 0);
+      const r = calcularHidratacionPan(modoEfectivo, harina_g, valorInput);
+
+      const lineas = [
+        `💧 **Hidratación del Pan**`,
+        ``,
+        `🌾 Harina: ${r.harina_g}g | 💦 Agua: **${r.agua_g}g** | Hidratación: **${r.hidratacion_pct}%**`,
+        ``,
+        `📊 **Clasificación: ${r.clasificacion}**`,
+        `   ${r.descripcion}`,
+        ``,
+        `🍞 Panes típicos: ${r.ejemplos.join(' · ')}`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // TOOL: calcular_sustitucion_masa_madre
+  servidor.tool(
+    'calcular_sustitucion_masa_madre',
+    'Calcula cuánta masa madre activa usar para sustituir levadura fresca, seca o instantánea. ' +
+    'Incluye el ajuste de harina y agua que hay que restar de la receta para compensar lo que aporta la masa madre.',
+    {
+      tipo_levadura: z.enum(['fresca', 'seca', 'instantanea']).optional()
+        .describe('Tipo de levadura de la receta original. Por defecto seca.'),
+      levadura_g: z.number().positive().describe('Gramos de levadura que pide la receta.'),
+      hidratacion_mm_pct: z.number().positive().optional()
+        .describe('Hidratación de tu masa madre en % (agua/harina × 100). Por defecto 100 (igual de harina que agua).'),
+    },
+    async ({ tipo_levadura, levadura_g, hidratacion_mm_pct }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_sustitucion_masa_madre', aiCaller);
+
+      const tipo: TipoLevaduraOrigen = tipo_levadura ?? 'seca';
+      const r = calcularSustitucionMasaMadre(tipo, levadura_g, hidratacion_mm_pct ?? 100);
+
+      const lineas = [
+        `🦠 **Sustitución de Levadura por Masa Madre**`,
+        ``,
+        `🔄 Levadura original: ${r.levadura_original_g}g (${r.levadura_original_tipo})`,
+        `→ **Masa madre necesaria: ${r.masa_madre_g}g** (hidratación ${r.hidratacion_mm_pct}%)`,
+        ``,
+        `📋 **Ajuste de receta:**`,
+        `   Restar harina: ${r.harina_restar_g}g`,
+        `   Restar agua: ${r.agua_restar_g}g`,
+        ``,
+        `⏱️ **Fermentación**: ${r.tiempo_fermentacion}`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // TOOL: calcular_temperatura_masa
+  servidor.tool(
+    'calcular_temperatura_masa',
+    'Calcula la temperatura exacta del agua de amasado para alcanzar la DDT (Desired Dough Temperature). ' +
+    'Usa la fórmula T_agua = DDT×3 − T_ambiente − T_harina − T_fricción, con variante de 4 factores si hay preferment.',
+    {
+      ddt_objetivo_c: z.number().optional()
+        .describe('Temperatura final deseada de la masa en °C. Típico: 23-25°C para masa madre, 26-28°C para levadura comercial. Por defecto 24°C.'),
+      t_ambiente_c: z.number()
+        .describe('Temperatura ambiente de la cocina en °C.'),
+      t_harina_c: z.number().optional()
+        .describe('Temperatura de la harina en °C. Si no se indica, se asume igual a la temperatura ambiente.'),
+      tipo_amasadora: z.enum(['manual', 'kitchen_aid', 'amasadora_espiral', 'thermomix']).optional()
+        .describe('Tipo de amasado (cada uno genera distinta fricción). Por defecto manual.'),
+      t_preferment_c: z.number().optional()
+        .describe('Temperatura del preferment (poolish, levain, biga) si la receta lo usa. Activa la fórmula de 4 factores.'),
+    },
+    async ({ ddt_objetivo_c, t_ambiente_c, t_harina_c, tipo_amasadora, t_preferment_c }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_temperatura_masa', aiCaller);
+
+      const ddt = ddt_objetivo_c ?? 24;
+      const tHarina = t_harina_c ?? t_ambiente_c;
+      const tipoAmas: TipoAmasadora = tipo_amasadora ?? 'manual';
+      const r = calcularDDT(ddt, t_ambiente_c, tHarina, tipoAmas, t_preferment_c);
+
+      const lineas = [
+        `🌡️ **DDT — Temperatura de la Masa**`,
+        ``,
+        `🎯 Temperatura objetivo de la masa: ${r.ddt_objetivo_c}°C`,
+        `🔧 Amasadora: ${r.factorFricion_descripcion} (+${r.t_friccion_c}°C fricción)`,
+        ``,
+        `💧 **Temperatura del agua recomendada: ${r.temperatura_agua_c}°C (${r.temperatura_agua_f}°F)**`,
+        ``,
+        `💡 ${r.interpretacion}`,
+        ...(r.advertencia ? [`⚠️ ${r.advertencia}`] : []),
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // TOOL: calcular_puntos_azucar
+  servidor.tool(
+    'calcular_puntos_azucar',
+    'Identifica la fase de cocción del azúcar según la temperatura en °C: almíbar ligero, bola blanda, ' +
+    'bola firme, bola dura, caramelo blando, caramelo duro, caramelo rubio, caramelo oscuro. ' +
+    'Incluye usos típicos y prueba del vaso de agua fría.',
+    {
+      temperatura_c: z.number()
+        .describe('Temperatura del almíbar en °C medida con termómetro de cocina. Rango útil: 100–200°C.'),
+    },
+    async ({ temperatura_c }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_puntos_azucar', aiCaller);
+
+      const r = calcularPuntosAzucar(temperatura_c);
+
+      const lineas = r.fase ? [
+        `🍬 **Puntos del Azúcar — ${temperatura_c}°C (${r.temperatura_f}°F)**`,
+        ``,
+        `✅ **Fase actual: ${r.fase.nombre}** (${r.fase.nombre_en})`,
+        `   Rango: ${r.fase.temp_min_c}–${r.fase.temp_max_c}°C`,
+        `   ${r.fase.descripcion}`,
+        ``,
+        `🍴 Usos típicos: ${r.fase.usosTipicos.join(', ')}`,
+        `🧪 Prueba agua fría: ${r.fase.prueba_agua_fria}`,
+        ...(r.fase_siguiente ? [``, `⏭️ Siguiente: ${r.fase_siguiente.nombre} (desde ${r.fase_siguiente.temp_min_c}°C)`] : []),
+        ...(r.advertencia ? [``, `⚠️ ${r.advertencia}`] : []),
+      ] : [
+        `🍬 **${temperatura_c}°C** — Temperatura entre fases`,
+        ...(r.fase_anterior ? [`⬅️ Fase anterior: ${r.fase_anterior.nombre} (hasta ${r.fase_anterior.temp_max_c}°C)`] : []),
+        ...(r.fase_siguiente ? [`➡️ Siguiente fase: ${r.fase_siguiente.nombre} (desde ${r.fase_siguiente.temp_min_c}°C)`] : []),
+        ...(r.advertencia ? [``, `⚠️ ${r.advertencia}`] : []),
+      ];
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // TOOL: calcular_sustitucion_gelatina
+  servidor.tool(
+    'calcular_sustitucion_gelatina',
+    'Convierte entre tipos de gelatina según el bloom strength: hojas de bronce (120), plata (160), ' +
+    'oro (200, estándar europeo), platino (250), gelatina en polvo 200/250 bloom y agar-agar. ' +
+    'Devuelve la tabla completa de equivalencias en gramos y hojas.',
+    {
+      tipo_origen: z.enum(['hoja_bronce', 'hoja_plata', 'hoja_oro', 'hoja_platino', 'polvo_200', 'polvo_250', 'agar_agar'])
+        .describe('Tipo de gelatina que tienes o que indica la receta. hoja_oro es la más común en supermercados.'),
+      cantidad: z.number().positive()
+        .describe('Cantidad a convertir (en gramos u hojas según la unidad).'),
+      unidad: z.enum(['gramos', 'hojas']).optional()
+        .describe('Unidad de medida. hojas solo aplica para tipos hoja_*. Por defecto gramos.'),
+    },
+    async ({ tipo_origen, cantidad, unidad }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_sustitucion_gelatina', aiCaller);
+
+      const tipoG: TipoGelatina = tipo_origen;
+      const r = calcularSustitucionGelatina(tipoG, cantidad, unidad ?? 'gramos');
+
+      const origen = r.origen.hojas
+        ? `${r.origen.hojas} hojas (${r.origen.cantidad_g}g)`
+        : `${r.origen.cantidad_g}g`;
+
+      const lineas = [
+        `🟡 **Sustitución de Gelatina — ${origen} de ${r.origen.nombre}**`,
+        ``,
+        `📊 **Equivalencias:**`,
+        ...r.equivalentes.map(e => {
+          const cant = e.hojas ? `${e.hojas} hojas (${e.cantidad_g}g)` : `${e.cantidad_g}g`;
+          return `   ${e.nombre.padEnd(35)} → **${cant}**`;
+        }),
+        ...(r.advertencia_agar ? [``, `⚠️ ${r.advertencia_agar}`] : []),
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // TOOL: calcular_ganache
+  servidor.tool(
+    'calcular_ganache',
+    'Calcula las proporciones exactas de chocolate y nata para un ganache según el tipo de chocolate ' +
+    '(negro extra/negro/semi-fondant/con leche/blanco) y la textura deseada (glaseado/trufa/firme). ' +
+    'El ratio se ajusta automáticamente al porcentaje de cacao.',
+    {
+      tipo_chocolate: z.enum(['negro_extra', 'negro', 'semi_fondant', 'con_leche', 'blanco']).optional()
+        .describe('negro_extra >70% | negro 55-70% | semi_fondant 40-55% | con_leche 28-40% | blanco 0% cacao. Por defecto negro.'),
+      textura: z.enum(['glaseado', 'trufa', 'firme']).optional()
+        .describe('glaseado: fluido para tartas/eclairs | trufa: para bolear trufas y rellenar bombones | firme: muy denso para modelar. Por defecto trufa.'),
+      total_g: z.number().positive().optional()
+        .describe('Gramos totales de ganache a preparar. Por defecto 200g.'),
+    },
+    async ({ tipo_chocolate, textura, total_g }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_ganache', aiCaller);
+
+      const tipoChoc: TipoChocolate = tipo_chocolate ?? 'negro';
+      const tex: TexturaGanache = textura ?? 'trufa';
+      const r = calcularGanache(tipoChoc, tex, total_g ?? 200);
+
+      const lineas = [
+        `🍫 **Ganache de Chocolate — ${r.total_g}g total (${r.textura})**`,
+        ``,
+        `🍫 Tipo: ${r.tipo_chocolate.replace('_', ' ')} (${r.porcentaje_cacao})`,
+        ``,
+        `📊 **Proporciones:**`,
+        `   🍫 Chocolate: **${r.chocolate_g}g**`,
+        `   🥛 Nata: **${r.nata_g}g**`,
+        `   📐 ${r.ratio_texto}`,
+        ``,
+        `🌡️ Temperatura de trabajo: ${r.temperatura_trabajo_c}`,
+        ``,
+        `✨ Usos: ${r.usos.join(' · ')}`,
+        `📝 Nota: ${r.nota}`,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
+    }
+  );
+
+  // TOOL: escalar_receta
+  servidor.tool(
+    'escalar_receta',
+    'Escala una receta a más o menos raciones. Aplica factor no lineal para levadura, ' +
+    'polvo de hornear y especias. Redondea cantidades de forma práctica según la unidad. ' +
+    'La temperatura del horno no cambia; indica si el tiempo necesita ajuste.',
+    {
+      raciones_original: z.number().positive()
+        .describe('Número de raciones/porciones de la receta original.'),
+      raciones_nueva: z.number().positive()
+        .describe('Número de raciones/porciones que quieres obtener.'),
+      ingredientes: z.array(z.object({
+        nombre: z.string().describe('Nombre del ingrediente.'),
+        cantidad: z.number().positive().describe('Cantidad en la receta original.'),
+        unidad: z.string().describe('Unidad: g, kg, ml, l, cucharada, cucharadita, etc.'),
+        categoria: z.enum(['normal', 'levadura', 'impulsores', 'sal', 'especias']).optional()
+          .describe('Categoría para escala: levadura e impulsores no escalan linealmente. Por defecto normal.'),
+      })).describe('Lista de ingredientes de la receta original.'),
+    },
+    async ({ raciones_original, raciones_nueva, ingredientes }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('escalar_receta', aiCaller);
+
+      const ings = ingredientes.map(i => ({
+        nombre: i.nombre,
+        cantidad: i.cantidad,
+        unidad: i.unidad,
+        categoria: i.categoria as CategoriaIngrediente | undefined,
+      }));
+      const r = escalarReceta(raciones_original, raciones_nueva, ings);
+
+      const lineas = [
+        `⚖️ **Escalador de Recetas — ${raciones_original} → ${raciones_nueva} raciones (×${r.factor_escala})**`,
+        ``,
+        `📋 **Ingredientes ajustados:**`,
+        ...r.ingredientes.map(i => {
+          const ajuste = i.nota ? ' ⚠️' : '';
+          return `   ${i.nombre.padEnd(22)} ${i.cantidad_original}${i.unidad} → **${i.cantidad_redondeada}**${ajuste}`;
+        }),
+        ``,
+        `🔥 ${r.nota_horno}`,
+        ...(r.advertencias.length > 0 ? [``, ...r.advertencias.map(a => `⚠️ ${a}`)] : []),
+        ...(r.ingredientes.some(i => i.nota) ? [``, `📝 Notas de ajuste:`, ...r.ingredientes.filter(i => i.nota).map(i => `   • ${i.nombre}: ${i.nota}`)] : []),
       ].join('\n');
 
       return { content: [{ type: 'text', text: lineas }] };

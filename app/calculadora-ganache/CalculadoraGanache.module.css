@@ -1,0 +1,748 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Hero */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 40px 30px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 0;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Main Content */
+.mainContent {
+  margin-bottom: 30px;
+}
+
+/* Pasos */
+.paso {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.pasoTitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pasoBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Tarjetas de tipo de chocolate */
+.chocolateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.chocolateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.chocolateCard:hover {
+  border-color: var(--secondary);
+  background: var(--hover);
+}
+
+.chocolateCardActiva {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.chocolateEmoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.chocolateNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.chocolateRango {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.chocolateDesc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Tarjetas de textura */
+.texturaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.texturaCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.texturaCard:hover {
+  border-color: var(--secondary);
+  background: var(--hover);
+}
+
+.texturaCardActiva {
+  border-color: var(--secondary);
+  background: color-mix(in srgb, var(--secondary) 8%, var(--bg-card));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary) 25%, transparent);
+}
+
+.texturaEmoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.texturaNombre {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.texturaDesc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Input cantidad */
+.cantidadRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputCantidad {
+  width: 120px;
+  padding: 12px 16px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.inputCantidad:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputUnidad {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.cantidadHint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Botón calcular */
+.btnCalcular {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btnCalcular:hover {
+  background: var(--secondary);
+}
+
+.btnCalcular:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Resultado */
+.resultadoSection {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.resultadoTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 24px;
+}
+
+.propGrid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.propCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 28px;
+  min-width: 130px;
+  text-align: center;
+}
+
+.propCardTotal {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg-card));
+}
+
+.propLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.propValor {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.propSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.propSeparador {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text-muted);
+}
+
+.ratioBox {
+  background: var(--bg-primary);
+  border-left: 3px solid var(--secondary);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.temperaturaBox {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.temperaturaIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.temperaturaBox p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+
+.usosSection {
+  margin-bottom: 16px;
+}
+
+.usosSection strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.usosList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.usoItem {
+  background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card));
+  color: var(--secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+[data-theme='dark'] .usoItem {
+  background: color-mix(in srgb, var(--secondary) 20%, var(--bg-card));
+}
+
+.notaBox {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Tabla de referencia */
+.tablaReferencia {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tablaRefTitulo {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.tablaRatios {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaRatios th,
+.tablaRatios td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaRatios th {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tablaRatios tbody tr:hover {
+  background: var(--hover);
+}
+
+.filaActiva {
+  background: color-mix(in srgb, var(--primary) 5%, var(--bg-card)) !important;
+  font-weight: 600;
+}
+
+.celdaActiva {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.celdaRango {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.tablaNota {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding-top: 8px !important;
+}
+
+/* ─── Educational Section ─────────────────────────────────────────────────── */
+
+.educationalContent {
+  padding: 8px 0;
+}
+
+.conceptoSection {
+  margin-bottom: 40px;
+}
+
+.conceptoSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.conceptoSection p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.tipCard h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.tipIcon {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-top: 12px;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparativaTable th {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.escenarioIcon {
+  font-size: 1.5rem;
+}
+
+.escenarioHeader strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.escenarioExample {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.escenarioTip {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-style: italic;
+}
+
+.warningBox {
+  background: color-mix(in srgb, #f59e0b 8%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 8px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningHeader strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 16px;
+  border-left: 3px solid color-mix(in srgb, #f59e0b 50%, transparent);
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ─── Dark Mode ───────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .chocolateCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .chocolateCardActiva {
+  background: color-mix(in srgb, var(--primary) 15%, var(--bg-card));
+}
+
+[data-theme='dark'] .texturaCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .texturaCardActiva {
+  background: color-mix(in srgb, var(--secondary) 15%, var(--bg-card));
+}
+
+[data-theme='dark'] .tipCard,
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .propCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .filaActiva {
+  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)) !important;
+}
+
+[data-theme='dark'] .warningBox {
+  background: color-mix(in srgb, #f59e0b 10%, var(--bg-card));
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 28px 20px;
+    margin-top: 70px;
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .texturaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .propGrid {
+    gap: 10px;
+  }
+
+  .propValor {
+    font-size: 1.8rem;
+  }
+
+  .paso {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chocolateCard,
+  .texturaCard,
+  .btnCalcular {
+    transition: none;
+  }
+}
