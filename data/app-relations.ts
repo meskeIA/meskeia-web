@@ -2534,10 +2534,21 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-fisica': [{ url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora Movimiento', description: 'MRU, MRUA, caída libre' }, { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ohm, potencia' }, { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm, potencia' }, { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }],
   'simulador-circuitos-electricos': [
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm y potencia básica' },
+    { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuito LED' },
     { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales interactivas' },
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
   ],
-  'calculadora-electricidad': [{ url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' }],
+  'calculadora-electricidad': [
+    { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuitos LED' },
+    { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' },
+    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' },
+    { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
+  ],
+  'calculadora-resistencias-led': [
+    { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora Electricidad', description: 'Ley de Ohm, potencia y circuitos' },
+    { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' },
+    { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hex, octal y bit a bit' },
+  ],
   'tabla-periodica': [
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tu química' },
     { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos paso a paso' },
