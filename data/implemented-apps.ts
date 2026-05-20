@@ -1104,6 +1104,11 @@ export const implementedAppsUrls = [
   "/simulador-balance-blancos/",          // Slider Kelvin 2500-10000K, 3 escenas (tungsteno/nublado/atardecer), indicador WB correcto, presets de cámara
   "/calculadora-profundidad-campo/",      // DoF + hiperfocal + Dn/Df, 4 sensores, regla SVG logarítmica, 5 presets típicos
   "/calculadora-regla-500-npf-astrofoto/", // Tiempo máximo sin estelas: regla 500 + NPF con declinación, visualización de cielo con estrellas/estelas
+  "/calculadora-regla-180-video/",         // Obturador correcto por fps (regla 180°), tabla de referencia 24–240fps
+  "/calculadora-camara-lenta/",            // Factor slow motion, obturador correcto, duración clip ralentizado
+  "/calculadora-filtro-nd-video/",         // Paradas ND necesarias para regla 180° en exteriores, ND2–ND1000
+  "/calculadora-bitrate-video/",           // Bitrate y tamaño de archivo por resolución, fps y códec
+  "/calculadora-fov-video/",               // FOV horizontal/vertical/diagonal, comparativa 4 sensores
   "/visualizador-reino-vegetal/",         // Árbol interactivo criptógamas/fanerógamas, 16 grupos, tabla comparativa y ciclos de vida
   "/visualizador-adaptaciones-plantas/",  // 6 hábitats extremos, 8 mecanismos adaptativos, 5 géneros carnívoras
   "/quiz-biologia-molecular/",            // 30 preguntas: ADN/ARN, replicación, transcripción, traducción, mutaciones

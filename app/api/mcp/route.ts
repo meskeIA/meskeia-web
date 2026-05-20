@@ -199,6 +199,8 @@ import { calcularDeduccionDobleImposicionIS, type TipoRentaExtranjera, type Meto
 import { calcularProfundidadCampo, calcularAstrofoto, calcularExposicionEquivalente, type TipoSensor, type ParametroFijo } from '@/lib/calculadoras/fotografia';
 // ── Deporte:
 import { calcularPrediccionRunning, calcularZonasCardiacas, calcular1RM, calcularPotenciaCiclismo, calcularPaceRunning, calcularSWOLF } from '@/lib/calculadoras/deporte';
+// ── Videografía:
+import { calcularRegla180, calcularCamaraLenta, calcularFiltroNDVideo, calcularBitrateVideo, calcularFOVVideo, type TipoResolucionVideo, type TipoCodecVideo } from '@/lib/calculadoras/videografia';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -9529,6 +9531,194 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       ];
 
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_regla_180_video
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_regla_180_video',
+    'Calcula la velocidad de obturación correcta para vídeo según la regla de los 180°. ' +
+    'El obturador debe ser el doble del frame rate para conseguir motion blur natural. ' +
+    'Devuelve el obturador recomendado y una tabla con todos los fps comunes.',
+    {
+      fps: z.number().positive()
+        .describe('Frame rate de grabación (ej. 24, 25, 30, 50, 60, 120, 240)'),
+    },
+    async ({ fps }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_regla_180_video', aiCaller);
+
+      const r = calcularRegla180(fps);
+      const tabla = r.fps_alternativos.slice(0, 8).map(f => `   ${f.fps} fps → ${f.obturador}`).join('\n');
+
+      const texto = [
+        `🎬 **Regla de los 180° — ${fps} fps**`,
+        ``,
+        `✅ **Obturador recomendado: ${r.obturadorFormateado}**`,
+        ``,
+        r.descripcion,
+        ``,
+        `📊 **Referencia rápida:**`,
+        tabla,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_camara_lenta
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_camara_lenta',
+    'Calcula el factor de ralentización de un vídeo slow motion a partir de los fps de grabación y reproducción. ' +
+    'Devuelve el multiplicador (ej. 4×), el obturador correcto según la regla 180° y la duración del clip ralentizado.',
+    {
+      fps_grabacion: z.number().positive()
+        .describe('FPS a los que se graba (ej. 60, 120, 240, 960)'),
+      fps_reproduccion: z.number().positive()
+        .describe('FPS a los que se reproducirá (ej. 24, 25, 30)'),
+      duracion_grabacion_s: z.number().positive().optional()
+        .describe('Duración del clip grabado en segundos. Opcional: si se indica, calcula la duración ralentizada'),
+    },
+    async ({ fps_grabacion, fps_reproduccion, duracion_grabacion_s }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_camara_lenta', aiCaller);
+
+      const r = calcularCamaraLenta(fps_grabacion, fps_reproduccion, duracion_grabacion_s);
+
+      const lineas = [
+        `🐢 **Slow Motion — ${fps_grabacion} fps grabación → ${fps_reproduccion} fps reproducción**`,
+        ``,
+        `🎯 **Factor de ralentización: ${r.factor_lentitud}×** — ${r.nivel}`,
+        `📷 Obturador durante la grabación: **${r.obturador_grabacion}** (regla 180°)`,
+      ];
+      if (r.duracion_resultado_s !== null) {
+        lineas.push(`⏱️ Duración resultado: **${r.duracion_resultado_s}s** (${duracion_grabacion_s}s grabados × ${r.factor_lentitud})`);
+      }
+      lineas.push(``, r.descripcion);
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_filtro_nd_video
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_filtro_nd_video',
+    'Calcula qué filtro ND necesitas para cumplir la regla de los 180° en exteriores. ' +
+    'Introduce el frame rate y la velocidad de obturación actual para obtener las paradas exactas ' +
+    'y el filtro recomendado de la gama ND2–ND1000.',
+    {
+      fps: z.number().positive()
+        .describe('Frame rate de grabación (ej. 25, 30, 60)'),
+      obturador_actual_s: z.number().positive()
+        .describe('Velocidad de obturación actual en segundos (ej. 0.002 para 1/500, 0.004 para 1/250)'),
+    },
+    async ({ fps, obturador_actual_s }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_filtro_nd_video', aiCaller);
+
+      const r = calcularFiltroNDVideo(fps, obturador_actual_s);
+
+      const lineas = [
+        `🔲 **Filtro ND para Vídeo — ${fps} fps · obturador actual ${r.obturadorActual}**`,
+        ``,
+        `🎯 Obturador objetivo (regla 180°): **${r.obturadorObjetivo}**`,
+        ``,
+        r.recomendacion,
+      ];
+
+      if (r.necesitaND) {
+        lineas.push(``, `📊 **Opciones disponibles:**`);
+        r.opciones.forEach(o => {
+          const marca = o.recomendado ? ' ★ RECOMENDADO' : '';
+          lineas.push(`   ${o.denominacion} (${o.paradas} stops) → ${o.obturadorResultante}${marca}`);
+        });
+      }
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_bitrate_video
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_bitrate_video',
+    'Estima el bitrate necesario y el tamaño de archivo de un vídeo según resolución, fps, duración y códec. ' +
+    'Incluye comparativa entre H.264, H.265, ProRes 422 y RAW.',
+    {
+      resolucion: z.enum(['480p', '720p', '1080p', '2k', '4k', '8k'])
+        .describe('Resolución del vídeo'),
+      fps: z.number().positive()
+        .describe('Frame rate (ej. 24, 30, 60, 120)'),
+      duracion_min: z.number().positive()
+        .describe('Duración del vídeo en minutos'),
+      codec: z.enum(['h264', 'h265', 'prores422', 'raw']).optional()
+        .describe('Códec de vídeo. Por defecto h264'),
+    },
+    async ({ resolucion, fps, duracion_min, codec }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_bitrate_video', aiCaller);
+
+      const codecUsado = (codec ?? 'h264') as TipoCodecVideo;
+      const r = calcularBitrateVideo(resolucion as TipoResolucionVideo, fps, duracion_min, codecUsado);
+
+      const codecs: TipoCodecVideo[] = ['h264', 'h265', 'prores422', 'raw'];
+      const comparativa = codecs.map(c => {
+        const rc = calcularBitrateVideo(resolucion as TipoResolucionVideo, fps, duracion_min, c);
+        return `   ${c.toUpperCase().padEnd(10)} ${rc.bitrate_mbps} Mbps → ${rc.tamano_formateado}`;
+      });
+
+      const texto = [
+        `💾 **Bitrate y Tamaño de Vídeo — ${resolucion} · ${fps} fps · ${duracion_min} min**`,
+        ``,
+        `📊 **${codecUsado.toUpperCase()}: ${r.bitrate_mbps} Mbps → ${r.tamano_formateado}**`,
+        ``,
+        `📈 **Comparativa de códecs:**`,
+        ...comparativa,
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: texto }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_fov_video
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_fov_video',
+    'Calcula el ángulo de campo (FOV) horizontal, vertical y diagonal para una focal y sensor dados. ' +
+    'Incluye comparativa entre Full Frame, APS-C y Micro 4/3 con el focal equivalente en 35mm.',
+    {
+      focal_mm: z.number().positive()
+        .describe('Focal del objetivo en milímetros (ej. 24, 35, 50, 85)'),
+      sensor: z.enum(['ff', 'apsc15', 'apsc16', 'm43']).optional()
+        .describe('Tipo de sensor: ff = Full Frame, apsc15 = APS-C Nikon/Sony, apsc16 = APS-C Canon, m43 = Micro 4/3. Por defecto ff'),
+    },
+    async ({ focal_mm, sensor }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_fov_video', aiCaller);
+
+      const sensorUsado = (sensor ?? 'ff') as TipoSensor;
+      const r = calcularFOVVideo(focal_mm, sensorUsado);
+
+      const lineas = [
+        `📐 **Ángulo de Campo (FOV) — ${focal_mm}mm en ${r.sensorNombre}**`,
+        ``,
+        `🎯 **FOV horizontal: ${r.fov_horizontal_deg}°** — ${r.clasificacion}`,
+        `   FOV vertical: ${r.fov_vertical_deg}° · Diagonal: ${r.fov_diagonal_deg}°`,
+        `   Focal equivalente FF: ${r.focalEquivalenteFF}mm`,
+        ``,
+        `📊 **Comparativa de sensores con ${focal_mm}mm:**`,
+        ...r.comparativa.map(c => `   ${c.nombre.padEnd(28)} ${c.fov_h}° horizontal (equiv. ${c.focal_eq_ff}mm FF)`),
+      ].join('\n');
+
+      return { content: [{ type: 'text', text: lineas }] };
     }
   );
 

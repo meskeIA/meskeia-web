@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "meskeIA — Fotografía Técnica",
-    "description": "Calculadoras técnicas de fotografía: profundidad de campo, exposición sin estelas para astrofotografía (regla 500 y NPF) y triángulo de exposición equivalente.",
-    "version": "1.0.0"
+    "title": "meskeIA — Fotografía y Videografía Técnica",
+    "description": "Calculadoras técnicas de fotografía y videografía: profundidad de campo, astrofotografía NPF, exposición equivalente, regla de los 180°, slow motion, filtros ND, bitrate de vídeo y ángulo de campo FOV.",
+    "version": "2.0.0"
   },
   "servers": [
     { "url": "https://meskeia.com" }
@@ -189,6 +189,149 @@
                 }
               }
             }
+          }
+        }
+      }
+    }
+  },
+    "/api/chatgpt/regla-180-video": {
+      "post": {
+        "operationId": "calcularRegla180Video",
+        "summary": "Obturador correcto para vídeo según la regla de los 180°",
+        "description": "Calcula la velocidad de obturación recomendada para cualquier frame rate según la regla de los 180°: el obturador debe ser el doble del frame rate para lograr un motion blur natural. Devuelve también una tabla con los valores para los fps más comunes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fps"],
+                "properties": {
+                  "fps": { "type": "number", "description": "Frame rate de grabación (ej. 24, 25, 30, 50, 60, 120, 240)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Obturador recomendado y tabla de referencia",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "obturador_recomendado": { "type": "string" }, "descripcion": { "type": "string" }, "tabla_fps_comunes": { "type": "array" } } } } }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/camara-lenta": {
+      "post": {
+        "operationId": "calcularCamaraLenta",
+        "summary": "Factor de ralentización y obturador para slow motion",
+        "description": "Calcula el factor de ralentización de un vídeo slow motion a partir de los fps de grabación y reproducción. Devuelve el multiplicador (ej. 4×), el obturador correcto según la regla 180° a los fps de grabación, la duración final del clip si se proporciona la duración grabada, y el nivel de slow motion.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fps_grabacion", "fps_reproduccion"],
+                "properties": {
+                  "fps_grabacion": { "type": "number", "description": "FPS a los que se graba (ej. 120, 240, 960)." },
+                  "fps_reproduccion": { "type": "number", "description": "FPS a los que se reproducirá (ej. 24, 25, 30)." },
+                  "duracion_grabacion_s": { "type": "number", "description": "Duración del clip grabado en segundos. Opcional: si se indica, calcula la duración del vídeo ralentizado." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Factor slow motion y detalles",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "factor_lentitud": { "type": "string" }, "nivel": { "type": "string" }, "obturador_grabacion": { "type": "string" }, "duracion_resultado_s": { "type": "number", "nullable": true } } } } }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/filtro-nd-video": {
+      "post": {
+        "operationId": "calcularFiltroNDVideo",
+        "summary": "Filtro ND necesario para cumplir la regla de los 180° en exteriores",
+        "description": "Calcula qué filtro de densidad neutra (ND) se necesita para pasar de la velocidad de obturación actual a la correcta según la regla de los 180°. Devuelve las paradas exactas necesarias y una tabla con los filtros ND disponibles (ND2–ND1000) indicando cuál es el más recomendado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fps", "obturador_actual_s"],
+                "properties": {
+                  "fps": { "type": "number", "description": "Frame rate de grabación (ej. 25, 30, 60)." },
+                  "obturador_actual_s": { "type": "number", "description": "Velocidad de obturación actual en segundos (ej. 0.002 para 1/500, 0.004 para 1/250)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filtro ND recomendado y tabla de opciones",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "necesita_nd": { "type": "boolean" }, "paradas_necesarias": { "type": "number" }, "recomendacion": { "type": "string" }, "opciones": { "type": "array" } } } } }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/bitrate-video": {
+      "post": {
+        "operationId": "calcularBitrateVideo",
+        "summary": "Estima el bitrate y tamaño de archivo de un vídeo",
+        "description": "Calcula el bitrate necesario y el tamaño aproximado de un archivo de vídeo según resolución, fps, duración y códec. Devuelve también una comparativa entre H.264, H.265, ProRes 422 y RAW para la misma configuración.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["resolucion", "fps", "duracion_min"],
+                "properties": {
+                  "resolucion": { "type": "string", "enum": ["480p","720p","1080p","2k","4k","8k"], "description": "Resolución del vídeo." },
+                  "fps": { "type": "number", "description": "Frame rate (ej. 24, 30, 60)." },
+                  "duracion_min": { "type": "number", "description": "Duración del vídeo en minutos." },
+                  "codec": { "type": "string", "enum": ["h264","h265","prores422","raw"], "description": "Códec de vídeo. Por defecto h264." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bitrate y tamaño estimados con comparativa de códecs",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "bitrate_mbps": { "type": "number" }, "tamano": { "type": "string" }, "comparativa_codecs": { "type": "array" } } } } }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/fov-video": {
+      "post": {
+        "operationId": "calcularFOVVideo",
+        "summary": "Calcula el ángulo de campo (FOV) para vídeo según focal y sensor",
+        "description": "Calcula los ángulos de campo horizontal, vertical y diagonal para una focal y sensor dados. Incluye comparativa entre Full Frame, APS-C Nikon/Sony, APS-C Canon y Micro 4/3 con la misma focal, mostrando el focal equivalente en 35mm para cada sensor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["focal_mm"],
+                "properties": {
+                  "focal_mm": { "type": "number", "description": "Focal del objetivo en milímetros (ej. 24, 35, 50, 85)." },
+                  "sensor": { "type": "string", "enum": ["ff","apsc15","apsc16","m43"], "description": "Tipo de sensor. Por defecto ff (Full Frame)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "FOV y comparativa de sensores",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "fov_horizontal_deg": { "type": "number" }, "fov_vertical_deg": { "type": "number" }, "clasificacion": { "type": "string" }, "comparativa_sensores": { "type": "array" } } } } }
           }
         }
       }

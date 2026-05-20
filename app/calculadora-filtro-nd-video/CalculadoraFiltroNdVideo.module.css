@@ -1,0 +1,486 @@
+/* CalculadoraFiltroNdVideo.module.css */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 2rem;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────────── */
+
+.hero {
+  background: var(--hero-bg);
+  width: 100%;
+  text-align: center;
+  padding: 2.5rem 1.5rem 2rem;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  max-width: 600px;
+  margin-inline: auto;
+}
+
+/* ─── Main content ──────────────────────────────────────────────────────────── */
+
+.mainContent {
+  width: 100%;
+  max-width: 820px;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ─── Input panel ───────────────────────────────────────────────────────────── */
+
+.inputPanel {
+  background: var(--bg-card);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fieldset {
+  border: 1px solid rgba(46, 134, 171, 0.25);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 0;
+}
+
+.legend {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 0 0.4rem;
+}
+
+.fieldHint {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+/* Botones preset fps */
+.presetBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.presetBtn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  border: 2px solid rgba(46, 134, 171, 0.35);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.presetBtn:hover {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.presetBtnActive {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.presetBtnActive:hover {
+  background: var(--primary);
+}
+
+/* Input manual fps */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.inputLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.inputNumber {
+  width: 90px;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.15s;
+}
+
+.inputNumber:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputActive {
+  border-color: var(--primary);
+}
+
+/* Select obturador */
+.select {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  border: 2px solid rgba(46, 134, 171, 0.3);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  appearance: auto;
+}
+
+.select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Resumen parámetros */
+.resumenParams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(46, 134, 171, 0.15);
+}
+
+/* ─── Results panel ─────────────────────────────────────────────────────────── */
+
+.resultsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* No ND card */
+.noNdCard {
+  background: var(--bg-card);
+  border: 2px solid #48A9A6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.noNdIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.noNdTitulo {
+  font-size: 1.05rem;
+  color: #48A9A6;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.noNdTexto {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+
+/* Paradas card */
+.paradasCard {
+  background: var(--bg-card);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.paradasNum {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.paradasLabel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.paradasDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+/* ─── Tabla filtros ─────────────────────────────────────────────────────────── */
+
+.tablaTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(46, 134, 171, 0.2);
+}
+
+.tablaFiltros {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+}
+
+.tablaFiltros th {
+  background: rgba(46, 134, 171, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.25);
+  white-space: nowrap;
+}
+
+.tablaFiltros td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgba(46, 134, 171, 0.1);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.tablaFiltros tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaFiltros tr:hover td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* Fila recomendada */
+.filtroRecomendado td {
+  background: rgba(46, 134, 171, 0.1) !important;
+  border-top: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.denominacion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.badgeRecomendado {
+  display: inline-block;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Colores de desviación */
+.desvPerfecta {
+  color: #2ecc71;
+  font-weight: 700;
+}
+
+.desvBuena {
+  color: #48A9A6;
+  font-weight: 600;
+}
+
+.desvAlta {
+  color: var(--text-muted);
+}
+
+/* ─── Educational section ───────────────────────────────────────────────────── */
+
+.guideSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 720px;
+  margin-inline: auto;
+  color: var(--text-primary);
+}
+
+.guideSection h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0.5rem 0 0;
+}
+
+.guideSection p {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.guideSection ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.guideSection li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.warningBox {
+  background: rgba(72, 169, 166, 0.1);
+  border-left: 4px solid #48A9A6;
+  border-radius: 0 8px 8px 0;
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+/* ─── Dark mode ─────────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .inputPanel {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .fieldset {
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .presetBtn {
+  border-color: rgba(46, 134, 171, 0.4);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .presetBtn:hover {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .inputNumber {
+  border-color: rgba(46, 134, 171, 0.4);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .select {
+  border-color: rgba(46, 134, 171, 0.4);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .tablaFiltros {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tablaFiltros th {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .filtroRecomendado td {
+  background: rgba(46, 134, 171, 0.18) !important;
+}
+
+[data-theme='dark'] .tablaFiltros tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .noNdCard {
+  border-color: #48A9A6;
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .paradasCard {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(72, 169, 166, 0.15);
+}
+
+[data-theme='dark'] .resumenParams {
+  border-color: rgba(46, 134, 171, 0.25);
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .inputPanel {
+    padding: 1rem;
+  }
+
+  .fieldset {
+    padding: 0.85rem 1rem;
+  }
+
+  .paradasNum {
+    font-size: 2.25rem;
+  }
+
+  .denominacion {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .tablaFiltros th,
+  .tablaFiltros td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.82rem;
+  }
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

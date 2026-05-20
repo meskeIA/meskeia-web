@@ -5313,6 +5313,38 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/golden-hour/', icon: '🌅', name: 'Hora Dorada y Azul', description: 'Planifica cuándo dispara: hora azul y crepúsculo astronómico' },
   ],
 
+  // ── Videografía ──
+  'calculadora-regla-180-video': [
+    { url: '/calculadora-filtro-nd-video/', icon: '🔲', name: 'Filtro ND para Vídeo', description: 'Qué filtro ND necesitas para aplicar la regla 180° en exteriores' },
+    { url: '/calculadora-camara-lenta/', icon: '🐢', name: 'Cámara Lenta (Slow Motion)', description: 'Factor de ralentización y obturador correcto a fps altos' },
+    { url: '/calculadora-fov-video/', icon: '📐', name: 'Ángulo de Campo (FOV)', description: 'Ángulo de visión según focal y sensor para cada plano' },
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'Domina ISO, apertura y velocidad: los mismos principios en foto y vídeo' },
+  ],
+  'calculadora-camara-lenta': [
+    { url: '/calculadora-regla-180-video/', icon: '🎬', name: 'Regla de los 180°', description: 'Obturador correcto para cada fps de grabación' },
+    { url: '/calculadora-filtro-nd-video/', icon: '🔲', name: 'Filtro ND para Vídeo', description: 'Filtro ND necesario cuando hay demasiada luz' },
+    { url: '/calculadora-bitrate-video/', icon: '💾', name: 'Bitrate y Tamaño de Vídeo', description: 'Cuánto espacio ocupará tu vídeo slow motion' },
+    { url: '/calculadora-fov-video/', icon: '📐', name: 'Ángulo de Campo (FOV)', description: 'Qué focal usar para cada tipo de plano' },
+  ],
+  'calculadora-filtro-nd-video': [
+    { url: '/calculadora-regla-180-video/', icon: '🎬', name: 'Regla de los 180°', description: 'El objetivo que justifica el filtro ND en vídeo' },
+    { url: '/calculadora-camara-lenta/', icon: '🐢', name: 'Cámara Lenta', description: 'Factor de ralentización y obturador a fps altos' },
+    { url: '/calculadora-fov-video/', icon: '📐', name: 'Ángulo de Campo (FOV)', description: 'Ángulo de visión con tu focal y sensor' },
+    { url: '/simulador-fotografia/', icon: '📷', name: 'Triángulo de Exposición', description: 'ISO, apertura y velocidad en foto y vídeo' },
+  ],
+  'calculadora-bitrate-video': [
+    { url: '/calculadora-regla-180-video/', icon: '🎬', name: 'Regla de los 180°', description: 'Obturador correcto para movimiento natural' },
+    { url: '/calculadora-camara-lenta/', icon: '🐢', name: 'Cámara Lenta', description: 'Slow motion: a más fps, más datos por segundo' },
+    { url: '/calculadora-fov-video/', icon: '📐', name: 'Ángulo de Campo (FOV)', description: 'Ángulo de visión con tu focal y sensor' },
+    { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'Hiperfocal y DoF: los mismos cálculos aplican en vídeo' },
+  ],
+  'calculadora-fov-video': [
+    { url: '/calculadora-regla-180-video/', icon: '🎬', name: 'Regla de los 180°', description: 'Obturador correcto para cada fps' },
+    { url: '/calculadora-filtro-nd-video/', icon: '🔲', name: 'Filtro ND para Vídeo', description: 'Filtro para cumplir la regla 180° en exteriores' },
+    { url: '/visualizador-focales-fotografia/', icon: '🔭', name: 'Visualizador de Focales', description: 'Compara 14/24/50/85/200 mm lado a lado' },
+    { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'La focal también afecta a la DoF: cálculo completo' },
+  ],
+
   'developers': [
     { url: '/calculadora-irpf/', icon: '🏛️', name: 'Calculadora IRPF', description: 'Ejemplo de herramienta fiscal disponible vía MCP' },
     { url: '/calculadora-hipoteca/', icon: '🏦', name: 'Simulador de Hipoteca', description: 'Ejemplo de herramienta financiera disponible vía MCP' },
