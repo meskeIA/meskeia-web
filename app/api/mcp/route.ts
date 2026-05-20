@@ -197,6 +197,8 @@ import { calcularRescatePlanPensiones, type FormaRescate, type ContingenciaResca
 import { calcularDeduccionDobleImposicionIS, type TipoRentaExtranjera, type MetodoEliminacionDI } from '@/lib/calculadoras/deduccionDobleImposicionIS';
 // ── Fotografía:
 import { calcularProfundidadCampo, calcularAstrofoto, calcularExposicionEquivalente, type TipoSensor, type ParametroFijo } from '@/lib/calculadoras/fotografia';
+// ── Deporte:
+import { calcularPrediccionRunning, calcularZonasCardiacas, calcular1RM, calcularPotenciaCiclismo, calcularPaceRunning, calcularSWOLF } from '@/lib/calculadoras/deporte';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -9283,6 +9285,250 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       ].join('\n');
 
       return conAviso(texto, AVISO_TECNICO);
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_prediccion_running
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_prediccion_running',
+    'Predice el tiempo de carrera en cualquier distancia usando la fórmula Riegel (T2 = T1 × (D2/D1)^1.06). ' +
+    'Devuelve el tiempo estimado, pace, velocidad y predicciones estándar para 5K, 10K, media maratón y maratón.',
+    {
+      distancia_base_km: z.number().positive()
+        .describe('Distancia de referencia conocida en kilómetros (ej. 5 para un 5K, 10 para un 10K)'),
+      tiempo_base_s: z.number().positive()
+        .describe('Tiempo real en esa distancia en segundos (ej. 1500 para 25 minutos)'),
+      distancia_objetivo_km: z.number().positive()
+        .describe('Distancia para la que se quiere predecir el tiempo en kilómetros (ej. 42.195 para maratón)'),
+    },
+    async ({ distancia_base_km, tiempo_base_s, distancia_objetivo_km }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_prediccion_running', aiCaller);
+
+      const r = calcularPrediccionRunning(distancia_base_km, tiempo_base_s, distancia_objetivo_km);
+
+      const lineas = [
+        `🏃 **Predictor de Tiempos de Running — Fórmula Riegel**`,
+        ``,
+        `📊 **Referencia:** ${distancia_base_km} km en ${Math.floor(tiempo_base_s/60)}min ${tiempo_base_s%60}s`,
+        ``,
+        `🎯 **Estimación para ${distancia_objetivo_km} km:**`,
+        `   • Tiempo: **${r.tiempoFormateado}**`,
+        `   • Pace: **${r.paceFormateado}**`,
+        `   • Velocidad: ${r.velocidad_km_h} km/h`,
+        ``,
+        `📈 **Predicciones para distancias estándar:**`,
+        ...r.prediccionesEstandar.map(p => `   • ${p.nombre}: ${p.tiempoFormateado} (${p.paceFormateado})`),
+      ];
+      if (r.advertencia) lineas.push(``, `⚠️ ${r.advertencia}`);
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_zonas_cardiacas
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_zonas_cardiacas',
+    'Calcula las 5 zonas de frecuencia cardíaca personalizadas con la fórmula de Karvonen. ' +
+    'Más precisa que el simple % FCmáx porque tiene en cuenta la FC en reposo. ' +
+    'Devuelve los rangos de pulsaciones para cada zona y su beneficio de entrenamiento.',
+    {
+      edad: z.number().positive()
+        .describe('Edad en años'),
+      fc_reposo: z.number().positive()
+        .describe('Frecuencia cardíaca en reposo en ppm (medida por la mañana antes de levantarse)'),
+      fc_maxima: z.number().positive().optional()
+        .describe('FCmáx medida en un test de esfuerzo en ppm. Opcional: si no se indica, se estima con 220−edad'),
+    },
+    async ({ edad, fc_reposo, fc_maxima }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_zonas_cardiacas', aiCaller);
+
+      const r = calcularZonasCardiacas(edad, fc_reposo, fc_maxima);
+
+      const fcNote = r.fcMaxEstimada
+        ? `FCmáx ${r.fcMax} ppm (estimada con 220−${edad} — ±10-20 ppm, medir en test para mayor precisión)`
+        : `FCmáx ${r.fcMax} ppm (valor introducido)`;
+
+      const lineas = [
+        `💓 **Zonas Cardíacas — Karvonen · ${edad} años · FC reposo ${fc_reposo} ppm**`,
+        ``,
+        `📊 ${fcNote}`,
+        `📊 FC reserva: ${r.fcReserva} ppm`,
+        ``,
+        `🎯 **Tus 5 zonas de entrenamiento:**`,
+        ...r.zonas.map(z =>
+          `   Z${z.zona} ${z.nombre}: **${z.fcMin}–${z.fcMax} ppm** (${z.porcentajeMin}–${z.porcentajeMax}%) — ${z.beneficioPrincipal}`
+        ),
+      ];
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_1rm_gimnasio
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_1rm_gimnasio',
+    'Calcula la repetición máxima (1RM) en cualquier ejercicio de fuerza usando las fórmulas Epley y Brzycki. ' +
+    'Devuelve el 1RM estimado y una tabla de cargas de entrenamiento por porcentaje.',
+    {
+      peso_kg: z.number().positive()
+        .describe('Peso levantado en kilogramos'),
+      repeticiones: z.number().int().positive()
+        .describe('Número de repeticiones completadas con ese peso (idealmente 1-12 para mayor precisión)'),
+    },
+    async ({ peso_kg, repeticiones }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_1rm_gimnasio', aiCaller);
+
+      const r = calcular1RM(peso_kg, repeticiones);
+
+      const lineas = [
+        `🏋️ **1RM (Repetición Máxima) — ${peso_kg} kg × ${repeticiones} reps**`,
+        ``,
+        `📊 **Estimaciones:**`,
+        `   • Epley:  ${r.epley} kg`,
+        `   • Brzycki: ${r.brzycki} kg`,
+        `   • **Media: ${r.media} kg** ← referencia recomendada`,
+        ``,
+        `📈 **Tabla de cargas de entrenamiento:**`,
+        ...r.tablaPorcentajes.map(t =>
+          `   ${t.porcentaje}% → **${t.peso_kg} kg** (~${t.repsAproximadas} reps)`
+        ),
+      ];
+      if (r.advertencia) lineas.push(``, `⚠️ ${r.advertencia}`);
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_potencia_ciclismo
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_potencia_ciclismo',
+    'Analiza el rendimiento en ciclismo: ratio W/kg con nivel, 6 zonas de entrenamiento basadas en FTP ' +
+    'y opcionalmente VAM (velocidad ascensional media) para subidas cronometradas.',
+    {
+      peso_kg: z.number().positive()
+        .describe('Peso del ciclista en kilogramos'),
+      ftp_w: z.number().positive()
+        .describe('FTP (Functional Threshold Power) en vatios: potencia máxima sostenible durante 1 hora'),
+      desnivel_m: z.number().positive().optional()
+        .describe('Desnivel positivo de una subida en metros (para calcular VAM). Opcional'),
+      tiempo_min: z.number().positive().optional()
+        .describe('Tiempo empleado en subir ese desnivel en minutos (para calcular VAM). Opcional'),
+    },
+    async ({ peso_kg, ftp_w, desnivel_m, tiempo_min }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_potencia_ciclismo', aiCaller);
+
+      const r = calcularPotenciaCiclismo(peso_kg, ftp_w, desnivel_m, tiempo_min);
+
+      const lineas = [
+        `🚴 **Potencia en Ciclismo — ${ftp_w} W · ${peso_kg} kg**`,
+        ``,
+        `⚡ **Ratio W/kg: ${r.wattsKg}** → ${r.nivelWattsKg} (${r.descripcionNivel})`,
+      ];
+
+      if (r.vam !== null) {
+        lineas.push(`🏔️ **VAM: ${r.vam} m/h** → ${r.nivelVam}`);
+      }
+
+      lineas.push(``, `📊 **Zonas de entrenamiento (basadas en FTP ${ftp_w} W):**`);
+      r.zonasPotencia.forEach(z => {
+        lineas.push(`   ${z.zona} ${z.nombre}: ${z.wattsMin}–${z.wattsMax} W (${z.porcentajeFTP})`);
+      });
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_pace_running
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_pace_running',
+    'Calcula el pace (ritmo por kilómetro), velocidad media, splits por km y proyecciones para ' +
+    '5K, 10K, media maratón y maratón a ese mismo ritmo.',
+    {
+      distancia_km: z.number().positive()
+        .describe('Distancia recorrida en kilómetros (ej. 10 para un 10K)'),
+      tiempo_s: z.number().positive()
+        .describe('Tiempo empleado en segundos (ej. 3000 para 50 minutos)'),
+    },
+    async ({ distancia_km, tiempo_s }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_pace_running', aiCaller);
+
+      const r = calcularPaceRunning(distancia_km, tiempo_s);
+      const totalMin = Math.floor(tiempo_s / 60);
+      const totalSec = tiempo_s % 60;
+
+      const lineas = [
+        `⏱️ **Pace de Running — ${distancia_km} km en ${totalMin}min ${totalSec}s**`,
+        ``,
+        `🏃 **Pace: ${r.paceFormateado}**`,
+        `⚡ Velocidad: ${r.velocidad_km_h} km/h`,
+        ``,
+        `📊 **Proyecciones a este ritmo:**`,
+        ...r.proyecciones.map(p => `   • ${p.nombre}: ${p.tiempoFormateado}`),
+      ];
+
+      if (r.splits.length > 0) {
+        const splitsMostrar = r.splits.slice(0, Math.min(5, r.splits.length));
+        lineas.push(``, `📈 **Primeros splits (tiempo acumulado):**`);
+        splitsMostrar.forEach(s => lineas.push(`   • Km ${s.km}: ${s.tiempoFormateado}`));
+        if (r.splits.length > 5) lineas.push(`   ... (${r.splits.length} splits totales disponibles en la app)`);
+      }
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_swolf_natacion
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_swolf_natacion',
+    'Calcula el índice SWOLF (segundos + brazadas por largo) como medida de eficiencia en natación. ' +
+    'Clasifica el nivel del nadador y proporciona consejo de mejora técnica. Compatible con piscinas de 25m y 50m.',
+    {
+      tiempo_s_largo: z.number().positive()
+        .describe('Tiempo por largo en segundos (ej. 20 para nadar 25m en 20 segundos)'),
+      brazadas_largo: z.number().int().positive()
+        .describe('Número de brazadas por largo'),
+      metros_largo: z.number().int().optional()
+        .describe('Longitud del largo en metros: 25 (defecto) o 50'),
+    },
+    async ({ tiempo_s_largo, brazadas_largo, metros_largo }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_swolf_natacion', aiCaller);
+
+      const metrosPiscina = metros_largo ?? 25;
+      const r = calcularSWOLF(tiempo_s_largo, brazadas_largo, metrosPiscina);
+
+      const nivelEmoji: Record<string, string> = {
+        elite: '🥇', avanzado: '🥈', intermedio: '🥉', principiante: '🎽',
+      };
+
+      const lineas = [
+        `🏊 **SWOLF — Eficiencia en Natación (piscina ${metrosPiscina}m)**`,
+        ``,
+        `📊 **${tiempo_s_largo}s + ${brazadas_largo} brazadas = SWOLF ${r.swolf}**`,
+        `${nivelEmoji[r.nivel]} **Nivel: ${r.eficiencia}** — ${r.descripcionNivel}`,
+        `⚡ Velocidad: ${r.velocidadMedia_min100m}`,
+        ``,
+        `💡 **Consejo:** ${r.consejo}`,
+      ];
+
+      return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }
   );
 

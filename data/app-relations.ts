@@ -1936,6 +1936,45 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-tension-arterial/', icon: '🩺', name: 'Orientador Tensión Arterial', description: 'Interpreta tus cifras de tensión' },
   ],
   'calculadora-zonas-entrenamiento': saludApps.filter(a => a.url !== '/calculadora-zonas-entrenamiento/').slice(0, 4),
+
+  // ── Deporte y Rendimiento Físico ──
+  'calculadora-tiempos-running': [
+    { url: '/calculadora-pace-running/', icon: '⏱️', name: 'Calculadora de Pace', description: 'Ritmo, velocidad y splits por kilómetro' },
+    { url: '/calculadora-zonas-cardiacas/', icon: '💓', name: 'Zonas Cardíacas (Karvonen)', description: 'Tus 5 zonas de entrenamiento personalizadas' },
+    { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento FC', description: 'Pulsaciones por zona para correr' },
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué actividad física te conviene?' },
+  ],
+  'calculadora-zonas-cardiacas': [
+    { url: '/calculadora-tiempos-running/', icon: '🏃', name: 'Predictor de Tiempos de Running', description: 'Estima tu tiempo en 5K, 10K y maratón' },
+    { url: '/calculadora-pace-running/', icon: '⏱️', name: 'Calculadora de Pace', description: 'Ritmo y splits por kilómetro' },
+    { url: '/calculadora-potencia-ciclismo/', icon: '🚴', name: 'Potencia en Ciclismo', description: 'W/kg, FTP y zonas de entrenamiento' },
+    { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento FC', description: 'Otra calculadora de zonas cardíacas' },
+  ],
+  'calculadora-1rm-gimnasio': [
+    { url: '/calculadora-zonas-cardiacas/', icon: '💓', name: 'Zonas Cardíacas (Karvonen)', description: 'Entrena en las zonas adecuadas' },
+    { url: '/calculadora-potencia-ciclismo/', icon: '🚴', name: 'Potencia en Ciclismo', description: 'W/kg y zonas de potencia FTP' },
+    { url: '/selector-tipo-gimnasio/', icon: '🏋️', name: 'Selector de Tipo de Gimnasio', description: '¿Qué tipo de entrenamiento te conviene?' },
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué actividad física te conviene?' },
+  ],
+  'calculadora-potencia-ciclismo': [
+    { url: '/calculadora-zonas-cardiacas/', icon: '💓', name: 'Zonas Cardíacas (Karvonen)', description: 'Combina potencia y frecuencia cardíaca' },
+    { url: '/calculadora-pace-running/', icon: '⏱️', name: 'Calculadora de Pace', description: 'Equivalente al pace para ciclistas' },
+    { url: '/calculadora-1rm-gimnasio/', icon: '🏋️', name: 'Calculadora de 1RM', description: 'Fuerza máxima para complementar el ciclismo' },
+    { url: '/calculadora-tiempos-running/', icon: '🏃', name: 'Predictor de Tiempos Running', description: 'Predice tus tiempos de carrera' },
+  ],
+  'calculadora-pace-running': [
+    { url: '/calculadora-tiempos-running/', icon: '🏃', name: 'Predictor de Tiempos de Running', description: 'Estima tu tiempo en cualquier distancia' },
+    { url: '/calculadora-zonas-cardiacas/', icon: '💓', name: 'Zonas Cardíacas (Karvonen)', description: 'Entrena en el ritmo cardíaco correcto' },
+    { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento FC', description: 'Pulsaciones por zona para correr' },
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué actividad física te conviene?' },
+  ],
+  'calculadora-swolf-natacion': [
+    { url: '/calculadora-zonas-cardiacas/', icon: '💓', name: 'Zonas Cardíacas (Karvonen)', description: 'Zonas de entrenamiento para natación' },
+    { url: '/calculadora-pace-running/', icon: '⏱️', name: 'Calculadora de Pace', description: 'Equivalent del pace en running' },
+    { url: '/calculadora-tiempos-running/', icon: '🏃', name: 'Predictor de Tiempos Running', description: 'Si también practicas running' },
+    { url: '/selector-ejercicio/', icon: '🏋️', name: 'Selector de Ejercicio', description: '¿Qué actividad física te conviene?' },
+  ],
+
   'selector-ejercicio': [
     { url: '/calculadora-zonas-entrenamiento/', icon: '❤️', name: 'Zonas de Entrenamiento', description: 'Calcula tus 5 zonas de FC para entrenar mejor' },
     { url: '/selector-dieta/', icon: '🥗', name: 'Selector de Dieta', description: '¿Qué tipo de alimentación te conviene?' },

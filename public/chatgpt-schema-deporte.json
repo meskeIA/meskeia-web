@@ -1,0 +1,316 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meskeIA — Deporte y Rendimiento",
+    "description": "Calculadoras técnicas de deporte y rendimiento físico: predictor de tiempos de running (Riegel), zonas cardíacas (Karvonen), 1RM en gimnasio (Epley/Brzycki), potencia en ciclismo (W/kg y VAM), pace de running y SWOLF en natación.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://meskeia.com" }
+  ],
+  "paths": {
+    "/api/chatgpt/prediccion-running": {
+      "post": {
+        "operationId": "calcularPrediccionRunning",
+        "summary": "Predice tiempos de running con la fórmula Riegel",
+        "description": "Calcula el tiempo estimado en cualquier distancia de running a partir de un tiempo de referencia conocido. Usa la fórmula Riegel (T2 = T1 × (D2/D1)^1.06). Devuelve predicciones para 5K, 10K, media maratón y maratón.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["distancia_base_km", "tiempo_base_s", "distancia_objetivo_km"],
+                "properties": {
+                  "distancia_base_km": {
+                    "type": "number",
+                    "description": "Distancia de referencia conocida en kilómetros (ej: 5 para un 5K, 10 para un 10K)."
+                  },
+                  "tiempo_base_s": {
+                    "type": "number",
+                    "description": "Tiempo real en esa distancia de referencia, en segundos (ej: 1500 para 25 minutos)."
+                  },
+                  "distancia_objetivo_km": {
+                    "type": "number",
+                    "description": "Distancia para la que se quiere predecir el tiempo (ej: 42.195 para maratón)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Predicciones de tiempo para running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tiempo_estimado": { "type": "string" },
+                    "pace": { "type": "string" },
+                    "velocidad_km_h": { "type": "number" },
+                    "predicciones_estandar": { "type": "array" },
+                    "advertencia": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/zonas-cardiacas": {
+      "post": {
+        "operationId": "calcularZonasCardiacas",
+        "summary": "Calcula las 5 zonas cardíacas con la fórmula Karvonen",
+        "description": "Calcula las 5 zonas de frecuencia cardíaca personalizadas usando la fórmula de Karvonen (FC_zona = FCreposo + % × FCreserva). Más precisa que la fórmula simple de % FCmáx porque tiene en cuenta la FC en reposo.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["edad", "fc_reposo"],
+                "properties": {
+                  "edad": {
+                    "type": "number",
+                    "description": "Edad en años."
+                  },
+                  "fc_reposo": {
+                    "type": "number",
+                    "description": "Frecuencia cardíaca en reposo en ppm (medida por la mañana antes de levantarse)."
+                  },
+                  "fc_maxima": {
+                    "type": "number",
+                    "description": "FCmáx medida en un test de esfuerzo (ppm). Opcional: si no se indica, se estima con 220−edad."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Zonas cardíacas personalizadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fc_max": { "type": "number" },
+                    "fc_max_estimada": { "type": "boolean" },
+                    "fc_reserva": { "type": "number" },
+                    "zonas": { "type": "array" },
+                    "nota": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/1rm-gimnasio": {
+      "post": {
+        "operationId": "calcular1RM",
+        "summary": "Calcula la repetición máxima (1RM) con Epley y Brzycki",
+        "description": "Estima el peso máximo con el que se puede hacer 1 repetición en cualquier ejercicio de fuerza, a partir del peso y las repeticiones realizadas. Usa las fórmulas Epley y Brzycki y devuelve una tabla de cargas de entrenamiento por porcentaje.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["peso_kg", "repeticiones"],
+                "properties": {
+                  "peso_kg": {
+                    "type": "number",
+                    "description": "Peso levantado en kilogramos."
+                  },
+                  "repeticiones": {
+                    "type": "number",
+                    "description": "Número de repeticiones completadas con ese peso (idealmente entre 1 y 12 para mayor precisión)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "1RM estimado y tabla de cargas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "epley_kg": { "type": "number" },
+                    "brzycki_kg": { "type": "number" },
+                    "media_kg": { "type": "number" },
+                    "tabla_cargas": { "type": "array" },
+                    "advertencia": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/potencia-ciclismo": {
+      "post": {
+        "operationId": "calcularPotenciaCiclismo",
+        "summary": "Calcula W/kg, zonas de potencia FTP y VAM para ciclismo",
+        "description": "Analiza el rendimiento en ciclismo: ratio W/kg con clasificación de nivel, 6 zonas de entrenamiento basadas en el FTP, y opcionalmente la VAM (velocidad ascensional media) para subidas cronometradas.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["peso_kg", "ftp_w"],
+                "properties": {
+                  "peso_kg": {
+                    "type": "number",
+                    "description": "Peso del ciclista en kilogramos."
+                  },
+                  "ftp_w": {
+                    "type": "number",
+                    "description": "FTP (Functional Threshold Power) en vatios: la potencia máxima sostenible durante 1 hora."
+                  },
+                  "desnivel_m": {
+                    "type": "number",
+                    "description": "Desnivel positivo de una subida en metros (para calcular VAM). Opcional."
+                  },
+                  "tiempo_min": {
+                    "type": "number",
+                    "description": "Tiempo empleado en subir ese desnivel, en minutos (para calcular VAM). Opcional."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Análisis de potencia ciclista",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "w_por_kg": { "type": "number" },
+                    "nivel_w_kg": { "type": "string" },
+                    "descripcion_nivel": { "type": "string" },
+                    "zonas_potencia": { "type": "array" },
+                    "vam_m_h": { "type": "number", "nullable": true },
+                    "nivel_vam": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/pace-running": {
+      "post": {
+        "operationId": "calcularPaceRunning",
+        "summary": "Calcula pace, velocidad, splits y proyecciones de running",
+        "description": "A partir de distancia y tiempo, calcula el pace por kilómetro, velocidad media, tabla de splits por km y proyecciones para 5K, 10K, media maratón y maratón a ese mismo ritmo.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["distancia_km", "tiempo_s"],
+                "properties": {
+                  "distancia_km": {
+                    "type": "number",
+                    "description": "Distancia recorrida en kilómetros (ej: 10 para un 10K)."
+                  },
+                  "tiempo_s": {
+                    "type": "number",
+                    "description": "Tiempo empleado en segundos (ej: 3000 para 50 minutos)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pace, velocidad y proyecciones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pace": { "type": "string" },
+                    "velocidad_km_h": { "type": "number" },
+                    "proyecciones": { "type": "array" },
+                    "splits_primeros_5km": { "type": "array" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chatgpt/swolf-natacion": {
+      "post": {
+        "operationId": "calcularSWOLF",
+        "summary": "Calcula el índice SWOLF de eficiencia en natación",
+        "description": "Calcula el SWOLF (segundos por largo + brazadas por largo), clasifica el nivel del nadador y proporciona consejo de mejora. Compatible con piscinas de 25m y 50m.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tiempo_s_largo", "brazadas_largo"],
+                "properties": {
+                  "tiempo_s_largo": {
+                    "type": "number",
+                    "description": "Tiempo por largo en segundos (ej: 20 para nadar un largo de 25m en 20 segundos)."
+                  },
+                  "brazadas_largo": {
+                    "type": "number",
+                    "description": "Número de brazadas por largo."
+                  },
+                  "metros_largo": {
+                    "type": "number",
+                    "enum": [25, 50],
+                    "description": "Longitud del largo en metros: 25 (defecto) o 50."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Índice SWOLF y clasificación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "swolf": { "type": "number" },
+                    "nivel": { "type": "string" },
+                    "eficiencia": { "type": "string" },
+                    "velocidad_min_100m": { "type": "string" },
+                    "consejo": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

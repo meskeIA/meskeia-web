@@ -555,6 +555,12 @@ export const implementedAppsUrls = [
   "/selector-alquiler-vs-compra/",           // Test 10 preguntas: situación vital, estabilidad, horizonte — ¿alquilar o comprar?
   "/selector-dieta/",                        // Test 10 preguntas: mediterránea, vegetariana, vegana, cetogénica, DASH, ayuno
   "/calculadora-zonas-entrenamiento/",       // 5 zonas FC: FCmáx (220−edad) o Karvonen, rango pulsaciones, beneficios por zona
+  "/calculadora-tiempos-running/",           // Predictor Riegel: 5K, 10K, media, maratón desde tiempo de referencia
+  "/calculadora-zonas-cardiacas/",           // Karvonen: 5 zonas FC personalizadas por edad y FC reposo
+  "/calculadora-1rm-gimnasio/",              // Epley + Brzycki: 1RM y tabla de cargas por porcentaje
+  "/calculadora-potencia-ciclismo/",         // W/kg, zonas FTP (Z1-Z6) y VAM para subidas
+  "/calculadora-pace-running/",              // Pace min/km, velocidad, splits y proyecciones
+  "/calculadora-swolf-natacion/",            // Índice SWOLF: eficiencia en piscina 25m/50m
   "/selector-ejercicio/",                    // Test 10 preguntas: gimnasio, running, natación, ciclismo, yoga, casa
   "/selector-seguro-hogar/",                 // Test 10 preguntas: cobertura básica, estándar o completa
   "/selector-zona-residencia/",              // Test 10 preguntas: ciudad grande, ciudad media, rural o costa

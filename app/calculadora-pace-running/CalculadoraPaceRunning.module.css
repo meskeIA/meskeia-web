@@ -1,0 +1,429 @@
+/* ── Calculadora de Pace de Running — CSS Module ── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+
+.hero {
+  background: var(--hero-bg);
+  color: #ffffff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ── Main content ─────────────────────────────────────────── */
+
+.mainContent {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ── Panel de entrada ─────────────────────────────────────── */
+
+.inputPanel {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 0.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input {
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Tiempo (3 campos) ────────────────────────────────────── */
+
+.tiempoRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tiempoField {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.tiempoField .input {
+  text-align: center;
+}
+
+.tiempoLabel {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ── Botón ────────────────────────────────────────────────── */
+
+.btnPrimary {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  align-self: flex-start;
+}
+
+.btnPrimary:hover {
+  background: var(--secondary);
+}
+
+.btnPrimary:active {
+  transform: scale(0.98);
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Warning box ──────────────────────────────────────────── */
+
+.warningBox {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  color: #856404;
+}
+
+/* ── Panel de resultados ──────────────────────────────────── */
+
+.resultadosPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Resultados principales ───────────────────────────────── */
+
+.resultadosPrincipales {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .resultadosPrincipales {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resultadoCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-top: 4px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.resultadoIcono {
+  font-size: 1.8rem;
+}
+
+.resultadoEtiqueta {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Pace destacado ───────────────────────────────────────── */
+
+.paceDestacado {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.velocidadDestacada {
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+  font-weight: 700;
+  color: var(--secondary);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* ── Sección de tabla ─────────────────────────────────────── */
+
+.seccionTabla {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tablaTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem;
+}
+
+.tablaSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+/* ── Tabla de proyecciones ────────────────────────────────── */
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tablaProyecciones {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tablaProyecciones thead tr {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.tablaProyecciones th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tablaProyecciones tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.tablaProyecciones tbody tr:hover {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.tablaProyecciones td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+.tiempoProyeccion {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ── Tabla de splits ──────────────────────────────────────── */
+
+.tablaSplitsWrapper {
+  max-height: 360px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.tablaSplits {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tablaSplits thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tablaSplits thead tr {
+  background: var(--secondary);
+  color: #ffffff;
+}
+
+.tablaSplits th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tablaSplits tbody tr:nth-child(even) {
+  background: rgba(72, 169, 166, 0.05);
+}
+
+.tablaSplits tbody tr:hover {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+.tablaSplits td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.tiempoSplit {
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+/* ── Sección educativa ────────────────────────────────────── */
+
+.guideSection {
+  margin-bottom: 1.5rem;
+}
+
+.guideSection h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.guideSection p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.guideSection ul {
+  padding-left: 1.4rem;
+  margin: 0 0 0.75rem;
+}
+
+.guideSection li {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+
+[data-theme='dark'] .inputPanel,
+[data-theme='dark'] .resultadoCard,
+[data-theme='dark'] .seccionTabla {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .input {
+  background: #2a2a2a;
+  border-color: #444;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.25);
+}
+
+[data-theme='dark'] .warningBox {
+  background: #3a2e10;
+  border-color: #b8860b;
+  color: #ffd966;
+}
+
+[data-theme='dark'] .tablaProyecciones tbody tr:nth-child(even),
+[data-theme='dark'] .tablaSplits tbody tr:nth-child(even) {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .tablaProyecciones tbody tr:hover,
+[data-theme='dark'] .tablaSplits tbody tr:hover {
+  background: rgba(46, 134, 171, 0.15);
+}
+
+[data-theme='dark'] .tablaProyecciones td,
+[data-theme='dark'] .tablaSplits td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .tablaSplitsWrapper {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Animaciones reducidas ────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .btnPrimary {
+    transition: none;
+  }
+}

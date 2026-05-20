@@ -1,0 +1,674 @@
+/* ─── Layout general ─────────────────────────────────────────────────────── */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────────────── */
+
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.hero h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ─── Calculadora ────────────────────────────────────────────────────────── */
+
+.calculadora {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.inputLabel {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.numberInput {
+  width: 110px;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.numberInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputUnit {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.inputHint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ─── Selector piscina ───────────────────────────────────────────────────── */
+
+.selectorPiscina {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.piscinaBtn {
+  padding: 0.5rem 1.25rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.piscinaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.piscinaBtnActive {
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.piscinaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Panel de resultado ─────────────────────────────────────────────────── */
+
+.resultadoPanel {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.swolfScoreWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.swolfLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.swolfScore {
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--primary);
+  letter-spacing: -2px;
+}
+
+/* ─── Badge de nivel ─────────────────────────────────────────────────────── */
+
+.nivelBadge {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.elite {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1.5px solid #93c5fd;
+}
+
+.avanzado {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+}
+
+.intermedio {
+  background: #fef9c3;
+  color: #a16207;
+  border: 1.5px solid #fde047;
+}
+
+.principiante {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1.5px solid #d1d5db;
+}
+
+/* ─── Detalles ───────────────────────────────────────────────────────────── */
+
+.detalles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.detalleItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detalleLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detalleValor {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ─── Consejo box ────────────────────────────────────────────────────────── */
+
+.consejoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.consejoIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.consejoTitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--secondary);
+  display: block;
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.consejoTexto {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ─── Referencia de rangos ───────────────────────────────────────────────── */
+
+.referenciaRangos {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.referenciaTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.9rem;
+}
+
+.rangosGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+}
+
+.rangoItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.rangoNivel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.rangoValor {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+/* ─── Sección educativa ──────────────────────────────────────────────────── */
+
+.eduSubtitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.6rem;
+}
+
+.guideParagraph {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.65;
+  margin: 0 0 0.75rem;
+}
+
+.guideList {
+  padding-left: 1.2rem;
+  margin: 0 0 0.75rem;
+}
+
+.guideList li {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.65;
+  margin-bottom: 0.4rem;
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-primary);
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: var(--bg-primary);
+}
+
+/* Steps */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.15rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Escenarios grid */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.escenarioCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: var(--text-primary);
+}
+
+.escenarioCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.faqItem {
+  padding: 0.9rem 1rem;
+  background: var(--bg-primary);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary);
+}
+
+.faqItem p {
+  margin: 0 0 0.3rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.faqTip {
+  font-size: 0.82rem !important;
+  color: var(--secondary) !important;
+  font-style: italic;
+}
+
+/* Tips grid */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tipCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.9rem;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.tipCard p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Warning box ────────────────────────────────────────────────────────── */
+
+.warningBox {
+  background: #fff7ed;
+  border: 1.5px solid #f97316;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c2410c;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.warningList li {
+  font-size: 0.875rem;
+  color: #7c2d12;
+  line-height: 1.55;
+  margin-bottom: 0.35rem;
+}
+
+/* ─── Dark Mode ──────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .calculadora,
+[data-theme='dark'] .resultadoPanel,
+[data-theme='dark'] .referenciaRangos {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .numberInput {
+  border-color: #4b5563;
+  background: #1a1a1a;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .numberInput:focus {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .piscinaBtn {
+  border-color: #4b5563;
+  background: #1a1a1a;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .piscinaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme='dark'] .consejoBox {
+  background: #1a1a1a;
+}
+
+[data-theme='dark'] .elite {
+  background: #1e3a5f;
+  color: #93c5fd;
+  border-color: #1d4ed8;
+}
+
+[data-theme='dark'] .avanzado {
+  background: #14532d;
+  color: #86efac;
+  border-color: #15803d;
+}
+
+[data-theme='dark'] .intermedio {
+  background: #422006;
+  color: #fde047;
+  border-color: #a16207;
+}
+
+[data-theme='dark'] .principiante {
+  background: #1f2937;
+  color: #9ca3af;
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #1a1a1a;
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  border-color: #374151;
+  background: #1a1a1a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2d1b00;
+  border-color: #f97316;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fb923c;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fed7aa;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .swolfScore {
+    font-size: 3.5rem;
+  }
+
+  .rangosGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detalles {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Animaciones respetuosas ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

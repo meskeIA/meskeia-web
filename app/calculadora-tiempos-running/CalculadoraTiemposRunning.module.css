@@ -1,0 +1,413 @@
+/* Calculadora Tiempos Running — meskeIA */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.heroTitle {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ─── Main ──────────────────────────────────────────────────────────────── */
+
+.main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ─── Formulario ────────────────────────────────────────────────────────── */
+
+.form {
+  background: var(--bg-card, #fff);
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary, #2E86AB);
+  margin: 0 0 1.25rem;
+}
+
+.formGroup {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.select,
+.input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary, #1A1A1A);
+  background: var(--bg-primary, #FAFAFA);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary, #2E86AB);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+/* ─── Inputs de tiempo ─────────────────────────────────────────────────── */
+
+.timeInputs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.timeField {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 90px;
+}
+
+.timeInput {
+  width: 100%;
+  padding: 0.6rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  color: var(--text-primary, #1A1A1A);
+  background: var(--bg-primary, #FAFAFA);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: var(--primary, #2E86AB);
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.15);
+}
+
+.timeLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+  min-width: 28px;
+}
+
+/* ─── Error ─────────────────────────────────────────────────────────────── */
+
+.errorBox {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ─── Botón calcular ─────────────────────────────────────────────────────── */
+
+.btnCalcular {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 0.25rem;
+}
+
+.btnCalcular:hover {
+  background: var(--secondary, #48A9A6);
+}
+
+.btnCalcular:active {
+  transform: scale(0.98);
+}
+
+.btnCalcular:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+/* ─── Resultados ──────────────────────────────────────────────────────────── */
+
+.resultados {
+  background: var(--bg-card, #fff);
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.resultCard {
+  background: var(--bg-primary, #FAFAFA);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.resultLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary, #666);
+}
+
+.resultValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary, #2E86AB);
+}
+
+/* ─── Warning box ─────────────────────────────────────────────────────────── */
+
+.warningBox {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #92400e;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* ─── Tabla predicciones ────────────────────────────────────────────────── */
+
+.tablaTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary, #1A1A1A);
+  margin: 0 0 0.75rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tablaPredicciones {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaPredicciones th {
+  background: var(--primary, #2E86AB);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablaPredicciones td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-primary, #1A1A1A);
+  white-space: nowrap;
+}
+
+.tablaPredicciones tr:last-child td {
+  border-bottom: none;
+}
+
+.tablaPredicciones tr:hover td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.rowDestacada td {
+  background: rgba(46, 134, 171, 0.1) !important;
+  font-weight: 600;
+}
+
+/* ─── Tabla educativa ─────────────────────────────────────────────────────── */
+
+.tablaEducativa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.tablaEducativa th {
+  background: var(--bg-primary, #FAFAFA);
+  color: var(--text-secondary, #666);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid rgba(46, 134, 171, 0.2);
+}
+
+.tablaEducativa td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-primary, #1A1A1A);
+}
+
+/* ─── Dark mode ─────────────────────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary, #1A1A1A);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .form,
+[data-theme='dark'] .resultados {
+  background: var(--bg-card, #2A2A2A);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .select,
+[data-theme='dark'] .input,
+[data-theme='dark'] .timeInput {
+  background: #1f2937;
+  color: var(--text-primary, #E5E5E5);
+  border-color: #374151;
+}
+
+[data-theme='dark'] .select:focus,
+[data-theme='dark'] .input:focus,
+[data-theme='dark'] .timeInput:focus {
+  border-color: var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .resultCard {
+  background: #1f2937;
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .tablaPredicciones td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #E5E5E5);
+}
+
+[data-theme='dark'] .tablaPredicciones tr:hover td {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+[data-theme='dark'] .rowDestacada td {
+  background: rgba(46, 134, 171, 0.2) !important;
+}
+
+[data-theme='dark'] .tablaEducativa th {
+  background: #1f2937;
+  color: var(--text-secondary, #B0B0B0);
+  border-bottom-color: rgba(46, 134, 171, 0.3);
+}
+
+[data-theme='dark'] .tablaEducativa td {
+  color: var(--text-primary, #E5E5E5);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .errorBox {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .label {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .timeLabel {
+  color: var(--text-secondary, #B0B0B0);
+}
+
+[data-theme='dark'] .tablaTitle {
+  color: var(--text-primary, #E5E5E5);
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .main {
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  .form,
+  .resultados {
+    padding: 1.25rem 1rem;
+  }
+
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeInputs {
+    gap: 0.5rem;
+  }
+}
+
+/* ─── Animaciones reducidas ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .btnCalcular {
+    transition: none;
+  }
+}

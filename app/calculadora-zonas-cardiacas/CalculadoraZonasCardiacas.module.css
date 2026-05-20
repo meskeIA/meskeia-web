@@ -1,0 +1,837 @@
+/* ============================================================
+   Calculadora de Zonas Cardíacas — CSS Module
+   Paleta meskeIA: --primary #2E86AB, --hero-bg #1a5278
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.hero p {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0 auto;
+  max-width: 720px;
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Formulario ───────────────────────────────────────────── */
+.formPanel {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.2rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.labelHint {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: border-color 0.15s;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Toggle FC máxima ─────────────────────────────────────── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.toggleBtn {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #d1d5db;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggleBtn.toggleActive {
+  background: var(--primary);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.toggleActive .toggleThumb {
+  transform: translateX(20px);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Errores ──────────────────────────────────────────────── */
+.errorBox {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.errorMsg {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.errorMsg + .errorMsg {
+  margin-top: 0.25rem;
+}
+
+/* ── Botón calcular ───────────────────────────────────────── */
+.btnCalcular {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+  margin-top: 0.5rem;
+}
+
+.btnCalcular:hover {
+  opacity: 0.9;
+}
+
+.btnCalcular:active {
+  transform: scale(0.98);
+}
+
+.btnCalcular:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Resultados ───────────────────────────────────────────── */
+.resultadoSection {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Resumen de datos */
+.resumenGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .resumenGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.resumenCard {
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.resumenLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.resumenValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.resumenNote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Tabla de zonas ───────────────────────────────────────── */
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.zonasTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.zonasTable th {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-bottom: 2px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.thZona {
+  width: 3rem;
+}
+
+.zonaRow {
+  border-bottom: 1px solid #e5e7eb;
+  transition: opacity 0.1s;
+}
+
+.zonaRow:last-child {
+  border-bottom: none;
+}
+
+.zonaRow td {
+  padding: 0.75rem 0.8rem;
+  vertical-align: middle;
+}
+
+.tdZona {
+  width: 3rem;
+  text-align: center;
+}
+
+.zonaNumero {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 2rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.tdNombre {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tdDesc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.tdRango {
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.tdRangoUnit {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.tdPct {
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tdBeneficio {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ── Colores por zona ─────────────────────────────────────── */
+.zona1 {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border-left: 4px solid #4ade80;
+}
+
+.zona2 {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-left: 4px solid #34d399;
+}
+
+.zona3 {
+  background-color: #fefce8;
+  color: #854d0e;
+  border-left: 4px solid #facc15;
+}
+
+.zona4 {
+  background-color: #fff7ed;
+  color: #9a3412;
+  border-left: 4px solid #fb923c;
+}
+
+.zona5 {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-left: 4px solid #f87171;
+}
+
+/* ── Barra visual de zonas ────────────────────────────────── */
+.barraZonas {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  height: 56px;
+}
+
+.barraSegmento {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-left: none;
+  padding: 0.25rem;
+  cursor: default;
+  transition: filter 0.15s;
+}
+
+.barraSegmento:hover {
+  filter: brightness(0.95);
+}
+
+.barraNombre {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.barraRango {
+  font-size: 0.68rem;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .barraRango {
+    display: none;
+  }
+}
+
+/* ── Nota FCmax estimada ──────────────────────────────────── */
+.notaEstimada {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Sección educativa ────────────────────────────────────── */
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.guideParagraph {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.formulaBox {
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.formulaTex {
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.formulaCaption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Tabla comparativa educativa */
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+/* Escenarios por zona */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 680px) {
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.escenarioCard {
+  border-radius: 8px;
+  padding: 1rem;
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+.escenarioCard h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.escenarioCard p {
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Steps */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.stepContent strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.stepContent p {
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.faqItem {
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.faqItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  margin: 0;
+}
+
+/* Tips */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.tipCard p {
+  margin: 0;
+}
+
+/* Warning box — v2.0 obligatorio */
+.warningBox {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: #78350f;
+  line-height: 1.6;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+[data-theme='dark'] .formPanel,
+[data-theme='dark'] .resultadoSection {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .input {
+  background: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+[data-theme='dark'] .input:focus {
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .zonasTable th {
+  background: #374151;
+  color: #9ca3af;
+  border-bottom-color: #4b5563;
+}
+
+[data-theme='dark'] .zonaRow {
+  border-bottom-color: #374151;
+}
+
+[data-theme='dark'] .zona1 {
+  background-color: #052e16;
+  color: #86efac;
+  border-left-color: #4ade80;
+}
+
+[data-theme='dark'] .zona2 {
+  background-color: #022c22;
+  color: #6ee7b7;
+  border-left-color: #34d399;
+}
+
+[data-theme='dark'] .zona3 {
+  background-color: #1c1917;
+  color: #fde68a;
+  border-left-color: #facc15;
+}
+
+[data-theme='dark'] .zona4 {
+  background-color: #1c0a00;
+  color: #fdba74;
+  border-left-color: #fb923c;
+}
+
+[data-theme='dark'] .zona5 {
+  background-color: #1c0505;
+  color: #fca5a5;
+  border-left-color: #f87171;
+}
+
+[data-theme='dark'] .resumenCard {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .notaEstimada {
+  background: #1e3a5f;
+  border-color: #1d4ed8;
+  color: #93c5fd;
+}
+
+[data-theme='dark'] .errorBox {
+  background: #450a0a;
+  border-color: #991b1b;
+}
+
+[data-theme='dark'] .errorMsg {
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #374151;
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #374151;
+}
+
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #1c1405;
+  border-color: #92400e;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #fde68a;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .escenarioCard.zona1 {
+  background-color: #052e16;
+  color: #86efac;
+}
+
+[data-theme='dark'] .escenarioCard.zona2 {
+  background-color: #022c22;
+  color: #6ee7b7;
+}
+
+[data-theme='dark'] .escenarioCard.zona3 {
+  background-color: #1c1917;
+  color: #fde68a;
+}
+
+[data-theme='dark'] .escenarioCard.zona4 {
+  background-color: #1c0a00;
+  color: #fdba74;
+}
+
+[data-theme='dark'] .escenarioCard.zona5 {
+  background-color: #1c0505;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .toggleBtn {
+  background: #4b5563;
+}
+
+[data-theme='dark'] .toggleBtn.toggleActive {
+  background: var(--primary);
+}
