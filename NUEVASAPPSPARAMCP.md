@@ -222,7 +222,7 @@ GPT: **meskeIA — Fotografía y Videografía Técnica** (ampliado en sesión 20
 
 ---
 
-### ✅ TANDA 3 — Cocina Técnica (2026-05-20, commit pendiente)
+### ✅ TANDA 3 — Cocina Técnica (2026-05-20, commit `dc036f35`)
 
 8 apps web + 8 tools MCP + 8 endpoints ChatGPT + nuevo GPT:
 - `calculadora-porcentaje-panadero` — Baker's percentage con detección automática de hidratación
@@ -235,8 +235,10 @@ GPT: **meskeIA — Fotografía y Videografía Técnica** (ampliado en sesión 20
 - `escalador-recetas` — escala no lineal para levadura/impulsores/especias, redondeo práctico por unidad
 
 **Librería**: `lib/calculadoras/cocina.ts`
-**Schema**: `chatgpt-schema-cocina.json` — 8 paths OpenAPI 3.1
-**GPT**: "meskeIA — Cocina Técnica" (nuevo GPT pendiente de publicar en ChatGPT)
+**Schema**: `chatgpt-schema-cocina.json` — 8 paths OpenAPI 3.1 (reducido, commit `0a723c8a`)
+**GPT**: "meskeIA — Cocina Técnica" — publicado y validado en sesión 2026-05-20
+**Claude Desktop**: tools visibles y funcionando tras reinicio completo de la app
+**Lección aprendida**: preguntar "herramientas de meskeIA" no activa las tools — usar "herramientas de cocina" o lanzar directamente un cálculo
 
 ---
 
