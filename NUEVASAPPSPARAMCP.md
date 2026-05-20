@@ -180,36 +180,85 @@ Igual que Fotografía Técnica:
 
 ---
 
-## Próximos pasos sugeridos
-
-1. **Primera tanda**: apps de Deporte/Running (3-4 apps, 1 GPT nuevo)
-2. **Segunda tanda**: Videografía (ampliar GPT Fotografía con 3 tools nuevas)
-3. **Tercera tanda**: Reformas domésticas (5 apps, 1 GPT nuevo)
-4. **Cuarta tanda**: Cocina técnica + Energía solar (según tracción de las anteriores)
+## Estado de implementación (actualizado 2026-05-20)
 
 ---
 
-## Pendiente técnico: añadir Fotografía al servidor MCP
+### ✅ TANDA 0 — Fotografía en MCP (2026-05-20, commit `c5a1c2ee`)
 
-**Estado**: lógica ya implementada, pendiente registrar en el MCP.
-
-Las 3 tools de fotografía creadas el 2026-05-19 están disponibles para ChatGPT pero **NO para Claude Desktop vía MCP**.
-
-**Lo que hay que hacer** (tarea corta, ~30 min):
-1. Abrir `app/api/mcp/route.ts`
-2. Registrar las 3 tools reutilizando `lib/calculadoras/fotografia.ts`:
-   - `calcular_profundidad_campo` — `calcularProfundidadCampo()`
-   - `calcular_astrofoto_exposicion` — `calcularAstrofoto()` (regla 500 + NPF)
-   - `calcular_exposicion_equivalente` — `calcularExposicionEquivalente()`
-3. Añadir `conAviso()` en los returns con `AVISO_TECNICO` (sin implicación fiscal/médica)
-4. Build + push → reiniciar Claude Desktop
-
-**Referencia**: el patrón de las tools de vehículos (Lote U, inline en route.ts) o cualquier tool existente en `app/api/mcp/route.ts`.
-
-**Beneficio**: desde Claude Desktop se podrá preguntar directamente _"¿cuánto tiempo máximo sin estelas con 14mm f/2,8 en Full Frame 24MP?"_ y Claude llamará a la tool en lugar de aproximar.
-
-> ⚠️ **Nota importante**: mientras no se haga este cambio, las tools de fotografía **tampoco aparecerán en los directorios MCP** (mcp.so, Smithery, PulseMCP, Glama). Cualquier IA que consuma el servidor MCP no las verá. Solo son accesibles desde el GPT de ChatGPT.
+3 tools MCP: `calcular_profundidad_campo`, `calcular_astrofoto_exposicion`, `calcular_exposicion_equivalente`
+GPT: **meskeIA — Fotografía y Videografía Técnica** (ampliado en sesión 2026-05-20)
 
 ---
 
-*Documento generado en sesión 2026-05-19. Retomar en nueva sesión con este archivo como contexto.*
+### ✅ TANDA 1 — Deporte y Rendimiento Físico (2026-05-20, commit `5f406548`)
+
+6 apps web + 6 tools MCP + 6 endpoints ChatGPT + GPT nuevo:
+- `calculadora-tiempos-running` — Riegel (⚠️ FCmax corregida a severity=high)
+- `calculadora-zonas-cardiacas` — Karvonen
+- `calculadora-1rm-gimnasio` — Epley + Brzycki
+- `calculadora-potencia-ciclismo` — W/kg + VAM
+- `calculadora-pace-running` — pace, splits, proyecciones
+- `calculadora-swolf-natacion` — índice SWOLF
+
+**Librería**: `lib/calculadoras/deporte.ts`
+**GPT**: "meskeIA — Deporte y Rendimiento" (10 preguntas validadas, resultados correctos en ChatGPT y Claude Desktop)
+**Fix posterior**: `calculadora-zonas-cardiacas` severity `medium` → `high`, commit `b9f7e8cf`
+
+---
+
+### ✅ TANDA 2 — Videografía Técnica (2026-05-20, commit `4abe3429`)
+
+5 apps web + 5 tools MCP + 5 endpoints ChatGPT + ampliación GPT Fotografía:
+- `calculadora-regla-180-video` — obturador correcto por fps
+- `calculadora-camara-lenta` — factor slow motion + duración
+- `calculadora-filtro-nd-video` — filtro ND para regla 180° en exteriores
+- `calculadora-bitrate-video` — bitrate y tamaño H.264/H.265/ProRes/RAW
+- `calculadora-fov-video` — FOV h/v/d, comparativa 4 sensores
+
+**Librería**: `lib/calculadoras/videografia.ts`
+**Schema**: `chatgpt-schema-fotografia.json` v2.0 — 8 paths (3 foto + 5 vídeo), commit `7847c0bf`
+**Nota**: el schema anterior tenía JSON malformado — regenerado limpio y validado con `python3 json.load`
+
+---
+
+### 🔜 TANDA 3 — Cocina Técnica (pendiente, nueva sesión)
+
+**Decisión**: Reformas domésticas y Energía Solar descartadas para MCP (AI los resuelve bien / variabilidad de precios). Electrónica básica: apps web existentes suficientes, no justifica MCP.
+
+**Cocina Técnica sí pasa los 4 filtros** — audiencia masiva, universal España+LATAM, fórmulas que la IA equivoca:
+
+| Tool candidata | Fórmula / por qué la IA falla |
+|---------------|-------------------------------|
+| `calcularBakersPercentage` | Confunde % de harina vs % de masa total |
+| `calcularHidratacionPan` | Bidireccional: agua→% y %→agua |
+| `calcularSustitucionMasaMadre` | Ajuste agua+harina según hidratación del fermento |
+| `calcularDDT` | Desired Dough Temperature — la IA desconoce la fórmula |
+| `calcularPuntosAzucar` | Brix/temperatura → fase (bola blanda, caramelo...) |
+| `calcularSustitucionGelatina` | Hojas vs polvo vs agar según bloom strength |
+| `calcularGanache` | Ratio chocolate/nata según % cacao para cada textura |
+| `escalarReceta` | Escalado con redondeos prácticos (levadura, temperatura, tiempo) |
+
+**GPT propuesto**: "meskeIA — Cocina Técnica" (nuevo GPT)
+**Referencia de implementación**: mismo patrón que Deporte y Videografía
+
+---
+
+### Apps web sin MCP pendientes de implementar
+
+Apps identificadas en sesión 2026-05-20 que tienen valor de catálogo web pero **no justifican MCP**:
+
+**Reformas domésticas** (web solo, SEO bricolaje):
+- `calculadora-pintura` — m² → litros según rendimiento
+- `calculadora-azulejos-suelo` — cajas con % merma
+- `calculadora-cable-electrico` — sección IEC/REBT (esta sí podría tener MCP en el futuro)
+- `calculadora-hormigon-mortero` — dosificaciones
+- `calculadora-aislamiento-termico` — R-value
+
+**Electrónica makers** (web solo, estudiantes/aficionados):
+- `calculadora-resistencia-led` — R = (Vcc - Vf) / If
+- `decodificador-codigo-colores-resistencia` — 4 y 5 bandas → valor Ω
+
+---
+
+*Última actualización: 2026-05-20. Retomar Tanda 3 en nueva sesión con este archivo como contexto.*
