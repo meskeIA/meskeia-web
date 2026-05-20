@@ -195,6 +195,8 @@ import { calcularIBI, type ClaseInmuebleIBI } from '@/lib/calculadoras/ibi';
 import { calcularModelo720, type CategoriaModelo720 } from '@/lib/calculadoras/modelo720';
 import { calcularRescatePlanPensiones, type FormaRescate, type ContingenciaRescate } from '@/lib/calculadoras/rescatePlanPensiones';
 import { calcularDeduccionDobleImposicionIS, type TipoRentaExtranjera, type MetodoEliminacionDI } from '@/lib/calculadoras/deduccionDobleImposicionIS';
+// ── Fotografía:
+import { calcularProfundidadCampo, calcularAstrofoto, calcularExposicionEquivalente, type TipoSensor, type ParametroFijo } from '@/lib/calculadoras/fotografia';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que usan las apps web
@@ -242,6 +244,11 @@ const AVISO_SALUD =
   'No constituye diagnóstico ni consejo médico. meskeIA no asume responsabilidad ' +
   'por decisiones de salud tomadas en base a estos datos. ' +
   'Consulte a un profesional sanitario para su caso concreto.*';
+
+const AVISO_TECNICO =
+  '\n\n---\n📷 *Resultado calculado con fórmulas técnicas estándar. ' +
+  'Los valores reales pueden variar según tolerancias de fabricación, ' +
+  'condiciones de captura y calibración del equipo.*';
 
 function conAviso(texto: string, aviso: string) {
   return { content: [{ type: 'text' as const, text: texto + aviso }] };
@@ -9106,6 +9113,176 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         `⚠️ Normativa orientativa a 2025. Las restricciones concretas (horarios, episodios) varían por ciudad. Consulta el portal oficial de tu municipio.`,
       ];
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_profundidad_campo
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_profundidad_campo',
+    'Calcula la profundidad de campo (DoF) para una combinación de focal, apertura, distancia y tipo de sensor. ' +
+    'Devuelve la distancia hiperfocal, los límites near/far de enfoque nítido y una clasificación del bokeh. ' +
+    'Útil para saber cuánto fondo quedará desenfocado o qué apertura usar en paisaje para máxima nitidez.',
+    {
+      focal_mm: z.number().positive()
+        .describe('Focal de la lente en milímetros (ej. 50 para un 50mm, 85 para un 85mm)'),
+      apertura: z.number().positive()
+        .describe('Apertura del diafragma en valor f (ej. 2.8 para f/2.8, 8 para f/8)'),
+      distancia_m: z.number().positive()
+        .describe('Distancia de enfoque en metros (ej. 3 para 3 metros, 0.5 para 50 cm)'),
+      sensor: z.enum(['ff', 'apsc15', 'apsc16', 'm43'])
+        .describe(
+          'Tipo de sensor: ' +
+          'ff = Full Frame (35mm), ' +
+          'apsc15 = APS-C Nikon/Sony (factor ×1,5), ' +
+          'apsc16 = APS-C Canon (factor ×1,6), ' +
+          'm43 = Micro 4/3 (factor ×2,0)'
+        ),
+    },
+    async ({ focal_mm, apertura, distancia_m, sensor }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_profundidad_campo', aiCaller);
+
+      const r = calcularProfundidadCampo(focal_mm, apertura, distancia_m, sensor as TipoSensor);
+
+      const dfTexto = r.dfEsInfinito ? 'infinito ∞' : `${r.dfM!.toFixed(2)} m`;
+      const dofTexto = r.dfEsInfinito ? 'infinito ∞' : `${r.dofM!.toFixed(2)} m`;
+
+      const texto = [
+        `📷 **Profundidad de campo — ${focal_mm}mm f/${apertura} a ${distancia_m}m**`,
+        ``,
+        `📏 **Plano más cercano nítido:** ${r.dnM.toFixed(2)} m`,
+        `📏 **Plano más lejano nítido:** ${dfTexto}`,
+        `📐 **Profundidad de campo total:** ${dofTexto}`,
+        `🔭 **Distancia hiperfocal:** ${r.hiperfocalM.toFixed(1)} m`,
+        ``,
+        `🎯 **Clasificación:** ${r.clasificacion}`,
+      ].join('\n');
+
+      return conAviso(texto, AVISO_TECNICO);
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_astrofoto_exposicion
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_astrofoto_exposicion',
+    'Calcula el tiempo máximo de exposición sin estelas de estrellas para astrofotografía. ' +
+    'Usa la fórmula NPF (precisa, tiene en cuenta pixel pitch y declinación) y la regla 500/300. ' +
+    'Evalúa si el tiempo elegido producirá estrellas puntuales, microestelas o star trails.',
+    {
+      focal_mm: z.number().positive()
+        .describe('Focal de la lente en milímetros (ej. 14 para un gran angular de 14mm)'),
+      apertura: z.number().positive()
+        .describe('Apertura del diafragma en valor f (ej. 2.8 para f/2.8)'),
+      sensor: z.enum(['ff', 'apsc15', 'apsc16', 'm43'])
+        .describe(
+          'Tipo de sensor: ' +
+          'ff = Full Frame, ' +
+          'apsc15 = APS-C Nikon/Sony (×1,5), ' +
+          'apsc16 = APS-C Canon (×1,6), ' +
+          'm43 = Micro 4/3 (×2,0)'
+        ),
+      megapixeles: z.number().positive()
+        .describe('Resolución del sensor en megapíxeles (ej. 24 para 24 MP, 45 para 45 MP)'),
+      declinacion_grados: z.number().min(0).max(90)
+        .describe(
+          'Declinación de la zona del cielo en grados (0 = ecuador celeste, 90 = polo celeste). ' +
+          'Para la Vía Láctea usa entre 0-30. Para Polaris usa ~89.'
+        ),
+      tiempo_elegido_s: z.number().positive()
+        .describe('Tiempo de exposición que quieres evaluar, en segundos (ej. 20 para 20 segundos)'),
+    },
+    async ({ focal_mm, apertura, sensor, megapixeles, declinacion_grados, tiempo_elegido_s }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_astrofoto_exposicion', aiCaller);
+
+      const r = calcularAstrofoto(focal_mm, apertura, sensor as TipoSensor, megapixeles, declinacion_grados, tiempo_elegido_s);
+
+      const npfTexto = r.tiempoNPF_s !== null
+        ? `${r.tiempoNPF_s.toFixed(1)} s`
+        : 'N/A (zona polar — la declinación hace cos≈0)';
+
+      const texto = [
+        `🌟 **Astrofotografía — ${focal_mm}mm f/${apertura} · ${megapixeles} MP · Dec ${declinacion_grados}°**`,
+        ``,
+        `⏱️ **Tiempo máximo sin estelas (NPF):** ${npfTexto}`,
+        `⏱️ **Regla 500:** ${r.tiempo500_s.toFixed(1)} s`,
+        `⏱️ **Regla 300 (conservadora):** ${r.tiempo300_s.toFixed(1)} s`,
+        ``,
+        `🔍 **Pixel pitch:** ${r.pixelPitchUm.toFixed(2)} µm`,
+        `📐 **Focal equivalente FF:** ${r.focalEquivalenteFF.toFixed(0)} mm`,
+        ``,
+        `📸 **Evaluación de ${tiempo_elegido_s}s:** ${r.descripcionVeredicto}`,
+      ].join('\n');
+
+      return conAviso(texto, AVISO_TECNICO);
+    }
+  );
+
+  // ------------------------------------------------------------------
+  // TOOL: calcular_exposicion_equivalente
+  // ------------------------------------------------------------------
+  servidor.tool(
+    'calcular_exposicion_equivalente',
+    'Calcula exposiciones fotográficas equivalentes variando uno de los tres parámetros del triángulo de exposición ' +
+    '(ISO, apertura o velocidad de obturación) manteniendo el mismo valor de exposición (EV). ' +
+    'Útil para adaptar la exposición a trípode, movimiento, ruido o bokeh sin cambiar la luz registrada.',
+    {
+      iso_base: z.number().positive()
+        .describe('ISO de la exposición original (ej. 100, 400, 1600, 3200)'),
+      apertura_base: z.number().positive()
+        .describe('Apertura original en valor f (ej. 2.8 para f/2.8, 8 para f/8)'),
+      obturador_base_s: z.number().positive()
+        .describe(
+          'Velocidad de obturación original en segundos ' +
+          '(ej. 0.01 para 1/100s, 0.004 para 1/250s, 2 para 2 segundos)'
+        ),
+      parametro_fijo: z.enum(['iso', 'apertura', 'obturador'])
+        .describe(
+          'Parámetro que cambias tú manualmente (el sistema ajusta los otros para mantener EV): ' +
+          'iso = cambias el ISO, ' +
+          'apertura = cambias el diafragma, ' +
+          'obturador = cambias la velocidad'
+        ),
+      nuevo_valor: z.number().positive()
+        .describe(
+          'Nuevo valor del parámetro elegido, en las mismas unidades: ' +
+          'ISO sin unidades (ej. 800), f-number para apertura (ej. 5.6), segundos para obturador (ej. 0.002)'
+        ),
+    },
+    async ({ iso_base, apertura_base, obturador_base_s, parametro_fijo, nuevo_valor }, extra) => {
+      const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
+      await registrarUsoMCP('calcular_exposicion_equivalente', aiCaller);
+
+      const r = calcularExposicionEquivalente(
+        iso_base,
+        apertura_base,
+        obturador_base_s,
+        parametro_fijo as ParametroFijo,
+        nuevo_valor,
+      );
+
+      const obturadorBaseTexto = obturador_base_s < 1
+        ? `1/${Math.round(1 / obturador_base_s)}s`
+        : `${obturador_base_s}s`;
+
+      const texto = [
+        `📷 **Triángulo de exposición — Exposición equivalente**`,
+        ``,
+        `📊 **Exposición original:** ISO ${iso_base} · f/${apertura_base} · ${obturadorBaseTexto}`,
+        ``,
+        `✅ **Exposición equivalente:**`,
+        `   • ISO: ${r.iso}`,
+        `   • Apertura: f/${r.apertura}`,
+        `   • Obturador: ${r.obturador_fraccion}`,
+        ``,
+        `📐 **Valor de Exposición (EV):** ${r.ev}`,
+      ].join('\n');
+
+      return conAviso(texto, AVISO_TECNICO);
     }
   );
 
