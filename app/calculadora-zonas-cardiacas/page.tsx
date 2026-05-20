@@ -257,7 +257,7 @@ export default function CalculadoraZonasCardiacasPage() {
           </div>
         )}
 
-        <DisclaimerCard variant="general" severity="medium" collapsible={true} />
+        <DisclaimerCard variant="general" severity="high" collapsible={false} />
 
         <EducationalSection
           title="Guía de Zonas Cardíacas y Entrenamiento"
