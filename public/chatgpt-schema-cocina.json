@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "meskeIA — Cocina Técnica",
-    "description": "Calculadoras de precisión para cocina técnica: porcentaje del panadero (baker's percentage), hidratación de masas de pan, sustitución de levadura por masa madre, temperatura de la masa (DDT), puntos del azúcar y fases de cocción, sustitución de gelatina por bloom strength, ratios de ganache por tipo de chocolate y textura, y escalado profesional de recetas con ajuste no lineal para levaduras y especias.",
+    "description": "Calculadoras de precisión para panadería y repostería: baker's percentage, hidratación, masa madre, DDT, puntos del azúcar, gelatinas, ganache y escalado de recetas.",
     "version": "1.0.0"
   },
   "servers": [
@@ -12,8 +12,8 @@
     "/api/chatgpt/porcentaje-panadero": {
       "post": {
         "operationId": "calcularPorcentajePanadero",
-        "summary": "Calcula el porcentaje del panadero (baker's percentage) para una receta",
-        "description": "Expresa cada ingrediente como porcentaje del peso de la harina (no del peso total de la masa). La harina siempre es 100%. Detecta automáticamente el agua para calcular la hidratación. Devuelve la tabla completa de porcentajes y opcionalmente el rendimiento en porciones.",
+        "summary": "Calcula el porcentaje del panadero (baker's percentage)",
+        "description": "Expresa cada ingrediente como % del peso de harina (la harina siempre es 100%). Detecta el agua para calcular la hidratación automáticamente.",
         "requestBody": {
           "required": true,
           "content": {
@@ -22,50 +22,27 @@
                 "type": "object",
                 "required": ["harina_g", "ingredientes"],
                 "properties": {
-                  "harina_g": {
-                    "type": "number",
-                    "description": "Peso total de la harina en gramos (siempre 100% en el sistema del panadero)."
-                  },
+                  "harina_g": { "type": "number", "description": "Peso de la harina en gramos." },
                   "ingredientes": {
                     "type": "array",
-                    "description": "Lista de los demás ingredientes de la receta.",
+                    "description": "Demás ingredientes de la receta.",
                     "items": {
                       "type": "object",
                       "required": ["nombre", "gramos"],
                       "properties": {
-                        "nombre": { "type": "string", "description": "Nombre del ingrediente (ej: 'agua', 'sal', 'levadura seca', 'mantequilla')." },
-                        "gramos": { "type": "number", "description": "Peso del ingrediente en gramos." }
+                        "nombre": { "type": "string" },
+                        "gramos": { "type": "number" }
                       }
                     }
                   },
-                  "peso_porcion_g": {
-                    "type": "number",
-                    "description": "Peso de cada porción (pieza de pan, bollo...) en gramos. Opcional: si se indica, calcula cuántas porciones salen."
-                  }
+                  "peso_porcion_g": { "type": "number", "description": "Peso por pieza en gramos. Opcional: calcula el número de porciones." }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Tabla de porcentajes del panadero",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "harina_g": { "type": "number" },
-                    "peso_masa_total_g": { "type": "number" },
-                    "hidratacion_pct": { "type": "number" },
-                    "rendimiento_porciones": { "type": "number", "nullable": true },
-                    "ingredientes": { "type": "array" },
-                    "nota": { "type": "string" }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Tabla de porcentajes del panadero e hidratación" }
         }
       }
     },
@@ -73,7 +50,7 @@
       "post": {
         "operationId": "calcularHidratacionPan",
         "summary": "Calcula la hidratación de la masa de pan (bidireccional)",
-        "description": "Modo 'calcular_porcentaje': dado harina + agua en gramos, devuelve el % de hidratación y la clasificación (seca, estándar, alta, muy alta, extrema) con ejemplos de panes típicos. Modo 'calcular_agua': dado harina + % de hidratación objetivo, devuelve los gramos de agua necesarios.",
+        "description": "Modo calcular_porcentaje: harina_g + agua_g → devuelve % hidratación y clasificación. Modo calcular_agua: harina_g + hidratacion_pct → devuelve gramos de agua necesarios.",
         "requestBody": {
           "required": true,
           "content": {
@@ -85,43 +62,26 @@
                   "modo": {
                     "type": "string",
                     "enum": ["calcular_porcentaje", "calcular_agua"],
-                    "description": "calcular_porcentaje: necesita agua_g para devolver el %. calcular_agua: necesita hidratacion_pct para devolver los gramos de agua. Por defecto 'calcular_porcentaje'."
+                    "description": "Por defecto calcular_porcentaje."
                   },
-                  "harina_g": { "type": "number", "description": "Peso de la harina en gramos." },
-                  "agua_g": { "type": "number", "description": "Gramos de agua. Requerido si modo='calcular_porcentaje'." },
-                  "hidratacion_pct": { "type": "number", "description": "Porcentaje de hidratación objetivo. Requerido si modo='calcular_agua'." }
+                  "harina_g": { "type": "number" },
+                  "agua_g": { "type": "number", "description": "Requerido si modo=calcular_porcentaje." },
+                  "hidratacion_pct": { "type": "number", "description": "Requerido si modo=calcular_agua." }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Hidratación calculada con clasificación",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "harina_g": { "type": "number" },
-                    "agua_g": { "type": "number" },
-                    "hidratacion_pct": { "type": "number" },
-                    "clasificacion": { "type": "string" },
-                    "descripcion": { "type": "string" },
-                    "ejemplos_panes": { "type": "array", "items": { "type": "string" } }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Hidratación, clasificación y ejemplos de panes típicos" }
         }
       }
     },
     "/api/chatgpt/masa-madre": {
       "post": {
         "operationId": "calcularSustitucionMasaMadre",
-        "summary": "Calcula cuánta masa madre usar para sustituir levadura comercial",
-        "description": "Convierte una cantidad de levadura fresca, seca o instantánea a su equivalente en masa madre activa. Calcula automáticamente cuánta harina y agua hay que restar de la receta para compensar lo que aporta la masa madre según su hidratación.",
+        "summary": "Cuánta masa madre usar para sustituir levadura comercial",
+        "description": "Convierte levadura fresca, seca o instantánea a masa madre activa. Calcula cuánta harina y agua restar de la receta para compensar lo que aporta la masa madre.",
         "requestBody": {
           "required": true,
           "content": {
@@ -133,41 +93,25 @@
                   "tipo_levadura": {
                     "type": "string",
                     "enum": ["fresca", "seca", "instantanea"],
-                    "description": "Tipo de levadura que indica la receta original. Por defecto 'seca'."
+                    "description": "Por defecto seca."
                   },
-                  "levadura_g": { "type": "number", "description": "Gramos de levadura que pide la receta original." },
-                  "hidratacion_mm_pct": { "type": "number", "description": "Hidratación de tu masa madre en % (agua/harina × 100). Por defecto 100 (partes iguales harina y agua)." }
+                  "levadura_g": { "type": "number" },
+                  "hidratacion_mm_pct": { "type": "number", "description": "Hidratación de tu masa madre en %. Por defecto 100." }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Cantidad de masa madre y ajuste de receta",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "levadura_original": { "type": "object" },
-                    "masa_madre_necesaria_g": { "type": "number" },
-                    "hidratacion_masa_madre_pct": { "type": "number" },
-                    "ajuste_receta": { "type": "object" },
-                    "tiempo_fermentacion_orientativo": { "type": "string" }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Gramos de masa madre y ajuste de harina/agua en la receta" }
         }
       }
     },
     "/api/chatgpt/temperatura-masa": {
       "post": {
         "operationId": "calcularTemperaturaMasa",
-        "summary": "Calcula la temperatura del agua para alcanzar la DDT (Desired Dough Temperature)",
-        "description": "Usa la fórmula profesional DDT para calcular la temperatura exacta del agua de amasado: T_agua = DDT×3 - T_ambiente - T_harina - T_fricción (o ×4 si hay preferment). La temperatura de la masa final determina la velocidad de fermentación: cada 5°C duplica o divide el tiempo de fermentación.",
+        "summary": "Temperatura del agua para alcanzar la DDT (Desired Dough Temperature)",
+        "description": "Fórmula: T_agua = DDT×3 − T_ambiente − T_harina − T_fricción. Con preferment usa factor ×4.",
         "requestBody": {
           "required": true,
           "content": {
@@ -176,47 +120,30 @@
                 "type": "object",
                 "required": ["t_ambiente_c"],
                 "properties": {
-                  "ddt_objetivo_c": { "type": "number", "description": "Temperatura final deseada de la masa en °C. Típico: 23-25°C para pan de masa madre, 26-28°C para levadura comercial. Por defecto 24°C." },
-                  "t_ambiente_c": { "type": "number", "description": "Temperatura ambiente de la cocina en °C." },
-                  "t_harina_c": { "type": "number", "description": "Temperatura de la harina en °C. Si no se indica, se asume igual a la temperatura ambiente." },
+                  "ddt_objetivo_c": { "type": "number", "description": "Temperatura deseada de la masa en °C. Por defecto 24°C." },
+                  "t_ambiente_c": { "type": "number" },
+                  "t_harina_c": { "type": "number", "description": "Por defecto igual a t_ambiente_c." },
                   "tipo_amasadora": {
                     "type": "string",
                     "enum": ["manual", "kitchen_aid", "amasadora_espiral", "thermomix"],
-                    "description": "Tipo de amasado: cada método genera distinta fricción que calienta la masa. Por defecto 'manual'."
+                    "description": "Por defecto manual."
                   },
-                  "t_preferment_c": { "type": "number", "description": "Temperatura del preferment (poolish, levain, biga) si la receta usa uno. Opcional — activa la fórmula de 4 factores." }
+                  "t_preferment_c": { "type": "number", "description": "Temperatura del preferment. Opcional." }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Temperatura del agua recomendada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "temperatura_agua_recomendada_c": { "type": "number" },
-                    "temperatura_agua_recomendada_f": { "type": "number" },
-                    "ddt_objetivo_c": { "type": "number" },
-                    "factores_usados": { "type": "object" },
-                    "interpretacion": { "type": "string" },
-                    "advertencia": { "type": "string", "nullable": true }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Temperatura recomendada del agua en °C y °F" }
         }
       }
     },
     "/api/chatgpt/puntos-azucar": {
       "post": {
         "operationId": "calcularPuntosAzucar",
-        "summary": "Identifica la fase del azúcar según la temperatura de cocción",
-        "description": "Dado la temperatura del almíbar en °C, identifica en qué fase de cocción del azúcar se encuentra (almíbar ligero, bola blanda, bola firme, bola dura, caramelo blando, caramelo duro, caramelo rubio, caramelo oscuro). Incluye descripción, usos típicos y la prueba tradicional del vaso de agua fría.",
+        "summary": "Identifica la fase del azúcar según la temperatura",
+        "description": "Dado el °C del almíbar, devuelve la fase (almíbar, bola blanda, bola dura, caramelo...) con usos típicos y la prueba del vaso de agua fría.",
         "requestBody": {
           "required": true,
           "content": {
@@ -225,39 +152,22 @@
                 "type": "object",
                 "required": ["temperatura_c"],
                 "properties": {
-                  "temperatura_c": { "type": "number", "description": "Temperatura del almíbar en °C medida con termómetro de cocina. Rango útil: 100–200°C." }
+                  "temperatura_c": { "type": "number", "description": "Temperatura del almíbar en °C. Rango útil: 100–200°C." }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Fase del azúcar y sus usos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "temperatura_c": { "type": "number" },
-                    "temperatura_f": { "type": "number" },
-                    "fase_actual": { "type": "object", "nullable": true },
-                    "fase_anterior": { "type": "object", "nullable": true },
-                    "fase_siguiente": { "type": "object", "nullable": true },
-                    "advertencia": { "type": "string", "nullable": true }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Fase del azúcar, usos típicos y fase anterior/siguiente" }
         }
       }
     },
     "/api/chatgpt/gelatina-cocina": {
       "post": {
         "operationId": "calcularSustitucionGelatina",
-        "summary": "Convierte entre tipos de gelatina según el bloom strength",
-        "description": "Calcula las equivalencias entre hojas de gelatina (bronce 120, plata 160, oro 200, platino 250), gelatina en polvo (200 o 250 bloom) y agar-agar. Usa la fórmula de bloom strength para conversiones precisas. Incluye advertencia sobre las diferencias de comportamiento del agar-agar.",
+        "summary": "Convierte entre tipos de gelatina por bloom strength",
+        "description": "Equivalencias entre hojas bronce/plata/oro/platino, gelatina en polvo 200/250 bloom y agar-agar.",
         "requestBody": {
           "required": true,
           "content": {
@@ -269,13 +179,13 @@
                   "tipo_origen": {
                     "type": "string",
                     "enum": ["hoja_bronce", "hoja_plata", "hoja_oro", "hoja_platino", "polvo_200", "polvo_250", "agar_agar"],
-                    "description": "Tipo de gelificante que tienes o que indica la receta. hoja_oro es la más común en supermercados españoles."
+                    "description": "hoja_oro es la estándar en supermercados."
                   },
-                  "cantidad": { "type": "number", "description": "Cantidad a convertir (gramos u hojas según 'unidad')." },
+                  "cantidad": { "type": "number" },
                   "unidad": {
                     "type": "string",
                     "enum": ["gramos", "hojas"],
-                    "description": "Unidad de la cantidad. 'hojas' solo aplica para tipos hoja_*. Por defecto 'gramos'."
+                    "description": "Por defecto gramos."
                   }
                 }
               }
@@ -283,29 +193,15 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Tabla de equivalencias entre todos los tipos de gelatina",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "origen": { "type": "object" },
-                    "equivalentes": { "type": "array" },
-                    "advertencia_agar": { "type": "string", "nullable": true }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Tabla de equivalencias en gramos y hojas para todos los tipos" }
         }
       }
     },
     "/api/chatgpt/ganache": {
       "post": {
         "operationId": "calcularGanache",
-        "summary": "Calcula las proporciones de chocolate y nata para ganache según tipo y textura",
-        "description": "Calcula exactamente cuántos gramos de chocolate y nata se necesitan para un ganache con la textura deseada (glaseado fluido, trufa o ganache firme), ajustando el ratio según el porcentaje de cacao del chocolate. Chocolate blanco y con leche requieren más chocolate por su menor contenido en manteca de cacao.",
+        "summary": "Proporciones de chocolate y nata para ganache",
+        "description": "Calcula gramos de chocolate y nata según tipo de chocolate (% cacao) y textura deseada. El ratio se ajusta automáticamente.",
         "requestBody": {
           "required": true,
           "content": {
@@ -316,50 +212,29 @@
                   "tipo_chocolate": {
                     "type": "string",
                     "enum": ["negro_extra", "negro", "semi_fondant", "con_leche", "blanco"],
-                    "description": "negro_extra: >70% cacao | negro: 55-70% | semi_fondant: 40-55% | con_leche: 28-40% | blanco: 0% cacao (manteca). Por defecto 'negro'."
+                    "description": "negro_extra >70% | negro 55-70% | semi_fondant 40-55% | con_leche 28-40% | blanco. Por defecto negro."
                   },
                   "textura": {
                     "type": "string",
                     "enum": ["glaseado", "trufa", "firme"],
-                    "description": "glaseado: fluido para cubrir tartas y eclairs | trufa: firme para bolear trufas y rellenar bombones | firme: muy denso para modelar. Por defecto 'trufa'."
+                    "description": "Por defecto trufa."
                   },
-                  "total_g": { "type": "number", "description": "Gramos totales de ganache que quieres preparar. Por defecto 200g." }
+                  "total_g": { "type": "number", "description": "Gramos totales de ganache. Por defecto 200g." }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Proporciones de chocolate y nata para el ganache",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tipo_chocolate": { "type": "string" },
-                    "rango_cacao": { "type": "string" },
-                    "textura": { "type": "string" },
-                    "chocolate_g": { "type": "number" },
-                    "nata_g": { "type": "number" },
-                    "total_g": { "type": "number" },
-                    "ratio": { "type": "string" },
-                    "temperatura_trabajo": { "type": "string" },
-                    "usos": { "type": "array", "items": { "type": "string" } },
-                    "nota_chocolate": { "type": "string" }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Gramos de chocolate, gramos de nata, ratio y temperatura de trabajo" }
         }
       }
     },
     "/api/chatgpt/escalar-receta": {
       "post": {
         "operationId": "escalarReceta",
-        "summary": "Escala una receta a más o menos raciones con ajuste no lineal para levaduras y especias",
-        "description": "Multiplica los ingredientes de una receta por el factor de escala necesario. Aplica ajuste sublineal para levadura, polvo de hornear y especias (que no escalan linealmente). Redondea las cantidades de forma práctica según la unidad. Incluye nota sobre tiempo y temperatura de horno.",
+        "summary": "Escala una receta a más o menos raciones",
+        "description": "Ajusta cantidades con redondeo práctico. Aplica escala no lineal para levadura, impulsores y especias. La temperatura del horno no cambia.",
         "requestBody": {
           "required": true,
           "content": {
@@ -368,22 +243,21 @@
                 "type": "object",
                 "required": ["raciones_original", "raciones_nueva", "ingredientes"],
                 "properties": {
-                  "raciones_original": { "type": "number", "description": "Número de raciones/porciones para las que está escrita la receta." },
-                  "raciones_nueva": { "type": "number", "description": "Número de raciones/porciones que quieres preparar." },
+                  "raciones_original": { "type": "number" },
+                  "raciones_nueva": { "type": "number" },
                   "ingredientes": {
                     "type": "array",
-                    "description": "Lista de ingredientes de la receta original.",
                     "items": {
                       "type": "object",
                       "required": ["nombre", "cantidad", "unidad"],
                       "properties": {
                         "nombre": { "type": "string" },
                         "cantidad": { "type": "number" },
-                        "unidad": { "type": "string", "description": "Unidad de medida: g, kg, ml, l, cucharada, cucharadita, etc." },
+                        "unidad": { "type": "string" },
                         "categoria": {
                           "type": "string",
                           "enum": ["normal", "levadura", "impulsores", "sal", "especias"],
-                          "description": "Categoría del ingrediente para el escalado: levadura e impulsores no escalan linealmente. Por defecto 'normal'."
+                          "description": "Por defecto normal."
                         }
                       }
                     }
@@ -394,24 +268,7 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Receta escalada con cantidades ajustadas",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "raciones_original": { "type": "number" },
-                    "raciones_nueva": { "type": "number" },
-                    "factor_escala": { "type": "number" },
-                    "ingredientes": { "type": "array" },
-                    "nota_horno": { "type": "string" },
-                    "advertencias": { "type": "array", "items": { "type": "string" } }
-                  }
-                }
-              }
-            }
-          }
+          "200": { "description": "Ingredientes escalados con cantidades redondeadas y nota de horno" }
         }
       }
     }
