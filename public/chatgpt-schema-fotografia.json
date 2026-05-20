@@ -22,23 +22,10 @@
                 "type": "object",
                 "required": ["focal_mm", "apertura", "distancia_m"],
                 "properties": {
-                  "focal_mm": {
-                    "type": "number",
-                    "description": "Focal real del objetivo en milímetros (ej: 50, 85, 135)."
-                  },
-                  "apertura": {
-                    "type": "number",
-                    "description": "Número f de apertura (ej: 1.4, 2.8, 5.6, 11)."
-                  },
-                  "distancia_m": {
-                    "type": "number",
-                    "description": "Distancia al sujeto en metros (ej: 1.5, 3, 10)."
-                  },
-                  "sensor": {
-                    "type": "string",
-                    "enum": ["ff", "apsc15", "apsc16", "m43"],
-                    "description": "Tipo de sensor: ff=Full Frame, apsc15=APS-C Nikon/Sony, apsc16=APS-C Canon, m43=Micro 4/3. Por defecto ff."
-                  }
+                  "focal_mm": { "type": "number", "description": "Focal real del objetivo en milímetros (ej: 50, 85, 135)." },
+                  "apertura": { "type": "number", "description": "Número f de apertura (ej: 1.4, 2.8, 5.6, 11)." },
+                  "distancia_m": { "type": "number", "description": "Distancia al sujeto en metros (ej: 1.5, 3, 10)." },
+                  "sensor": { "type": "string", "enum": ["ff", "apsc15", "apsc16", "m43"], "description": "Tipo de sensor: ff=Full Frame, apsc15=APS-C Nikon/Sony, apsc16=APS-C Canon, m43=Micro 4/3. Por defecto ff." }
                 }
               }
             }
@@ -53,7 +40,6 @@
                   "type": "object",
                   "properties": {
                     "sensor_usado": { "type": "string" },
-                    "coc_mm": { "type": "number" },
                     "hiperfocal_m": { "type": "number" },
                     "dn_m": { "type": "number" },
                     "df_m": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
@@ -72,7 +58,7 @@
       "post": {
         "operationId": "calcularAstrofotoExposicion",
         "summary": "Tiempo máximo sin estelas (regla 500, NPF)",
-        "description": "Calcula el tiempo máximo de exposición para que las estrellas salgan como puntos (no estelas), usando la regla 500 clásica y la fórmula NPF más precisa que considera apertura, pixel pitch y declinación celeste.",
+        "description": "Calcula el tiempo máximo de exposición para que las estrellas salgan como puntos, usando la regla 500 y la fórmula NPF más precisa que considera apertura, pixel pitch y declinación celeste.",
         "requestBody": {
           "required": true,
           "content": {
@@ -81,31 +67,12 @@
                 "type": "object",
                 "required": ["focal_mm", "apertura"],
                 "properties": {
-                  "focal_mm": {
-                    "type": "number",
-                    "description": "Focal real del objetivo en mm (ej: 14, 24, 35)."
-                  },
-                  "apertura": {
-                    "type": "number",
-                    "description": "Número f de apertura (ej: 1.8, 2.8, 4)."
-                  },
-                  "sensor": {
-                    "type": "string",
-                    "enum": ["ff", "apsc15", "apsc16", "m43"],
-                    "description": "Tipo de sensor. Por defecto ff (Full Frame)."
-                  },
-                  "megapixeles": {
-                    "type": "number",
-                    "description": "Megapíxeles del sensor (ej: 24, 36, 45, 61). Por defecto 24."
-                  },
-                  "declinacion_grados": {
-                    "type": "number",
-                    "description": "Declinación celeste en grados (0=ecuador celeste/Orión, 30=Vía Láctea típica, 60=Casiopea, 85=cerca de Polaris). Por defecto 0."
-                  },
-                  "tiempo_elegido_s": {
-                    "type": "number",
-                    "description": "Tiempo de exposición que el usuario quiere usar, en segundos. Se evalúa si produce estelas. Por defecto 20."
-                  }
+                  "focal_mm": { "type": "number", "description": "Focal real del objetivo en mm (ej: 14, 24, 35)." },
+                  "apertura": { "type": "number", "description": "Número f de apertura (ej: 1.8, 2.8, 4)." },
+                  "sensor": { "type": "string", "enum": ["ff", "apsc15", "apsc16", "m43"], "description": "Tipo de sensor. Por defecto ff." },
+                  "megapixeles": { "type": "number", "description": "Megapíxeles del sensor (ej: 24, 36, 45). Por defecto 24." },
+                  "declinacion_grados": { "type": "number", "description": "Declinación celeste en grados (0=ecuador, 30=Vía Láctea, 85=cerca Polaris). Por defecto 0." },
+                  "tiempo_elegido_s": { "type": "number", "description": "Tiempo que el usuario quiere evaluar en segundos. Por defecto 20." }
                 }
               }
             }
@@ -113,7 +80,7 @@
         },
         "responses": {
           "200": {
-            "description": "Tiempos máximos y veredicto sobre el tiempo elegido",
+            "description": "Tiempos máximos y veredicto",
             "content": {
               "application/json": {
                 "schema": {
@@ -121,11 +88,8 @@
                   "properties": {
                     "tiempo_maximo_npf_s": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
                     "tiempo_maximo_500_s": { "type": "number" },
-                    "tiempo_maximo_300_s": { "type": "number" },
-                    "pixel_pitch_um": { "type": "number" },
                     "veredicto": { "type": "string" },
-                    "descripcion": { "type": "string" },
-                    "recomendacion": { "type": "string" }
+                    "descripcion": { "type": "string" }
                   }
                 }
               }
@@ -138,7 +102,7 @@
       "post": {
         "operationId": "calcularExposicionEquivalente",
         "summary": "Calcula exposición equivalente (triángulo ISO/apertura/obturador)",
-        "description": "Dado un triángulo de exposición base (ISO, apertura, velocidad de obturación), calcula la exposición equivalente al cambiar uno de los parámetros, ajustando automáticamente otro para mantener el mismo valor de exposición (EV).",
+        "description": "Dado un triángulo de exposición base (ISO, apertura, velocidad), calcula la exposición equivalente al cambiar uno de los parámetros manteniendo el mismo EV.",
         "requestBody": {
           "required": true,
           "content": {
@@ -147,27 +111,11 @@
                 "type": "object",
                 "required": ["iso_base", "apertura_base", "obturador_base_s", "parametro_fijo", "nuevo_valor"],
                 "properties": {
-                  "iso_base": {
-                    "type": "number",
-                    "description": "ISO de partida (ej: 100, 400, 1600)."
-                  },
-                  "apertura_base": {
-                    "type": "number",
-                    "description": "Apertura f de partida (ej: 2.8, 5.6, 11)."
-                  },
-                  "obturador_base_s": {
-                    "type": "number",
-                    "description": "Velocidad de obturación base en segundos (ej: 0.01 para 1/100, 0.001 para 1/1000, 2 para 2 s)."
-                  },
-                  "parametro_fijo": {
-                    "type": "string",
-                    "enum": ["iso", "apertura", "obturador"],
-                    "description": "Qué parámetro se cambia: iso (ajusta apertura), apertura (ajusta obturador), obturador (ajusta ISO)."
-                  },
-                  "nuevo_valor": {
-                    "type": "number",
-                    "description": "Nuevo valor del parámetro elegido (ej: si parametro_fijo=apertura y quieres f/1.4, nuevo_valor=1.4)."
-                  }
+                  "iso_base": { "type": "number", "description": "ISO de partida (ej: 100, 400, 1600)." },
+                  "apertura_base": { "type": "number", "description": "Apertura f de partida (ej: 2.8, 5.6)." },
+                  "obturador_base_s": { "type": "number", "description": "Velocidad de obturación en segundos (ej: 0.01 para 1/100, 2 para 2s)." },
+                  "parametro_fijo": { "type": "string", "enum": ["iso", "apertura", "obturador"], "description": "Qué parámetro cambia: iso (ajusta apertura), apertura (ajusta obturador), obturador (ajusta ISO)." },
+                  "nuevo_valor": { "type": "number", "description": "Nuevo valor del parámetro elegido." }
                 }
               }
             }
@@ -181,10 +129,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "exposicion_original": { "type": "object" },
-                    "exposicion_equivalente": { "type": "object" },
-                    "valores_en_pasos": { "type": "object" },
-                    "nota": { "type": "string" }
+                    "iso": { "type": "number" },
+                    "apertura": { "type": "number" },
+                    "obturador_fraccion": { "type": "string" },
+                    "ev": { "type": "number" }
                   }
                 }
               }
@@ -192,13 +140,12 @@
           }
         }
       }
-    }
-  },
+    },
     "/api/chatgpt/regla-180-video": {
       "post": {
         "operationId": "calcularRegla180Video",
         "summary": "Obturador correcto para vídeo según la regla de los 180°",
-        "description": "Calcula la velocidad de obturación recomendada para cualquier frame rate según la regla de los 180°: el obturador debe ser el doble del frame rate para lograr un motion blur natural. Devuelve también una tabla con los valores para los fps más comunes.",
+        "description": "Calcula la velocidad de obturación recomendada para cualquier frame rate según la regla de los 180°. Devuelve también una tabla con los fps más comunes.",
         "requestBody": {
           "required": true,
           "content": {
@@ -216,7 +163,18 @@
         "responses": {
           "200": {
             "description": "Obturador recomendado y tabla de referencia",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "obturador_recomendado": { "type": "string" }, "descripcion": { "type": "string" }, "tabla_fps_comunes": { "type": "array" } } } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "obturador_recomendado": { "type": "string" },
+                    "descripcion": { "type": "string" },
+                    "tabla_fps_comunes": { "type": "array" }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -225,7 +183,7 @@
       "post": {
         "operationId": "calcularCamaraLenta",
         "summary": "Factor de ralentización y obturador para slow motion",
-        "description": "Calcula el factor de ralentización de un vídeo slow motion a partir de los fps de grabación y reproducción. Devuelve el multiplicador (ej. 4×), el obturador correcto según la regla 180° a los fps de grabación, la duración final del clip si se proporciona la duración grabada, y el nivel de slow motion.",
+        "description": "Calcula el factor de ralentización de un vídeo slow motion a partir de los fps de grabación y reproducción. Devuelve el multiplicador, el obturador correcto según la regla 180° y opcionalmente la duración del clip ralentizado.",
         "requestBody": {
           "required": true,
           "content": {
@@ -236,7 +194,7 @@
                 "properties": {
                   "fps_grabacion": { "type": "number", "description": "FPS a los que se graba (ej. 120, 240, 960)." },
                   "fps_reproduccion": { "type": "number", "description": "FPS a los que se reproducirá (ej. 24, 25, 30)." },
-                  "duracion_grabacion_s": { "type": "number", "description": "Duración del clip grabado en segundos. Opcional: si se indica, calcula la duración del vídeo ralentizado." }
+                  "duracion_grabacion_s": { "type": "number", "description": "Duración del clip grabado en segundos. Opcional." }
                 }
               }
             }
@@ -245,7 +203,19 @@
         "responses": {
           "200": {
             "description": "Factor slow motion y detalles",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "factor_lentitud": { "type": "string" }, "nivel": { "type": "string" }, "obturador_grabacion": { "type": "string" }, "duracion_resultado_s": { "type": "number", "nullable": true } } } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "factor_lentitud": { "type": "string" },
+                    "nivel": { "type": "string" },
+                    "obturador_grabacion": { "type": "string" },
+                    "duracion_resultado_s": { "type": "number", "nullable": true }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -254,7 +224,7 @@
       "post": {
         "operationId": "calcularFiltroNDVideo",
         "summary": "Filtro ND necesario para cumplir la regla de los 180° en exteriores",
-        "description": "Calcula qué filtro de densidad neutra (ND) se necesita para pasar de la velocidad de obturación actual a la correcta según la regla de los 180°. Devuelve las paradas exactas necesarias y una tabla con los filtros ND disponibles (ND2–ND1000) indicando cuál es el más recomendado.",
+        "description": "Calcula qué filtro ND se necesita para pasar de la velocidad de obturación actual a la correcta según la regla de los 180°. Devuelve las paradas exactas y una tabla ND2–ND1000.",
         "requestBody": {
           "required": true,
           "content": {
@@ -273,7 +243,19 @@
         "responses": {
           "200": {
             "description": "Filtro ND recomendado y tabla de opciones",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "necesita_nd": { "type": "boolean" }, "paradas_necesarias": { "type": "number" }, "recomendacion": { "type": "string" }, "opciones": { "type": "array" } } } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "necesita_nd": { "type": "boolean" },
+                    "paradas_necesarias": { "type": "number" },
+                    "recomendacion": { "type": "string" },
+                    "opciones": { "type": "array" }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -282,7 +264,7 @@
       "post": {
         "operationId": "calcularBitrateVideo",
         "summary": "Estima el bitrate y tamaño de archivo de un vídeo",
-        "description": "Calcula el bitrate necesario y el tamaño aproximado de un archivo de vídeo según resolución, fps, duración y códec. Devuelve también una comparativa entre H.264, H.265, ProRes 422 y RAW para la misma configuración.",
+        "description": "Calcula el bitrate y el tamaño aproximado según resolución, fps, duración y códec. Devuelve comparativa entre H.264, H.265, ProRes 422 y RAW.",
         "requestBody": {
           "required": true,
           "content": {
@@ -291,10 +273,10 @@
                 "type": "object",
                 "required": ["resolucion", "fps", "duracion_min"],
                 "properties": {
-                  "resolucion": { "type": "string", "enum": ["480p","720p","1080p","2k","4k","8k"], "description": "Resolución del vídeo." },
+                  "resolucion": { "type": "string", "enum": ["480p", "720p", "1080p", "2k", "4k", "8k"], "description": "Resolución del vídeo." },
                   "fps": { "type": "number", "description": "Frame rate (ej. 24, 30, 60)." },
                   "duracion_min": { "type": "number", "description": "Duración del vídeo en minutos." },
-                  "codec": { "type": "string", "enum": ["h264","h265","prores422","raw"], "description": "Códec de vídeo. Por defecto h264." }
+                  "codec": { "type": "string", "enum": ["h264", "h265", "prores422", "raw"], "description": "Códec. Por defecto h264." }
                 }
               }
             }
@@ -302,8 +284,19 @@
         },
         "responses": {
           "200": {
-            "description": "Bitrate y tamaño estimados con comparativa de códecs",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "bitrate_mbps": { "type": "number" }, "tamano": { "type": "string" }, "comparativa_codecs": { "type": "array" } } } } }
+            "description": "Bitrate y tamaño con comparativa de códecs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "bitrate_mbps": { "type": "number" },
+                    "tamano": { "type": "string" },
+                    "comparativa_codecs": { "type": "array" }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -312,7 +305,7 @@
       "post": {
         "operationId": "calcularFOVVideo",
         "summary": "Calcula el ángulo de campo (FOV) para vídeo según focal y sensor",
-        "description": "Calcula los ángulos de campo horizontal, vertical y diagonal para una focal y sensor dados. Incluye comparativa entre Full Frame, APS-C Nikon/Sony, APS-C Canon y Micro 4/3 con la misma focal, mostrando el focal equivalente en 35mm para cada sensor.",
+        "description": "Calcula los ángulos de campo horizontal, vertical y diagonal. Incluye comparativa entre Full Frame, APS-C y Micro 4/3 con el focal equivalente en 35mm.",
         "requestBody": {
           "required": true,
           "content": {
@@ -322,7 +315,7 @@
                 "required": ["focal_mm"],
                 "properties": {
                   "focal_mm": { "type": "number", "description": "Focal del objetivo en milímetros (ej. 24, 35, 50, 85)." },
-                  "sensor": { "type": "string", "enum": ["ff","apsc15","apsc16","m43"], "description": "Tipo de sensor. Por defecto ff (Full Frame)." }
+                  "sensor": { "type": "string", "enum": ["ff", "apsc15", "apsc16", "m43"], "description": "Tipo de sensor. Por defecto ff." }
                 }
               }
             }
@@ -331,7 +324,19 @@
         "responses": {
           "200": {
             "description": "FOV y comparativa de sensores",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "fov_horizontal_deg": { "type": "number" }, "fov_vertical_deg": { "type": "number" }, "clasificacion": { "type": "string" }, "comparativa_sensores": { "type": "array" } } } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fov_horizontal_deg": { "type": "number" },
+                    "fov_vertical_deg": { "type": "number" },
+                    "clasificacion": { "type": "string" },
+                    "comparativa_sensores": { "type": "array" }
+                  }
+                }
+              }
+            }
           }
         }
       }
