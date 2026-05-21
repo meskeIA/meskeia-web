@@ -884,4 +884,113 @@ export const analyticsRouter = router({
         tablaPuente,
       };
     }),
+
+  /**
+   * Procedure: getTendencias
+   * Devuelve tendencia mensual 2026, desglose por canal y % LATAM mes actual vs anterior.
+   */
+  getTendencias: publicProcedure
+    .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      let ipExcluida = '';
+      if (input.excluir_mi_ip) {
+        try {
+          const r = await client.execute({ sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`, args: [] });
+          if (r.rows.length > 0) ipExcluida = String(r.rows[0].valor);
+        } catch { /* ignorar */ }
+      }
+
+      const ahora = new Date();
+      const mesActual = String(ahora.getMonth() + 1).padStart(2, '0');
+      const anioActual = String(ahora.getFullYear());
+      const mesAnteriorDate = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+      const mesAnterior = String(mesAnteriorDate.getMonth() + 1).padStart(2, '0');
+      const anioAnterior = String(mesAnteriorDate.getFullYear());
+
+      const ipFiltro = ipExcluida
+        ? ` AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != '${ipExcluida}')`
+        : ` AND (es_propio IS NULL OR es_propio = 0)`;
+      const botFiltro = ` AND (es_bot IS NULL OR es_bot = 0)`;
+
+      // 1. Evolución mensual 2026
+      const mensualRes = await client.execute({
+        sql: `
+          SELECT
+            substr(timestamp,7,4) || '-' || substr(timestamp,4,2) as mes,
+            COUNT(*) as visitas,
+            COUNT(DISTINCT sesion_id) as sesiones,
+            COUNT(DISTINCT pais) as paises
+          FROM uso_aplicaciones
+          WHERE substr(timestamp,7,4) = '${anioActual}'
+            ${ipFiltro}${botFiltro}
+          GROUP BY mes
+          ORDER BY mes
+        `,
+        args: [],
+      });
+
+      // 2. Canal de tráfico mes actual
+      const canalRes = await client.execute({
+        sql: `
+          SELECT
+            CASE
+              WHEN modo = 'referral-ia' THEN 'ia'
+              WHEN modo = 'referral-social' THEN 'social'
+              WHEN modo = 'pwa' THEN 'pwa'
+              ELSE 'web'
+            END as canal,
+            COUNT(*) as visitas
+          FROM uso_aplicaciones
+          WHERE substr(timestamp,7,4) = '${anioActual}'
+            AND substr(timestamp,4,2) = '${mesActual}'
+            ${ipFiltro}${botFiltro}
+          GROUP BY canal
+          ORDER BY visitas DESC
+        `,
+        args: [],
+      });
+
+      // 3. % LATAM mes actual y mes anterior
+      const paisesLatam = `'MX','CO','AR','BO','EC','PE','CL','CR','VE','UY','PY','GT','HN','SV','NI','DO','CU','PA','PR'`;
+      const latamRes = await client.execute({
+        sql: `
+          SELECT
+            substr(timestamp,7,4) || '-' || substr(timestamp,4,2) as mes,
+            COUNT(*) as total,
+            SUM(CASE WHEN pais IN (${paisesLatam}) THEN 1 ELSE 0 END) as latam
+          FROM uso_aplicaciones
+          WHERE (
+            (substr(timestamp,7,4) = '${anioActual}' AND substr(timestamp,4,2) = '${mesActual}')
+            OR (substr(timestamp,7,4) = '${anioAnterior}' AND substr(timestamp,4,2) = '${mesAnterior}')
+          )
+          ${ipFiltro}${botFiltro}
+          GROUP BY mes
+          ORDER BY mes
+        `,
+        args: [],
+      });
+
+      const latamPorMes = latamRes.rows.map(r => ({
+        mes: String(r.mes),
+        total: Number(r.total),
+        latam: Number(r.latam),
+        pct: Number(r.total) > 0 ? Math.round((Number(r.latam) / Number(r.total)) * 1000) / 10 : 0,
+      }));
+
+      return {
+        mensual: mensualRes.rows.map(r => ({
+          mes: String(r.mes),
+          visitas: Number(r.visitas),
+          sesiones: Number(r.sesiones),
+          paises: Number(r.paises),
+        })),
+        canales: Object.fromEntries(
+          canalRes.rows.map(r => [String(r.canal), Number(r.visitas)])
+        ) as Record<string, number>,
+        latam: latamPorMes,
+      };
+    }),
 });

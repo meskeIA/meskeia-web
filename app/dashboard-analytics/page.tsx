@@ -141,6 +141,9 @@ export default function DashboardAnalyticsPage() {
   // tRPC: Navegación (apps por sesión, pares from→to, apps puente)
   const navegacionQuery = trpc.analytics.getNavegacion.useQuery({ dias: 14 });
 
+  // tRPC: Tendencias históricas (mensual 2026, canales, LATAM)
+  const tendenciasQuery = trpc.analytics.getTendencias.useQuery({ excluir_mi_ip: filtroIPActivo });
+
   // tRPC: Obtener configuración de IP
   const ipConfigQuery = trpc.analytics.getIPConfig.useQuery(
     { ip_actual: typeof window !== 'undefined' ? window.location.hostname : 'unknown' },
@@ -647,6 +650,127 @@ export default function DashboardAnalyticsPage() {
             </div>
           </section>
 
+          {/* Evolución mensual 2026 */}
+          {tendenciasQuery.data && tendenciasQuery.data.mensual.length > 0 && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>📊 Evolución Mensual {new Date().getFullYear()}</h2>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid var(--primary)' }}>
+                      <th style={{ textAlign: 'left', padding: '8px 12px', color: 'var(--text-secondary)' }}>Mes</th>
+                      <th style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>Visitas</th>
+                      <th style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>Sesiones</th>
+                      <th style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>Países</th>
+                      <th style={{ textAlign: 'left', padding: '8px 12px', color: 'var(--text-secondary)' }}>Tendencia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tendenciasQuery.data.mensual.map((fila, idx) => {
+                      const prev = tendenciasQuery.data!.mensual[idx - 1];
+                      const pct = prev && prev.visitas > 0
+                        ? Math.round(((fila.visitas - prev.visitas) / prev.visitas) * 100)
+                        : null;
+                      const max = Math.max(...tendenciasQuery.data!.mensual.map(m => m.visitas));
+                      const barWidth = Math.round((fila.visitas / max) * 100);
+                      return (
+                        <tr key={fila.mes} style={{ borderBottom: '1px solid var(--bg-primary)' }}>
+                          <td style={{ padding: '8px 12px', fontWeight: 600 }}>{fila.mes}</td>
+                          <td style={{ textAlign: 'right', padding: '8px 12px' }}>{fila.visitas.toLocaleString('es-ES')}</td>
+                          <td style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>{fila.sesiones.toLocaleString('es-ES')}</td>
+                          <td style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--text-secondary)' }}>{fila.paises}</td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{ flex: 1, height: '8px', background: 'var(--bg-primary)', borderRadius: '4px', minWidth: '60px' }}>
+                                <div style={{ width: `${barWidth}%`, height: '100%', background: 'var(--primary)', borderRadius: '4px' }} />
+                              </div>
+                              {pct !== null && (
+                                <span style={{ fontSize: '0.8rem', color: pct >= 0 ? '#22c55e' : '#ef4444', fontWeight: 600, minWidth: '45px' }}>
+                                  {pct >= 0 ? '↑' : '↓'}{Math.abs(pct)}%
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* Canal de tráfico + LATAM */}
+          {tendenciasQuery.data && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>📡 Canal de Tráfico y Alcance LATAM</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+
+                {/* Canal de tráfico */}
+                <div style={{ background: 'var(--bg-card)', borderRadius: '12px', padding: '1.25rem', border: '1px solid var(--bg-primary)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>
+                    Origen de visitas (mes actual)
+                  </h3>
+                  {(() => {
+                    const canales = tendenciasQuery.data!.canales;
+                    const total = Object.values(canales).reduce((a, b) => a + b, 0);
+                    const items = [
+                      { key: 'web', label: 'Orgánico / Directo', icon: '🌐' },
+                      { key: 'ia', label: 'IAs (ChatGPT, Copilot…)', icon: '🤖' },
+                      { key: 'social', label: 'Redes sociales (X, etc.)', icon: '📱' },
+                      { key: 'pwa', label: 'PWA instalada', icon: '📲' },
+                    ];
+                    return items.map(({ key, label, icon }) => {
+                      const v = canales[key] ?? 0;
+                      const pct = total > 0 ? Math.round((v / total) * 100) : 0;
+                      return (
+                        <div key={key} style={{ marginBottom: '0.75rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px', fontSize: '0.85rem' }}>
+                            <span>{icon} {label}</span>
+                            <span style={{ fontWeight: 700 }}>{v.toLocaleString('es-ES')} <span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>({pct}%)</span></span>
+                          </div>
+                          <div style={{ height: '6px', background: 'var(--bg-primary)', borderRadius: '3px' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', background: 'var(--primary)', borderRadius: '3px' }} />
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+
+                {/* LATAM */}
+                <div style={{ background: 'var(--bg-card)', borderRadius: '12px', padding: '1.25rem', border: '1px solid var(--bg-primary)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>
+                    Alcance LATAM
+                  </h3>
+                  {tendenciasQuery.data!.latam.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Sin datos</p>
+                  ) : (
+                    tendenciasQuery.data!.latam.map(fila => (
+                      <div key={fila.mes} style={{ marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem' }}>
+                          <span style={{ fontWeight: 600 }}>{fila.mes}</span>
+                          <span style={{ fontWeight: 700, color: fila.pct >= 30 ? '#22c55e' : 'var(--primary)' }}>
+                            {fila.pct}% LATAM
+                          </span>
+                        </div>
+                        <div style={{ height: '8px', background: 'var(--bg-primary)', borderRadius: '4px' }}>
+                          <div style={{ width: `${fila.pct}%`, height: '100%', background: fila.pct >= 30 ? '#22c55e' : 'var(--primary)', borderRadius: '4px' }} />
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          {fila.latam.toLocaleString('es-ES')} de {fila.total.toLocaleString('es-ES')} visitas
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                    Objetivo reposicionamiento: ≥30% LATAM
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Gráfico de Tendencia */}
           {tendenciaData && (
             <section className={styles.section}>
@@ -699,7 +823,7 @@ export default function DashboardAnalyticsPage() {
             <section className={styles.section}>
               <h2>🌍 Top Países</h2>
               <div className={styles.geoList}>
-                {datos.estadisticas.geografia.paises.slice(0, 5).map((pais: any, idx) => (
+                {datos.estadisticas.geografia.paises.slice(0, 10).map((pais: any, idx) => (
                   <div key={String(pais.pais)} className={styles.geoItem}>
                     <span className={styles.geoRank}>#{idx + 1}</span>
                     <span className={styles.geoName}>{pais.pais}</span>
