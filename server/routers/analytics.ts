@@ -913,7 +913,7 @@ export const analyticsRouter = router({
       const ipFiltro = ipExcluida
         ? ` AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != '${ipExcluida}')`
         : ` AND (es_propio IS NULL OR es_propio = 0)`;
-      const botFiltro = ` AND (es_bot IS NULL OR es_bot = 0)`;
+      const botFiltro = ` AND modo NOT IN ('bot', 'mcp')`;
 
       // 1. Evolución mensual 2026
       const mensualRes = await client.execute({
