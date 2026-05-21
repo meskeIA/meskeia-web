@@ -205,6 +205,9 @@ export const implementedAppsUrls = [
   "/diapason/",                    // Diapasón digital La 440Hz
   "/generador-tonos/",             // Generador de frecuencias de audio
   "/afinador-instrumentos/",       // Afinador cromático para instrumentos
+  "/transpositor-acordes/",        // Transponer acordes a cualquier tonalidad al instante
+  "/visualizador-escalas-musicales/", // Escalas mayor, menor, pentatónica, blues y modos griegos en teclado de piano
+  "/visualizador-circulo-quintas/",   // Círculo de quintas interactivo con acordes diatónicos y armaduras
   "/lupa-digital/",                // Lupa digital con zoom y filtros
   "/espejo/",                      // Espejo digital con cámara frontal
 

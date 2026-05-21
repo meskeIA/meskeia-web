@@ -1,0 +1,826 @@
+/* VisualizadorEscalasMusicales.module.css — meskeIA */
+
+/* ─────────────────────────────────────────────
+   Layout principal
+───────────────────────────────────────────── */
+
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --hero-bg: #1a5278;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+  margin-top: 80px;
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  opacity: 0.92;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* ─────────────────────────────────────────────
+   Selectores
+───────────────────────────────────────────── */
+
+.selectores {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.selectorGroup {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.selectorLabel {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+/* Grid de notas raíz */
+.notasGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.notaBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--bg-primary);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 56px;
+}
+
+.notaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.notaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.notaBtnActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.notaBtnActiva:hover {
+  color: #fff;
+}
+
+.notaBtnNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.notaBtnEs {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+/* Grupos de escalas */
+.grupoEscala {
+  margin-bottom: 0.75rem;
+}
+
+.grupoLabel {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+}
+
+.escalasBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.escalaBtn {
+  padding: 0.4rem 0.9rem;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.escalaBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.escalaBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.escalaBtnActiva {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.escalaBtnActiva:hover {
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────
+   Resultados
+───────────────────────────────────────────── */
+
+.resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.caracterCard {
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.caracterTitulo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 0.4rem;
+}
+
+.caracterDesc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.seccionTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
+}
+
+/* Chips de notas */
+.notasEscalaSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.notasChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.notaChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  min-width: 60px;
+}
+
+.chipGrado {
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chipNombre {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.chipNombreEs {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  margin-top: 1px;
+}
+
+/* ─────────────────────────────────────────────
+   Piano
+───────────────────────────────────────────── */
+
+.pianoSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.pianoWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.pianoSvg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+  max-width: 800px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.teclaBlanca {
+  fill: #f9f9f9;
+  stroke: #ccc;
+  stroke-width: 1;
+  cursor: default;
+}
+
+.teclaBlancaActiva {
+  fill: #2E86AB;
+  stroke: #1a5278;
+  stroke-width: 1;
+  cursor: default;
+}
+
+.teclaNegra {
+  fill: #222;
+  stroke: #111;
+  stroke-width: 0.5;
+  cursor: default;
+}
+
+.teclaNegrActiva {
+  fill: #1a5278;
+  stroke: #0d3a5a;
+  stroke-width: 0.5;
+  cursor: default;
+}
+
+.teclaLabel {
+  pointer-events: none;
+  user-select: none;
+}
+
+.pianoLeyenda {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 0;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────
+   Acordes diatónicos
+───────────────────────────────────────────── */
+
+.acordesSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.acordesDesc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.acordesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.acordeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--secondary);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  min-width: 72px;
+  text-align: center;
+}
+
+.acordeGrado {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.acordeNombre {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 2px 0;
+}
+
+.acordeTipo {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.acordeNotas {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+/* ─────────────────────────────────────────────
+   Intervalos
+───────────────────────────────────────────── */
+
+.intervalosSection {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.intervalosRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.intervaloItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  min-width: 52px;
+  text-align: center;
+}
+
+.intervaloNum {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--secondary);
+  line-height: 1;
+}
+
+.intervaloGrado {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ─────────────────────────────────────────────
+   Sección educativa v2.0
+───────────────────────────────────────────── */
+
+.eduIntro {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.eduTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 1.5rem 0 0.75rem;
+}
+
+/* Tabla comparativa */
+.tablaSection {
+  margin-bottom: 1rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabla th {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.tabla td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.tabla tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+.monoCell {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: var(--secondary);
+}
+
+.tablaNote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.4rem 0 0;
+  font-style: italic;
+}
+
+/* Escenarios / casos de uso */
+.escenariosSection {
+  margin-bottom: 1rem;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  border-left: 3px solid var(--secondary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.escenarioTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+/* FAQ */
+.faqSection {
+  margin-bottom: 1rem;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--bg-primary);
+  overflow: hidden;
+}
+
+.faqPregunta {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.faqPregunta::-webkit-details-marker {
+  display: none;
+}
+
+.faqPregunta::before {
+  content: '▶';
+  font-size: 0.6rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+details[open] .faqPregunta::before {
+  transform: rotate(90deg);
+}
+
+.faqRespuesta {
+  padding: 0 1rem 0.75rem 2rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Pasos */
+.pasosSection {
+  margin-bottom: 1rem;
+}
+
+.pasosList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pasoItem {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pasoNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.pasoTitulo {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.pasoDesc {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Tips */
+.tipsSection {
+  margin-bottom: 1rem;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tipItem {
+  padding: 0.6rem 0.9rem 0.6rem 1.5rem;
+  background: var(--bg-card);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  position: relative;
+}
+
+.tipItem::before {
+  content: '✦';
+  position: absolute;
+  left: 0.5rem;
+  color: var(--secondary);
+  font-size: 0.75rem;
+  top: 0.7rem;
+}
+
+/* WarningBox — OBLIGATORIO v2.0 */
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #f0c330;
+  border-left: 4px solid #e6a800;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.warningTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #7a5400;
+  margin: 0 0 0.5rem;
+}
+
+.warningList {
+  list-style: disc;
+  padding-left: 1.2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.warningList li {
+  font-size: 0.85rem;
+  color: #6b4500;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────────── */
+
+[data-theme='dark'] .container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .selectorGroup,
+[data-theme='dark'] .caracterCard,
+[data-theme='dark'] .notasEscalaSection,
+[data-theme='dark'] .pianoSection,
+[data-theme='dark'] .acordesSection,
+[data-theme='dark'] .intervalosSection,
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .pasoItem {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .notaBtn,
+[data-theme='dark'] .escalaBtn,
+[data-theme='dark'] .intervaloItem,
+[data-theme='dark'] .acordeCard {
+  background: #333;
+  color: var(--text-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .teclaBlanca {
+  fill: #e0e0e0;
+  stroke: #999;
+}
+
+[data-theme='dark'] .teclaBlancaActiva {
+  fill: #2E86AB;
+  stroke: #1a5278;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a2000;
+  border-color: #6b4500;
+  border-left-color: #e6a800;
+}
+
+[data-theme='dark'] .warningTitulo {
+  color: #ffc744;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #d4a84b;
+}
+
+[data-theme='dark'] .tabla th {
+  background: #1a5278;
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: #333;
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tabla tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .tipItem {
+  background: var(--bg-card);
+}
+
+/* ─────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+    margin-top: 64px;
+  }
+
+  .main {
+    padding: 1rem 0.75rem 2rem;
+  }
+
+  .selectorGroup {
+    padding: 1rem;
+  }
+
+  .notaBtn {
+    min-width: 48px;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .notaBtnNombre {
+    font-size: 0.9rem;
+  }
+
+  .acordesGrid {
+    gap: 0.4rem;
+  }
+
+  .acordeCard {
+    min-width: 62px;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notaBtn,
+  .escalaBtn,
+  .faqPregunta::before {
+    transition: none;
+  }
+}

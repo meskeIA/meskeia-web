@@ -885,10 +885,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-vacunas/', icon: '💉', name: 'Cómo Funciona una Vacuna', description: 'Sistema inmune visual' },
   ],
   'visualizador-matematicas-musica': [
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
+    { url: '/visualizador-escalas-musicales/', icon: '🎼', name: 'Escalas Musicales', description: 'Mayor, menor, pentatónica y modos' },
+    { url: '/visualizador-circulo-quintas/', icon: '🎶', name: 'Círculo de Quintas', description: 'Acordes diatónicos y armonía' },
     { url: '/visualizador-probabilidad/', icon: '🎲', name: 'Probabilidad', description: 'Simulaciones interactivas' },
-    { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones del Mundo', description: '4 funciones fundamentales' },
-    { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
-    { url: '/visualizador-escalas-tiempo/', icon: '⏳', name: 'Cuánto Tarda el Mundo', description: 'Escalas temporales' },
   ],
   'visualizador-construccion-edificio': [
     { url: '/visualizador-ciudad/', icon: '🏙️', name: 'Anatomía de una Ciudad', description: 'Infraestructura urbana' },
@@ -2571,16 +2571,49 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'luxometro': [{ url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Hora dorada y azul' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/conversor-colores/', icon: '🎨', name: 'Conversor Colores', description: 'HEX, RGB, HSL' }],
   'golden-hour': [{ url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
   'mi-ip': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
-  'metronomo': [{ url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' }, { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica de productividad' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }],
+  'metronomo': [
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
+    { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento con el micrófono' },
+    { url: '/visualizador-circulo-quintas/', icon: '🎶', name: 'Círculo de Quintas', description: 'Acordes diatónicos y armonía' },
+    { url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' },
+  ],
   'calculadora-inflacion': finanzasPersonalesApps,
   'analizador-espectro': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
   'nivel-burbuja': [{ url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud y ángulos' }, { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros necesarios' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }],
 
   // INSTRUMENTOS DIGITALES (sustituyen aparatos físicos)
   'contador-manual': [{ url: '/cronometro/', icon: '⏱️', name: 'Cronómetro', description: 'Medir tiempo' }, { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica productividad' }, { url: '/seguimiento-habitos/', icon: '✅', name: 'Seguimiento Hábitos', description: 'Rastrea tus hábitos' }],
-  'diapason': [{ url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }, { url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }],
+  'diapason': [
+    { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' },
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
+    { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
+    { url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' },
+  ],
   'generador-tonos': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento' }, { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440Hz' }, { url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }],
-  'afinador-instrumentos': [{ url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440Hz' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }, { url: '/generador-tonos/', icon: '🔊', name: 'Generador Tonos', description: 'Frecuencias de audio' }, { url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }],
+  'transpositor-acordes': [
+    { url: '/visualizador-escalas-musicales/', icon: '🎼', name: 'Escalas Musicales', description: 'Notas, intervalos y piano interactivo' },
+    { url: '/visualizador-circulo-quintas/', icon: '🎶', name: 'Círculo de Quintas', description: 'Acordes diatónicos y tonalidades vecinas' },
+    { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento con el micrófono' },
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Los Números de la Música', description: 'Frecuencias, armonía y ritmo' },
+  ],
+  'visualizador-escalas-musicales': [
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia el tono de tu canción al instante' },
+    { url: '/visualizador-circulo-quintas/', icon: '🎶', name: 'Círculo de Quintas', description: 'Acordes diatónicos y armonía' },
+    { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento con el micrófono' },
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Los Números de la Música', description: 'Frecuencias, ratios pitagóricos y armonía' },
+  ],
+  'visualizador-circulo-quintas': [
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia el tono de tu canción al instante' },
+    { url: '/visualizador-escalas-musicales/', icon: '🎼', name: 'Escalas Musicales', description: 'Mayor, menor, pentatónica y modos griegos' },
+    { url: '/afinador-instrumentos/', icon: '🎸', name: 'Afinador', description: 'Afina tu instrumento con el micrófono' },
+    { url: '/visualizador-matematicas-musica/', icon: '🎵', name: 'Los Números de la Música', description: 'Frecuencias, ratios pitagóricos y armonía' },
+  ],
+  'afinador-instrumentos': [
+    { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
+    { url: '/visualizador-escalas-musicales/', icon: '🎼', name: 'Escalas Musicales', description: 'Notas, intervalos y piano' },
+    { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440Hz de referencia' },
+    { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
+  ],
   'lupa-digital': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/espejo/', icon: '🪞', name: 'Espejo', description: 'Espejo digital' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
   'espejo': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía con la cámara' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
 
