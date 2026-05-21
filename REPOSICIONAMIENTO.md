@@ -3,7 +3,8 @@
 > **Fuente de verdad** del proyecto de revisión estratégica iniciado el 2026-05-05.
 > Aquí se registra: contexto, decisiones tomadas, qué se ha implementado y qué queda por hacer.
 
-**Última actualización:** 2026-05-07 (Plan A descubrimiento cerrado en fase de medición + 27 simuladores creados — solo queda esperar 2-3 semanas para ver datos)
+**Última actualización:** 2026-05-21 (Revisión de 14 días — datos reales navegación, fix tracking compartir, RelatedApps top 5 apps mejoradas, dashboard ampliado)
+**Próxima revisión:** 2026-06-11
 
 ---
 
@@ -108,17 +109,25 @@ Esta definición canónica se inyectó en 8 sitios de la web (home, /acerca, /ap
 | **0** | Tracking de origen de clics + fix del `sesion_id` | ✅ COMPLETADA (2026-05-06) | `25c3831e`, `756339f3`, `ebfd1c20` |
 | **L** | Auditoría Latam-friendly + adaptación apps top + RegionBadge en 56 apps | ✅ COMPLETADA (2026-05-06) | varios |
 | **A+B** | Pestaña 🧭 Navegación en dashboard + tracking `?from=` en home, búsqueda, catálogo, sidebar | ✅ COMPLETADA (2026-05-07) | `e2191d6d` |
-| **1** | Componente `ContinuaCon` con datos dinámicos | ⏸️ EN PAUSA | Decidir tras 2-3 semanas de datos en pestaña Navegación |
-| **2** | Home con tracción real (top semanal, caminos) | ⏸️ EN PAUSA | Decidir cuando los datos muestren si la home es motor de descubrimiento o solo escaparate |
-| **3** | Decisión sobre `app-relations.ts` (4.680 líneas curadas) | ⏸️ EN PAUSA | Decidir cuando el ratio de continuación de RelatedApps tenga muestra suficiente |
+| **1** | Componente `ContinuaCon` con datos dinámicos | ⏸️ EN PAUSA | RelatedApps ya hace esa función. Revisar si apps/sesión mejora con los nuevos cross-links |
+| **2** | Home con tracción real (top semanal, caminos) | ❌ DESCARTADA (2026-05-21) | 0% de sesiones empieza o pasa por la home. Sin ROI. |
+| **3** | RelatedApps — mejora quirúrgica de top apps | 🔄 EN CURSO | Corregidas 5 apps el 2026-05-21. Medir impacto en próxima revisión (2026-06-11) |
 
 **Cambio de enfoque (2026-05-07)**: en lugar de ejecutar a ciegas las FASES 1-3, primero se construyó el **observatorio cuantitativo** (pestaña Navegación con KPIs de apps por sesión, distribución, transiciones origen→destino y ratio de continuación por app). A 2-3 semanas, los datos dirán si vale la pena cada una de esas fases o si el problema está en otro sitio.
+
+**Revisión de 14 días (2026-05-21)**: datos reales de navegación por primera vez.
+- Apps por sesión: **1,27** (objetivo 2,0+ — lejos aún)
+- Sesiones single-app: **94,6%** — problema estructural confirmado
+- Home: **0%** empieza / **0%** pasa — FASE 2 descartada definitivamente
+- Transiciones reales dominadas por `related-*` (RelatedApps es la única palanca activa)
+- Correlación 0% continuación con cross-links irrelevantes confirmada en `simulador-genetica`
 
 **Mejoras adicionales aplicadas en este eje**:
 
 - Cross-linking en top 19 apps (2026-05-06): RelatedApps reescrito en `tabla-periodica`, `test-perfil-inversor`, `simulador-genetica`, `calculadora-notas`, `generador-anagramas`, etc.
 - Filtro de datacenters cloud (2026-05-06): scrapers Tencent/AWS marcados como `bot` en analytics.
 - Tracking `?from=` en 5 puntos (2026-05-07): `home-daily` (DailyApps), `search` (SearchBar), `catalog` y `catalog-guides` (/apps), `sidebar-recent` (Sidebar/SidebarMobile). `related-{slug}` ya existía.
+- **RelatedApps top 5 apps corregidas (2026-05-21)** — `68b3c1c6`: `simulador-puertas-logicas`, `simulador-genetica`, `simulador-movimiento-circular`, `tabla-periodica`, `calculadora-notas`. Links irrelevantes sustituidos por links directamente relacionados con la tarea del usuario.
 
 ---
 
@@ -196,51 +205,59 @@ Esta definición canónica se inyectó en 8 sitios de la web (home, /acerca, /ap
 | 2026-05-07 | NO redistribuir Estudiantes vs Cultura quirúrgicamente | Solo 1.7% del tráfico ve el catálogo; opción intermedia con reglas suficiente |
 | 2026-05-07 | Crear 27 simuladores en una sola sesión (10 ciencias + 11 informática + 6 fiscal-España) | Cierra los 3 bloques abiertos del REPOSICIONAMIENTO. Justificado por 43m duración y 41% recurrencia de simuladores frente a 55s/18% de visualizadores |
 | 2026-05-07 | Construir pestaña Navegación ANTES de implementar FASES 1-3 del Plan A | Mejor medir primero qué pasa que ejecutar a ciegas componentes "ContinuaCon", refactor app-relations, etc. |
+| 2026-05-21 | FASE 2 (home dinámica) descartada definitivamente | 0% de sesiones empieza o pasa por la home — sin ROI posible |
+| 2026-05-21 | X/Twitter diagnosticado como canal de bajo ROI | 17 visitas en todo 2026 con 3-4 posts diarios. ChatGPT GPTs generan 111 visitas con esfuerzo cero |
+| 2026-05-21 | RelatedApps: corrección quirúrgica en lugar de refactor masivo | Diagnosticado que el problema es relevancia de links, no el mecanismo. Corregidas las 5 apps con más tráfico y peor ratio |
+| 2026-05-21 | Fix tracking compartir en Footer | El botón del Footer no añadía `?ref=share` — todas esas visitas no se contabilizaban. Corregido |
 
 ---
 
 ## 8. Métricas a seguir
 
-| Métrica | Valor 2026-05-05 | Objetivo | Dónde verla |
-|---------|-----------------:|----------|-------------|
-| Apps por sesión (real, post-fix `sesion_id`) | a medir | 2,0+ | Pestaña 🧭 Navegación (KPI destacado) |
-| Distribución sesiones single-app vs multi-app | a medir | <60% single-app | Pestaña 🧭 Navegación |
-| Top transiciones origen→destino | a medir | identificar 5 rutas frecuentes | Pestaña 🧭 Navegación |
-| Ratio de continuación por app (puente vs puerta) | a medir | top apps ≥50% | Pestaña 🧭 Navegación |
-| % catálogo descubierto | 61,3% | 80%+ | Pestaña Resumen IA |
-| Recurrencia global | 28,5% | 40%+ | Pestaña Visión General |
-| % tráfico Latam global | 23% | 30%+ a 1 mes | Pestaña Resumen IA |
-| `calculadora-notas` % Latam | 4% | 20%+ a 1 mes | Por app |
-| Apps con >40% Latam | 11 | 18+ a 1 mes | — |
-| Apps con JSON-LD activo | 89 | crecer si Search Console valida tracción | — |
+| Métrica | Valor 2026-05-05 | Valor 2026-05-21 | Objetivo | Dónde verla |
+|---------|----------------:|----------------:|----------|-------------|
+| Apps por sesión (real, post-fix `sesion_id`) | a medir | **1,27** | 2,0+ | Pestaña 🧭 Navegación |
+| Sesiones single-app | a medir | **94,6%** | <60% | Pestaña 🧭 Navegación |
+| Ratio continuación top apps | a medir | 0-13% (mayoría) | ≥50% | Pestaña 🧭 Navegación |
+| Visitas mensuales | ~1.066 (mar) | **~2.750 (may, estimado)** | crecimiento sostenido | Visión General / Tendencias |
+| % tráfico LATAM | 23% | **38% (mayo)** | 30%+ | Sección LATAM (nueva) |
+| Países únicos mes | 32 (marzo) | **41 (mayo, récord)** | crecer | Sección Tendencias (nueva) |
+| % catálogo descubierto | 61,3% | sin actualizar | 80%+ | Pestaña Resumen IA |
+| Recurrencia global | 28,5% | **38,2%** | 40%+ | Pestaña Visión General |
+| Visitas por canal — web orgánico | — | **~91%** | dominante | Sección Canales (nueva) |
+| Visitas por canal — IA (ChatGPT, Copilot) | — | **~4% (111 vis.)** | crecer | Sección Canales (nueva) |
+| Visitas por canal — social (X) | — | **<1% (17 vis.)** | — | Sección Canales (nueva) |
+| Apps con JSON-LD activo | 89 | 89 | crecer con tráfico real | — |
 
 ---
 
 ## 9. Pendiente (corta lista)
 
-### Espera (datos en cocción — nada que hacer hasta entonces)
+### Próxima revisión — 2026-06-11 (3 semanas)
 
-1. **Revisión inicial de la pestaña 🧭 Navegación** — primera revisión a 7-14 días desde el 2026-05-07: muestra suficiente para apps por sesión y distribución, pero las transiciones con `?from=` explícito necesitan 3-5 días para empezar a aparecer.
-2. **Revisión cuantitativa a 2-3 semanas**: con muestra suficiente, decidir:
-   - Si vale la pena el componente `ContinuaCon` dinámico (FASE 1 original)
-   - Si la home necesita refactor con tracción real (FASE 2 original)
-   - Si `app-relations.ts` debe simplificarse o reescribirse a dinámico (FASE 3 original)
-3. **Métricas Latam**: comprobar si `calculadora-notas` con escalas Latam mueve el % de tráfico Latam a 2-3 semanas.
+1. **Impacto RelatedApps corregidas** — medir si las 5 apps mejoradas el 2026-05-21 han subido su ratio de continuación en la pestaña 🧭 Navegación. Referencia: simulador-genetica 0%, simulador-puertas-logicas 4,3%, tabla-periodica 5,3%.
+2. **Apps por sesión** — ¿ha subido de 1,27 tras los nuevos cross-links? ¿Single-app sigue en 94,6%?
+3. **Tracking de compartir** — ¿el fix del Footer ha aumentado el contador "Llegaron por Compartir" (estaba en 7)?
+4. **Mayo completo vs junio parcial** — comparar tendencia mensual con la nueva sección del dashboard.
+5. **LATAM** — ¿el 38% de mayo se sostiene en junio o era puntual?
+6. **Identificar próximas apps con RelatedApps débiles** — continuar la corrección quirúrgica con las apps que tengan mucho tráfico y poco ratio de continuación.
 
 ### A largo plazo (~agosto 2026)
 
-4. **Sweep adicional JSON-LD**: aplicar a apps que hayan ganado tráfico, si Search Console muestra tracción en las 89 actuales. Reglas y scripts ya disponibles (`scripts/apply-jsonld-batch.mjs`, `scripts/top-apps-next-50.mjs`).
-5. **Análisis de apps con 0 visitas**: solo cuando las palancas (difusión X, JSON-LD, RelatedApps mejorado, refactor catálogo) hayan tenido 2-3 meses para producir efecto. Antes de eso, "0 visitas" sigue significando "no descubierta", no "inútil".
+7. **Sweep adicional JSON-LD**: aplicar a apps que hayan ganado tráfico desde mayo. Scripts disponibles (`scripts/apply-jsonld-batch.mjs`, `scripts/top-apps-next-50.mjs`).
+8. **Análisis de apps con 0 visitas**: cuando las palancas activadas (JSON-LD, RelatedApps mejorado) tengan 3 meses de efecto (~agosto). Antes de eso, "0 visitas" = "no descubierta".
+9. **Comunidades educativas** — explorar WhatsApp/Telegram de docentes y estudiantes como canal de difusión orgánica (el spike de Bolivia confirma el potencial).
 
 ### Bloques estratégicos abiertos (sin urgencia)
 
-6. **Apps fiscales-España**: ¿señalizar visualmente más allá del `RegionBadge`? (mejora UX-Latam si hace falta)
-7. **Filosofía como filtro evolutivo**: criterio claro de "qué SÍ creamos / qué NO" para apps futuras. Pendiente de formalizar como decálogo.
+10. **Filosofía como filtro evolutivo**: criterio claro de "qué SÍ creamos / qué NO" para apps futuras. Pendiente de formalizar como decálogo.
 
 ### Cerrado en esta sesión (ya no figura como pendiente)
 
-- ~~Doblar apuesta en simuladores y tests~~ → 27 simuladores creados el 2026-05-07: 10 ciencias + 11 informática + 6 fiscal-España visual.
-- ~~Implementar componente ContinuaCon a ciegas~~ → Reemplazado por enfoque de medición previa con pestaña Navegación.
+- ~~Revisión inicial pestaña Navegación~~ → Completada el 2026-05-21 (14 días post-deploy). Datos: apps/sesión 1,27, 94,6% single-app, 0% home.
+- ~~FASE 2 (home dinámica)~~ → Descartada definitivamente. 0% de sesiones pasa por la home.
+- ~~Doblar apuesta en simuladores y tests~~ → 27 simuladores creados el 2026-05-07.
+- ~~Implementar componente ContinuaCon a ciegas~~ → Reemplazado por corrección quirúrgica de RelatedApps.
 
 ---
 
@@ -265,3 +282,5 @@ Esta definición canónica se inyectó en 8 sitios de la web (home, /acerca, /ap
 - **2026-05-07 noche**: Plan A descubrimiento cerrado en fase de medición. Pestaña 🧭 Navegación en dashboard + tracking `?from=` en home, búsqueda, catálogo y sidebar. Las FASES 1-3 originales (ContinuaCon, home dinámica, refactor app-relations) quedan EN PAUSA hasta tener 2-3 semanas de datos.
 
 **Total de la sesión 2026-05-05 a 2026-05-07**: ~35 commits, ~3.500 líneas eliminadas (código muerto), 13 suites, 0 momentos, 89 apps con JSON-LD, 56 con RegionBadge, 14 apps Latam-friendly, **27 simuladores nuevos** y **observatorio cuantitativo de navegación**. Ahora toca esperar para ver datos antes de seguir tocando.
+
+- **2026-05-21**: Revisión de 14 días. Primera lectura real de métricas de navegación (apps/sesión 1,27, 94,6% single-app, 0% home). Datos de crecimiento: mayo en camino a ~2.750 visitas (+99% vs abril), LATAM al 38% (objetivo 30% superado), 41 países únicos (récord). Diagnóstico canal X: 17 visitas en 2026 con posting diario — bajo ROI confirmado. Fix tracking compartir en Footer (`68b3c1c6`). RelatedApps corregidas en 5 apps top (`68b3c1c6`). Dashboard ampliado con tendencias mensuales, canales de tráfico, % LATAM y top 10 países (`27824270`). FASE 2 descartada definitivamente. Próxima revisión: **2026-06-11**.
