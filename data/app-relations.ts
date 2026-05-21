@@ -504,10 +504,10 @@ const familiaApps: RelatedApp[] = [
 export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ESTUDIANTES
   'calculadora-notas': [
-    { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'La app top para estudiar química' },
-    { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces y probabilidades genéticas' },
-    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Ciencias', description: 'Términos clave para estudiar' },
+    { url: '/generador-horarios-estudio/', icon: '📅', name: 'Horario de Estudio', description: 'Planifica tu tiempo entre asignaturas' },
+    { url: '/creador-flashcards/', icon: '🃏', name: 'Flashcards', description: 'Memoriza conceptos con tarjetas de repaso' },
     { url: '/temporizador-pomodoro/', icon: '🍅', name: 'Pomodoro', description: 'Técnica de estudio 25/5' },
+    { url: '/planificador-estudio-oposiciones/', icon: '📚', name: 'Planificador Estudio', description: 'Distribución de temas y repasos espaciados' },
   ],
   'creador-flashcards': estudiantesApps.filter(a => a.url !== '/creador-flashcards/'),
   'generador-horarios-estudio': estudiantesApps.filter(a => a.url !== '/generador-horarios-estudio/'),
@@ -2550,10 +2550,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hex, octal y bit a bit' },
   ],
   'tabla-periodica': [
-    { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tu química' },
-    { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos paso a paso' },
-    { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora de Notas', description: 'Nota media y conversor multi-país' },
-    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave para estudiar' },
+    { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tus conocimientos de química' },
+    { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'Reacciones, masas molares y reactivo limitante' },
+    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
+    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave de química y física' },
   ],
   'glosario-fisica-quimica': [{ url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
 
@@ -2654,7 +2654,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-arquitectura-computador': informaticaApps.filter(a => a.url !== '/visualizador-arquitectura-computador/'),
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
   'playground-sql': informaticaApps.filter(a => a.url !== '/playground-sql/'),
-  'simulador-puertas-logicas': informaticaApps.filter(a => a.url !== '/simulador-puertas-logicas/'),
+  'simulador-puertas-logicas': [
+    { url: '/calculadora-algebra-booleana/', icon: '🔢', name: 'Álgebra Booleana', description: 'Karnaugh, SOP, POS y simplificación lógica' },
+    { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hexadecimal y octal' },
+    { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo y Ley de Ohm' },
+    { url: '/visualizador-estructuras-datos/', icon: '📦', name: 'Estructuras de Datos', description: 'Arrays, pilas, colas y árboles' },
+  ],
   'glosario-programacion': informaticaApps.filter(a => a.url !== '/glosario-programacion/'),
   'calculadora-sistemas-numericos': informaticaApps.filter(a => a.url !== '/calculadora-sistemas-numericos/'),
   'calculadora-subredes': informaticaApps.filter(a => a.url !== '/calculadora-subredes/'),
@@ -2664,10 +2669,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': [
-    { url: '/simulador-lotka-volterra/', icon: '🦊', name: 'Depredador-Presa', description: 'Lotka-Volterra: dinámica de poblaciones' },
-    { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
-    { url: '/calculadora-estadistica/', icon: '📈', name: 'Estadística', description: 'Probabilidades y distribuciones' },
-    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Ciencias', description: 'Términos clave de biología y química' },
+    { url: '/simulador-deriva-genetica/', icon: '🧬', name: 'Deriva Genética', description: 'Cambios aleatorios en frecuencias alélicas por azar' },
+    { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'Evolución y adaptación de poblaciones' },
+    { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'Mutaciones y árboles filogenéticos' },
+    { url: '/calculadora-probabilidad/', icon: '🎲', name: 'Calculadora de Probabilidad', description: 'Herramienta complementaria para los cruces de Punnett' },
   ],
   'calculadora-estadistica-medica': biomedicinaApps.filter(a => a.url !== '/calculadora-estadistica-medica/'),
 
@@ -5235,10 +5240,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SIMULADORES FÍSICA + QUÍMICA — Lista B Sonnet (2026-05-10)
   'simulador-movimiento-circular': [
-    { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Otro sistema oscilatorio: a_c cambia, en MAS la aceleración varía linealmente' },
-    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'En MCU la energía cinética es constante: caso especial' },
-    { url: '/simulador-fluidos-bernoulli/', icon: '🌊', name: 'Fluidos: Bernoulli', description: 'La fuerza centrípeta en curvas y la presión en fluidos: misma física' },
-    { url: '/simulador-lentes-opticas/', icon: '🔍', name: 'Lentes Ópticas', description: 'Otro simulador de Física EBAU con trazado geométrico' },
+    { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo Simple', description: 'Movimiento periódico, período y oscilaciones' },
+    { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Movimiento armónico simple y frecuencia' },
+    { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Energía cinética y potencial en sistemas físicos' },
+    { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Más simulaciones de física de bachillerato' },
   ],
   'simulador-mas-resorte': [
     { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'MCU: otro caso de movimiento periódico con ω constante' },

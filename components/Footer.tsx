@@ -21,7 +21,8 @@ export default function Footer({ appName }: FooterProps) {
 
   const compartirApp = async () => {
     const titulo = appName || document.title;
-    const url = window.location.href;
+    const baseUrl = window.location.href;
+    const url = baseUrl.includes('?') ? `${baseUrl}&ref=share` : `${baseUrl}?ref=share`;
     const texto = '¡Mira lo que he encontrado en meskeIA!';
 
     // Web Share API (móviles) - incluye texto + URL
