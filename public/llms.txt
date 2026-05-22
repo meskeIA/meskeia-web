@@ -1,152 +1,225 @@
 # meskeIA
 
-> Plataforma gratuita con 354+ herramientas y calculadoras online en español para España. Sin registro, sin publicidad, 100% privacidad (procesamiento local en navegador).
+> Biblioteca gratuita de 961+ aplicaciones web en español: calculadoras, simuladores, visualizadores, quizzes y herramientas de productividad. Sin registro, sin publicidad, 100% privacidad (procesamiento local en navegador).
 
-meskeIA es una colección de aplicaciones web gratuitas organizadas en 15 suites temáticas. Todas funcionan directamente en el navegador sin necesidad de cuenta ni registro. Los datos se procesan localmente (no se envían a servidores). Formato español: números con punto de miles y coma decimal (1.234,56 €), fechas DD/MM/AAAA, moneda en euros.
+meskeIA es una plataforma hispanohablante (España + Latinoamérica) con herramientas organizadas en 13 suites temáticas. Las apps funcionan directamente en el navegador sin cuenta ni registro. Los datos no se envían a servidores externos. Formato español: números con punto de miles y coma decimal (1.234,56 €), fechas DD/MM/AAAA, moneda en euros.
 
 URL base: https://meskeia.com
-Idioma: Español (España)
+Idioma: Español (España y Latinoamérica)
 Patrón de URLs: https://meskeia.com/{slug}/
 Índice completo máquina: https://meskeia.com/ai-index.json
 Sitemap: https://meskeia.com/sitemap.xml
+Última actualización del catálogo: 2026-05-21
 
-## Finanzas e Inversión
+## Finanzas e Inversión (127 herramientas)
 
-- [Simulador de hipoteca](https://meskeia.com/simulador-hipoteca/): Cuota mensual, intereses totales y ratio de endeudamiento para hipoteca fija, variable o mixta
-- [Capacidad hipotecaria](https://meskeia.com/capacidad-hipoteca/): Cuánta hipoteca puedes permitirte según la regla del 30% del Banco de España
-- [Amortización anticipada](https://meskeia.com/amortizacion-anticipada/): Comparar reducir cuota vs reducir plazo al amortizar hipoteca
-- [Calculadora de ahorro](https://meskeia.com/calculadora-ahorro/): Proyección de ahorro con interés compuesto
-- [Interés compuesto](https://meskeia.com/interes-compuesto/): Simulador de crecimiento de inversiones a largo plazo
-- [Calculadora de inflación](https://meskeia.com/calculadora-inflacion/): Impacto de la inflación en el poder adquisitivo
-- [Comparador de depósitos](https://meskeia.com/comparador-depositos/): Comparar rentabilidad real de depósitos bancarios
-- [Calculadora de dividendos](https://meskeia.com/calculadora-dividendos/): Rendimiento por dividendos con reinversión
-- [Regla del 72](https://meskeia.com/regla-del-72/): Tiempo para duplicar una inversión
-- [Calculadora FIRE](https://meskeia.com/calculadora-fire/): Independencia financiera y retiro anticipado
-- [Fondo de emergencia](https://meskeia.com/fondo-emergencia/): Calcular el colchón financiero recomendado
-- [Rentabilidad alquiler](https://meskeia.com/rentabilidad-alquiler/): Rentabilidad bruta y neta de inversión inmobiliaria
-- [Alquiler vs compra](https://meskeia.com/alquiler-vs-compra/): Comparar coste total de alquilar frente a comprar vivienda
+Ahorro, inversión y planificación financiera personal.
 
-## Legal y Fiscal
+- [Interés compuesto](https://meskeia.com/interes-compuesto/): Simulador de crecimiento de inversiones a largo plazo con aportaciones periódicas
+- [Calculadora de ahorro](https://meskeia.com/calculadora-ahorro/): Proyección de ahorro con interés compuesto y objetivo de capital
+- [Calculadora FIRE](https://meskeia.com/calculadora-fire/): Independencia financiera y retiro anticipado (número FIRE, tasa de ahorro)
+- [Calculadora de inflación](https://meskeia.com/calculadora-inflacion/): Impacto de la inflación en el poder adquisitivo a largo plazo
+- [Regla del 72](https://meskeia.com/regla-del-72/): Tiempo para duplicar una inversión según la tasa de rentabilidad
+- [Fondo de emergencia](https://meskeia.com/fondo-emergencia/): Calcular el colchón financiero recomendado según gastos y perfil
+- [Comparador de depósitos](https://meskeia.com/comparador-depositos/): Rentabilidad real de depósitos bancarios descontando inflación
+- [Calculadora de dividendos](https://meskeia.com/calculadora-dividendos/): Rendimiento por dividendos con reinversión compuesta
+- [Rentabilidad alquiler](https://meskeia.com/rentabilidad-alquiler/): Rentabilidad bruta y neta de inversión en vivienda para alquiler
+- [Alquiler vs compra](https://meskeia.com/alquiler-vs-compra/): Comparar coste total de alquilar frente a comprar vivienda a largo plazo
+- [Calculadora de propinas](https://meskeia.com/calculadora-propinas/): División de cuenta con propina entre comensales
+
+## Legal, Fiscal y Patrimonio (67 herramientas)
+
+Impuestos, herencias, jubilación, pensiones y planificación patrimonial. Datos normativos España 2025.
 
 - [Calculadora IRPF](https://meskeia.com/calculadora-irpf/): Tramos IRPF 2025 con mínimos personales y familiares
 - [Calculadora de IVA](https://meskeia.com/calculadora-iva/): IVA general (21%), reducido (10%) y superreducido (4%)
-- [Calculadora de retenciones](https://meskeia.com/calculadora-retenciones/): Retención IRPF en nómina y facturas
-- [Plusvalía municipal](https://meskeia.com/plusvalia-municipal/): IIVTNU por método real u objetivo
-- [Gastos compraventa](https://meskeia.com/gastos-compraventa/): ITP/IVA, notaría, registro y gestoría por CCAA
-- [Calculadora de herencias](https://meskeia.com/calculadora-herencias/): Impuesto de sucesiones por CCAA con bonificaciones
-- [Calculadora de donaciones](https://meskeia.com/calculadora-donaciones/): Impuesto de donaciones por CCAA
-- [Impuesto de sociedades](https://meskeia.com/calculadora-impuesto-sociedades/): Tipos IS y regímenes especiales
 - [Calculadora de nómina](https://meskeia.com/calculadora-nomina/): Salario neto desde bruto con IRPF y Seguridad Social
+- [Calculadora de retenciones](https://meskeia.com/calculadora-retenciones/): Retención IRPF en nómina y facturas profesionales
+- [Plusvalía municipal](https://meskeia.com/plusvalia-municipal/): IIVTNU por método real u objetivo al vender vivienda
+- [Gastos compraventa](https://meskeia.com/gastos-compraventa/): ITP/IVA, notaría, registro y gestoría al comprar vivienda por CCAA
+- [Calculadora de herencias](https://meskeia.com/calculadora-herencias/): Impuesto de sucesiones por comunidad autónoma con bonificaciones
+- [Calculadora de donaciones](https://meskeia.com/calculadora-donaciones/): Impuesto de donaciones por comunidad autónoma
+- [Impuesto de sociedades](https://meskeia.com/calculadora-impuesto-sociedades/): Tipos IS y regímenes especiales (general, entidades pequeñas, start-ups)
 - [Calculadora de finiquito](https://meskeia.com/calculadora-finiquito/): Liquidación por fin de contrato laboral
-
-## Freelance y Autónomo
-
-- [Cuota de autónomos](https://meskeia.com/cuota-autonomos/): Tramos RETA 2025 por ingresos reales
-- [Tarifa freelance](https://meskeia.com/tarifa-freelance/): Calcular tarifa hora/proyecto incluyendo impuestos y gastos
-- [Factura de autónomo](https://meskeia.com/generador-facturas/): Generar facturas con IVA e IRPF
-
-## Inmobiliaria y Hogar
-
-- [Selector tipo hipoteca](https://meskeia.com/selector-hipoteca/): Recomendación fija/variable/mixta/verde según perfil
-- [Calculadora de mudanza](https://meskeia.com/calculadora-mudanza/): Estimación de costes de mudanza
-- [Coste de vida](https://meskeia.com/coste-vida-ciudades/): Comparador de coste de vida entre ciudades españolas
-- [Calculadora de reforma](https://meskeia.com/calculadora-reforma/): Presupuesto estimado para reformas del hogar
-- [Eficiencia energética](https://meskeia.com/eficiencia-energetica/): Ahorro potencial con mejoras energéticas
-
-## Jubilación y Patrimonio
-
-- [Calculadora de jubilación](https://meskeia.com/calculadora-jubilacion/): Pensión estimada según años cotizados y base
+- [Calculadora de jubilación](https://meskeia.com/calculadora-jubilacion/): Pensión estimada según años cotizados y base reguladora
 - [Jubilación anticipada](https://meskeia.com/jubilacion-anticipada/): Coeficientes reductores por jubilación antes de la edad legal
-- [Planificador de pensiones](https://meskeia.com/planificador-pensiones/): Plan de ahorro complementario para la jubilación
+- [Planificador de pensiones](https://meskeia.com/planificador-pensiones/): Plan de ahorro complementario para cubrir brecha de jubilación
 
-## Salud y Bienestar
+## Freelance y Autónomo (72 herramientas)
 
-- [Calculadora de IMC](https://meskeia.com/calculadora-imc/): Índice de masa corporal con interpretación
-- [Calculadora de calorías](https://meskeia.com/calculadora-calorias/): Necesidades calóricas diarias según actividad
-- [Calculadora de macros](https://meskeia.com/calculadora-macros/): Distribución de macronutrientes personalizada
-- [Frecuencia cardíaca](https://meskeia.com/frecuencia-cardiaca/): Zonas de entrenamiento por frecuencia cardíaca
-- [Calculadora de sueño](https://meskeia.com/calculadora-sueno/): Ciclos de sueño y hora óptima para acostarse/despertar
-- [Coste de fumar](https://meskeia.com/coste-fumar/): Impacto económico y sanitario del tabaquismo
+Herramientas para profesionales independientes en España.
 
-## Estudiantes
+- [Cuota de autónomos](https://meskeia.com/cuota-autonomos/): Tramos RETA 2025 según ingresos reales netos
+- [Tarifa freelance](https://meskeia.com/tarifa-freelance/): Calcular tarifa hora/proyecto incluyendo impuestos, gastos y vacaciones
+- [Modelo 130](https://meskeia.com/modelo-130/): Pago fraccionado IRPF trimestral para autónomos en estimación directa
+- [Gastos deducibles](https://meskeia.com/gastos-deducibles-autonomos/): Qué gastos puede deducirse un autónomo en IRPF
+- [Break-even freelance](https://meskeia.com/break-even/): Punto de equilibrio ingresos/gastos para profesionales independientes
+- [Horas facturables](https://meskeia.com/horas-facturables/): Calcular horas reales productivas descontando vacaciones y baja
+- [Checklist Verifactu](https://meskeia.com/checklist-verifactu/): Verificar cumplimiento del sistema de facturación electrónica
 
-- [Calculadora científica](https://meskeia.com/calculadora-cientifica/): Operaciones científicas y trigonometría
-- [Calculadora de matrices](https://meskeia.com/calculadora-matrices/): Operaciones con matrices (determinante, inversa, multiplicación)
+## Inmobiliaria y Hogar (59 herramientas)
+
+Hipotecas, alquiler, compraventa y gestión del hogar.
+
+- [Simulador de hipoteca](https://meskeia.com/simulador-hipoteca/): Cuota mensual, intereses totales y amortización para hipoteca fija, variable o mixta
+- [Capacidad hipotecaria](https://meskeia.com/capacidad-hipoteca/): Cuánta hipoteca puedes permitirte según la regla del 30%
+- [Amortización anticipada](https://meskeia.com/amortizacion-anticipada/): Comparar reducir cuota vs reducir plazo al amortizar hipoteca antes de tiempo
+- [Selector de hipoteca](https://meskeia.com/selector-hipoteca/): Recomendación fija/variable/mixta/verde según perfil y tolerancia al riesgo
+- [Calculadora de reforma](https://meskeia.com/calculadora-reforma/): Presupuesto estimado para reformas del hogar por tipo y superficie
+- [Eficiencia energética](https://meskeia.com/eficiencia-energetica/): Ahorro potencial con mejoras energéticas en vivienda
+- [Calculadora de mudanza](https://meskeia.com/calculadora-mudanza/): Estimación de costes de mudanza según distancia y volumen
+- [Coste de vida por ciudades](https://meskeia.com/coste-vida-ciudades/): Comparar coste de vida entre ciudades españolas
+
+## Salud y Bienestar (182 herramientas)
+
+Salud personal, nutrición, ejercicio y cuidado de mascotas.
+
+- [Calculadora de IMC](https://meskeia.com/calculadora-imc/): Índice de masa corporal con interpretación y tabla de peso saludable
+- [Calculadora de calorías](https://meskeia.com/calculadora-calorias/): Necesidades calóricas diarias según actividad física y objetivo
+- [Calculadora de macros](https://meskeia.com/calculadora-macros/): Distribución óptima de macronutrientes personalizada
+- [Frecuencia cardíaca](https://meskeia.com/frecuencia-cardiaca/): Zonas de entrenamiento por frecuencia cardíaca máxima
+- [Calculadora de sueño](https://meskeia.com/calculadora-sueno/): Ciclos de sueño REM y hora óptima para acostarse o despertarse
+- [Coste de fumar](https://meskeia.com/coste-fumar/): Impacto económico y sanitario del tabaquismo a largo plazo
+- [Hidratación diaria](https://meskeia.com/hidratacion-diaria/): Cantidad de agua recomendada según peso, actividad y clima
+
+## Estudiantes (382 herramientas)
+
+Matemáticas, física, química, biología, informática y herramientas de estudio.
+
+- [Calculadora científica](https://meskeia.com/calculadora-cientifica/): Operaciones científicas, trigonometría y funciones avanzadas
+- [Calculadora de matrices](https://meskeia.com/calculadora-matrices/): Determinante, inversa, multiplicación y transposición de matrices
 - [Calculadora de derivadas](https://meskeia.com/calculadora-derivadas/): Derivadas simbólicas paso a paso
-- [Calculadora de integrales](https://meskeia.com/calculadora-integrales/): Integrales simbólicas paso a paso
-- [Conversor de unidades](https://meskeia.com/conversor-unidades/): Longitud, peso, volumen, temperatura y más
+- [Calculadora de integrales](https://meskeia.com/calculadora-integrales/): Integrales definidas e indefinidas paso a paso
+- [Calculadora de probabilidad](https://meskeia.com/calculadora-probabilidad/): Combinaciones, permutaciones y distribuciones de probabilidad
+- [Conversor de unidades](https://meskeia.com/conversor-unidades/): Longitud, peso, volumen, temperatura, presión y más
 - [Tabla periódica](https://meskeia.com/tabla-periodica/): Tabla periódica interactiva con datos de cada elemento
-- [Calculadora de probabilidad](https://meskeia.com/calculadora-probabilidad/): Combinaciones, permutaciones y distribuciones
+- Simuladores de Bachillerato: física (cinemática, dinámica, óptica), química, biología, informática, estadística y cálculo
 
-## Productividad
+## Cultura General (476 herramientas)
 
-- [Generador de QR](https://meskeia.com/generador-qr/): Códigos QR personalizables para URLs, texto, WiFi, vCard
-- [Temporizador Pomodoro](https://meskeia.com/pomodoro/): Técnica Pomodoro con ciclos configurables
-- [Calculadora de tiempo](https://meskeia.com/calculadora-tiempo/): Sumar y restar horas, minutos y segundos
-- [Comparador de precios](https://meskeia.com/comparador-precios/): Precio por unidad para comparar ofertas del supermercado
-- [Calculadora de propinas](https://meskeia.com/calculadora-propinas/): División de cuenta con propina entre comensales
-- [Conversor de divisas](https://meskeia.com/conversor-divisas/): Tipos de cambio actualizados
+Conocimiento, cronologías históricas, arte, música, geografía y divulgación.
 
-## Diseño y Desarrollo
+- [Visualizador historia](https://meskeia.com/visualizador-historia/): 133 cronologías históricas (Grecia, Roma, Egipto, Imperio Otomano, Mongol, Renacimiento, Revolución Industrial y más)
+- [Cronologías de filosofía](https://meskeia.com/visualizador-filosofia/): Corrientes filosóficas desde la Antigüedad hasta hoy
+- [Movimientos musicales](https://meskeia.com/visualizador-musica-movimientos/): Historia de los movimientos musicales con contexto
+- [Quiz de banderas](https://meskeia.com/quiz-banderas/): Identificar banderas del mundo
+- [Quiz de capitales](https://meskeia.com/quiz-capitales/): Adivinar capitales del mundo
+- Visualizadores de ciencia, cosmos, geología, sociedad y economía
+
+## Diseño y Contenido (64 herramientas)
+
+Diseñadores, desarrolladores web y creadores de contenido.
 
 - [Generador de paletas](https://meskeia.com/generador-paletas/): Paletas de colores armónicas para diseño web
-- [Generador de gradientes](https://meskeia.com/generador-gradientes/): Gradientes CSS personalizables
-- [Conversor de colores](https://meskeia.com/conversor-colores/): Convertir entre HEX, RGB, HSL y más
-- [Generador de sombras CSS](https://meskeia.com/generador-sombras/): Box-shadow CSS visual
-- [Generador de tipografía](https://meskeia.com/emparejador-tipografias/): Combinaciones de fuentes Google Fonts
-
-## Marketing y Contenido
-
-- [Contador de palabras](https://meskeia.com/contador-palabras/): Palabras, caracteres, tiempo de lectura y densidad
-- [Generador de meta tags](https://meskeia.com/generador-meta-tags/): Meta tags SEO con vista previa de Google/redes
+- [Generador de gradientes](https://meskeia.com/generador-gradientes/): Gradientes CSS personalizables con código listo para copiar
+- [Conversor de colores](https://meskeia.com/conversor-colores/): Convertir entre HEX, RGB, HSL y otros formatos
+- [Generador de sombras CSS](https://meskeia.com/generador-sombras/): Box-shadow CSS visual e interactivo
+- [Generador de meta tags](https://meskeia.com/generador-meta-tags/): Meta tags SEO con vista previa de Google y redes sociales
+- [Contador de palabras](https://meskeia.com/contador-palabras/): Palabras, caracteres, tiempo de lectura y densidad de keywords
 - [Analizador de legibilidad](https://meskeia.com/analizador-legibilidad/): Índice Flesch-Szigriszt adaptado al español
-- [Generador de hashtags](https://meskeia.com/generador-hashtags/): Hashtags relevantes para redes sociales
-- [Calculadora de engagement](https://meskeia.com/calculadora-engagement/): Tasa de engagement para Instagram, TikTok, YouTube
+- [Calculadora de engagement](https://meskeia.com/calculadora-engagement/): Tasa de engagement para Instagram, TikTok y YouTube
 
-## Criptografía y Seguridad
+## Herramientas Técnicas (165 herramientas)
 
-- [Generador de contraseñas](https://meskeia.com/generador-contrasenas/): Contraseñas seguras personalizables
-- [Cifrado de texto](https://meskeia.com/cifrado-texto/): Cifrado AES-256 en navegador
+Herramientas especializadas para fotografía, vídeo, programación y conversión.
+
+- [Simulador de fotografía](https://meskeia.com/simulador-fotografia/): Triángulo de exposición (ISO, apertura, velocidad) con simulación visual
+- [Calculadora profundidad de campo](https://meskeia.com/calculadora-profundidad-campo/): DOF según objetivo, apertura y distancia
+- [Calculadora regla 500/NPF astrofoto](https://meskeia.com/calculadora-regla-500-npf-astrofoto/): Exposición máxima sin trepidación estelar
+- [Generador de contraseñas](https://meskeia.com/generador-contrasenas/): Contraseñas seguras configurables por longitud y caracteres
+- [Cifrado de texto](https://meskeia.com/cifrado-texto/): Cifrado AES-256 en el navegador sin enviar datos al servidor
 - [Generador de hashes](https://meskeia.com/generador-hashes/): MD5, SHA-1, SHA-256, SHA-512
+- [Generador de QR](https://meskeia.com/generador-qr/): Códigos QR para URLs, texto, WiFi y vCard
 
-## Juegos y Ocio
+## Productividad (115 herramientas)
+
+Organización personal y herramientas del día a día.
+
+- [Temporizador Pomodoro](https://meskeia.com/pomodoro/): Técnica Pomodoro con ciclos configurables y sonidos
+- [Calculadora de tiempo](https://meskeia.com/calculadora-tiempo/): Sumar y restar horas, minutos y segundos
+- [Comparador de precios](https://meskeia.com/comparador-precios/): Precio por unidad para comparar ofertas del supermercado
+- [Conversor de divisas](https://meskeia.com/conversor-divisas/): Tipos de cambio actualizados
+- [Calculadora de días](https://meskeia.com/calculadora-dias/): Días entre dos fechas, días hábiles y festivos
+- Apps de reflexión personal, gestión de objetivos y toma de decisiones
+
+## Accesibilidad e Inclusión (18 herramientas)
+
+Herramientas adaptadas para personas con TDAH, dislexia, autismo o discapacidad visual.
+
+- [Herramientas TDAH](https://meskeia.com/tdah-herramientas/): Timer visual, ruido blanco y organizador para personas con TDAH
+- [Lector accesible](https://meskeia.com/lector-accesible/): Lectura adaptada con fuentes para dislexia (OpenDyslexic)
+- [Conversor Braille](https://meskeia.com/conversor-braille/): Texto a Braille y viceversa
+- [Calculadora accesible](https://meskeia.com/calculadora-accesible/): Calculadora con alto contraste y navegación completa por teclado
+- [Guía de accesibilidad](https://meskeia.com/guia/accesibilidad/): Journey de 6 etapas con test de 3 perfiles de necesidades
+
+## Juegos y Ocio (40 herramientas)
+
+Diversión, entretenimiento y juegos de conocimiento.
 
 - [Wordle en español](https://meskeia.com/wordle-espanol/): Wordle diario con palabras en español
 - [Sudoku](https://meskeia.com/sudoku/): Sudoku con múltiples niveles de dificultad
-- [Generador de dados](https://meskeia.com/generador-dados/): Dados virtuales configurables
-- [Quiz de banderas](https://meskeia.com/quiz-banderas/): Adivinar banderas del mundo
-- [Quiz de capitales](https://meskeia.com/quiz-capitales/): Adivinar capitales del mundo
+- [Generador de dados](https://meskeia.com/generador-dados/): Dados virtuales de 4, 6, 8, 10, 12 y 20 caras
+- [Quiz de banderas](https://meskeia.com/quiz-banderas/): Adivinar banderas de todos los países del mundo
+- [Quiz de capitales](https://meskeia.com/quiz-capitales/): Adivinar capitales del mundo por continente
 
-## Accesibilidad e Inclusión
+## Viajes y Turismo (15 herramientas)
 
-- [Herramientas TDAH](https://meskeia.com/tdah-herramientas/): Timer visual, ruido blanco y organizador para TDAH
-- [Lector accesible](https://meskeia.com/lector-accesible/): Lectura adaptada con fuentes para dislexia
-- [Conversor Braille](https://meskeia.com/conversor-braille/): Texto a Braille y viceversa
-- [Calculadora accesible](https://meskeia.com/calculadora-accesible/): Calculadora con alto contraste y navegación por teclado
+Planificación de viajes, divisas y presupuestos.
 
-## Guías de decisión
+- [Conversor de divisas](https://meskeia.com/conversor-divisas/): Tipos de cambio para más de 150 países
+- [Calculadora de viaje](https://meskeia.com/calculadora-viaje/): Presupuesto completo para un viaje
+- [Buscador de enchufes](https://meskeia.com/tipos-enchufes/): Tipos de enchufes y voltajes por país
 
-Landing pages que agrupan herramientas para decisiones importantes:
+## Guías de decisión (8 guías)
 
-- [Guía: Comprar casa](https://meskeia.com/guia/comprar-casa/): Proceso completo de compra de vivienda en España
-- [Guía: Freelance](https://meskeia.com/guia/freelance/): Todo para darte de alta como autónomo
-- [Guía: Invertir](https://meskeia.com/guia/invertir/): Primeros pasos en inversión
-- [Guía: Ahorrar dinero](https://meskeia.com/guia/ahorrar-dinero/): Estrategias de ahorro
-- [Guía: Vivir sano](https://meskeia.com/guia/vivir-sano/): Herramientas de salud y bienestar
-- [Guía: Comprar coche](https://meskeia.com/guia/comprar-coche/): Decisión de compra de vehículo
-- [Guía: Montar negocio](https://meskeia.com/guia/montar-negocio/): Emprender en España
+Landing pages que agrupan herramientas para procesos de decisión a corto-medio plazo con implicaciones económicas o legales en España:
+
+- [Guía: Comprar casa](https://meskeia.com/guia/comprar-casa/): Proceso completo de compra de vivienda (hipoteca, gastos, ITP, reforma)
+- [Guía: Freelance](https://meskeia.com/guia/freelance/): Todo para darte de alta como autónomo (cuota RETA, tarifa, modelo 130)
+- [Guía: Invertir](https://meskeia.com/guia/invertir/): Primeros pasos en inversión (fondos, dividendos, FIRE)
+- [Guía: Ahorrar dinero](https://meskeia.com/guia/ahorrar-dinero/): Estrategias de ahorro y control de gastos
+- [Guía: Vivir sano](https://meskeia.com/guia/vivir-sano/): Herramientas de salud y bienestar integradas
+- [Guía: Comprar coche](https://meskeia.com/guia/comprar-coche/): Decisión de compra: eléctrico, híbrido o combustión
+- [Guía: Montar negocio](https://meskeia.com/guia/montar-negocio/): Emprender en España (forma jurídica, costes, impuestos)
 - [Guía: Accesibilidad](https://meskeia.com/guia/accesibilidad/): Herramientas para neurodivergencia y discapacidad
+
+## Guías directorio (27 guías)
+
+Guías de referencia sobre gastronomía, naturaleza y materiales:
+
+Especias, infusiones, café, té, quesos, aceite de oliva, cócteles, setas, superalimentos, cortes de carne, varietales de vino, estilos de cerveza, tipos de pan, tipos de pasta, tipos de arroz, vinagres del mundo, plantas de interior, frutas exóticas, frutos secos, hierbas aromáticas, tejidos y fibras, maderas, aves comunes, insectos de jardín, razas de perros, razas de gatos.
 
 ## API para asistentes IA
 
-meskeIA ofrece endpoints API para integración con asistentes de IA:
+meskeIA ofrece integración nativa con los principales asistentes de IA:
 
-- Servidor MCP: https://meskeia.com/api/mcp (para Claude Desktop, Perplexity y otros clientes MCP)
-- API ChatGPT: 42 endpoints en /api/chatgpt/ para Custom GPTs de OpenAI
-- Índice máquina: https://meskeia.com/ai-index.json (catálogo completo en JSON)
+### Servidor MCP (Model Context Protocol)
+- URL: https://meskeia.com/api/mcp
+- 185 herramientas de cálculo disponibles: 163 fiscal/financieras + 8 cocina técnica + 6 deporte + 5 videografía + 3 fotografía
+- Compatible con Claude Desktop, Perplexity Pro y cualquier cliente MCP
+- Uso: calculadoras de IRPF, hipotecas, herencias, autónomos, nóminas, finiquitos, inversión, jubilación, fotografía y más
 
-## Información legal
+### Custom GPTs en ChatGPT (12 GPTs publicados)
+Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "meskeIA":
+- [meskeIA — Salario e IRPF España](https://chatgpt.com/g/g-69c54d1b83e481918c466289cc586106-meskeia-salario-e-irpf-espana): sueldo neto, IRPF, segundo pagador, devolución
+- [meskeIA — Freelance España](https://chatgpt.com/g/g-69c4f49b5048819192920bd94355a2d5-meskeia-freelance-espana): tarifa hora/proyecto, modelo 130, gastos deducibles, IVA, break-even
+- [meskeIA — Emprender en España](https://chatgpt.com/g/g-69c5194e2084819194ce20df6da5b265-meskeia-emprender-en-espana): autónomo vs SL, impuesto sociedades, coste empleado, TIR/VAN
+- [meskeIA — Inversión y Ahorro España](https://chatgpt.com/g/g-69c54099dbc8819181c10c8144dac9b7-meskeia-inversion-y-ahorro-espana): interés compuesto, plusvalías IRPF, plan pensiones, dividendos
+- [meskeIA — Jubilación España](https://chatgpt.com/g/g-69c546bbabd481919d5b076d2c07bfc1-meskeia-jubilacion-espana): pensión pública, jubilación anticipada, brecha de jubilación
+- [meskeIA — Herencias y Donaciones España](https://chatgpt.com/g/g-69c3c2a0187c8191b3cf62df7098f042-meskeia-herencias-y-donaciones-espana): ISD por CCAA, legítimas, impuesto donaciones
+- [meskeIA — Hipotecas España](https://chatgpt.com/g/g-69c3cc3d85888191bf16a1443c65f99b-meskeia-hipotecas-espana): hipoteca, capacidad hipotecaria, amortización anticipada, gastos compraventa
+- [meskeIA — Inmobiliaria y Alquiler España](https://chatgpt.com/g/g-69c5590a4e488191b236b572fd5a87b0-meskeia-inmobiliaria-y-alquiler-espana): rentabilidad alquiler, plusvalía municipal, imputación rentas
+- [meskeIA — Coches España](https://chatgpt.com/g/g-69c65f8e11fc8191bae04f1729439950-meskeia-coches-espana): recomendador tipo vehículo, break-even eléctrico, etiqueta DGT
+- [meskeIA — Fotografía y Videografía Técnica](https://chatgpt.com/g/g-6a0c8112f5f881918722c59fb762853c-meskeia-fotografia-y-videografia-tecnica): profundidad de campo, astrofoto, regla 180, cámara lenta, filtros ND, bitrate, FOV
+- [meskeIA — Deporte y Rendimiento](https://chatgpt.com/g/g-6a0d687e916c8191864990bb83318dcc-meskeia-deporte-y-rendimiento): predicción tiempos running (Riegel), zonas cardíacas (Karvonen), 1RM gimnasio (Epley/Brzycki), potencia ciclismo (W/kg y VAM), pace running, eficiencia natación (SWOLF)
+- [meskeIA — Cocina Técnica](https://chatgpt.com/g/g-6a0dce6f24d8819199d6617ab066d1b6-meskeia-cocina-tecnica): porcentaje panadero, hidratación, masa madre, DDT, ganache, escalar recetas
+
+### Índice máquina
+- JSON completo: https://meskeia.com/ai-index.json (catálogo con slugs, descripciones y suites de las 961 apps)
+
+## Información legal y contacto
 
 - [Política de privacidad](https://meskeia.com/privacidad/)
 - [Términos de uso](https://meskeia.com/terminos/)
-- [Acerca de](https://meskeia.com/acerca/)
+- [Acerca de meskeIA](https://meskeia.com/acerca/)
+- Contacto: https://meskeia.com/contacto/
