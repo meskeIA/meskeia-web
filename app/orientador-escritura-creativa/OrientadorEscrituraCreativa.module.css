@@ -1,0 +1,1186 @@
+/* Variables y contenedor */
+.container {
+  --primary: #2E86AB;
+  --secondary: #48A9A6;
+  --accent: #7FB3D3;
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl) var(--spacing-xl);
+  background: var(--hero-bg, #1a5278);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.92;
+}
+
+/* Barra de progreso */
+.progressBar {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md) 0;
+}
+
+.progressStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 var(--spacing-lg);
+  position: relative;
+  color: var(--text-secondary);
+}
+
+.progressStep::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 14px;
+  width: 2rem;
+  height: 2px;
+  background: var(--border);
+  transform: translateX(50%);
+}
+
+.progressStep:last-child::after {
+  display: none;
+}
+
+.progressStepActive {
+  color: var(--primary);
+}
+
+.progressStepSkipped {
+  opacity: 0.4;
+}
+
+.progressNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--bg-primary);
+  z-index: 1;
+}
+
+.progressStepActive .progressNum {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.progressLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Panel de pasos */
+.stepPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.stepTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stepSubtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Grid de géneros */
+.generosGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.generoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--bg-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  gap: 0.5rem;
+}
+
+.generoCard:hover {
+  border-color: var(--accent);
+  background: var(--hover);
+  transform: translateY(-2px);
+}
+
+.generoCardSelected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .generoCardSelected {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.generoCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.generoIcono {
+  font-size: 2rem;
+}
+
+.generoNombre {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.generoDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+.generoMeta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.generoExtension {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--hover);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+[data-theme='dark'] .generoExtension {
+  background: #3A3A3A;
+}
+
+.generoDificultad {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(72, 169, 166, 0.12);
+  color: var(--secondary);
+}
+
+.dificultadFacil {
+  background: rgba(39, 174, 96, 0.12);
+  color: #27ae60;
+}
+
+.dificultadAvanzada {
+  background: rgba(231, 76, 60, 0.12);
+  color: #e74c3c;
+}
+
+[data-theme='dark'] .dificultadFacil {
+  background: rgba(39, 174, 96, 0.2);
+}
+
+[data-theme='dark'] .dificultadAvanzada {
+  background: rgba(231, 76, 60, 0.2);
+}
+
+.generoEjemplos {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+  width: 100%;
+}
+
+/* Grid de perspectivas */
+.perspectivGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.perspectivaCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--bg-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.perspectivaCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.perspectivaCardSelected {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.06);
+}
+
+[data-theme='dark'] .perspectivaCardSelected {
+  background: rgba(46, 134, 171, 0.12);
+}
+
+.perspectivaCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.perspectivHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.perspectivIcono {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.perspectivNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.perspectivForma {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-style: italic;
+  background: none;
+}
+
+.perspectivDesc {
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.perspectivVentajas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ventajaBadge {
+  font-size: 0.77rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(72, 169, 166, 0.1);
+  color: var(--secondary);
+}
+
+[data-theme='dark'] .ventajaBadge {
+  background: rgba(72, 169, 166, 0.18);
+}
+
+.perspectivIdeal {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.perspectivEjemplo {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Navegación entre pasos */
+.stepNav {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* Botones */
+.btnPrimary {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #256a8a;
+  transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnSecundario {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecundario:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnSecundario:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Badge resultado (paso 3) */
+.resultBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-xl);
+  color: white;
+}
+
+.resultBadgeIcono {
+  font-size: 2.5rem;
+}
+
+.resultTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.resultSubtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin: 0.25rem 0 0;
+}
+
+/* Secciones de guía */
+.guiaSection {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border);
+}
+
+.guiaSection:last-child {
+  border-bottom: none;
+}
+
+.guiaSectionTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.guiaSectionDesc {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Estructura */
+.estructuraList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.estructuraPaso {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.estructuraNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.estructuraContent {
+  flex: 1;
+  padding-top: 0.3rem;
+}
+
+.estructuraContent strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.estructuraContent p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Kit de arranque */
+.kitPreguntas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.kitPregunta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kitLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.kitNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.kitInput {
+  padding: 0.65rem var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.kitInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .kitInput {
+  background: #333;
+}
+
+.btnHojaRuta {
+  padding: 0.75rem 1.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnHojaRuta:hover {
+  opacity: 0.9;
+}
+
+.btnHojaRuta:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Lista de errores */
+.erroresList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.errorItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding: 0.5rem var(--spacing-md);
+  background: var(--hover);
+  border-radius: var(--radius);
+  border-left: 3px solid #e74c3c;
+}
+
+[data-theme='dark'] .errorItem {
+  background: #333;
+}
+
+.errorIcono {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  margin-top: 0.1rem;
+}
+
+.consejoCard {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  padding: var(--spacing-lg);
+  background: rgba(46, 134, 171, 0.06);
+  border: 1px solid rgba(46, 134, 171, 0.2);
+  border-radius: var(--radius);
+  margin-top: var(--spacing-md);
+}
+
+[data-theme='dark'] .consejoCard {
+  background: rgba(46, 134, 171, 0.1);
+  border-color: rgba(46, 134, 171, 0.3);
+}
+
+.consejoIcono {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.consejoCard p {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Hoja de Ruta */
+.hojaRuta {
+  background: linear-gradient(135deg, rgba(46, 134, 171, 0.05), rgba(72, 169, 166, 0.05));
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin: var(--spacing-xl) 0;
+}
+
+[data-theme='dark'] .hojaRuta {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.hojaRutaTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.hojaRutaGrid {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.hojaRutaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.hojaRutaLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.hojaRutaValor {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hojaRutaRespuestas {
+  margin-bottom: var(--spacing-lg);
+}
+
+.hojaRutaRespuestasTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.hojaRutaRespuesta {
+  margin-bottom: var(--spacing-md);
+  padding: 0.75rem var(--spacing-md);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
+}
+
+[data-theme='dark'] .hojaRutaRespuesta {
+  background: #333;
+}
+
+.hojaRutaRespuesta strong {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.hojaRutaRespuesta p {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.hojaRutaConsejo {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-style: italic;
+  border-top: 1px solid var(--border);
+  padding-top: var(--spacing-md);
+  margin: 0;
+}
+
+/* ── EducationalSection v2.0 ─────────────────────────────────────── */
+
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.92rem;
+}
+
+/* Tabla comparativa */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable thead tr {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+}
+
+.comparativaTable th {
+  padding: 0.85rem var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.comparativaTable td {
+  padding: 0.75rem var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+.comparativaTable td strong {
+  color: var(--text-primary);
+}
+
+.comparativaTable tbody tr:hover {
+  background: var(--hover);
+}
+
+.comparativaTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:hover {
+  background: #333;
+}
+
+/* Escenarios / Casos de uso */
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.2s;
+}
+
+.escenarioCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: #2A2A2A;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.escenarioIcono {
+  font-size: 1.75rem;
+}
+
+.escenarioHeader h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.escenarioExample {
+  background: var(--hover);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.75rem;
+  margin-bottom: var(--spacing-md);
+  font-size: 0.87rem;
+}
+
+[data-theme='dark'] .escenarioExample {
+  background: #333;
+}
+
+.escenarioExample p {
+  margin: 0 0 0.25rem;
+  color: var(--text-secondary);
+}
+
+.escenarioExample p:last-child {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.escenarioTip {
+  font-size: 0.87rem;
+  color: var(--secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* FAQ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.2s;
+}
+
+.faqItem:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .faqItem {
+  background: #2A2A2A;
+}
+
+.faqItem h4 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.4;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-sm);
+}
+
+.faqItem p:last-child {
+  margin-bottom: 0;
+}
+
+.faqTip {
+  font-size: 0.85rem !important;
+  color: var(--secondary) !important;
+  font-style: italic;
+  padding: 0.5rem 0.75rem;
+  background: rgba(72, 169, 166, 0.06);
+  border-radius: var(--radius);
+}
+
+[data-theme='dark'] .faqTip {
+  background: rgba(72, 169, 166, 0.1);
+}
+
+/* Guía paso a paso (EducationalSection) */
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .step {
+  background: #2A2A2A;
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.stepContent h4 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Tips / Mejores prácticas */
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .tipCard {
+  background: #2A2A2A;
+}
+
+.tipIcono {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tipCard h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(243, 156, 18, 0.06);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(243, 156, 18, 0.08);
+  border-color: rgba(243, 156, 18, 0.25);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.warningIcono {
+  font-size: 1.5rem;
+}
+
+.warningHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: var(--spacing-md);
+  border-left: 3px solid #f39c12;
+}
+
+.warningList li strong {
+  color: var(--text-primary);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .generosGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .progressBar {
+    gap: 0;
+  }
+
+  .progressStep {
+    padding: 0 var(--spacing-md);
+  }
+
+  .progressLabel {
+    font-size: 0.72rem;
+  }
+
+  .stepPanel {
+    padding: var(--spacing-lg);
+  }
+
+  .generosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .perspectivGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepNav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hojaRutaGrid {
+    flex-direction: column;
+  }
+
+  .resultBadge {
+    padding: var(--spacing-md);
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.6rem 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generoCard,
+  .perspectivaCard,
+  .btnPrimary,
+  .btnSecundario,
+  .btnHojaRuta {
+    transition: none;
+    transform: none !important;
+  }
+}

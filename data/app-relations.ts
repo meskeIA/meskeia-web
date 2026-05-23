@@ -2097,6 +2097,20 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'analizador-geo': seoApps,
   'generador-hashtags': [...seoApps.slice(0, 2), ...negociosApps.slice(2, 4)],
 
+  // ESCRITURA CREATIVA
+  'orientador-escritura-creativa': [
+    { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
+    { url: '/contador-palabras/', icon: '🔢', name: 'Contador de Palabras', description: 'Palabras, caracteres y tiempo de lectura' },
+    { url: '/calculadora-tiempo-lectura/', icon: '⏱️', name: 'Tiempo de Lectura', description: 'Estima los minutos de lectura' },
+    { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
+  ],
+  'curso-redaccion-academica': [
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+    { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
+    { url: '/contador-palabras/', icon: '🔢', name: 'Contador de Palabras', description: 'Palabras, caracteres y tiempo de lectura' },
+    { url: '/comparador-textos/', icon: '🔍', name: 'Comparador de Textos', description: 'Diferencias entre versiones' },
+  ],
+
   // TEXTO
   'contador-palabras': [...textoApps.filter(a => a.url !== '/contador-palabras/'), textoExtraApps[0]],
   'conversor-texto': [...textoApps.filter(a => a.url !== '/conversor-texto/'), textoExtraApps[1]],

@@ -1129,6 +1129,7 @@ export const implementedAppsUrls = [
   "/calculadora-gelatina/",               // Conversión entre hojas (bronce/plata/oro/platino), polvo y agar-agar
   "/calculadora-ganache/",                // Proporciones chocolate:nata según tipo y textura (glaseado/trufa/firme)
   "/escalador-recetas/",                  // Escalado de recetas con ajuste no lineal para levadura, impulsores y especias
+  "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
 ];
 
 /**
