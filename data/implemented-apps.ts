@@ -1142,6 +1142,7 @@ export const implementedAppsUrls = [
   "/visualizador-narratologia/",        // Genette y Greimas: historia/relato, tiempo narrativo, voz/focalización, actancial
   "/visualizador-estructuras-narrativas/", // 6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu, Save the Cat, 5 Actos
   "/constructor-personaje/",              // 19 dimensiones: deseo, necesidad, miedo, voz, herida, arco. Ficha copiable
+  "/guia-metrica-estrofas/",             // Contador de sílabas, sinalefa, tipos de verso, rima, estrofas y formas poéticas
 ];
 
 /**

@@ -2132,8 +2132,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // RECURSOS LITERARIOS
   'visualizador-recursos-literarios': [
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras en contexto real' },
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
-    { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
   ],
 
@@ -2147,7 +2147,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // QUIZ LITERATURA UNIVERSAL
   'quiz-literatura-universal': [
-    { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
@@ -2155,7 +2155,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ERRORES ESCRITURA CREATIVA
   'errores-escritura-creativa': [
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
-    { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
     { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
   ],
@@ -2195,9 +2195,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // CONSTRUCTOR DE PERSONAJE
   'constructor-personaje': [
     { url: '/visualizador-estructuras-narrativas/', icon: '🏗️', name: 'Estructuras Narrativas', description: '6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu…' },
-    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
+  ],
+
+  // GUÍA DE MÉTRICA Y ESTROFAS
+  'guia-metrica-estrofas': [
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+    { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
+    { url: '/constructor-personaje/', icon: '👤', name: 'Constructor de Personaje', description: '19 dimensiones para crear personajes memorables' },
   ],
 
   'curso-redaccion-academica': [
