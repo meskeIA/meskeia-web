@@ -1138,6 +1138,8 @@ export const implementedAppsUrls = [
   "/quiz-literatura-universal/",         // Quiz 15 preguntas de literatura: básico, medio, avanzado
   "/configurador-narrativo/",            // 14 combinaciones narrativas: persona, narrador y tiempo verbal con análisis de efecto
   "/errores-escritura-creativa/",        // 15 errores frecuentes con ejemplo incorrecto, corrección y consejo práctico
+  "/generador-incipit/",                // 62 primeras frases literarias: reales e inventadas, filtros por género y tono
+  "/visualizador-narratologia/",        // Genette y Greimas: historia/relato, tiempo narrativo, voz/focalización, actancial
 ];
 
 /**

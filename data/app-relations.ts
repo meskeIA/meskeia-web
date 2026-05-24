@@ -2100,7 +2100,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ESTILOS LITERARIOS
   'visualizador-estilos-literarios': [
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
-    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
+    { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
   ],
@@ -2108,7 +2108,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // COMPARADOR DE VOCES
   'comparador-voces-narrativas': [
     { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
-    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+    { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
   ],
@@ -2117,8 +2117,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'orientador-escritura-creativa': [
     { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
-    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
+    { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
   ],
 
   // GÉNEROS DE LA NOVELA
@@ -2133,7 +2133,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-recursos-literarios': [
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras en contexto real' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
-    { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
+    { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
   ],
 
@@ -2157,15 +2157,31 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
-    { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
+    { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
   ],
 
   // CONFIGURADOR NARRATIVO
   'configurador-narrativo': [
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+    { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
+    { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
+  ],
+
+  // GENERADOR DE ÍNCIPIT
+  'generador-incipit': [
+    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+    { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+  ],
+
+  // NARRATOLOGÍA VISUAL
+  'visualizador-narratologia': [
+    { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
   ],
 
   'curso-redaccion-academica': [
