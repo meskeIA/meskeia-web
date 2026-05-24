@@ -2100,25 +2100,41 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ESTILOS LITERARIOS
   'visualizador-estilos-literarios': [
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
-    { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
-    { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
+    { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
   ],
 
   // COMPARADOR DE VOCES
   'comparador-voces-narrativas': [
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
-    { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
-    { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
+    { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
   ],
 
   // ESCRITURA CREATIVA
   'orientador-escritura-creativa': [
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
-    { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
-    { url: '/contador-palabras/', icon: '🔢', name: 'Contador de Palabras', description: 'Palabras, caracteres y tiempo de lectura' },
+    { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
     { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
+  ],
+
+  // TEST TIPO LECTOR
+  'test-tipo-lector': [
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+    { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+  ],
+
+  // QUIZ LITERATURA UNIVERSAL
+  'quiz-literatura-universal': [
+    { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+    { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
   ],
   'curso-redaccion-academica': [
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
