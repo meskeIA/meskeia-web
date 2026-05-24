@@ -1130,6 +1130,7 @@ export const implementedAppsUrls = [
   "/calculadora-ganache/",                // Proporciones chocolate:nata según tipo y textura (glaseado/trufa/firme)
   "/escalador-recetas/",                  // Escalado de recetas con ajuste no lineal para levadura, impulsores y especias
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
+  "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
 ];
 
 /**
