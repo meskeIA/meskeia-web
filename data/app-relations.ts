@@ -2121,6 +2121,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
   ],
 
+  // GÉNEROS DE LA NOVELA
+  'visualizador-generos-novela': [
+    { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+    { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
+  ],
+
   // RECURSOS LITERARIOS
   'visualizador-recursos-literarios': [
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras en contexto real' },
@@ -2131,10 +2139,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // TEST TIPO LECTOR
   'test-tipo-lector': [
+    { url: '/visualizador-generos-novela/', icon: '🐉', name: 'Géneros de la Novela', description: 'Explora los 11 grandes géneros narrativos' },
     { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
-    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
   ],
 
   // QUIZ LITERATURA UNIVERSAL

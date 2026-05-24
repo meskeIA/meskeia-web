@@ -1131,6 +1131,7 @@ export const implementedAppsUrls = [
   "/escalador-recetas/",                  // Escalado de recetas con ajuste no lineal para levadura, impulsores y especias
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
+  "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada
   "/visualizador-recursos-literarios/",  // 27 figuras retóricas: definición, ejemplos, distinción y 6 pares confundidos
   "/comparador-voces-narrativas/",       // Compara el estilo de 10 novelistas: dimensiones, técnicas y fragmentos
   "/test-tipo-lector/",                  // Test 8 preguntas para descubrir tu arquetipo lector (5 perfiles)
