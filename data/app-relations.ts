@@ -2202,10 +2202,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // GUÍA DE MÉTRICA Y ESTROFAS
   'guia-metrica-estrofas': [
+    { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
-    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
     { url: '/constructor-personaje/', icon: '👤', name: 'Constructor de Personaje', description: '19 dimensiones para crear personajes memorables' },
+  ],
+
+  // QUIZ DE MÉTRICA Y ESTROFAS
+  'quiz-metrica-estrofas': [
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
+    { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
   ],
 
   'curso-redaccion-academica': [
@@ -2530,9 +2538,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'quiz-figuras-retoricas': [
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Guía de Figuras Retóricas', description: '27 figuras con definición, ejemplos y cómo distinguirlas' },
+    { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Tipos de verso, estrofas y rima · 3 niveles' },
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Los grandes movimientos de la literatura' },
     { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Autores, obras y movimientos literarios' },
-    { url: '/conjugador-verbos/', icon: '📖', name: 'Conjugador Verbos', description: 'Verbos en español' },
   ],
   'quiz-reinos-naturaleza': [
     { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales en 6 grupos' },
