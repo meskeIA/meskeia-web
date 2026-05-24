@@ -2186,10 +2186,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // ESTRUCTURAS NARRATIVAS
   'visualizador-estructuras-narrativas': [
+    { url: '/constructor-personaje/', icon: '👤', name: 'Constructor de Personaje', description: '19 dimensiones para crear personajes memorables' },
     { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
     { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+  ],
+
+  // CONSTRUCTOR DE PERSONAJE
+  'constructor-personaje': [
+    { url: '/visualizador-estructuras-narrativas/', icon: '🏗️', name: 'Estructuras Narrativas', description: '6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu…' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+    { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
   ],
 
   'curso-redaccion-academica': [
