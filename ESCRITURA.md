@@ -5,13 +5,15 @@ Actualizar en cada sesión antes de continuar.
 
 ---
 
-## Apps implementadas (3)
+## Apps implementadas (5)
 
 | App | URL | Commit | Suite |
 |-----|-----|--------|-------|
 | Orientador de Escritura Creativa | `/orientador-escritura-creativa/` | `e8d4535c` | cultura, productividad |
 | Estilos y Movimientos Literarios | `/visualizador-estilos-literarios/` | `b785b054` | cultura, estudiantes |
 | Comparador de Voces Narrativas | `/comparador-voces-narrativas/` | `039c4590` | cultura, estudiantes |
+| Test: ¿Qué tipo de lector eres? | `/test-tipo-lector/` | `12b3fa81` | cultura |
+| Quiz de Literatura Universal | `/quiz-literatura-universal/` | `12b3fa81` | cultura, estudiantes |
 
 ### Qué cubre ya el Orientador (evitar duplicar)
 
@@ -26,14 +28,14 @@ El `orientador-escritura-creativa` ya incluye dentro de su paso 3:
 
 ---
 
-## Apps pendientes (8 válidas)
+## Apps pendientes (6 válidas)
 
-### 🔴 Alta prioridad
+### ~~🔴 Alta prioridad~~ ✅ Completado
 
-| # | App | Descripción | Suite | Slug |
-|---|-----|-------------|-------|------|
-| 1 | **Test: ¿Qué tipo de lector eres?** | Test de perfil lector (ritmo de lectura, géneros preferidos, relación con los personajes, tolerancia a la ambigüedad). Resultado = arquetipo lector con lecturas recomendadas | cultura | `test-tipo-lector` |
-| 2 | **Quiz de Literatura Universal** | 50–60 preguntas, 3 niveles (básico / medio / avanzado), 4 categorías (autores, obras, movimientos, citas), puntuación + explicación tras cada respuesta | cultura, estudiantes | `quiz-literatura-universal` |
+| # | App | Estado |
+|---|-----|--------|
+| 1 | **Test: ¿Qué tipo de lector eres?** | ✅ `12b3fa81` |
+| 2 | **Quiz de Literatura Universal** | ✅ `12b3fa81` |
 
 ### 🟡 Media prioridad
 
@@ -75,9 +77,9 @@ El `orientador-escritura-creativa` ya incluye dentro de su paso 3:
 ## Orden de implementación sugerido
 
 ```
-Sesión actual o siguiente:
-  [ ] 1. Test: ¿Qué tipo de lector eres?
-  [ ] 2. Quiz de Literatura Universal
+✅ Completado (sesión 2026-05-24):
+  [x] 1. Test: ¿Qué tipo de lector eres?
+  [x] 2. Quiz de Literatura Universal
 
 Sesión siguiente:
   [ ] 3. Recursos literarios
@@ -120,5 +122,5 @@ visualizador-generos-novela ───► orientador-escritura-creativa
 
 ---
 
-_Última actualización: 2026-05-24_
-_Apps totales en el bloque: 3 implementadas + 8 pendientes = 11 apps_
+_Última actualización: 2026-05-24 (sesión 2)_
+_Apps totales en el bloque: 5 implementadas + 6 pendientes = 11 apps_

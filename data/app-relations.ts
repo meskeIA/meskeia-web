@@ -2121,6 +2121,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
   ],
 
+  // RECURSOS LITERARIOS
+  'visualizador-recursos-literarios': [
+    { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras en contexto real' },
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+  ],
+
   // TEST TIPO LECTOR
   'test-tipo-lector': [
     { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Pon a prueba tus conocimientos literarios' },
@@ -2457,9 +2465,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/conjugador-verbos/', icon: '📖', name: 'Conjugador Verbos', description: 'Verbos en español' },
   ],
   'quiz-figuras-retoricas': [
-    { url: '/quiz-verbos-irregulares/', icon: '📝', name: 'Quiz Verbos Inglés', description: 'Past simple A1-B2' },
-    { url: '/quiz-reinos-naturaleza/', icon: '🔬', name: 'Quiz Reinos Naturaleza', description: '43 organismos sorprendentes' },
-    { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Capitales y banderas del mundo' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Guía de Figuras Retóricas', description: '27 figuras con definición, ejemplos y cómo distinguirlas' },
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Los grandes movimientos de la literatura' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Autores, obras y movimientos literarios' },
     { url: '/conjugador-verbos/', icon: '📖', name: 'Conjugador Verbos', description: 'Verbos en español' },
   ],
   'quiz-reinos-naturaleza': [
