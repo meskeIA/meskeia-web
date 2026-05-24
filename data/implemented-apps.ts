@@ -1131,6 +1131,7 @@ export const implementedAppsUrls = [
   "/escalador-recetas/",                  // Escalado de recetas con ajuste no lineal para levadura, impulsores y especias
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
+  "/comparador-voces-narrativas/",       // Compara el estilo de 10 novelistas: dimensiones, técnicas y fragmentos
 ];
 
 /**

@@ -1,0 +1,931 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.heroSubtitle {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ===================== */
+/* Slots                 */
+/* ===================== */
+
+.slots {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.slot {
+  flex: 1;
+  min-height: 80px;
+  border: 2px dashed rgba(0, 0, 0, 0.18);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.slotActivo {
+  border-style: solid;
+}
+
+.slotEtiqueta {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: white;
+  background: var(--text-muted);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  width: fit-content;
+  transition: background 0.2s ease;
+}
+
+.slotNombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.slotMeta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.slotVacio {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.vsCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ===================== */
+/* Selección de autores  */
+/* ===================== */
+
+.seleccion {
+  margin-bottom: 2rem;
+}
+
+.seleccionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.autoresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.autorCard {
+  background: var(--bg-card);
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.autorCardA,
+.autorCardB {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.autorInfo {
+  flex: 1;
+}
+
+.autorNombre {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.autorMeta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.1rem;
+}
+
+.autorObra {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0.25rem 0 0;
+}
+
+.autorBotones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.btnSlot {
+  flex: 1;
+  padding: 0.35rem 0;
+  border: 1.5px solid rgba(0, 0, 0, 0.18);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnSlot:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btnSlotActivoA,
+.btnSlotActivoB {
+  color: white;
+}
+
+/* ===================== */
+/* Panel de comparación  */
+/* ===================== */
+
+.comparacion {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.compDual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.compCabecera {
+  background: var(--bg-card);
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 4px solid;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.compTag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: white;
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  width: fit-content;
+}
+
+.compNombre {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.compMetaLine {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.compMovimiento {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.compVoz {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.25rem 0 0;
+}
+
+.compBloque {
+  background: var(--bg-card);
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+.compBloqueTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+}
+
+/* ===================== */
+/* Dimensiones / barras  */
+/* ===================== */
+
+.dimensiones {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dimensionRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.dimensionMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.dimensionLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dimensionPolos {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.barrasDuo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.barraRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.barraAutor {
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: 80px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barraTrack {
+  flex: 1;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.barraFill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.barraVal {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  width: 28px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* ===================== */
+/* Fragmentos            */
+/* ===================== */
+
+.fragmento {
+  background: var(--bg-primary);
+  border-left: 4px solid;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 0;
+}
+
+.fragmentoTexto {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin: 0 0 0.75rem;
+}
+
+.fragmentoFoot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fragmentoCita {
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.fragmentoNota {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ===================== */
+/* Técnicas              */
+/* ===================== */
+
+.tecnicasList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tecnicaItem {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid;
+  background: var(--bg-primary);
+  border-radius: 0 6px 6px 0;
+  line-height: 1.45;
+}
+
+/* ===================== */
+/* Obras                 */
+/* ===================== */
+
+.obrasList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.obraTag {
+  font-size: 0.82rem;
+  font-style: italic;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  display: inline-block;
+}
+
+/* ===================== */
+/* Análisis              */
+/* ===================== */
+
+.analisisDual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.analisisComun,
+.analisisDistinto {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.analisisTitleGreen {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #27ae60;
+  margin: 0 0 0.6rem;
+}
+
+.analisisTitleBlue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.6rem;
+}
+
+.analisisList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.analisisList li {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  padding-left: 1rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.analisisList li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-size: 0.7rem;
+}
+
+.analisisVacio {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ===================== */
+/* Instrucciones         */
+/* ===================== */
+
+.instrucciones {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border-radius: 14px;
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  margin-bottom: 2rem;
+}
+
+.instrucciones p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ===================== */
+/* v2.0 Educational      */
+/* ===================== */
+
+.guideSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.guideSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.guideSection > p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1.25rem;
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.escenarioIcono {
+  font-size: 1.5rem;
+}
+
+.escenarioHeader h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.escenarioCard p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 0.5rem;
+}
+
+.escenarioExample {
+  color: var(--primary);
+  font-style: italic;
+}
+
+.escenarioTip {
+  font-size: 0.8rem;
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1rem 1.25rem;
+}
+
+.faqItem h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.faqTip {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.1rem 0 0.3rem;
+}
+
+.stepContent p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tipIcono {
+  font-size: 1.4rem;
+}
+
+.tipCard h4 {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tipCard p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.warningBox {
+  background: rgba(231, 76, 60, 0.06);
+  border: 1.5px solid rgba(231, 76, 60, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.warningIcono {
+  font-size: 1.2rem;
+}
+
+.warningHeader h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #c0392b;
+  margin: 0;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  color: #c0392b;
+  font-size: 0.75rem;
+}
+
+/* ===================== */
+/* Dark mode             */
+/* ===================== */
+
+[data-theme='dark'] .slot {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] .autorCard {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .btnSlot {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .compCabecera {
+  border-color: rgba(255, 255, 255, 0.08);
+  border-top-color: inherit;
+}
+
+[data-theme='dark'] .compBloque {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .barraTrack {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .fragmento {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .tecnicaItem {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .analisisComun,
+[data-theme='dark'] .analisisDistinto {
+  background: var(--bg-card);
+}
+
+[data-theme='dark'] .instrucciones {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .comparativaTable tr:hover td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+[data-theme='dark'] .analisisTitleGreen {
+  color: #2ecc71;
+}
+
+/* ===================== */
+/* Responsive            */
+/* ===================== */
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 1.6rem;
+  }
+
+  .heroSubtitle {
+    font-size: 0.92rem;
+  }
+
+  .main {
+    padding: 1.25rem;
+  }
+
+  .slots {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .vsCircle {
+    transform: rotate(90deg);
+  }
+
+  .slot {
+    width: 100%;
+  }
+
+  .autoresGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .compDual {
+    grid-template-columns: 1fr;
+  }
+
+  .analisisDual {
+    grid-template-columns: 1fr;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.78rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .autoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barraFill {
+    transition: none;
+  }
+}

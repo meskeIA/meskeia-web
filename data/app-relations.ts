@@ -2099,10 +2099,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // ESTILOS LITERARIOS
   'visualizador-estilos-literarios': [
+    { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
     { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
-    { url: '/contador-palabras/', icon: '🔢', name: 'Contador de Palabras', description: 'Palabras, caracteres y tiempo de lectura' },
+  ],
+
+  // COMPARADOR DE VOCES
+  'comparador-voces-narrativas': [
+    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+    { url: '/curso-redaccion-academica/', icon: '📝', name: 'Redacción Académica', description: 'TFG, tesis y artículos científicos' },
+    { url: '/calculadora-legibilidad/', icon: '📖', name: 'Calculadora de Legibilidad', description: 'Mide cuán fácil de leer es tu texto' },
   ],
 
   // ESCRITURA CREATIVA
