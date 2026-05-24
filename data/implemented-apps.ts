@@ -1144,6 +1144,7 @@ export const implementedAppsUrls = [
   "/constructor-personaje/",              // 19 dimensiones: deseo, necesidad, miedo, voz, herida, arco. Ficha copiable
   "/guia-metrica-estrofas/",             // Contador de sílabas, sinalefa, tipos de verso, rima, estrofas y formas poéticas
   "/quiz-metrica-estrofas/",             // Quiz 3 niveles: tipos de verso, estrofas, rima y licencias métricas
+  "/guia-comentario-texto/",             // Metodología 7 pasos, análisis poesía+prosa, vocabulario y plantillas
 ];
 
 /**

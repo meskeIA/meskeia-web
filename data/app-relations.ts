@@ -2132,9 +2132,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // RECURSOS LITERARIOS
   'visualizador-recursos-literarios': [
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras en contexto real' },
+    { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
-    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
   ],
 
   // TEST TIPO LECTOR
@@ -2203,9 +2203,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // GUÍA DE MÉTRICA Y ESTROFAS
   'guia-metrica-estrofas': [
     { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima' },
+    { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
-    { url: '/constructor-personaje/', icon: '👤', name: 'Constructor de Personaje', description: '19 dimensiones para crear personajes memorables' },
+  ],
+
+  // GUÍA COMENTARIO DE TEXTO
+  'guia-comentario-texto': [
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
+    { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Tipos de verso, estrofas y rima · 3 niveles' },
   ],
 
   // QUIZ DE MÉTRICA Y ESTROFAS
