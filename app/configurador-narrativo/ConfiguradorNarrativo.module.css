@@ -1,0 +1,282 @@
+.container { min-height: 100vh; background: var(--bg-primary); color: var(--text-primary); }
+
+.hero { background: var(--hero-bg); color: white; padding: 3rem 2rem; text-align: center; }
+.heroTitle { font-size: 2.2rem; font-weight: 700; margin: 0 0 0.75rem; }
+.heroSubtitle { font-size: 1.05rem; opacity: 0.9; margin: 0 auto; max-width: 640px; }
+
+.main { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+/* ── Pasos ── */
+.pasoBox {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.pasoHeader { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.25rem; }
+.pasoNum {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(0,0,0,0.15); color: white;
+  font-size: 0.9rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.pasoTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+
+/* ── Persona ── */
+.personaGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+.personaBtn {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  padding: 1.1rem 1rem;
+  border: 2px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+}
+.personaBtn:hover { transform: translateY(-1px); }
+.personaBtnActivo { color: white; }
+
+.personaLabel { font-size: 1rem; font-weight: 700; color: inherit; }
+.personaPronombre { font-size: 1.1rem; font-weight: 700; font-style: italic; }
+.personaDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+.personaBtnActivo .personaLabel,
+.personaBtnActivo .personaDesc { color: rgba(255,255,255,0.9); }
+
+/* ── Narrador ── */
+.narradorGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+.narradorBtn {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem;
+  padding: 1rem;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+.narradorBtn:hover { border-color: var(--primary); }
+.narradorBtnActivo { }
+
+.narradorEmoji { font-size: 1.6rem; line-height: 1; }
+.narradorNombre { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); }
+.narradorDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* ── Info box ── */
+.infoBox {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.02);
+}
+.infoEmoji { font-size: 1.3rem; flex-shrink: 0; }
+.infoBox p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
+
+/* ── Tiempo ── */
+.tiempoGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.tiempoBtn {
+  display: flex; flex-direction: column; gap: 0.35rem;
+  padding: 1.1rem 1.25rem;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+.tiempoBtn:hover { border-color: var(--primary); }
+
+.tiempoLabel { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+.tiempoEjemplo { font-size: 0.85rem; color: var(--text-secondary); font-style: italic; }
+.tiempoDesc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* ── Resultado ── */
+.resultadoBox {
+  border-radius: 16px;
+  border: 2px solid;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.resultadoHeader { padding: 1.5rem; color: white; }
+.resultadoTitulo { }
+.resultadoNombre { font-size: 1.4rem; font-weight: 700; margin: 0 0 0.6rem; }
+.resultadoBadges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.badge { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.2); border-radius: 10px; }
+.badgeFrecuencia { font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 10px; color: white; }
+
+.resultadoBody { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.resultadoDescripcion { font-size: 0.95rem; color: var(--text-primary); line-height: 1.7; margin: 0; }
+
+.resultadoDual { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.resultadoBloque { }
+.resultadoBloqueTitle { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin: 0 0 0.65rem; }
+.resultadoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.65; margin: 0; }
+
+.fortalezaDebilidad { display: flex; flex-direction: column; gap: 0.75rem; }
+.fortaleza { background: rgba(39,174,96,0.06); border-left: 3px solid #27AE60; border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; }
+.fortalezaLabel { font-size: 0.75rem; font-weight: 700; color: #27AE60; display: block; margin-bottom: 0.25rem; }
+.fortaleza p { font-size: 0.84rem; color: var(--text-primary); margin: 0; line-height: 1.5; }
+.debilidad { background: rgba(231,76,60,0.05); border-left: 3px solid #E67E22; border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; }
+.debilidadLabel { font-size: 0.75rem; font-weight: 700; color: #E67E22; display: block; margin-bottom: 0.25rem; }
+.debilidad p { font-size: 0.84rem; color: var(--text-primary); margin: 0; line-height: 1.5; }
+
+.listaCheck { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.listaCheck li {
+  font-size: 0.84rem; color: var(--text-primary); line-height: 1.5;
+  padding: 0.35rem 0.6rem 0.35rem 0.75rem;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  background: var(--bg-primary);
+}
+.listaEvitar { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.listaEvitar li {
+  font-size: 0.84rem; color: var(--text-primary); line-height: 1.5;
+  padding-left: 1.2rem; position: relative;
+}
+.listaEvitar li::before { content: '✗'; position: absolute; left: 0; color: #E74C3C; font-size: 0.75rem; }
+
+.ejemplosSeccion { }
+.ejemplosGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.5rem; }
+.ejemploCard {
+  background: var(--bg-primary);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 8px 8px;
+  padding: 0.75rem;
+  display: flex; flex-direction: column; gap: 0.25rem;
+}
+.ejemploTitulo { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
+.ejemploAutor { font-size: 0.78rem; color: var(--text-secondary); font-style: italic; }
+.ejemploNota { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45; }
+
+/* ── Tabla autores ── */
+.autoresSection { margin-bottom: 2rem; }
+.autoresTitulo { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.35rem; }
+.autoresSubtitulo { font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 1rem; }
+
+.tableWrapper { overflow-x: auto; }
+.autoresTable { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.autoresTable th { background: var(--primary); color: white; padding: 0.65rem 0.85rem; text-align: left; font-weight: 600; white-space: nowrap; }
+.autoresTable td { padding: 0.55rem 0.85rem; border-bottom: 1px solid rgba(0,0,0,0.06); color: var(--text-primary); vertical-align: top; }
+.autoresTableRow { cursor: pointer; transition: background 0.1s ease; }
+.autoresTableRow:hover td { background: rgba(46,134,171,0.06); }
+
+.tdAutor { font-weight: 700; white-space: nowrap; }
+.tdObra { color: var(--text-secondary); }
+.tdBadge { font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 8px; color: white; white-space: nowrap; }
+.tdNarrador { text-transform: capitalize; }
+.tdTiempo { text-transform: capitalize; }
+.tdNota { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* ── CTA ── */
+.ctaBox {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 16px; padding: 2rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  margin-bottom: 2rem; color: white;
+}
+.ctaTexto { flex: 1; }
+.ctaTitulo { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.35rem; }
+.ctaDesc { font-size: 0.88rem; opacity: 0.9; margin: 0; }
+.ctaBtn {
+  white-space: nowrap; padding: 0.85rem 1.75rem;
+  background: white; color: var(--primary);
+  border-radius: 10px; font-size: 0.95rem; font-weight: 700;
+  text-decoration: none; transition: opacity 0.15s ease; flex-shrink: 0;
+}
+.ctaBtn:hover { opacity: 0.9; }
+
+/* ── Educational v2.0 ── */
+.guideSection { display: flex; flex-direction: column; gap: 1.5rem; }
+.guideSection h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.75rem; }
+.guideSection > p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+
+.comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.comparativaTable th { background: var(--primary); color: white; padding: 0.65rem 0.85rem; text-align: left; font-weight: 600; }
+.comparativaTable td { padding: 0.55rem 0.85rem; border-bottom: 1px solid rgba(0,0,0,0.06); color: var(--text-primary); vertical-align: top; }
+.comparativaTable tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+
+.escenariosGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 1rem; }
+.escenarioCard { background: var(--bg-card); border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); padding: 1.25rem; }
+.escenarioHeader { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+.escenarioIcono { font-size: 1.5rem; }
+.escenarioHeader h4 { font-size: 0.92rem; font-weight: 700; margin: 0; color: var(--text-primary); }
+.escenarioCard p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+.faqList { display: flex; flex-direction: column; gap: 0.75rem; }
+.faqItem { background: var(--bg-card); border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); padding: 1rem 1.25rem; }
+.faqItem h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.4rem; }
+.faqItem p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+.stepGuide { display: flex; flex-direction: column; gap: 1rem; }
+.step { display: flex; gap: 1rem; align-items: flex-start; }
+.stepNumber { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stepContent h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0.1rem 0 0.3rem; }
+.stepContent p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+.tipsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1rem; }
+.tipCard { background: var(--bg-card); border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); padding: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.tipIcono { font-size: 1.4rem; }
+.tipCard h4 { font-size: 0.86rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.tipCard p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+.warningBox { background: rgba(231,76,60,0.06); border: 1.5px solid rgba(231,76,60,0.25); border-radius: 12px; padding: 1.25rem; }
+.warningHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+.warningIcono { font-size: 1.2rem; }
+.warningHeader h4 { font-size: 0.9rem; font-weight: 700; color: #c0392b; margin: 0; }
+.warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.warningList li { font-size: 0.84rem; color: var(--text-secondary); padding-left: 1.2rem; position: relative; line-height: 1.5; }
+.warningList li::before { content: '✗'; position: absolute; left: 0; color: #c0392b; font-size: 0.75rem; }
+
+/* ── Dark mode ── */
+[data-theme='dark'] .pasoBox { border-color: rgba(255,255,255,0.08); }
+[data-theme='dark'] .pasoNum { background: rgba(255,255,255,0.12); }
+[data-theme='dark'] .personaBtn { border-color: rgba(255,255,255,0.15); }
+[data-theme='dark'] .narradorBtn { border-color: rgba(255,255,255,0.12); }
+[data-theme='dark'] .tiempoBtn { border-color: rgba(255,255,255,0.12); }
+[data-theme='dark'] .resultadoBox { }
+[data-theme='dark'] .listaCheck li,
+[data-theme='dark'] .ejemploCard { background: rgba(255,255,255,0.04); }
+[data-theme='dark'] .autoresTable td { border-bottom-color: rgba(255,255,255,0.06); }
+[data-theme='dark'] .autoresTableRow:hover td { background: rgba(46,134,171,0.1); }
+[data-theme='dark'] .comparativaTable td { border-bottom-color: rgba(255,255,255,0.06); }
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard { border-color: rgba(255,255,255,0.08); }
+[data-theme='dark'] .warningBox { background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.3); }
+[data-theme='dark'] .infoBox { background: rgba(255,255,255,0.03); }
+[data-theme='dark'] .fortaleza { background: rgba(39,174,96,0.08); }
+[data-theme='dark'] .debilidad { background: rgba(231,76,60,0.07); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .heroTitle { font-size: 1.6rem; }
+  .main { padding: 1.25rem; }
+  .pasoBox { padding: 1.25rem; }
+  .personaGrid { grid-template-columns: 1fr; }
+  .narradorGrid { grid-template-columns: 1fr; }
+  .tiempoGrid { grid-template-columns: 1fr; }
+  .resultadoDual { grid-template-columns: 1fr; }
+  .ejemplosGrid { grid-template-columns: 1fr; }
+  .escenariosGrid { grid-template-columns: 1fr; }
+  .tipsGrid { grid-template-columns: 1fr 1fr; }
+  .ctaBox { flex-direction: column; text-align: center; }
+}
+@media (max-width: 480px) {
+  .tipsGrid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .resultadoBox { animation: none; } }

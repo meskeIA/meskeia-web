@@ -1136,6 +1136,7 @@ export const implementedAppsUrls = [
   "/comparador-voces-narrativas/",       // Compara el estilo de 10 novelistas: dimensiones, técnicas y fragmentos
   "/test-tipo-lector/",                  // Test 8 preguntas para descubrir tu arquetipo lector (5 perfiles)
   "/quiz-literatura-universal/",         // Quiz 15 preguntas de literatura: básico, medio, avanzado
+  "/configurador-narrativo/",            // 14 combinaciones narrativas: persona, narrador y tiempo verbal con análisis de efecto
 ];
 
 /**
