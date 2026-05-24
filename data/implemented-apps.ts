@@ -1145,6 +1145,7 @@ export const implementedAppsUrls = [
   "/guia-metrica-estrofas/",             // Contador de sílabas, sinalefa, tipos de verso, rima, estrofas y formas poéticas
   "/quiz-metrica-estrofas/",             // Quiz 3 niveles: tipos de verso, estrofas, rima y licencias métricas
   "/guia-comentario-texto/",             // Metodología 7 pasos, análisis poesía+prosa, vocabulario y plantillas
+  "/generador-poemas/",                  // Editor métrico guiado: haiku, redondilla, serventesio, romance, lira y soneto con contador sílabas
 ];
 
 /**

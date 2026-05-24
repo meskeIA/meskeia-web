@@ -2132,9 +2132,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // RECURSOS LITERARIOS
   'visualizador-recursos-literarios': [
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras en contexto real' },
+    { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
     { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
-    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
   ],
 
   // TEST TIPO LECTOR
@@ -2203,25 +2203,33 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // GUÍA DE MÉTRICA Y ESTROFAS
   'guia-metrica-estrofas': [
     { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima' },
+    { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
     { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
-    { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
   ],
 
   // GUÍA COMENTARIO DE TEXTO
   'guia-comentario-texto': [
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
+    { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
-    { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Tipos de verso, estrofas y rima · 3 niveles' },
   ],
 
   // QUIZ DE MÉTRICA Y ESTROFAS
   'quiz-metrica-estrofas': [
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
+    { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
     { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
-    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
+  ],
+
+  // GENERADOR DE POEMAS POR FORMA
+  'generador-poemas': [
+    { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
+    { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima · 3 niveles' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
   ],
 
   'curso-redaccion-academica': [
