@@ -426,7 +426,7 @@ export default function VisualizadorEstilosLiterariosPage() {
             ← Todos los movimientos
           </button>
 
-          <div className={styles.detalleHeader} style={{ borderColor: movimientoActual.color }}>
+          <div className={styles.detalleHeader} style={{ background: movimientoActual.color }}>
             <span className={styles.detalleIcono} aria-hidden="true">{movimientoActual.icono}</span>
             <div>
               <h2 className={styles.detalleNombre}>{movimientoActual.nombre}</h2>

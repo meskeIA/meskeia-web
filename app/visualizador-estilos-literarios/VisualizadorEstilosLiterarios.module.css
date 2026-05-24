@@ -248,7 +248,7 @@
 
 .detalleDescripcion {
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   line-height: 1.65;
   margin-bottom: 1.5rem;
 }
