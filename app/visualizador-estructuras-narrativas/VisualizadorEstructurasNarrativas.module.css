@@ -1,0 +1,621 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.hero {
+  background: var(--hero-bg);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.heroTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.heroSubtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Tabs */
+.tabsNav {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0;
+  scrollbar-width: none;
+}
+
+.tabsNav::-webkit-scrollbar {
+  display: none;
+}
+
+.tabBtn {
+  padding: 0.65rem 1rem;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.18s, background 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 4px 4px 0 0;
+  flex-shrink: 0;
+}
+
+.tabBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.tabBtnActive {
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tabBtnNombre {
+  display: inline;
+}
+
+/* Panel */
+.estructuraPanel {
+  margin-bottom: 2rem;
+}
+
+.estructuraHeader {
+  margin-bottom: 1rem;
+}
+
+.estructuraNombre {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.estructuraOrigen {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.estructuraDesc {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.paraBox {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--secondary);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  line-height: 1.55;
+}
+
+.paraLabel {
+  font-weight: 700;
+  color: var(--secondary);
+  margin-right: 0.4rem;
+}
+
+/* Diagrama de tensión */
+.diagramaWrapper {
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 0.75rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.diagramaEjeY {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.diagrama {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 140px;
+  padding: 0 1rem 0 1.25rem;
+}
+
+.diagramaCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.diagramaBarra {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease;
+  min-height: 4px;
+}
+
+.diagramaLabel {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.diagramaEjeX {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-align: right;
+  margin-top: 0.4rem;
+}
+
+/* Etapas */
+.etapasLista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.etapaCard {
+  display: flex;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  align-items: flex-start;
+}
+
+.etapaNumero {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.etapaContenido {
+  flex: 1;
+}
+
+.etapaNombre {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.etapaDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Ejemplo literario */
+.ejemploBox {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid var(--primary);
+}
+
+.ejemploHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ejemploIcon {
+  font-size: 1.1rem;
+}
+
+.ejemploHeader strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.ejemploAutor {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.ejemploTexto {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* EducationalSection v2.0 */
+.tableWrapper {
+  overflow-x: auto;
+  margin: 0.75rem 0 1.5rem;
+  border-radius: 8px;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  min-width: 520px;
+}
+
+.comparativaTable th {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+  color: var(--text-primary);
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: var(--bg-primary);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.escenarioCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1.25rem;
+  border-left: 4px solid var(--primary);
+}
+
+.escenarioCard strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.escenarioCard p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.faqList {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.faqItem {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #eee;
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.faqTip {
+  background: var(--bg-primary);
+  border-radius: 6px;
+  padding: 0.6rem 0.875rem;
+  font-size: 0.85rem;
+  color: var(--primary);
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.step {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.tipCard {
+  background: var(--bg-primary);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.tipCard strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.tipCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.warningBox {
+  background: #fff8e1;
+  border: 1px solid #ffc107;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin: 0.75rem 0;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.875rem;
+  color: #7a5200;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.warningList li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ffe082;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.warningList li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .tabsNav {
+  border-bottom-color: #3a3a3a;
+}
+
+[data-theme='dark'] .tabBtnActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+[data-theme='dark'] .diagramaWrapper {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .etapaCard {
+  border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .comparativaTable th {
+  background: #1a4a6a;
+}
+
+[data-theme='dark'] .comparativaTable td {
+  border-bottom-color: #333;
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: #222;
+}
+
+[data-theme='dark'] .escenarioCard {
+  background: #222;
+}
+
+[data-theme='dark'] .tipCard {
+  background: #222;
+}
+
+[data-theme='dark'] .faqItem {
+  border-bottom-color: #333;
+}
+
+[data-theme='dark'] .faqTip {
+  background: #1a1a1a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #241f0f;
+  border-color: #6b5500;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #d4a017;
+}
+
+[data-theme='dark'] .warningList li {
+  border-bottom-color: #3a3000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 1.5rem;
+  }
+
+  .tabsNav {
+    gap: 0;
+  }
+
+  .tabBtn {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .tabBtnNombre {
+    display: none;
+  }
+
+  .tabBtn {
+    font-size: 1.2rem;
+  }
+
+  .estructuraNombre {
+    font-size: 1.25rem;
+  }
+
+  .diagrama {
+    height: 100px;
+  }
+
+  .escenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .comparativaTable {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1.25rem;
+  }
+
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .diagrama {
+    height: 80px;
+    gap: 0.25rem;
+  }
+
+  .diagramaLabel {
+    font-size: 0.58rem;
+  }
+}

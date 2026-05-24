@@ -1140,6 +1140,7 @@ export const implementedAppsUrls = [
   "/errores-escritura-creativa/",        // 15 errores frecuentes con ejemplo incorrecto, corrección y consejo práctico
   "/generador-incipit/",                // 62 primeras frases literarias: reales e inventadas, filtros por género y tono
   "/visualizador-narratologia/",        // Genette y Greimas: historia/relato, tiempo narrativo, voz/focalización, actancial
+  "/visualizador-estructuras-narrativas/", // 6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu, Save the Cat, 5 Actos
 ];
 
 /**

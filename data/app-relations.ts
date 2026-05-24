@@ -2115,7 +2115,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // ESCRITURA CREATIVA
   'orientador-escritura-creativa': [
-    { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
+    { url: '/visualizador-estructuras-narrativas/', icon: '🏗️', name: 'Estructuras Narrativas', description: '6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu…' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
     { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
     { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
@@ -2162,7 +2162,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // CONFIGURADOR NARRATIVO
   'configurador-narrativo': [
-    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+    { url: '/visualizador-estructuras-narrativas/', icon: '🏗️', name: 'Estructuras Narrativas', description: '6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu…' },
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
     { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
     { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
@@ -2179,9 +2179,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // NARRATOLOGÍA VISUAL
   'visualizador-narratologia': [
     { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
+    { url: '/visualizador-estructuras-narrativas/', icon: '🏗️', name: 'Estructuras Narrativas', description: '6 modelos: Freytag, 3 Actos, Héroe, Kishōtenketsu…' },
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
-    { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Explora los grandes movimientos de la literatura' },
+  ],
+
+  // ESTRUCTURAS NARRATIVAS
+  'visualizador-estructuras-narrativas': [
+    { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
+    { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
+    { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
+    { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
   ],
 
   'curso-redaccion-academica': [
