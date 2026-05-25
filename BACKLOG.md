@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-05-17
-> **Apps totales**: 929 | **Suites**: 13
+> **Última actualización**: 2026-05-25
+> **Apps totales**: 978 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -45,6 +45,12 @@
 - [x] **npm audit: 11 vulnerabilidades transitivas resueltas** — `npm audit fix` (sin --force) limpió 10/13 (dompurify, flatted, minimatch, fast-uri, brace-expansion, picomatch, path-to-regexp, ip-address, hono, @hono/node-server, express-rate-limit). Solo `package-lock.json` modificado. Build OK. *(resuelto: 2026-05-11)*
 
 - [x] **npm audit: brace-expansion reapareció** — Nueva vuln moderate en `brace-expansion` detectada en auditoría 2026-05-17. Corregida con `npm audit fix` sin --force. Quedan 2 moderate (postcss vía next — deuda aceptada). *(resuelto: 2026-05-17)*
+
+- [x] **npm audit: vuln `ws` moderate corregida** — `ws 8.0.0–8.20.0` en `@libsql/isomorphic-ws` (GHSA-58qx-3vcg-4xpx). Corregida con `npm audit fix`. *(resuelto: 2026-05-25)*
+
+- [x] **Actualizaciones menores** — `@anthropic-ai/sdk` 0.96→0.98, `@tanstack/react-query` 5.100.10→5.100.14, `@types/react` 19.2.14→19.2.15, `baseline-browser-mapping` 2.10.30→2.10.32. Build 1.273 páginas OK. *(resuelto: 2026-05-25)*
+
+- [ ] **npm audit: vuln `uuid/exceljs` moderate pendiente** — `exceljs >=3.5.0` depende de `uuid <11.1.1` (GHSA-w5hq-g745-h8pq, buffer bounds check). Fix requiere `npm audit fix --force` con downgrade a `exceljs@3.4.0` (breaking change desde 4.4.0). Riesgo bajo para nuestro uso (lectura/escritura Excel, no generación UUID con buf). Pospuesto hasta que exceljs publique versión >=4.x con uuid corregido. *(detectado: 2026-05-25)*
 
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura
