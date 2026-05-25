@@ -150,11 +150,13 @@
 >
 > **Estrategia**: Cubrir Freelance mediante mejoras en apps existentes (ver sección 🔵), no con nuevas apps fiscales dinámicas.
 
-### 🎲 Juegos y Ocio (20 apps — objetivo: quizzes de universo acotado)
+### 🎲 Juegos y Ocio (20 apps — ⛔ SUITE CERRADA)
 
-> ⚠️ `quiz-cultura-general` **descartado**: universo abierto (historia/ciencia/arte/deporte/geografía) es a la vez demasiado amplio para curar bien y demasiado pequeño para ser representativo. El modelo correcto es universo cerrado y verificable (como `quiz-paises-capitales`).
+> **Decisión 2026-05-25**: Los datos de analytics confirman que la suite no genera tracción real. Los juegos arcade y casuales tienen 1–3 usos cada uno. Los quizzes educativos alcanzan como máximo 12 usos. En comparación, los simuladores educativos y las herramientas financieras generan 100–400 usos. El público de meskeIA busca resolver algo concreto, no entretenerse.
 >
-> **Candidatos válidos para próximas sesiones**: quiz de símbolos químicos, quiz de tablas de multiplicar, quiz de presidentes/reyes de España, quiz de capitales europeas.
+> **No añadir más apps a esta suite** salvo que un quiz concreto surja como necesidad real detectada en analytics (no por iniciativa propia).
+>
+> ~~**Candidatos descartados**~~: quiz de tablas de multiplicar (`tablas-multiplicar` ya existe), quiz de presidentes/reyes de España, quiz de capitales europeas (`quiz-paises-capitales` ya existe). Todos descartados por baja demanda demostrada.
 
 ---
 
