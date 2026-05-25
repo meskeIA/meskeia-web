@@ -2621,7 +2621,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'generador-firma-email': codigosApps.filter(a => a.url !== '/generador-firma-email/'),
 
   // HOGAR Y COCINA
-  'calculadora-cocina': cocinaApps.filter(a => a.url !== '/calculadora-cocina/'),
+  'calculadora-cocina': [
+    { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta cantidades a cualquier número de raciones' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Panadería: % del Panadero', description: 'Fórmulas profesionales para pan y masas fermentadas' },
+    { url: '/calculadora-ganache/', icon: '🍫', name: 'Repostería: Ganache', description: 'Proporciones de chocolate y nata según textura' },
+    { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Repostería: Puntos del Azúcar', description: 'Fases de cocción del azúcar de almíbar a caramelo' },
+  ],
   'lista-compras': cocinaApps.filter(a => a.url !== '/lista-compras/'),
   'calculadora-pintura': hogarApps.filter(a => a.url !== '/calculadora-pintura/'),
   'calculadora-gasto-energetico': hogarApps.filter(a => a.url !== '/calculadora-gasto-energetico/'),
@@ -5572,7 +5577,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas según tipo de chocolate y textura' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las cantidades de azúcar y demás ingredientes' },
     { url: '/calculadora-gelatina/', icon: '🟡', name: 'Sustitución de Gelatina', description: 'Para recetas que combinan caramelo y gelificación' },
-    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema de porcentajes para otras preparaciones de pastelería' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversiones de unidades y más herramientas culinarias' },
   ],
   'calculadora-gelatina': [
     { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones de chocolate y nata para entremets y mousses' },
@@ -5584,12 +5589,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Puntos del Azúcar', description: 'Temperatura para glasas y caramelos con los que combinar el ganache' },
     { url: '/calculadora-gelatina/', icon: '🟡', name: 'Sustitución de Gelatina', description: 'Añade firmeza a mousses y bavarois de chocolate' },
     { url: '/escalador-recetas/', icon: '⚖️', name: 'Escalador de Recetas', description: 'Ajusta las proporciones a la cantidad total que necesitas' },
-    { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Aplica el mismo sistema de proporciones a otras preparaciones' },
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversiones de unidades y más herramientas culinarias' },
   ],
   'escalador-recetas': [
+    { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversiones de unidades culinarias para cualquier receta' },
     { url: '/calculadora-porcentaje-panadero/', icon: '🥖', name: 'Porcentaje del Panadero', description: 'Sistema de proporciones para escalar recetas de pan sin errores' },
     { url: '/calculadora-hidratacion-pan/', icon: '💧', name: 'Hidratación del Pan', description: 'Verifica la hidratación tras escalar tu masa' },
-    { url: '/calculadora-masa-madre/', icon: '🦠', name: 'Sustitución Masa Madre', description: 'Convierte levadura a masa madre al reescalar recetas' },
     { url: '/calculadora-ganache/', icon: '🍫', name: 'Ganache de Chocolate', description: 'Proporciones exactas para cualquier cantidad de ganache' },
   ],
 };
