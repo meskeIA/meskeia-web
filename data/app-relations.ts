@@ -544,6 +544,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // FINANZAS - HIPOTECA / INMOBILIARIA
   'simulador-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/estimador-hipoteca/'),
   'simulador-compraventa-inmueble': finanzasHipotecaApps.filter(a => a.url !== '/estimador-compraventa-inmueble/'),
+  'estimador-compraventa-inmueble': [
+    { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula la cuota mensual de tu préstamo' },
+    { url: '/calculadora-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Impuesto del vendedor en la transmisión' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Alquiler vs Compra', description: 'Análisis financiero completo para decidir' },
+    { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI y cash flow si vas a alquilar' },
+  ],
   'simulador-gastos-compraventa-garaje': [
     { url: '/estimador-compraventa-inmueble/', icon: '📋', name: 'Estimador Completo', description: 'Todos los tipos de inmueble' },
     { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Calcula los gastos de tu trastero' },
@@ -2305,7 +2311,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'creador-thumbnails': [...imagenesApps.slice(0, 2), ...disenoColoresApps.slice(0, 2)],
   'generador-og-images': [
     { url: '/creador-thumbnails/', icon: '🎬', name: 'Creador Thumbnails', description: 'Miniaturas para YouTube' },
-    { url: '/generador-schema-markup/', icon: '🏷️', name: 'Schema Markup', description: 'Datos estructurados SEO' },
+    { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Elige la paleta de colores de tu imagen' },
     { url: '/analizador-titulos-seo/', icon: '🎯', name: 'Analizador Títulos', description: 'Optimiza títulos SEO' },
     { url: '/generador-meta-descripciones/', icon: '📝', name: 'Meta Descripciones', description: 'Para Google' },
   ],
@@ -2575,8 +2581,18 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países', description: 'Capitales y banderas del mundo' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Consulta los 118 elementos' },
   ],
-  'juego-memoria': juegosPuzzleApps.filter(a => a.url !== '/juego-memoria/'),
-  'juego-puzzle-matematico': juegosPuzzleApps.filter(a => a.url !== '/juego-puzzle-matematico/'),
+  'juego-memoria': [
+    { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Puzzle lógico clásico' },
+    { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos mentales' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+    { url: '/quiz-paises-capitales/', icon: '🌍', name: 'Quiz Países y Capitales', description: 'Pon a prueba tu memoria geográfica' },
+  ],
+  'juego-puzzle-matematico': [
+    { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Puzzle lógico clásico' },
+    { url: '/juego-memoria/', icon: '🧠', name: 'Juego de Memoria', description: 'Encuentra parejas y entrena la memoria' },
+    { url: '/juego-ahorcado/', icon: '🎯', name: 'Ahorcado', description: 'Adivina la palabra letra a letra' },
+    { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora de Notas', description: 'Calcula medias y notas para superar el curso' },
+  ],
   'juego-tres-en-raya': juegosCasualApps.filter(a => a.url !== '/juego-tres-en-raya/'),
   'juego-piedra-papel-tijera': juegosCasualApps.filter(a => a.url !== '/juego-piedra-papel-tijera/'),
   'ruleta-aleatoria': juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/'),
