@@ -994,9 +994,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-peso-numeros/', icon: '🔢', name: 'El Peso de los Números', description: 'Escalas numéricas' },
   ],
   'simulador-reacciones-quimicas': [
+    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Reacciones reversibles, Le Chatelier y constante Kc' },
+    { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'Caso práctico de reacción controlada gota a gota' },
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas Visual', description: 'Tipos, balanceo y átomos animados' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Masas atómicas y propiedades' },
-    { url: '/quiz-tabla-periodica/', icon: '🔬', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tu química' },
   ],
   'visualizador-reacciones-quimicas': [
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Calculadora de Reacciones', description: 'Estequiometría y reactivo limitante' },
@@ -2291,7 +2292,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'creador-paletas': disenoColoresApps.filter(a => a.url !== '/creador-paletas/'),
   'generador-gradientes': disenoColoresApps.filter(a => a.url !== '/generador-gradientes/'),
   'contraste-colores': disenoColoresApps.filter(a => a.url !== '/contraste-colores/'),
-  'simulador-baja-vision': disenoColoresApps.filter(a => a.url !== '/simulador-baja-vision/'),
+  'simulador-baja-vision': [
+    { url: '/simulador-daltonismo/', icon: '🌈', name: 'Simulador de Daltonismo', description: 'Sube una imagen y simula protanopia, deuteranopia y tritanopia' },
+    { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'El sistema de lectura para visión muy reducida o ceguera' },
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Herramienta de magnificación con cámara para baja visión' },
+    { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Recorrido completo por las herramientas y apoyos visuales' },
+  ],
   'simulador-daltonismo': disenoColoresApps.filter(a => a.url !== '/simulador-daltonismo/'),
   'convertidor-subtitulos': [
     { url: '/contraste-colores/', icon: '👁️', name: 'Contraste Colores', description: 'Accesibilidad WCAG' },
@@ -2622,7 +2628,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-numeros-romanos': conversoresApps.filter(a => a.url !== '/conversor-numeros-romanos/'),
   'conversor-morse': [...conversoresApps.filter(a => a.url !== '/conversor-morse/').slice(0, 2), ...criptografiaClasicaApps.slice(0, 2)],
   'conversor-binario': [...conversoresApps.slice(0, 2), ...criptografiaModernaApps.slice(2, 4)],
-  'conversor-braille': conversoresApps,
+  'conversor-braille': [
+    { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador de Baja Visión', description: 'Entiende cataratas, glaucoma y daltonismo: cuándo el Braille es esencial' },
+    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Otra forma de hacer accesible el texto: tipografía y espaciado' },
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía texto y objetos con la cámara hasta 5x' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto a Voz', description: 'Alternativa auditiva para baja visión severa' },
+  ],
 
   // CÓDIGOS
   'generador-qr': codigosApps.filter(a => a.url !== '/generador-qr/'),
@@ -2772,7 +2783,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/diapason/', icon: '🎼', name: 'Diapasón', description: 'La 440Hz de referencia' },
     { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' },
   ],
-  'lupa-digital': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/espejo/', icon: '🪞', name: 'Espejo', description: 'Espejo digital' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
+  'lupa-digital': [
+    { url: '/simulador-baja-vision/', icon: '👁️', name: 'Simulador de Baja Visión', description: 'Entiende por qué necesitas magnificación: cataratas, glaucoma, miopía severa' },
+    { url: '/conversor-braille/', icon: '⠃', name: 'Traductor de Braille', description: 'Alternativa para casos donde la lupa ya no basta' },
+    { url: '/adaptador-dislexia/', icon: '📖', name: 'Adaptador Dislexia', description: 'Otro apoyo de lectura: tipografías y espaciado adaptado' },
+    { url: '/espejo/', icon: '🪞', name: 'Espejo Digital', description: 'Otra herramienta que aprovecha la cámara del móvil' },
+  ],
   'espejo': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Amplía con la cámara' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
 
   // REFERENCIA Y CULTURA GENERAL
@@ -2854,10 +2870,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave para estudiar' },
   ],
   'simulador-equilibrio-quimico': [
+    { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'Aplicación práctica del equilibrio: curva de pH y punto de equivalencia' },
     { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Estequiometría y reactivo limitante' },
-    { url: '/visualizador-cinetica-quimica/', icon: '📈', name: 'Cinética Química', description: 'Velocidades de reacción' },
-    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
-    { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala y reacciones de equilibrio' },
+    { url: '/visualizador-cinetica-quimica/', icon: '📈', name: 'Cinética Química', description: 'Velocidades de reacción y energía de activación' },
+    { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala y reacciones de equilibrio iónico' },
   ],
   'simulador-lotka-volterra': [
     { url: '/simulador-genetica/', icon: '🧬', name: 'Genética Mendeliana', description: 'Cruces, Punnett y poblaciones' },
@@ -3069,9 +3085,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ACCESIBILIDAD
   'adaptador-dislexia': [
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
-    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores' },
-    { url: '/planificador-chequeos-medicos/', icon: '🏥', name: 'Chequeos Médicos', description: 'Revisiones preventivas por edad' },
-    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Lee textos en voz alta' },
+    { url: '/lector-texto-voz/', icon: '🔊', name: 'Lector de Texto', description: 'Alternativa auditiva para la lectura' },
+    { url: '/lupa-digital/', icon: '🔍', name: 'Lupa Digital', description: 'Magnificación con cámara para texto pequeño' },
+    { url: '/temporizador-visual/', icon: '⏱️', name: 'Temporizador Visual', description: 'Timer con círculo de colores para organización' },
   ],
   'temporizador-visual': [
     { url: '/guia/accesibilidad/', icon: '♿', name: 'Guía de Accesibilidad', description: 'Kit completo de apoyos visuales en casa' },
