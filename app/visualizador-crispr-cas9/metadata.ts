@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-crispr-cas9';
-const TITLE = 'CRISPR-Cas9: Edición Génica Paso a Paso';
+const TITLE = 'CRISPR-Cas9: Edición Génica Paso a Paso - meskeIA';
 const DESCRIPTION =
   'Visualiza el mecanismo completo de CRISPR-Cas9: ARN guía, búsqueda del PAM, corte de doble hebra, reparación por NHEJ o HDR, aplicaciones terapéuticas y el debate bioético.';
 const URL = `https://meskeia.com/${APP_NAME}/`;

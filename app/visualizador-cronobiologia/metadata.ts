@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-cronobiologia';
-const TITLE = 'Cronobiología: Ritmos Circadianos, Cronotipos y Cronofarmacología';
+const TITLE = 'Cronobiología: Ritmos Circadianos, Cronotipos y Cronofarmacología - meskeIA';
 const DESCRIPTION = 'Visualiza el reloj molecular CLOCK/BMAL1/PER/CRY, sincronizadores circadianos, cronotipos búho/alondra y el efecto del momento del día en la eficacia de medicamentos.';
 const URL = `https://meskeia.com/${APP_NAME}/`;
 

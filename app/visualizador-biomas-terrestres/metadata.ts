@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-biomas-terrestres';
-const TITLE = 'Biomas Terrestres: Clima, Biodiversidad y Amenazas';
+const TITLE = 'Biomas Terrestres: Clima, Biodiversidad y Amenazas - meskeIA';
 const DESCRIPTION =
   'Explora los 7 biomas terrestres principales: temperatura, precipitación, biodiversidad característica, suelo, fauna representativa y amenazas ambientales de cada ecosistema.';
 const URL = `https://meskeia.com/${APP_NAME}/`;

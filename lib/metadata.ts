@@ -30,10 +30,9 @@ export const siteConfig = {
 export function generateBaseMetadata(overrides?: Partial<Metadata>): Metadata {
   return {
     metadataBase: new URL(siteConfig.url),
-    title: {
-      default: siteConfig.title,
-      template: `%s | ${siteConfig.name}`,
-    },
+    // Sin template: cada app define su title completo (con "- meskeIA" si corresponde).
+    // El template anterior duplicaba "meskeIA" porque 800+ apps ya lo incluyen en su title.
+    title: siteConfig.title,
     description: siteConfig.description,
     keywords: siteConfig.keywords,
     authors: [{ name: siteConfig.author }],

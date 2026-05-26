@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-embriogenesis';
-const TITLE = 'Embriogénesis: Del Cigoto al Embrión Trilaminar';
+const TITLE = 'Embriogénesis: Del Cigoto al Embrión Trilaminar - meskeIA';
 const DESCRIPTION =
   'Visualiza la fecundación, segmentación celular, formación de mórula/blástula/gástrula, las 3 capas germinales y la diferenciación de órganos en el desarrollo embrionario humano.';
 const URL = `https://meskeia.com/${APP_NAME}/`;

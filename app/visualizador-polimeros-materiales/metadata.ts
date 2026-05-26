@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-polimeros-materiales';
-const TITLE = 'Polímeros y Materiales: Plásticos, Propiedades y Reciclaje';
+const TITLE = 'Polímeros y Materiales: Plásticos, Propiedades y Reciclaje - meskeIA';
 const DESCRIPTION = 'Visualiza la polimerización por adición y condensación, propiedades de termoplásticos y termoestables, clasificación de plásticos y su ciclo de vida medioambiental.';
 const URL = `https://meskeia.com/${APP_NAME}/`;
 

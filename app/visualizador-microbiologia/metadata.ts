@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-microbiologia';
-const TITLE = 'Microbiología: Bacterias, Gram y Dominios de la Vida';
+const TITLE = 'Microbiología: Bacterias, Gram y Dominios de la Vida - meskeIA';
 const DESCRIPTION = 'Explora las morfologías bacterianas, curva de crecimiento logístico, diferencia Gram+/Gram-, conjugación y esporulación, y el árbol de los 3 dominios de la vida: Archaea, Bacteria y Eukarya.';
 const URL = `https://meskeia.com/${APP_NAME}/`;
 

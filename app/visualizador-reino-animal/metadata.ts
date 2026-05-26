@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 const APP_NAME = 'visualizador-reino-animal';
-const TITLE = 'Reino Animal: Vertebrados, Invertebrados y Filogenia';
+const TITLE = 'Reino Animal: Vertebrados, Invertebrados y Filogenia - meskeIA';
 const DESCRIPTION =
   'Explora el árbol filogenético del reino Animalia: 5 clases de vertebrados, phyla de invertebrados, comparativa de sistemas circulatorio/reproductor/excretor y adaptaciones por entorno.';
 const URL = `https://meskeia.com/${APP_NAME}/`;
