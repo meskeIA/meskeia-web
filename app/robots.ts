@@ -65,7 +65,5 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: 'https://meskeia.com/sitemap.xml',
-    // Host canónico
-    host: 'https://meskeia.com',
   };
 }
