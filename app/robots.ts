@@ -21,14 +21,17 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       // Regla general para todos los bots
-      // /api/ son endpoints serverless (MCP, ChatGPT tools, analytics, tRPC).
-      // No son páginas web indexables; devuelven 4xx ante GET de crawlers.
-      // Los LLMs que sí necesitan /api/ (GPTBot, Claude-Web, etc.) lo tienen
-      // permitido explícitamente en sus reglas específicas más abajo.
+      // - /api/: endpoints serverless (MCP, ChatGPT tools, analytics, tRPC).
+      //   Devuelven 4xx ante GET de crawlers — no son páginas indexables.
+      //   Los LLMs que sí los necesitan tienen acceso explícito más abajo.
+      // - /*?from=*: tracking interno de cross-linking entre apps.
+      // - /*?ref=*: parámetros UTM de campañas externas (Product Hunt, etc.).
+      //   La canonical apunta a la URL limpia, así que Google las marca como
+      //   "alternativas". Bloquearlas ahorra crawl budget y elimina el aviso.
       {
         userAgent: '*',
         allow: '/',
-        disallow: '/api/',
+        disallow: ['/api/', '/*?from=', '/*?ref='],
       },
       // GPTBot (ChatGPT/OpenAI) - Permitir acceso completo + índice de herramientas
       {
