@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Conversor de Código Braille - Texto a Braille en Español | meskeIA',
-  description: 'Convierte texto a código Braille y viceversa. Alfabeto Braille español completo con ñ y acentos. Visualización con celdas y caracteres Unicode.',
+  title: 'Traductor Braille a Español y Texto a Braille Online - Bidireccional',
+  description: 'Convierte texto a Braille y traduce Braille a español al instante. Alfabeto completo con ñ y tildes (á, é, í, ó, ú). Visualización de celdas Unicode. Gratis.',
   keywords: 'braille, conversor, texto, accesibilidad, alfabeto braille, español, discapacidad visual, unicode, celdas',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Conversor de Código Braille en Español',
-    description: 'Convierte texto a Braille y viceversa con alfabeto español completo',
+    title: 'Traductor Braille a Español y Texto a Braille - Bidireccional',
+    description: 'Convierte texto a Braille y traduce Braille a español al instante. Alfabeto completo con ñ y tildes. Visualización de celdas Unicode.',
     url: 'https://meskeia.com/conversor-braille/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Conversor de Código Braille',
-    description: 'Texto a Braille en español con visualización interactiva',
+    title: 'Traductor Braille a Español y Texto a Braille',
+    description: 'Bidireccional, alfabeto completo con ñ y tildes. Celdas Unicode.',
     images: ['https://meskeia.com/og-image.png']
   },
 };

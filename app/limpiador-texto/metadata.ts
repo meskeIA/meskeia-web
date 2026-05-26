@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Limpiador de Texto - Elimina Espacios, Duplicados y Más | meskeIA',
-  description: 'Limpia y formatea tu texto: elimina espacios extra, líneas duplicadas, caracteres especiales, saltos de línea innecesarios. Gratis, privado y sin registro.',
+  title: 'Limpiador de Texto Online Gratis - Quita Espacios, Duplicados y Formato',
+  description: 'Limpia texto al instante: elimina espacios sobrantes, líneas duplicadas, saltos de línea, caracteres especiales y formato copiado. Pega, limpia y copia. Sin registro.',
   keywords: 'limpiador texto, eliminar espacios, quitar duplicados, limpiar texto, formatear texto, eliminar lineas vacias, text cleaner, remover caracteres',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Limpiador de Texto Online - Formatea y Limpia',
-    description: 'Elimina espacios extra, líneas duplicadas, caracteres especiales y más. Herramienta gratuita.',
+    title: 'Limpiador de Texto Online Gratis - Quita Espacios y Duplicados',
+    description: 'Limpia texto al instante: elimina espacios, líneas duplicadas, saltos y caracteres especiales. Pega, limpia y copia.',
     url: 'https://meskeia.com/limpiador-texto/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -24,8 +24,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Limpiador de Texto | meskeIA',
-    description: 'Limpia texto: elimina espacios, duplicados, caracteres especiales',
+    title: 'Limpiador de Texto Online Gratis',
+    description: 'Quita espacios, líneas duplicadas y formato. Pega, limpia y copia.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {

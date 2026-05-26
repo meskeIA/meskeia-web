@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Contador de Sílabas - Separa y Cuenta Sílabas en Español | meskeIA',
-  description: 'Cuenta y separa las sílabas de cualquier palabra o texto en español. Herramienta útil para poesía, ortografía y aprendizaje del idioma.',
+  title: 'Contador de Sílabas Online - Cuenta y Separa Sílabas en Español',
+  description: 'Cuenta sílabas y sepáralas con guiones al instante. Para poesía (versos, métrica), ortografía y deberes escolares. Reconoce diptongos, hiatos y triptongos. Gratis.',
   keywords: 'contador sílabas, separar sílabas, silabeador español, división silábica, sílabas online, poesía, métrica',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Contador de Sílabas en Español - meskeIA',
-    description: 'Cuenta y separa las sílabas de cualquier texto en español',
+    title: 'Contador de Sílabas Online - Cuenta y Separa Sílabas',
+    description: 'Cuenta sílabas y sepáralas con guiones al instante. Para poesía, ortografía y deberes escolares. Diptongos, hiatos y triptongos.',
     url: 'https://meskeia.com/contador-silabas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contador de Sílabas en Español - meskeIA',
-    description: 'Cuenta y separa las sílabas de cualquier texto en español',
+    title: 'Contador de Sílabas Online',
+    description: 'Cuenta sílabas y sepáralas con guiones. Para poesía, ortografía y escolares.',
     images: ['https://meskeia.com/og-image.png']
   },
 };

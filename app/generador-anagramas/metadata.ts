@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Generador de Anagramas - Encuentra Palabras con tus Letras | meskeIA',
-  description: 'Genera anagramas y encuentra todas las palabras posibles con tus letras. Ideal para Wordle, Scrabble, Apalabrados y crucigramas. Diccionario español incluido.',
+  title: 'Generador de Anagramas Online Gratis - Buscador de Palabras con Letras',
+  description: 'Genera anagramas en español: introduce tus letras y encuentra todas las palabras posibles. Ideal para Scrabble, Apalabrados, Wordle y crucigramas. Sin registro, gratis.',
   keywords: 'anagramas, generador, palabras, letras, wordle, scrabble, apalabrados, crucigramas, español, diccionario',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Generador de Anagramas en Español',
-    description: 'Encuentra todas las palabras posibles con tus letras',
+    title: 'Generador de Anagramas Online Gratis - Buscador de Palabras',
+    description: 'Introduce tus letras y encuentra todas las palabras posibles. Ideal para Scrabble, Apalabrados, Wordle y crucigramas.',
     url: 'https://meskeia.com/generador-anagramas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Generador de Anagramas',
-    description: 'Ideal para Wordle, Scrabble y crucigramas',
+    title: 'Generador de Anagramas Online Gratis',
+    description: 'Encuentra todas las palabras posibles con tus letras. Scrabble, Apalabrados, Wordle, crucigramas.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
