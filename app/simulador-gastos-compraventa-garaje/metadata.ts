@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Garaje - Calcular ITP y Costes | meskeIA',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const jsonLd = generateWebAppSchema({
+const webAppSchema = generateWebAppSchema({
   name: 'Simulador Gastos Compraventa Garaje',
   description: 'Calculadora de gastos de compra y venta de garaje o plaza de parking en España. Incluye ITP por comunidad autónoma, notaría, registro de la propiedad, plusvalía municipal y IRPF del vendedor.',
   url: 'https://meskeia.com/simulador-gastos-compraventa-garaje/',
@@ -45,3 +45,31 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['gastos garaje', 'ITP garaje', 'compraventa garaje', 'plaza parking impuestos', 'España'],
 });
+
+const faqSchema = generateFAQSchema({
+  url: 'https://meskeia.com/simulador-gastos-compraventa-garaje/',
+  mainEntity: [
+    {
+      question: '¿Se puede comprar un garaje sin ser propietario de una vivienda?',
+      answer: 'Sí. En España no existe ninguna restricción legal que obligue al comprador de un garaje a ser propietario de una vivienda. Cualquier persona puede adquirir una plaza de parking de forma independiente. La única excepción son los garajes vinculados a una promoción específica donde el promotor exige comprarlo junto con la vivienda del mismo edificio.',
+    },
+    {
+      question: '¿Qué ITP paga un garaje de segunda mano?',
+      answer: 'El garaje tributa por el Impuesto de Transmisiones Patrimoniales (ITP) al mismo tipo que los inmuebles residenciales de su comunidad autónoma, que oscila entre el 4% (País Vasco) y el 11% (Cataluña, Comunidad Valenciana). El garaje se considera inmueble residencial y puede beneficiarse de tipos reducidos para jóvenes, familias numerosas o personas con discapacidad si los cumple.',
+    },
+    {
+      question: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
+      answer: 'Un garaje de primera transmisión (nuevo, del promotor) paga IVA al 10% más AJD (entre 0,5% y 1,5% según la comunidad). Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.',
+    },
+    {
+      question: '¿El vendedor de un garaje paga plusvalía municipal?',
+      answer: 'Sí. El vendedor debe pagar el Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) al ayuntamiento donde esté ubicado el garaje. Desde 2021, puede elegir entre el método objetivo y el real, pagando el más favorable. Si vende por menos de lo que compró, puede quedar exento acreditando la pérdida.',
+    },
+    {
+      question: '¿Existen tipos reducidos de ITP para garajes?',
+      answer: 'Sí, en muchas comunidades autónomas los tipos reducidos aplicables a inmuebles residenciales también se pueden aplicar a garajes, siempre que el garaje se compre junto con o en el mismo acto que la vivienda, o cuando se cumplan los requisitos del comprador (edad, ingresos, discapacidad). Conviene consultar la normativa específica de tu comunidad, ya que los requisitos varían.',
+    },
+  ],
+});
+
+export const jsonLd = combineSchemas(webAppSchema, faqSchema);
