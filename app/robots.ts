@@ -21,9 +21,14 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       // Regla general para todos los bots
+      // /api/ son endpoints serverless (MCP, ChatGPT tools, analytics, tRPC).
+      // No son páginas web indexables; devuelven 4xx ante GET de crawlers.
+      // Los LLMs que sí necesitan /api/ (GPTBot, Claude-Web, etc.) lo tienen
+      // permitido explícitamente en sus reglas específicas más abajo.
       {
         userAgent: '*',
         allow: '/',
+        disallow: '/api/',
       },
       // GPTBot (ChatGPT/OpenAI) - Permitir acceso completo + índice de herramientas
       {
