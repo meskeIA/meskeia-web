@@ -4202,20 +4202,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // ─── Cronologías culturales Grupo 2 (2026-04-30) ──────────────────────────
-
-  'visualizador-historia-medicina': [
-    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'La medicina digital y la telemedicina nacen en la misma era que el cloud computing y el big data' },
-    { url: '/visualizador-derechos-humanos/', icon: '⚖️', name: 'Derechos Humanos', description: 'El derecho a la salud es un derecho humano fundamental consagrado en la Declaración Universal de 1948' },
-    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'La farmacología industrial y la radiología nacen en la misma era que la Segunda Revolución Industrial' },
-    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'El juramento hipocrático es filosofía aplicada; la bioética moderna dialoga con el existencialismo' },
-  ],
-
-  'visualizador-historia-internet': [
-    { url: '/visualizador-historia/medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'La medicina digital, el diagnóstico por IA y la telemedicina son hijas directas de la revolución de Internet' },
-    { url: '/visualizador-derechos-humanos/', icon: '⚖️', name: 'Derechos Humanos', description: 'Los derechos digitales y la privacidad online son la frontera más nueva de los derechos humanos' },
-    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'Internet es el motor de la Tercera y Cuarta Revolución Industrial: sin red, no hay fábrica inteligente' },
-    { url: '/visualizador-arquitectura-estilos/', icon: '🏛️', name: 'Estilos Arquitectónicos', description: 'Los centros de datos y la arquitectura paramétrica (BIM) son hijos de la era digital' },
-  ],
+  // Nota: las claves antiguas visualizador-historia-{medicina,internet} se eliminaron
+  // al migrar al sistema dinámico /visualizador-historia/[slug]/.
 
   'visualizador-derechos-humanos': [
     { url: '/visualizador-historia/medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'El derecho a la salud es un derecho humano; la bioética nació cuando la medicina superó sus propios límites' },
@@ -4232,12 +4220,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // Cronologías Ciencia — Grupo 3 (2026-05-01)
-  'visualizador-historia-fisica': [
-    { url: '/visualizador-historia/matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'El cálculo de Newton y Leibniz, las ecuaciones de Maxwell y la mecánica cuántica son física y matemáticas inseparables' },
-    { url: '/visualizador-historia/quimica/', icon: '🧪', name: 'Historia de la Química', description: 'La mecánica cuántica explica el enlace químico; la termodinámica une física y química' },
-    { url: '/visualizador-historia/astronomia/', icon: '🔭', name: 'Historia de la Astronomía', description: 'La relatividad general y las ondas gravitacionales son física aplicada al cosmos' },
-    { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'La mecánica cuántica desafió el determinismo; Einstein y Bohr debatieron sobre la realidad misma' },
-  ],
+  // Nota: clave antigua visualizador-historia-fisica eliminada al migrar a /visualizador-historia/[slug]/.
   'visualizador-historia-quimica': [
     { url: '/visualizador-historia/fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'La mecánica cuántica explica el enlace covalente; termodinámica y electroquímica son física y química a la vez' },
     { url: '/visualizador-historia/matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'La tabla periódica es matemática; la química computacional resuelve ecuaciones cuánticas con álgebra lineal' },
@@ -4302,12 +4285,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-filosofia/', icon: '🦉', name: 'Historia de la Filosofía', description: 'Aristóteles teorizó el teatro en la Poética; Brecht aplicó filosofía marxista; Beckett expresó el existencialismo en escena' },
     { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'Teatro y literatura son inseparables: Shakespeare, Ibsen, Chéjov y Beckett son tanto dramaturgos como escritores' },
   ],
-  'visualizador-historia-danza': [
-    { url: '/visualizador-historia/teatro/', icon: '🎭', name: 'Historia del Teatro', description: 'Danza y teatro comparten escena desde los coros griegos; el Tanztheater de Pina Bausch los fusiona definitivamente' },
-    { url: '/visualizador-musica-movimientos/', icon: '🎵', name: 'Historia de la Música', description: 'Sin música no hay danza: de los ritmos tribales a Tchaikovsky, Stravinski y el hip-hop, música y danza evolucionan juntas' },
-    { url: '/visualizador-historia/psicologia/', icon: '🧠', name: 'Historia de la Psicología', description: 'La danza terapia aplica psicología; Laban analizó el movimiento como expresión psicológica; el cuerpo es lenguaje emocional' },
-    { url: '/visualizador-historia/cine/', icon: '🎬', name: 'Historia del Cine', description: 'Musicals de Hollywood, Bollywood y el videoclip llevan la danza al cine; la videodanza es un género propio' },
-  ],
+  // Nota: clave antigua visualizador-historia-danza eliminada al migrar a /visualizador-historia/[slug]/.
   // Cronologías Cultura Popular — Grupo 4
   'visualizador-historia-cine': [
     { url: '/visualizador-historia/videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Cine y videojuegos comparten efectos especiales, narrativa y revoluciones digitales paralelas' },
@@ -4346,18 +4324,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/epidemias/', icon: '🦠', name: 'Historia de las Epidemias', description: 'El cambio climático amplifica vectores de enfermedades: el clima y la salud global están ligados' },
     { url: '/visualizador-historia/medicina/', icon: '🏥', name: 'Historia de la Medicina', description: 'Las pandemias y el clima han moldeado la historia de la humanidad como fuerzas paralelas' },
   ],
-  'visualizador-historia-aviacion': [
-    { url: '/visualizador-historia/energia/', icon: '⚡', name: 'Historia de la Energía', description: 'El queroseno y el SAF son combustibles de aviación: la historia energética determina el futuro del vuelo' },
-    { url: '/visualizador-historia/fisica/', icon: '⚛️', name: 'Historia de la Física', description: 'Aerodinámica, propulsión a chorro y mecánica de fluidos: la física es el fundamento de volar' },
-    { url: '/visualizador-historia/exploracion/', icon: '🧭', name: 'Historia de la Exploración', description: 'La aviación aceleró la exploración: de los vuelos de Lindbergh a las misiones espaciales' },
-    { url: '/visualizador-revoluciones-industriales/', icon: '🏭', name: 'Revoluciones Industriales', description: 'El motor de reacción y la industria aeronáutica son productos de la segunda y tercera revolución industrial' },
-  ],
-  'visualizador-historia-comics': [
-    { url: '/visualizador-historia/cine/', icon: '🎬', name: 'Historia del Cine', description: 'El MCU y las adaptaciones de cómic han redefinido el cine del siglo XXI' },
-    { url: '/visualizador-literatura-movimientos/', icon: '📖', name: 'Movimientos Literarios', description: 'La novela gráfica es literatura: Maus ganó el Pulitzer y Fun Home llegó a Broadway' },
-    { url: '/visualizador-arte-movimientos/', icon: '🎨', name: 'Movimientos Artísticos', description: 'Pop Art, expresionismo y surrealismo influyeron directamente en el lenguaje visual del cómic' },
-    { url: '/visualizador-historia/videojuegos/', icon: '🎮', name: 'Historia de los Videojuegos', description: 'Videojuegos y cómics comparten universos, personajes y fans: de Batman al Arkham de Rocksteady' },
-  ],
+  // Nota: claves antiguas visualizador-historia-{aviacion,comics} eliminadas al migrar a /visualizador-historia/[slug]/.
 
   // Cronologías Tendencias España — Roadmap v8 EJE A (2026-05-02)
   'visualizador-historia-radio': [

@@ -453,7 +453,7 @@ export default function VisualizadorCicloAguaPage() {
         {renderSeccion()}
 
         <div className={styles.enlaceApp}>
-          <span aria-hidden="true">{'\uD83D\uDD17'}</span> Mas explicadores → <a href="/visualizador-agua-virtual/">Agua Virtual</a> · <a href="/visualizador-co2-diario/">Tu CO2 Diario</a> · <a href="/visualizador-clima-extremo/">Clima Extremo</a>
+          <span aria-hidden="true">{'\uD83D\uDD17'}</span> Mas explicadores → <a href="/visualizador-agua-virtual/">Agua Virtual</a> · <a href="/calculadora-huella-carbono/">Huella de Carbono</a> · <a href="/visualizador-clima/">Cómo Funciona el Clima</a>
         </div>
 
         <EducationalSection

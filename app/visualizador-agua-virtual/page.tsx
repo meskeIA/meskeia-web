@@ -459,7 +459,7 @@ export default function VisualizadorAguaVirtualPage() {
         {renderSeccion()}
 
         <div className={styles.enlaceApp}>
-          <span aria-hidden="true">{'\uD83D\uDD17'}</span> Mas explicadores → <a href="/visualizador-dinero-y-tiempo/">El Dinero y el Tiempo</a> · <a href="/visualizador-sueldo-neto/">Tu Sueldo al Desnudo</a> · <a href="/visualizador-co2-diario/">Tu CO2 Diario</a>
+          <span aria-hidden="true">{'\uD83D\uDD17'}</span> Mas explicadores → <a href="/visualizador-dinero-y-tiempo/">El Dinero y el Tiempo</a> · <a href="/visualizador-sueldo-neto/">Tu Sueldo al Desnudo</a> · <a href="/calculadora-huella-carbono/">Huella de Carbono</a>
         </div>
 
         <EducationalSection
