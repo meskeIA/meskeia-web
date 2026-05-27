@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: '2048 - Juego de Números | meskeIA',
-  description: 'Juega al clásico 2048. Desliza y combina números para llegar a 2048. Guarda tu mejor puntuación. Gratis y sin registro.',
+  description: 'Juega al clásico 2048 en español. Desliza y combina fichas para alcanzar la suma de 2048. Modo oscuro, puntuación guardada y estadísticas de partida. Gratis.',
   keywords: '2048, juego, numeros, puzzle, estrategia, combinar, deslizar, online, gratis',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

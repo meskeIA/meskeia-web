@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Edad de Mascotas - Perros y Gatos en Años Humanos | meskeIA',
-  description: 'Calcula la edad de tu perro o gato en años humanos. Fórmula científica actualizada según el tamaño del animal.',
+  description: 'Calcula la edad de tu perro o gato en años humanos según su tamaño y raza. Fórmula científica actualizada, más precisa que la regla de los 7 años. Gratis.',
   keywords: 'calculadora edad perro, edad gato años humanos, años perro, conversión edad mascota, cuántos años tiene mi perro',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

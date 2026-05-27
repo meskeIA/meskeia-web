@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Estimador de Deuda - Método Bola de Nieve y Avalancha | meskeIA',
-  description: 'Elimina tus deudas más rápido. Compara el método bola de nieve vs avalancha y descubre cuál te ahorra más dinero e intereses.',
+  description: 'Estrategia para salir de deudas: compara bola de nieve vs avalancha. Calcula cuánto ahorras en intereses y en cuánto tiempo liquidas todo. Planificador gratuito.',
   keywords: 'eliminar deudas, bola de nieve, avalancha, pagar deudas, estrategia deuda, salir de deudas, intereses, prestamos, tarjetas credito',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Potencia en Ciclismo — FTP, W/kg y VAM | meskeIA',
-  description: 'Calcula tu ratio W/kg, zonas de entrenamiento por potencia (FTP) y VAM para subidas cronometradas. Conoce tu nivel como ciclista.',
+  description: 'Calcula tu ratio W/kg, zonas de entrenamiento por FTP y VAM en subidas cronometradas. Compara tu nivel de ciclismo y obtén recomendaciones de entrenamiento. Gratis.',
   keywords: 'calculadora potencia ciclismo, FTP vatios, W/kg ciclismo, zonas entrenamiento potencia, VAM ciclismo, nivel ciclista',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

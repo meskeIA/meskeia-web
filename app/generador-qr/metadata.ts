@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Generador de Códigos QR - Crea QR Gratis Online | meskeIA',
-  description: 'Genera códigos QR gratis para URLs, texto, WiFi, contactos y más. Descarga en PNG. Sin registro, sin límites, 100% privado.',
+  description: 'Generador de códigos QR gratuito para URLs, texto, WiFi, contactos, email y más. Descarga en PNG de alta resolución. Sin registro, sin límites, 100% privado.',
   keywords: 'generador qr, crear codigo qr, qr gratis, qr wifi, qr url, qr texto, codigo qr online, generar qr',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

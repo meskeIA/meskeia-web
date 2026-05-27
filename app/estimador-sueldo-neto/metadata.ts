@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Estimador Sueldo Neto a Bruto y Bruto a Neto 2025 | meskeIA',
-  description: 'Estima tu sueldo neto a partir del bruto o viceversa. Orientación sobre IRPF, Seguridad Social y deducciones para España 2025.',
+  description: 'Calcula tu sueldo neto desde el bruto o al revés. Estimación de IRPF, cotizaciones a la Seguridad Social y deducciones aplicables en España 2025. Orientativo.',
   keywords: 'estimador sueldo neto, sueldo bruto a neto, calcular neto, calcular bruto, IRPF, seguridad social, nómina, salario neto, salario bruto, España 2025',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

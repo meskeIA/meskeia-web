@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Cálculo - Derivadas, Integrales y Límites | meskeIA',
-  description: 'Calcula derivadas, integrales definidas e indefinidas, límites de funciones. Análisis matemático paso a paso.',
+  description: 'Calculadora de cálculo diferencial e integral: deriva e integra funciones, calcula límites con explicaciones paso a paso. Funciona en el navegador. Gratis.',
   keywords: 'derivadas, integrales, límites, cálculo diferencial, cálculo integral, funciones, análisis matemático',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

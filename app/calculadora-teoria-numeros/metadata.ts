@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Calculadora Teoría de Números - Primos, MCD, MCM | meskeIA',
-  description: 'Factoriza números, encuentra primos, calcula MCD y MCM, divisores y más. Herramienta completa de teoría de números.',
+  description: 'Factoriza números en primos, calcula MCD y MCM, encuentra todos los divisores, verifica primalidad y más. Herramienta completa de teoría de números. Gratis.',
   keywords: 'números primos, factorización, MCD, MCM, divisores, teoría de números, criba, Euclides',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

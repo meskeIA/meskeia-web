@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cartografía y Proyecciones - Mercator, Peters y Robinson | meskeIA',
-  description: 'Por qué Groenlandia parece del tamaño de África. 5 proyecciones cartográficas comparadas, coordenadas y husos horarios.',
+  description: 'Por qué los mapas mienten: Groenlandia no es tan grande como África. Compara 5 proyecciones cartográficas y entiende las distorsiones de tamaño y forma. Interactivo.',
   keywords: 'cartografia, proyecciones, Mercator, Peters, Robinson, mapa, coordenadas, husos horarios, distorsion',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
