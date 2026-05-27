@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿A qué edad se jubila normalmente en España en 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En 2025, la edad ordinaria de jubilación en España es de 66 años y 6 meses si se tienen menos de 38 años y 3 meses cotizados. Para quienes acrediten 38 años y 3 meses o más de cotización, la edad de jubilación ordinaria se mantiene en 65 años. La edad de jubilación ordinaria seguirá aumentando hasta alcanzar los 67 años en 2027.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos años hay que cotizar para recibir el 100% de la pensión?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para percibir el 100% de la base reguladora en 2025 se necesitan 37 años cotizados (el cómputo aumenta progresivamente hasta los 38,5 años en 2027). Con menos años cotizados se aplican porcentajes reductores: entre 15 y 36 años, la pensión oscila entre el 50% y el 99,2%. El mínimo para acceder a la jubilación ordinaria es 15 años cotizados, de los cuales 2 deben estar en los últimos 15 años.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la brecha de jubilación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La brecha de jubilación es la diferencia entre el último salario activo y la pensión pública estimada. En España, la tasa de reemplazo (pensión como porcentaje del salario) es aproximadamente del 74%, una de las más altas de la OCDE. Sin embargo, con las reformas de sostenibilidad en marcha, esta tasa podría reducirse en las próximas décadas, haciendo más importante el ahorro complementario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánta deducción fiscal tiene un plan de pensiones en el IRPF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las aportaciones a planes de pensiones individuales se deducen de la base imponible del IRPF con un límite de 1.500 € anuales (o el 30% de los rendimientos del trabajo y actividades económicas, si es menor). Con un tipo marginal del 37% y aportación de 1.500 €, el ahorro fiscal es de 555 € anuales. Los planes de empresa tienen límites adicionales más altos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un plan de pensiones y un fondo de inversión para la jubilación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El plan de pensiones ofrece deducción fiscal en la aportación pero tributa como rendimiento del trabajo en el rescate (tipo entre 19% y 47%) y es ilíquido hasta la jubilación salvo supuestos excepcionales. El fondo de inversión no da deducción en la aportación pero tributa como ganancia patrimonial en el rescate (tipo entre 19% y 28%) y es líquido en cualquier momento. Para rentas altas en activo con tramo marginal alto, el plan de pensiones suele ser más eficiente fiscalmente.',
+      },
+    },
+  ],
+};

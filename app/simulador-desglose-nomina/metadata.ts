@@ -59,3 +59,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['nómina', 'bruto neto', 'IRPF', 'cotizaciones', 'fiscal España'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto se descuenta por Seguridad Social en la nómina en 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En 2025, el trabajador cotiza: 4,7% por contingencias comunes, 1,55% por desempleo, 0,1% por formación profesional y 0,12% por el MEI (Mecanismo de Equidad Intergeneracional). El total aproximado es el 6,47% del salario bruto, aunque varía según el tipo de contrato. El empleador paga además alrededor del 30% adicional que no aparece en la nómina del trabajador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula la retención del IRPF en la nómina?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La empresa calcula una retención estimada para que al final del año el trabajador no tenga que pagar una cantidad grande en la declaración. Se basa en el salario bruto anual proyectado, el número de pagadores, la situación familiar y las deducciones aplicables. El porcentaje resultante se aplica mensualmente. Puedes cambiarlo presentando un modelo 145 a tu empresa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre salario bruto y salario neto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El salario bruto es el coste laboral antes de descuentos. El neto es lo que realmente ingresas en cuenta: bruto menos cotizaciones a la Seguridad Social (aprox. 6,47%) menos retención del IRPF (variable según tu situación, desde 0% hasta más del 35%). Con un salario bruto de 30.000 €, el neto habitual ronda los 23.000-24.500 € anuales, entre 1.900 y 2.000 € mensuales con 12 pagas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el MEI en la nómina y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El MEI (Mecanismo de Equidad Intergeneracional) es una cotización solidaria creada en 2023 para reforzar la sostenibilidad del sistema de pensiones. En 2025 el trabajador paga el 0,12% y la empresa el 0,58% del salario. Estos fondos se destinan al Fondo de Reserva de la Seguridad Social, no a la pensión individual del cotizante.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las pagas extras y cómo afectan al salario mensual?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las empresas están obligadas a pagar al menos dos pagas extraordinarias al año (normalmente en junio y diciembre), salvo que el convenio colectivo las prorratee en los 12 meses. Si se prorratean, el salario mensual incluye la parte proporcional. Si no se prorratean, el salario mensual ordinario es menor pero hay dos meses con ingresos adicionales. El IRPF se retiene igual en ambos casos.',
+      },
+    },
+  ],
+};
