@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Cálculo - Derivadas, Integrales y Límites | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Cálculo",
+  description: "Calculadora de cálculo diferencial e integral: deriva e integra funciones, calcula límites con explicaciones paso a paso. Funciona en el navegador. Gratis.",
+  url: "https://meskeia.com/calculadora-calculo/",
+  category: 'EducationalApplication',
+  features: [],
+});

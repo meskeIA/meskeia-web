@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Ondas y Visualizador de Audio - Señales Sonoras | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador de Ondas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Ondas y Visualizador",
+  description: "Genera ondas sonoras (senoidal, cuadrada, triangular, diente de sierra), visualiza audio y aprende sobre frecuencias. Herramienta educativa interactiva para física y música.",
+  url: "https://meskeia.com/generador-ondas/",
+  category: 'EducationalApplication',
+  features: [],
+});

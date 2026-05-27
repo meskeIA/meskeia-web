@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador Lorem Ipsum - Texto de Prueba Online | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador Lorem Ipsum",
+  description: "Genera texto Lorem Ipsum de 1 a 10 párrafos. Ideal para diseño, maquetación y desarrollo web. Texto de relleno profesional, gratis y sin registro.",
+  url: "https://meskeia.com/generador-lorem-ipsum/",
+  category: 'UtilityApplication',
+  features: [],
+});

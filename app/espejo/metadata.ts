@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Espejo Digital Online - Espejo de Bolsillo Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Espejo Digital",
+  description: "Espejo digital gratuito que usa la cámara frontal de tu dispositivo. Ideal para retocarte, maquillarte o comprobar tu aspecto cuando no tienes un espejo a mano.",
+  url: "https://meskeia.com/espejo/",
+  category: 'UtilityApplication',
+  features: [],
+});

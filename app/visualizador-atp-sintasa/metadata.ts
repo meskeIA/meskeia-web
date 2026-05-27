@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'ATP Sintasa - El Motor Molecular que Produce tu Energía | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "ATP Sintasa - El Motor Molecular que te da Energía",
+  description: "Cómo funciona la ATP sintasa: el motor molecular rotante que produce ATP, la quimioósmosis de Mitchell, el gradiente de protones, y cuánto ATP fabrica tu cuerpo cada día.",
+  url: "https://meskeia.com/visualizador-atp-sintasa/",
+  category: 'EducationalApplication',
+  features: [],
+});

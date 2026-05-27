@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Base de Datos Relacional: Tablas, JOIN e Índices | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Base de Datos Relacional: Tablas, JOIN e Índices",
+  description: "Cómo funciona una base de datos relacional: tablas y claves primarias/foráneas, los 4 tipos de JOIN visualizados, índices que aceleran 1000x las consultas, transacciones ACID y cuándo elegir SQL vs No",
+  url: "https://meskeia.com/visualizador-base-datos-relacional/",
+  category: 'EducationalApplication',
+  features: [],
+});

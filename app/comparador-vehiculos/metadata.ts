@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Comparador Compra Vehículo: Contado vs Financiación vs Renting vs Leasing | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Comparador Vehículos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador Compra Vehículos",
+  description: "Compara las 4 formas de adquirir un coche: contado, financiación, renting y leasing. Calcula el coste total real de cada opción y descubre cuál te conviene más.",
+  url: "https://meskeia.com/comparador-vehiculos/",
+  category: 'FinanceApplication',
+  features: [],
+});

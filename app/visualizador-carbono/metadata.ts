@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Carbono: Diamante, Grafeno y la Molécula de la Vida | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Carbono: Diamante, Grafeno y la Molécula de la Vida",
+  description: "Por qué un solo elemento forma el diamante más duro y el grafeno más flexible. Alótropos, ciclo del carbono, química orgánica y datación con C-14.",
+  url: "https://meskeia.com/visualizador-carbono/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor IEEE 754 - Punto Flotante 32/64 bits | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Conversor IEEE 754 meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor IEEE 754",
+  description: "Convierte números decimales a formato IEEE 754 (punto flotante) y viceversa. Visualiza signo, exponente y mantisa en binario. Soporta precisión simple (32 bits) y doble (64 bits).",
+  url: "https://meskeia.com/conversor-ieee754/",
+  category: 'EducationalApplication',
+  features: [],
+});

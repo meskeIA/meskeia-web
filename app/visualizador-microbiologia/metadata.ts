@@ -33,3 +33,11 @@ export function generateJsonLd() {
     ],
   });
 }
+
+export const jsonLd = generateWebAppSchema({
+  name: "Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida",
+  description: "Visualizador interactivo de microbiología. Morfologías bacterianas clicables (cocos, bacilos, espirilos) con estructura interna detallada, curva de crecimiento logístico con sliders β y K, Gram+/Gram-",
+  url: "https://meskeia.com/visualizador-microbiologia/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Cuota de Autónomo 2025 - Orientación RETA | meskeIA',
@@ -79,3 +80,11 @@ export const faqJsonLd = {
     },
   ],
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Cuota de Autónomo",
+  description: "Estima tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos 2025, tarifa plana, bonificaciones y orientación sobre pagos mensuales.",
+  url: "https://meskeia.com/estimador-cuota-autonomo/",
+  category: 'FinanceApplication',
+  features: [],
+});

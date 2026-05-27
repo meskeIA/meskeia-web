@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de Imágenes - JPG, PNG, WebP | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Imágenes",
+  description: "Convierte imágenes entre JPG, PNG y WebP. Redimensiona, comprime y ajusta la calidad. Presets para redes sociales Instagram, Facebook, Twitter.",
+  url: "https://meskeia.com/conversor-imagenes/",
+  category: 'UtilityApplication',
+  features: [],
+});

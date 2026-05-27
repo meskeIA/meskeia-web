@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Serotonina: Cómo Funciona | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Serotonina: Mucho Más que la Hormona de la Felicidad",
+  description: "El 90% de la serotonina está en el intestino. Visualiza síntesis, funciones, mecanismo SSRI, eje intestino-cerebro y por qué no es simplemente la hormona de la felicidad.",
+  url: "https://meskeia.com/visualizador-serotonina/",
+  category: 'EducationalApplication',
+  features: [],
+});

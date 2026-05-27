@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Puntos de Inflexión Climáticos | Tipping Points y Retroalimentaciones | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Puntos de Inflexión Climáticos - Tipping Points",
+  description: "Los 9 tipping points climáticos: deshielo Ártico, Groenlandia, Amazonas, permafrost de Siberia y AMOC. Retroalimentaciones, cascadas y escenarios IPCC AR6.",
+  url: "https://meskeia.com/visualizador-cambio-climatico-tipping-points/",
+  category: 'EducationalApplication',
+  features: [],
+});

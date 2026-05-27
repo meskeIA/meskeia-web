@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Detector de Idioma Online - Identifica el Idioma de un Texto | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Detector de Idioma",
+  description: "Detector de idioma gratuito. Pega cualquier texto y descubre en qué idioma está escrito. Detecta más de 20 idiomas con porcentaje de confianza.",
+  url: "https://meskeia.com/detector-idioma/",
+  category: 'EducationalApplication',
+  features: [],
+});

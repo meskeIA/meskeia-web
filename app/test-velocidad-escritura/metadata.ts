@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Velocidad de Escritura - Mide tus PPM y Precisión | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Test de Velocidad de Escritura",
+  description: "Test de mecanografía online gratuito. Mide tu velocidad de escritura en palabras por minuto (PPM), precisión y mejora tu técnica con textos en español.",
+  url: "https://meskeia.com/test-velocidad-escritura/",
+  category: 'UtilityApplication',
+  features: [],
+});

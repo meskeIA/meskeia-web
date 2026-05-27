@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Tiempo de Lectura - Estima Minutos de Lectura | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Tiempo de Lectura",
+  description: "Calcula el tiempo de lectura y escucha de tus textos. Estadísticas de estructura, densidad y recomendaciones por tipo de contenido.",
+  url: "https://meskeia.com/calculadora-tiempo-lectura/",
+  category: 'UtilityApplication',
+  features: [],
+});

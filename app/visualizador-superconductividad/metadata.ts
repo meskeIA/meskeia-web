@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Superconductividad: Resistencia Cero y Levitación Magnética | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Superconductividad: Efecto Meissner y Pares de Cooper",
+  description: "Explora la superconductividad interactivamente: efecto Meissner (levitación magnética), pares de Cooper, temperatura crítica de 8 materiales reales y aplicaciones en MRI, LHC, Maglev y fusión nuclear.",
+  url: "https://meskeia.com/visualizador-superconductividad/",
+  category: 'EducationalApplication',
+  features: [],
+});

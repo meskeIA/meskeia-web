@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Ciclos de Sueño - Hora Óptima para Dormir | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Sueño",
+  description: "Calcula la hora ideal para dormir o despertar según los ciclos de sueño de 90 minutos. Despierta descansado respetando las fases REM.",
+  url: "https://meskeia.com/calculadora-sueno/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Recortador de Audio Online - Corta MP3, WAV, OGG Gratis | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Recortador de Audio meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Recortador de Audio",
+  description: "Recorta y edita archivos de audio online gratis. Corta MP3, WAV, OGG sin límites ni marcas de agua. Fade in/out, ajuste de volumen. 100% privado en tu navegador.",
+  url: "https://meskeia.com/recortador-audio/",
+  category: 'UtilityApplication',
+  features: [],
+});

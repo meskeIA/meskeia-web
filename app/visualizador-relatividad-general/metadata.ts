@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Relatividad General: La Curvatura del Espacio-Tiempo | meskeIA',
@@ -25,3 +26,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Relatividad General: Curvatura del Espacio-Tiempo",
+  description: "La gravedad no es una fuerza — es curvatura del espacio-tiempo. Malla SVG interactiva, geodésicas, lentes gravitacionales, agujeros negros, ondas LIGO y corrección GPS.",
+  url: "https://meskeia.com/visualizador-relatividad-general/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Electromagnetismo - Campo Eléctrico, Magnético e Inducción | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Electromagnetismo - Campo Eléctrico, Magnético e Inducción",
+  description: "Visualiza el electromagnetismo: campo eléctrico de cargas, dipolo magnético, inducción de Faraday y espectro EM completo. Física interactiva sin ecuaciones complejas.",
+  url: "https://meskeia.com/visualizador-electromagnetismo/",
+  category: 'EducationalApplication',
+  features: [],
+});

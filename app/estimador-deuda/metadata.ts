@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Deuda - Método Bola de Nieve y Avalancha | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Deuda",
+  description: "Estrategia para salir de deudas: compara bola de nieve vs avalancha. Calcula cuánto ahorras en intereses y en cuánto tiempo liquidas todo. Planificador gratuito.",
+  url: "https://meskeia.com/estimador-deuda/",
+  category: 'FinanceApplication',
+  features: [],
+});

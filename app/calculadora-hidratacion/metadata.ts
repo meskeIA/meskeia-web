@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Hidratación Diaria | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Hidratación",
+  description: "Calcula cuánta agua necesitas beber al día según tu peso, actividad física y clima. Recomendaciones personalizadas para una hidratación óptima.",
+  url: "https://meskeia.com/calculadora-hidratacion/",
+  category: 'UtilityApplication',
+  features: [],
+});

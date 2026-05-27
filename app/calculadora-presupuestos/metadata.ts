@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Presupuestos Freelance - Genera Presupuestos Profesionales | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Presupuestos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Presupuestos",
+  description: "Crea presupuestos profesionales para clientes: servicios, horas, materiales, descuentos. Exporta a PDF. Completa el flujo freelance: presupuesto → trabajo → factura. 100% gratis.",
+  url: "https://meskeia.com/calculadora-presupuestos/",
+  category: 'BusinessApplication',
+  features: [],
+});

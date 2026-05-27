@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador Sesgos del Inversor — ¿Decides con la cabeza o con el miedo? | meskeIA',
@@ -35,3 +36,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/simulador-sesgos-inversor/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Simulador Sesgos del Inversor",
+  description: "8 escenarios reales para detectar tus sesgos cognitivos como inversor: aversión a pérdidas, efecto manada, exceso de confianza, sesgo de confirmación y más. Descubre qué frena tu rentabilidad.",
+  url: "https://meskeia.com/simulador-sesgos-inversor/",
+  category: 'FinanceApplication',
+  features: [],
+});

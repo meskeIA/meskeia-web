@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Relatividad Especial - Dilatación del Tiempo, E=mc² y Paradoja de los Gemelos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Relatividad Especial - Dilatación del Tiempo y E=mc²",
+  description: "Visualiza la dilatación del tiempo, contracción de longitud y E=mc² con sliders interactivos. La relatividad especial de Einstein sin matemáticas complejas.",
+  url: "https://meskeia.com/visualizador-relatividad-especial/",
+  category: 'EducationalApplication',
+  features: [],
+});

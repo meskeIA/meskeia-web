@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Terremotos y Tsunamis: Cómo Funcionan | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Terremotos y Tsunamis: De la Falla al Impacto",
+  description: "Visualiza cómo se generan los terremotos (fallas normales, inversas y en desgarre), los tres tipos de ondas sísmicas (P, S, superficiales), cómo se forman y propagan los tsunamis y cómo funcionan los ",
+  url: "https://meskeia.com/visualizador-terremotos-tsunamis/",
+  category: 'EducationalApplication',
+  features: [],
+});

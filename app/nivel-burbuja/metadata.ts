@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Nivel de Burbuja Digital + Inclinómetro - Mide ángulos con tu móvil | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Nivel de Burbuja Digital",
+  description: "Nivel de burbuja digital gratuito con inclinómetro. Mide inclinaciones y ángulos con el sensor de tu móvil. Ideal para bricolaje, colgar cuadros y medir pendientes.",
+  url: "https://meskeia.com/nivel-burbuja/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Juego Platform Runner - Plataformas en Español | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego Platform Runner",
+  description: "Juega a Platform Runner online gratis. Corre, salta, recolecta monedas y derrota enemigos. Juego de plataformas con niveles progresivos y récords.",
+  url: "https://meskeia.com/juego-platform-runner/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'ADN Polimerasa - La Enzima que Copia el Genoma | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "ADN Polimerasa - La Máquina que Copia tu Genoma",
+  description: "Cómo funciona la ADN polimerasa: replica el genoma a 1.000 nucleótidos por segundo con un error cada 10⁹ bases, la horquilla de replicación, los fragmentos de Okazaki, la corrección de pruebas y la Ta",
+  url: "https://meskeia.com/visualizador-adn-polimerasa/",
+  category: 'EducationalApplication',
+  features: [],
+});

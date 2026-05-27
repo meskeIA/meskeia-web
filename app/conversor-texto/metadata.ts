@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de Texto - Mayúsculas, Minúsculas, Invertir | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Texto",
+  description: "Convierte texto a mayúsculas, minúsculas, capitalizado, formato título, invertido. Elimina acentos y espacios extra. Gratis, privado y sin registro.",
+  url: "https://meskeia.com/conversor-texto/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -41,3 +41,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Inversión",
+  description: "Test de 10 preguntas para saber qué tipo de inversión se adapta mejor a tu perfil: fondos indexados, acciones directas, renta fija, inversión inmobiliaria o plan de pensiones/PPI. Análisis según horiz",
+  url: "https://meskeia.com/selector-inversiones/",
+  category: 'FinanceApplication',
+  features: [],
+});

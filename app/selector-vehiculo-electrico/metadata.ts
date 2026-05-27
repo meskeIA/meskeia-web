@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Vehículo Eléctrico | ¿BEV, PHEV o Híbrido? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Vehículo Eléctrico",
+  description: "Test de 10 preguntas para saber qué tipo de vehículo eléctrico o híbrido se adapta mejor a tu situación: eléctrico puro (BEV), híbrido enchufable (PHEV), híbrido suave (HEV), moto eléctrica o esperar.",
+  url: "https://meskeia.com/selector-vehiculo-electrico/",
+  category: 'FinanceApplication',
+  features: [],
+});

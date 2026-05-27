@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Rentabilidad de Alquiler - ROI Inversión Inmobiliaria | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Rentabilidad de Inversión en Alquiler",
+  description: "Calcula la rentabilidad bruta y neta de una inversión inmobiliaria en alquiler. ROI, cash flow mensual, payback y análisis completo de gastos: IBI, comunidad, seguro, reparaciones.",
+  url: "https://meskeia.com/calculadora-rentabilidad-alquiler/",
+  category: 'FinanceApplication',
+  features: [],
+});

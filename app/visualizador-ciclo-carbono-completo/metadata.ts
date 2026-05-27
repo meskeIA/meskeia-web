@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ciclo del Carbono Completo: Reservorios y Flujos | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ciclo del Carbono Completo: Reservorios y Flujos",
+  description: "Los 5 grandes reservorios de carbono en la Tierra (atmósfera, océanos, biota terrestre, suelos, litosfera) y todos los flujos en Gt C/año. La perturbación humana: +10 Gt C/año extra y sus consecuencia",
+  url: "https://meskeia.com/visualizador-ciclo-carbono-completo/",
+  category: 'EducationalApplication',
+  features: [],
+});

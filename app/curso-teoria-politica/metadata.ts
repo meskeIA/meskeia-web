@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Introducción a la Teoría Política | meskeIA',
@@ -36,3 +37,11 @@ export const metadata: Metadata = {
     'application-name': 'Curso Teoría Política meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Introducción a la Teoría Política",
+  description: "Aprende los fundamentos de la teoría política: desde Platón y Aristóteles hasta Marx y Rawls. 9 capítulos con los pensadores más influyentes de la historia.",
+  url: "https://meskeia.com/curso-teoria-politica/",
+  category: 'EducationalApplication',
+  features: [],
+});

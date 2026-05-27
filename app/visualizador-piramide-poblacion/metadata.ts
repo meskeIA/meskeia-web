@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Pirámide de Población: España 1950-2100 | meskeIA',
@@ -30,3 +31,11 @@ export const metadata: Metadata = {
   },
   other: { 'application-name': 'Pirámide de Población meskeIA' },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Pirámide de Población: España 1950-2100",
+  description: "Visualiza cómo envejece España. Pirámide de población interactiva con datos del INE: desde 1950 hasta las proyecciones del año 2100. Tasa de dependencia y edad mediana.",
+  url: "https://meskeia.com/visualizador-piramide-poblacion/",
+  category: 'EducationalApplication',
+  features: [],
+});

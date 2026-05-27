@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Validador JSON y XML - Formatea y Minifica Código | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Validador JSON",
+  description: "Valida, formatea y minifica código JSON y XML al instante. Detecta errores de sintaxis, muestra línea del error y genera código limpio.",
+  url: "https://meskeia.com/validador-json/",
+  category: 'UtilityApplication',
+  features: [],
+});

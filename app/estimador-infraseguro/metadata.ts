@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Infraseguro - Regla Proporcional | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/estimador-infraseguro/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Infraseguro",
+  description: "Calcula cuánto cobrarás en caso de siniestro si tienes infraseguro. Aplica la regla proporcional según la Ley de Contrato de Seguro (art. 30).",
+  url: "https://meskeia.com/estimador-infraseguro/",
+  category: 'FinanceApplication',
+  features: [],
+});

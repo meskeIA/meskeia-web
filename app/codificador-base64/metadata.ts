@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Codificador Base64 Online - Codificar y Decodificar | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Codificador Base64",
+  description: "Codifica y decodifica texto en Base64 y URL encoding. Soporta archivos e imágenes. Herramienta segura que funciona en tu navegador sin enviar datos.",
+  url: "https://meskeia.com/codificador-base64/",
+  category: 'UtilityApplication',
+  features: [],
+});

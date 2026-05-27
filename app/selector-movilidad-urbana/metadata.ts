@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Movilidad Urbana | ¿Coche, Transporte Público o Bici? | meskeIA',
@@ -30,3 +31,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Movilidad Urbana",
+  description: "Test de 10 preguntas para saber qué medio de transporte se adapta mejor a tu estilo de vida: coche propio, transporte público, moto o escúter, bicicleta o patinete eléctrico, o una combinación.",
+  url: "https://meskeia.com/selector-movilidad-urbana/",
+  category: 'UtilityApplication',
+  features: [],
+});

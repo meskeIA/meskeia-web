@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Fondo de Emergencia - Cuánto Ahorrar | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Fondo de Emergencia",
+  description: "Calcula cuánto dinero necesitas como fondo de emergencia según tu situación laboral, gastos mensuales y cargas familiares. Colchón de seguridad financiera.",
+  url: "https://meskeia.com/estimador-fondo-emergencia/",
+  category: 'FinanceApplication',
+  features: [],
+});

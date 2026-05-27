@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Historia de España — Desde los Íberos hasta la Constitución de 1978 | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Historia de España",
+  description: "Pon a prueba tus conocimientos de historia española: 81 preguntas verificables desde la época romana hasta la Constitución de 1978. 3 dificultades, 9 épocas históricas.",
+  url: "https://meskeia.com/quiz-historia-espana/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Break-Even - Punto de Equilibrio de Productos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Break-Even",
+  description: "Calcula el punto de equilibrio de tus productos. Analiza cuántas unidades necesitas vender para cubrir costes. Margen de contribución, rentabilidad y escenarios.",
+  url: "https://meskeia.com/estimador-break-even/",
+  category: 'BusinessApplication',
+  features: [],
+});

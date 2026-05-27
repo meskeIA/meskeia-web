@@ -41,3 +41,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Seguro de Vida",
+  description: "Test de 10 preguntas para saber si necesitas un seguro de vida, qué tipo te conviene (temporal, ahorro o mixto) y qué capital asegurado necesitas. Análisis según cargas familiares, hipoteca y situació",
+  url: "https://meskeia.com/selector-seguro-vida/",
+  category: 'FinanceApplication',
+  features: [],
+});

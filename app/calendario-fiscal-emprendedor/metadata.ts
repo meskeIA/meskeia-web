@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calendario Fiscal del Emprendedor - Fechas y Modelos Tributarios | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calendario Fiscal meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calendario Fiscal Emprendedor",
+  description: "Calendario fiscal 2025 para autónomos y sociedades en España. Fechas límite de declaraciones, modelos tributarios (303, 130, 111, 200), recordatorios y estimador de pagos.",
+  url: "https://meskeia.com/calendario-fiscal-emprendedor/",
+  category: 'FinanceApplication',
+  features: [],
+});

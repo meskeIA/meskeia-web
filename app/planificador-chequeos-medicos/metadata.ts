@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Chequeos Médicos Preventivos - Qué Revisiones Hacerte según tu Edad | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Chequeos Médicos Preventivos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Chequeos Médicos Preventivos",
+  description: "Descubre qué revisiones médicas preventivas te corresponden según tu edad y sexo. Basado en las recomendaciones del Ministerio de Sanidad y la SEMFyC.",
+  url: "https://meskeia.com/planificador-chequeos-medicos/",
+  category: 'FinanceApplication',
+  features: [],
+});

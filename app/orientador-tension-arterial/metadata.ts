@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Tensión Arterial - Clasifica tu Presión según ESH/ESC | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Tensión Arterial meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Tensión Arterial",
+  description: "Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH/ESC 2018. Calcula TAM, presión de pulso y guarda tu historial.",
+  url: "https://meskeia.com/orientador-tension-arterial/",
+  category: 'FinanceApplication',
+  features: [],
+});

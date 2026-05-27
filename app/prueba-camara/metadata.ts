@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Prueba de Cámara Web Online - Test Webcam Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Prueba de Cámara Web",
+  description: "Prueba tu cámara web antes de videollamadas. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.",
+  url: "https://meskeia.com/prueba-camara/",
+  category: 'UtilityApplication',
+  features: [],
+});

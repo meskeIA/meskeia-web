@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Comercio Internacional - Ventaja Comparativa, Balanza Comercial y Aranceles | meskeIA',
@@ -30,3 +31,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comercio Internacional - Ventaja Comparativa y Aranceles",
+  description: "Visualiza el comercio internacional: ventaja comparativa de Ricardo, balanza comercial de España, tipos de cambio y su efecto en exportaciones, y simulador de aranceles.",
+  url: "https://meskeia.com/visualizador-comercio-internacional/",
+  category: 'FinanceApplication',
+  features: [],
+});

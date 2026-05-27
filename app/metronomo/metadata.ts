@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Metrónomo Online - Tempo Preciso para Músicos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Metrónomo Online",
+  description: "Metrónomo online gratuito con tempo ajustable (40-220 BPM), tap tempo, múltiples compases y visualización del pulso. Ideal para práctica musical.",
+  url: "https://meskeia.com/metronomo/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Asistente Constitución Sociedad (SL, SLU, SA) - Checklist y Costes | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Asistente Constitución Sociedad",
+  description: "Guía paso a paso para constituir una Sociedad Limitada, Sociedad Limitada Unipersonal o Sociedad Anónima en España. Checklist de 20 trámites, estimación de costes y formulario de datos sociales.",
+  url: "https://meskeia.com/asistente-constitucion-sociedad/",
+  category: 'FinanceApplication',
+  features: [],
+});

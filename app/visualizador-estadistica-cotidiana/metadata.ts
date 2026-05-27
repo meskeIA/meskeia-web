@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estadística en la Vida Cotidiana - Probabilidad y Sesgos | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estadística en la Vida Cotidiana - Probabilidad y Sesgos",
+  description: "Entiende la estadística sin matemáticas: probabilidad condicional, regresión a la media, paradoja de Simpson, sesgo de supervivencia y la ley de los grandes números con ejemplos cotidianos.",
+  url: "https://meskeia.com/visualizador-estadistica-cotidiana/",
+  category: 'EducationalApplication',
+  features: [],
+});

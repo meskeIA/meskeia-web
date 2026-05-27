@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cifrado Playfair Online - Cifrado por Digramas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cifrado Playfair",
+  description: "Cifra textos con el método Playfair usando una matriz 5x5. Cifrado por pares de letras usado en guerras mundiales. Visualización interactiva de la matriz.",
+  url: "https://meskeia.com/cifrado-playfair/",
+  category: 'EducationalApplication',
+  features: [],
+});

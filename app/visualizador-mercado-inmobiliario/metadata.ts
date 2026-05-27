@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Mercado Inmobiliario: Burbuja, Accesibilidad y Ciudades — meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Mercado Inmobiliario: Burbuja, Precios y Accesibilidad",
+  description: "Visualizador del mercado de vivienda español. Curvas oferta/demanda interactivas, burbuja 2008, ratio precio/renta por ciudad, accesibilidad generacional y alquiler vs compra.",
+  url: "https://meskeia.com/visualizador-mercado-inmobiliario/",
+  category: 'FinanceApplication',
+  features: [],
+});

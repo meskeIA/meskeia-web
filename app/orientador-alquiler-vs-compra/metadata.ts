@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Alquiler vs Compra - ¿Qué me conviene más? | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Alquiler vs Compra",
+  description: "Compara alquilar vs comprar vivienda en España. Análisis a 10, 20 y 30 años con hipoteca, IBI, comunidad, seguros y coste de oportunidad de la entrada.",
+  url: "https://meskeia.com/orientador-alquiler-vs-compra/",
+  category: 'FinanceApplication',
+  features: [],
+});

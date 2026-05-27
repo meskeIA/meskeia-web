@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Algoritmos de Ordenación: Visualizador Paso a Paso | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Algoritmos de Ordenación: Visualizador Paso a Paso",
+  description: "Visualiza paso a paso cómo ordenan Burbuja, Inserción, Selección, Quicksort y Mergesort. Complejidad O(n), O(n log n) y O(n²), comparativa de velocidad y cuándo usar cada algoritmo en la práctica.",
+  url: "https://meskeia.com/visualizador-algoritmos-ordenacion/",
+  category: 'EducationalApplication',
+  features: [],
+});

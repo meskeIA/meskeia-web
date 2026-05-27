@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cara o Cruz - Lanzar Moneda Online con Estadísticas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cara o Cruz",
+  description: "Lanza una moneda virtual con animación realista. Incluye historial de lanzamientos, estadísticas de probabilidad y visualización de la ley de grandes números. Perfecto para tomar decisiones.",
+  url: "https://meskeia.com/cara-o-cruz/",
+  category: 'UtilityApplication',
+  features: [],
+});

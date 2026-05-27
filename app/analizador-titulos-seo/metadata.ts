@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Analizador de Títulos SEO - Optimiza tus Title Tags | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Analizador de Títulos SEO",
+  description: "Analiza y optimiza tus títulos SEO. Longitud óptima, palabras de poder, puntuación CTR y vista previa en Google. Mejora tu posicionamiento web.",
+  url: "https://meskeia.com/analizador-titulos-seo/",
+  category: 'UtilityApplication',
+  features: [],
+});

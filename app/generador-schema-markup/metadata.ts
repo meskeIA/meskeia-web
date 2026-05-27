@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Schema Markup JSON-LD - Datos Estructurados | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Schema Markup",
+  description: "Genera código Schema Markup JSON-LD para Article, Product, FAQ, LocalBusiness y Recipe. Mejora tu SEO con datos estructurados y rich snippets.",
+  url: "https://meskeia.com/generador-schema-markup/",
+  category: 'UtilityApplication',
+  features: [],
+});

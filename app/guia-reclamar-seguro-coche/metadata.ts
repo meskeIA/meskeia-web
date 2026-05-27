@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía: ¿Cuándo Reclamar al Seguro del Coche? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/guia-reclamar-seguro-coche/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía Reclamar Seguro Coche",
+  description: "Guía completa para decidir cuándo reclamar al seguro del coche. Siniestros menores, asistencia en carretera, atropello de animales, rotura de lunas y más.",
+  url: "https://meskeia.com/guia-reclamar-seguro-coche/",
+  category: 'FinanceApplication',
+  features: [],
+});

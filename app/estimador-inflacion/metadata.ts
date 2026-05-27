@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Inflación - Poder Adquisitivo Histórico | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Inflación meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Inflación",
+  description: "Calcula cómo la inflación afecta tu dinero. Datos del IPC del INE desde 1961. Descubre cuánto valían tus euros en el pasado y cuánto necesitas hoy.",
+  url: "https://meskeia.com/estimador-inflacion/",
+  category: 'FinanceApplication',
+  features: [],
+});

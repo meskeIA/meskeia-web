@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Constelaciones del Cielo - Guía de 32 Constelaciones Famosas | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Constelaciones del Cielo meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Constelaciones del Cielo",
+  description: "Explora las 32 constelaciones más famosas del cielo: zodiacales, boreales y australes. Estrellas principales, mitología griega, mejor época de observación y curiosidades.",
+  url: "https://meskeia.com/constelaciones-del-cielo/",
+  category: 'EducationalApplication',
+  features: [],
+});

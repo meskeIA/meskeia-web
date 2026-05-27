@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Avatares - Crea avatares únicos desde tu nombre | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador de Avatares meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Avatares",
+  description: "Genera avatares únicos y personalizados a partir de tu nombre o texto. 8 estilos diferentes, descarga PNG, sin subir fotos. 100% privado y gratuito.",
+  url: "https://meskeia.com/generador-avatares/",
+  category: 'UtilityApplication',
+  features: [],
+});

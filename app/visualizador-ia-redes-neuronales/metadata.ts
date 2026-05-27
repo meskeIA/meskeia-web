@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Redes Neuronales e IA | Cómo Aprende una IA | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Redes Neuronales e IA - Cómo Aprende una Inteligencia Artificial",
+  description: "Aprende cómo funciona una red neuronal: neurona artificial, capas, backpropagation, gradient descent y tipos de redes (CNN, Transformer, GAN). Del perceptrón a los LLMs como GPT.",
+  url: "https://meskeia.com/visualizador-ia-redes-neuronales/",
+  category: 'EducationalApplication',
+  features: [],
+});

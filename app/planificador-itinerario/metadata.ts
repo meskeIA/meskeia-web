@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Itinerario de Viaje - Organiza Días y Actividades | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Planificador Itinerario Viaje meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador de Itinerario",
+  description: "Crea y organiza tu itinerario de viaje día a día. Añade actividades, tiempos, notas y exporta tu plan de viaje. 100% gratis y sin registro.",
+  url: "https://meskeia.com/planificador-itinerario/",
+  category: 'UtilityApplication',
+  features: [],
+});

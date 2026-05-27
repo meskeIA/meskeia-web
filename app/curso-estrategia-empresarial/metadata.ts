@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Estrategia Empresarial para la Era de la Incertidumbre | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Curso Estrategia Empresarial meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Estrategia Empresarial",
+  description: "Aprende a pensar estratégicamente en entornos hiperdinámicos. Desde los fundamentos clásicos hasta las nuevas realidades de la IA y la disrupción continua. Un curso honesto sobre qué funciona y qué ha",
+  url: "https://meskeia.com/curso-estrategia-empresarial/",
+  category: 'EducationalApplication',
+  features: [],
+});

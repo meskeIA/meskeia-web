@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Sistemas Numéricos - Binario, Octal, Decimal, Hexadecimal | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Sistemas Numéricos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Sistemas Numéricos",
+  description: "Convierte números entre sistemas numéricos: binario, octal, decimal y hexadecimal. Muestra el proceso paso a paso. Incluye operaciones aritméticas y lógicas en binario.",
+  url: "https://meskeia.com/calculadora-sistemas-numericos/",
+  category: 'EducationalApplication',
+  features: [],
+});

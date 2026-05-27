@@ -41,3 +41,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Método de Productividad",
+  description: "Test de 10 preguntas para saber qué método de productividad se adapta mejor a tu forma de trabajar: GTD, Pomodoro, Kanban, Timeboxing o Inbox Zero. Análisis según tipo de trabajo, distracciones y obje",
+  url: "https://meskeia.com/selector-herramienta-productividad/",
+  category: 'BusinessApplication',
+  features: [],
+});

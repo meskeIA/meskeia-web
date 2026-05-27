@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Inversiones - Asignación de Activos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Inversiones",
+  description: "Calcula y optimiza tu cartera de inversión. Asignación de activos según tu perfil de riesgo, análisis de diversificación y rebalanceo de portfolio.",
+  url: "https://meskeia.com/estimador-inversiones/",
+  category: 'FinanceApplication',
+  features: [],
+});

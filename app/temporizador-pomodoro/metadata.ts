@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Temporizador Pomodoro Online - Técnica Pomodoro Gratis | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Temporizador Pomodoro meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Temporizador Pomodoro",
+  description: "Temporizador Pomodoro online gratuito. Mejora tu productividad con sesiones de 25 minutos, estadísticas de concentración y sonidos personalizables. Sin registro.",
+  url: "https://meskeia.com/temporizador-pomodoro/",
+  category: 'BusinessApplication',
+  features: [],
+});

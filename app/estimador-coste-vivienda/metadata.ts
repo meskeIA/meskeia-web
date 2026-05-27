@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Coste Real de Vivienda - Gastos Mensuales Totales | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador Coste Vivienda meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Coste Vivienda",
+  description: "Calcula el coste real mensual de mantener una vivienda: hipoteca, IBI, comunidad, seguros, suministros, mantenimiento y más. Ideal para segundas residencias y viviendas heredadas.",
+  url: "https://meskeia.com/estimador-coste-vivienda/",
+  category: 'FinanceApplication',
+  features: [],
+});

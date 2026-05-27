@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cifrado AES Online - Cifrado Simétrico Moderno | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cifrado AES",
+  description: "Cifra y descifra textos con AES-256, el estándar de cifrado más seguro. Modos GCM y CBC, generación de claves, todo en tu navegador sin enviar datos.",
+  url: "https://meskeia.com/cifrado-aes/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Antibióticos: Cómo Funcionan y la Resistencia | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Antibióticos: Cómo Matan Bacterias y la Resistencia",
+  description: "Visualiza los 5 mecanismos de acción de los antibióticos, bacteriostático vs bactericida, y la crisis de la resistencia. Por qué no funcionan en virus.",
+  url: "https://meskeia.com/visualizador-antibioticos/",
+  category: 'EducationalApplication',
+  features: [],
+});

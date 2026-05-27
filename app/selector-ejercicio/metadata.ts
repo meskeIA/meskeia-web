@@ -55,3 +55,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Ejercicio",
+  description: "Test de 10 preguntas para descubrir qué tipo de ejercicio o deporte se adapta mejor a tus objetivos, disponibilidad, presupuesto y condición física actual.",
+  url: "https://meskeia.com/selector-ejercicio/",
+  category: 'UtilityApplication',
+  features: [],
+});

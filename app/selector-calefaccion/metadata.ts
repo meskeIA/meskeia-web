@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Sistema de Calefacción",
+  description: "Test de 10 preguntas para saber qué sistema de calefacción te conviene: caldera de gas, bomba de calor, aerotermia, suelo radiante o pellet. Según vivienda, uso y subvenciones disponibles.",
+  url: "https://meskeia.com/selector-calefaccion/",
+  category: 'FinanceApplication',
+  features: [],
+});

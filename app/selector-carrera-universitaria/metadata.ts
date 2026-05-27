@@ -57,3 +57,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Carrera Universitaria",
+  description: "Test de 10 preguntas para saber qué rama de estudios universitarios se adapta mejor a tu perfil: ciencias/ingeniería, salud, humanidades/sociales, tecnología/informática o arte/diseño. Sin mencionar u",
+  url: "https://meskeia.com/selector-carrera-universitaria/",
+  category: 'EducationalApplication',
+  features: [],
+});

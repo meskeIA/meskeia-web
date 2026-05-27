@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Embarazo y Bebé - Calculadora FPP, Checklist, Compras y Vacunas | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Planificador de Embarazo meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador Embarazo y Bebé",
+  description: "Planifica tu embarazo completo: calcula tu fecha probable de parto (FPP), organiza tareas por trimestre, lista de compras del bebé con prioridades y calendario de vacunación infantil España 2024.",
+  url: "https://meskeia.com/planificador-embarazo/",
+  category: 'UtilityApplication',
+  features: [],
+});

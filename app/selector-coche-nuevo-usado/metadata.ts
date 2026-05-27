@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Coche Nuevo o Usado",
+  description: "Test de 10 preguntas para saber si te conviene más un coche nuevo, seminuevo (1-3 años) o de segunda mano. Análisis según presupuesto, uso, garantías y etiqueta DGT.",
+  url: "https://meskeia.com/selector-coche-nuevo-usado/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Hipoteca - Calcula tu Cuota Mensual | meskeIA',
@@ -84,3 +85,11 @@ export const faqJsonLd = {
     },
   ],
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Hipoteca",
+  description: "Calcula la cuota mensual de tu hipoteca. Simulador con sistema francés, tabla de amortización completa, comparador de ofertas y análisis de gastos.",
+  url: "https://meskeia.com/estimador-hipoteca/",
+  category: 'FinanceApplication',
+  features: [],
+});

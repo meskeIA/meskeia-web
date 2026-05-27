@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Economía Circular - De lo Lineal a los Ciclos Cerrados | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Economía Circular - De Lineal a Circular",
+  description: "Visualiza la economía circular: diferencias con el modelo lineal, las 7 estrategias (reducir, reutilizar, reparar, reciclar), flujos de residuos en España y casos de éxito.",
+  url: "https://meskeia.com/visualizador-economia-circular/",
+  category: 'EducationalApplication',
+  features: [],
+});

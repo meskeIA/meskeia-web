@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Vitamina B12: Ciclo de Metilación y Factor Intrínseco | meskeIA',
@@ -25,3 +26,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Vitamina B12: Ciclo de Metilación y Factor Intrínseco",
+  description: "Ciclo de metilación, sistema de absorción por factor intrínseco, grupos de riesgo (veganos, mayores de 50, metformina) y síntomas neurológicos de la deficiencia.",
+  url: "https://meskeia.com/visualizador-vitamina-b12/",
+  category: 'EducationalApplication',
+  features: [],
+});

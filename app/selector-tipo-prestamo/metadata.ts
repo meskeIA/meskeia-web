@@ -58,3 +58,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Préstamo",
+  description: "Test de 10 preguntas para saber qué tipo de préstamo o financiación te conviene: personal, hipotecario, de consumo, línea de crédito o microcrédito. Análisis según finalidad, importe, garantías y situ",
+  url: "https://meskeia.com/selector-tipo-prestamo/",
+  category: 'FinanceApplication',
+  features: [],
+});

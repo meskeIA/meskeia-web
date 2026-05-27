@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Aspirina, Paracetamol e Ibuprofeno: Diferencias | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Aspirina, Paracetamol e Ibuprofeno: Comparativa de los 3 Analgésicos",
+  description: "Comparativa de los 3 analgésicos más usados: mecanismos distintos, órganos de riesgo distintos y cuándo es mejor cada uno. Solo el ibuprofeno y la aspirina son antiinflamatorios.",
+  url: "https://meskeia.com/visualizador-analgesicos/",
+  category: 'EducationalApplication',
+  features: [],
+});

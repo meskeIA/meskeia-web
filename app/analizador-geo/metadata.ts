@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Analizador GEO/AEO - Optimiza tu Contenido para IAs | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Analizador GEO/AEO meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Analizador GEO/AEO",
+  description: "Analiza y optimiza tu contenido para ser citado por ChatGPT, Perplexity, Gemini y Google AI Overviews. Puntuación GEO, análisis E-E-A-T, estructura y citabilidad.",
+  url: "https://meskeia.com/analizador-geo/",
+  category: 'UtilityApplication',
+  features: [],
+});

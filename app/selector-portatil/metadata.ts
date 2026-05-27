@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Portátil y PC",
+  description: "Test de 10 preguntas para saber qué ordenador te conviene: portátil o sobremesa, Windows o Mac, gama de rendimiento y modelos de referencia actualizados para 2025.",
+  url: "https://meskeia.com/selector-portatil/",
+  category: 'UtilityApplication',
+  features: [],
+});

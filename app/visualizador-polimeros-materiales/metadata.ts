@@ -40,3 +40,11 @@ export function generateJsonLd() {
     ],
   });
 }
+
+export const jsonLd = generateWebAppSchema({
+  name: "Polímeros y Materiales: Plásticos, Propiedades y Reciclaje",
+  description: "Visualizador interactivo de polímeros. Polimerización por adición (PE, PVC, PS) vs condensación (nylon, PET, policarbonato), propiedades Tm/Tg/densidad de 6 polímeros comunes, clasificación termoplást",
+  url: "https://meskeia.com/visualizador-polimeros-materiales/",
+  category: 'EducationalApplication',
+  features: [],
+});

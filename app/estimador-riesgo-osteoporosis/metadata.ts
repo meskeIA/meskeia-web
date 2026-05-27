@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Riesgo de Osteoporosis - Test de factores validados | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador Riesgo Osteoporosis meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Riesgo de Osteoporosis",
+  description: "Test de 12 preguntas basado en factores de riesgo validados (FRAX e IOF) para estimar el riesgo de osteoporosis y recibir recomendaciones preventivas personalizadas.",
+  url: "https://meskeia.com/estimador-riesgo-osteoporosis/",
+  category: 'FinanceApplication',
+  features: [],
+});

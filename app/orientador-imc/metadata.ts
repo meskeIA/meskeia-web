@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador IMC - Índice de Masa Corporal | meskeIA',
@@ -76,3 +77,11 @@ export const faqJsonLd = {
     },
   ],
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador IMC",
+  description: "Calcula tu Índice de Masa Corporal (IMC) gratis. Conoce tu clasificación según la OMS: bajo peso, normal, sobrepeso u obesidad. Fórmula peso/altura².",
+  url: "https://meskeia.com/orientador-imc/",
+  category: 'UtilityApplication',
+  features: [],
+});

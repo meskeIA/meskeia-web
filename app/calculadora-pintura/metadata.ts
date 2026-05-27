@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Pintura - Calcula Litros por Metros Cuadrados | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora de Pintura - meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Pintura",
+  description: "Calcula cuántos litros de pintura necesitas según los metros cuadrados, número de capas y tipo de superficie. Incluye calculadora de coste total.",
+  url: "https://meskeia.com/calculadora-pintura/",
+  category: 'FinanceApplication',
+  features: [],
+});

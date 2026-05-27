@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Hierro: Hemoglobina, Absorción y Anemia Ferropénica | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Hierro: Hemoglobina, Absorción y Anemia Ferropénica",
+  description: "Distribución del hierro en el cuerpo, absorción hemo vs no hemo, regulación por hepcidina y espectro clínico desde déficit hasta hemocromatosis.",
+  url: "https://meskeia.com/visualizador-hierro/",
+  category: 'EducationalApplication',
+  features: [],
+});

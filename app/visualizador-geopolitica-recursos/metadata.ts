@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Geopolítica de los Recursos - Petróleo, Litio y Tierras Raras | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Geopolítica de los Recursos - Petróleo, Litio y Tierras Raras",
+  description: "Visualiza la distribución global de recursos estratégicos: petróleo, gas, litio, tierras raras y cobre. Dependencia de Europa, conflictos por recursos y transición energética.",
+  url: "https://meskeia.com/visualizador-geopolitica-recursos/",
+  category: 'EducationalApplication',
+  features: [],
+});

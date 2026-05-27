@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Mudanzas - Organiza tu Mudanza Paso a Paso | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Planificador de Mudanzas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador de Mudanzas",
+  description: "Planifica tu mudanza con checklist de tareas, inventario de objetos por habitación y control de presupuesto. Herramienta gratuita para organizar mudanzas sin estrés.",
+  url: "https://meskeia.com/planificador-mudanzas/",
+  category: 'FinanceApplication',
+  features: [],
+});

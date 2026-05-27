@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Ecuaciones - Resolver Ecuaciones Lineales y Cuadráticas | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora de Ecuaciones meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Ecuaciones",
+  description: "¿Necesitas resolver ecuaciones algebraicas? Calculadora paso a paso para ecuaciones lineales, cuadráticas y sistemas de ecuaciones 2x2. Visualiza gráficas de parábolas y aprende mientras resuelves.",
+  url: "https://meskeia.com/algebra-ecuaciones/",
+  category: 'EducationalApplication',
+  features: [],
+});

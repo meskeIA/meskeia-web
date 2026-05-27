@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estrógenos - Las Hormonas del Ciclo y la Salud Ósea | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estrógenos - Las Hormonas del Ciclo y la Salud Ósea",
+  description: "Entiende los estrógenos: los tres tipos (E1, E2, E3), su papel en el ciclo menstrual, efectos en hueso, corazón y cerebro, la menopausia como transición fisiológica, y los estrógenos en los hombres.",
+  url: "https://meskeia.com/visualizador-estrogenos/",
+  category: 'EducationalApplication',
+  features: [],
+});

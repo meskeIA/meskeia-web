@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Regla de Tres - Simple, Inversa y Compuesta | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Regla de Tres meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Regla de Tres",
+  description: "Calculadora online de regla de tres simple directa, inversa y compuesta. Resuelve proporciones con explicaciones paso a paso y ejemplos prácticos. Gratis y sin registro.",
+  url: "https://meskeia.com/calculadora-regla-de-tres/",
+  category: 'EducationalApplication',
+  features: [],
+});

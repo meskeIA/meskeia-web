@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Idioma | ¿Qué Idioma Aprender? | meskeIA',
@@ -41,3 +42,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/selector-idioma/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Idioma",
+  description: "Test de 10 preguntas para saber qué idioma extranjero aprender según tus objetivos: inglés, francés, alemán, portugués o chino/japonés.",
+  url: "https://meskeia.com/selector-idioma/",
+  category: 'EducationalApplication',
+  features: [],
+});

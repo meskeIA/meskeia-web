@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador del Envejecimiento Celular | Telómeros, Senescencia y Hallmarks | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Envejecimiento Celular - Telómeros, Senescencia y Hallmarks",
+  description: "Los mecanismos moleculares del envejecimiento: telómeros (límite de Hayflick), senescencia celular (SASP), disfunción mitocondrial, reloj epigenético de Horvath y los 9 Hallmarks of Aging.",
+  url: "https://meskeia.com/visualizador-envejecimiento-celular/",
+  category: 'EducationalApplication',
+  features: [],
+});

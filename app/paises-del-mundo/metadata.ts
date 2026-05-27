@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Países del Mundo - Buscador con Capitales, Banderas y Datos | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Países del Mundo meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Países del Mundo",
+  description: "Explora los 195 países del mundo. Busca por nombre o capital y descubre banderas, población, superficie, moneda, idioma y prefijo telefónico de cada país.",
+  url: "https://meskeia.com/paises-del-mundo/",
+  category: 'EducationalApplication',
+  features: [],
+});

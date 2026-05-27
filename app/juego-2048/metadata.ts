@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: '2048 - Juego de Números | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego 2048",
+  description: "Juega al clásico 2048 en español. Desliza y combina fichas para alcanzar la suma de 2048. Modo oscuro, puntuación guardada y estadísticas de partida. Gratis.",
+  url: "https://meskeia.com/juego-2048/",
+  category: 'UtilityApplication',
+  features: [],
+});

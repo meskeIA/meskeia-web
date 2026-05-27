@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Evolución Humana - De Lucy a Homo Sapiens | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Evolución Humana - De los Primeros Homínidos al Homo Sapiens",
+  description: "Visualiza el linaje humano: Australopithecus, Homo habilis, erectus, Neandertales y sapiens. Timeline interactivo, migraciones Out of Africa y la revolución cognitiva.",
+  url: "https://meskeia.com/visualizador-evolucion-humana/",
+  category: 'EducationalApplication',
+  features: [],
+});

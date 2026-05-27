@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Comparador de Textos - Encuentra Diferencias (Diff) | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Comparador de Textos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador de Textos",
+  description: "Compara dos textos y encuentra las diferencias. Resalta líneas añadidas, eliminadas y modificadas estilo diff. Gratis, privado y sin registro.",
+  url: "https://meskeia.com/comparador-textos/",
+  category: 'UtilityApplication',
+  features: [],
+});

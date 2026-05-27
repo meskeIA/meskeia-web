@@ -57,3 +57,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador Eléctrico vs Combustión",
+  description: "Calcula el punto de equilibrio entre un coche eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato",
+  url: "https://meskeia.com/comparador-electrico/",
+  category: 'FinanceApplication',
+  features: [],
+});

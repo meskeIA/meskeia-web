@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Acetilcolina: Cómo Funciona | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Acetilcolina: El Primer Neurotransmisor Descubierto",
+  description: "El primer neurotransmisor descubierto. Visualiza la unión neuromuscular, sistema parasimpático, receptores nicotínicos vs muscarínicos, Botox, Alzheimer y organofosforados.",
+  url: "https://meskeia.com/visualizador-acetilcolina/",
+  category: 'EducationalApplication',
+  features: [],
+});

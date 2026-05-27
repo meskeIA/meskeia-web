@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Modalidad de Trabajo | ¿Presencial, Remoto o Híbrido? | meskeIA',
@@ -19,3 +20,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Modalidad de Trabajo",
+  description: "Test de 10 preguntas para saber qué modalidad de trabajo se adapta mejor a tu perfil: presencial en oficina, teletrabajo total, modelo híbrido, coworking o nómada digital.",
+  url: "https://meskeia.com/selector-modalidad-trabajo/",
+  category: 'BusinessApplication',
+  features: [],
+});

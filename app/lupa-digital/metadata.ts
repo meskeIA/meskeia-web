@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Lupa Digital Online - Amplía con la Cámara Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Lupa Digital con Cámara",
+  description: "Lupa digital gratuita que usa la cámara de tu dispositivo para ampliar texto, objetos pequeños y detalles. Ideal para leer letra pequeña y accesibilidad.",
+  url: "https://meskeia.com/lupa-digital/",
+  category: 'UtilityApplication',
+  features: [],
+});

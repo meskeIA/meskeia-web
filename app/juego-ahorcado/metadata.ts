@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Juego del Ahorcado en Español - Adivina la Palabra | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Juego del Ahorcado meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego del Ahorcado",
+  description: "Juega al clásico juego del ahorcado en español. 4 categorías: animales, países, profesiones y vocabulario. Sin registro, sin publicidad, 100% local.",
+  url: "https://meskeia.com/juego-ahorcado/",
+  category: 'EducationalApplication',
+  features: [],
+});

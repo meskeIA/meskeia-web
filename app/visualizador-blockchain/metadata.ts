@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Blockchain | Bloques, Consenso y Contratos Inteligentes | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Blockchain - Cadena de Bloques y Contratos Inteligentes",
+  description: "Cómo funciona una blockchain: anatomía de un bloque (hash, merkle tree), Proof of Work vs Proof of Stake, contratos inteligentes, DeFi y comparativa Bitcoin vs Ethereum.",
+  url: "https://meskeia.com/visualizador-blockchain/",
+  category: 'EducationalApplication',
+  features: [],
+});

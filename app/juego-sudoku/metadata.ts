@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Sudoku - Juego de Lógica y Números | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego Sudoku",
+  description: "Juega Sudoku online gratis. 3 niveles de dificultad, validación automática, pistas y guardado de progreso. Entrena tu mente con este clásico puzzle.",
+  url: "https://meskeia.com/juego-sudoku/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Tipo de Gimnasio | ¿Qué Tipo de Entrenamiento te Conviene? | meskeIA',
@@ -30,3 +31,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Gimnasio",
+  description: "Test de 10 preguntas para saber qué tipo de entrenamiento o gimnasio se adapta mejor a ti: gimnasio tradicional, CrossFit o funcional, yoga o pilates, entrenamiento en casa o al aire libre.",
+  url: "https://meskeia.com/selector-tipo-gimnasio/",
+  category: 'UtilityApplication',
+  features: [],
+});

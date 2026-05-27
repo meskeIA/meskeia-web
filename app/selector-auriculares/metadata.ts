@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Auriculares | ¿Qué Auriculares Necesitas? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Auriculares",
+  description: "Test de 10 preguntas para saber qué tipo de auriculares se adaptan mejor a tu uso: in-ear TWS inalámbricos, over-ear con cancelación de ruido, deportivos, gaming o auriculares de cable de calidad.",
+  url: "https://meskeia.com/selector-auriculares/",
+  category: 'UtilityApplication',
+  features: [],
+});

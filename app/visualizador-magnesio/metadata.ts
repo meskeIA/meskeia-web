@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Magnesio: 300 Reacciones Enzimáticas y Deficiencia Silenciosa | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Magnesio: 300 Reacciones Enzimáticas y Déficit Silencioso",
+  description: "Cofactor del ATP, equilibrio calcio/magnesio en músculos, bloqueador del receptor NMDA y síntomas de la deficiencia más infradiagnosticada.",
+  url: "https://meskeia.com/visualizador-magnesio/",
+  category: 'EducationalApplication',
+  features: [],
+});

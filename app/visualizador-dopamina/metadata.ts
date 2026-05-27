@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Dopamina - El Sistema de Recompensa del Cerebro | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Dopamina - El Sistema de Recompensa del Cerebro",
+  description: "Cómo funciona la dopamina: el circuito de recompensa mesolímbico, el ciclo deseo-anticipación-recompensa, su papel en redes sociales y adicciones, y cómo modular el sistema de forma natural.",
+  url: "https://meskeia.com/visualizador-dopamina/",
+  category: 'EducationalApplication',
+  features: [],
+});

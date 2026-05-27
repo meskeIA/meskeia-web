@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Adaptación del Hogar para Mayores - Checklist y costes | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Adaptación del Hogar meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Adaptación del Hogar",
+  description: "Checklist interactivo de adaptaciones del hogar para mayores y personas con movilidad reducida. Costes orientativos, ítems con ayudas públicas y prioridades por estancia.",
+  url: "https://meskeia.com/adaptacion-hogar/",
+  category: 'FinanceApplication',
+  features: [],
+});

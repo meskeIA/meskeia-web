@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Meta Descripciones SEO - Vista Previa Google | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador Meta Descripciones meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Meta Descripciones",
+  description: "Genera meta descripciones optimizadas para SEO. Contador de caracteres en tiempo real, vista previa de snippet de Google y plantillas por tipo de página.",
+  url: "https://meskeia.com/generador-meta-descripciones/",
+  category: 'UtilityApplication',
+  features: [],
+});

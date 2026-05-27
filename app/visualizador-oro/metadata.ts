@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Oro: Por Qué la Relatividad Explica su Color y su Nobleza | meskeIA',
@@ -25,3 +26,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Oro: Por Qué la Relatividad Explica su Color y su Nobleza",
+  description: "La relatividad especial de Einstein explica por qué el oro es amarillo, no se oxida y es vital en electrónica. Configuración electrónica, nanopartículas y medicina.",
+  url: "https://meskeia.com/visualizador-oro/",
+  category: 'EducationalApplication',
+  features: [],
+});

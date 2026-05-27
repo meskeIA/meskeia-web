@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Adrenalina: Cómo Funciona | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Adrenalina: La Hormona de la Supervivencia",
+  description: "La doble vida de la adrenalina: neurotransmisor (noradrenalina) y hormona. Cascada lucha-huida, receptores α y β, EpiPen en anafilaxia y estrés crónico.",
+  url: "https://meskeia.com/visualizador-adrenalina/",
+  category: 'EducationalApplication',
+  features: [],
+});

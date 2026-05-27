@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Caos y Efecto Mariposa: El Atractor de Lorenz | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Caos y Mariposa: El Atractor de Lorenz",
+  description: "Visualiza el atractor de Lorenz y el efecto mariposa: dos trayectorias casi idénticas que divergen completamente. Caos determinista, sensibilidad a condiciones iniciales y sistemas caóticos reales.",
+  url: "https://meskeia.com/visualizador-caos-mariposa/",
+  category: 'EducationalApplication',
+  features: [],
+});

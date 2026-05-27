@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Plusvalía Municipal (IIVTNU) 2025 | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Plusvalía Municipal (IIVTNU)",
+  description: "Oriéntate sobre el importe de la Plusvalía Municipal (IIVTNU) al vender o heredar un inmueble en España. Compara el método objetivo y el método real conforme al RDL 26/2021.",
+  url: "https://meskeia.com/estimador-plusvalia-municipal/",
+  category: 'FinanceApplication',
+  features: [],
+});

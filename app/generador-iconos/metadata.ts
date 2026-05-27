@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Iconos PWA - Crea Favicon y App Icons | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Iconos PWA",
+  description: "Genera todos los tamaños de iconos necesarios para tu PWA, favicon y aplicaciones móviles. 12 tamaños automáticos, múltiples formatos, descarga como ZIP.",
+  url: "https://meskeia.com/generador-iconos/",
+  category: 'UtilityApplication',
+  features: [],
+});

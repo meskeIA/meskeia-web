@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Vitamina D: La Vitamina que Actúa como Hormona | meskeIA',
@@ -28,3 +29,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Vitamina D: La Vitamina que Actúa como Hormona",
+  description: "Síntesis solar paso a paso, receptores VDR en 37 tejidos, niveles óptimos y la paradoja de la deficiencia en España a pesar del sol.",
+  url: "https://meskeia.com/visualizador-vitamina-d/",
+  category: 'EducationalApplication',
+  features: [],
+});

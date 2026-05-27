@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Smartphone",
+  description: "Test de 10 preguntas para saber qué smartphone te conviene según tu uso, presupuesto y prioridades. iOS o Android, gama alta, media o básica. Modelos de referencia actualizados.",
+  url: "https://meskeia.com/selector-smartphone/",
+  category: 'UtilityApplication',
+  features: [],
+});

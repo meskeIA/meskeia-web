@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Redacción Académica - Guía Práctica para TFG, TFM, Tesis y Artículos | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Curso Redacción Académica meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Redacción Académica",
+  description: "Aprende a escribir textos académicos de calidad. Curso práctico con pautas aplicables a tu TFG, TFM, tesis o artículo. Estructura, citas APA, coherencia, estilo académico y más.",
+  url: "https://meskeia.com/curso-redaccion-academica/",
+  category: 'EducationalApplication',
+  features: [],
+});

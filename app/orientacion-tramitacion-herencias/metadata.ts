@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientación para Tramitar una Herencia - Checklist y Plazos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientación para Tramitar una Herencia",
+  description: "Asistente interactivo para gestionar una herencia en España: checklist personalizado de documentos, orden de gestiones paso a paso, plazos críticos y costes orientativos.",
+  url: "https://meskeia.com/orientacion-tramitacion-herencias/",
+  category: 'FinanceApplication',
+  features: [],
+});

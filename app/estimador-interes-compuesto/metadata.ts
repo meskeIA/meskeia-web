@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Interés Compuesto - Simula tu Inversión | meskeIA',
@@ -76,3 +77,11 @@ export const faqJsonLd = {
     },
   ],
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Interés Compuesto",
+  description: "Calcula el interés compuesto de tus inversiones. Simula el crecimiento de tu capital con aportaciones periódicas y visualiza la evolución año a año.",
+  url: "https://meskeia.com/estimador-interes-compuesto/",
+  category: 'FinanceApplication',
+  features: [],
+});

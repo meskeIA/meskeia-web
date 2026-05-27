@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ciclo Cardíaco - Sístole, Diástole, Válvulas y ECG | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ciclo Cardíaco - Sístole, Diástole y ECG",
+  description: "Visualiza el ciclo cardíaco: sístole y diástole, las 4 válvulas del corazón, trazado ECG interactivo y cálculo de gasto cardíaco. Aprende cómo late tu corazón.",
+  url: "https://meskeia.com/visualizador-corazon-ciclo-cardiaco/",
+  category: 'EducationalApplication',
+  features: [],
+});

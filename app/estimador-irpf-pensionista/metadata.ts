@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador IRPF Pensionista 2025 - Cuánto pagas de renta | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador IRPF Pensionista meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador IRPF Pensionista",
+  description: "Estima el IRPF que pagas como pensionista: reducción por rendimientos del trabajo, mínimo personal por edad y cuota orientativa. Pensión neta mensual real.",
+  url: "https://meskeia.com/estimador-irpf-pensionista/",
+  category: 'FinanceApplication',
+  features: [],
+});

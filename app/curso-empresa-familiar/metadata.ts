@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Empresa Familiar - Gobierno, Sucesión y Profesionalización | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Curso Empresa Familiar meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Empresa Familiar",
+  description: "Aprende a gestionar una empresa familiar: gobierno corporativo, protocolo familiar, sucesión generacional, modelos de empresa familiar y profesionalización. Contenido actualizado 2024-2025.",
+  url: "https://meskeia.com/curso-empresa-familiar/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Validador de Expresiones Regulares (RegEx) | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Validador RegEx",
+  description: "Testa y valida expresiones regulares online. Resaltado de coincidencias, flags interactivos y biblioteca de patrones comunes para email, teléfono, URL y más.",
+  url: "https://meskeia.com/validador-regex/",
+  category: 'UtilityApplication',
+  features: [],
+});

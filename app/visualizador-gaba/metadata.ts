@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'GABA: El Freno del Sistema Nervioso | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "GABA: El Gran Freno del Sistema Nervioso",
+  description: "Visualiza cómo el GABA equilibra la excitación cerebral: GABA-A vs GABA-B, moduladores alostéricos (benzodiacepinas, alcohol, anestésicos), epilepsia y ansiedad.",
+  url: "https://meskeia.com/visualizador-gaba/",
+  category: 'EducationalApplication',
+  features: [],
+});

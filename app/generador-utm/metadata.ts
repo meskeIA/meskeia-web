@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Enlaces UTM - Trackea tus Campañas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Enlaces UTM",
+  description: "Genera enlaces UTM para Google Analytics. Crea URLs con parámetros utm_source, utm_medium, utm_campaign para medir el ROI de tus campañas de marketing.",
+  url: "https://meskeia.com/generador-utm/",
+  category: 'UtilityApplication',
+  features: [],
+});

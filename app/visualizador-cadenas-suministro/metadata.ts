@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cadenas de Suministro Globales: Cómo Llega Todo hasta Ti — meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring",
+  description: "Visualizador interactivo de cadenas de suministro globales: el viaje de un smartphone, just-in-time vs just-in-case, grandes disrupciones históricas y reshoring. Logística y economía.",
+  url: "https://meskeia.com/visualizador-cadenas-suministro/",
+  category: 'EducationalApplication',
+  features: [],
+});

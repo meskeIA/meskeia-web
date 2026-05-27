@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Creador de Flashcards - Memoriza con Tarjetas de Estudio | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Creador de Flashcards",
+  description: "Crea y estudia flashcards personalizadas. Organiza tus tarjetas por mazos, categorías y colores. Exporta e importa en JSON y CSV. Modo estudio con flip animado.",
+  url: "https://meskeia.com/creador-flashcards/",
+  category: 'EducationalApplication',
+  features: [],
+});

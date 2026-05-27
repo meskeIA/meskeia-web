@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Aspirina: Cómo Funciona | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Aspirina: Cómo Funciona el Fármaco más Universal",
+  description: "Visualiza el mecanismo molecular de la aspirina: inhibición COX-1/COX-2, síntesis de prostaglandinas, 4 efectos y su base bioquímica. Historia de 120 años.",
+  url: "https://meskeia.com/visualizador-aspirina/",
+  category: 'EducationalApplication',
+  features: [],
+});

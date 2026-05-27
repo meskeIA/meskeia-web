@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Mi IP Pública y Conexión - Información de Red Completa | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Mi IP y Conexión",
+  description: "Descubre tu IP pública, ubicación aproximada, proveedor de internet, tipo de conexión y velocidad. Historial de IPs, copiar con un clic. Gratis y sin registro.",
+  url: "https://meskeia.com/mi-ip/",
+  category: 'BusinessApplication',
+  features: [],
+});

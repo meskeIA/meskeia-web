@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guías meskeIA - Decisiones Importantes con Herramientas Gratuitas',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
   },
   robots: 'index, follow',
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía para Gestionar una Herencia",
+  description: "Guías paso a paso para las decisiones más importantes de tu vida: comprar casa, invertir, ser freelance, montar un negocio, ahorrar o vivir más sano. Herramientas gratuitas.",
+  url: "https://meskeia.com/guia/",
+  category: 'FinanceApplication',
+  features: [],
+});

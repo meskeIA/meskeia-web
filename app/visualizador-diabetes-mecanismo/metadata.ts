@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Diabetes: Mecanismo Biológico de Insulina y Glucagón — meskeIA',
@@ -25,3 +26,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Diabetes: Mecanismo Biológico de Insulina y Glucagón",
+  description: "Visualizador del mecanismo biológico de la diabetes. Páncreas, insulina y glucagón, mecanismo de resistencia a la insulina, tipos 1/2/gestacional y HbA1c. Biología molecular pura, sin diagnóstico.",
+  url: "https://meskeia.com/visualizador-diabetes-mecanismo/",
+  category: 'EducationalApplication',
+  features: [],
+});

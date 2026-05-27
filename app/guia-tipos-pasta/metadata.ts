@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Tipos de Pasta Italiana | meskeIA',
@@ -42,3 +43,11 @@ export const metadata: Metadata = {
     follow: true,
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía de Tipos de Pasta",
+  description: "Guía de referencia de 40 tipos de pasta: spaghetti, penne, fusilli, ravioli y más. Forma, región, tiempo de cocción y salsa ideal.",
+  url: "https://meskeia.com/guia-tipos-pasta/",
+  category: 'EducationalApplication',
+  features: [],
+});

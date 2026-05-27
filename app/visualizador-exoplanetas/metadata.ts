@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Exoplanetas: Detección, Zona Habitable y Diversidad — meskeIA',
@@ -31,3 +32,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Exoplanetas: Tránsito, Zona Habitable y Kepler",
+  description: "Explora cómo detectamos exoplanetas con animaciones del método de tránsito y velocidad radial, la zona habitable de Goldilocks, clasificación de tipos y distribución de los 5.500+ mundos conocidos.",
+  url: "https://meskeia.com/visualizador-exoplanetas/",
+  category: 'EducationalApplication',
+  features: [],
+});

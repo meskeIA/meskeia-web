@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Gastos de Comunidad - Reparto por Cuotas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Gastos de Comunidad",
+  description: "Calcula y reparte los gastos de la comunidad de propietarios: cuota mensual, derramas, reparto por coeficiente o partes iguales. Gestiona los presupuestos de tu comunidad.",
+  url: "https://meskeia.com/estimador-gastos-comunidad/",
+  category: 'FinanceApplication',
+  features: [],
+});

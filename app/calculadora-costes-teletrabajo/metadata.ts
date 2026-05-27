@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Costes Teletrabajo vs Oficina — Ahorro Real | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Costes Teletrabajo",
+  description: "Calcula el ahorro o coste real de trabajar desde casa frente a ir a la oficina: transporte, comidas, electricidad, ropa y más. Resultado mensual y anual.",
+  url: "https://meskeia.com/calculadora-costes-teletrabajo/",
+  category: 'FinanceApplication',
+  features: [],
+});

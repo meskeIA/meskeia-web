@@ -40,3 +40,11 @@ export function generateJsonLd() {
     category: 'EducationalApplication',
   });
 }
+
+export const jsonLd = generateWebAppSchema({
+  name: "CRISPR-Cas9: Mecanismo, Edición Genómica y Bioética",
+  description: "Visualizador interactivo de CRISPR-Cas9. Mecanismo completo en 6 pasos con SVG animado (guía ARN, endonucleasa Cas9, corte DSB), comparativa NHEJ vs HDR con tabla de aplicaciones, 6 enfermedades terap",
+  url: "https://meskeia.com/visualizador-crispr-cas9/",
+  category: 'EducationalApplication',
+  features: [],
+});

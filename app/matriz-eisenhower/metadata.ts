@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Matriz Eisenhower - Prioriza Tareas por Urgencia e Importancia | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Matriz Eisenhower meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Matriz Eisenhower",
+  description: "Organiza tus tareas con la matriz Eisenhower. Clasifica por urgente/importante, obtén recomendaciones de acción y mejora tu productividad. 100% gratis y privado.",
+  url: "https://meskeia.com/matriz-eisenhower/",
+  category: 'BusinessApplication',
+  features: [],
+});

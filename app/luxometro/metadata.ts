@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Luxómetro Online - Mide la Intensidad de Luz | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Luxómetro meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Luxómetro / Fotómetro",
+  description: "Mide la intensidad de luz en lux con tu dispositivo. Ideal para fotógrafos: incluye recomendaciones de ISO, apertura y velocidad según la iluminación.",
+  url: "https://meskeia.com/luxometro/",
+  category: 'UtilityApplication',
+  features: [],
+});

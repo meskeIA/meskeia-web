@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Forma Jurídica",
+  description: "Test de 10 preguntas para saber si te conviene trabajar como autónomo o constituir una Sociedad Limitada (SL). Análisis según ingresos, riesgo, socios y proyección de negocio en España.",
+  url: "https://meskeia.com/selector-forma-juridica/",
+  category: 'FinanceApplication',
+  features: [],
+});

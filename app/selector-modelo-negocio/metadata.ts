@@ -58,3 +58,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Modelo de Negocio",
+  description: "Test de 10 preguntas para saber qué modelo de negocio se adapta mejor a tu perfil emprendedor: tienda física, e-commerce, servicios/consultoría, SaaS/producto digital o marketplace. Análisis sin marca",
+  url: "https://meskeia.com/selector-modelo-negocio/",
+  category: 'FinanceApplication',
+  features: [],
+});

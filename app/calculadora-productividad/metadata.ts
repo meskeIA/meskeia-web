@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Productividad Freelance - Ingresos por Hora Real | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Productividad meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Productividad",
+  description: "Calcula tu productividad real como freelance. Analiza ingresos por hora efectiva de trabajo descontando reuniones, gestión y tiempo no facturable. 100% gratis.",
+  url: "https://meskeia.com/calculadora-productividad/",
+  category: 'BusinessApplication',
+  features: [],
+});

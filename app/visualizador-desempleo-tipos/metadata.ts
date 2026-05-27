@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tipos de Desempleo: Friccional, Estructural, Cíclico — meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Tipos de Desempleo: Friccional, Estructural y Cíclico",
+  description: "Visualizador de los 4 tipos de desempleo (friccional, estructural, cíclico, estacional), NAIRU, curva de Beveridge, evolución histórica España vs EU y políticas activas vs pasivas.",
+  url: "https://meskeia.com/visualizador-desempleo-tipos/",
+  category: 'EducationalApplication',
+  features: [],
+});

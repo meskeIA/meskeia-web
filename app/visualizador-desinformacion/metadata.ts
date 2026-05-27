@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cómo se Propaga un Bulo: El Ciclo de la Desinformación | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Ciclo de la Desinformación: Cómo se Propaga un Bulo",
+  description: "Descubre cómo nace y se viraliza un bulo. Visualizador interactivo del ciclo de desinformación: creación, amplificación, viralización y desmentido. Con datos del MIT y el Reuters Institute.",
+  url: "https://meskeia.com/visualizador-desinformacion/",
+  category: 'EducationalApplication',
+  features: [],
+});

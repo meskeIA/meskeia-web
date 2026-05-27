@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conjugador de Verbos Español - Todos los tiempos verbales | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conjugador de Verbos Español",
+  description: "Conjugador completo de verbos en español. Todos los tiempos verbales: indicativo, subjuntivo, imperativo. Incluye verbos irregulares. Gratis y sin registro.",
+  url: "https://meskeia.com/conjugador-verbos/",
+  category: 'EducationalApplication',
+  features: [],
+});

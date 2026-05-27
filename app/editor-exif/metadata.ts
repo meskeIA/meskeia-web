@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Editor EXIF - Visualiza y Elimina Metadatos de Fotos | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Editor EXIF meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Editor EXIF",
+  description: "Analiza qué datos revelan tus fotos (GPS, cámara, fecha, dispositivo). Elimina metadatos EXIF para proteger tu privacidad. 100% offline, procesamiento local en tu navegador.",
+  url: "https://meskeia.com/editor-exif/",
+  category: 'UtilityApplication',
+  features: [],
+});

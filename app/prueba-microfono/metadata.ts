@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Prueba de Micrófono Online - Test Audio Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Prueba de Micrófono",
+  description: "Prueba tu micrófono antes de videollamadas. Visualiza niveles de audio, graba tu voz y reproduce. Sin registro ni instalación. 100% privado.",
+  url: "https://meskeia.com/prueba-microfono/",
+  category: 'UtilityApplication',
+  features: [],
+});

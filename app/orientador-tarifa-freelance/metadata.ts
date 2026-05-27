@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Tarifa Freelance - Calcula tu Precio por Hora | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Tarifa Freelance",
+  description: "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Herramienta gratuita para autónomos y freelancers en España.",
+  url: "https://meskeia.com/orientador-tarifa-freelance/",
+  category: 'BusinessApplication',
+  features: [],
+});

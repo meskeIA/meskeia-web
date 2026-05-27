@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Computación Cuántica — Qubits, Puertas Cuánticas y Algoritmo de Shor | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Computación Cuántica - Qubits, Puertas y Algoritmo de Shor",
+  description: "Entiende la computación cuántica: qubits vs bits, superposición, puertas cuánticas, paralelismo cuántico y por qué amenaza el cifrado RSA. Sin matemáticas complejas.",
+  url: "https://meskeia.com/visualizador-computacion-cuantica/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Huesos del Cuerpo Humano - Guía Completa del Esqueleto | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Huesos del Cuerpo Humano meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Huesos del Cuerpo Humano",
+  description: "Explora los 206 huesos del esqueleto humano: nombre, función, articulaciones y curiosidades. Guía interactiva para estudiantes de medicina, enfermería y anatomía.",
+  url: "https://meskeia.com/huesos-cuerpo-humano/",
+  category: 'EducationalApplication',
+  features: [],
+});

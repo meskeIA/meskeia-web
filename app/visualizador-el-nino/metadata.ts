@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Niño y La Niña: ENSO Explicado | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Niño y La Niña: ENSO Explicado",
+  description: "Visualiza el fenómeno El Niño/La Niña: circulación Walker, desplazamiento del agua cálida, teleconexiones globales y predicción ENSO. Por qué afecta al clima de España, Australia y Sudamérica.",
+  url: "https://meskeia.com/visualizador-el-nino/",
+  category: 'EducationalApplication',
+  features: [],
+});

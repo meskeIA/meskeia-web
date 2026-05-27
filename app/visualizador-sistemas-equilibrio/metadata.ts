@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cómo el Cuerpo Mantiene el Equilibrio | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/visualizador-sistemas-equilibrio/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cómo el Cuerpo Mantiene el Equilibrio",
+  description: "Descubre los tres sistemas que permiten al cuerpo mantenerse en equilibrio: el sistema vestibular, la visión y la propiocepción. Visualizador educativo interactivo.",
+  url: "https://meskeia.com/visualizador-sistemas-equilibrio/",
+  category: 'EducationalApplication',
+  features: [],
+});

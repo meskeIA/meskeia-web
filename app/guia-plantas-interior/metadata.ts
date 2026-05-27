@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Plantas de Interior - Cuidados, luz y toxicidad | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/guia-plantas-interior/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía de Plantas de Interior",
+  description: "40 plantas de interior: nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas y cuidados específicos. Filtros por luz, dificultad y aptitud para mascotas.",
+  url: "https://meskeia.com/guia-plantas-interior/",
+  category: 'EducationalApplication',
+  features: [],
+});

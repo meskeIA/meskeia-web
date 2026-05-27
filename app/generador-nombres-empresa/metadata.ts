@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Nombres para Empresa - Ideas Creativas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Nombres",
+  description: "Genera nombres creativos para tu empresa, startup o marca. Por sector, estilo y longitud. Verifica disponibilidad de dominio .com y .es al instante.",
+  url: "https://meskeia.com/generador-nombres-empresa/",
+  category: 'BusinessApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora MCD y MCM Online - Máximo Común Divisor y Mínimo Común Múltiplo | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora MCD y MCM",
+  description: "Calculadora de MCD (Máximo Común Divisor) y MCM (Mínimo Común Múltiplo) online y gratuita. Calcula hasta 5 números con explicación paso a paso del método.",
+  url: "https://meskeia.com/calculadora-mcd-mcm/",
+  category: 'EducationalApplication',
+  features: [],
+});

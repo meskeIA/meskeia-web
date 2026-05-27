@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador del Hígado | Funciones, Detoxificación y Metabolismo | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Hígado - Detoxificación y Metabolismo",
+  description: "Explora el hígado como laboratorio del cuerpo: detoxificación (fases 1 y 2), metabolismo de glucosa y lípidos, síntesis de proteínas y producción de bilis.",
+  url: "https://meskeia.com/visualizador-higado/",
+  category: 'EducationalApplication',
+  features: [],
+});

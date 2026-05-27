@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Minerales del Mundo - Guía de 50 Minerales Esenciales | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Minerales del Mundo meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Minerales del Mundo",
+  description: "Explora 50 minerales esenciales con su composición química, dureza Mohs, sistema cristalino, usos industriales y curiosidades. Guía completa para estudiantes y curiosos.",
+  url: "https://meskeia.com/minerales-del-mundo/",
+  category: 'EducationalApplication',
+  features: [],
+});

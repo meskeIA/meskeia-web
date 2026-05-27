@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Control de Gastos Mensual - Gestiona tu Presupuesto | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Control de Gastos",
+  description: "Controla tus gastos mensuales por categorías. Registra ingresos y gastos, visualiza estadísticas y gestiona tu presupuesto familiar de forma sencilla.",
+  url: "https://meskeia.com/control-gastos/",
+  category: 'FinanceApplication',
+  features: [],
+});

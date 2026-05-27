@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Símbolos Químicos — Aprende la Tabla Periódica | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Símbolos Químicos",
+  description: "Pon a prueba tus conocimientos de química: adivina el nombre del elemento por su símbolo o viceversa. 3 dificultades, 2 modos, 85 elementos. ¡Cuántos conoces?",
+  url: "https://meskeia.com/quiz-simbolos-quimicos/",
+  category: 'EducationalApplication',
+  features: [],
+});

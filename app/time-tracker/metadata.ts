@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Time Tracker - Registro de Horas por Proyecto | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Time Tracker meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Time Tracker",
+  description: "Registra y gestiona el tiempo dedicado a cada proyecto y cliente. Informes, tarifas por hora y exportación. Ideal para freelancers y autónomos.",
+  url: "https://meskeia.com/time-tracker/",
+  category: 'BusinessApplication',
+  features: [],
+});

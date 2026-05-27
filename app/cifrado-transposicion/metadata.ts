@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cifrado por Transposición Online - Columnas, Rail Fence, Escítala | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cifrado por Transposición",
+  description: "Cifra textos reordenando letras con métodos de transposición: Columnas con clave, Rail Fence (zigzag) y Escítala espartana. Visualización paso a paso.",
+  url: "https://meskeia.com/cifrado-transposicion/",
+  category: 'EducationalApplication',
+  features: [],
+});

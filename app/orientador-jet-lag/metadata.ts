@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador de Jet Lag - Calcula el Impacto de tu Viaje | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Orientador de Jet Lag meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador de Jet Lag",
+  description: "Calcula el jet lag de tu próximo viaje internacional. Conoce los días de adaptación necesarios y recibe recomendaciones personalizadas según el cambio horario y la dirección del vuelo.",
+  url: "https://meskeia.com/orientador-jet-lag/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Cuenta Bancaria | ¿Qué Tipo de Cuenta Necesitas? | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Cuenta Bancaria",
+  description: "Test de 10 preguntas para saber qué tipo de cuenta bancaria se adapta mejor a tu situación: cuenta corriente estándar, cuenta nómina, cuenta joven, cuenta de ahorro remunerada o mantener la actual.",
+  url: "https://meskeia.com/selector-cuenta-bancaria/",
+  category: 'FinanceApplication',
+  features: [],
+});

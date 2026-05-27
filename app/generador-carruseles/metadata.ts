@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Carruseles para Redes Sociales - Instagram y LinkedIn | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador de Carruseles meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Carruseles",
+  description: "Crea carruseles profesionales para Instagram y LinkedIn gratis. Diseña slides con texto, elige entre 5 plantillas, personaliza colores y descarga como imágenes PNG. Sin registro.",
+  url: "https://meskeia.com/generador-carruseles/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Telomerasa - La Enzima del Envejecimiento y la Inmortalidad Celular | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Telomerasa - La Enzima de la Inmortalidad Celular",
+  description: "Cómo funciona la telomerasa: alarga los telómeros usando su propio ARN como molde, el límite de Hayflick, por qué las células cancerosas son \"inmortales\" y el Premio Nobel 2009.",
+  url: "https://meskeia.com/visualizador-telomerasa/",
+  category: 'EducationalApplication',
+  features: [],
+});

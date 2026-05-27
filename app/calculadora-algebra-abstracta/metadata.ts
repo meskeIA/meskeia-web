@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Álgebra Abstracta - Grupos, Anillos, Cuerpos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Álgebra Abstracta",
+  description: "Explora estructuras algebraicas: grupos, anillos y cuerpos. Operaciones modulares, tablas de Cayley y propiedades algebraicas.",
+  url: "https://meskeia.com/calculadora-algebra-abstracta/",
+  category: 'EducationalApplication',
+  features: [],
+});

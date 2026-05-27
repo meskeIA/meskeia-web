@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Códigos QR - Crea QR Gratis Online | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Códigos QR",
+  description: "Generador de códigos QR gratuito para URLs, texto, WiFi, contactos, email y más. Descarga en PNG de alta resolución. Sin registro, sin límites, 100% privado.",
+  url: "https://meskeia.com/generador-qr/",
+  category: 'UtilityApplication',
+  features: [],
+});

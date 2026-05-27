@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Fondo de Inversión: Por Dentro | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Fondo de Inversión: Por Dentro",
+  description: "Cómo funciona un fondo de inversión por dentro: NAV, gestión activa vs indexada, el impacto devastador de las comisiones a largo plazo y qué significa diversificar de verdad. Educativo — sin recomenda",
+  url: "https://meskeia.com/visualizador-fondo-inversion/",
+  category: 'FinanceApplication',
+  features: [],
+});

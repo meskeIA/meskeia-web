@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador de Legítimas — Herencia forzosa por CCAA | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador Legítimas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Legítimas",
+  description: "Calcula la legítima hereditaria según el derecho civil de tu comunidad autónoma (Código Civil, Cataluña, Aragón, Galicia, Baleares, País Vasco, Navarra). Estimación de cuotas por heredero forzoso y pa",
+  url: "https://meskeia.com/estimador-legitimas/",
+  category: 'FinanceApplication',
+  features: [],
+});

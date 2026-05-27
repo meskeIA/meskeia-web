@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estadística Inferencial: p-valor, Errores Tipo I/II e Intervalos de Confianza | meskeIA',
@@ -21,3 +22,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estadística Inferencial: p-valor, Errores y Confianza",
+  description: "Visualiza en tiempo real los conceptos más malinterpretados en ciencia: el p-valor, errores tipo I y tipo II, intervalos de confianza y potencia estadística. Entiende por qué p<0.05 no es suficiente.",
+  url: "https://meskeia.com/visualizador-estadistica-inferencial/",
+  category: 'EducationalApplication',
+  features: [],
+});

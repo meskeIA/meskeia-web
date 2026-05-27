@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Regímenes Políticos: Tipología y Características Estructurales — meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Regímenes Políticos: Tipología y Características Estructurales",
+  description: "Matriz interactiva de los 6 tipos de régimen político, espectro de concentración del poder, evolución histórica agregada y mecanismos de transición. Tipología estructural de la ciencia política académ",
+  url: "https://meskeia.com/visualizador-regimenes-politicos/",
+  category: 'EducationalApplication',
+  features: [],
+});

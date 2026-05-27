@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ruleta Aleatoria Online - Sorteos y Decisiones | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ruleta Aleatoria",
+  description: "Ruleta aleatoria personalizable para sorteos, decisiones y selección al azar. Añade tus propias opciones, personaliza colores y gira. Gratis y sin registro.",
+  url: "https://meskeia.com/ruleta-aleatoria/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Teoría de Juegos: Dilema del Prisionero y Equilibrio de Nash | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Teoría de Juegos: Dilema del Prisionero y Nash",
+  description: "Juega al Dilema del Prisionero y descubre el Equilibrio de Nash. Visualizador interactivo de teoría de juegos: suma cero, cooperativos, tragedia de los comunes y aplicaciones reales.",
+  url: "https://meskeia.com/visualizador-teoria-juegos/",
+  category: 'EducationalApplication',
+  features: [],
+});

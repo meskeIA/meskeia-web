@@ -55,3 +55,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Seguro de Hogar",
+  description: "Test de 10 preguntas para saber qué tipo de seguro de hogar te conviene: cobertura básica, multirriesgo estándar o completa. Según vivienda, zona, contenido y prioridades.",
+  url: "https://meskeia.com/selector-seguro-hogar/",
+  category: 'FinanceApplication',
+  features: [],
+});

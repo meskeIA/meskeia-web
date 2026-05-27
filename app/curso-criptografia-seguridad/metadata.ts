@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Criptografía y Seguridad - Aprende desde Cifrado César hasta AES | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Curso Criptografía meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Criptografía y Seguridad",
+  description: "Domina los fundamentos de la criptografía: desde cifrados históricos como César y Vigenère hasta técnicas modernas como AES y hashes SHA-256. Curso gratuito con herramientas prácticas.",
+  url: "https://meskeia.com/curso-criptografia-seguridad/",
+  category: 'EducationalApplication',
+  features: [],
+});

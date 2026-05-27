@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Gestión del Estrés | ¿Cómo Manejas el Estrés? | meskeIA',
@@ -19,3 +20,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Gestión del Estrés",
+  description: "Test de 10 preguntas para saber qué método de gestión del estrés se adapta mejor a ti: meditación/mindfulness, ejercicio físico, terapia/psicología, hobbies creativos o desconexión digital.",
+  url: "https://meskeia.com/selector-gestion-estres/",
+  category: 'UtilityApplication',
+  features: [],
+});

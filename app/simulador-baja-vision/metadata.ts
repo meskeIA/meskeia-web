@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Baja Visión | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/simulador-baja-vision/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Simulador de Baja Visión",
+  description: "Simula cómo ven las personas con cataratas, miopía severa, glaucoma, degeneración macular y daltonismo. Herramienta para diseñadores y desarrolladores.",
+  url: "https://meskeia.com/simulador-baja-vision/",
+  category: 'UtilityApplication',
+  features: [],
+});

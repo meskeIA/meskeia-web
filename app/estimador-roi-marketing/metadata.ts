@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador ROI Marketing - Analiza tu Inversión Publicitaria | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador ROI Marketing",
+  description: "Calcula el ROI de tus campañas de marketing por canal. Analiza Google Ads, Facebook, Instagram, Email y SEO. Métricas CAC, CLV y recomendaciones.",
+  url: "https://meskeia.com/estimador-roi-marketing/",
+  category: 'BusinessApplication',
+  features: [],
+});

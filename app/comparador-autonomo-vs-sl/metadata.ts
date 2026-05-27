@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Comparador Autónomo vs SL 2025 - ¿Qué conviene más fiscalmente? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Comparador Autónomo vs SL meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador Autónomo vs SL",
+  description: "Compara orientativamente la carga fiscal entre ser autónomo (IRPF + RETA) y constituir una Sociedad Limitada (IS 25% + dividendos). Descubre a partir de qué ingresos conviene una SL.",
+  url: "https://meskeia.com/comparador-autonomo-vs-sl/",
+  category: 'FinanceApplication',
+  features: [],
+});

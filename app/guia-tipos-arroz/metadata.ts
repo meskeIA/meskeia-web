@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Tipos de Arroz del Mundo | meskeIA',
@@ -43,3 +44,11 @@ export const metadata: Metadata = {
     follow: true,
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía de Tipos de Arroz",
+  description: "Guía de referencia de 30 variedades de arroz: basmati, jazmín, bomba, arborio, sushi y más. Tipo de grano, origen, cocción y uso ideal.",
+  url: "https://meskeia.com/guia-tipos-arroz/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Mascota",
+  description: "Test de 10 preguntas para saber qué mascota te conviene según tu estilo de vida, vivienda, tiempo disponible y presupuesto. Perro, gato, roedor, pez, pájaro o reptil.",
+  url: "https://meskeia.com/selector-mascota/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Colesterol - Ratios y Riesgo Cardiovascular | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Colesterol meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Colesterol",
+  description: "Analiza tus niveles de colesterol: ratio CT/HDL, LDL/HDL, colesterol no-HDL y fórmula de Friedewald. Interpretación de resultados y recomendaciones. 100% gratis y privado.",
+  url: "https://meskeia.com/orientador-colesterol/",
+  category: 'FinanceApplication',
+  features: [],
+});

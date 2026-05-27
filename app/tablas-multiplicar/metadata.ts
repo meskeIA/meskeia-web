@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Entrenador Tablas de Multiplicar - Juego Educativo para Niños | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Entrenador Tablas Multiplicar",
+  description: "Aprende las tablas de multiplicar jugando. Juego educativo gratuito con niveles, puntuación, rachas y medallas. Para niños de primaria. Sin registro.",
+  url: "https://meskeia.com/tablas-multiplicar/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Lista de Equipaje Inteligente - Checklist de Viaje Personalizado | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Lista de Equipaje - meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Lista de Equipaje",
+  description: "Genera una lista de equipaje personalizada según destino, clima, duración y tipo de viaje. Checklist interactivo para no olvidar nada.",
+  url: "https://meskeia.com/lista-equipaje/",
+  category: 'UtilityApplication',
+  features: [],
+});

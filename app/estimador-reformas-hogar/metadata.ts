@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Reformas del Hogar 2026 | Presupuesto estimado | meskeIA',
@@ -35,3 +36,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/estimador-reformas-hogar',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Reformas del Hogar",
+  description: "Estima el presupuesto de tu reforma en España: cocina, baño, pintura, suelos, eléctrica, fontanería y más. Precios de referencia 2026 por m². 100% gratuito, sin registro.",
+  url: "https://meskeia.com/estimador-reformas-hogar/",
+  category: 'FinanceApplication',
+  features: [],
+});

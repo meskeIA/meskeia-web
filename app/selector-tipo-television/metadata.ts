@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Televisión",
+  description: "Test de 10 preguntas para saber qué tecnología de pantalla te conviene: OLED, QLED/Mini-LED, LED LCD IPS o LED LCD VA. Análisis según uso, habitación, presupuesto y distancia de visión.",
+  url: "https://meskeia.com/selector-tipo-television/",
+  category: 'UtilityApplication',
+  features: [],
+});

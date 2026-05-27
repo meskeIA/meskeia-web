@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ciclo Menstrual: Fases y Hormonas — meskeIA',
@@ -25,3 +26,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ciclo Menstrual: Fases y Hormonas",
+  description: "Visualizador educativo del ciclo menstrual. Gráfico interactivo de las 4 hormonas (FSH, LH, estrógeno, progesterona) en las 4 fases. SOP y anticonceptivos explicados.",
+  url: "https://meskeia.com/visualizador-ciclo-menstrual/",
+  category: 'EducationalApplication',
+  features: [],
+});

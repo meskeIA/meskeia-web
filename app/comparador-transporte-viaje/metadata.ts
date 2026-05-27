@@ -53,3 +53,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador de Transporte para Viajes",
+  description: "Compara avión, tren, autobús y coche para tu trayecto: coste total, tiempo de viaje, emisiones CO₂ y equipaje. Elige el transporte más adecuado según tu presupuesto y preferencias.",
+  url: "https://meskeia.com/comparador-transporte-viaje/",
+  category: 'UtilityApplication',
+  features: [],
+});

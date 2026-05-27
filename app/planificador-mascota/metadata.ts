@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Mascota - Cachorro y Gatito | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador de Mascota",
+  description: "Organiza la llegada de tu cachorro o gatito: checklist por etapas, lista de compras esenciales, calendario de vacunas y consejos de cuidado. Herramienta gratuita.",
+  url: "https://meskeia.com/planificador-mascota/",
+  category: 'UtilityApplication',
+  features: [],
+});

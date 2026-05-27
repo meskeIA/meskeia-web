@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Seguro de Salud",
+  description: "Test de 10 preguntas para saber si te conviene contratar un seguro de salud privado en España, qué cobertura necesitas y en qué situaciones tiene más sentido.",
+  url: "https://meskeia.com/selector-seguro-salud/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Hábitos Saludables - Evalúa tu Bienestar | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Test de Hábitos Saludables",
+  description: "Evalúa tus hábitos de vida con nuestro test gratuito. Analiza hidratación, alimentación, actividad física, descanso y más. Obtén un perfil visual de tu bienestar.",
+  url: "https://meskeia.com/test-habitos-saludables/",
+  category: 'UtilityApplication',
+  features: [],
+});

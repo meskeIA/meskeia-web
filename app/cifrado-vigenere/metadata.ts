@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cifrado Vigenère Online - Cifrado Polialfabético con Clave | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cifrado Vigenère",
+  description: "Cifrado Vigenère gratuito. Encripta mensajes con palabra clave usando el cifrado polialfabético histórico. Visualización de la tabla Vigenère y explicaciones detalladas.",
+  url: "https://meskeia.com/cifrado-vigenere/",
+  category: 'EducationalApplication',
+  features: [],
+});

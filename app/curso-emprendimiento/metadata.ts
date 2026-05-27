@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Emprendimiento Práctico - Aprende a Emprender | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Emprendimiento",
+  description: "Curso gratuito de emprendimiento con metodología práctica. 6 capítulos: Pensar, Escuchar, Planear, Clarificar, Respaldar e Iterar. Incluye Business Model Canvas, análisis DAFO y más herramientas.",
+  url: "https://meskeia.com/curso-emprendimiento/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Asistente Constitución de Asociación - Genera Acta y Estatutos | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Asistente Constitución Asociación meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Asistente Constitución Asociación",
+  description: "Asistente paso a paso para constituir una asociación sin ánimo de lucro en España. Genera Acta Fundacional, Estatutos y documentos necesarios para el Registro.",
+  url: "https://meskeia.com/asistente-constitucion-asociacion/",
+  category: 'FinanceApplication',
+  features: [],
+});

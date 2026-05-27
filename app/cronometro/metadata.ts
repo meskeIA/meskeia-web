@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cronómetro y Temporizador Online | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Cronómetro meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cronómetro y Temporizador",
+  description: "Cronómetro online con vueltas, temporizador de cuenta atrás y alarma. Herramienta gratuita para medir tiempo, entrenamientos, cocina y productividad.",
+  url: "https://meskeia.com/cronometro/",
+  category: 'UtilityApplication',
+  features: [],
+});

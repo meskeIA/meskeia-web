@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor Markdown a HTML - Convierte MD a HTML en Tiempo Real | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor Markdown-HTML",
+  description: "Convierte Markdown a HTML limpio con vista previa en tiempo real. Soporte completo: títulos, listas, enlaces, imágenes, código y tablas. 100% gratis y privado.",
+  url: "https://meskeia.com/conversor-markdown-html/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Lista de Compras - Organiza tu Supermercado | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Lista de Compras meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Lista de Compras",
+  description: "Lista de compras inteligente con organización automática por categorías del supermercado. Guarda tus listas en el navegador, comparte y exporta. Gratis y sin registro.",
+  url: "https://meskeia.com/lista-compras/",
+  category: 'FinanceApplication',
+  features: [],
+});

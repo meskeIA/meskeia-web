@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Turnos - Organiza Horarios de Trabajo | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Planificador de Turnos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador de Turnos",
+  description: "Planifica turnos de trabajo para tu equipo. Gestiona empleados, franjas horarias personalizables, disponibilidad y genera horarios automáticamente. Ideal para restaurantes, tiendas y pequeños negocios",
+  url: "https://meskeia.com/planificador-turnos/",
+  category: 'UtilityApplication',
+  features: [],
+});

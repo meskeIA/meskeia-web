@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Agujeros Negros: Anatomía y Fenomenología Visual | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Agujeros Negros: Anatomía, Hawking y Espaguetización",
+  description: "Explora la anatomía de los agujeros negros: singularidad, horizonte de sucesos, esfera de fotones, ergosfera, disco de acreción y jets. Calculadora de radio de Schwarzschild, espaguetización animada y",
+  url: "https://meskeia.com/visualizador-agujeros-negros/",
+  category: 'EducationalApplication',
+  features: [],
+});

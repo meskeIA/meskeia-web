@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Piedra Papel Tijera - Juego Clásico Online | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego Piedra Papel Tijera",
+  description: "Juega al clásico Piedra, Papel o Tijera contra la computadora. Estadísticas de partidas, rachas y historial. Gratis y sin registro.",
+  url: "https://meskeia.com/juego-piedra-papel-tijera/",
+  category: 'UtilityApplication',
+  features: [],
+});

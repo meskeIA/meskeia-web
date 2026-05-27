@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Pensión de Viudedad 2025 — Cuantía y requisitos SS | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador Pensión Viudedad meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Pensión de Viudedad",
+  description: "Calcula la pensión de viudedad estimada según la Seguridad Social española 2025. Porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y requisitos de acceso.",
+  url: "https://meskeia.com/estimador-pension-viudedad/",
+  category: 'FinanceApplication',
+  features: [],
+});

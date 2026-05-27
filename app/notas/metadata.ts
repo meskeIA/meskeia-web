@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Notas - Guarda tus Ideas y Apuntes | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Notas",
+  description: "Guarda tus notas, ideas y apuntes organizados por categorías. Escribe o pega texto con guardado automático local. Gratis y sin registro.",
+  url: "https://meskeia.com/notas/",
+  category: 'BusinessApplication',
+  features: [],
+});

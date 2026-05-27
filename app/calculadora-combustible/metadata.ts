@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Consumo de Combustible - Litros/100km y Coste | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Consumo Combustible",
+  description: "Calcula el consumo de combustible de tu vehículo en L/100km. Conoce el coste por kilómetro y planifica tus viajes con precisión.",
+  url: "https://meskeia.com/calculadora-combustible/",
+  category: 'FinanceApplication',
+  features: [],
+});

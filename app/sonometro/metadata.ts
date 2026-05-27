@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Sonómetro Online - Medidor de Decibelios Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Sonómetro / Decibelímetro",
+  description: "Mide el nivel de ruido en decibelios (dB) con tu micrófono. Sonómetro digital gratuito para documentar ruido, medir ambientes de trabajo o verificar niveles sonoros.",
+  url: "https://meskeia.com/sonometro/",
+  category: 'UtilityApplication',
+  features: [],
+});

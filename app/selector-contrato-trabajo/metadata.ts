@@ -58,3 +58,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Contrato",
+  description: "Test de 10 preguntas para saber qué tipo de contrato o modalidad laboral se adapta mejor a tu perfil: indefinido, temporal, autónomo/freelance, prácticas o funcionario. Análisis según estabilidad, ing",
+  url: "https://meskeia.com/selector-contrato-trabajo/",
+  category: 'BusinessApplication',
+  features: [],
+});

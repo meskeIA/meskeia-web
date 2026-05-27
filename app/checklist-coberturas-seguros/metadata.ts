@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Checklist de Coberturas de Seguros por Perfil | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/checklist-coberturas-seguros/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Checklist Coberturas de Seguros",
+  description: "Descubre qué seguros necesitas según tu perfil: autónomo, familia, jubilado, propietario o inquilino. Coberturas obligatorias vs recomendables en España.",
+  url: "https://meskeia.com/checklist-coberturas-seguros/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Palabras Clave SEO - Ideas Long Tail | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador Palabras Clave meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Palabras Clave",
+  description: "Genera ideas de palabras clave long-tail a partir de una semilla. Variaciones, preguntas, comparativas y sugerencias organizadas por categoría.",
+  url: "https://meskeia.com/generador-palabras-clave/",
+  category: 'UtilityApplication',
+  features: [],
+});

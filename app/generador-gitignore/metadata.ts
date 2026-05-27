@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de .gitignore - Plantillas para Git | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador de .gitignore meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de .gitignore",
+  description: "Generador de archivos .gitignore profesional con plantillas para Node.js, Python, Java, React y más. Combina tecnologías, descarga y copia tu configuración Git personalizada.",
+  url: "https://meskeia.com/generador-gitignore/",
+  category: 'UtilityApplication',
+  features: [],
+});

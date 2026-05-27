@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Canal de Venta | ¿Marketplace, Tienda Propia o Redes Sociales? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Canal de Venta",
+  description: "Test de 10 preguntas para saber qué canal de venta se adapta mejor a tu negocio: marketplace generalista, plataforma sectorial, tienda online propia, venta por redes sociales o venta directa local.",
+  url: "https://meskeia.com/selector-canal-venta/",
+  category: 'BusinessApplication',
+  features: [],
+});

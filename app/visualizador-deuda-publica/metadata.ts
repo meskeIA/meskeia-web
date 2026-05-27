@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de la Deuda Pública | Bonos, Prima de Riesgo y Sostenibilidad | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Deuda Pública - Bonos, Prima de Riesgo y Sostenibilidad",
+  description: "Cómo funciona la deuda soberana: emisión de bonos (Letras, Bonos, Obligaciones), prima de riesgo, quién financia la deuda española y sostenibilidad (ratio r vs g).",
+  url: "https://meskeia.com/visualizador-deuda-publica/",
+  category: 'FinanceApplication',
+  features: [],
+});

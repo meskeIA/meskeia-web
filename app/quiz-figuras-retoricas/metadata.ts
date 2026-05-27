@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Figuras Retóricas - Identifica Metáfora, Hipérbole, Símil y más | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Quiz Figuras Retóricas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Figuras Retóricas",
+  description: "Aprende a identificar las figuras retóricas con este quiz interactivo. 27 figuras (básico, bachillerato, selectividad): metáfora, hipérbole, anáfora, oxímoron y mucho más. Sin registro.",
+  url: "https://meskeia.com/quiz-figuras-retoricas/",
+  category: 'EducationalApplication',
+  features: [],
+});

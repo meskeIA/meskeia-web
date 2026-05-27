@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Imágenes OG para Redes Sociales | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador OG Images meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador Imágenes OG",
+  description: "Crea imágenes Open Graph (OG) profesionales para Facebook, Twitter, LinkedIn y WhatsApp. Plantillas listas, editor visual y exportación 1200x630 px.",
+  url: "https://meskeia.com/generador-og-images/",
+  category: 'UtilityApplication',
+  features: [],
+});

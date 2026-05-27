@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Optimizador de Rentas 60+ — Estrategia IRPF para pensionistas | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Optimizador Rentas 60 meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Optimizador de Rentas 60+",
+  description: "Planifica el orden óptimo de retirada de fondos (pensión pública, plan de pensiones, ahorro, alquiler) para minimizar el IRPF total. Herramienta de estrategia fiscal para mayores de 60 años.",
+  url: "https://meskeia.com/optimizador-rentas-60/",
+  category: 'FinanceApplication',
+  features: [],
+});

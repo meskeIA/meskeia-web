@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Insulina y Glucosa - Cómo Regula tu Cuerpo el Azúcar | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Visualizador Insulina y Glucosa meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Insulina y Glucosa - Cómo Regula tu Cuerpo el Azúcar",
+  description: "Entiende cómo funciona la insulina: curva de glucosa tras las comidas, mecanismo de acción celular, diferencia entre resistencia insulínica y diabetes tipo 1 vs tipo 2. Solo educativo.",
+  url: "https://meskeia.com/visualizador-insulina-glucosa/",
+  category: 'EducationalApplication',
+  features: [],
+});

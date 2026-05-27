@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Seguro de Vida - meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/orientador-seguro-vida/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Seguro de Vida",
+  description: "Calcula cuánto seguro de vida necesitas para proteger a tu familia. Analiza ingresos, deudas, hipoteca y gastos futuros para determinar el capital óptimo.",
+  url: "https://meskeia.com/orientador-seguro-vida/",
+  category: 'FinanceApplication',
+  features: [],
+});

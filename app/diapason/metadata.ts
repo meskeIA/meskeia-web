@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Diapasón Digital Online - La 440Hz Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Diapasón Digital (La 440Hz)",
+  description: "Diapasón digital gratuito con tono de referencia La 440Hz. Ideal para afinar instrumentos, coros y orquestas. Incluye otras frecuencias de afinación.",
+  url: "https://meskeia.com/diapason/",
+  category: 'EducationalApplication',
+  features: [],
+});

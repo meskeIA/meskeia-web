@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Océanos y Corrientes - AMOC, Corriente del Golfo y Acidificación | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Océanos y Corrientes - AMOC, Corriente del Golfo y Acidificación",
+  description: "Visualiza la circulación termohalina oceánica, el impacto del debilitamiento del AMOC en Europa, la acidificación del mar y las zonas muertas hipóxicas.",
+  url: "https://meskeia.com/visualizador-oceanos-corrientes/",
+  category: 'EducationalApplication',
+  features: [],
+});

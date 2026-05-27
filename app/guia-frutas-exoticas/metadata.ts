@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Frutas Exóticas del Mundo | meskeIA',
@@ -38,3 +39,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/guia-frutas-exoticas',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía de Frutas Exóticas",
+  description: "Guía de 40 frutas exóticas: durian, mangostán, rambután, pitaya, lichi, baobab, yuzu y más. Origen, temporada, sabor y forma de consumo.",
+  url: "https://meskeia.com/guia-frutas-exoticas/",
+  category: 'EducationalApplication',
+  features: [],
+});

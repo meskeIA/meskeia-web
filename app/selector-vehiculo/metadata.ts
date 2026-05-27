@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Vehículo",
+  description: "Test para saber qué tipo de coche te conviene según tu uso, presupuesto y estilo de vida. Compacto, SUV, familiar. Gasolina, híbrido o eléctrico. Comparativa de costes anuales incluida.",
+  url: "https://meskeia.com/selector-vehiculo/",
+  category: 'FinanceApplication',
+  features: [],
+});

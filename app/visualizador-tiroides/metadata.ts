@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tiroides - Cómo Funciona la Glándula que Regula tu Metabolismo | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Tiroides - La Glándula que Regula tu Metabolismo",
+  description: "Entiende el funcionamiento del tiroides: eje hipotálamo-hipófisis-tiroides, hormonas T3 y T4, mecanismo del feedback hormonal, diferencias fisiológicas entre hipo e hipertiroidismo.",
+  url: "https://meskeia.com/visualizador-tiroides/",
+  category: 'EducationalApplication',
+  features: [],
+});

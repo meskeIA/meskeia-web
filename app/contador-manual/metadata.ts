@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Contador Manual Online - Tally Counter Digital Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Contador Manual (Tally Counter)",
+  description: "Contador manual digital gratuito. Cuenta personas, objetos, repeticiones de ejercicio o cualquier cosa con un clic. Múltiples contadores, sonido y vibración.",
+  url: "https://meskeia.com/contador-manual/",
+  category: 'UtilityApplication',
+  features: [],
+});

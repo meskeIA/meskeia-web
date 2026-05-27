@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Ahorro",
+  description: "Test de 10 preguntas para saber qué vehículo de ahorro te conviene: cuenta remunerada, depósito a plazo fijo, fondo indexado o una combinación. Análisis según liquidez, horizonte y perfil de riesgo.",
+  url: "https://meskeia.com/selector-tipo-ahorro/",
+  category: 'FinanceApplication',
+  features: [],
+});

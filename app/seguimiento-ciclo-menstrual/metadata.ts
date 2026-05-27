@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Seguimiento Ciclo Menstrual y Fertilidad - Calculadora Ovulación | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Seguimiento Ciclo Menstrual y Fertilidad",
+  description: "Calcula tu ventana fértil, predicción de ovulación y próximas fechas de menstruación. Todo se calcula en tu navegador: ningún dato se envía a servidores.",
+  url: "https://meskeia.com/seguimiento-ciclo-menstrual/",
+  category: 'UtilityApplication',
+  features: [],
+});

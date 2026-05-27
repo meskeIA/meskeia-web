@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'El Hidrógeno: Del Big Bang a la Pila de Combustible | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "El Hidrógeno: Del Big Bang a la Pila de Combustible",
+  description: "El elemento más abundante del universo que alimenta el sol por fusión nuclear y podría descarbonizar el transporte mediante pilas de combustible. Hidrógeno verde, gris y azul.",
+  url: "https://meskeia.com/visualizador-hidrogeno/",
+  category: 'EducationalApplication',
+  features: [],
+});

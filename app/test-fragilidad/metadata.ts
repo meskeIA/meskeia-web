@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Fragilidad (Escala FRAIL) - Evaluación para mayores | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Test Fragilidad FRAIL meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Test de Fragilidad (Escala FRAIL)",
+  description: "Test validado de 5 preguntas basado en la escala FRAIL para detectar fragilidad en personas mayores. Orientación preventiva sobre riesgo de caídas, dependencia y pérdida de autonomía.",
+  url: "https://meskeia.com/test-fragilidad/",
+  category: 'FinanceApplication',
+  features: [],
+});

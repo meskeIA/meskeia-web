@@ -55,3 +55,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Dieta",
+  description: "Test de 10 preguntas para descubrir qué patrón alimentario se adapta mejor a tus objetivos, estilo de vida, salud y restricciones. Mediterránea, vegana, cetogénica, DASH y más.",
+  url: "https://meskeia.com/selector-dieta/",
+  category: 'UtilityApplication',
+  features: [],
+});

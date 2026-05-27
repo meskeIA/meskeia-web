@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Radio meskeIA - Emisoras Online en Español | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Radio meskeIA",
+  description: "Escucha emisoras de radio online gratis. Música, noticias, deportes y más. Reproductor minimalista con favoritos y control de volumen.",
+  url: "https://meskeia.com/radio-meskeia/",
+  category: 'UtilityApplication',
+  features: [],
+});

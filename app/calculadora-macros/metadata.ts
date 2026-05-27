@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Macronutrientes - Proteínas, Carbohidratos y Grasas | meskeIA',
@@ -79,3 +80,11 @@ export const faqJsonLd = {
     },
   ],
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Macros",
+  description: "Calcula tus macros diarios según tu objetivo: volumen, definición o mantenimiento. Proteínas, carbohidratos y grasas personalizados para tu peso y actividad.",
+  url: "https://meskeia.com/calculadora-macros/",
+  category: 'UtilityApplication',
+  features: [],
+});

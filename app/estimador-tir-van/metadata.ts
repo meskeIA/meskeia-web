@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador TIR y VAN - Análisis de Inversiones | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador TIR-VAN",
+  description: "Calcula la Tasa Interna de Retorno (TIR) y el Valor Actual Neto (VAN) de tus proyectos de inversión. Herramienta gratuita para análisis financiero.",
+  url: "https://meskeia.com/estimador-tir-van/",
+  category: 'FinanceApplication',
+  features: [],
+});

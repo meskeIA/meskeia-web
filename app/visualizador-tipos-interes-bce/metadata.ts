@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tipos de Interés BCE - Cómo Afectan a Hipotecas, Bolsa y Ahorro | meskeIA',
@@ -26,3 +27,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Tipos de Interés BCE - Transmisión Monetaria",
+  description: "Entiende cómo el BCE sube o baja tipos y la cadena de transmisión monetaria: hipotecas variables, crédito, bolsa y ahorro. Diagrama interactivo.",
+  url: "https://meskeia.com/visualizador-tipos-interes-bce/",
+  category: 'FinanceApplication',
+  features: [],
+});

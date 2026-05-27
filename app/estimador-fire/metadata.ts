@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador FIRE - Independencia Financiera | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador FIRE",
+  description: "Calcula cuánto necesitas para alcanzar la independencia financiera (FIRE). Usa la regla del 4% y proyecta cuántos años te faltan para retirarte anticipadamente.",
+  url: "https://meskeia.com/estimador-fire/",
+  category: 'FinanceApplication',
+  features: [],
+});

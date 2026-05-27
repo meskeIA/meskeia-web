@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Edad de Mascotas - Perros y Gatos en Años Humanos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Edad Mascotas",
+  description: "Calcula la edad de tu perro o gato en años humanos según su tamaño y raza. Fórmula científica actualizada, más precisa que la regla de los 7 años. Gratis.",
+  url: "https://meskeia.com/calculadora-edad-mascotas/",
+  category: 'UtilityApplication',
+  features: [],
+});

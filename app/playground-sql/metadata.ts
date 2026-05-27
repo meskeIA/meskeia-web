@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Playground SQL - Editor y Ejercicios Interactivos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Playground SQL",
+  description: "Aprende SQL practicando en el navegador. Editor interactivo con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada.",
+  url: "https://meskeia.com/playground-sql/",
+  category: 'EducationalApplication',
+  features: [],
+});

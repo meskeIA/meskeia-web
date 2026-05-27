@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Seguro de Viaje - Qué Cobertura Necesitas según Destino | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Guía Seguro de Viaje meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Guía de Seguro de Viaje",
+  description: "Descubre qué coberturas de seguro de viaje necesitas según tu destino y tipo de viaje. Checklist completo de 12 puntos para verificar antes de contratar cualquier póliza.",
+  url: "https://meskeia.com/guia-seguro-viaje/",
+  category: 'FinanceApplication',
+  features: [],
+});

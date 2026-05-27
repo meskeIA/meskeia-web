@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Financiación Empresarial | ¿Cómo Financiar tu Negocio? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Financiación Empresarial",
+  description: "Test de 10 preguntas para saber qué tipo de financiación se adapta mejor a tu negocio: autofinanciación, préstamo bancario, inversores o business angels, crowdfunding o subvenciones públicas.",
+  url: "https://meskeia.com/selector-financiacion-empresa/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Tolerancia al Riesgo Detallado | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/test-tolerancia-riesgo-detallado/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Test de Tolerancia al Riesgo Detallado",
+  description: "Evaluación profunda de tu perfil inversor en 5 dimensiones: horizonte temporal, capacidad financiera, reacción emocional, experiencia y objetivos. 20 preguntas, 5 perfiles con asignación de activos re",
+  url: "https://meskeia.com/test-tolerancia-riesgo-detallado/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ibuprofeno: Cómo Funciona | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ibuprofeno: Inhibidor COX con Efecto Antiinflamatorio",
+  description: "El ibuprofeno inhibe reversiblemente COX-1 y COX-2 bloqueando prostaglandinas inflamatorias. Visualiza por qué es mejor para la inflamación y sus riesgos en estómago, riñón y corazón.",
+  url: "https://meskeia.com/visualizador-ibuprofeno/",
+  category: 'EducationalApplication',
+  features: [],
+});

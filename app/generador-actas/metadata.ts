@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Actas de Reunión - Crea Actas Profesionales | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador de Actas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Actas de Reunión",
+  description: "Genera actas de reunión profesionales con plantillas predefinidas. Gestiona asistentes, orden del día, acuerdos y tareas. Exporta a PDF desde el navegador. 100% gratuito.",
+  url: "https://meskeia.com/generador-actas/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Geografía de España — Provincias, Ríos, Montañas y CCAA | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Geografía de España",
+  description: "Pon a prueba tus conocimientos de geografía española: 75 preguntas sobre provincias, capitales, ríos, montañas y comunidades autónomas. 3 dificultades, ideal para oposiciones.",
+  url: "https://meskeia.com/quiz-geografia-espana/",
+  category: 'EducationalApplication',
+  features: [],
+});

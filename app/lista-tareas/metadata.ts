@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Lista de Tareas - Organiza tu Día | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Lista de Tareas meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Lista de Tareas",
+  description: "Lista de tareas online con prioridades, fechas límite y categorías. Guarda tus tareas en el navegador. Gratis, privado y sin registro.",
+  url: "https://meskeia.com/lista-tareas/",
+  category: 'BusinessApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Tipo de Alojamiento | ¿Hotel, Apartamento o Camping? | meskeIA',
@@ -19,3 +20,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Alojamiento",
+  description: "Test de 10 preguntas para saber qué tipo de alojamiento se adapta mejor a tu viaje: hotel, apartamento turístico, hostel o B&B, camping o glamping, o casa rural.",
+  url: "https://meskeia.com/selector-tipo-alojamiento/",
+  category: 'EducationalApplication',
+  features: [],
+});

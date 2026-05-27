@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Coste Real a Plazos - Descubre el Precio Oculto | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Coste Real a Plazos",
+  description: "Calcula el coste real de financiar productos a plazos. Descubre la TAE, los intereses ocultos y cuánto pagas de más respecto al precio de contado.",
+  url: "https://meskeia.com/estimador-coste-plazos/",
+  category: 'FinanceApplication',
+  features: [],
+});

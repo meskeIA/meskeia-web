@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Método de Estudio | ¿Cómo Estudias Mejor? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Método de Estudio",
+  description: "Test de 10 preguntas para saber qué método de estudio se adapta mejor a tu forma de aprender: repetición espaciada, mapas mentales, proyectos prácticos, Pomodoro con libros o clases particulares.",
+  url: "https://meskeia.com/selector-metodo-estudio/",
+  category: 'EducationalApplication',
+  features: [],
+});

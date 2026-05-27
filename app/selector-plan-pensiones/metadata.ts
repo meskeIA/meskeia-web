@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Plan de Pensiones",
+  description: "Test de 10 preguntas para saber si te conviene un plan de pensiones individual, de empleo, EPSV (País Vasco/Navarra) o si es mejor no contratar ninguno. Análisis según perfil fiscal, horizonte tempora",
+  url: "https://meskeia.com/selector-plan-pensiones/",
+  category: 'FinanceApplication',
+  features: [],
+});

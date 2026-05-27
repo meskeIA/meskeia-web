@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tirador de Dados Online | Dados Virtuales para Rol y Juegos de Mesa | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Tirador de Dados meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Tirador de Dados",
+  description: "Lanza dados virtuales online: D4, D6, D8, D10, D12, D20 y D100. Perfecto para D&D, Pathfinder, juegos de mesa y rol. Historial, suma automática y múltiples dados.",
+  url: "https://meskeia.com/tirador-dados/",
+  category: 'UtilityApplication',
+  features: [],
+});

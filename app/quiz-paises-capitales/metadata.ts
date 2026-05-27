@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Países y Capitales del Mundo - Adivina la Capital | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Quiz Países y Capitales meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Países y Capitales",
+  description: "Pon a prueba tus conocimientos de geografía: adivina las capitales del mundo, identifica países por su bandera y mucho más. 195 países, 3 modos de juego, 5 dificultades.",
+  url: "https://meskeia.com/quiz-paises-capitales/",
+  category: 'EducationalApplication',
+  features: [],
+});

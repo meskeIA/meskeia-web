@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Puzzle Matemático - Juego de Operaciones | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego Puzzle Matemático",
+  description: "Resuelve puzzles matemáticos contrarreloj. Suma, resta, multiplicación y división con niveles progresivos. Entrena tu agilidad mental.",
+  url: "https://meskeia.com/juego-puzzle-matematico/",
+  category: 'EducationalApplication',
+  features: [],
+});

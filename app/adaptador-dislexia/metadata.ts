@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Adaptador de Lectura para Dislexia - Personaliza tu texto | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Adaptador de Lectura para Dislexia",
+  description: "Herramienta gratuita para adaptar textos y facilitar la lectura a personas con dislexia. Ajusta fuente, tamaño, espaciado, interlineado y color de fondo. Tus preferencias se guardan automáticamente.",
+  url: "https://meskeia.com/adaptador-dislexia/",
+  category: 'EducationalApplication',
+  features: [],
+});

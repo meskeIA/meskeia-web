@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Burnout Laboral — Evalúa tu Agotamiento Profesional | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Test de Burnout Laboral",
+  description: "Evalúa tu nivel de burnout laboral con 15 preguntas en 3 dimensiones: agotamiento emocional, cinismo y realización personal. Resultados orientativos. Sin registro. 100% privado.",
+  url: "https://meskeia.com/test-burnout-laboral/",
+  category: 'UtilityApplication',
+  features: [],
+});

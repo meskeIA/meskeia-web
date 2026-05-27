@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador IRPF 2025 - Orientación Declaración Renta | meskeIA',
@@ -87,3 +88,11 @@ export const faqJsonLd = {
     },
   ],
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador IRPF",
+  description: "Estima orientativamente tu cuota de IRPF 2025. Calcula la cuota íntegra, retenciones y si saldrá a pagar o devolver según tu situación personal y familiar.",
+  url: "https://meskeia.com/estimador-irpf/",
+  category: 'FinanceApplication',
+  features: [],
+});

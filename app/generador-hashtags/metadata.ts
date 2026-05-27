@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Hashtags - Instagram, TikTok, Twitter | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Generador Hashtags meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Hashtags",
+  description: "Genera hashtags relevantes para Instagram, TikTok, Twitter y LinkedIn. Categorías por nicho, copiar con un clic y optimiza tu alcance en redes sociales.",
+  url: "https://meskeia.com/generador-hashtags/",
+  category: 'UtilityApplication',
+  features: [],
+});

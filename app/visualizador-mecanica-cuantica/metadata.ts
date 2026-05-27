@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Mecánica Cuántica - Dualidad, Incertidumbre, Superposición y Efecto Túnel | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Mecánica Cuántica - Dualidad, Incertidumbre y Efecto Túnel",
+  description: "Visualiza los fenómenos cuánticos: dualidad onda-partícula, principio de incertidumbre, gato de Schrödinger y efecto túnel. Sin ecuaciones, con animaciones interactivas.",
+  url: "https://meskeia.com/visualizador-mecanica-cuantica/",
+  category: 'EducationalApplication',
+  features: [],
+});

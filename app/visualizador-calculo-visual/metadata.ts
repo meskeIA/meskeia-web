@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cálculo Visual: Límites, Derivadas e Integrales | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cálculo Visual: Límites, Derivadas e Integrales",
+  description: "Visualiza los conceptos del cálculo en tiempo real. Límites, derivadas (tangente deslizante) e integrales (área de Riemann) animados con sliders interactivos.",
+  url: "https://meskeia.com/visualizador-calculo-visual/",
+  category: 'EducationalApplication',
+  features: [],
+});

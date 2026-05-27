@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Energía Nuclear | Fisión, Fusión y Comparativa | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Energía Nuclear - Fisión, Fusión y Comparativa",
+  description: "Explora la fisión nuclear (reacción en cadena, reactores PWR/BWR), la fusión (tokamak, ITER) y la comparativa de CO₂ y densidad energética con otras fuentes.",
+  url: "https://meskeia.com/visualizador-energia-nuclear/",
+  category: 'EducationalApplication',
+  features: [],
+});

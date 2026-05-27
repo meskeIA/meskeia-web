@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de Código Morse Online - Texto a Morse y Morse a Texto | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Código Morse",
+  description: "Conversor de código Morse gratuito. Traduce texto a código Morse y viceversa. Reproduce el sonido del mensaje. Incluye alfabeto Morse completo.",
+  url: "https://meskeia.com/conversor-morse/",
+  category: 'EducationalApplication',
+  features: [],
+});

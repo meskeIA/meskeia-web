@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector Régimen Fiscal Autónomo | ¿Módulos, Directa o SL? | meskeIA',
@@ -30,3 +31,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector Régimen Fiscal Autónomo",
+  description: "Test de 10 preguntas para orientarte sobre qué régimen fiscal puede encajar mejor con tu actividad como autónomo: estimación objetiva (módulos), directa simplificada, directa normal o constituir una S",
+  url: "https://meskeia.com/selector-regimen-fiscal-autonomo/",
+  category: 'FinanceApplication',
+  features: [],
+});

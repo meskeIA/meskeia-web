@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Efecto Doppler: Visualizador Interactivo | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Efecto Doppler: De las Sirenas al Redshift de Galaxias",
+  description: "Visualiza el efecto Doppler: ondas sonoras comprimidas y expandidas, fórmula matemática, radar de velocidad, ecografía Doppler y redshift de galaxias.",
+  url: "https://meskeia.com/visualizador-efecto-doppler/",
+  category: 'EducationalApplication',
+  features: [],
+});

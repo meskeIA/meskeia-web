@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Impacto de la IA en los Sectores - Automatización y Empleos | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Impacto de la IA en los Sectores - Automatización y Empleos",
+  description: "Visualiza cómo la IA transforma cada sector económico: empleos en riesgo de automatización, nuevos roles emergentes, timeline de adopción y habilidades del futuro.",
+  url: "https://meskeia.com/visualizador-impacto-ia-sectores/",
+  category: 'EducationalApplication',
+  features: [],
+});

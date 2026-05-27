@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Limpiador de Texto Online Gratis - Quita Espacios, Duplicados y Formato',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Limpiador de Texto meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Limpiador de Texto",
+  description: "Limpia texto al instante: elimina espacios sobrantes, líneas duplicadas, saltos de línea, caracteres especiales y formato copiado. Pega, limpia y copia. Sin registro.",
+  url: "https://meskeia.com/limpiador-texto/",
+  category: 'UtilityApplication',
+  features: [],
+});

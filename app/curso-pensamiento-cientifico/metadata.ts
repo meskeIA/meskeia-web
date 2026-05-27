@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Curso de Pensamiento Científico - Aprende a Pensar Como un Científico | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Curso Pensamiento Científico meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Curso de Pensamiento Científico",
+  description: "Curso gratuito de pensamiento científico: aprende el método científico, pensamiento crítico, falacias lógicas y cómo aplicar la ciencia en tu vida cotidiana. 12 capítulos interactivos.",
+  url: "https://meskeia.com/curso-pensamiento-cientifico/",
+  category: 'EducationalApplication',
+  features: [],
+});

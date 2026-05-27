@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Roommates - Divide Gastos de Piso Compartido | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Roommates",
+  description: "Divide los gastos del piso entre compañeros de forma justa. Luz, internet, compras comunes. Calcula quién debe a quién y simplifica las cuentas.",
+  url: "https://meskeia.com/calculadora-roommates/",
+  category: 'FinanceApplication',
+  features: [],
+});

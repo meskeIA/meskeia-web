@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Organizador de Documentos de Viaje - Checklist Completo | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Organizador Documentos Viaje meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Organizador de Documentos de Viaje",
+  description: "Checklist personalizable con todos los documentos necesarios para tu viaje. Pasaporte, visados, seguros, reservas. Adaptado según destino: España, Europa o internacional.",
+  url: "https://meskeia.com/checklist-documentos-viaje/",
+  category: 'UtilityApplication',
+  features: [],
+});

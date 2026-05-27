@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador del Impuesto de Donaciones 2025 | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Impuesto de Donaciones",
+  description: "Estima el Impuesto de Donaciones en las 17 comunidades autónomas de España. Régimen común, Cataluña, País Vasco y Navarra. Orientación antes de hablar con tu asesor fiscal.",
+  url: "https://meskeia.com/estimador-impuesto-donaciones/",
+  category: 'FinanceApplication',
+  features: [],
+});

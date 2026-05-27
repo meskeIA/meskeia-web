@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Sueldo Neto a Bruto y Bruto a Neto 2025 | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador Sueldo Neto meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador de Sueldo Neto",
+  description: "Calcula tu sueldo neto desde el bruto o al revés. Estimación de IRPF, cotizaciones a la Seguridad Social y deducciones aplicables en España 2025. Orientativo.",
+  url: "https://meskeia.com/estimador-sueldo-neto/",
+  category: 'FinanceApplication',
+  features: [],
+});

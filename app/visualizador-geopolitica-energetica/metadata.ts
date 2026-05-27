@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Geopolítica Energética: Flujos, Dependencias e Infraestructuras | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Geopolítica Energética: Flujos, Dependencias e Infraestructuras",
+  description: "Visualiza los flujos de energía global: dependencia de la UE en gas y petróleo, mix energético por región, infraestructuras clave (gasoductos, LNG) y transición renovable. Datos IEA, Eurostat, IRENA.",
+  url: "https://meskeia.com/visualizador-geopolitica-energetica/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Residencia vs Cuidado en Casa - Comparativa de costes | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Residencia vs Cuidado en Casa meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Residencia vs Cuidado en Casa",
+  description: "Compara los costes orientativos de residencia privada, servicio de ayuda a domicilio (SAD) y cuidador en casa para elegir la opción de cuidado más adecuada.",
+  url: "https://meskeia.com/residencia-vs-cuidado-en-casa/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de Unidades RF - dBm, Watts, VSWR, Longitud de Onda | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor de Unidades RF",
+  description: "Conversor especializado para radiofrecuencia: dBm↔Watts, dBµV, VSWR↔Return Loss, frecuencia↔longitud de onda. Herramienta para ingenieros RF y radioaficionados.",
+  url: "https://meskeia.com/conversor-unidades-rf/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Creador de Thumbnails YouTube - Diseña miniaturas atractivas gratis | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Creador de Thumbnails meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Creador de Thumbnails YouTube",
+  description: "Crea thumbnails profesionales para YouTube gratis. Editor visual con texto personalizable, formas, emojis y exportación PNG en 1280x720. Sin registro.",
+  url: "https://meskeia.com/creador-thumbnails/",
+  category: 'UtilityApplication',
+  features: [],
+});

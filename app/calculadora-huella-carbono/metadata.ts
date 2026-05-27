@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Huella de Carbono Personal - meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora Huella de Carbono meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Huella de Carbono",
+  description: "Calcula tu huella de carbono anual. Analiza el impacto de tu transporte, hogar, alimentación y consumo. Compara con la media española y obtén consejos para reducirla.",
+  url: "https://meskeia.com/calculadora-huella-carbono/",
+  category: 'FinanceApplication',
+  features: [],
+});

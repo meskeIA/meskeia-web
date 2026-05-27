@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Teoría de Grafos - Dijkstra, Euler, Hamilton | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Visualizador Teoría de Grafos meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Teoría de Grafos: Dijkstra, Königsberg y Redes",
+  description: "Explora la teoría de grafos de forma interactiva: algoritmo de Dijkstra animado, caminos de Euler y Hamilton, detector de propiedades de grafos y grafos famosos como los Puentes de Königsberg.",
+  url: "https://meskeia.com/visualizador-teoria-grafos/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Ciclo de Replicación Viral: Cómo se Reproducen los Virus — meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Ciclo de Replicación Viral: Cómo se Reproducen los Virus",
+  description: "Visualizador del ciclo viral completo: 6 etapas de replicación, virus ADN vs ARN, retrovirus, latencia y mecanismos de evasión inmune. Biología molecular pura.",
+  url: "https://meskeia.com/visualizador-ciclo-viral/",
+  category: 'EducationalApplication',
+  features: [],
+});

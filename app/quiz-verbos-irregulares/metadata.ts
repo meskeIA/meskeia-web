@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Verbos Irregulares en Inglés - Past Simple A1 a B2 | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Quiz Verbos Irregulares meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Verbos Irregulares Inglés",
+  description: "Aprende los verbos irregulares en inglés con este quiz interactivo. 75 verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.",
+  url: "https://meskeia.com/quiz-verbos-irregulares/",
+  category: 'EducationalApplication',
+  features: [],
+});

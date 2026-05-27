@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Teoría de Números - Primos, MCD, MCM | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora Teoría de Números",
+  description: "Factoriza números en primos, calcula MCD y MCM, encuentra todos los divisores, verifica primalidad y más. Herramienta completa de teoría de números. Gratis.",
+  url: "https://meskeia.com/calculadora-teoria-numeros/",
+  category: 'EducationalApplication',
+  features: [],
+});

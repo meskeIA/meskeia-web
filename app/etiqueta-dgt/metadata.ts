@@ -60,3 +60,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Etiqueta DGT y Zonas de Bajas Emisiones",
+  description: "Descubre la etiqueta medioambiental DGT de tu vehículo y si puedes circular por las Zonas de Bajas Emisiones de Madrid, Barcelona, Valencia y otras ciudades españolas.",
+  url: "https://meskeia.com/etiqueta-dgt/",
+  category: 'FinanceApplication',
+  features: [],
+});

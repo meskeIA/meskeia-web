@@ -55,3 +55,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Alquiler o Compra",
+  description: "Test de 10 preguntas para saber si te conviene más alquilar o comprar vivienda según tu situación personal, laboral y vital. Sin cálculos, solo tu contexto real.",
+  url: "https://meskeia.com/selector-alquiler-vs-compra/",
+  category: 'FinanceApplication',
+  features: [],
+});

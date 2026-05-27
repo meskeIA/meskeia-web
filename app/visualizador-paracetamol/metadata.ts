@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Paracetamol: Cómo Funciona | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Paracetamol: Cómo Actúa en el Sistema Nervioso Central",
+  description: "El analgésico más usado del mundo actúa en el cerebro, no en la inflamación. Visualiza el metabolismo hepático, el NAPQI, la sobredosis y por qué el alcohol lo hace más peligroso.",
+  url: "https://meskeia.com/visualizador-paracetamol/",
+  category: 'EducationalApplication',
+  features: [],
+});

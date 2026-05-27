@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cifrado Clásico Online - César, ROT13 y Atbash | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cifrado Clásico",
+  description: "Cifrados clásicos gratuitos: César, ROT13 y Atbash. Encripta y descifra mensajes con métodos históricos. Visualización del alfabeto cifrado y explicaciones educativas.",
+  url: "https://meskeia.com/cifrado-clasico/",
+  category: 'EducationalApplication',
+  features: [],
+});

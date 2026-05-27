@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Porciones - Mide con tu Mano | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Porciones",
+  description: "Aprende a estimar porciones de alimentos usando tu mano como referencia. Método visual y práctico para controlar las cantidades sin necesidad de báscula.",
+  url: "https://meskeia.com/calculadora-porciones/",
+  category: 'UtilityApplication',
+  features: [],
+});

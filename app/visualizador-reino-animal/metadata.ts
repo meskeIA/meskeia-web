@@ -56,3 +56,11 @@ export function generateJsonLd() {
     category: 'EducationalApplication',
   });
 }
+
+export const jsonLd = generateWebAppSchema({
+  name: "Reino Animal: Vertebrados, Invertebrados y Árbol Filogenético",
+  description: "Visualizador interactivo del reino animal. Árbol filogenético clicable, 5 clases de vertebrados con SVG del corazón por cámaras (pez 2, anfibio 3, reptil 3-4, ave 4, mamífero 4), 7 phyla de invertebra",
+  url: "https://meskeia.com/visualizador-reino-animal/",
+  category: 'EducationalApplication',
+  features: [],
+});

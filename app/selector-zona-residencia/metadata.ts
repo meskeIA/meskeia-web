@@ -63,3 +63,11 @@ export const metadata: Metadata = {
     ),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Zona de Residencia",
+  description: "Test de 10 preguntas para saber qué tipo de zona de residencia se adapta mejor a tu estilo de vida: ciudad grande, ciudad media, pueblo o zona rural, o costa. Análisis según trabajo, familia, presupue",
+  url: "https://meskeia.com/selector-zona-residencia/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -39,3 +39,11 @@ export function generateJsonLd() {
     ],
   });
 }
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cronobiología: Relojes Circadianos, Cronotipos y Cronofarmacología",
+  description: "Visualizador interactivo de cronobiología. Reloj molecular CLOCK/BMAL1/PER/CRY con SVG circular y slider hora, 5 sincronizadores Zeitgebers (luz, alimentación, ejercicio, temperatura, social), cronoti",
+  url: "https://meskeia.com/visualizador-cronobiologia/",
+  category: 'EducationalApplication',
+  features: [],
+});

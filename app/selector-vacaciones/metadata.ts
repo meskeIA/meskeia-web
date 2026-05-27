@@ -52,3 +52,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Vacaciones",
+  description: "Test de 10 preguntas para saber qué tipo de vacaciones se adapta mejor a ti: playa, montaña, ciudad cultural, aventura o viaje organizado. Análisis según presupuesto, compañía, descanso y actividad.",
+  url: "https://meskeia.com/selector-vacaciones/",
+  category: 'UtilityApplication',
+  features: [],
+});

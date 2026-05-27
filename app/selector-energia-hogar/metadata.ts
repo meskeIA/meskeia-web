@@ -41,3 +41,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Energía para el Hogar",
+  description: "Test de 10 preguntas para saber qué sistema de calefacción y agua caliente te conviene: electricidad/bomba de calor, gas natural, aerotermia, biomasa/pellets o solar térmica. Sin marcas, análisis técn",
+  url: "https://meskeia.com/selector-energia-hogar/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Juego Asteroids - Arcade Clásico en Español | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego Asteroids",
+  description: "Juega al clásico Asteroids online gratis. Controla tu nave, destruye asteroides y OVNIs. Juego arcade retro con controles de teclado y récords locales.",
+  url: "https://meskeia.com/juego-asteroids/",
+  category: 'UtilityApplication',
+  features: [],
+});

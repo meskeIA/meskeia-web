@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador Cash Flow - Flujo de Caja a 12 Meses | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador Cash Flow",
+  description: "Proyecta tu flujo de caja mes a mes. Identifica meses críticos, previene crisis de liquidez y simula escenarios What-If. Herramienta gratuita para autónomos y pymes.",
+  url: "https://meskeia.com/planificador-cashflow/",
+  category: 'BusinessApplication',
+  features: [],
+});

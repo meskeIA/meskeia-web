@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Cómo Funcionan los LLMs - Tokens, Embeddings, Atención y Temperatura | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Cómo Funcionan los LLMs - Tokens, Embeddings y Atención",
+  description: "Entiende cómo funcionan ChatGPT, Claude y los modelos de lenguaje: tokenización interactiva, espacio semántico de embeddings, mecanismo de atención transformers y temperatura.",
+  url: "https://meskeia.com/visualizador-llm-funcionamiento/",
+  category: 'EducationalApplication',
+  features: [],
+});

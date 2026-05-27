@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Seguro de Coche | ¿Terceros o Todo Riesgo? | meskeIA',
@@ -19,3 +20,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Seguro de Coche",
+  description: "Test de 10 preguntas para saber qué modalidad de seguro de coche necesitas: terceros básico, terceros ampliado, todo riesgo con franquicia o todo riesgo sin franquicia.",
+  url: "https://meskeia.com/selector-seguro-coche/",
+  category: 'FinanceApplication',
+  features: [],
+});

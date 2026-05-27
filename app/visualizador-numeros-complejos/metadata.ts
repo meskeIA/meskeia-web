@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Números Complejos: El Plano de Argand y e^(iπ)+1=0 | meskeIA',
@@ -25,3 +26,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Números Complejos: El Plano de Argand",
+  description: "Visualiza los números complejos como geometría. Plano de Argand interactivo, operaciones como rotaciones, forma polar, fórmula de Euler y la identidad más bella de las matemáticas.",
+  url: "https://meskeia.com/visualizador-numeros-complejos/",
+  category: 'EducationalApplication',
+  features: [],
+});

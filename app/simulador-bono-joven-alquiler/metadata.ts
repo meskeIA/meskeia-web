@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador Bono Joven Alquiler — Comprueba tu Elegibilidad | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Simulador Bono Joven Alquiler",
+  description: "Comprueba si cumples los requisitos del Bono Joven Alquiler: 18-35 años, ingresos ≤ 3× IPREM. Calcula cuánto puedes ahorrar: hasta €250/mes durante 2 años (€6.000 total).",
+  url: "https://meskeia.com/simulador-bono-joven-alquiler/",
+  category: 'FinanceApplication',
+  features: [],
+});

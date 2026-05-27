@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Compresor de Imágenes por Lotes - Comprime JPG, PNG, WebP Gratis | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Compresor de Imágenes meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Compresor de Imágenes por Lotes",
+  description: "Comprime múltiples imágenes a la vez sin límites ni marcas de agua. Reduce el tamaño de tus fotos JPG, PNG y WebP manteniendo la calidad. 100% gratis y privado.",
+  url: "https://meskeia.com/compresor-imagenes/",
+  category: 'UtilityApplication',
+  features: [],
+});

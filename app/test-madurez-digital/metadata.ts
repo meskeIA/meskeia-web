@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test Madurez Digital en el Trabajo — ¿Cómo usa la IA tu empresa? | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Test Madurez Digital",
+  description: "15 preguntas para descubrir el nivel de madurez digital de tu empresa. Evalúa el uso de IA, automatización, datos y cultura digital. Obtén tu perfil y recomendaciones.",
+  url: "https://meskeia.com/test-madurez-digital/",
+  category: 'UtilityApplication',
+  features: [],
+});

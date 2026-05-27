@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Epigenética: Cómo el Entorno Modifica la Expresión Génica — meskeIA',
@@ -31,3 +32,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Epigenética: Metilación, Histonas e Imprinting",
+  description: "Visualizador de epigenética: metilación del ADN, modificaciones de histonas, imprinting genómico y factores que modifican el epigenoma. Sin alterar el ADN.",
+  url: "https://meskeia.com/visualizador-epigenetica/",
+  category: 'EducationalApplication',
+  features: [],
+});

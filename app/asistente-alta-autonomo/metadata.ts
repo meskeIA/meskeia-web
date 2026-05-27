@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Asistente Alta Autónomo - Guía Paso a Paso para Darse de Alta | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Asistente Alta Autónomo meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Asistente Alta Autónomo",
+  description: "Guía completa para darte de alta como autónomo en España. Checklist interactivo con todos los trámites: Hacienda, Seguridad Social, IAE, licencias. Calculadora de cuota y costes.",
+  url: "https://meskeia.com/asistente-alta-autonomo/",
+  category: 'FinanceApplication',
+  features: [],
+});

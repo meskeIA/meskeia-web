@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de Números Romanos Online - Arábigos a Romanos | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Conversor Números Romanos",
+  description: "Conversor de números romanos gratuito. Convierte números arábigos (1, 2, 3...) a romanos (I, II, III...) y viceversa. Con reglas y ejemplos.",
+  url: "https://meskeia.com/conversor-numeros-romanos/",
+  category: 'EducationalApplication',
+  features: [],
+});

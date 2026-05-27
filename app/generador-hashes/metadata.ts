@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Hashes Online - MD5, SHA-256, SHA-512 | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Hashes",
+  description: "Genera hashes MD5, SHA-256 y SHA-512 de textos y archivos. Verifica integridad de datos, compara checksums y aprende sobre funciones hash criptográficas.",
+  url: "https://meskeia.com/generador-hashes/",
+  category: 'UtilityApplication',
+  features: [],
+});

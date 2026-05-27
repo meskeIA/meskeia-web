@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Farmacocinética | ADME — Cómo Viaja un Fármaco | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Farmacocinética - Cómo Viaja un Fármaco por el Cuerpo",
+  description: "Aprende cómo viaja un fármaco por el cuerpo: absorción (biodisponibilidad, primer paso), distribución (Vd), metabolismo (CYP450, vida media) y excreción. Curva concentración-tiempo explicada.",
+  url: "https://meskeia.com/visualizador-farmacocinetica/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Juego Space Invaders - Arcade Clásico en Español | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Juego Space Invaders",
+  description: "Juega al clásico Space Invaders online gratis. Defiende la Tierra de la invasión alienígena. Juego arcade retro con controles de teclado y récords.",
+  url: "https://meskeia.com/juego-space-invaders/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de la Piel | Capas, Funciones y Cicatrización | meskeIA',
@@ -18,3 +19,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "La Piel - Capas, Funciones y Cicatrización",
+  description: "Explora las capas de la piel (epidermis, dermis, hipodermis), sus funciones de protección, cicatrización y fototipos. Visualizador educativo interactivo.",
+  url: "https://meskeia.com/visualizador-piel/",
+  category: 'EducationalApplication',
+  features: [],
+});

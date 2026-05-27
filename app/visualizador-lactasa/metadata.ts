@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Lactasa - La Enzima que Digiere la Leche | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Lactasa - La Enzima que Revolucionó la Historia Humana",
+  description: "Cómo funciona la lactasa: rompe la lactosa en glucosa y galactosa, por qué el 65% de los humanos la pierde en la edad adulta, la evolución de la persistencia de lactasa y el mecanismo de la intoleranc",
+  url: "https://meskeia.com/visualizador-lactasa/",
+  category: 'EducationalApplication',
+  features: [],
+});

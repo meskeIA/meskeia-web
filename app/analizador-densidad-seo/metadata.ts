@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Analizador de Densidad de Palabras Clave SEO | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Analizador Densidad SEO meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Analizador de Densidad SEO",
+  description: "Analiza la densidad de keywords en tu texto. Detecta sobreoptimización, calcula frecuencia de palabras y optimiza tu contenido para SEO on-page.",
+  url: "https://meskeia.com/analizador-densidad-seo/",
+  category: 'UtilityApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Plusvalías IRPF 2025 - Ganancias Patrimoniales | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estimador Plusvalías IRPF meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estimador Plusvalías IRPF",
+  description: "Estima orientativamente el IRPF por venta de inmuebles, fondos o acciones. Calcula la ganancia patrimonial y la cuota fiscal según los tramos de la base del ahorro 2025.",
+  url: "https://meskeia.com/estimador-plusvalias-irpf/",
+  category: 'FinanceApplication',
+  features: [],
+});

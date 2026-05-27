@@ -41,3 +41,11 @@ export const metadata: Metadata = {
     })),
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Tipo de Vivienda",
+  description: "Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a tu situación: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido. Análisis según familia, presu",
+  url: "https://meskeia.com/selector-tipo-vivienda/",
+  category: 'FinanceApplication',
+  features: [],
+});

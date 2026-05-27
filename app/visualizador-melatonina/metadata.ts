@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Melatonina - La Hormona que Regula tu Reloj Interno | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Melatonina - La Hormona del Reloj Interno",
+  description: "Cómo funciona la melatonina: la curva circadiana opuesta al cortisol, el efecto de la luz azul en su producción, los patrones estacionales, el jet lag y lo que dice la ciencia sobre los suplementos.",
+  url: "https://meskeia.com/visualizador-melatonina/",
+  category: 'EducationalApplication',
+  features: [],
+});

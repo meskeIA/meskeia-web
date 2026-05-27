@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Flujos Migratorios Globales: Mapa Interactivo 2024 | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Flujos Migratorios Globales: Mapa 2024",
+  description: "Visualiza los principales flujos migratorios del mundo en 2024. Refugiados, migrantes económicos, rutas y factores que impulsan la migración global. Datos UNHCR e IOM.",
+  url: "https://meskeia.com/visualizador-migracion-global/",
+  category: 'EducationalApplication',
+  features: [],
+});

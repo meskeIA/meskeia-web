@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Reinos de la Naturaleza - ¿Animal, Planta, Hongo o Bacteria? | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Quiz Reinos de la Naturaleza meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Quiz Reinos de la Naturaleza",
+  description: "Descubre a qué grupo pertenecen 43 organismos sorprendentes: murciélago (mamífero), coral (animal), liquen (simbiosis), virus (¿ser vivo?). Quiz de biología con curiosidades. Sin registro.",
+  url: "https://meskeia.com/quiz-reinos-naturaleza/",
+  category: 'EducationalApplication',
+  features: [],
+});

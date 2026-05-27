@@ -57,3 +57,11 @@ export function generateJsonLd() {
     category: 'EducationalApplication',
   });
 }
+
+export const jsonLd = generateWebAppSchema({
+  name: "Biomas Terrestres: Clima, Fauna y Conservación",
+  description: "Visualizador interactivo de biomas terrestres. Selector de 7 biomas (tropical, templado, taiga, tundra, desierto, sabana, mediterráneo) con datos completos, climograma Walter-Lieth con barras de preci",
+  url: "https://meskeia.com/visualizador-biomas-terrestres/",
+  category: 'EducationalApplication',
+  features: [],
+});

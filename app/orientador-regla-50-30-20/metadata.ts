@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Regla 50/30/20 - Distribuye tu Presupuesto | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Regla 50/30/20",
+  description: "Aplica la regla 50/30/20 de Elizabeth Warren para distribuir tus ingresos: 50% necesidades, 30% deseos, 20% ahorro. Organiza tu presupuesto mensual.",
+  url: "https://meskeia.com/orientador-regla-50-30-20/",
+  category: 'FinanceApplication',
+  features: [],
+});

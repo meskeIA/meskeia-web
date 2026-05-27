@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Endorfinas - Los Opioides que Fabrica tu Cuerpo | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Endorfinas - Los Opioides que Fabrica tu Cuerpo",
+  description: "Qué son las endorfinas, cómo activan los receptores opioides, por qué el \"runner's high\" es en realidad endocannabinoides, qué lo dispara realmente y la diferencia con los opioides externos.",
+  url: "https://meskeia.com/visualizador-endorfinas/",
+  category: 'EducationalApplication',
+  features: [],
+});

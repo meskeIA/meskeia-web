@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Comparador de Tipos de Seguros - Guía Completa | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/comparador-tipos-seguros/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Comparador Tipos de Seguros",
+  description: "Compara tipos de seguros en España: vida, auto, hogar y salud. Descubre las diferencias entre coberturas y elige el seguro adecuado para ti.",
+  url: "https://meskeia.com/comparador-tipos-seguros/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Probabilidad Online - Combinatoria y Estadística | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Probabilidad",
+  description: "Calcula probabilidades, combinaciones, permutaciones y distribuciones estadísticas. Herramienta completa con simulaciones y teoría de probabilidad.",
+  url: "https://meskeia.com/calculadora-probabilidad/",
+  category: 'EducationalApplication',
+  features: [],
+});

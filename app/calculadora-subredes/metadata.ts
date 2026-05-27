@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Subredes IP - CIDR, Máscaras y Direcciones | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Calculadora de Subredes IP meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Calculadora de Subredes IP",
+  description: "Calcula subredes IP: máscara de red, dirección de broadcast, rango de hosts, IPs disponibles. Soporta notación CIDR y máscaras de subred. Herramienta educativa para redes.",
+  url: "https://meskeia.com/calculadora-subredes/",
+  category: 'EducationalApplication',
+  features: [],
+});

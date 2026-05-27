@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Facturas - Crea Facturas Profesionales Gratis | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Facturas",
+  description: "Genera facturas profesionales para autónomos y pequeñas empresas. IVA automático (21%, 10%, 4%), retención IRPF, múltiples líneas, exporta a PDF. Gratis y sin registro.",
+  url: "https://meskeia.com/generador-facturas/",
+  category: 'BusinessApplication',
+  features: [],
+});

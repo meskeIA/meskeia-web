@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Selector de Formación Postgrado | ¿Máster, FP, Bootcamp u Oposiciones? | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Selector de Formación Postgrado",
+  description: "Test de 10 preguntas para saber qué tipo de formación postgrado se adapta mejor a tu perfil: máster universitario, FP de grado superior, bootcamp online, oposiciones o certificación profesional.",
+  url: "https://meskeia.com/selector-formacion-postgrado/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Extractor de Audio de Vídeo - AVI, MP4 a MP3 o WAV | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Extractor de Audio de Vídeo",
+  description: "Extrae y recorta fragmentos de audio de tus vídeos AVI, MP4, MOV, MKV directamente en el navegador. Convierte a MP3 o WAV. 100% privado: ningún archivo sale de tu dispositivo.",
+  url: "https://meskeia.com/extractor-audio-video/",
+  category: 'UtilityApplication',
+  features: [],
+});

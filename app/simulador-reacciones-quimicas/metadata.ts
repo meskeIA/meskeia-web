@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Reacciones Químicas | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/simulador-reacciones-quimicas/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Simulador de Reacciones Químicas",
+  description: "Calculadora de estequiometría y reactivo limitante para 20 reacciones químicas reales. Dado X gramos o moles de una sustancia, calcula todos los demás. Encuentra el reactivo que agota primero y el ren",
+  url: "https://meskeia.com/simulador-reacciones-quimicas/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Boda - Checklist y Presupuesto Gratis | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Planificador de Boda meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador de Boda",
+  description: "Organiza tu boda paso a paso con nuestra herramienta gratuita. Checklist por meses, calculadora de presupuesto, timeline del día y consejos de wedding planner.",
+  url: "https://meskeia.com/planificador-boda/",
+  category: 'FinanceApplication',
+  features: [],
+});

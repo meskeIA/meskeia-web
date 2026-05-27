@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Grado de Discapacidad — ¿Vale la Pena Solicitarlo? | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Grado de Discapacidad",
+  description: "Descubre si tu situación funcional podría justificar solicitar el reconocimiento del grado de discapacidad en España. Test orientativo basado en el RD 888/2022. Gratuito y sin registro.",
+  url: "https://meskeia.com/orientador-discapacidad/",
+  category: 'FinanceApplication',
+  features: [],
+});

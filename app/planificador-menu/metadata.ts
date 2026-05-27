@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Planificador de Menú Semanal - Organiza tus Comidas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Planificador de Menú Semanal",
+  description: "Planifica tu menú semanal de forma equilibrada. Genera estructura de comidas saludables para toda la semana con sugerencias mediterráneas. Gratis y sin registro.",
+  url: "https://meskeia.com/planificador-menu/",
+  category: 'FinanceApplication',
+  features: [],
+});

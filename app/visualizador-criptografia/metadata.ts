@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Criptografía | AES, RSA, Firma Digital y HTTPS | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Criptografía - AES, RSA, ECDSA, SHA-256 y TLS",
+  description: "Cómo funciona la criptografía: cifrado simétrico (AES), asimétrico (RSA, curvas elípticas), funciones hash (SHA-256), firma digital y el handshake TLS/HTTPS explicado visualmente.",
+  url: "https://meskeia.com/visualizador-criptografia/",
+  category: 'EducationalApplication',
+  features: [],
+});

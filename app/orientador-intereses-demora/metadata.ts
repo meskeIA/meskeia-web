@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador de Intereses de Demora 2025 | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador de Intereses de Demora",
+  description: "Oriéntate sobre los intereses que puedes reclamar por facturas impagadas o deudas vencidas. Calcula orientativamente el interés de demora comercial (Ley 3/2004) o civil (art. 1108 CC) en España.",
+  url: "https://meskeia.com/orientador-intereses-demora/",
+  category: 'FinanceApplication',
+  features: [],
+});

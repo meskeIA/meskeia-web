@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Circuitos Eléctricos | meskeIA',
@@ -33,3 +34,11 @@ export const metadata: Metadata = {
     canonical: 'https://meskeia.com/simulador-circuitos-electricos/',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Simulador Circuitos Eléctricos",
+  description: "Analiza circuitos eléctricos en serie y paralelo. Calcula resistencia equivalente, caídas de tensión, corrientes de rama y potencia disipada. Hasta 6 resistencias.",
+  url: "https://meskeia.com/simulador-circuitos-electricos/",
+  category: 'EducationalApplication',
+  features: [],
+});

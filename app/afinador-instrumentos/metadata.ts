@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Afinador de Instrumentos Online Gratis - Cromático | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Afinador de Instrumentos",
+  description: "Afinador cromático online gratuito para guitarra, bajo, violín, ukelele y más. Detecta automáticamente la nota y muestra si está afinada con precisión.",
+  url: "https://meskeia.com/afinador-instrumentos/",
+  category: 'EducationalApplication',
+  features: [],
+});

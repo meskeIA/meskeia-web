@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador de Horarios de Estudio - Planifica tu Semana | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Generador de Horarios de Estudio",
+  description: "Crea horarios de estudio personalizados. Añade asignaturas con prioridad, configura tu disponibilidad semanal y genera automáticamente un plan de estudio optimizado.",
+  url: "https://meskeia.com/generador-horarios-estudio/",
+  category: 'EducationalApplication',
+  features: [],
+});

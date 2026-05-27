@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador Grado de Dependencia - Baremo BVD España | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Orientador Grado Dependencia meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Orientador Grado de Dependencia",
+  description: "Cuestionario orientativo para estimar el grado de dependencia (I, II o III) según el Baremo de Valoración de la Dependencia español. Guía para solicitar la valoración oficial y acceder a prestaciones.",
+  url: "https://meskeia.com/orientador-grado-dependencia/",
+  category: 'FinanceApplication',
+  features: [],
+});

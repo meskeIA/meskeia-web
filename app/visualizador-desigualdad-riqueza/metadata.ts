@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini",
+  description: "Visualiza la distribución de la riqueza con la curva de Lorenz, el coeficiente Gini, la paradoja del 1%, datos reales de España y el mundo, y el efecto acumulación.",
+  url: "https://meskeia.com/visualizador-desigualdad-riqueza/",
+  category: 'FinanceApplication',
+  features: [],
+});

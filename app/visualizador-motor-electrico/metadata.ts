@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Motor Eléctrico: Cómo Funciona | meskeIA',
@@ -16,3 +17,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Motor Eléctrico: Campo Magnético Rotante y Regeneración",
+  description: "Visualiza el motor eléctrico: campo magnético rotante, estátor y rotor, inversor trifásico, frenado regenerativo y ventajas termodinámicas frente al motor de combustión.",
+  url: "https://meskeia.com/visualizador-motor-electrico/",
+  category: 'EducationalApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Checklist Declaración de la Renta 2026 — Documentos y Fechas | meskeIA',
@@ -29,3 +30,11 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Checklist Declaración de la Renta 2026",
+  description: "Lista de documentos para hacer la renta 2025 (ejercicio 2024). Adaptada a tu perfil: asalariado, autónomo, pensionista, inversor o arrendador. Fechas clave, deducciones y guía paso a paso.",
+  url: "https://meskeia.com/checklist-declaracion-renta/",
+  category: 'FinanceApplication',
+  features: [],
+});

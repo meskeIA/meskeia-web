@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Burbuja Especulativa: Las 5 Fases de Minsky | meskeIA',
@@ -27,3 +28,11 @@ export const metadata: Metadata = {
     }]
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Burbuja Especulativa: Las 5 Fases de Minsky",
+  description: "Anatomía de un ciclo boom-crash: las 5 fases de Minsky (desplazamiento, boom, euforia, angustia, pánico) aplicadas a tulipanes 1637, dot-com 2000, subprime 2008 y cripto. Los sesgos que las alimentan ",
+  url: "https://meskeia.com/visualizador-burbuja-especulativa/",
+  category: 'FinanceApplication',
+  features: [],
+});

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora Estadística Avanzada - Tests, Regresión y Correlación | meskeIA',
@@ -32,3 +33,11 @@ export const metadata: Metadata = {
     'application-name': 'Estadística Avanzada meskeIA',
   },
 };
+
+export const jsonLd = generateWebAppSchema({
+  name: "Estadística Avanzada",
+  description: "Herramienta estadística avanzada: test t-Student, chi-cuadrado, regresión lineal, correlación Pearson/Spearman, intervalos de confianza y análisis de normalidad. Gratis y en español.",
+  url: "https://meskeia.com/estadistica-avanzada/",
+  category: 'EducationalApplication',
+  features: [],
+});
