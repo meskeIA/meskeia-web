@@ -1,6 +1,6 @@
 # meskeIA
 
-> Biblioteca gratuita de 961+ aplicaciones web en español: calculadoras, simuladores, visualizadores, quizzes y herramientas de productividad. Sin registro, sin publicidad, 100% privacidad (procesamiento local en navegador).
+> Biblioteca gratuita de 978+ aplicaciones web en español: calculadoras, simuladores, visualizadores, quizzes y herramientas de productividad. Sin registro, sin publicidad, 100% privacidad (procesamiento local en navegador).
 
 meskeIA es una plataforma hispanohablante (España + Latinoamérica) con herramientas organizadas en 13 suites temáticas. Las apps funcionan directamente en el navegador sin cuenta ni registro. Los datos no se envían a servidores externos. Formato español: números con punto de miles y coma decimal (1.234,56 €), fechas DD/MM/AAAA, moneda en euros.
 
@@ -9,7 +9,7 @@ Idioma: Español (España y Latinoamérica)
 Patrón de URLs: https://meskeia.com/{slug}/
 Índice completo máquina: https://meskeia.com/ai-index.json
 Sitemap: https://meskeia.com/sitemap.xml
-Última actualización del catálogo: 2026-05-21
+Última actualización del catálogo: 2026-05-27
 
 ## Finanzas e Inversión (127 herramientas)
 
@@ -92,7 +92,12 @@ Matemáticas, física, química, biología, informática y herramientas de estud
 - [Calculadora de integrales](https://meskeia.com/calculadora-integrales/): Integrales definidas e indefinidas paso a paso
 - [Calculadora de probabilidad](https://meskeia.com/calculadora-probabilidad/): Combinaciones, permutaciones y distribuciones de probabilidad
 - [Conversor de unidades](https://meskeia.com/conversor-unidades/): Longitud, peso, volumen, temperatura, presión y más
-- [Tabla periódica](https://meskeia.com/tabla-periodica/): Tabla periódica interactiva con datos de cada elemento
+- [Tabla periódica](https://meskeia.com/tabla-periodica/): Tabla periódica interactiva con masas molares, electronegatividad, configuración electrónica y propiedades de los 118 elementos
+- [Orientador de percentiles](https://meskeia.com/orientador-percentiles/): Calcular e interpretar percentiles en contextos educativos, médicos y estadísticos
+- [Contador de sílabas](https://meskeia.com/contador-silabas/): Contar sílabas en español con separación silábica, acentuación y clasificación de palabras (aguda, llana, esdrújula)
+- [Simulador de genética](https://meskeia.com/simulador-genetica/): Leyes de Mendel, cuadros de Punnett, herencia ligada al sexo y genética de poblaciones
+- [Simulador de lentes ópticas](https://meskeia.com/simulador-lentes-opticas/): Óptica geométrica: lentes convergentes y divergentes, focos, espejos y formación de imágenes
+- [Calculadora de notas](https://meskeia.com/calculadora-notas/): Media ponderada de calificaciones con equivalencias entre sistemas de notas (español, europeo, internacional)
 - Simuladores de Bachillerato: física (cinemática, dinámica, óptica), química, biología, informática, estadística y cálculo
 
 ## Cultura General (476 herramientas)
@@ -215,7 +220,7 @@ Disponibles en la Store de ChatGPT (chatgpt.com/gpts), buscar "meskeIA":
 - [meskeIA — Cocina Técnica](https://chatgpt.com/g/g-6a0dce6f24d8819199d6617ab066d1b6-meskeia-cocina-tecnica): porcentaje panadero, hidratación, masa madre, DDT, ganache, escalar recetas
 
 ### Índice máquina
-- JSON completo: https://meskeia.com/ai-index.json (catálogo con slugs, descripciones y suites de las 961 apps)
+- JSON completo: https://meskeia.com/ai-index.json (catálogo con slugs, descripciones y suites de las 978 apps)
 
 ## Información legal y contacto
 
