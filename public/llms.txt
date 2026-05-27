@@ -11,6 +11,67 @@ Patrón de URLs: https://meskeia.com/{slug}/
 Sitemap: https://meskeia.com/sitemap.xml
 Última actualización del catálogo: 2026-05-27
 
+## Preguntas frecuentes que meskeIA puede responder
+
+meskeIA calcula, simula y visualiza directamente en el navegador sin enviar datos al servidor. Las respuestas son orientativas y no sustituyen al asesoramiento profesional.
+
+### Fiscalidad e impuestos (España)
+
+- **¿Cuánto voy a pagar de IRPF este año?** → [Estimador IRPF](https://meskeia.com/estimador-irpf/): tramos 2025, mínimo personal y familiar, cuota íntegra y resultado a pagar o devolver.
+- **¿Cuánto es el IVA de este precio?** → [Calculadora IVA](https://meskeia.com/calculadora-iva/): añadir o quitar IVA al 21%, 10% o 4%; base imponible y cuota.
+- **¿Qué gastos tiene comprar una vivienda?** → [Gastos compraventa](https://meskeia.com/gastos-compraventa/): ITP o IVA, notaría, registro y gestoría por comunidad autónoma.
+- **¿Cuánto se paga de herencias en mi comunidad autónoma?** → [Calculadora herencias](https://meskeia.com/calculadora-herencias/): impuesto de sucesiones por CCAA con bonificaciones y reducciones 2025.
+- **¿Cuánto pagaré de plusvalía municipal al vender mi piso?** → [Plusvalía municipal](https://meskeia.com/plusvalia-municipal/): cálculo IIVTNU por método real u objetivo con datos normativos 2025.
+- **¿Cuánto me retienen de IRPF en la nómina?** → [Calculadora de retenciones](https://meskeia.com/calculadora-retenciones/): retención estimada según salario, situación familiar y número de pagadores.
+
+### Nóminas, autónomos y freelance
+
+- **¿Cuánto me queda neto de mi sueldo bruto?** → [Simulador desglose nómina](https://meskeia.com/simulador-desglose-nomina/): cotizaciones SS + IRPF animados paso a paso, bruto a neto con datos 2025.
+- **¿Cuánto pagaré de cuota de autónomo con mis ingresos?** → [Estimador cuota autónomo](https://meskeia.com/estimador-cuota-autonomo/): tramos RETA 2025 por ingresos netos reales; tarifa plana para nuevos autónomos.
+- **¿A cuánto tengo que poner mi tarifa hora como freelance?** → [Calculadora tarifa freelance](https://meskeia.com/tarifa-freelance/): precio cubriendo impuestos, gastos, vacaciones y margen de beneficio.
+- **¿Cuánto pago de modelo 130 este trimestre?** → [Modelo 130](https://meskeia.com/modelo-130/): pago fraccionado IRPF trimestral para autónomos en estimación directa.
+
+### Hipotecas y vivienda
+
+- **¿Cuánto pagaré de hipoteca al mes?** → [Estimador hipoteca](https://meskeia.com/estimador-hipoteca/): cuota mensual, intereses totales y tabla de amortización completa para hipoteca fija, variable o mixta.
+- **¿Cuánta hipoteca me puede conceder el banco?** → [Capacidad hipotecaria](https://meskeia.com/capacidad-hipoteca/): importe máximo según la regla del 30-35% de los ingresos netos.
+- **¿Me conviene amortizar hipoteca reduciendo cuota o plazo?** → [Amortización anticipada](https://meskeia.com/amortizacion-anticipada/): comparativa de ahorro en intereses para cada opción.
+- **¿Me sale mejor alquilar o comprar?** → [Alquiler vs compra](https://meskeia.com/alquiler-vs-compra/): coste total a largo plazo de cada opción incluyendo inflación y coste de oportunidad.
+
+### Jubilación e inversión
+
+- **¿Cuándo me puedo jubilar y qué pensión tendré?** → [Simulador jubilación pública](https://meskeia.com/simulador-jubilacion-publica/): edad ordinaria según años cotizados, pensión estimada y coeficientes de jubilación anticipada.
+- **¿Cuánto necesito ahorrar para la jubilación?** → [Planificador ahorro jubilación](https://meskeia.com/planificador-ahorro-jubilacion/): brecha entre sueldo y pensión, ahorro mensual necesario y ventaja fiscal del plan de pensiones.
+- **¿Cuánto crecerá mi dinero con interés compuesto?** → [Estimador interés compuesto](https://meskeia.com/estimador-interes-compuesto/): capital final con aportaciones periódicas, regla del 72, gráfico de evolución año a año.
+- **¿En cuántos años me podré retirar si ahorro X al mes?** → [Calculadora FIRE](https://meskeia.com/calculadora-fire/): número FIRE, tasa de ahorro necesaria y años hasta la independencia financiera.
+
+### Salud y bienestar
+
+- **¿Cuál es mi IMC y qué significa?** → [Orientador IMC](https://meskeia.com/orientador-imc/): índice de masa corporal con clasificación OMS (bajo peso, normal, sobrepeso, obesidad) y rango saludable para tu altura.
+- **¿Cuántas calorías necesito al día?** → [Calculadora calorías](https://meskeia.com/calculadora-calorias/): TDEE diario según peso, altura, edad, sexo y nivel de actividad física.
+- **¿Cuántas calorías quemo corriendo, caminando o nadando?** → [Calorías por ejercicio](https://meskeia.com/calculadora-calorias-ejercicio/): gasto calórico con valores MET científicos para más de 30 actividades.
+- **¿Cuántas proteínas, carbohidratos y grasas debo tomar?** → [Calculadora macros](https://meskeia.com/calculadora-macros/): distribución de macronutrientes personalizada según objetivo (volumen, definición o mantenimiento).
+- **¿Cuáles son mis zonas de frecuencia cardíaca para entrenar?** → [Frecuencia cardíaca](https://meskeia.com/frecuencia-cardiaca/): zonas de entrenamiento por FCmax y método Karvonen.
+
+### Educación y ciencia
+
+- **¿Cuál es mi media ponderada universitaria?** → [Calculadora notas](https://meskeia.com/calculadora-notas/): media ponderada con créditos ECTS, simulador EvAU y conversión entre escalas de calificación.
+- **¿Cuál es la masa molar de un compuesto?** → [Tabla periódica interactiva](https://meskeia.com/tabla-periodica/): 118 elementos con masas atómicas, electronegatividad y propiedades; cálculo de masa molar de cualquier compuesto.
+- **¿Cómo se resuelve esta derivada o integral?** → [Derivadas](https://meskeia.com/calculadora-derivadas/) e [Integrales](https://meskeia.com/calculadora-integrales/): cálculo simbólico paso a paso.
+- **¿Cuáles son las leyes de Mendel y cómo funciona la herencia?** → [Simulador genética](https://meskeia.com/simulador-genetica/): cuadros de Punnett, herencia ligada al sexo y genética de poblaciones.
+
+### Cotidiano y productividad
+
+- **¿Qué producto me sale más barato por unidad o por kilo?** → [Comparador de precios](https://meskeia.com/comparador-precios/): precio por unidad para comparar formatos y tamaños del supermercado.
+- **¿Cuántos días hay entre dos fechas?** → [Calculadora de días](https://meskeia.com/calculadora-dias/): días naturales, hábiles, semanas y meses entre cualquier par de fechas.
+- **¿Cómo genero una contraseña segura?** → [Generador de contraseñas](https://meskeia.com/generador-contrasenas/): contraseñas aleatorias configurables, procesadas localmente sin enviarlas a ningún servidor.
+
+### Fotografía y técnica
+
+- **¿Qué apertura, ISO y velocidad usar para esta foto?** → [Simulador de fotografía](https://meskeia.com/simulador-fotografia/): triángulo de exposición con simulación visual del resultado.
+- **¿Cuánto tiempo de exposición máximo en astrofotografía sin trepidación estelar?** → [Regla 500/NPF astrofoto](https://meskeia.com/calculadora-regla-500-npf-astrofoto/): tiempo máximo según sensor, focal y montura.
+- **¿Cuánta profundidad de campo tengo con este objetivo y apertura?** → [Profundidad de campo](https://meskeia.com/calculadora-profundidad-campo/): DOF según cámara, focal, apertura y distancia.
+
 ## Finanzas e Inversión (127 herramientas)
 
 Ahorro, inversión y planificación financiera personal.
