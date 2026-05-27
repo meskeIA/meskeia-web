@@ -45,3 +45,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['paleta colores', 'color harmony', 'diseño', 'CSS', 'esquema cromático'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la teoría del color y cómo se aplica al diseño web?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La teoría del color estudia cómo se relacionan los colores entre sí y cómo afectan emocionalmente al espectador. En diseño web se aplica eligiendo combinaciones armónicas: colores complementarios (opuestos en la rueda) crean contraste y energía; análogos (contiguos) dan armonía y serenidad; triádicos (equidistantes) aportan vivacidad; monocromáticos (misma tonalidad) transmiten elegancia. Cada combinación genera una percepción diferente de la marca.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los formatos de color en CSS: HEX, RGB y HSL?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'HEX (#RRGGBB) es el más usado en diseño web; cada par hexadecimal representa rojo, verde y azul del 00 al FF. RGB (red, green, blue) usa valores de 0-255 y permite añadir opacidad con RGBA: rgba(255,0,0,0.5). HSL (hue, saturation, lightness) es el más intuitivo para diseñadores: hue es el ángulo en la rueda de color (0-360°), saturation la intensidad (0-100%) y lightness el brillo (0-100%). HSL facilita crear variantes de un mismo color cambiando solo lightness.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el contraste de color en accesibilidad web?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El contraste de color mide la diferencia de luminosidad entre texto y fondo, expresado como ratio. Las WCAG (directrices de accesibilidad web) exigen: nivel AA mínimo 4.5:1 para texto normal, 3:1 para texto grande (≥18pt o ≥14pt bold); nivel AAA: 7:1 y 4.5:1 respectivamente. Un texto negro (#000) sobre blanco (#FFF) tiene ratio 21:1, el máximo posible. Texto gris claro sobre blanco suele fallar la verificación de accesibilidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo crear una paleta de colores para una marca?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El proceso estándar: 1) Elige el color primario que represente los valores de la marca. 2) Genera variantes de ese color (más claro/oscuro para fondos y estados hover). 3) Añade un color secundario complementario o análogo. 4) Define un color de acento para CTAs y elementos destacados. 5) Completa con neutros (grises) para textos y fondos. Verifica siempre que las combinaciones superen el ratio de contraste WCAG 4.5:1.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las variables CSS de color y cómo exportarlas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las variables CSS (custom properties) permiten definir colores una vez y reutilizarlos en todo el CSS. Se declaran en :root { --color-primary: #2E86AB; } y se usan con var(--color-primary). Las variables SCSS ($color-primary: #2E86AB) funcionan igual pero requieren compilación. El creador de paletas de meskeIA genera automáticamente el código de variables CSS y SCSS listo para copiar e integrar en tu proyecto.',
+      },
+    },
+  ],
+};
