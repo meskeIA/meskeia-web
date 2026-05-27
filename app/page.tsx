@@ -41,9 +41,9 @@ export default function Home() {
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <MeskeiaLogo disableLink inline showThemeToggle={false} />
-            <p className={styles.subtitle}>
+            <h1 className={styles.subtitle}>
               {TOTAL_IMPLEMENTED_APPS} aplicaciones web gratuitas para tu día a día
-            </p>
+            </h1>
           </div>
         </header>
 
