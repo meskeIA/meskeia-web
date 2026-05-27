@@ -3,7 +3,7 @@ import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/s
 
 export const metadata: Metadata = {
   title: 'Calculadora de Media Ponderada Universidad - Notas por Créditos ECTS',
-  description: 'Calcula tu media ponderada del expediente universitario con créditos ECTS. Incluye simulador de EvAU, conversor de escalas Latam y «qué nota necesito». Gratis.',
+  description: 'Calculadora de notas: media ponderada por créditos ECTS, simulador EvAU, conversor de escalas Latam y «¿qué nota necesito para aprobar?». Gratis.',
   keywords: 'calculadora notas, media ponderada, ECTS, EvAU, selectividad, GPA, conversor notas, expediente académico, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -91,3 +91,50 @@ const faqSchema = generateFAQSchema({
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula la media ponderada de notas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se multiplica cada nota por su peso (créditos ECTS, horas o porcentaje), se suman todos los productos y se divide entre la suma total de los pesos. Ejemplo: (7×6 + 5×3) / (6+3) = 57/9 = 6,33. Es diferente de la media aritmética simple, que solo suma y divide sin ponderar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué nota necesito en el examen final para aprobar la asignatura?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende del peso del examen final en la nota global. Si el examen vale un 60% y tienes un 4 en la evaluación continua (40%), necesitas: nota_final ≥ (5 − 1,6) / 0,6 = 5,67. La calculadora puede resolver este cálculo automáticamente según los porcentajes de tu asignatura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona la nota de acceso a la universidad (EVAU / Selectividad)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La nota de acceso = 0,6 × media de Bachillerato + 0,4 × nota EVAU. Para la nota de admisión se pueden sumar hasta 4 puntos extra de la fase específica (dos materias × ponderador, máximo 2 puntos por materia). El máximo posible es 14 puntos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se convierte una nota española al sistema GPA americano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La conversión más usada: 9-10 → 4,0 (A), 7-8,9 → 3,0-3,9 (B), 5-6,9 → 2,0-2,9 (C), 3-4,9 → 1,0-1,9 (D), 0-2,9 → 0,0 (F). No existe una fórmula oficial; cada institución americana puede aplicar su propia escala de conversión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Las asignaturas suspensas cuentan en la media del expediente universitario?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Según el RD 1125/2003 del Espacio Europeo de Educación Superior, solo se incluyen las asignaturas superadas en el cálculo del expediente oficial. Sin embargo, algunas universidades calculan una «media bruta» que sí incluye los suspensos. Consulta el reglamento de tu universidad.',
+      },
+    },
+  ],
+};
