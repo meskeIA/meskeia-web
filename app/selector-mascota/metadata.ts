@@ -71,3 +71,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué mascota se adapta mejor a un piso pequeño?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En pisos pequeños, los gatos y los roedores (como hámsters o cobayas) suelen adaptarse bien porque no necesitan salir a la calle diariamente y ocupan poco espacio. Los peces y los pájaros son también buenas opciones si el espacio es muy reducido. Los perros de razas grandes o muy activas, en cambio, suelen sufrir en espacios pequeños sin acceso a zonas de ejercicio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué mascota es más fácil de cuidar para alguien que trabaja muchas horas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los peces son la opción más autónoma: con una alimentación diaria y limpieza semanal del acuario es suficiente. Los gatos toleran bien la soledad durante la jornada laboral. Los reptiles y los roedores también requieren poca atención diaria. Los perros, en cambio, necesitan entre 2 y 4 salidas al día y pueden desarrollar ansiedad si se quedan solos más de 6-8 horas seguidas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta mantener una mascota al mes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El coste varía mucho según la especie. Un perro puede suponer entre 80 y 200 € mensuales (alimentación, veterinario, peluquería, seguro). Un gato suele costar entre 40 y 100 € al mes. Los roedores pequeños pueden mantenerse por menos de 20 € mensuales. Los peces, una vez montado el acuario, tienen gastos de mantenimiento de 10-30 € al mes. A estos importes habría que sumar gastos veterinarios imprevistos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué mascota es mejor si hay niños pequeños en casa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los perros de temperamento tranquilo y razas sociables (como el Golden Retriever o el Labrador) son excelentes con niños, aunque requieren supervisión. Los gatos también pueden convivir bien con niños, dependiendo del carácter del animal. Los roedores como cobayas o conejos enanos son buenos para niños mayores de 6-7 años que ya pueden manipularlos con cuidado. Los reptiles y ciertos pájaros exóticos no se recomiendan en familias con niños muy pequeños.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es mejor adoptar o comprar una mascota?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Adoptar en protectoras y refugios permite dar un hogar a animales que lo necesitan y suele ser gratuito o tener un coste simbólico. Además, muchos animales en adopción ya están esterilizados y vacunados. Comprar a un criador acreditado puede tener sentido si se busca un perfil muy concreto de temperamento o tamaño. En cualquier caso, conviene evitar tiendas de animales que no acrediten la procedencia de sus ejemplares.',
+      },
+    },
+  ],
+};

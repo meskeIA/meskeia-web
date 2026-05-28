@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué deducciones IRPF existen por obras de mejora energética en vivienda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Existen tres deducciones recogidas en la Disposición Adicional 50.ª de la Ley del IRPF: el 20% por obras que reduzcan la demanda de calefacción y refrigeración (base máxima 5.000 €/año), el 40% por obras que reduzcan el consumo de energía primaria no renovable al menos un 30% (base máxima 7.500 €/año), y el 60% por rehabilitación energética de edificios completos (base máxima 5.000 €/año por propietario, acumulable hasta 15.000 € en varios ejercicios). Los plazos y requisitos han sido prorrogados por el RDL 2/2026.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué certificado energético se necesita para aplicar la deducción del 20% o del 40%?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para la deducción del 20% se requiere un certificado de eficiencia energética emitido por técnico competente antes y después de las obras, que acredite una reducción de al menos el 7% en la demanda de calefacción y refrigeración. Para la deducción del 40% el certificado posterior debe reflejar una mejora de al menos el 30% en el indicador de consumo de energía primaria no renovable, o que la vivienda alcance la clase energética A o B.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre la deducción del 40% y la del 60% por obras energéticas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La deducción del 40% se aplica sobre obras en la propia vivienda habitual y exige reducir el consumo de energía primaria no renovable en un 30% como mínimo. La deducción del 60% está pensada para obras de rehabilitación energética que afectan al edificio completo (comunidades de propietarios); el propietario puede deducir el 60% de las cantidades pagadas con una base máxima de 5.000 €/año, y acumular hasta 15.000 € a lo largo de hasta cuatro ejercicios.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se pueden combinar las deducciones del 20%, 40% y 60% en el mismo año?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Las tres deducciones son incompatibles entre sí para las mismas obras en el mismo ejercicio fiscal. Si una obra puede calificar para varias modalidades, el contribuyente debe elegir la más favorable. Sí es posible aplicar una deducción por obras en la vivienda y otra distinta por obras en el edificio en el mismo año, siempre que sean actuaciones independientes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Hasta cuándo se pueden realizar las obras para beneficiarse de estas deducciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Real Decreto-Ley 2/2026 prorrogó el régimen transitorio de deducciones por obras de mejora energética. Las obras deben haberse realizado y pagado dentro de los plazos establecidos por la normativa vigente en cada ejercicio; consultar la redacción actualizada de la DA 50.ª LIRPF o el texto del RDL 2/2026 para confirmar la fecha límite exacta aplicable a cada modalidad.',
+      },
+    },
+  ],
+};

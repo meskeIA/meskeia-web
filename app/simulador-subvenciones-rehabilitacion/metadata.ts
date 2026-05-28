@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué subvenciones existen para la rehabilitación energética de viviendas en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los principales programas son los del Plan de Recuperación (PRTR), financiados con fondos Next Generation EU: el Programa 3 subvenciona mejoras en instalaciones comunes de edificios residenciales, el Programa 4 cubre la rehabilitación de edificios completos con mejora mínima del 30 % en eficiencia energética, y el Programa 5 está destinado a barrios enteros. Las ayudas pueden cubrir entre el 40 % y el 80 % de la inversión según la renta y el tipo de actuación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué deducciones en el IRPF se pueden aplicar por obras de rehabilitación energética?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Ley de Presupuestos estableció deducciones temporales de hasta el 20 % por reducción de la demanda de calefacción y refrigeración, el 40 % por mejora del consumo de energía primaria no renovable, y el 60 % por rehabilitación energética de edificios enteros. La base máxima varía entre 5.000 y 15.000 € según la actuación y la declaración conjunta o individual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo acumular subvenciones Next Generation con las deducciones del IRPF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En principio sí, pero la base deducible en el IRPF debe minorarse en el importe de la subvención recibida; es decir, no puedes deducirte la parte del gasto que ya ha sido subvencionada. Es imprescindible contar con un certificado energético antes y después de la reforma que acredite la mejora conseguida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tipo de obras se consideran rehabilitación energética subvencionable?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Entre las actuaciones elegibles destacan: mejora del aislamiento de fachadas, cubiertas y suelos; sustitución de ventanas por unidades de bajo consumo; instalación de aerotermia, bomba de calor o sistemas de climatización de alta eficiencia; y mejoras en la iluminación o instalación de energías renovables. La obra debe realizarla una empresa habilitada y quedar documentada con facturas y certificados técnicos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué IVA se aplica a las obras de rehabilitación energética?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las obras de rehabilitación de viviendas particulares tributan al tipo reducido del 10 % de IVA (en lugar del 21 % general), siempre que se cumplan determinados requisitos: que el inmueble lleve al menos dos años construido, que sea de uso residencial y que la factura supere el 40 % de coste de mano de obra respecto al coste total. Las comunidades de propietarios también pueden beneficiarse del 10 % en obras de rehabilitación del edificio.',
+      },
+    },
+  ],
+};

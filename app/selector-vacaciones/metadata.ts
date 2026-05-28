@@ -60,3 +60,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo saber qué tipo de vacaciones me convienen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La elección depende de factores como tu presupuesto, con quién viajas, si buscas descanso o actividad, y cuánto tiempo tienes. Un test de perfil viajero analiza estas variables y te orienta hacia el tipo de viaje más adecuado: playa, montaña, ciudad cultural, aventura o viaje organizado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los tipos de vacaciones más habituales en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los cinco perfiles más frecuentes son: vacaciones de playa (sol y mar, principalmente en julio y agosto), escapadas de montaña o turismo rural, viajes a ciudades con oferta cultural, aventura activa (senderismo, deportes al aire libre) y viajes organizados con todo incluido. Cada perfil tiene necesidades distintas de presupuesto y planificación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué vacaciones son mejores para familias con niños pequeños?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las familias con niños pequeños suelen adaptarse mejor a destinos de playa con oferta de animación, a zonas rurales tranquilas o a viajes organizados que resuelven la logística. La clave es priorizar la accesibilidad, la seguridad y la flexibilidad horaria, evitando itinerarios demasiado intensos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta de media unas vacaciones en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Según datos del INE, el gasto medio de los españoles en vacaciones oscila entre 600 y 1.200 € por persona en viajes nacionales de una semana, y entre 1.200 y 2.500 € en destinos internacionales. El coste varía enormemente según el tipo de alojamiento, la temporada y si el viaje incluye vuelos o se hace en coche.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia un viaje organizado de uno independiente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un viaje organizado incluye traslados, alojamiento y actividades contratadas de antemano a través de una agencia; ofrece comodidad y seguridad, pero menos flexibilidad. El viaje independiente lo planifica el propio viajero, lo que permite personalizar cada detalle y a menudo resulta más económico, aunque requiere más tiempo de gestión.',
+      },
+    },
+  ],
+};

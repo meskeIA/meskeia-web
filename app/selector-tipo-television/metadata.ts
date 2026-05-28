@@ -71,3 +71,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre OLED y QLED?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'OLED (Organic Light-Emitting Diode) usa píxeles que emiten su propia luz y pueden apagarse por completo, logrando negros perfectos y contraste infinito. QLED (Quantum Light-Emitting Diode) es una tecnología de retroiluminación LED mejorada con una capa de puntos cuánticos que amplía el espectro de color y el brillo máximo. En términos prácticos, OLED destaca en habitaciones oscuras y para cine; QLED brilla más en salones con mucha luz ambiental.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué televisión es mejor para gaming?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para gaming competitivo lo más importante es la latencia de entrada (input lag) y la tasa de refresco (Hz). Los paneles OLED ofrecen tiempos de respuesta de 0,1-0,2 ms y son excelentes para juegos de acción rápida, aunque su precio es mayor. Los paneles QLED/Mini-LED modernos ofrecen mayor brillo y son una opción sólida a precio más ajustado. Ambas tecnologías suelen incluir HDMI 2.1 con 4K/120 Hz en los modelos actuales orientados a consolas de nueva generación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tamaño de televisión necesito según mi distancia de visión?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La recomendación habitual para 4K es que la distancia de visión sea entre 1,5 y 2,5 veces la diagonal de la pantalla. Por ejemplo, para un televisor de 55 pulgadas (139 cm) la distancia óptima es de unos 2 a 3,5 metros. A distancias cortas (menos de 2 m) un televisor de 65" o más puede resultar incómodo; a más de 4 m conviene considerar al menos 65-75 pulgadas para aprovechar la resolución 4K.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los televisores OLED tienen riesgo de burn-in (quemado de pantalla)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El burn-in o retención de imagen puede ocurrir en pantallas OLED si se muestran elementos estáticos de alto contraste de forma continuada durante muchas horas (HUDs de videojuegos, logos de canales, barras de noticias). Los modelos actuales incorporan medidas de mitigación como pixel shift, screen saver automático y ciclos de compensación. Para un uso variado (películas, series, juegos con sesiones normales) el riesgo es bajo; el problema es más relevante en instalaciones comerciales con imagen fija permanente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre LED IPS y LED VA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'IPS (In-Plane Switching) ofrece ángulos de visión amplios (hasta 178°) y colores consistentes incluso viendo la pantalla desde un lado, pero su contraste nativo es inferior al de VA. VA (Vertical Alignment) tiene un contraste nativo mucho más alto (2.000:1 o más frente a 1.000:1 de IPS), lo que se traduce en negros más profundos; sin embargo, los ángulos de visión son más limitados y pueden aparecer zonas oscuras al ver la pantalla en diagonal. IPS es mejor para habitaciones donde varias personas ven desde distintos ángulos; VA es preferible para una sola persona en sala oscura.',
+      },
+    },
+  ],
+};

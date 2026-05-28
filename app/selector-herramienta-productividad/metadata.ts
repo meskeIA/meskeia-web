@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'BusinessApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué método de productividad es mejor, GTD o Pomodoro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No existe un método universalmente mejor: depende de tu tipo de trabajo y estilo personal. GTD (Getting Things Done) de David Allen es ideal si manejas muchas tareas dispersas y necesitas un sistema de captura y organización. Pomodoro funciona mejor para personas que necesitan estructura temporal y luchan contra las distracciones. Lo más efectivo es probar ambos durante una semana y evaluar cuál se sostiene sin esfuerzo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el método Kanban y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Kanban es un sistema visual de gestión de tareas basado en columnas (típicamente "Por hacer", "En curso", "Hecho"). Fue desarrollado por Toyota para producción industrial y adaptado al trabajo del conocimiento. Es especialmente útil para equipos o personas con flujo de trabajo continuo y variable. A diferencia de Pomodoro, no impone intervalos de tiempo, sino que limita el trabajo en curso para evitar la multitarea.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé qué método de productividad se adapta a mí?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los factores clave son: el tipo de tareas que realizas (creativas, operativas, reactivas), cuántas interrupciones recibes al día, si trabajas solo o en equipo y si tus objetivos son a corto o largo plazo. Un test orientativo de 10 preguntas sobre estas dimensiones puede señalarte el método más alineado con tu perfil antes de invertir tiempo en aprenderlo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es Timeboxing y en qué se diferencia del Pomodoro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Timeboxing es una técnica que asigna un bloque de tiempo fijo a cada tarea específica en la agenda. A diferencia del Pomodoro, los bloques no tienen una duración estándar (25 min) sino que se adaptan a la tarea. Es más flexible y orientado a planificación diaria/semanal. Figuras como Elon Musk y Bill Gates son conocidos usuarios de timeboxing para gestionar agendas muy fragmentadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos métodos de productividad principales existen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los cinco métodos más consolidados con evidencia de uso amplio son GTD (Getting Things Done), Pomodoro, Kanban, Timeboxing e Inbox Zero. Existen decenas de variantes y enfoques adicionales (Deep Work, Eat the Frog, Ivy Lee…), pero estos cinco cubren la mayor parte de los perfiles de trabajo. La mayoría de sistemas más complejos son combinaciones o adaptaciones de estos fundamentos.',
+      },
+    },
+  ],
+};
