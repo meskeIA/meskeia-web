@@ -38,3 +38,35 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo se juega al 2048?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Se desliza el tablero en cuatro direcciones (arriba, abajo, izquierda, derecha) y las fichas con el mismo número se combinan sumándose. El objetivo es alcanzar una ficha con el valor 2048. Cada movimiento añade una nueva ficha de valor 2 o 4 en una casilla vacía.' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la estrategia más efectiva para llegar a 2048?',
+      acceptedAnswer: { '@type': 'Answer', text: 'La estrategia más reconocida es mantener la ficha de mayor valor en una esquina y construir una cadena decreciente de fichas a lo largo de los bordes, evitando deslizar en la dirección contraria a esa esquina. Esto maximiza las fusiones y libera espacio en el centro del tablero.' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es posible seguir jugando después de alcanzar 2048?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Sí. Al llegar a 2048 el juego permite continuar para alcanzar valores aún más altos: 4096, 8192 o incluso 16384. La partida termina únicamente cuando el tablero 4×4 está completamente lleno y no hay ningún movimiento posible.' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Quién creó el juego 2048?',
+      acceptedAnswer: { '@type': 'Answer', text: 'El juego original fue creado por Gabriele Cirulli, un desarrollador italiano, y publicado en marzo de 2014. Se viralizó en pocas semanas alcanzando millones de partidas diarias. Está inspirado en juegos previos como Threes! (2014) y 1024, aunque Cirulli lo desarrolló de forma independiente.' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve jugar al 2048?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Además del entretenimiento, el 2048 ejercita el pensamiento estratégico, la planificación a varios movimientos vista y el reconocimiento de patrones. Algunos docentes lo usan para motivar el aprendizaje de potencias de 2 y aritmética mental de forma lúdica.' },
+    },
+  ],
+};

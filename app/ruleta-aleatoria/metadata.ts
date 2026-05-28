@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve una ruleta aleatoria online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una ruleta aleatoria online sirve para tomar decisiones o realizar sorteos de forma imparcial. Puedes usarla para elegir a un ganador entre varios participantes, decidir qué actividad o tarea hacer primero, o simplemente dejar al azar cualquier elección con múltiples opciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo añado mis propias opciones a la ruleta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Solo tienes que escribir o pegar tus opciones en el campo de texto, una por línea o separadas por comas. La ruleta se actualiza automáticamente con los segmentos correspondientes. Puedes añadir tantas opciones como necesites, desde 2 hasta varias decenas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los resultados de la ruleta son verdaderamente aleatorios?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La ruleta utiliza el generador de números pseudoaleatorios del navegador (Math.random), que produce resultados estadísticamente uniformes. Cada opción tiene exactamente la misma probabilidad de salir si los segmentos son del mismo tamaño, garantizando imparcialidad en los sorteos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo usar la ruleta para sorteos en clase o en el trabajo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, es una herramienta muy usada por profesores para elegir alumnos al azar, por equipos para asignar tareas o turnos, y en dinámicas de grupo o presentaciones. No requiere registro ni instalación; basta con abrir la página y empezar a usarla.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre esta ruleta y "Wheel of Names"?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '"Wheel of Names" es una herramienta popular en inglés con funciones avanzadas de guardado en la nube. Esta ruleta está pensada para el público hispanohablante, funciona completamente en español, no requiere cuenta ni almacena datos, y es totalmente gratuita sin límites de uso.',
+      },
+    },
+  ],
+};

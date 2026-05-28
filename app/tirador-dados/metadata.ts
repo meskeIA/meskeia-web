@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de dados puedo lanzar online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los tiradores de dados online suelen incluir los tipos estándar de juegos de rol: D4 (4 caras), D6 (6 caras, el dado clásico de mesa), D8 (8 caras), D10 (10 caras), D12 (12 caras), D20 (20 caras, fundamental en D&D y Pathfinder) y D100 (porcentual, usado para tiradas de habilidad). También permiten lanzar varios dados a la vez y sumar los resultados automáticamente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué juegos de rol sirve un tirador de dados online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un tirador de dados online es compatible con la mayoría de juegos de rol de mesa: Dungeons & Dragons (D&D 5e), Pathfinder, Warhammer Fantasy Roleplay, Call of Cthulhu, Vampire: The Masquerade y muchos otros. Cada sistema utiliza combinaciones distintas de dados (ej. D&D usa principalmente D20 para acciones y D6/D8/D10/D12 para daño).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es realmente aleatorio un tirador de dados virtual?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Los tiradores de dados online emplean generadores de números pseudoaleatorios del navegador o del servidor, que producen distribuciones estadísticamente uniformes. Cada cara de un dado tiene la misma probabilidad de salir: 1/6 en un D6, 1/20 en un D20, etc. El resultado de cada lanzamiento es independiente de los anteriores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo lanzar múltiples dados a la vez?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La mayoría de tiradores permiten seleccionar cuántos dados del mismo tipo se lanzan simultáneamente y muestran el resultado individual de cada dado junto con la suma total. Esto es especialmente útil para tiradas de daño en juegos de rol (ej. 2D6+3 o 4D8) o para juegos de mesa que requieren varios dados a la vez.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ventaja tiene un dado virtual frente a uno físico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los dados virtuales son matemáticamente perfectos: no se pueden cargar ni desgastar con el uso, siempre producen probabilidades exactas. Además permiten lanzar tipos de dado poco comunes (D4, D100) sin necesidad de tenerlos físicamente, guardar historial de tiradas, lanzar muchos dados a la vez y usarlos en partidas online o en movimiento desde el móvil.',
+      },
+    },
+  ],
+};

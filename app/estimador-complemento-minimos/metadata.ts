@@ -48,3 +48,50 @@ export const jsonLd = {
   author: { '@type': 'Organization', name: 'meskeIA', url: 'https://meskeia.com' },
   inLanguage: 'es',
 };
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el complemento a mínimos de la Seguridad Social?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El complemento a mínimos es una prestación adicional que la Seguridad Social abona a los pensionistas cuya pensión contributiva no alcanza el importe mínimo establecido para cada modalidad. Su objetivo es garantizar que ningún pensionista perciba una cantidad inferior a la pensión mínima legal, que varía según el tipo de pensión, la edad del titular y su situación familiar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los requisitos para cobrar el complemento a mínimos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para tener derecho al complemento a mínimos es necesario: que la pensión contributiva reconocida sea inferior a la cuantía mínima del año en curso, residir en España, y no disponer de rentas anuales superiores al límite de ingresos establecido (en 2025, alrededor de 8.942 € al año). Quedan excluidas las pensiones de gran invalidez y ciertas modalidades de incapacidad permanente total con porcentaje reducido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto es la pensión mínima de jubilación en 2026?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En 2026, la pensión mínima de jubilación con cónyuge a cargo ronda los 1.020 € al mes en 14 pagas. Sin cónyuge a cargo se sitúa en torno a 835 € mensuales, y para beneficiarios menores de 65 años en torno a 790 €. Estos importes se actualizan cada año conforme a la revalorización de pensiones aprobada en los Presupuestos Generales o mediante real decreto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El complemento a mínimos se aplica también a pensiones de viudedad e incapacidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El complemento a mínimos se puede aplicar a jubilación, incapacidad permanente (total, absoluta y gran invalidez) y viudedad, siempre que la pensión reconocida quede por debajo del mínimo correspondiente a cada modalidad. Los importes mínimos difieren: por ejemplo, la pensión mínima de viudedad con cargas familiares es superior a la de viudedad sin cargas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula si tengo derecho al complemento a mínimos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cálculo compara tu pensión contributiva bruta con la cuantía mínima legal para tu tipo de pensión y situación familiar. Si tu pensión es inferior, la diferencia es el complemento a mínimos. A continuación se verifica que tus rentas totales anuales (excluyendo la propia pensión) no superen el límite vigente. El estimador automatiza este proceso introduciendo tu pensión reconocida, tipo de prestación, edad y situación de convivencia.',
+      },
+    },
+  ],
+};

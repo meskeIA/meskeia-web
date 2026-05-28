@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['lotería', 'números aleatorios', 'Primitiva', 'Euromillones', 'Bonoloto'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos números hay que elegir en la Primitiva y en el Euromillones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En la Primitiva se eligen 6 números del 1 al 49, más un número complementario y el Reintegro. En el Euromillones se eligen 5 números del 1 al 50 y 2 estrellas del 1 al 12. El generador produce automáticamente combinaciones válidas para cada modalidad respetando estos rangos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Genera números realmente aleatorios o usa algún patrón?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los números se generan mediante algoritmos pseudoaleatorios del navegador, sin ningún patrón predefinido. Cada combinación es independiente de las anteriores. Ningún método de generación aleatoria puede predecir ni influir en los sorteos oficiales, que son completamente independientes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve guardar el historial de combinaciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El historial permite ver todas las combinaciones generadas en la sesión actual y evitar repetirlas si juegas varias apuestas distintas. También es útil para comparar tus boletos con los resultados del sorteo. El historial se borra al cerrar o recargar la página.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Usar un generador aleatorio mejora mis probabilidades en la lotería?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. En los sorteos de lotería todos los números tienen exactamente la misma probabilidad de salir, independientemente de cómo se elijan. Un generador aleatorio no mejora ni empeora las probabilidades: sirve para ahorrar tiempo y evitar sesgos inconscientes al elegir los números.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo generar combinaciones para la Quiniela o El Gordo de Navidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El generador incluye opciones para la Quiniela de fútbol (15 resultados: 1, X, 2) y para El Gordo de la Primitiva (5 números del 1 al 54 más un número clave del 0 al 9). Puedes cambiar la modalidad en el selector y generar tantas combinaciones como necesites.',
+      },
+    },
+  ],
+};
