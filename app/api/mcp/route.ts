@@ -10083,7 +10083,12 @@ async function handler(req: Request): Promise<Response> {
   return transport.handleRequest(req);
 }
 
-export const GET     = handler;
+// GET abre SSE stream — incompatible con Vercel serverless (timeout). Devolver 405
+// per spec MCP: servidores PUEDEN no soportar GET. Clientes deben usar POST.
+export const GET = async () => new Response(
+  JSON.stringify({ error: 'SSE not supported. Use POST for all MCP requests.' }),
+  { status: 405, headers: { 'Content-Type': 'application/json', 'Allow': 'POST, DELETE, OPTIONS' } }
+);
 export const POST    = handler;
 export const DELETE  = handler;
 export const OPTIONS = async () => new Response(null, { status: 204 });
