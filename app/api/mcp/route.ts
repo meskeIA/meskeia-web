@@ -10083,6 +10083,7 @@ async function handler(req: Request): Promise<Response> {
   return transport.handleRequest(req);
 }
 
-export const GET  = handler;
-export const POST = handler;
-export const DELETE = handler;
+export const GET     = handler;
+export const POST    = handler;
+export const DELETE  = handler;
+export const OPTIONS = async () => new Response(null, { status: 204 });
