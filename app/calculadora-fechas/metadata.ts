@@ -102,3 +102,5 @@ export const faqSchema = {
     },
   ],
 };
+
+export const faqJsonLd = faqSchema;

@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los valores normales de tensión arterial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Según las guías europeas ESH/ESC 2018, la tensión arterial óptima es inferior a 120/80 mmHg. Se considera normal entre 120-129/80-84 mmHg, y normal-alta entre 130-139/85-89 mmHg. A partir de 140/90 mmHg se clasifica como hipertensión grado 1.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre tensión sistólica y diastólica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tensión sistólica (el número mayor) mide la presión en las arterias cuando el corazón late y bombea sangre. La diastólica (el número menor) mide la presión cuando el corazón está en reposo entre latidos. Ambos valores son necesarios para clasificar correctamente la presión arterial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la TAM o presión arterial media?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La TAM (Tensión Arterial Media) representa la presión de perfusión promedio que llega a los órganos durante un ciclo cardíaco completo. Se calcula como diastólica + (sistólica − diastólica) / 3. Un valor normal está entre 70 y 100 mmHg; por debajo de 60 mmHg puede indicar riesgo de hipoperfusión orgánica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia debo medirme la tensión arterial en casa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para el seguimiento habitual en personas con hipertensión conocida, se recomienda medir dos veces por la mañana y dos veces por la tarde durante 7 días consecutivos (protocolo HBPM). Para control preventivo en personas sanas, una medición mensual es suficiente. Siempre medir en reposo, sentado, con 5 minutos de espera previa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A partir de qué cifra debo consultar al médico urgentemente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una crisis hipertensiva se define por una tensión sistólica ≥180 mmHg o diastólica ≥120 mmHg. Si además aparecen síntomas como dolor de cabeza intenso, visión borrosa, dolor en el pecho o dificultad para respirar, es una emergencia hipertensiva que requiere atención médica inmediata. Sin síntomas graves, se habla de urgencia hipertensiva y se debe contactar con el médico en el mismo día.',
+      },
+    },
+  ],
+};

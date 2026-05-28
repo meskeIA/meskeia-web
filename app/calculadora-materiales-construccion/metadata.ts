@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo calculo cuántos azulejos necesito para una habitación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mide la superficie total en metros cuadrados (largo × ancho) y añade un porcentaje de desperdicio de entre el 10% y el 15% para cubrir cortes, roturas y ajustes. La calculadora divide la superficie total entre el área de cada azulejo y convierte el resultado en cajas según el rendimiento del fabricante.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos litros de pintura necesito para pintar una habitación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El rendimiento estándar de la pintura de interiores es de 10 a 12 m² por litro en superficies lisas. Para una habitación de 15 m² con paredes de 2,5 m de altura (perímetro de 15 m de pared = 37,5 m²) necesitarías entre 6 y 8 litros por mano. Se recomienda siempre dar dos manos, especialmente en cambios de color.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué porcentaje de desperdicio debo aplicar en la tarima?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para una colocación recta (paralela a las paredes) se recomienda un 10% de desperdicio. Si se coloca en diagonal o a espiga (efecto espiga o V), el desperdicio puede llegar al 15-20% por los cortes adicionales en los ángulos. La calculadora permite ajustar este porcentaje según tu caso concreto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos sacos de mortero o adhesivo necesito para colocar azulejos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El consumo estándar de adhesivo cementoso para azulejos de interior es de 3 a 5 kg por m², según el tamaño de la pieza y la llana usada. Un saco de 25 kg cubre entre 5 y 8 m². Para azulejos grandes (>60×60 cm) el consumo puede superar los 6 kg/m². La calculadora estima los sacos necesarios en función de la superficie introducida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo usar esta calculadora para estimar el coste total de una reforma?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La herramienta permite introducir el precio por unidad o por caja de cada material y calcula automáticamente el coste total estimado de materiales. Ten en cuenta que la estimación no incluye mano de obra ni otros gastos indirectos; sirve como referencia para presupuestar la partida de materiales de una reforma.',
+      },
+    },
+  ],
+};
