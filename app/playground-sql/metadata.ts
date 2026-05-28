@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es SQL y para qué se usa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SQL (Structured Query Language) es el lenguaje estándar para gestionar y consultar bases de datos relacionales. Se usa para crear tablas, insertar datos, realizar búsquedas con SELECT, combinar tablas con JOIN, agrupar resultados con GROUP BY y mucho más. Es una de las habilidades más demandadas en perfiles de desarrollador, analista de datos y científico de datos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona un playground SQL en el navegador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El playground ejecuta consultas SQL usando SQLite compilado en WebAssembly (sql.js), lo que permite correr un motor de base de datos completo directamente en el navegador sin enviar datos a ningún servidor. Puedes escribir consultas, ver los resultados en tiempo real y experimentar con datasets de ejemplo sin instalar nada ni crear ninguna cuenta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las cláusulas SQL más importantes para aprender primero?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El orden de aprendizaje recomendado es: SELECT y FROM (recuperar datos), WHERE (filtrar filas), ORDER BY (ordenar), GROUP BY con COUNT/SUM/AVG (agregar), JOIN (combinar tablas) y HAVING (filtrar grupos). Con estas cláusulas se resuelven el 80% de las consultas del día a día en análisis de datos y desarrollo de aplicaciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este playground de instalar MySQL o PostgreSQL?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Instalar MySQL o PostgreSQL requiere descargar software, configurar un servidor local y gestionar usuarios y permisos, lo que puede llevar horas a un principiante. Este playground funciona al instante desde el navegador y cubre toda la sintaxis SQL estándar (ANSI SQL), que es compatible con MySQL, PostgreSQL, SQL Server y otros sistemas. Es ideal para aprender la base antes de pasar a un sistema concreto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es SQL difícil de aprender desde cero?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SQL es uno de los lenguajes más accesibles para principiantes porque su sintaxis se parece al inglés natural. En pocas horas se puede aprender a realizar consultas básicas con SELECT, WHERE y ORDER BY. Las partes más complejas (subconsultas, CTEs, window functions) requieren más práctica, pero son innecesarias al inicio. Practicar con ejercicios reales, como los de este playground, es la forma más rápida de avanzar.',
+      },
+    },
+  ],
+};

@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué tipo de tablet me conviene comprar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de tu uso principal: si priorizas apps, juegos y multimedia, un iPad o tablet Android son las opciones más equilibradas. Si necesitas Office nativo y compatibilidad con software de escritorio, una tablet Windows (como Surface) es más adecuada. Para leer libros, una eReader con tinta electrónica ofrece mayor autonomía y menos fatiga visual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es mejor un iPad o una tablet Android?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El iPad destaca por su ecosistema cerrado con mayor optimización de apps, mejor soporte a largo plazo y herramientas creativas como el Apple Pencil. Las tablets Android ofrecen más variedad de precios, mayor libertad de personalización y mejor integración con servicios de Google. La elección depende principalmente de si ya usas dispositivos Apple o Android en tu día a día.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve una tablet Windows?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una tablet Windows (como las de la gama Surface o similares) ejecuta el mismo software que un ordenador de escritorio: Microsoft Office completo, programas de edición profesional y aplicaciones de empresa. Es ideal para quienes trabajan en movilidad y necesitan compatibilidad total con su entorno laboral, aunque suele tener mayor precio y menor autonomía que las tablets convencionales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tablet es mejor para estudiar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para estudiantes de secundaria o universidad, un iPad de gama media o una tablet Android de 10-11 pulgadas suelen ser suficientes para tomar apuntes, leer PDFs y hacer presentaciones. Si los estudios requieren software específico (programación, diseño técnico, estadística), valorar una tablet Windows o directamente un portátil ligero.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Merece la pena comprar una tablet o es mejor un portátil?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una tablet es más cómoda para consumir contenido (vídeo, lectura, redes sociales) y trabajar en movilidad con tareas ligeras. Un portátil es más versátil para crear documentos largos, programar o usar software profesional. Muchos usuarios optan por la combinación de un smartphone potente más un portátil, prescindiendo de la tablet, salvo que tengan un caso de uso muy concreto.',
+      },
+    },
+  ],
+};

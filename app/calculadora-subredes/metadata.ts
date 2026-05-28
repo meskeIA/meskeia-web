@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una subred y para qué se usa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una subred (subnet) es una división lógica de una red IP más grande en segmentos más pequeños. Se usa para mejorar el rendimiento reduciendo el tráfico de difusión, aumentar la seguridad aislando grupos de dispositivos y gestionar mejor los rangos de direcciones IP disponibles en una organización.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué significa la notación CIDR como /24 o /16?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'CIDR (Classless Inter-Domain Routing) indica cuántos bits de la dirección IP corresponden a la red. /24 significa 24 bits de red y 8 de hosts, dando 254 hosts utilizables. /16 da 65.534 hosts. /30 solo 2 hosts, ideal para enlaces punto a punto entre routers.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la dirección de broadcast y por qué no se puede asignar a un dispositivo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La dirección de broadcast es la última IP del rango de una subred (todos los bits de host a 1). Se usa para enviar paquetes a todos los dispositivos de esa subred simultáneamente. Como está reservada para ese uso, no puede asignarse a ningún equipo individual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos hosts utilizables tiene una subred /24, /25 y /30?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los hosts utilizables se calculan como 2^(bits de host) − 2 (se restan la dirección de red y el broadcast). Una /24 tiene 254 hosts, una /25 tiene 126, una /26 tiene 62, una /30 tiene 2 y una /32 tiene 0 (dirección de host individual).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre máscara de subred y prefijo CIDR?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Son dos formas de expresar lo mismo. La máscara de subred usa notación decimal con puntos: 255.255.255.0. El prefijo CIDR usa un número que indica los bits de red: /24. Ambos indican que los primeros 24 bits identifican la red y los 8 restantes identifican el host dentro de ella.',
+      },
+    },
+  ],
+};

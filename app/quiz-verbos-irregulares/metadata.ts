@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos verbos irregulares hay en inglés y cuáles son los más importantes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El inglés tiene alrededor de 200 verbos irregulares de uso frecuente, aunque en la práctica cotidiana se utilizan principalmente unos 75-100. Los más importantes por frecuencia de uso son: be, have, do, go, say, get, make, know, think y come. Este quiz incluye 75 verbos clasificados por nivel MCER, desde los esenciales de A1 hasta los menos habituales de B2.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el Past Simple y el Past Participle de los verbos irregulares?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Past Simple se usa para acciones completadas en un momento específico del pasado (I went to school yesterday). El Past Participle se combina con auxiliares para formar tiempos compuestos como el Present Perfect (I have gone) o la voz pasiva (It was written). Para muchos verbos irregulares ambas formas coinciden (bought / bought), pero en otros son distintas (go → went → gone).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel de inglés es útil practicar los verbos irregulares?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los verbos irregulares son imprescindibles desde el nivel A1, donde se aprenden los más básicos (be, have, go, come). A medida que se avanza hacia B1 y B2 aparecen verbos más complejos y menos frecuentes. Dominar las tres formas (infinitivo, past simple, past participle) es obligatorio para superar exámenes oficiales como Cambridge KET, PET o FCE.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el quiz de verbos irregulares?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El quiz muestra el verbo en infinitivo y pide seleccionar la forma correcta de Past Simple o Past Participle entre cuatro opciones. Al responder, se muestra si la respuesta es correcta y la conjugación completa del verbo. Puedes filtrar por nivel MCER (A1, A2, B1, B2) para adaptar la dificultad a tu nivel actual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la mejor forma de memorizar los verbos irregulares en inglés?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La repetición espaciada es el método más eficaz: practicar un poco cada día en lugar de estudiar muchos de una vez. Agrupar los verbos por patrones sonoros también ayuda (bring/brought, buy/bought, think/thought). Complementar la práctica con lectura y escucha de contenidos reales en inglés acelera la retención porque el cerebro asocia las formas con contextos reales.',
+      },
+    },
+  ],
+};

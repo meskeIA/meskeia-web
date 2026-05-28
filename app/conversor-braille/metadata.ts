@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['Braille', 'accesibilidad', 'discapacidad visual', 'conversor texto Braille'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el código Braille y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Braille es un sistema de escritura táctil creado por Louis Braille en 1824 para personas con discapacidad visual. Cada carácter se representa mediante una celda de 6 puntos en relieve (2 columnas × 3 filas), lo que permite hasta 64 combinaciones distintas. En este conversor las celdas se muestran como símbolos Unicode del bloque Braille (U+2800–U+28FF).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El conversor incluye la ñ y las vocales con tilde del español?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El conversor utiliza el alfabeto Braille español completo: incluye la ñ, las vocales acentuadas (á, é, í, ó, ú), números y los signos de puntuación más comunes. Esto lo diferencia de convertidores genéricos que solo cubren el inglés básico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo convertir Braille a texto normal o solo texto a Braille?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El conversor funciona en ambas direcciones. Puedes escribir texto en español y obtener los símbolos Braille correspondientes, o pegar caracteres Braille Unicode para obtener el texto en español. La conversión se realiza en tiempo real directamente en el navegador, sin enviar datos a ningún servidor.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué se usa un conversor de Braille online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para educadores y familias que acompañan a personas con discapacidad visual, para estudiantes que aprenden Braille, para diseñadores que crean materiales accesibles y para curiosos que quieren entender cómo funciona este sistema. También permite verificar transcripciones antes de imprimir en papel Braille con una impresora especializada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este conversor de una impresora Braille?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una impresora Braille produce puntos en relieve sobre papel especial que se pueden sentir con los dedos; este conversor genera representaciones visuales en pantalla mediante caracteres Unicode. Es ideal para aprendizaje y verificación, pero no reemplaza el soporte físico necesario para que una persona ciega lea por tacto.',
+      },
+    },
+  ],
+};

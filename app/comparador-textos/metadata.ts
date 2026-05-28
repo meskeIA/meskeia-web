@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un comparador de textos o diff online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un comparador de textos (o "diff") es una herramienta que analiza dos versiones de un texto y muestra visualmente qué líneas se han añadido, eliminado o modificado. Es el mismo principio que usan sistemas de control de versiones como Git para detectar cambios en el código fuente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona la comparación de textos línea a línea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El algoritmo divide cada texto en líneas y las compara una a una usando la técnica LCS (Longest Common Subsequence). Las líneas solo presentes en el texto original se marcan en rojo (eliminadas), las nuevas en verde (añadidas) y las comunes permanecen sin resaltar. El resultado es legible de un vistazo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué se usa un comparador de textos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se usa para revisar cambios entre dos versiones de un documento, contrato o artículo; detectar plagios o copias parciales; comparar salidas de programas o logs; y verificar que una traducción no ha omitido fragmentos del original. También es muy útil al hacer revisiones de código sin acceso a Git.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre comparar textos y usar Git diff?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Git diff opera sobre archivos versionados en un repositorio y muestra diferencias en formato de parche (patch). Un comparador de textos online permite comparar cualquier fragmento de texto pegado directamente, sin necesidad de tener un repositorio ni instalar ningún programa. Es la opción más rápida para comparaciones puntuales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los textos que comparo se envían a algún servidor?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. La comparación se realiza completamente en el navegador mediante JavaScript. Ningún texto se transmite a servidores externos, lo que garantiza total privacidad. Esto lo hace adecuado para comparar documentos confidenciales, contratos o código propietario.',
+      },
+    },
+  ],
+};
