@@ -90,3 +90,50 @@ const faqSchema = generateFAQSchema({
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto se paga de ITP al comprar una vivienda de segunda mano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Impuesto de Transmisiones Patrimoniales (ITP) varía entre el 6 % y el 11 % del valor del inmueble según la comunidad autónoma. Cataluña aplica el 10 %, Madrid el 6 %, Andalucía el 7 % y el País Vasco el 4 %. Además, desde 2022 la base imponible es el mayor valor entre el precio escriturado y el valor de referencia catastral, por lo que comprar por debajo del valor de referencia no reduce el impuesto a pagar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué gastos tiene el comprador al adquirir una vivienda en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El comprador asume habitualmente: el ITP (segunda mano) o IVA + AJD (obra nueva), los gastos de notaría (entre 300 € y 1.000 €), los gastos de inscripción en el Registro de la Propiedad (entre 100 € y 600 €), y opcionalmente la gestoría (200-400 €). En total, los gastos de compraventa suelen representar entre el 8 % y el 13 % del precio de compra, dependiendo de la comunidad autónoma y si hay hipoteca.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el 19 % y el 28 % según el importe. Existen exenciones relevantes: reinversión en vivienda habitual, mayores de 65 años, vivienda habitual con hipoteca...',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la escritura notarial de una compraventa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los honorarios del notario en una compraventa se calculan según el Arancel Notarial (RD 1426/1989) y dependen del precio del inmueble. Para una vivienda de 200.000 € los gastos de notaría rondan los 700-900 €; para 400.000 €, aproximadamente 900-1.200 €. Si hay hipoteca, desde 2019 los gastos de notaría de la hipoteca los paga el banco, no el comprador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la plusvalía municipal y quién la paga?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La plusvalía municipal (IIVTNU, Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) grava el aumento de valor del suelo desde la última transmisión. La paga el vendedor, salvo en herencias y donaciones (donde la paga el heredero o donatario). Desde la sentencia del Tribunal Constitucional de 2021, si no hay ganancia real en el terreno se puede acreditar la pérdida y quedar exento o pagar menos.',
+      },
+    },
+  ],
+};

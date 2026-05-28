@@ -45,3 +45,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['gastos nave industrial', 'IVA nave industrial', 'ITP nave industrial', 'compraventa nave', 'España'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué impuesto paga la compra de una nave industrial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Si la nave es de nueva construcción y la vende el promotor, se paga IVA al 21% más AJD (Actos Jurídicos Documentados), que varía entre el 0,5% y el 1,5% según la comunidad autónoma. Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, habitualmente entre el 6% y el 10%. No pueden coexistir IVA e ITP en la misma operación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puede una empresa deducirse el IVA de la compra de una nave industrial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Si el comprador es una empresa o autónomo que actúa en el ejercicio de su actividad económica y está sujeto a IVA, puede deducirse el IVA soportado en la compra de la nave, siempre que la nave se destine a la actividad. El porcentaje deducible depende del porcentaje de afectación a la actividad. Esta deducibilidad no existe con el ITP, que es un gasto no recuperable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la notaría y el registro en la compra de una nave industrial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los honorarios notariales y registrales se calculan sobre el valor escriturado según aranceles oficiales. Para una nave de 200.000 €, la notaría suele costar entre 700 € y 1.200 €, y el Registro de la Propiedad entre 400 € y 800 €. Los aranceles son decrecientes: el porcentaje baja a medida que sube el precio de la operación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia comprar una nave industrial de comprar un local comercial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Fiscalmente, tanto nave industrial como local comercial tienen el mismo tratamiento: IVA 21% en primera transmisión e ITP al tipo general en segunda mano. La diferencia práctica está en el uso (industrial vs. comercial o de oficinas) y en la calificación urbanística, que determina qué actividades pueden realizarse. La superficie, la normativa de seguridad industrial y los servicios disponibles también difieren habitualmente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué comunidad autónoma tiene el ITP más bajo para la compra de una nave?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El País Vasco aplica uno de los tipos más bajos (en torno al 4%-6% según territorio histórico). Madrid aplica el 6%, y otras comunidades como Castilla y León o Aragón tienen tipos en el rango del 7%-8%. Cataluña y Comunidad Valenciana se encuentran entre las que aplican tipos más altos, llegando al 10%-11%. Estos tipos pueden variar y se recomienda consultar la normativa vigente de cada comunidad.',
+      },
+    },
+  ],
+};

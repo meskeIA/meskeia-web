@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿A qué edad me puedo jubilar en España en 2026?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En 2026, la edad ordinaria de jubilación en España es de 66 años y 8 meses si tienes menos de 38 años y 3 meses cotizados, o de 65 años si superas esa cotización. La edad se incrementa progresivamente hasta alcanzar los 67 años en 2027 para quienes tengan menos de 38 años y 6 meses cotizados. El año de nacimiento y los años cotizados son los dos factores determinantes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula la pensión pública de jubilación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La pensión se calcula dividiendo la base reguladora (promedio de las bases de cotización de los últimos 25 años, con correctores de inflación) entre el número de meses del período de cálculo, y aplicando un porcentaje según los años cotizados. Con el sistema dual 2026, puedes elegir entre la fórmula clásica (últimos 25 años) y la ampliada (toda la vida laboral con descarte de los peores años), aplicándose la más favorable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto se reduce la pensión por jubilarse antes de tiempo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La jubilación anticipada voluntaria aplica coeficientes reductores permanentes sobre la pensión. Si te jubilas 2 años antes, la reducción es de entre el 13% y el 14% dependiendo de los años cotizados. Cuanto menos se haya cotizado y más se anticipe la jubilación, mayor es la penalización. La jubilación anticipada involuntaria (por despido colectivo, enfermedad, etc.) aplica coeficientes algo menos penalizadores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la jubilación parcial y quién puede solicitarla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La jubilación parcial permite reducir la jornada laboral (entre un 25% y un 50%) y cobrar simultáneamente una parte proporcional de la pensión, siempre que la empresa contrate a un trabajador sustituto mediante un contrato de relevo. Para solicitarla se requieren al menos 33 años cotizados (en algunos casos 25), tener al menos 60 años (con coeficientes reductores si es antes de la ordinaria) y un acuerdo con la empresa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la pensión máxima de jubilación en 2026?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La pensión máxima de jubilación de la Seguridad Social en 2026 es de 3.267,60 € al mes (en 14 pagas), que se revisa anualmente según el IPC. Esta cifra actúa como techo independientemente de la base reguladora calculada. La pensión mínima garantizada para un pensionista con cónyuge a cargo supera los 900 € mensuales en 2026.',
+      },
+    },
+  ],
+};

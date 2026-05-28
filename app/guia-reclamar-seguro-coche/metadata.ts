@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuándo conviene reclamar al seguro del coche y cuándo no?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Conviene reclamar cuando el coste de la reparación supera claramente la penalización en el bonus o la franquicia. En daños menores (abolladuras pequeñas, arañazos superficiales) a menudo es más rentable pagar de bolsillo para no perder descuentos por no siniestralidad. Para accidentes con terceros, lesionados o daños importantes, siempre hay que comunicarlo a la aseguradora aunque no se tramite la prestación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el bonus-malus y cómo afecta al precio de mi seguro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El bonus-malus es un sistema de descuentos y recargos según el historial de siniestros. Cada año sin partes te da un descuento (bonus) que puede llegar al 30-40% de la prima. Cada siniestro culpable sube la prima (malus) durante 3-5 años según la aseguradora. Antes de reclamar, calcula si el ahorro en la reparación compensa el encarecimiento futuro del seguro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cubre el seguro el atropello de animales en carretera?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los daños por atropello de animales en carretera suelen estar cubiertos por la póliza de todo riesgo. En seguros de terceros básicos, puede incluirse como cobertura opcional. Desde la reforma de la Ley de Tráfico de 2014, la responsabilidad es del titular del aprovechamiento cinegético o del titular de la vía, no del conductor, salvo negligencia demostrada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo reclamar al seguro del coche por rotura de luna?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cobertura de lunas suele ser independiente del bonus-malus en la mayoría de pólizas, por lo que reclamar por rotura de luna generalmente no penaliza en la prima. Hay que comunicar el siniestro a la aseguradora, que habitualmente tiene talleres concertados de reparación rápida. Si la rotura es un pequeño impacto sin fisura propagada, algunos talleres lo reparan en 30-45 minutos sin coste para el asegurado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué plazo tengo para reclamar un siniestro al seguro del coche?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En España, el plazo general de prescripción para reclamar a la aseguradora es de 2 años para seguros de daños (artículo 23 de la Ley del Contrato de Seguro). Para seguros de responsabilidad civil de vehículos a motor el plazo también es de 2 años desde el momento del siniestro. No obstante, las pólizas pueden establecer condiciones de comunicación inmediata; conviene revisar las condiciones particulares.',
+      },
+    },
+  ],
+};

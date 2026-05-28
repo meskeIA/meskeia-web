@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tarda en hacerse la digestión completa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La digestión completa, desde que ingerimos un alimento hasta que se eliminan los residuos, dura entre 24 y 72 horas en adultos sanos. La mayor parte del tiempo transcurre en el intestino grueso (12-48 h), mientras que el estómago retiene los alimentos entre 2 y 4 horas, y el intestino delgado absorbe los nutrientes en unas 4-6 horas adicionales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué enzimas participan en la digestión y dónde actúan?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La amilasa salival comienza a descomponer el almidón en la boca. En el estómago, la pepsina degrada las proteínas con la ayuda del ácido clorhídrico. En el intestino delgado actúan las enzimas pancreáticas (lipasa, proteasa, amilasa pancreática) y las enzimas del borde en cepillo intestinal, que completan la digestión de grasas, proteínas e hidratos de carbono antes de la absorción.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el peristaltismo y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El peristaltismo son contracciones musculares rítmicas y coordinadas que impulsan el bolo alimenticio a lo largo del tubo digestivo. Estas ondas de contracción-relajación permiten que la comida avance desde el esófago hasta el intestino sin necesidad de la gravedad, por eso podemos comer incluso boca abajo. El sistema nervioso entérico del intestino coordina estas contracciones de forma autónoma.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se absorben los nutrientes en el intestino delgado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La pared del intestino delgado está cubierta de millones de vellosidades intestinales y microvellosidades que aumentan la superficie de absorción hasta unos 200 m². Los nutrientes digeridos (glucosa, aminoácidos, ácidos grasos) pasan a través del epitelio intestinal hacia los capilares sanguíneos y los vasos linfáticos (para las grasas), transportándose así a todo el organismo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué papel tiene la microbiota intestinal en la digestión?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La microbiota intestinal, formada por unos 100 billones de microorganismos, fermenta fibras que el intestino delgado no puede digerir, produciendo ácidos grasos de cadena corta beneficiosos para el colon. También sintetiza vitaminas (K, B12), refuerza la barrera intestinal y entrena al sistema inmunitario. Se estima que el 70 % de las células inmunes del cuerpo residen en el intestino.',
+      },
+    },
+  ],
+};

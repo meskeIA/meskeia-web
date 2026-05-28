@@ -54,3 +54,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en espanol',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántas semanas dura el permiso por nacimiento en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Desde el 1 de enero de 2021, ambos progenitores tienen derecho a 16 semanas de permiso por nacimiento en España, según el Real Decreto-Ley 6/2019. Las 6 primeras semanas son obligatorias e ininterrumpidas a partir del parto; las 10 restantes son voluntarias y pueden disfrutarse hasta que el menor cumpla 12 meses.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se pueden ampliar las 16 semanas del permiso de maternidad o paternidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El permiso se amplía en 2 semanas adicionales por cada hijo en caso de parto múltiple, discapacidad del recién nacido u hospitalización neonatal prolongada. También existe una semana adicional para familias monoparentales. Estas ampliaciones se suman a las 16 semanas base.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre las semanas obligatorias y las voluntarias del permiso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las 6 primeras semanas tras el parto son obligatorias: deben disfrutarse de forma ininterrumpida justo después del nacimiento. Las 10 semanas voluntarias son flexibles: se pueden tomar a jornada completa o parcial, de forma continuada o en periodos separados, y hasta que el bebé cumpla 12 meses, previa comunicación a la empresa con al menos 15 días de antelación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cobra un trabajador durante la baja por nacimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La prestación económica de la Seguridad Social durante el permiso por nacimiento es el 100% de la base reguladora, calculada a partir de las cotizaciones de los últimos meses trabajados. Para acceder a la prestación es necesario tener un mínimo de cotización previo (varía según la edad del solicitante). La prestación la gestiona directamente la Seguridad Social, no la empresa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puede el padre o la madre disfrutar el permiso al mismo tiempo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, ambos progenitores pueden disfrutar su permiso de forma simultánea, salvo las 6 semanas obligatorias que cada uno debe tomar por separado a continuación del parto. Esto significa que en los primeros días tras el nacimiento es posible que los dos estén de permiso al mismo tiempo.',
+      },
+    },
+  ],
+};

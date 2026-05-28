@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto puedo cobrar por una habitación en zona tensionada en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En una zona declarada de mercado residencial tensionado, la suma de las rentas de todas las habitaciones del piso no puede superar la renta máxima que correspondería al alquiler del inmueble completo según el índice de referencia aplicable (SERPAVI u otro índice autonómico). Dicho de otro modo, alquilar por habitaciones no puede ser un mecanismo para eludir el tope de renta del piso entero.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es una zona de mercado residencial tensionado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es una declaración administrativa que identifica municipios o áreas donde el precio del alquiler supera el 30 % de los ingresos medios de los hogares o ha crecido más de 3 puntos sobre el IPC en los últimos 5 años. La Ley 12/2023 de vivienda establece el procedimiento. Declarada la zona, se activan límites de renta para nuevos contratos y renovaciones. A mediados de 2026 hay más de 300 municipios declarados, concentrados sobre todo en Cataluña.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es legal alquilar una habitación a un precio superior al índice de referencia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No en zonas tensionadas. Cobrar por encima del tope de renta se considera infracción grave según la Ley 12/2023 y puede acarrear multas de entre 10.000 y 100.000 €. En Cataluña, la Agència de l\'Habitatge aplica su propio régimen sancionador, con sanciones que pueden alcanzar los 90.000 € en casos de reincidencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A qué contratos de alquiler de habitaciones afecta la nueva regulación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regulación afecta a los contratos de alquiler de habitación para uso de vivienda habitual del inquilino, firmados a partir de la entrada en vigor de la normativa en cada municipio. Los contratos de temporada o los alquileres turísticos siguen una regulación distinta. El RDL 8/2026 y la proposición de ley en tramitación a 2026 buscan cerrar vacíos normativos en los contratos de habitación que no quedaban plenamente cubiertos por la Ley de Arrendamientos Urbanos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Dónde puedo consultar si mi municipio es zona tensionada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cada comunidad autónoma publica las resoluciones de declaración en su boletín oficial. En Cataluña, la Agència de l\'Habitatge mantiene actualizado el listado en la web oficial. Para el resto de España, el Ministerio de Vivienda y Agenda Urbana publica las declaraciones en el BOE. Esta herramienta incluye un buscador con los municipios declarados con más de 300 municipios registrados a mayo de 2026.',
+      },
+    },
+  ],
+};

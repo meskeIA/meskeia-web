@@ -73,3 +73,50 @@ const faqSchema = generateFAQSchema({
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué IVA paga un trastero nuevo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un trastero de obra nueva (primera transmisión del promotor) paga IVA al 10%, igual que una vivienda o garaje residencial. Este tipo se aplica tanto si va vinculado a una vivienda como si se vende de forma independiente, siempre que sea la primera transmisión. Si fuese un local de uso mixto o con finalidad no residencial, podría aplicar el 21%.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre trastero vinculado y trastero independiente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El trastero vinculado forma parte de la misma finca registral que la vivienda y se vende junto a ella como anejo. El trastero independiente tiene su propia referencia catastral y escritura y puede venderse por separado. La diferencia fiscal es que el trastero independiente puede recibir un tratamiento distinto en algunas comunidades autónomas, especialmente en ITP de segunda mano. Consulta siempre con un asesor fiscal antes de la operación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede comprar un trastero sin comprar también la vivienda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Si el trastero tiene finca registral propia (trastero independiente), se puede comprar y vender de forma autónoma sin necesidad de adquirir la vivienda a la que originalmente estuvo vinculado. Esta es una operación habitual, especialmente en comunidades de propietarios donde el trastero sale a la venta de forma separada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se paga plusvalía municipal al vender un trastero?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay ganancia, se puede acreditar la pérdida y quedar exento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Tienen tipos reducidos de ITP los trasteros?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de cada comunidad autónoma. La mayoría de los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) se diseñaron para vivienda habitual. No obstante, como el trastero vinculado se considera anejo residencial, algunas comunidades autónomas pueden extenderlos. En el caso del trastero independiente, el tratamiento es menos claro y varía según la normativa autonómica. Verifica los requisitos específicos de tu comunidad antes de la compra.',
+      },
+    },
+  ],
+};
