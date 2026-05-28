@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['daltonismo', 'accesibilidad', 'diseño', 'WCAG', 'color blindness', 'protanopia', 'deuteranopia', 'tritanopia'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el daltonismo y qué tipos existen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El daltonismo es una alteración hereditaria en la percepción del color causada por la ausencia o mal funcionamiento de uno o más tipos de conos en la retina. Los tipos más frecuentes son la protanopia y la deuteranopia (dificultad para distinguir rojos y verdes), que afectan a alrededor del 8% de los hombres y el 0,5% de las mujeres. La tritanopia (azul-amarillo) y la acromatopsia (ausencia total de color) son mucho más raras.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo simula una herramienta digital la visión de una persona con daltonismo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se aplican matrices de transformación de color que modelan cómo cada tipo de daltonismo altera la señal visual. Las matrices más utilizadas son las de Machado, Oliveira y Fernandes (2009), derivadas de datos fisiológicos sobre la sensibilidad espectral de cada tipo de cono. El proceso transforma píxel a píxel los colores de la imagen original para reproducir la apariencia percibida por cada tipo de daltónico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué es importante considerar el daltonismo al diseñar interfaces o presentaciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Aproximadamente 1 de cada 12 hombres tiene algún grado de daltonismo. Si una interfaz, gráfico o presentación codifica información únicamente con color (por ejemplo, rojo = error, verde = correcto), una parte significativa del público no podrá interpretar ese mensaje. Los estándares WCAG recomiendan no usar el color como único medio de transmitir información, combinándolo siempre con iconos, texto o patrones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre protanopia, deuteranopia y tritanopia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La protanopia implica la ausencia de conos sensibles al rojo: los colores rojos aparecen más oscuros y pueden confundirse con marrones o negros. La deuteranopia supone la ausencia de conos verdes: rojos y verdes se confunden, aunque los rojos no se oscurecen tanto como en la protanopia. La tritanopia, mucho menos frecuente, afecta a los conos azules: azules y amarillos se perciben de forma similar, y los colores fríos pierden saturación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo hacer que mis diseños sean accesibles para personas con daltonismo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las principales recomendaciones son: no codificar información solo con color, asegurarse de que el contraste entre texto y fondo cumple WCAG AA (ratio ≥ 4,5:1), usar iconos o patrones junto al color en gráficos y señales de estado, y evitar combinaciones problemáticas como rojo-verde o azul-morado. Simular el diseño en los distintos tipos de daltonismo antes de publicarlo ayuda a detectar problemas que serían difíciles de intuir sin la herramienta.',
+      },
+    },
+  ],
+};

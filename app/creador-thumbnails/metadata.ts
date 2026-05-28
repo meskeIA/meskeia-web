@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el tamaño recomendado para un thumbnail de YouTube?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'YouTube recomienda 1280×720 píxeles con una relación de aspecto 16:9, que es el formato estándar HD. El archivo no debe superar 2 MB y los formatos aceptados son JPG, PNG, GIF y BMP. El editor genera la imagen directamente en 1280×720 px lista para subir.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué hace que un thumbnail consiga más clics?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los thumbnails con mayor CTR suelen combinar tres elementos: un rostro con expresión emocional visible (aumenta la conexión humana), texto en negrita de 3–5 palabras que promete un beneficio concreto, y contraste de color elevado para destacar en el feed. Evitar fondos blancos y usar tipografías grandes mejora la legibilidad en dispositivos móviles.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo exportar el thumbnail creado como archivo PNG?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El editor permite exportar la miniatura en formato PNG a 1280×720 píxeles con un solo clic, sin marcas de agua ni registro previo. El archivo queda listo para subir directamente al panel de YouTube al publicar o editar el vídeo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tarda en aprender a usar un editor de thumbnails online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mayoría de creadores diseña su primer thumbnail en menos de 5 minutos usando un editor visual con plantillas. No se necesitan conocimientos de diseño gráfico: basta con elegir un fondo o color, añadir texto y ajustar el tamaño. La curva de aprendizaje es mínima comparada con herramientas profesionales como Photoshop.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre diseñar thumbnails online y usar Canva o Photoshop?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las herramientas online especializadas en thumbnails son más rápidas para casos concretos: exportan al tamaño exacto de YouTube sin configuración, funcionan sin instalación y son gratuitas. Canva ofrece más plantillas y elementos de diseño. Photoshop proporciona control total pero requiere conocimientos avanzados y suscripción de pago.',
+      },
+    },
+  ],
+};

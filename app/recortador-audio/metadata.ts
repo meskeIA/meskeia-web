@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo recortar un archivo MP3 online sin instalar programas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sube el archivo MP3 a la herramienta, ajusta los puntos de inicio y fin en la línea de tiempo y descarga el fragmento recortado. Todo el procesamiento ocurre en tu navegador, por lo que no se sube ningún dato a servidores externos. No necesitas instalar ningún programa ni registrarte.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué formatos de audio admite un recortador online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los formatos más compatibles con navegadores modernos son MP3, WAV y OGG. El MP3 es el más universal para música y podcasts; el WAV ofrece calidad sin pérdida y es preferido en producción de audio; el OGG es habitual en videojuegos y aplicaciones web. Algunos recortadores también admiten M4A y FLAC.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve el efecto fade in y fade out en audio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El fade in aumenta progresivamente el volumen al inicio del clip, evitando cortes bruscos. El fade out lo reduce al final, creando un cierre suave. Ambos efectos se usan para crear tonos de llamada, intros de pódcast, transiciones musicales y eliminación de ruidos de fondo al principio o al final de una grabación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es seguro usar un recortador de audio online para archivos personales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, siempre que el procesamiento sea local (en el propio navegador mediante la Web Audio API). En ese caso el archivo nunca abandona tu dispositivo y no existe riesgo de filtración de datos. Antes de usar cualquier herramienta, verifica que no envía el archivo a un servidor externo revisando la política de privacidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre recortar audio y convertir audio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Recortar audio consiste en seleccionar un fragmento temporal de un archivo, manteniendo el formato y la calidad originales. Convertir audio cambia el formato del archivo (por ejemplo, de WAV a MP3) sin modificar necesariamente su duración. Son operaciones distintas: se puede recortar sin convertir y viceversa.',
+      },
+    },
+  ],
+};

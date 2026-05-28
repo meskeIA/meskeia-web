@@ -43,3 +43,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Por dónde empiezo a escribir si soy principiante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Lo más importante antes de escribir es elegir el género que te resulte más natural y una perspectiva narrativa con la que te sientas cómodo. Define el conflicto central de tu historia y el perfil básico de tu protagonista. Con esos elementos mínimos ya puedes escribir la primera escena sin bloqueos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre primera persona y tercera persona en una novela?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La primera persona ("yo") ofrece acceso inmediato a los pensamientos del narrador y crea intimidad con el lector, pero limita lo que puedes mostrar a lo que el narrador conoce. La tercera persona omnisciente permite moverse entre múltiples personajes y escenas con libertad total. La tercera limitada combina ambas ventajas: sigue a un solo personaje pero en voz externa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas páginas debe tener una novela?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una novela convencional tiene entre 70.000 y 100.000 palabras (unas 250-350 páginas en formato estándar). Las novelas juveniles o de género suelen ser más cortas (50.000-80.000 palabras), mientras que la fantasía épica puede superar las 150.000. Para un primer libro, lo más recomendable es apuntar a entre 80.000 y 100.000 palabras.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el error más frecuente del escritor principiante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El error más habitual es intentar que el primer borrador sea perfecto. El primer borrador existe para explorar la historia, no para publicar. Otros errores frecuentes incluyen comenzar la historia demasiado antes del conflicto real, dar demasiada información al lector en los primeros capítulos (infodump) y crear personajes sin motivaciones claras.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es mejor planificar la novela antes de escribir o ir improvisando?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende del estilo de cada escritor. Los "plotters" planifican estructura, arcos y personajes antes de escribir la primera página; los "pantsers" descubren la historia mientras la escriben. La mayoría de escritores usa un enfoque intermedio: un esquema flexible con puntos clave y libertad para improvisar. Lo importante es conocer al menos el final antes de empezar.',
+      },
+    },
+  ],
+};

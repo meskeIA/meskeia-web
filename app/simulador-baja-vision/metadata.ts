@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la baja visión y cuántas personas la tienen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La baja visión es una pérdida de agudeza o campo visual que no puede corregirse totalmente con gafas, lentes de contacto o cirugía. La Organización Mundial de la Salud estima que más de 253 millones de personas en el mundo tienen algún grado de discapacidad visual, de las cuales alrededor de 217 millones presentan baja visión moderada o grave. Las causas más frecuentes son las cataratas, el glaucoma y la degeneración macular.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona un simulador de baja visión?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un simulador de baja visión aplica filtros gráficos sobre una imagen o texto para reproducir los efectos visuales de distintas condiciones oculares. Por ejemplo, simula el desenfoque progresivo de las cataratas, el campo visual reducido del glaucoma, la mancha central de la degeneración macular o la distorsión de la miopía severa. El resultado ayuda a comprender de forma intuitiva las dificultades de lectura y navegación que experimentan estas personas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve simular la baja visión en el proceso de diseño?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Permite a diseñadores y desarrolladores detectar problemas de legibilidad y usabilidad antes de publicar un producto. Al ver cómo se percibe la interfaz con distintas condiciones visuales, es más fácil tomar decisiones sobre tamaño de fuente, contraste, densidad de información y estructura de navegación. Es una práctica recomendada por los estándares WCAG y por metodologías de diseño centrado en el usuario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre baja visión y daltonismo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La baja visión implica una reducción general de la agudeza o el campo visual debida a condiciones como glaucoma, cataratas o degeneración macular. El daltonismo, en cambio, es una alteración en la percepción de determinados colores causada por diferencias en los fotorreceptores del ojo (conos), sin que necesariamente disminuya la nitidez de la visión. Ambas condiciones son independientes aunque pueden coexistir en la misma persona.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué condiciones visuales simula esta herramienta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La herramienta simula las condiciones visuales más prevalentes: cataratas (desenfoque y pérdida de contraste), miopía severa (visión borrosa a distancia), glaucoma (pérdida del campo periférico con visión en túnel), degeneración macular (mancha central que dificulta la lectura), y algunas formas de daltonismo (protanopia, deuteranopia). Cada simulación refleja los efectos típicos de cada condición para facilitar la empatía con los usuarios afectados.',
+      },
+    },
+  ],
+};

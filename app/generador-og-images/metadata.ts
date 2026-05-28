@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una imagen Open Graph (OG) y por qué es importante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una imagen Open Graph es la vista previa visual que aparece cuando se comparte un enlace en redes sociales como Facebook, LinkedIn, WhatsApp o Telegram. Se define mediante la etiqueta meta og:image en el HTML de la página. Sin ella, la red social escoge una imagen aleatoria, lo que suele generar previsualizaciones poco atractivas que reducen el número de clics.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las dimensiones correctas para una imagen OG?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tamaño recomendado es 1200×630 píxeles con relación de aspecto 1,91:1, que es el estándar aceptado por Facebook, LinkedIn, Twitter/X y WhatsApp. El archivo debe pesar menos de 8 MB en JPG o PNG. El editor genera la imagen directamente en esas dimensiones para subir al servidor sin reescalar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo añado la imagen OG a mi web o blog?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una vez generada y subida a tu servidor, añade la etiqueta <meta property="og:image" content="https://tudominio.com/imagen-og.png"> dentro del <head> del HTML. En WordPress basta con instalar un plugin SEO (Yoast, Rank Math) e indicar la URL de la imagen. En Next.js se configura en el objeto openGraph de la metadata.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Una misma imagen OG sirve para todas las redes sociales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La imagen OG estándar (1200×630 px) funciona en Facebook, LinkedIn y WhatsApp. Twitter/X usa la misma imagen si se especifica con twitter:image, aunque puede recortarla según el tipo de tarjeta (summary_large_image o summary). Para Pinterest existen propiedades adicionales pero la imagen OG sirve como fallback.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia debo actualizar la imagen OG de mis páginas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se recomienda actualizar la imagen OG cuando cambies el contenido principal de la página, la gráfica de campaña o el nombre del producto. Las redes sociales cachean las previsualizaciones durante días o semanas; puedes forzar la actualización en Facebook con la herramienta "Depurador de URLs" y en LinkedIn con el Inspector de publicaciones, ambas gratuitas.',
+      },
+    },
+  ],
+};

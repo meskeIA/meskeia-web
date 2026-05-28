@@ -36,3 +36,50 @@ export const jsonLd = generateWebAppSchema({
       "En español"
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el ratio de contraste de colores y por qué importa en diseño web?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El ratio de contraste mide la diferencia de luminosidad entre dos colores, como el texto y su fondo. Un contraste insuficiente dificulta la lectura a personas con baja visión o en condiciones de luz intensa. Las guías WCAG 2.1 establecen umbrales mínimos para garantizar que el contenido sea legible por la mayor cantidad de usuarios posible.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre el nivel WCAG AA y el nivel AAA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'WCAG AA requiere un ratio mínimo de 4,5:1 para texto normal y 3:1 para texto grande (18pt o 14pt en negrita). Es el estándar exigido en la mayoría de proyectos públicos y legislaciones de accesibilidad. WCAG AAA eleva los umbrales a 7:1 y 4,5:1 respectivamente, y se recomienda cuando el público incluye personas con discapacidad visual severa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula el ratio de contraste entre dos colores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se calcula dividiendo la luminancia relativa del color más claro entre la del más oscuro, sumando 0,05 a ambas para evitar la división por cero. La luminancia relativa se obtiene transformando los valores RGB al espacio lineal. El resultado va de 1:1 (sin contraste) a 21:1 (negro sobre blanco).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil un verificador de contraste de colores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para diseñadores de interfaces, desarrolladores front-end y equipos de UX que necesitan validar que sus combinaciones de colores cumplen los estándares de accesibilidad. También lo usan equipos de calidad web, auditores de accesibilidad y cualquier persona que quiera asegurarse de que sus materiales digitales son legibles para todos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Existe alguna norma legal que obligue a cumplir el estándar WCAG en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En España, el Real Decreto 1112/2018 transpone la Directiva Europea 2016/2102 y obliga a los sitios web y aplicaciones del sector público a cumplir al menos el nivel WCAG 2.1 AA. Para el sector privado no existe una obligación legal general, aunque la normativa europea de accesibilidad (European Accessibility Act) extiende requisitos a empresas privadas en determinados servicios digitales a partir de junio de 2025.',
+      },
+    },
+  ],
+};
