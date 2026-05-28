@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el mínimo por discapacidad en el IRPF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El mínimo por discapacidad es una cantidad que se resta de la base imponible del IRPF para reconocer los gastos adicionales que conlleva la discapacidad. En 2025, el mínimo general es de 3.000 € anuales para discapacidades del 33 % al 64 %, y de 9.000 € para discapacidades del 65 % o superior. Si se necesita asistencia de terceras personas, se suma un complemento adicional de 3.000 €.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué grado de discapacidad reconocida es necesario para aplicar la deducción?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es necesario tener un grado de discapacidad reconocido oficialmente de al menos el 33 %. Este reconocimiento debe constar en resolución del Instituto Nacional de Servicios Sociales (IMSERSO) o del organismo autonómico competente. Las pensiones de incapacidad permanente total, absoluta o gran invalidez de la Seguridad Social también dan derecho al mínimo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede aplicar el mínimo por discapacidad de un familiar a cargo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La deducción se puede aplicar también por ascendientes (padres, abuelos) o descendientes (hijos, nietos) con discapacidad reconocida que convivan con el contribuyente y no tengan rentas anuales superiores a 8.000 €. Los importes son los mismos que para el contribuyente: 3.000 € o 9.000 € según el grado, más 3.000 € si necesitan asistencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto dinero me puedo ahorrar en la declaración de la renta por discapacidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El ahorro real depende del tipo marginal del IRPF que te corresponda. Si tienes discapacidad del 65 % con necesidad de asistencia, el mínimo total es de 12.000 €. Con un tipo marginal del 30 %, el ahorro fiscal sería de 3.600 € aproximadamente. La herramienta calcula este ahorro estimado de forma automática en función de tu situación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Son compatibles el mínimo por discapacidad y las prestaciones de dependencia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En general sí son compatibles. Las prestaciones del Sistema para la Autonomía y Atención a la Dependencia (SAAD) están exentas de IRPF, por lo que no afectan a la aplicación del mínimo por discapacidad. No obstante, conviene revisar cada situación particular con un asesor fiscal, ya que la combinación de prestaciones y circunstancias personales puede variar el resultado.',
+      },
+    },
+  ],
+};

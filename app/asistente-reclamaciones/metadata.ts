@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo reclamar mis derechos como consumidor en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes reclamar ante el vendedor por escrito, solicitar una hoja de reclamaciones oficial en el establecimiento o acudir a la OMIC (Oficina Municipal de Información al Consumidor) de tu municipio. Si no obtienes respuesta, puedes presentar una reclamación ante la Dirección General de Consumo de tu comunidad autónoma o iniciar un arbitraje de consumo gratuito.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el plazo para reclamar la garantía de un producto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En España, los productos nuevos tienen una garantía legal de 3 años desde la entrega (ampliada de 2 a 3 años en 2022). Los productos de segunda mano tienen 1 año salvo pacto en contrario. El plazo para ejercer la acción de responsabilidad es de 3 años desde que el consumidor conoce el defecto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el derecho de desistimiento y cuándo se puede ejercer?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El derecho de desistimiento permite devolver un producto comprado a distancia (internet, teléfono) sin necesidad de dar ningún motivo, en un plazo de 14 días naturales desde la recepción. No aplica a compras en tiendas físicas ni a productos personalizados, perecederos o contenidos digitales descargados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve la hoja de reclamaciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La hoja de reclamaciones es un documento oficial con el que el consumidor puede dejar constancia escrita de su queja ante un establecimiento. Todos los comercios y empresas que prestan servicios en España están obligados a tenerla disponible. Una copia se envía a la administración de consumo correspondiente, que puede iniciar un procedimiento de inspección.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre una reclamación y una denuncia de consumo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una reclamación busca resolver un conflicto concreto entre el consumidor y la empresa (devolución, reparación, indemnización). Una denuncia, en cambio, pone en conocimiento de la administración una infracción que puede afectar a otros consumidores, sin que el denunciante sea necesariamente parte del conflicto. Ambas pueden presentarse ante los servicios de consumo de tu comunidad autónoma.',
+      },
+    },
+  ],
+};
