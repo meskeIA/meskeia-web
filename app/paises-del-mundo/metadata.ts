@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos países hay en el mundo actualmente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Actualmente se reconocen 195 países en el mundo: 193 son estados miembros de las Naciones Unidas y 2 tienen estatus de estado observador (Vaticano y Palestina). Esta cifra puede variar ligeramente según el criterio de reconocimiento internacional que se aplique.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el país más grande del mundo por superficie?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Rusia es el país más grande del mundo, con una superficie de aproximadamente 17,1 millones de km², lo que representa cerca del 11% de la superficie terrestre total. Le siguen Canadá (10 millones de km²), Estados Unidos (9,8 millones de km²) y China (9,6 millones de km²).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué país tiene más habitantes en el mundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'India superó a China en 2023 como el país más poblado del mundo, con más de 1.440 millones de habitantes. China tiene aproximadamente 1.410 millones. Estados Unidos ocupa el tercer lugar con alrededor de 335 millones de personas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve un buscador de países del mundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un buscador de países permite consultar rápidamente datos geográficos y culturales de cualquier nación: capital, bandera, población, superficie, moneda oficial, idioma principal y prefijo telefónico internacional. Es útil para estudiantes, viajeros, periodistas y cualquier persona que necesite información básica de referencia sobre geografía mundial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos idiomas oficiales existen en el mundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el mundo existen entre 6.000 y 7.000 lenguas vivas, aunque el número de idiomas con estatus oficial varía según el país. El español es oficial en 21 países, el inglés en más de 50 y el francés en 29. Algunos países como Bolivia, India o Sudáfrica tienen más de 10 idiomas oficiales reconocidos.',
+      },
+    },
+  ],
+};

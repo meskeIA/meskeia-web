@@ -55,3 +55,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['aval ICO', 'primera vivienda', 'hipoteca 100%', 'jóvenes vivienda', 'ICO', 'comprar sin entrada'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el Aval ICO para la vivienda y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Aval ICO es un programa del gobierno de España gestionado por el Instituto de Crédito Oficial (ICO) que actúa como garante de hasta el 20% del préstamo hipotecario. Permite a los compradores acceder a una hipoteca del 100% del valor de la vivienda sin necesidad de disponer del ahorro previo habitual del 20%, que suele ser la principal barrera para acceder a la primera vivienda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Quién puede solicitar el Aval ICO para comprar una vivienda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Pueden solicitarlo dos perfiles: jóvenes menores de 35 años que vayan a comprar su primera vivienda habitual, y familias con menores a cargo independientemente de la edad. En ambos casos se requiere residencia legal en España, que la vivienda sea la residencia habitual y permanente, y que los ingresos anuales no superen ciertos límites establecidos por el programa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el límite de ingresos para acceder al Aval ICO?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El límite general es de 37.800 euros brutos anuales por solicitante (4,5 veces el IPREM). En el caso de compra en pareja, el límite se aplica individualmente a cada persona. Para familias con hijos o personas con discapacidad, el límite puede incrementarse. El orientador calcula automáticamente si tus ingresos están dentro del umbral según tu situación familiar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El Aval ICO es un préstamo o una subvención? ¿Hay que devolverlo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Aval ICO no es un préstamo ni una subvención: es una garantía. El ICO actúa como avalista ante el banco, lo que permite al comprador acceder a una hipoteca mayor. No hay que devolver nada al ICO directamente; la deuda es únicamente con el banco que concede la hipoteca. Sin embargo, si se produce un impago, el ICO respondería ante el banco y podría reclamar posteriormente al comprador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué documentación se necesita para solicitar el Aval ICO?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La documentación básica incluye: DNI o NIE en vigor, última declaración de la renta o certificado de imputaciones de la AEAT, vida laboral y contrato de trabajo o autónomo, libro de familia si se tiene hijos menores, y nota simple registral de la vivienda a comprar. La solicitud se tramita a través de las entidades bancarias adheridas al programa, no directamente ante el ICO.',
+      },
+    },
+  ],
+};

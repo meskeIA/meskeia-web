@@ -53,3 +53,50 @@ export const jsonLd = generateWebAppSchema({
     'Funciona 100% en el navegador, sin registro',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre el vinagre balsámico de Módena y el balsámico tradicional?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El vinagre balsámico tradicional de Módena (DOP) se elabora exclusivamente con mosto cocido de uvas Lambrusco o Trebbiano y envejece al menos 12 años en barricas de distintas maderas. El balsámico de Módena IGP puede mezclar vinagre de vino con mosto concentrado y tiene un proceso mucho más corto. La diferencia se nota claramente en precio, densidad y complejidad de sabor.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué vinagre es mejor para hacer vinagretas y aliños de ensalada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para vinagretas ligeras, el vinagre de vino blanco o el vinagre de champán aportan una acidez elegante sin dominar otros ingredientes. El vinagre de jerez ofrece más cuerpo y notas tostadas, ideal para ensaladas con ingredientes robustos. El de manzana tiene una acidez suave y frutada que combina bien con ensaladas de frutas o espinacas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la acidez habitual de los vinagres y cómo afecta al cocinado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mayoría de vinagres de uso culinario tienen entre un 5 % y un 8 % de acidez acética. Los vinagres de arroz japoneses rondan el 4-5 %, lo que los hace más suaves al paladar. A mayor acidez, mayor potencia al cocinar: una acidez alta resalta en reducciones y escabeches, mientras que acideces bajas son preferibles en salsas delicadas o sushi.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué se usa el vinagre de arroz en la cocina asiática?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El vinagre de arroz es imprescindible para condimentar el arroz del sushi, equilibrar salsas como la ponzu y preparar encurtidos japoneses (tsukemono) y coreanos. En China se usa tanto en agridulces como en marinados. Su baja acidez (4-5 %) y sabor suave y ligeramente dulce lo hacen versátil sin resultar agresivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El vinagre de kombucha tiene beneficios para la salud?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El vinagre de kombucha se obtiene por fermentación prolongada de té azucarado con una colonia de bacterias y levaduras (SCOBY). Contiene ácido acético, ácidos orgánicos y trazas de vitaminas del grupo B. Aunque se le atribuyen propiedades probióticas, la evidencia científica sólida sobre beneficios concretos en humanos es aún limitada. Como cualquier vinagre, su consumo moderado forma parte de una dieta equilibrada.',
+      },
+    },
+  ],
+};

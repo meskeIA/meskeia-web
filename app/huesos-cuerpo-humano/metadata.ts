@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos huesos tiene el cuerpo humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El esqueleto adulto tiene 206 huesos. Al nacer, los bebés tienen alrededor de 270-300 piezas óseas, muchas de las cuales se fusionan durante el crecimiento. Esta fusión se completa hacia los 25 años, cuando el esqueleto alcanza su configuración definitiva de 206 huesos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el hueso más largo del cuerpo humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El fémur, el hueso del muslo, es el más largo del cuerpo humano. En un adulto de estatura media mide aproximadamente 45-50 cm y representa alrededor del 27% de la altura total de la persona. También es el hueso más resistente: puede soportar fuerzas de compresión de hasta 1.700 kg.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el hueso más pequeño del cuerpo humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El estribo, uno de los tres huesecillos del oído medio, es el hueso más pequeño del cuerpo humano. Mide aproximadamente 3 mm de longitud. Los tres osículos del oído (martillo, yunque y estribo) transmiten las vibraciones sonoras desde el tímpano hasta el oído interno.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve estudiar la anatomía ósea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El conocimiento del esqueleto es fundamental en medicina, enfermería, fisioterapia, osteopatía y ciencias del deporte. Permite interpretar radiografías, comprender lesiones, planificar cirugías y entender el movimiento corporal. También es materia obligatoria en oposiciones sanitarias y en el examen MIR, donde la anatomía musculoesquelética representa una parte relevante del temario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos huesos tiene la columna vertebral?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La columna vertebral está formada por 33 vértebras distribuidas en cinco regiones: 7 cervicales, 12 torácicas, 5 lumbares, 5 sacras (fusionadas en el sacro) y 4 coccígeas (fusionadas en el cóccix). En el adulto, las vértebras sacras y coccígeas fusionadas reducen el número de piezas independientes a 26.',
+      },
+    },
+  ],
+};
