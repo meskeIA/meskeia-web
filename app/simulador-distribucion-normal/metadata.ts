@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['distribución normal', 'Gauss', 'estadística', 'probabilidad', 'puntuación Z', 'EBAU', 'Bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la distribución normal o curva de Gauss?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La distribución normal es un modelo estadístico que describe cómo se distribuyen muchas variables naturales y sociales (alturas, errores de medición, calificaciones) alrededor de su valor medio. Su gráfica forma una campana simétrica característica, llamada campana de Gauss. Queda completamente definida por dos parámetros: la media (μ), que determina el centro, y la desviación típica (σ), que controla el ancho de la campana.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué significa la regla 68-95-99,7 en estadística?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regla empírica establece que, en cualquier distribución normal, aproximadamente el 68% de los datos cae dentro de una desviación típica de la media (μ ± σ), el 95% dentro de dos desviaciones (μ ± 2σ) y el 99,7% dentro de tres desviaciones (μ ± 3σ). Esta regla permite hacer estimaciones rápidas de probabilidad sin necesidad de calcular integrales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula una puntuación Z y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La puntuación Z (o valor tipificado) indica cuántas desviaciones típicas está un valor respecto a la media: Z = (X − μ) / σ. Sirve para comparar valores de distribuciones con distintas medias y desviaciones en una escala común. Por ejemplo, una nota de 7 en un examen con μ=5 y σ=1 tiene Z=2, lo que indica que está dos desviaciones por encima de la media del grupo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia la distribución normal de otras distribuciones estadísticas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La distribución normal es continua, simétrica y sus colas se extienden teóricamente hasta ±∞. Se diferencia de la distribución binomial (discreta, para recuentos de éxitos) o de la distribución uniforme (todos los valores igualmente probables). Su importancia radica en el Teorema Central del Límite: la media de muchas muestras independientes tiende a seguir una distribución normal, independientemente de la distribución original de los datos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil un simulador interactivo de distribución normal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para estudiantes de Bachillerato, ciclos formativos o universidad que aprenden estadística y probabilidad. También ayuda a docentes a visualizar conceptos en clase. Permite experimentar cómo cambia la forma de la curva al modificar μ y σ, calcular probabilidades de tramos concretos y comprender visualmente conceptos que resultan abstractos con solo fórmulas.',
+      },
+    },
+  ],
+};
