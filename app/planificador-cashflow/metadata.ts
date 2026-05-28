@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'BusinessApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un cash flow o flujo de caja y para qué sirve proyectarlo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cash flow registra el movimiento real de dinero que entra y sale de un negocio cada mes, a diferencia del beneficio contable. Proyectarlo a 12 meses permite anticipar meses con déficit de liquidez antes de que ocurran, tomar decisiones de financiación con tiempo suficiente y evitar situaciones en las que hay beneficios en papel pero no hay dinero en la cuenta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se usa el planificador de flujo de caja?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Introduce el saldo inicial de caja, las entradas previstas (cobros de clientes, subvenciones, financiación) y las salidas (nóminas, alquileres, proveedores, impuestos) para cada uno de los 12 meses. El planificador calcula automáticamente el saldo acumulado mes a mes y señala los períodos con riesgo de saldo negativo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es más útil un planificador de cash flow?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente valioso para autónomos y pequeñas empresas con ingresos estacionales o irregulares, negocios que cobran a 30-90 días pero pagan a proveedor al contado, y emprendedores que acaban de lanzar su actividad. También es útil para detectar el impacto de una nueva inversión o contratación en la liquidez futura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre flujo de caja y cuenta de resultados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cuenta de resultados recoge ingresos y gastos cuando se devengan (al emitir o recibir una factura), mientras que el cash flow refleja cuándo entra o sale el dinero realmente. Un negocio puede tener beneficios contables y quedarse sin liquidez si sus clientes tardan en pagar. Por eso la proyección de tesorería es un complemento indispensable de la contabilidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los escenarios What-If en la planificación de tesorería?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los escenarios What-If permiten simular situaciones hipotéticas: ¿qué pasa si un cliente importante tarda 30 días más en pagar? ¿O si suben los costes de suministros un 10%? Modificando una variable se ve en tiempo real cómo cambia el saldo acumulado en cada mes, lo que ayuda a tomar decisiones preventivas antes de que el problema sea real.',
+      },
+    },
+  ],
+};

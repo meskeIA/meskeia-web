@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un cronómetro y un temporizador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un cronómetro mide el tiempo transcurrido desde que pulsas inicio, útil para medir la duración de una actividad. Un temporizador cuenta hacia atrás desde un tiempo fijado y emite una alarma al llegar a cero. Ambas funciones son complementarias y se usan en contextos diferentes: el cronómetro para entrenamientos o carreras, el temporizador para cocina o técnica Pomodoro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve registrar vueltas en un cronómetro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La función de vueltas (laps) permite guardar tiempos parciales sin detener el cronómetro general. Es especialmente útil en atletismo, natación o ciclismo para comparar el rendimiento vuelta a vuelta. También se usa en tests de productividad para medir cuánto tarda cada tarea dentro de una sesión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El cronómetro online es preciso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La precisión depende del navegador y del hardware del dispositivo. Los navegadores modernos utilizan la API de alta resolución (performance.now()) con precisión de milisegundos. Para actividades de alta competición donde se requieren fracciones de segundo exactas, es preferible un cronómetro físico certificado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo usar el cronómetro en el móvil?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, la herramienta funciona en cualquier dispositivo con navegador web moderno: móvil, tableta u ordenador. No requiere instalación ni registro. En móvil, mantén la pantalla activa para evitar que el sistema operativo pause el contador en segundo plano.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué técnica Pomodoro recomienda usar el temporizador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La técnica Pomodoro estándar usa intervalos de 25 minutos de trabajo seguidos de 5 minutos de descanso. Tras cuatro ciclos se hace una pausa larga de 15-30 minutos. Configura el temporizador en 25 minutos, empieza a trabajar y descansa cuando suene la alarma. Esta estructura mejora la concentración y reduce la fatiga mental.',
+      },
+    },
+  ],
+};

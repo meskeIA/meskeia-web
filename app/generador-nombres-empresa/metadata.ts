@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'BusinessApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo elegir un buen nombre para una empresa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un buen nombre de empresa debe ser corto (1-2 palabras), fácil de pronunciar y recordar. Conviene verificar que el dominio .com o .es esté disponible y que no exista una marca registrada similar. Los nombres con significado relacionado con el sector o con raíces latinas suelen funcionar bien en mercados hispanohablantes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué estilos de nombre puedo generar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La herramienta permite generar nombres por estilo: descriptivo (refleja lo que hace la empresa), abstracto (inventado o evocador), portmanteau (fusión de palabras), acrónimo y con sufijos tecnológicos como -ly, -io o -hub. Cada estilo tiene ventajas distintas según el tipo de negocio y el público objetivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé si el dominio de mi nombre está libre?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La herramienta genera un enlace directo a la consulta del dominio en registradores como Namecheap o GoDaddy para cada nombre sugerido. Así puedes verificar la disponibilidad de .com y .es en segundos sin salir de la página.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo generar nombres para cualquier sector de negocio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Puedes filtrar por sector (tecnología, salud, alimentación, moda, servicios profesionales, etc.) y por longitud preferida del nombre. El generador adapta el vocabulario, los prefijos y los sufijos al sector seleccionado para ofrecer sugerencias más relevantes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Necesito registrar el nombre de empresa antes de usarlo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En España, para operar legalmente como sociedad (SL, SA) debes registrar la denominación social en el Registro Mercantil Central. Además, si quieres protegerla como marca, debes registrarla en la Oficina Española de Patentes y Marcas (OEPM). Verificar la disponibilidad en ambos registros antes de invertir en branding es fundamental.',
+      },
+    },
+  ],
+};

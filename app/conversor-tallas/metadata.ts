@@ -65,40 +65,48 @@ export const jsonLd = {
   },
 };
 
-export const faqSchema = {
+export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cómo funciona el conversor de tallas internacional?',
+      name: '¿Cómo convierto mi talla europea a talla americana?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Selecciona el tipo de prenda (ropa hombre/mujer, calzado, complementos), elige tu sistema de tallas actual (ES/EU, US, UK), introduce tu talla y obtendrás las equivalencias automáticamente en los otros sistemas.',
+        text: 'La conversión depende del tipo de prenda. En ropa de mujer, una talla 36 EU equivale aproximadamente a una XS/2 US; una 40 EU es una S/6 US. En calzado de mujer, una 38 EU corresponde a una 7.5 US. Selecciona el tipo de prenda en el conversor, introduce tu talla EU y obtendrás la equivalencia US al instante.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué sistemas de tallas soporta?',
+      name: '¿Qué sistemas de tallas soporta el conversor?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Soportamos conversiones entre España/Europa (ES/EU), Estados Unidos (US) y Reino Unido (UK) para ropa de hombre y mujer, calzado de todas las edades, anillos, guantes y gorros.',
+        text: 'El conversor cubre los tres sistemas más usados en compras internacionales: España/Europa (ES/EU), Estados Unidos (US) y Reino Unido (UK). Incluye ropa de hombre y mujer, calzado para adultos y niños, y complementos como anillos, guantes y gorros.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Son exactas las conversiones de tallas?',
+      name: '¿Son exactas las equivalencias de tallas entre países?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las conversiones son aproximadas basadas en estándares internacionales. Cada marca puede variar, por lo que recomendamos consultar siempre la guía de tallas específica del fabricante antes de comprar.',
+        text: 'Las conversiones se basan en estándares internacionales ampliamente aceptados, pero cada marca puede aplicar sus propias hormas y patrones. Se recomienda contrastar siempre con la guía de tallas específica del fabricante antes de finalizar una compra, especialmente en calzado y ropa ajustada.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Puedo convertir tallas de calzado en centímetros?',
+      name: '¿Puedo convertir tallas de calzado usando la medida del pie en centímetros?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, nuestro conversor de calzado también muestra la longitud aproximada del pie en centímetros, lo cual es muy útil para comparar con las medidas exactas del fabricante.',
+        text: 'Sí. El conversor de calzado muestra también la longitud aproximada del pie en centímetros para cada talla, lo que facilita la comparación con las tablas de medidas internas que publican algunos fabricantes y permite una elección más precisa cuando hay duda entre dos tallas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve un conversor de tallas si puedo buscar en Google?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una búsqueda general suele devolver tablas estáticas que no distinguen entre tipo de prenda, género o sistema de origen. Este conversor aplica la tabla específica según la categoría elegida (ropa hombre, mujer, calzado niño, anillos…) y permite cambiar el sistema de origen libremente, reduciendo el riesgo de errores en compras online internacionales.',
       },
     },
   ],

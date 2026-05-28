@@ -71,3 +71,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué factores debo considerar antes de decidir dónde vivir?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los factores más relevantes son: tipo de trabajo (presencial, híbrido o teletrabajo), coste de la vivienda en relación a tus ingresos, necesidades familiares (colegios, dependencia), preferencias de ocio y naturaleza, y conectividad (transporte público, internet). No existe una opción universalmente mejor; depende del equilibrio entre estos factores para cada persona.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es más barato vivir en un pueblo que en una ciudad grande?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En general, sí: el precio de la vivienda en compra o alquiler es significativamente más bajo en pueblos y zonas rurales que en grandes ciudades. Sin embargo, hay que considerar los costes ocultos: necesidad de coche (compra, seguro, combustible), desplazamientos frecuentes si el trabajo es presencial, y menor acceso a servicios como sanidad especializada o centros educativos. El ahorro real depende mucho del perfil de cada persona.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ventajas tiene vivir en la costa frente al interior?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La zona costera combina calidad de vida relacionada con el mar y el clima con precios de vivienda que varían mucho según la provincia. Puede ser adecuada para teletrabajadores, jubilados o quienes valoran el ocio al aire libre. Sus principales inconvenientes son la estacionalidad (masificación en verano), los precios en zonas turísticas consolidadas y una oferta laboral más reducida fuera del sector turístico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es una ciudad media y qué ventajas ofrece frente a Madrid o Barcelona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una ciudad media (entre 50.000 y 300.000 habitantes, como Valladolid, Alicante o Málaga) ofrece servicios urbanos completos (sanidad, universidades, transporte) con precios de vivienda considerablemente más bajos que Madrid o Barcelona y menor tiempo de desplazamiento interno. Es una opción equilibrada para familias que necesitan servicios urbanos pero quieren reducir el coste de vida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El teletrabajo cambia qué tipo de zona conviene elegir?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, de forma sustancial. El teletrabajo total elimina la dependencia del mercado laboral local, lo que abre la posibilidad de vivir en pueblos, zonas rurales o costeras con menor coste de vida. Sin embargo, conviene verificar la cobertura de fibra óptica, que en algunas zonas rurales todavía es limitada. El teletrabajo parcial (híbrido) mantiene la necesidad de proximidad a transporte o a la ciudad de la empresa, lo que restringe las opciones.',
+      },
+    },
+  ],
+};

@@ -71,3 +71,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé si necesito un portátil o un ordenador de sobremesa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Si te mueves frecuentemente entre casa, la oficina u otros lugares, un portátil es la opción más práctica. Si trabajas siempre en el mismo sitio y priorizas el rendimiento máximo por el precio, un sobremesa ofrece más potencia por el mismo presupuesto. Los 2 en 1 (convertibles) son una tercera opción para quienes necesitan flexibilidad y no exigen máximo rendimiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre Windows, Mac y Linux para uso cotidiano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Windows es el sistema más extendido, compatible con la mayoría de software empresarial y juegos. macOS es la opción habitual en diseño, edición de vídeo y desarrollo iOS/macOS; está integrado con el ecosistema Apple. Linux es gratuito, muy personalizable y preferido en programación y servidores, aunque tiene menos compatibilidad con software comercial. Para uso general o de oficina, Windows cubre prácticamente todos los casos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué procesador es suficiente para trabajar con documentos y videoconferencias?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para tareas ofimáticas, navegación web y videoconferencias (Zoom, Teams) es suficiente con un procesador de gama media-baja: Intel Core i5 de última generación, AMD Ryzen 5 o Apple M1/M2. Lo más importante es acompañarlo de al menos 8 GB de RAM y un almacenamiento SSD para que el sistema responda con fluidez.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánta RAM necesito en un ordenador en 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '8 GB de RAM es el mínimo razonable para uso cotidiano. 16 GB es lo recomendable si tienes muchas pestañas abiertas, usas aplicaciones de edición o desarrollo. 32 GB o más solo tiene sentido para edición de vídeo profesional, modelado 3D o máquinas virtuales. En portátiles con RAM soldada (como algunos Mac o ultrabooks), elegir bien desde el inicio es crucial porque no se puede ampliar después.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué tipo de usuario está pensado un portátil gaming?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los portátiles gaming incorporan una tarjeta gráfica dedicada (GPU) que los hace adecuados no solo para jugar, sino también para edición de vídeo, renderizado 3D y ciertas tareas de inteligencia artificial. Su inconveniente es el peso (habitualmente 2-2,5 kg), la autonomía reducida (3-5 horas) y el precio más elevado respecto a portátiles sin GPU dedicada. Si no juegas ni editas vídeo, no merece la pena su sobrecoste.',
+      },
+    },
+  ],
+};

@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['generador tonos', 'frecuencias audio', 'test audio', 'calibración altavoces', 'tinnitus'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve un generador de tonos online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un generador de tonos produce frecuencias de audio puras que puedes usar para varias pruebas: comprobar el rango de frecuencias que escuchas, detectar pérdida auditiva en frecuencias concretas, calibrar altavoces y auriculares, o explorar fenómenos acústicos como los tonos binaurales. También se usa en audioterapia y para generar ruido blanco o tonos de referencia en producción musical.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué rango de frecuencias puede oír el ser humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El oído humano adulto percibe sonidos en el rango de aproximadamente 20 Hz a 20.000 Hz (20 kHz). Con la edad, la capacidad de escuchar frecuencias altas disminuye: la mayoría de adultos mayores de 40 años ya no perciben con claridad por encima de 15.000-16.000 Hz. Los niños y adolescentes pueden escuchar con más facilidad frecuencias cerca de los 20.000 Hz.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre una onda senoidal, cuadrada, triangular y sierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La onda senoidal es el tono más puro, sin armónicos, y suena suave. La onda cuadrada tiene un timbre metálico y brillante por sus múltiples armónicos impares. La onda triangular es similar a la senoidal pero con más brillo. La onda de sierra (diente de sierra) es la más rica en armónicos y suena más agresiva. Para tests de oído y calibración, se recomienda la senoidal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo uso el generador de tonos para hacer un test de audición básico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Selecciona la onda senoidal, ajusta el volumen a un nivel moderado con auriculares y barre las frecuencias desde 20 Hz hasta 20.000 Hz. Anota la frecuencia más alta que puedes escuchar claramente. Si no percibes tonos por encima de 8.000-10.000 Hz, puede indicar pérdida auditiva en agudos. Este test es orientativo; para un diagnóstico auditivo profesional consulta a un audioprotesista.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Necesito instalar algo para usar el generador de tonos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. El generador funciona completamente en el navegador mediante la Web Audio API, sin necesidad de descargar ni instalar ninguna aplicación. Es compatible con Chrome, Firefox, Safari y Edge en ordenadores y móviles. Solo necesitas unos auriculares o altavoces y tener el volumen activado en tu dispositivo.',
+      },
+    },
+  ],
+};
