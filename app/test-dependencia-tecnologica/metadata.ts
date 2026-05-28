@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la dependencia tecnológica en el trabajo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La dependencia tecnológica profesional ocurre cuando la capacidad de hacer un trabajo disminuye significativamente si una herramienta deja de estar disponible. No es malo usar tecnología de forma intensiva, sino no saber trabajar sin ella. El riesgo real aparece cuando las herramientas fallan, cambian de modelo de negocio, quedan fuera de presupuesto o son sustituidas por alternativas incompatibles con los flujos que has construido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo saber si soy demasiado dependiente de la IA para trabajar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Algunos indicadores son: no poder completar una tarea sin la herramienta aunque tengas los conocimientos base, no recordar cómo hacías algo antes de adoptarla, o sentir bloqueo real cuando hay una interrupción del servicio. Este test evalúa dos dimensiones: qué tan autónomo eres si la tecnología falla, y qué tan bien te adaptas cuando cambia o desaparece una herramienta concreta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este test de dependencia tecnológica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para profesionales que usan activamente IA, software especializado o plataformas digitales en su trabajo: freelances, gestores de proyectos, analistas, diseñadores, programadores o cualquier perfil de conocimiento. Es especialmente útil si has incorporado herramientas de IA en los últimos dos años y quieres saber cuánto de tu capacidad profesional depende ahora de que esas herramientas sigan funcionando.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Reducir la dependencia tecnológica significa usar menos herramientas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No necesariamente. La autonomía tecnológica no significa renunciar a la productividad que dan las herramientas; significa mantener las habilidades de respaldo que te permiten funcionar si algo cambia. La estrategia es seguir usando lo que te hace más eficiente, pero también practicar periódicamente las habilidades base, diversificar herramientas cuando sea posible y documentar procesos clave sin depender de una plataforma específica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre dependencia tecnológica y uso intensivo de tecnología?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El uso intensivo es eficiencia; la dependencia es vulnerabilidad. Usar la IA para redactar borradores más rápido es uso intensivo. No poder estructurar un argumento sin que la IA lo haga por ti es dependencia. La diferencia está en si las habilidades propias se mantienen o si se han atrofiado por delegación sistemática. Este test ayuda a identificar en qué tareas concretas hay riesgo de atrofia.',
+      },
+    },
+  ],
+};

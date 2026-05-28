@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un análisis pre-mortem y en qué se diferencia de un post-mortem?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un post-mortem analiza por qué algo falló después de que ocurrió. Un pre-mortem hace lo mismo antes de que el proyecto empiece: imagina que el proyecto ha fracasado y trabaja hacia atrás para identificar las causas probables. La técnica fue propuesta por el psicólogo Gary Klein y reduce el sesgo de optimismo que lleva a subestimar riesgos antes de lanzar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se realiza un pre-mortem paso a paso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se parte de un supuesto: "Imaginemos que han pasado seis meses y el proyecto ha fracasado por completo. ¿Qué salió mal?". Cada participante escribe individualmente las razones de ese fracaso imaginado, se ponen en común y se priorizan. Después se diseñan medidas de mitigación para los riesgos más probables. El proceso puede hacerse en solitario o en equipo y suele durar entre 30 y 90 minutos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué tipo de proyectos es útil el análisis pre-mortem?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es aplicable a cualquier proyecto con consecuencias relevantes si falla: lanzamiento de un producto, cambio de empleo, apertura de negocio, gran inversión, mudanza o decisión personal con impacto duradero. No está pensado para tareas rutinarias de bajo riesgo. Cuanto mayor sea la inversión de tiempo o recursos, más rentable resulta dedicar 30 minutos a anticipar fallos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué los equipos suelen saltarse el análisis de riesgos antes de lanzar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La causa principal es el sesgo de optimismo: tendemos a sobrevalorar la probabilidad de éxito y a infravalorar los obstáculos, especialmente cuando estamos emocionalmente comprometidos con la idea. También influyen la presión de tiempo, el pensamiento de grupo (groupthink) y la cultura que penaliza señalar problemas. El pre-mortem reduce ese sesgo al dar permiso explícito para imaginar el peor escenario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un análisis de riesgos tradicional y un pre-mortem?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El análisis de riesgos tradicional lista amenazas en abstracto y asigna probabilidades. El pre-mortem parte de un fracaso ya asumido como real, lo que activa otro tipo de razonamiento: en lugar de evaluar posibilidades, buscamos causas concretas de algo que "ya pasó". Esa diferencia de enfoque genera una lista de riesgos más variada y más honesta, según los estudios de Klein.',
+      },
+    },
+  ],
+};

@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánta agua se puede ahorrar en casa al año con hábitos sostenibles?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un hogar promedio puede reducir su consumo entre 30.000 y 60.000 litros al año adoptando hábitos sencillos como cerrar el grifo mientras te lavas los dientes, instalar reductores de caudal o usar el lavavajillas con carga completa. El ahorro exacto depende del número de personas, el precio del agua en tu municipio y los hábitos actuales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto dinero se ahorra al reducir el consumo de agua en el hogar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En España, el precio medio del agua doméstica ronda los 2 €/m³ (incluyendo tasas y alcantarillado), aunque varía mucho por municipio. Un hogar de 3 personas que adopta las principales medidas de ahorro puede reducir su factura entre 80 € y 180 € al año. Las acciones con mayor impacto económico son eliminar fugas, acortar las duchas y evitar el riego en horas de calor.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué acciones ahorran más agua en casa de forma rápida?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las tres acciones con mayor impacto inmediato son: sustituir el baño de inmersión por ducha (ahorro de 100-150 litros por uso), detectar y reparar fugas en grifos y cisternas (una gota por segundo supone 30 litros/día), e instalar una cisterna de doble descarga (reduce el consumo por descarga de 9 a 3-6 litros). Estos cambios no requieren inversión significativa y el retorno es visible en pocas semanas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve una herramienta de estimación de ahorro hídrico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Este tipo de herramienta te permite identificar cuáles de tus hábitos actuales tienen mayor impacto en el consumo de agua y estimar, en litros y euros, lo que ahorrarías si los cambias. Es útil tanto para familias que quieren reducir la factura como para quienes buscan reducir su huella ambiental. Al personalizar el cálculo con el número de personas y el precio del agua local, los resultados son mucho más precisos que las estimaciones genéricas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la huella hídrica y cómo se calcula en el hogar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La huella hídrica mide la cantidad total de agua dulce utilizada, directa e indirectamente, para producir los bienes y servicios que consume una persona. En el hogar, el consumo directo (grifo, ducha, inodoro, lavadora) representa solo una parte: la dieta y los productos que compramos suelen suponer el 90% de la huella total. En España, el consumo doméstico directo ronda los 130 litros por persona y día, frente a una media mundial de 140 litros.',
+      },
+    },
+  ],
+};

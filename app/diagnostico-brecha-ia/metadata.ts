@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la brecha IA y cómo afecta al trabajo profesional?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La brecha IA describe la distancia entre quienes usan la inteligencia artificial como amplificador de su propio criterio y quienes la usan como sustituto del pensamiento. Quienes quedan en el segundo grupo asumen el riesgo de deteriorar habilidades cognitivas clave: síntesis, juicio contextual, detección de errores y razonamiento en situaciones nuevas. La brecha se agranda a medida que los modelos mejoran, por lo que el momento de desarrollar el hábito correcto es ahora.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo saber si estoy dependiendo demasiado de la IA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Señales de dependencia excesiva incluyen: dificultad para empezar una tarea sin consultar antes a la IA, aceptar respuestas sin verificarlas, no recordar cómo hacías esa tarea hace un año o sentir ansiedad cuando la herramienta no está disponible. El test de esta herramienta evalúa esos patrones en 10 preguntas y genera un diagnóstico con tu nivel de criterio propio frente al aprovechamiento de la IA.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre usar la IA como amplificador o como sustituto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Usarla como amplificador significa llegar con una hipótesis, criterio o borrador previo y pedir a la IA que lo mejore, cuestione o amplíe. Usarla como sustituto es delegar la generación de la idea, la decisión o el análisis completo sin participación propia. La distinción no es el tiempo dedicado sino el rol del propio juicio: en el primer caso se mantiene activo; en el segundo, se externaliza.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es este diagnóstico sobre el uso de la inteligencia artificial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para cualquier persona que use herramientas de IA generativa en su trabajo o estudio con cierta regularidad: escritores, desarrolladores, analistas, estudiantes universitarios, directivos, docentes o cualquier profesional con conocimiento como materia prima. No es necesario ser experto técnico; el test evalúa comportamientos y hábitos, no conocimientos sobre cómo funciona la IA por dentro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué habilidades cognitivas corre riesgo de deteriorar el uso pasivo de la IA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las más estudiadas son la escritura argumentativa (reducción de la práctica deliberada), la memoria de trabajo (dependencia del contexto externo), el pensamiento crítico (aceptar sin cuestionar), la creatividad divergente (partir siempre de una propuesta ajena) y la tolerancia a la ambigüedad (buscar respuesta inmediata en lugar de elaborar la propia). Ninguna desaparece de golpe, pero se debilitan gradualmente si no se ejercitan de forma independiente.',
+      },
+    },
+  ],
+};

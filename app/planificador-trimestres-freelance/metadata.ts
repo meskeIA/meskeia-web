@@ -54,3 +54,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve un planificador trimestral como autónomo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un planificador trimestral ayuda a los autónomos a tener una visión global del año fiscal: cuándo presentar los modelos 303 (IVA), 130 (IRPF fraccionado), 390 y 190, y cuánto dinero reservar en cada trimestre. Permite anticipar meses de mayor carga fiscal como enero, abril, julio y octubre, y evitar sorpresas de tesorería.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo hay que presentar el modelo 303 y el modelo 130?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los modelos 303 (IVA) y 130 (pago fraccionado de IRPF) se presentan trimestralmente: entre el 1 y el 20 de abril, julio y octubre, y entre el 1 y el 30 de enero para el cuarto trimestre. El mes de agosto es crítico porque el tercer trimestre vence el 20 de octubre, coincidiendo con el fin del verano.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué diciembre y agosto son meses críticos para un autónomo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Agosto y diciembre son meses de menor actividad comercial para muchos autónomos, pero con obligaciones fiscales próximas. En agosto hay que preparar el tercer trimestre (modelo 303/130 que vence en octubre). En diciembre termina el año fiscal: hay que revisar si el IRPF fraccionado cubre la facturación real y prever la declaración de enero.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto debo reservar de mis ingresos para los impuestos como autónomo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La recomendación habitual es reservar entre el 25 % y el 35 % de cada ingreso bruto para cubrir IRPF e IVA. El porcentaje exacto depende de tu tramo de IRPF estimado y del tipo de IVA aplicable a tus servicios. El planificador trimestral permite introducir tus objetivos de ingresos y gastos por trimestre para calcular las reservas necesarias.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el modelo 130 y el modelo 131 para autónomos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El modelo 130 es el pago fraccionado de IRPF para autónomos en estimación directa (normal o simplificada). El modelo 131 corresponde a autónomos en estimación objetiva (módulos). La mayoría de los freelancers y autónomos de servicios utilizan el modelo 130, calculando el 20 % del beneficio neto acumulado en el trimestre menos los pagos ya realizados.',
+      },
+    },
+  ],
+};

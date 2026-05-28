@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el estancamiento profesional y cómo saber si lo estoy viviendo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El estancamiento profesional ocurre cuando las exigencias de tu trabajo no crecen al ritmo de tus capacidades, lo que genera aburrimiento, desmotivación o sensación de no avanzar. Señales habituales son realizar tareas que ya dominas por completo, ausencia de retos nuevos y pérdida del entusiasmo inicial. Un test de reflexión estructurado te ayuda a identificar si estás en zona de confort, estrés o flujo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué consiste el modelo de flujo de Csikszentmihalyi aplicado al trabajo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El psicólogo Mihaly Csikszentmihalyi propuso que el estado de flujo (flow) se alcanza cuando el nivel de desafío de una tarea coincide con el nivel de habilidad de la persona. Si el desafío supera ampliamente la habilidad, surge ansiedad; si la habilidad supera el desafío, aparece el aburrimiento. Aplicado al trabajo, el flujo se asocia con alta productividad, satisfacción y aprendizaje continuo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre zona de confort y estado de flujo en el ámbito laboral?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En la zona de confort realizas tareas conocidas sin esfuerzo significativo, lo que es seguro pero limita el crecimiento. El estado de flujo implica un reto equilibrado con tus capacidades actuales, generando concentración profunda y satisfacción. Salir de la zona de confort hacia tareas ligeramente más difíciles es la vía más directa para alcanzar el flujo sin caer en el estrés.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este diagnóstico de estancamiento profesional?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para cualquier persona que sienta que su carrera o trabajo actual no la motiva como antes, que se perciba demasiado cómoda o, al contrario, desbordada por la carga. También resulta valioso para quienes están planificando un cambio de rol, un ascenso o una transición profesional y quieren entender su punto de partida emocional y de habilidades.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tipo de acciones concretas se obtienen tras el diagnóstico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El diagnóstico devuelve un perfil visual que sitúa tu situación en el mapa desafío-habilidad y sugiere acciones específicas según tu resultado: si estás en zona de confort, propone cómo buscar retos progresivos; si estás en estrés, cómo reducir carga o desarrollar nuevas habilidades; si estás cerca del flujo, cómo mantener y expandir ese estado.',
+      },
+    },
+  ],
+};

@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el prompt engineering y por qué importa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El prompt engineering es la práctica de formular instrucciones claras y estructuradas para obtener respuestas útiles de una inteligencia artificial. Un prompt bien construido incluye contexto, rol, formato esperado y restricciones relevantes. Sin esta habilidad, se obtienen respuestas genéricas o incorrectas incluso de los modelos más avanzados. Es la competencia más transferible del trabajo con IA porque sirve para ChatGPT, Claude, Gemini y cualquier modelo futuro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé si mis prompts son buenos o malos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un prompt es bueno cuando la respuesta de la IA requiere pocas o ninguna corrección adicional. Las señales de un prompt débil incluyen: tener que pedir aclaraciones múltiples, recibir respuestas demasiado largas o irrelevantes, o que la IA asuma un tono o formato que no necesitabas. Este evaluador mide dos dimensiones clave: la especificidad de tus instrucciones y cómo procesas críticamente las respuestas que recibes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este test?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para cualquier persona que use herramientas de IA en su trabajo diario: redactores, desarrolladores, analistas, profesores, consultores o emprendedores. También sirve a quienes están empezando con la IA y quieren saber en qué punto están. No requiere conocimientos técnicos previos; las preguntas evalúan comportamientos concretos, no terminología.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este evaluador de un curso de prompts?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un curso enseña técnicas; este evaluador diagnostica tu práctica actual. En 10 preguntas identifica si tu problema está en cómo formulas las instrucciones, en cómo evalúas críticamente las respuestas, o en ambos. El diagnóstico termina con un perfil específico y acciones concretas priorizadas, no con contenido genérico. Es un punto de partida para saber dónde enfocar el aprendizaje.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo lleva completar el test?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Entre 5 y 8 minutos. Son 10 preguntas de opción múltiple que reflejan situaciones reales de trabajo con IA. Al terminar recibes inmediatamente un diagnóstico visual con tu posición en un mapa bidimensional, tu perfil y recomendaciones específicas. No requiere registro ni guardar datos.',
+      },
+    },
+  ],
+};
