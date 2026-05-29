@@ -63,3 +63,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué ejercicio me conviene si soy principiante y tengo poco tiempo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para principiantes con agenda ajustada, las actividades de baja complejidad técnica y alta eficiencia son las más adecuadas: caminar rápido, ciclismo o entrenamientos HIIT de 20-30 minutos. Lo más importante es la constancia; incluso 3 sesiones semanales de 30 minutos producen mejoras cardiovasculares y de fuerza en pocas semanas. Elegir una actividad que encaje con tu horario real reduce el riesgo de abandono.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre entrenamiento en gimnasio y ejercicio al aire libre?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El gimnasio ofrece equipamiento específico, climatización y posibilidad de trabajo con pesas, lo que facilita la progresión en fuerza muscular. El ejercicio al aire libre (running, ciclismo, senderismo) añade beneficios psicológicos del contacto con la naturaleza, mayor variedad de terrenos y coste reducido. La elección depende del objetivo principal: hipertrofia muscular → gimnasio; bienestar general, resistencia cardiovascular o bajo presupuesto → exterior.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué deporte es mejor para perder peso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No existe un único deporte "mejor" para perder peso; lo que determina el resultado es el déficit calórico total y la adherencia al ejercicio. Actividades de alta intensidad (running, ciclismo, natación) queman más calorías por sesión, pero el entrenamiento de fuerza aumenta el metabolismo basal a largo plazo. La combinación de cardio y fuerza es la estrategia más eficaz según la evidencia, siempre acompañada de una alimentación adecuada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ejercicio puedo hacer si tengo problemas de rodilla o espalda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ante problemas articulares, las actividades de bajo impacto son las más seguras: natación, acuagym, ciclismo estático o yoga. Estas modalidades mantienen la movilidad y fortalecen la musculatura de soporte sin sobrecargar las articulaciones. Siempre es recomendable consultar con un fisioterapeuta o médico deportivo antes de iniciar cualquier programa si existen lesiones previas, para personalizar la carga y la progresión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia hay que hacer ejercicio para notar resultados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Organización Mundial de la Salud recomienda al menos 150-300 minutos semanales de actividad aeróbica moderada o 75-150 minutos de actividad intensa para adultos, combinados con 2 días de entrenamiento de fuerza. Para notar mejoras de resistencia se necesitan unas 4-6 semanas; los cambios de composición corporal son visibles a partir de las 8-12 semanas con constancia. La clave es distribuir las sesiones a lo largo de la semana y respetar el descanso entre entrenamientos.',
+      },
+    },
+  ],
+};

@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto recibe realmente el agricultor del precio que pago en el supermercado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En productos frescos convencionales, el agricultor suele recibir entre el 10 % y el 25 % del precio final de venta. El resto se reparte entre intermediarios, procesado, logística y margen del punto de venta. La proporción varía mucho según el producto: en frutas y verduras el margen del agricultor tiende a ser menor que en productos con denominación de origen o canal corto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la cadena alimentaria y cuántas etapas tiene?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cadena alimentaria es el recorrido que sigue un alimento desde que se produce hasta que llega al consumidor. Comprende cinco etapas principales: producción (agricultura, ganadería, pesca), procesado o transformación industrial, distribución y logística, venta al detalle (supermercados, mercados) y consumo final en el hogar o la hostelería.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto alimento se desperdicia en España a lo largo de la cadena?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Según datos del Ministerio de Agricultura, en España se desperdician alrededor de 1.300 millones de kilos de alimentos al año en los hogares. Si se suma el desperdicio en fase industrial y distribución, la cifra total supera los 7,7 millones de toneladas anuales. El hogar representa aproximadamente el 40 % de ese total.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre comprar en el supermercado y comprar en un canal corto o km0?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el canal corto (venta directa del productor, cooperativas, mercados locales o grupos de consumo) se eliminan uno o varios intermediarios. Esto puede hacer que el agricultor reciba entre el 50 % y el 80 % del precio final, frente al 10-25 % habitual en el canal largo. Para el consumidor, los precios pueden ser similares o incluso inferiores, con productos más frescos y menor huella de carbono por transporte.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve un visualizador interactivo de la cadena alimentaria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un visualizador de la cadena alimentaria permite entender de forma gráfica y sin tecnicismos quién participa en el proceso de llevar un alimento a la mesa, qué porcentaje del precio se queda cada eslabón y dónde se produce el mayor desperdicio. Es útil para consumidores que quieren tomar decisiones de compra más informadas, para estudiantes de economía o medioambiente, y para cualquier persona interesada en la sostenibilidad del sistema alimentario.',
+      },
+    },
+  ],
+};

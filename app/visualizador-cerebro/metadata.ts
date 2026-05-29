@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántas neuronas tiene el cerebro humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cerebro humano contiene aproximadamente 86.000 millones de neuronas, según estudios de recuento directo realizados por el neurocientífico Suzana Herculano-Houzel. Cada neurona puede conectarse con otras 10.000, lo que genera unos 150 billones de sinapsis en total. Esta red es responsable de todas las funciones cognitivas, emocionales y motoras del organismo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué hace cada lóbulo del cerebro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El lóbulo frontal controla el razonamiento, la planificación, el lenguaje y el movimiento voluntario. El lóbulo parietal procesa información sensorial táctil y espacial. El lóbulo temporal gestiona la audición, la memoria y el reconocimiento de objetos. El lóbulo occipital se encarga del procesamiento visual. Aunque cada región tiene funciones predominantes, casi todas las tareas cognitivas complejas implican la colaboración de múltiples lóbulos al mismo tiempo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la neuroplasticidad y puede cambiar el cerebro adulto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La neuroplasticidad es la capacidad del cerebro para reorganizar sus conexiones en respuesta a la experiencia, el aprendizaje o lesiones. Los estudios de London Knowledge (taxistas de Londres) mostraron que el hipocampo posterior era significativamente mayor en conductores experimentados, en comparación con la población general. El cerebro adulto mantiene esta capacidad de reorganización, aunque de forma más gradual que en la infancia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se forman y almacenan los recuerdos en el cerebro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La formación de un recuerdo pasa por tres fases: codificación (la información sensorial se convierte en señales eléctricas y químicas), consolidación (el hipocampo y la corteza trabajan juntos para estabilizar el recuerdo durante horas o días) y recuperación (la red neuronal asociada se activa para reconstruir el recuerdo). Los recuerdos no se almacenan en un único lugar, sino distribuidos en patrones de conexiones sinápticas que se reactivan al recordar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué las ilusiones ópticas engañan al cerebro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las ilusiones ópticas revelan que el cerebro no procesa la realidad directamente, sino que construye interpretaciones basadas en reglas heurísticas que funcionan bien en la mayoría de situaciones. Ilusiones clásicas como Müller-Lyer (dos líneas iguales que parecen distintas) explotan los mecanismos de estimación de profundidad y tamaño. El cerebro aplica atajos evolutivamente útiles que, en contextos artificiales, producen percepciones erróneas incluso cuando ya conoces el truco.',
+      },
+    },
+  ],
+};

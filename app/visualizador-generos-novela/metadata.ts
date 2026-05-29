@@ -42,3 +42,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin registro, en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los grandes géneros de la novela?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los géneros narrativos principales incluyen la novela negra, el thriller, el terror, la ciencia ficción, la fantasía épica, la distopía, la novela histórica, el romance, la novela literaria, la aventura y el realismo mágico. Cada uno tiene convenciones propias en cuanto a atmósfera, ritmo y tipo de conflicto central.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia la novela negra del thriller?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La novela negra centra la trama en la investigación de un crimen, habitualmente con un detective o figura análoga, y suele tener un tono sombrío y crítico con la sociedad. El thriller prioriza la tensión y el ritmo acelerado, con el protagonista directamente amenazado. Ambos comparten la suspensión, pero el motor narrativo es distinto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé qué género me va a gustar si nunca he leído ese tipo de libros?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Lo más práctico es identificar qué buscas al leer: emoción y suspense (thriller, novela negra), mundos imaginados (ciencia ficción, fantasía), reflexión sobre el presente (distopía, literaria) o conocer épocas pasadas (histórica). Leer la primera novela más accesible de cada género es la forma más fiable de descubrir afinidades.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es una buena primera novela de ciencia ficción para quien no ha leído el género?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para iniciarse en ciencia ficción suelen recomendarse títulos de ritmo accesible y premisas concretas: "El marciano" de Andy Weir, "Ender\'s Game" de Orson Scott Card o "La mano izquierda de la oscuridad" de Ursula K. Le Guin son puntos de entrada habituales que no exigen conocer la tradición del género.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia a la fantasía épica de la ciencia ficción?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La fantasía épica construye mundos secundarios con magia, razas o cosmologías propias, y las reglas internas no se justifican científicamente. La ciencia ficción extrapola tecnología, ciencia o sociedad desde el mundo real o conocido, buscando una coherencia interna basada en principios plausibles. La frontera puede ser difusa en obras que mezclan ambas tradiciones.',
+      },
+    },
+  ],
+};

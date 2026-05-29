@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo identifico si un insecto en mi jardín es beneficioso o perjudicial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los insectos beneficiosos más comunes incluyen la mariquita (elimina pulgones), la crisopa verde (depredadora de ácaros y pulgones) y el abejorro (polinizador clave). Los perjudiciales más frecuentes son el pulgón, la mosca blanca y el trips. Observar qué come el insecto y los daños visibles en las plantas es el primer paso para identificarlos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el control biológico de plagas en el jardín?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El control biológico consiste en usar organismos vivos, principalmente insectos depredadores o parásitos, para reducir la población de plagas sin recurrir a pesticidas químicos. Por ejemplo, liberar mariquitas para combatir pulgones o atraer crisopas plantando flores silvestres. Es el método central de la jardinería ecológica y no daña a los polinizadores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué insectos debo proteger en mi huerto para que las plantas crezcan mejor?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Hay que proteger especialmente a los polinizadores (abejas, abejorros, mariposas) y a los depredadores naturales de plagas (mariquitas, crisopas, arañas de jardín, tijeretas). Evitar insecticidas de amplio espectro y plantar flores con néctar entre los cultivos favorece su presencia y aumenta la producción de frutos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre plaga y presencia puntual de un insecto perjudicial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una plaga implica una proliferación que supera el umbral de daño económico o estético: colonias de pulgones que cubren los brotes, trips que decoloran hojas o mosca blanca que debilita la planta. Una presencia puntual de un insecto herbívoro, en cambio, suele ser inofensiva y no requiere intervención. Actuar solo cuando el daño es visible evita eliminar también a sus depredadores naturales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos insectos hay catalogados y qué información incluye cada ficha?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La guía incluye 35 insectos del jardín y huerto. Cada ficha recoge el rol (beneficioso, perjudicial, polinizador o neutro), el orden taxonómico, el tamaño aproximado, las zonas del jardín donde aparece, la actividad (diurna/nocturna), la dieta, cómo identificarlo visualmente, qué acción tomar y una curiosidad entomológica. Puede filtrarse por rol o zona y buscarse por nombre común o científico.',
+      },
+    },
+  ],
+};

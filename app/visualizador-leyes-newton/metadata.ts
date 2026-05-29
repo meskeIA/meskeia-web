@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las 3 leyes de Newton y qué explica cada una?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La primera ley o ley de inercia establece que un objeto en reposo o en movimiento uniforme mantiene ese estado a menos que actúe una fuerza externa. La segunda ley (F=ma) relaciona la fuerza neta con la masa y la aceleración producida. La tercera ley dice que toda acción genera una reacción igual y opuesta en otro cuerpo. Juntas forman la base de la mecánica clásica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la inercia en física y cómo se experimenta en la vida cotidiana?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inercia es la resistencia de un objeto a cambiar su estado de movimiento. Se experimenta al frenar bruscamente en un vehículo (el cuerpo tiende a seguir hacia adelante), al empujar un carrito de supermercado vacío frente a uno lleno, o al observar que una pelota sobre una superficie sin fricción seguiría rodando indefinidamente. Cuanto mayor la masa, mayor la inercia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se aplica F=ma en problemas reales de física?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ecuación F=ma permite calcular la fuerza necesaria para acelerar un objeto, la aceleración que produce una fuerza dada o la masa de un objeto si se conocen fuerza y aceleración. Se usa en ingeniería para diseñar vehículos, en aeronáutica para calcular empuje de motores y en medicina para estudiar impactos biomecánicos. Las unidades son: F en newtons (N), m en kilogramos (kg) y a en m/s².',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué los cohetes funcionan según la tercera ley de Newton?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un cohete expulsa gases a gran velocidad hacia atrás (acción), y como reacción la nave recibe un empuje igual y opuesto hacia adelante. No necesita "empujarse contra el aire" como un avión; por eso funciona en el vacío del espacio. Este principio también explica el retroceso de las armas de fuego, el impulso de los jets de agua y el funcionamiento de los globos al soltarlos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Las leyes de Newton siguen siendo válidas hoy o han sido superadas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las leyes de Newton son completamente válidas para objetos cotidianos a velocidades bajas. Se superan en dos casos: a velocidades próximas a la luz (donde entra la relatividad especial de Einstein) y a escala atómica y subatómica (donde rige la mecánica cuántica). Para ingeniería, arquitectura, vehículos, deportes y la mayoría de situaciones prácticas, la mecánica newtoniana sigue siendo el marco correcto.',
+      },
+    },
+  ],
+};

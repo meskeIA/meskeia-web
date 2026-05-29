@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el índice SWOLF en natación y cómo se calcula?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SWOLF es un índice de eficiencia en natación que combina el tiempo en segundos por largo y el número de brazadas necesarias para recorrerlo. Se calcula sumando ambos valores: SWOLF = segundos por largo + brazadas por largo. Un SWOLF más bajo indica mayor eficiencia técnica. Por ejemplo, completar un largo de 25 m en 30 segundos con 20 brazadas da un SWOLF de 50.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué valores de SWOLF se consideran buenos para un nadador aficionado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En piscina de 25 m, valores SWOLF por debajo de 35 son propios de nadadores élite, entre 35 y 45 corresponden a nivel avanzado, entre 45 y 60 a nivel intermedio y por encima de 60 a principiante. En piscina de 50 m los valores son más altos por la mayor distancia. Lo importante es la tendencia: un SWOLF que baja con el tiempo indica mejora técnica real, independientemente del valor absoluto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia el SWOLF de otras métricas de natación como las SPL o el ritmo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las SPL (strokes per length, brazadas por largo) miden solo la eficiencia del movimiento sin tener en cuenta la velocidad. El ritmo (min/100m) mide solo la velocidad sin considerar la técnica. El SWOLF combina ambas dimensiones: penaliza tanto nadar muy despacio como usar demasiadas brazadas. Por eso es útil para detectar si una mejora de velocidad se logra a costa de un aumento de brazadas, lo que puede indicar técnica deficiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué tipo de nadador es útil calcular el SWOLF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El SWOLF es especialmente útil para nadadores aficionados y triatletas que quieren mejorar su técnica sin entrenador. Permite hacer un seguimiento objetivo de la eficiencia sesión a sesión sin equipamiento especial, solo con un cronómetro y contando brazadas. También es valioso para nadadores que ya tienen buena resistencia cardiovascular pero quieren optimizar el deslizamiento y reducir el coste energético por metro recorrido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo mejorar mi índice SWOLF en natación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para mejorar el SWOLF hay que trabajar en dos frentes: aumentar el deslizamiento por brazada (mayor longitud de brazada) y reducir la resistencia frontal. Ejercicios como el "catch-up" o la natación con aletas largas ayudan a alargar la brazada. Nadar más despacio de forma consciente contando brazadas también entrena la conciencia propioceptiva. Con el tiempo, el objetivo es mantener el mismo tiempo por largo con menos brazadas.',
+      },
+    },
+  ],
+};
