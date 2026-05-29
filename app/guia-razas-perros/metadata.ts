@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué raza de perro es más adecuada para vivir en un apartamento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las razas de nivel de energía bajo o medio y tamaño pequeño o mediano se adaptan mejor a la vida en piso: Bichón Frisé, Shih Tzu, Bulldog Francés, Cavalier King Charles Spaniel o el Basset Hound son buenas opciones. El factor clave no es solo el tamaño sino la necesidad de ejercicio diario: un Greyhound, por ejemplo, es grande pero descansa la mayor parte del día. La guía incluye un filtro específico de "apto apartamento" para facilitar esta búsqueda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las razas de perros más recomendadas para familias con niños pequeños?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Labrador Retriever, el Golden Retriever, el Beagle y el Boxer destacan por su paciencia, sociabilidad y tolerancia con los niños. En general, las razas de los grupos FCI de cobradores, levantadores y perros de agua, así como los pastores de carácter equilibrado, suelen mostrar una alta tolerancia. Se recomienda evitar razas con alta tendencia al territorio o a la guarda intensa si hay niños muy pequeños en casa y no hay experiencia previa con perros.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué significan los grupos FCI y cómo me ayudan a elegir raza?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Federación Cinológica Internacional (FCI) clasifica las razas caninas en 10 grupos según su función original: pastores (I), molosos (II), terriers (III), teckels (IV), spitz y primitivos (V), sabuesos (VI), perros de muestra (VII), cobradores y levantadores (VIII), compañía (IX) y lebreles (X). Conocer el grupo orienta sobre el instinto, el nivel de actividad y el tipo de estímulo que necesita el perro, lo que facilita la convivencia y el adiestramiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué perros requieren menos mantenimiento del pelo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las razas de pelo corto y liso como el Boxer, el Dálmata, el Vizsla o el Weimaraner necesitan solo un cepillado semanal y baños ocasionales. Los perros de pelo corto y denso (Labrador, Beagle) mudan con más intensidad pero siguen siendo fáciles de mantener. En el extremo opuesto, razas de pelo largo (Afgano, Bobtail) o rizado (Caniche, Bichón) requieren cepillados diarios y visitas frecuentes al peluquero canino. La ficha de cada raza indica el nivel de mantenimiento con una escala de 1 a 5.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto viven los perros de media según su tamaño?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En general existe una relación inversa entre tamaño y esperanza de vida en perros. Las razas pequeñas (Chihuahua, Yorkshire Terrier) suelen vivir entre 14 y 16 años; las medianas (Beagle, Cocker), entre 12 y 14 años; y las grandes o gigantes (Gran Danés, San Bernardo), entre 7 y 10 años. Se trata de promedios: la alimentación, el ejercicio, la genética y los cuidados veterinarios influyen de forma significativa en la longevidad individual de cada animal.',
+      },
+    },
+  ],
+};

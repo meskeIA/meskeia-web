@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el sistema endocrino y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El sistema endocrino es la red de glándulas que producen hormonas y las vierten directamente al torrente sanguíneo para regular funciones como el metabolismo, el crecimiento, la reproducción y la respuesta al estrés. A diferencia del sistema nervioso, actúa de forma más lenta pero con efectos más duraderos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el feedback negativo hormonal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El feedback negativo es el mecanismo por el que el propio nivel de una hormona inhibe su producción para evitar el exceso. Un ejemplo clásico: cuando la glucosa en sangre sube, el páncreas secreta insulina; cuando baja, se frena la insulina y se activa el glucagón. Este equilibrio se llama homeostasis hormonal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué hormonas produce la glándula tiroides?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tiroides produce T3 (triyodotironina) y T4 (tiroxina), que regulan el metabolismo basal, la temperatura corporal y el desarrollo neurológico. Su producción está controlada por la TSH hipofisaria. Cuando la tiroides produce en exceso (hipertiroidismo) o en defecto (hipotiroidismo), el metabolismo se acelera o ralentiza con síntomas muy variados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el eje HPA y por qué se activa con el estrés?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El eje hipotálamo-hipófisis-suprarrenal (HPA) es el circuito que regula la respuesta al estrés. Ante una amenaza, el hipotálamo libera CRH, que estimula a la hipófisis para secretar ACTH, que a su vez activa las glándulas suprarrenales para producir cortisol. El cortisol aumenta la glucosa disponible y suprime procesos no urgentes como la digestión o el sistema inmune.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este explicador del sistema endocrino?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para estudiantes de Biología, Medicina o Enfermería que necesitan entender la regulación hormonal de forma visual e interactiva. También es apropiado para cualquier persona curiosa que quiera comprender cómo funcionan la insulina, el cortisol o las hormonas tiroideas sin necesidad de conocimientos previos.',
+      },
+    },
+  ],
+};

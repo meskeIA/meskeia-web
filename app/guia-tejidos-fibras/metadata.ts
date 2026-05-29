@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre fibras naturales y fibras sintéticas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las fibras naturales provienen de fuentes vegetales (algodón, lino, cáñamo, yute), animales (lana, seda, cachemira, angora) o minerales (amianto, sin uso textil actual). Las fibras sintéticas se fabrican a partir de polímeros derivados del petróleo, como el poliéster, el nailon o el acrílico. En términos generales, las naturales suelen ser más transpirables y biodegradables; las sintéticas ofrecen mayor resistencia, elasticidad y menor coste, aunque su impacto ambiental es más elevado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A qué temperatura se puede lavar la lana sin que encoja?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La lana encoge porque sus escamas proteicas se contraen con el calor y la agitación mecánica. Para lavarla sin riesgo, usa agua fría o templada (máximo 30 °C), programa de lana o delicados en la lavadora, o lava a mano con movimientos suaves sin frotar. Usa un detergente específico para prendas delicadas o lana. Nunca escurras retorciendo: presiona suavemente y sécala plana sobre una superficie horizontal para que no pierda su forma.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué tejido es más sostenible: algodón orgánico o poliéster reciclado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ambos tienen ventajas e inconvenientes según el criterio. El algodón orgánico evita pesticidas sintéticos y es biodegradable, pero requiere grandes cantidades de agua (hasta 10.000 litros por kg de fibra). El poliéster reciclado (rPET) reduce el consumo energético en un 30-50% respecto al poliéster virgen y aprovecha residuos plásticos, pero libera microfibras de plástico en cada lavado y no es biodegradable. Ninguno es perfectamente sostenible; la mejor opción depende de priorizar el consumo de agua, las emisiones o la biodegradabilidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el Gore-Tex y para qué tipo de prendas se usa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Gore-Tex es una membrana de politetrafluoroetileno (PTFE) expandido con microporos que dejan pasar el vapor de agua corporal hacia el exterior (transpirabilidad) pero bloquean las gotas de lluvia y el viento (impermeabilidad). Se usa principalmente en ropa técnica de montaña, senderismo, esquí y actividades al aire libre donde se necesita protección frente a la lluvia sin sobrecalentar. Los poros de la membrana son 20.000 veces más pequeños que una gota de agua pero 700 veces más grandes que una molécula de vapor.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo saber qué fibra es la prenda que estoy comprando?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Toda prenda textil vendida en la UE está obligada por ley a incluir una etiqueta con la composición de fibras en porcentaje (por ejemplo, "80% algodón, 20% poliéster"). Esta etiqueta suele encontrarse en el interior de la prenda, cosida en el lateral o en el cuello. Si la prenda no tiene etiqueta o es de segunda mano, puedes hacer una prueba de combustión controlada: las fibras naturales (algodón, lino) se queman con olor a papel o pelo, mientras que las sintéticas se funden y desprenden humo negro.',
+      },
+    },
+  ],
+};

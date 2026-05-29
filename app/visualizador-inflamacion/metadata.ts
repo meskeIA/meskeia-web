@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la inflamación y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inflamación es la respuesta defensiva del sistema inmunitario ante lesiones o agentes patógenos. Su función es aislar el daño, eliminar la causa y reparar el tejido. Los 5 signos clásicos descritos por Celso son rubor, calor, tumor, dolor y pérdida de función, cada uno con una base celular concreta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre inflamación aguda y crónica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inflamación aguda dura horas o días, está dominada por neutrófilos y termina en resolución o reparación. La crónica persiste semanas o meses, con predominio de macrófagos y linfocitos T, y puede dañar el propio tejido. Enfermedades como artritis reumatoide, enfermedad inflamatoria intestinal o aterosclerosis implican inflamación crónica sostenida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué células participan en la respuesta inflamatoria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los mastocitos son los primeros en reaccionar, liberando histamina y prostaglandinas que provocan vasodilatación. Los neutrófilos llegan masivamente en las primeras horas para fagocitar patógenos. Los macrófagos limpian los restos celulares y dirigen la resolución. Los linfocitos T coordinan la respuesta adaptativa en inflamaciones crónicas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué factores amplifican la inflamación crónica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El sedentarismo, la obesidad, el tabaquismo, el estrés crónico, la dieta proinflamatoria (alto contenido en azúcares refinados y grasas trans) y las infecciones persistentes son los principales factores que mantienen activa la inflamación de bajo grado. La reducción de estos factores es la estrategia más efectiva para controlarla.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tarda en resolverse una inflamación aguda normal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una inflamación aguda sin complicaciones sigue una línea temporal de 0-2 horas (vasodilatación y llegada de neutrófilos), 6-24 horas (fagocitosis activa) y 2-7 días (resolución y reparación tisular). Si no se resuelve en ese plazo, el proceso puede cronificarse y requerir evaluación médica.',
+      },
+    },
+  ],
+};

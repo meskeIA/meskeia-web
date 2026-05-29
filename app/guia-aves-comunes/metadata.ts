@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo identificar un ave que veo por primera vez?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para identificar un ave nueva conviene fijarse en cuatro rasgos clave: tamaño (compáralo con una paloma o un gorrión), coloración y marcas características (manchas, bandas alares, color del pecho), forma del pico (fino e insectívoro, grueso y granívoro, curvo y carnívoro) y comportamiento (si camina, salta, se cuelga de ramas). Anotar el hábitat y la época del año también reduce mucho las posibilidades. Esta guía incluye fichas con todos esos datos para 40 especies comunes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué aves se pueden ver en España durante todo el año?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las aves sedentarias o residentes que permanecen en España durante los doce meses incluyen el gorrión común, el mirlo, el petirrojo, la paloma bravía, la urraca, la corneja negra, el herrerillo común y el carbonero común, entre otras. Su presencia constante hace que sean las más fáciles de observar y aprender a identificar para quien empieza con el birdwatching.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el estado de conservación de las aves incluidas en la guía?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cada especie muestra su categoría en la Lista Roja de la IUCN: desde LC (Preocupación Menor) para las más abundantes, hasta NT (Casi Amenazada), VU (Vulnerable) o EN (En Peligro) en casos más delicados. Conocer el estado de conservación es útil tanto para la concienciación ambiental como para priorizar avistamientos de especies escasas antes de que su rango se reduzca aún más.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un ave migratoria y una ave residente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las aves residentes viven en una zona durante todo el año, mientras que las migratorias solo están presentes en temporadas concretas. Las especies estivales (como la golondrina o el vencejo) llegan a Europa en primavera para criar y regresan a África en otoño. Las invernantes (como algunas anátidas o el zorzal) proceden del norte de Europa y pasan el invierno en latitudes más cálidas. Algunas aves son además de paso: se ven brevemente durante sus migraciones entre áreas de cría y de invernada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué material básico necesito para empezar a hacer birdwatching?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para iniciarse en la observación de aves basta con unos prismáticos de entre 8x42 y 10x42 (relación aumento × diámetro objetivo), una guía de campo impresa o una app de identificación y ropa discreta en colores apagados. Un cuaderno para anotar fecha, lugar, especie y comportamiento ayuda a mejorar rápidamente. Los parques urbanos, humedales y bosques de ribera son excelentes puntos de inicio, ya que concentran gran variedad de especies a lo largo del año.',
+      },
+    },
+  ],
+};

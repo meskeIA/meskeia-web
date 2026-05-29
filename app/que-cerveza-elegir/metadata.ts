@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué cerveza marida mejor con carne a la brasa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las cervezas ahumadas (Rauchbier) o las stouts robustas (como una American Stout o Porter) maridan muy bien con carne a la brasa, ya que sus notas tostadas complementan el sabor ahumado de la parrilla. También funcionan bien una Pale Ale con amargor moderado o una Märzen de carácter maltoso. La clave es buscar cuerpo suficiente para no quedar opacado por la proteína.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre una IPA y una NEIPA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La IPA (India Pale Ale) tradicional se caracteriza por un amargor pronunciado, cuerpo seco y claridad en el vaso. La NEIPA (New England IPA) es una variante moderna que prioriza el aroma y el sabor frutado (mango, melocotón, cítricos) sobre el amargor, con una textura más cremosa y un aspecto turbio. Si buscas amargor intenso, elige IPA clásica; si prefieres jugosidad y aroma, la NEIPA es mejor opción.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué cerveza regalar a alguien que no bebe habitualmente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para alguien poco habituado a la cerveza, los estilos más accesibles son la Wheat Beer (trigo), la Blonde Ale o una Mexican Lager: son suaves, con poco amargor y buenas notas frutadas o de cereal. También funcionan las cervezas de frutas o las Saison ligeras. Evita estilos muy amargos (Double IPA, Imperial Stout) o muy intensos (Quadrupel) para una primera experiencia agradable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las cervezas trapenses y en qué se diferencian del resto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las cervezas trapenses son elaboradas en o bajo supervisión de monasterios trapenses certificados (actualmente 14 en el mundo, la mayoría en Bélgica). Sus estilos más conocidos son Dubbel (caramelo, frutas oscuras, 6-8% ABV), Tripel (dorada, especiada, 8-10% ABV) y Quadrupel (marrón oscura, muy maltosa, 10-12% ABV). Se distinguen del resto por el uso de levaduras propias, fermentación en alta y la certificación "Authentic Trappist Product".',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A qué temperatura se sirven los distintos estilos de cerveza?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La temperatura de servicio varía según el estilo: las lagers y pilsners se sirven entre 3-5 °C, las ales ligeras (Pale Ale, Blonde) entre 7-10 °C, las IPA entre 8-12 °C y las cervezas más complejas como Stouts, Porters o trapenses entre 10-14 °C. Servir demasiado fría una cerveza de carácter anula sus aromas; servir demasiado templada una lager la hace pesada. El vaso limpio y la temperatura correcta marcan la diferencia.',
+      },
+    },
+  ],
+};

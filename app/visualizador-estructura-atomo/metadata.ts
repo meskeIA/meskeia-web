@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿De qué está hecho un átomo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un átomo se compone de un núcleo central formado por protones (carga positiva) y neutrones (sin carga), rodeado por una nube de electrones (carga negativa). Los protones y neutrones están formados a su vez por quarks, las partículas elementales del modelo estándar. La masa del átomo se concentra casi por completo en el núcleo, que ocupa tan solo una fracción ínfima del volumen total.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué se dice que el átomo es casi todo vacío?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Si el núcleo de un átomo de hidrógeno tuviera el tamaño de una canica (1 cm), el electrón orbitaría a unos 500 metros de distancia. Esto significa que más del 99,9999% del volumen atómico es espacio vacío. Toda la materia sólida que percibimos como compacta está formada por átomos con esta inmensa proporción de vacío.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el modelo de Bohr y el modelo de orbitales cuánticos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El modelo de Bohr (1913) describe los electrones como partículas en órbitas circulares fijas alrededor del núcleo, útil para explicar el espectro del hidrógeno pero impreciso para átomos más complejos. El modelo cuántico moderno reemplaza las órbitas por orbitales: nubes de probabilidad (s, p, d, f) que indican dónde es más probable encontrar al electrón. Este último es el modelo aceptado actualmente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es un isótopo y en qué se diferencia de un ion?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los isótopos son átomos del mismo elemento (mismo número de protones) que difieren en el número de neutrones; por ejemplo, el carbono-12 y el carbono-14. Los iones son átomos que han ganado o perdido electrones, adquiriendo carga eléctrica; por ejemplo, el Na⁺ (sodio que perdió un electrón) o el Cl⁻ (cloro que ganó uno). Los isótopos cambian la masa; los iones cambian la carga.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se usa la estructura atómica en tecnología y medicina?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La comprensión de la estructura atómica tiene aplicaciones directas: los semiconductores (chips, transistores) explotan los niveles energéticos de electrones; la resonancia magnética (RM) se basa en los espines nucleares de átomos de hidrógeno; la datación con C-14 usa isótopos radiactivos para determinar la edad de materiales orgánicos; y la radioterapia emplea núcleos inestables para destruir células tumorales.',
+      },
+    },
+  ],
+};

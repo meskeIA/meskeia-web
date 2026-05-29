@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo se digieren los carbohidratos en el cuerpo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los carbohidratos complejos se rompen en glucosa mediante enzimas: la amilasa salival inicia la digestión en la boca y la amilasa pancreática la completa en el intestino delgado. La glucosa pasa al torrente sanguíneo elevando la glucemia, lo que estimula al páncreas a secretar insulina para que las células la absorban y usen como energía.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre proteínas completas e incompletas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las proteínas completas contienen los 9 aminoácidos esenciales que el organismo no puede sintetizar por sí solo. Se encuentran principalmente en alimentos de origen animal (carne, huevo, pescado, lácteos) y en algunas fuentes vegetales como la soja y la quinoa. Las proteínas incompletas, presentes en legumbres y cereales por separado, carecen de algún aminoácido esencial pero pueden complementarse combinando distintos alimentos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas calorías aporta cada macronutriente por gramo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los carbohidratos aportan 4 kcal por gramo, las proteínas también 4 kcal por gramo, y las grasas 9 kcal por gramo, más del doble. El alcohol aporta 7 kcal por gramo sin valor nutricional. Estos valores son los factores de Atwater y permiten calcular el aporte energético de cualquier alimento a partir de su composición en la etiqueta nutricional.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el índice glucémico y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El índice glucémico (IG) mide la velocidad con que un alimento eleva la glucosa en sangre en comparación con la glucosa pura (IG=100). Alimentos con IG alto (>70) producen picos de insulina rápidos; los de IG bajo (<55) elevan la glucemia de forma gradual. Este concepto es útil para personas con diabetes tipo 2 o resistencia a la insulina, aunque no refleja la cantidad total de carbohidratos consumida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las vitaminas esenciales y en qué alimentos se encuentran?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las 13 vitaminas esenciales se dividen en hidrosolubles (C y el complejo B) y liposolubles (A, D, E y K). La vitamina D se obtiene principalmente por exposición solar y alimentos grasos como el salmón. La B12 solo está en alimentos de origen animal o suplementos, siendo especialmente relevante en dietas vegetarianas. La vitamina C abunda en frutas y verduras frescas y es necesaria para la síntesis de colágeno.',
+      },
+    },
+  ],
+};
