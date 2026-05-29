@@ -68,3 +68,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué etiqueta medioambiental DGT tiene mi coche?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La etiqueta DGT depende del tipo de combustible y el año de matriculación del vehículo. Los coches eléctricos e híbridos enchufables con más de 40 km de autonomía obtienen la etiqueta CERO. Los híbridos no enchufables y vehículos de gas reciben la ECO. Los gasolina matriculados desde 2006 y diésel desde 2014 llevan la etiqueta C. Los gasolina entre 2000 y 2005 y diésel entre 2006 y 2013 obtienen la B. Los vehículos más antiguos no tienen etiqueta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las Zonas de Bajas Emisiones (ZBE) en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley de Residuos de 2021 obliga a los municipios de más de 50.000 habitantes a establecer sus ZBE. Las principales ciudades con ZBE operativas son Madrid (Madrid Central y Madrid 360), Barcelona (ZBE Rondes) y Valencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo circular por Madrid Central sin etiqueta DGT?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En general, los vehículos sin etiqueta DGT tienen restringido el acceso a Madrid Central y Madrid 360 durante los días laborables. Existen excepciones para residentes en la zona, vehículos de carga y descarga, personas con movilidad reducida y algunos servicios esenciales. Las restricciones pueden variar en episodios de alta contaminación, cuando también se limitan los vehículos con etiqueta B.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se obtiene la etiqueta medioambiental de la DGT?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La etiqueta medioambiental DGT se solicita en las Jefaturas Provinciales de Tráfico, en puntos de expedición autorizados o a través de la sede electrónica de la DGT. Para obtenerla es necesario presentar la documentación del vehículo (permiso de circulación) y pagar una tasa. La categoría de la etiqueta está predeterminada según el tipo de motor y la fecha de matriculación, por lo que no se puede elegir.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿La etiqueta DGT es obligatoria para circular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La etiqueta medioambiental DGT no es obligatoria para circular en general, pero sí es imprescindible para acceder a las Zonas de Bajas Emisiones si el vehículo tiene derecho a etiqueta. Sin ella visible en el parabrisas, los agentes o cámaras de control pueden multar al vehículo incluso si técnicamente le corresponde una categoría que permite el acceso. Se recomienda tenerla siempre colocada en el lado inferior derecho del parabrisas.',
+      },
+    },
+  ],
+};

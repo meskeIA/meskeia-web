@@ -82,3 +82,50 @@ const faqSchema = generateFAQSchema({
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre MRU y MRUA en física?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El MRU (Movimiento Rectilíneo Uniforme) ocurre cuando un objeto se desplaza en línea recta a velocidad constante, sin aceleración. El MRUA (Movimiento Rectilíneo Uniformemente Acelerado) se da cuando la velocidad cambia de forma constante por la acción de una aceleración uniforme, como ocurre en la caída libre o en un coche que frena. La fórmula del MRU es d = v·t, mientras que en MRUA se usa d = v₀·t + ½·a·t².',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula la velocidad final en un movimiento uniformemente acelerado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La fórmula es v = v₀ + a·t, donde v₀ es la velocidad inicial, a es la aceleración y t es el tiempo transcurrido. Si un objeto parte del reposo (v₀ = 0) con una aceleración de 5 m/s² durante 4 segundos, alcanza una velocidad final de 20 m/s. Para calcular la distancia recorrida en ese caso: d = ½·a·t² = ½·5·16 = 40 m.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tarda un objeto en caer desde determinada altura en caída libre?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En caída libre (sin rozamiento del aire) la fórmula es t = √(2h/g), donde h es la altura en metros y g = 9,8 m/s². Desde 20 m: t = √(2·20/9,8) ≈ 2,02 s. Desde 45 m: t ≈ 3,03 s. La velocidad al impactar se obtiene con v = g·t. Recuerda convertir siempre las unidades al Sistema Internacional antes de calcular.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué niveles educativos es útil esta calculadora de cinemática?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La calculadora cubre los contenidos de cinemática que se trabajan en los últimos años de educación secundaria y en el primer año universitario de física. Es especialmente útil para estudiantes que preparan exámenes de admisión universitaria, asignaturas de física general o que quieren repasar conceptos de MRU, MRUA, caída libre y tiro parabólico con ejemplos resueltos paso a paso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el tiro parabólico y qué ángulo da el mayor alcance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el tiro parabólico un objeto lanzado con velocidad inicial v₀ y ángulo θ describe una trayectoria curva. El movimiento horizontal es uniforme (vₓ = v₀·cos θ) y el vertical es uniformemente acelerado (vy = v₀·sin θ − g·t). El alcance máximo se obtiene con θ = 45°, ya que maximiza la función sin(2θ). Para un lanzamiento horizontal desde altura h, el alcance es x = v₀·√(2h/g).',
+      },
+    },
+  ],
+};

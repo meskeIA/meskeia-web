@@ -45,3 +45,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cobra una persona durante el permiso por nacimiento en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La prestación por nacimiento equivale al 100% de la base reguladora del trabajador, que se calcula dividiendo la suma de las bases de cotización de los últimos 12 meses entre 365. No hay límite máximo especial: el tope es la base máxima de cotización vigente. El importe diario se multiplica por los días de permiso disfrutados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas semanas dura el permiso por nacimiento en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ambos progenitores tienen derecho a 16 semanas de permiso por nacimiento en igualdad de condiciones. Las primeras 6 semanas son obligatorias e inmediatamente posteriores al parto. Las 10 semanas restantes pueden distribuirse de forma flexible, incluso a tiempo parcial, durante el primer año del menor.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué requisito mínimo de cotización se exige para cobrar la prestación por nacimiento?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El periodo mínimo de cotización depende de la edad del trabajador en el momento del parto. Menores de 21 años no necesitan periodo mínimo. De 21 a 26 años se exigen 90 días cotizados en los 7 años previos. A partir de 26 años se requieren 180 días en los 7 años anteriores o 360 días cotizados a lo largo de toda la vida laboral.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se amplía el permiso por nacimiento en caso de parto múltiple o parto prematuro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. En partos múltiples el permiso se amplía en 2 semanas por cada hijo adicional a partir del segundo. Si el recién nacido requiere hospitalización neonatal durante más de 7 días, se añaden tantas semanas de ampliación como días de ingreso, con un máximo de 13 semanas adicionales. Estas ampliaciones aplican a ambos progenitores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Existe una prestación por nacimiento para quienes no cumplen los requisitos de cotización?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Existe la prestación no contributiva por nacimiento y cuidado de menor, que tiene una cuantía fija equivalente al 100% del IPREM mensual vigente y dura 42 días naturales (6 semanas). Para acceder a ella es necesario no reunir el periodo mínimo de cotización exigido para la prestación contributiva.',
+      },
+    },
+  ],
+};

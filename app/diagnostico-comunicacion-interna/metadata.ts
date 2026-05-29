@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué problemas causa una mala comunicación interna en un equipo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una comunicación interna deficiente genera duplicidades de trabajo, decisiones tomadas sin información suficiente, conflictos derivados de malentendidos y pérdida de tiempo en reuniones innecesarias. Estudios sobre productividad organizacional estiman que los trabajadores del conocimiento destinan hasta el 20% de su jornada a buscar información que ya existe pero no está disponible de forma clara. La falta de profundidad comunicativa también reduce la confianza y el sentido de pertenencia al equipo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se equilibran la velocidad y la profundidad en la comunicación de un equipo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La clave está en elegir el canal adecuado para cada tipo de mensaje. La comunicación asincrónica (documentos, wikis, correo) permite profundidad y registro permanente, mientras que la comunicación sincrónica (reuniones, llamadas, Slack en tiempo real) es útil para decisiones rápidas o contextos emocionales. Los equipos más efectivos combinan ambas: documentan las decisiones importantes y limitan las interrupciones síncronas a lo que realmente las requiere.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué tipo de equipos o empresas es útil este diagnóstico de comunicación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para cualquier equipo que trabaje de forma colaborativa: equipos remotos o híbridos, startups en crecimiento, departamentos que han escalado rápido y sienten que la información no fluye bien, o managers que notan que las reuniones se multiplican sin resolver los problemas de fondo. El diagnóstico no presupone ningún sector ni tamaño de empresa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre comunicación interna y cultura de equipo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La comunicación interna es el conjunto de prácticas, canales y hábitos que usa un equipo para compartir información. La cultura de equipo es más amplia e incluye valores, normas implícitas y formas de relacionarse. Aunque están relacionadas, son distintas: un equipo puede tener canales de comunicación bien estructurados pero una cultura de silos, o viceversa. Mejorar la comunicación interna es generalmente más rápido y tangible que cambiar la cultura, y puede ser un primer paso hacia ella.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el "Slack fatigue" y cómo afecta a la comunicación de equipo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El "Slack fatigue" o fatiga de mensajería instantánea describe el agotamiento cognitivo que produce recibir y responder mensajes en tiempo real de forma continua durante la jornada laboral. La mensajería instantánea favorece la velocidad pero fragmenta la concentración y puede generar la percepción de que "todo es urgente". Investigaciones sobre flujo de trabajo sugieren que cambiar de contexto frecuentemente puede reducir la productividad efectiva hasta un 40%. Establecer franjas horarias sin notificaciones y usar canales asincrónicos para temas no urgentes son estrategias habituales para mitigarlo.',
+      },
+    },
+  ],
+};

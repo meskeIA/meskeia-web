@@ -39,3 +39,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los principales estilos de decoración de interiores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los estilos más extendidos son el minimalista (líneas limpias, pocos elementos), el clásico o tradicional (molduras, maderas oscuras, tejidos ricos), el industrial (ladrillo visto, metal, madera cruda), el nórdico o escandinavo (blanco, madera clara, funcionalidad) y el mediterráneo (colores cálidos, cerámica, materiales naturales). Cada uno refleja una estética y una forma de entender el hogar muy distintas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé qué estilo decorativo se adapta mejor a mi personalidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La elección depende de factores como tus preferencias de orden y amplitud, los colores que te resultan acogedores, si prefieres objetos con historia o piezas nuevas, y el nivel de mantenimiento que estás dispuesto a asumir. Un test de preguntas sobre hábitos y gustos permite identificar qué estilo encaja mejor con tu forma de vivir antes de invertir en muebles o reforma.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede mezclar varios estilos de decoración en una misma casa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, el llamado estilo ecléctico combina elementos de diferentes tendencias. La clave es mantener una paleta de colores coherente y un hilo conductor (materiales, proporciones o época) para que el resultado no parezca caótico. Mezclas frecuentes son nórdico con toques industriales o clásico con detalles modernos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué estilo decorativo es más económico de implementar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El estilo nórdico y el minimalista suelen ser los más accesibles porque apuestan por pocos elementos de calidad y ausencia de adornos superfluos. El estilo industrial también puede ser económico si se aprovechan materiales reciclados o se opta por mobiliario de segunda mano. El estilo clásico tiende a ser el más costoso por la artesanía y los materiales nobles que requiere.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre el estilo nórdico y el mediterráneo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El estilo nórdico prioriza la funcionalidad, los colores neutros (blancos, grises, beige) y la madera clara para maximizar la luz en climas fríos. El mediterráneo usa tonos más cálidos (azules, terracota, ocre), cerámica artesanal y plantas de interior para evocar el clima y la cultura del sur de Europa. El primero tiende a ser más austero; el segundo, más sensorial y colorido.',
+      },
+    },
+  ],
+};

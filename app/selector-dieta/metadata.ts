@@ -63,3 +63,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué dieta es mejor para perder peso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No existe una dieta universalmente mejor para perder peso: depende de tu estilo de vida, preferencias y condiciones de salud. Patrones como la dieta mediterránea, la cetogénica o el ayuno intermitente han mostrado resultados en estudios clínicos, pero la adherencia a largo plazo es el factor más determinante. Consulta con un dietista-nutricionista antes de cambiar tu alimentación de forma drástica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre la dieta mediterránea y la dieta cetogénica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La dieta mediterránea es rica en frutas, verduras, legumbres, aceite de oliva y pescado, con carbohidratos moderados y respaldo científico extenso para la salud cardiovascular. La dieta cetogénica (keto) reduce los carbohidratos a menos de 50 g al día para inducir cetosis, favoreciendo las grasas como fuente de energía. La mediterránea es más flexible y sostenible a largo plazo; la cetogénica puede ser eficaz a corto plazo pero requiere mayor planificación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la dieta DASH y para quién está recomendada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La dieta DASH (Dietary Approaches to Stop Hypertension) fue diseñada para reducir la presión arterial alta. Se basa en frutas, verduras, cereales integrales, lácteos bajos en grasa y reducción de sal y alimentos ultraprocesados. Está especialmente indicada para personas con hipertensión, aunque también se considera saludable para la población general por su perfil nutricional equilibrado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puede una persona vegetariana cubrir todos sus nutrientes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, una dieta vegetariana bien planificada puede cubrir todos los nutrientes esenciales. Es importante prestar atención a la vitamina B12 (en vegetarianos que consumen lácteos y huevos la ingesta puede ser suficiente, pero en veganos es necesario suplementar), el hierro de origen vegetal, el calcio, el zinc y los ácidos grasos omega-3. Combinar legumbres con cereales y consumir alimentos variados facilita obtener todos los aminoácidos esenciales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé qué patrón alimentario se adapta mejor a mí?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los factores clave son tu objetivo principal (perder peso, mejorar la salud cardiovascular, ganar masa muscular…), tu nivel de actividad física, restricciones alimentarias o alergias, tiempo disponible para cocinar y tu relación con los grupos de alimentos. Un test orientativo basado en estas variables puede orientarte hacia la dieta más adecuada, aunque siempre es recomendable validar la elección con un profesional de la nutrición.',
+      },
+    },
+  ],
+};

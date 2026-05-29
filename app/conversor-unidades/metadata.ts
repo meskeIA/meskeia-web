@@ -42,3 +42,50 @@ export const jsonLd = generateWebAppSchema({
       "En español"
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántas categorías de unidades puedo convertir?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El conversor incluye 13 categorías: longitud, masa, temperatura, área, volumen, tiempo, velocidad, almacenamiento de datos, química (mol, número de partículas), presión, energía, fuerza y potencia. Cubre tanto unidades del Sistema Internacional como unidades imperiales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo convierto grados Celsius a Fahrenheit?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Selecciona la categoría "Temperatura", elige Celsius como unidad de origen y Fahrenheit como unidad de destino, escribe el valor y obtendrás el resultado al instante. La fórmula aplicada es °F = (°C × 9/5) + 32.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve el conversor de unidades de química?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La categoría de química permite convertir entre mol, milimol, micromol y número de partículas (usando la constante de Avogadro: 6,022 × 10²³). Es útil para estudiantes de bachillerato, laboratorios y cálculos estequiométricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Los resultados son exactos o son aproximaciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las conversiones usan factores de conversión definidos con alta precisión numérica. Para la mayoría de usos cotidianos y académicos el resultado es suficientemente exacto. En contextos de metrología de alta precisión se recomienda consultar tablas oficiales de la BIPM.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia de los conversores integrados en buscadores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los buscadores suelen ofrecer conversiones básicas (longitud, peso, temperatura). Este conversor añade categorías científicas menos comunes —presión, energía, fuerza, potencia, almacenamiento digital y química— en un único panel sin necesidad de cambiar de búsqueda.',
+      },
+    },
+  ],
+};

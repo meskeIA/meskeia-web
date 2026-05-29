@@ -45,3 +45,50 @@ export const jsonLd = {
   author: { '@type': 'Organization', name: 'meskeIA', url: 'https://meskeia.com' },
   inLanguage: 'es',
 };
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el test WHO-5 y qué mide exactamente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El WHO-5 (Índice de Bienestar de la OMS) es una escala de 5 preguntas desarrollada por la Organización Mundial de la Salud para medir el bienestar subjetivo de las últimas dos semanas. Evalúa estado de ánimo positivo, calma, vitalidad, sueño reparador y actividades cotidianas. La puntuación va de 0 a 100: por debajo de 50 indica malestar significativo y por debajo de 28 sugiere depresión probable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es el WHO-5 un test clínico oficial o solo orientativo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El WHO-5 es una herramienta de cribado validada científicamente y utilizada en investigación y atención primaria en más de 30 países. No es un diagnóstico clínico: sirve para detectar señales de alerta y decidir si consultar con un profesional de salud mental. Una puntuación baja no confirma ningún trastorno, igual que una puntuación alta no descarta problemas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se interpreta la puntuación del WHO-5?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cada pregunta se puntúa de 0 (nunca) a 5 (siempre). La suma de las 5 preguntas (máximo 25) se multiplica por 4 para obtener un índice de 0 a 100. Puntuaciones de 76-100 indican buen bienestar; 51-75, bienestar moderado; 26-50, malestar significativo; y 0-25, probable depresión. Ante cualquier duda, se recomienda consultar a un médico o psicólogo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil hacer el test de bienestar WHO-5?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cualquier persona adulta puede usar el WHO-5 para hacer un seguimiento periódico de su bienestar emocional. Es especialmente útil en momentos de estrés laboral, cambios vitales importantes, dificultades para dormir o sensación persistente de cansancio o tristeza. También se usa en empresas, centros de salud y estudios de investigación como herramienta de seguimiento colectivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Con qué frecuencia se recomienda hacer el test WHO-5?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La OMS recomienda aplicarlo con una periodicidad mínima de dos semanas, ya que las preguntas se refieren a ese período concreto. Para seguimiento personal es habitual hacerlo cada 4-6 semanas y comparar las puntuaciones a lo largo del tiempo. En contextos clínicos suele administrarse en cada consulta de seguimiento para evaluar la evolución del paciente.',
+      },
+    },
+  ],
+};

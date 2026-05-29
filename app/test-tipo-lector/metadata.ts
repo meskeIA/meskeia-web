@@ -42,3 +42,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de lector existen y cómo sé cuál soy?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Existen múltiples formas de clasificar los perfiles lectores. Este test identifica cinco arquetipos: El Detective (amante de la trama y los giros), El Explorador (curioso por mundos y culturas nuevas), El Empático (enganchado a los personajes y emociones), El Esteta (que disfruta del estilo y el lenguaje) y El Pensador (que busca ideas y reflexión). Las 8 preguntas del test analizan tus motivaciones, hábitos y preferencias para determinar tu arquetipo principal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este test de otros tests de personalidad lectora?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A diferencia de los tests genéricos de "género favorito", este analiza motivaciones lectoras profundas: por qué lees, qué buscas en una historia, cómo reaccionas ante los personajes o el estilo del autor. El resultado no solo nombra tu arquetipo, sino que incluye géneros afines, autores emblema de ese perfil y recomendaciones de lectura concretas adaptadas a tus respuestas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué géneros literarios corresponden a cada arquetipo lector?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Detective se orienta al thriller, la novela negra y el misterio. El Explorador disfruta de la ciencia ficción, la fantasía épica y la literatura de viajes. El Empático se inclina por la ficción literaria contemporánea y las novelas de formación. El Esteta prefiere la poesía, el ensayo y la prosa de autor cuidada. El Pensador busca la no ficción, el ensayo filosófico y la ciencia divulgativa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo tener características de más de un arquetipo lector?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, los perfiles no son excluyentes. El test determina tu arquetipo predominante en función de la suma de tus respuestas, pero muchos lectores combinan rasgos de dos o más perfiles: un lector puede ser principalmente Empático con fuerte componente Pensador. Si tu resultado te parece mixto, es porque probablemente lo es: los arquetipos son orientaciones, no categorías rígidas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve conocer mi perfil lector?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Conocer tu perfil lector ayuda a elegir libros con más acierto, reducir el abandono de lecturas que no conectan contigo y descubrir géneros o autores que quizás no habrías explorado. También es útil para educadores y bibliotecarios que quieran recomendar lecturas personalizadas. El test tarda menos de 3 minutos y el resultado incluye sugerencias concretas de títulos y autores.',
+      },
+    },
+  ],
+};

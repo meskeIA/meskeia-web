@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo organizo la lista de compras por secciones del supermercado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al añadir cada producto puedes asignarle una categoría (frutas, lácteos, carnicería, conservas…). La herramienta agrupa automáticamente los artículos por sección para que recorras el supermercado en orden y no tengas que volver atrás. Solo tienes que introducir el nombre del producto y seleccionar su categoría.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se guarda la lista si cierro el navegador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La lista se guarda automáticamente en el almacenamiento local del navegador (localStorage), sin necesidad de cuenta ni conexión a internet. Al volver a abrir la página encontrarás exactamente la misma lista. Solo se pierde si limpias los datos del navegador manualmente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo compartir la lista con otra persona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes exportar la lista en texto o copiarla al portapapeles y enviarla por WhatsApp, email o cualquier mensajería. No requiere que la otra persona tenga cuenta ni instale ninguna aplicación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Funciona sin conexión a internet?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, una vez cargada la página funciona completamente sin conexión. Los datos se almacenan en el dispositivo, por lo que puedes consultarla y marcar productos en el supermercado aunque no tengas cobertura o WiFi.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo evito comprar de más y reducir el gasto en el supermercado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Planificar el menú semanal antes de hacer la lista reduce el gasto entre un 20 y un 30% según estudios de consumo. Añadir solo lo que realmente necesitas, revisar el stock en casa antes de salir y establecer cantidades concretas por producto ayuda a evitar compras impulsivas y desperdicio alimentario.',
+      },
+    },
+  ],
+};

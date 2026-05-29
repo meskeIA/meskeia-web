@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué son las figuras retóricas y para qué sirven?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las figuras retóricas son recursos del lenguaje que alteran el uso habitual de las palabras para conseguir un efecto expresivo o estético. Se usan en literatura, publicidad y discursos para hacer el mensaje más vívido, persuasivo o memorable. Hay más de 60 figuras catalogadas, aunque en la práctica escolar se trabajan unas 20-30.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las figuras retóricas más importantes para Selectividad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las figuras más frecuentes en los exámenes de Selectividad (EBAU/EvAU) son: metáfora, símil o comparación, hipérbole, personificación, anáfora, antítesis, oxímoron, metonimia, sinestesia y encabalgamiento. El quiz cubre estas y otras 17 más, organizadas por nivel de dificultad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia una metáfora de un símil?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El símil (o comparación) establece una semejanza usando nexos explícitos como "como", "igual que" o "parece": "Sus ojos son como el mar". La metáfora elimina ese nexo e identifica directamente los dos términos: "Sus ojos son el mar". Ambas relacionan dos realidades distintas, pero la metáfora lo hace de forma más directa e implícita.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A partir de qué curso se estudian las figuras retóricas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las figuras básicas (comparación, metáfora, hipérbole, personificación) se introducen habitualmente en 2.º y 3.º de la ESO (12-14 años). En Bachillerato se amplía el repertorio con figuras más complejas como la sinestesia, el oxímoron o el quiasmo, que son las que suelen aparecer en Selectividad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas preguntas tiene el quiz y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El quiz presenta ejemplos reales de textos literarios y el usuario debe identificar qué figura retórica contiene, eligiendo entre varias opciones. Cubre 27 figuras distintas distribuidas en tres niveles (básico, Bachillerato y Selectividad). Al finalizar cada pregunta se muestra la explicación de la figura, sin necesidad de registro ni instalación.',
+      },
+    },
+  ],
+};

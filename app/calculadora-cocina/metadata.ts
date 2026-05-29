@@ -94,3 +94,50 @@ const faqSchema = generateFAQSchema({
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos gramos tiene una taza de harina?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una taza americana (cup, 240 ml) equivale a entre 120 y 130 g de harina según el grado de compactación. La harina tamizada pesa unos 120 g; la compactada puede llegar a 140 g. En repostería se recomienda siempre usar báscula para mayor precisión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se escala una receta para más comensales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Divide las porciones deseadas entre las originales para obtener el factor de escala y multiplica cada ingrediente por ese número. Por ejemplo, de 4 a 8 personas el factor es 2×. Con la levadura conviene reducirla un 15-20% al doblar o triplicar, y la sal ajustarla al gusto al final.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A cuántos grados Celsius equivale 350°F en el horno?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '350 °F equivalen a 177 °C (se redondea a 180 °C en la práctica). La fórmula exacta es: °C = (°F − 32) × 5/9. Otras referencias frecuentes: 325°F = 163°C, 375°F = 190°C, 400°F = 204°C.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tarda en cocinarse una pechuga de pollo al horno?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una pechuga de pollo de 150-200 g tarda aproximadamente 20-25 minutos a 180 °C. Piezas más grandes (250-300 g) pueden necesitar 30-35 minutos. La temperatura interna debe alcanzar los 74 °C para que sea segura. Con horno ventilado, reducir la temperatura 15-20 °C o el tiempo un 10-15%.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué puedo usar como sustituto del huevo en repostería?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los sustitutos más habituales son: 1 cucharada de semillas de lino molidas + 3 de agua (reposo 5 min), 60 ml de puré de manzana, 60 g de plátano maduro triturado o 1 cucharadita de bicarbonato + 1 cucharada de vinagre. Cada opción aporta distinta textura; el lino y el vinagre son los más neutros en sabor.',
+      },
+    },
+  ],
+};

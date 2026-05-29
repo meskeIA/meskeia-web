@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la tensión entre explotación y exploración en una empresa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tensión explotación-exploración describe el dilema estratégico que enfrentan las organizaciones entre optimizar lo que ya hacen bien (explotación) e invertir en nuevas ideas, productos o modelos de negocio (exploración). El economista James G. March identificó en 1991 que las empresas que se inclinan demasiado hacia la explotación arriesgan quedarse obsoletas, mientras que las que exploran en exceso pueden perder eficiencia operativa. El equilibrio entre ambas es clave para la sostenibilidad a largo plazo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé si mi empresa está demasiado centrada en la eficiencia y descuida la innovación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Señales de un exceso de explotación son: los proyectos de innovación se cancelan sistemáticamente por presupuesto, las métricas de corto plazo dominan todas las decisiones, hay resistencia al cambio y el equipo rara vez propone ideas nuevas. Un diagnóstico basado en preguntas sobre procesos reales de tu organización puede ayudarte a detectar si el desequilibrio existe y en qué áreas es más pronunciado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este tipo de diagnóstico organizacional?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para líderes de equipo, managers intermedios, directivos y fundadores de startups o pymes que quieran entender la orientación estratégica real de su organización. También resulta valioso para consultores, coaches organizacionales y profesionales de recursos humanos que acompañan procesos de cambio o transformación cultural.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este diagnóstico de un análisis DAFO o una auditoría de innovación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El DAFO analiza factores internos y externos del negocio desde una perspectiva estática, mientras que una auditoría de innovación suele medir outputs (patentes, nuevos productos). Este diagnóstico, basado en el modelo de March, evalúa la orientación cognitiva y cultural de la organización: cómo toma decisiones, distribuye recursos y responde a la incertidumbre. Es una herramienta de reflexión, no de medición de resultados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué proporción ideal existe entre explotación y exploración?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No existe una proporción universal válida para todas las industrias. En sectores maduros o regulados (banca, salud, utilities) el peso de la explotación suele ser mayor. En tecnología o medios, la exploración constante es necesaria para sobrevivir. Investigaciones posteriores al trabajo de March sugieren que las organizaciones más resilientes desarrollan capacidades "ambidextras": unidades separadas para explorar y estructuras eficientes para explotar, coordinadas desde la dirección.',
+      },
+    },
+  ],
+};

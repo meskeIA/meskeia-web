@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos días tarda en recuperarse el jet lag?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Como regla general, el organismo necesita aproximadamente un día de adaptación por cada hora de diferencia horaria cruzada. Un vuelo con 8 horas de desfase puede requerir entre 5 y 8 días para una adaptación completa, aunque varía según la dirección del vuelo y cada persona.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es peor el jet lag viajando hacia el este o hacia el oeste?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Viajar hacia el este suele producir un jet lag más intenso porque obliga al cuerpo a adelantar su reloj biológico, lo que resulta más difícil fisiológicamente. Viajar hacia el oeste, en cambio, alarga el día natural del organismo y la adaptación tiende a ser más llevadera.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula el impacto del jet lag?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cálculo combina el número de zonas horarias cruzadas, la dirección del vuelo (este u oeste) y factores personales como el cronotipo (mañanero o nocturno) y la duración del vuelo. El resultado estima el nivel de afectación y los días estimados de adaptación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué estrategias ayudan a reducir el jet lag antes de volar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Adelantar o retrasar la hora de dormir en 1-2 horas durante los 2-3 días previos al viaje, en la dirección del destino, facilita la adaptación. También ayuda hidratarse bien, evitar el alcohol en el vuelo y exponerse a la luz natural al llegar al destino.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué viajes merece la pena planificar el jet lag?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La planificación es especialmente útil cuando el viaje supera 5 zonas horarias o cuando los primeros días en el destino son laborales o de alta exigencia (reuniones, competiciones, eventos). En viajes cortos de turismo con menos de 4 horas de diferencia el impacto suele ser tolerable sin intervención específica.',
+      },
+    },
+  ],
+};

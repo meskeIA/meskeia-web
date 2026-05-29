@@ -42,3 +42,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué período histórico cubre el quiz de historia de España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El quiz abarca desde la presencia romana en la Península Ibérica (siglo III a.C.) hasta la aprobación de la Constitución española de 1978, que marca el final de la Transición democrática. Se estructura en 9 épocas: romanización, visigodos, Al-Ándalus, Reconquista, Reyes Católicos, Imperio español, siglo XIX, Guerra Civil y Franquismo, y Transición.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas preguntas tiene y cómo se organizan?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El quiz contiene 81 preguntas verificables repartidas en tres niveles de dificultad: básico, medio y avanzado. Todas las preguntas están basadas en hechos contrastables de fuentes históricas reconocidas, sin opiniones ni interpretaciones controvertidas. Puedes seleccionar el nivel y la época histórica que quieras repasar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué exámenes o asignaturas sirve este quiz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para preparar la asignatura de Historia de España de 2.º de Bachillerato y el examen de Selectividad (EBAU/EvAU), que incluye obligatoriamente Historia de España. También sirve para repasar en la ESO (3.º y 4.º), para oposiciones que incluyen cultura general española, y para cualquier persona interesada en conocer la historia del país.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este quiz de los test de historia que hay en otras páginas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las preguntas están diseñadas para ser verificables: cada respuesta correcta tiene una justificación basada en hechos documentados, no en interpretaciones. Además, cubre 9 épocas históricas completas en un solo sitio, sin publicidad ni registro, con tres niveles de dificultad para adaptarse a distintos objetivos de estudio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué época de la historia de España tiene más peso en Selectividad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En la EBAU/EvAU, el temario oficial de Historia de España de 2.º de Bachillerato da mayor peso a los siglos XIX y XX: el liberalismo y la Restauración, la Segunda República (1931-1939), la Guerra Civil (1936-1939), el Franquismo y la Transición democrática. El período anterior a 1800 suele aparecer en preguntas de contexto o en la parte de nivel básico.',
+      },
+    },
+  ],
+};
