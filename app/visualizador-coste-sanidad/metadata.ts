@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta una operación en la sanidad privada en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los costes en la sanidad privada española varían notablemente según el procedimiento. Una apendicectomía puede rondar los 3.000-6.000 €, una operación de cataratas entre 1.000 y 2.500 € por ojo, y una prótesis de cadera entre 8.000 y 15.000 €. Una consulta con especialista oscila entre 60 y 150 €. Estas cifras dependen del centro, la ciudad y si se cuenta con seguro médico privado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se financia la sanidad pública en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La sanidad pública española se financia principalmente a través de los impuestos generales del Estado (IRPF, IVA, cotizaciones sociales) que se transfieren a las comunidades autónomas, que son las responsables de gestionar los servicios sanitarios. El gasto público sanitario en España representa aproximadamente el 6-7 % del PIB, por debajo de la media europea del 8 %. El copago farmacéutico es la única aportación directa del usuario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta enfermarse en Estados Unidos sin seguro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En Estados Unidos, una visita a urgencias sin seguro puede costar entre 1.000 y 3.000 dólares. Una hospitalización de varios días puede superar los 30.000 dólares, y una operación mayor puede alcanzar los 100.000 dólares o más. Es el sistema sanitario con mayor coste per cápita del mundo: unos 12.000 dólares anuales por habitante, frente a los ~3.500 € de media en España.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Vale la pena contratar un seguro médico privado teniendo la sanidad pública?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de varios factores: las listas de espera en tu comunidad autónoma, la frecuencia con que usas servicios médicos y el coste del seguro (entre 50 y 150 €/mes para adultos sanos). Los seguros privados ofrecen principalmente menores tiempos de espera, elección de especialista y habitación individual. Para procedimientos urgentes o de vida o muerte, la sanidad pública ofrece las mismas garantías que la privada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué país tiene la sanidad más cara del mundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Estados Unidos es el país con el mayor gasto sanitario per cápita del mundo, con aproximadamente 12.500 dólares anuales por persona (datos OCDE 2022), más del doble que la media de los países europeos. Le siguen Suiza (~8.000 USD) y Noruega (~7.700 USD). A pesar del gasto, los indicadores de salud estadounidenses —esperanza de vida, mortalidad infantil— se sitúan por debajo de muchos países con menor gasto.',
+      },
+    },
+  ],
+};

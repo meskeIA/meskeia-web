@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tarda en construirse un edificio residencial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un edificio residencial de entre 20 y 40 viviendas tarda habitualmente entre 24 y 36 meses desde la obtención de la licencia de obras hasta la entrega de llaves. El proceso previo —redacción del proyecto, visados colegiales y tramitación municipal— puede añadir entre 6 y 18 meses adicionales. Los plazos varían considerablemente según el ayuntamiento, la complejidad del terreno y las condiciones climáticas durante la ejecución.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las principales fases de construcción de un edificio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las fases principales son: 1) Trabajo previo y movimiento de tierras; 2) Cimentación (zapatas o pilotes); 3) Estructura (pilares, forjados y muros de carga); 4) Cerramiento y fachada; 5) Instalaciones (electricidad, fontanería, climatización, telecomunicaciones); 6) Acabados interiores (alicatados, solados, carpintería, pintura); 7) Urbanización y entrega. Cada fase requiere oficios distintos y no puede iniciarse hasta completar la anterior.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta construir un edificio de viviendas por metro cuadrado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El coste de construcción de un edificio plurifamiliar en España oscila entre 1.200 y 1.800 €/m² construido, dependiendo de la calidad de los materiales y la ubicación. A eso hay que sumar el suelo (muy variable), honorarios de proyecto (entre el 5 % y el 8 % del presupuesto) y tributos. Un edificio de 30 viviendas de 80 m² puede requerir una inversión total que va de 3 a 6 millones de euros sin contar el precio del solar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué oficios participan en la construcción de un edificio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Intervienen más de 15 oficios distintos a lo largo de la obra: topógrafo, excavador y encofrador en las primeras fases; ferrallista y hormigonero en la estructura; albañil, fontanero, electricista y instalador de climatización en las instalaciones; alicatador, solador, carpintero de madera, carpintero de aluminio y pintor en los acabados. El aparejador o arquitecto técnico supervisa la ejecución y coordina a todos los gremios.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué licencias necesita un promotor antes de empezar a construir?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El proceso administrativo incluye: aprobación del Plan de Ordenación Urbanística (o uso del suelo), visado del proyecto por el colegio de arquitectos, solicitud y concesión de la licencia de obras municipales, y alta en la Seguridad Social del centro de trabajo (apertura de obra). Una vez finalizado el edificio se requiere la licencia de primera ocupación o cédula de habitabilidad para poder habitarlo o venderlo legalmente.',
+      },
+    },
+  ],
+};

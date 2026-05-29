@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué cambios físicos ocurren en el cuerpo con la edad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Con cada década el cuerpo experimenta cambios acumulativos: el metabolismo basal desciende aproximadamente un 2-3 % por década a partir de los 30 años, la masa muscular puede reducirse un 3-8 % por década (sarcopenia), la densidad ósea disminuye —especialmente en mujeres tras la menopausia— y la capacidad cardíaca máxima baja alrededor de 1 % al año. La visión y el oído también pierden agudeza de forma gradual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A qué edad empieza a declinar el metabolismo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El gasto metabólico basal comienza a reducirse de forma perceptible alrededor de los 30 años. Entre los 30 y los 60 años el descenso es gradual (2-3 % por década); a partir de los 60 puede acelerarse si no se mantiene actividad física y masa muscular. La pérdida de músculo es el factor principal, ya que el tejido muscular consume más energía en reposo que el tejido graso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede frenar el envejecimiento corporal con ejercicio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El ejercicio de fuerza y el ejercicio aeróbico son las intervenciones con mayor evidencia científica para ralentizar el declive fisiológico. El entrenamiento de resistencia puede preservar o incluso aumentar la masa muscular en adultos mayores, mejorar la densidad ósea y mantener la capacidad cardiovascular. No detiene el envejecimiento, pero reduce significativamente su impacto funcional.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo pierde el cuerpo más densidad ósea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La densidad ósea alcanza su pico máximo alrededor de los 25-30 años y luego desciende lentamente. En mujeres, la caída se acelera durante la menopausia debido al descenso de estrógenos, pudiendo perderse hasta un 20 % de masa ósea en los primeros 5-7 años. En hombres el proceso es más gradual. La vitamina D, el calcio y el ejercicio de impacto ayudan a preservar el hueso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil un visualizador del envejecimiento corporal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para cualquier persona que quiera entender los cambios fisiológicos que ocurren con la edad: adultos que buscan planificar hábitos preventivos, estudiantes de ciencias de la salud, educadores que enseñan biología humana y profesionales sanitarios que necesitan explicar a sus pacientes qué esperar en cada etapa de la vida.',
+      },
+    },
+  ],
+};

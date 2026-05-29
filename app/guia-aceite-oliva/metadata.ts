@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Funciona 100% en el navegador, sin registro',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre aceite de oliva virgen extra, virgen y aceite de oliva?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El aceite de oliva virgen extra (AOVE) es el de mayor calidad: se obtiene únicamente por procedimientos mecánicos sin refinar, tiene una acidez máxima de 0,8° y carece de defectos organolépticos. El virgen también es de primera extracción mecánica, pero admite hasta 2° de acidez y puede tener leves defectos de sabor. El aceite de oliva (sin adjetivo) mezcla aceite refinado con un porcentaje de virgen para darle sabor, siendo el de menor complejidad organoléptica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la variedad de aceituna más común en España y cómo sabe su aceite?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La variedad Picual es la más cultivada en España, representando aproximadamente el 50% de la producción nacional. Produce un aceite de sabor intenso y robusto, con notas amargas y picantes pronunciadas, aromas a tomate, higuera e hierba, y una alta estabilidad oxidativa que lo hace ideal para frituras. Es originaria de Jaén y concentra la mayor parte de los AOVE con D.O.P. Sierra de Segura y Sierra Mágica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se conserva el aceite de oliva virgen extra para que no se enrancie?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los tres enemigos del AOVE son la luz, el calor y el oxígeno. Para conservarlo correctamente: guardarlo en un lugar oscuro y fresco (entre 15 °C y 18 °C), en envase opaco (lata o vidrio oscuro), y cerrar bien el tapón tras cada uso. Evitar colocarlo junto a la cocina o la ventana. Una vez abierto, consumirlo preferiblemente en 4-6 meses para disfrutar de su máxima calidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre un aceite de oliva frutado verde y frutado maduro?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un AOVE frutado verde se obtiene de aceitunas recolectadas antes de la maduración completa (cosecha temprana). Tiene mayor intensidad aromática, con notas a hierba, tomate, almendra verde y alcachofa, y un amargor y picante más pronunciados. El frutado maduro procede de aceitunas más avanzadas en su maduración: el aceite es más suave, con aromas a frutos maduros, menos amargo, y sabor más redondo. Ambos son AOVE de calidad; la preferencia es personal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué usos culinarios es mejor cada tipo de aceite de oliva?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El AOVE intenso (Picual, Cornicabra) es ideal para frituras por su alta estabilidad, aliños con carnes y en crudo sobre legumbres y sopas. El AOVE suave y afrutado (Arbequina, Hojiblanca) funciona mejor en pescados, verduras, postres y elaboraciones donde un aceite intenso taparía otros sabores. El aceite de oliva (refinado) es el más indicado para frituras prolongadas y preparaciones que no requieran matices organolépticos.',
+      },
+    },
+  ],
+};

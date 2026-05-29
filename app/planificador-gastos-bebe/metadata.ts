@@ -54,3 +54,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta el primer año de un bebé en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El coste del primer año varía mucho según el nivel de gasto y las circunstancias familiares. En un nivel ajustado puede situarse en torno a 5.000-7.000 euros anuales; en un nivel medio, entre 8.000 y 12.000 euros; y en un nivel confortable puede superar los 15.000 euros si se incluye guardería privada y artículos de mayor precio. Las partidas más importantes son la guardería, la alimentación (especialmente leche de fórmula) y el material de movilidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto se gasta en pañales durante el primer año del bebé?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un bebé puede usar entre 6 y 10 pañales al día durante los primeros meses. Con pañales de marca media (talla 1-3), el gasto anual se sitúa aproximadamente entre 500 y 900 euros dependiendo de la marca elegida y si se usan pañales de tela en algún momento. Comprar en packs grandes o en oferta reduce significativamente este coste.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cuesta la guardería en España para un bebé menor de un año?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de la guardería pública subvencionada en España oscila entre 200 y 500 euros al mes, aunque hay listas de espera en muchas ciudades. La guardería privada puede costar entre 400 y 900 euros mensuales. Las comunidades autónomas tienen ayudas y cheques guardería distintos. La guardería es habitualmente la partida de mayor peso en el presupuesto del primer año si ambos progenitores trabajan.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es más barato dar el pecho que usar leche de fórmula?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. La lactancia materna exclusiva elimina el gasto en leche artificial, que puede suponer entre 80 y 200 euros al mes en los primeros meses. En cambio, la lactancia materna tiene costes indirectos: sacaleches (alquiler o compra, 50-300 euros), bolsas de conservación, y en algunos casos consultas con una matrona o asesora de lactancia. Aun así, el ahorro frente a la fórmula es considerable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ayudas económicas existen en España por tener un bebé?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En España existen varias prestaciones: la baja por nacimiento (16 semanas retribuidas al 100% del salario base para cada progenitor), la deducción por maternidad en el IRPF (1.200 euros anuales por hijo menor de 3 años para madres trabajadoras), el cheque bebé de algunas comunidades autónomas, y ayudas municipales variables. Algunas familias también pueden acceder a la prestación por nacimiento del IMSERSO si cumplen requisitos de renta.',
+      },
+    },
+  ],
+};
