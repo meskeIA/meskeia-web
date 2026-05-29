@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué relación tienen las matemáticas y la música?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La música se basa completamente en matemáticas: cada nota es una frecuencia en hercios, los intervalos entre notas son ratios numéricos simples y el ritmo se organiza con fracciones (compás de 4/4, 3/4…). Pitágoras ya describía los intervalos consonantes como razones de números enteros pequeños, como 2:1 para la octava o 3:2 para la quinta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el La estándar está afinado a 440 Hz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El La4 a 440 Hz fue adoptado como estándar internacional en 1939 por la ISO para facilitar la afinación común entre músicos y fabricantes de instrumentos de todo el mundo. Antes de ese acuerdo, el La variaba entre 415 Hz y 466 Hz según la época y el país. Algunos intérpretes de música barroca usan aún 415 Hz como referencia histórica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué los acordes mayores suenan alegres y los menores tristes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La diferencia reside en la tercera del acorde: el acorde mayor tiene una tercera mayor (4 semitonos) que genera un ratio de frecuencias próximo a 5:4, considerado consonante y "brillante". El acorde menor usa una tercera menor (3 semitonos), con un ratio algo más tenso. Esta distinción perceptiva tiene base en la serie armónica natural y en el condicionamiento cultural occidental.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la proporción áurea en música?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La proporción áurea (φ ≈ 1,618) aparece en la estructura de algunas composiciones: el clímax de varias obras de Debussy o Bartók se sitúa aproximadamente en el punto que divide la pieza según esta razón. También los números de Fibonacci (1, 1, 2, 3, 5, 8, 13…) aparecen en patrones rítmicos y en la disposición de secciones de ciertas composiciones del siglo XX.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este explicador visual de matemáticas y música?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está pensado para estudiantes de bachillerato, conservatorio o universidad que quieran entender la base física y matemática del sonido, para músicos con curiosidad teórica y para cualquier persona interesada en saber por qué ciertas combinaciones de notas suenan bien o mal. No se necesitan conocimientos previos de solfeo ni de matemáticas avanzadas.',
+      },
+    },
+  ],
+};

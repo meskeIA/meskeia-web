@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto dinero se ahorra en 10 años dejando de fumar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Fumando un paquete diario a un precio medio de 5,50 € en España, el gasto anual supera los 2.000 €. A lo largo de 10 años eso equivale a más de 20.000 €. Si ese dinero se invirtiera con un rendimiento moderado del 5 % anual, el resultado compuesto sería aún mayor. El impacto en salud es adicional e independiente del económico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo influye caminar 30 minutos al día en la salud a largo plazo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Caminar 30 minutos diarios a ritmo moderado suma alrededor de 182 horas de actividad física al año. Estudios de seguimiento a largo plazo asocian este hábito con una reducción del riesgo de enfermedades cardiovasculares, mejor control del peso y menor probabilidad de diabetes tipo 2. A 10 años, el efecto acumulado en bienestar general es difícil de cuantificar en una sola cifra, pero el beneficio es sólido y bien documentado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el efecto del interés compuesto en el ahorro diario?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El interés compuesto hace que los rendimientos se reinviertan y generen nuevos rendimientos sobre rendimientos previos. Ahorrar 5 € al día equivale a 1.825 € anuales. Con una rentabilidad del 5 % anual compuesto, tras 10 años el capital acumulado supera los 23.000 € en lugar de los 18.250 € que resultarían sin rentabilidad. A 20 años la diferencia se multiplica drásticamente por el efecto de aceleración exponencial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve visualizar el impacto de las decisiones cotidianas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las personas tendemos a infravalorar los cambios pequeños porque su efecto es imperceptible día a día. Visualizar el resultado acumulado a 1, 5 y 10 años hace tangible lo que el cerebro no puede intuir directamente. Esta perspectiva no sustituye la toma de decisiones individual ni tiene en cuenta circunstancias personales, pero puede servir de punto de partida para reflexionar sobre hábitos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Dormir una hora más cada noche tiene impacto real a largo plazo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Dormir entre 7 y 9 horas se asocia con mejor rendimiento cognitivo, menor riesgo de obesidad y mejor regulación del estado de ánimo, según recomendaciones de la Sociedad Española del Sueño. Añadir una hora de sueño cuando se partía de un déficit crónico representa más de 365 horas adicionales de descanso al año. El beneficio no es lineal y depende de la calidad del sueño, pero la privación crónica acumulada tiene efectos negativos bien documentados.',
+      },
+    },
+  ],
+};

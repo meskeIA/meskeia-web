@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el cifrado Playfair?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cifrado Playfair es un sistema criptográfico clásico que cifra el texto de dos letras en dos letras (dígrafos), usando una matriz cuadrada de 5×5 construida a partir de una palabra clave. Fue inventado por Charles Wheatstone en 1854 y popularizado por Lord Playfair, de ahí su nombre. Fue el primer cifrado de digramas usado a escala militar práctica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el cifrado Playfair?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se construye una matriz 5×5 con las letras de la clave (sin repetidas) seguida del resto del alfabeto; I y J comparten celda. El texto se divide en pares de letras (dígrafos); si un par es igual se inserta una X entre ellos. Cada dígrafo se cifra según tres reglas: si las letras están en la misma fila se desplazan a la derecha; si están en la misma columna, hacia abajo; si forman un rectángulo, se intercambian las esquinas opuestas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué guerras se usó el cifrado Playfair?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cifrado Playfair fue empleado por el ejército británico durante la Segunda Guerra Bóer (1899-1902) y en la Primera Guerra Mundial. Australia lo usó en la Segunda Guerra Mundial para comunicaciones tácticas de bajo nivel. Fue considerado suficientemente seguro para mensajes en campo de batalla, aunque los criptoanalistas aliados ya conocían métodos para romperlo con texto suficiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se rompe el cifrado Playfair?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Playfair se puede atacar mediante análisis de frecuencia de dígrafos: aunque cifra pares en lugar de letras individuales, los patrones estadísticos del idioma persisten. Con unos 100-200 dígrafos de texto cifrado es posible reconstruir la matriz mediante métodos de análisis diferencial o búsqueda heurística. La longitud del texto cifrado y el conocimiento del idioma original son claves para el ataque.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el cifrado Playfair combina I y J en la misma celda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El alfabeto latino tiene 26 letras, pero una matriz cuadrada de 5×5 solo tiene 25 celdas. Para adaptarlo, se fusionan las letras I y J en una sola celda, ya que en inglés son frecuentemente intercambiables en contextos donde el cifrado era más usado. Al descifrar, el receptor debe deducir por contexto si la letra corresponde a I o J. En algunos alfabetos europeos se omite la Q o la W en su lugar.',
+      },
+    },
+  ],
+};

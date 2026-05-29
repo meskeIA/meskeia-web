@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo nace una estrella?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las estrellas nacen en nebulosas, nubes de gas (principalmente hidrógeno) y polvo interestelar. Cuando una región de la nebulosa alcanza suficiente densidad por su propia gravedad, el gas colapsa formando una protoestrella. Al aumentar la temperatura y presión en el núcleo hasta unos 10 millones de kelvin, se desencadena la fusión nuclear del hidrógeno en helio, y la estrella entra en la secuencia principal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué determina el destino final de una estrella?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La masa inicial es el factor decisivo. Las estrellas de baja y media masa (como el Sol) terminan como gigantes rojas y luego como enanas blancas rodeadas de una nebulosa planetaria. Las estrellas muy masivas (más de 8 masas solares) mueren en una supernova y dejan como remanente una estrella de neutrones o, si la masa residual supera unas 3 masas solares, un agujero negro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es una supernova y por qué ocurre?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una supernova es una explosión estelar catastrófica que ocurre cuando una estrella masiva agota el combustible de su núcleo. Sin la presión de la fusión nuclear, el núcleo colapsa en milisegundos bajo su propia gravedad; la energía liberada expulsa las capas exteriores a miles de kilómetros por segundo, con una luminosidad que puede superar la de toda una galaxia durante semanas. En ese proceso se forjan elementos pesados como el hierro, el oro o el uranio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo vive una estrella como el Sol?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Sol tiene una vida estimada de unos 10.000 millones de años en la secuencia principal, de los cuales lleva unos 4.600 millones transcurridos. En general, cuanto más masiva es una estrella, más corta es su vida: una estrella de 20 masas solares puede agotar su combustible en apenas unos pocos millones de años, mientras que una estrella de muy poca masa (enana roja) puede vivir billones de años.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿De dónde vienen los elementos químicos del cuerpo humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mayoría de los elementos que componen el cuerpo humano se fabricaron en el interior de estrellas o en explosiones de supernovas. El hidrógeno proviene del Big Bang; el carbono, nitrógeno, oxígeno y hierro se forjaron en núcleos estelares; y elementos más pesados como el yodo o el zinc se originaron en supernovas o colisiones de estrellas de neutrones. Somos, literalmente, polvo de estrellas reciclado.',
+      },
+    },
+  ],
+};

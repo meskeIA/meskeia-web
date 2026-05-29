@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el cifrado Vigenère?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cifrado Vigenère es un método de cifrado polialfabético que usa una palabra clave para encriptar mensajes. Cada letra del texto se desplaza un número distinto de posiciones según la letra correspondiente de la clave, lo que lo hace mucho más seguro que el cifrado César simple. Fue descrito por Giovan Battista Bellaso en 1553 y popularizado erróneamente bajo el nombre de Blaise de Vigenère.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el cifrado Vigenère paso a paso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se elige una clave, por ejemplo "CLAVE". Cada letra de la clave indica cuántas posiciones desplazar la letra correspondiente del mensaje: C=2, L=11, A=0, V=21, E=4. La clave se repite cíclicamente a lo largo del texto. Para descifrar, se aplica el desplazamiento inverso usando la misma clave. La tabla Vigenère (cuadrado de Vigenère) visualiza todas las sustituciones posibles.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es seguro el cifrado Vigenère hoy en día?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. El cifrado Vigenère fue roto definitivamente por Charles Babbage y Friedrich Kasiski en el siglo XIX mediante el análisis de la longitud de la clave. Con claves cortas y texto suficiente es vulnerable al análisis de frecuencia. Hoy se usa exclusivamente con fines educativos para entender los fundamentos de la criptografía histórica, no para proteger información real.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia el cifrado Vigenère del cifrado César?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cifrado César usa un único desplazamiento fijo para todas las letras del mensaje, mientras que el Vigenère aplica desplazamientos distintos a cada letra según una clave repetida. Esto hace que el Vigenère sea polialfabético (usa múltiples alfabetos cifrados) y sea significativamente más difícil de romper por análisis de frecuencia simple.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve aprender el cifrado Vigenère?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Estudiar el cifrado Vigenère es fundamental en cursos de criptografía e informática porque ilustra conceptos clave: cifrado por sustitución polialfabética, uso de clave secreta compartida y vulnerabilidades al análisis estadístico. Es un paso natural entre los cifrados monoalfabéticos (César, Atbash) y los sistemas modernos de clave simétrica como AES.',
+      },
+    },
+  ],
+};

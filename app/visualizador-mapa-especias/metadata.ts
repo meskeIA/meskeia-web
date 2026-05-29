@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Por qué las especias fueron tan valiosas históricamente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Antes de la refrigeración moderna, las especias eran imprescindibles para conservar alimentos, enmascarar sabores de carne en mal estado y elaborar medicamentos. Su producción estaba concentrada en regiones remotas de Asia y el Próximo Oriente, y el transporte era costoso y peligroso. En el siglo XIV, la pimienta negra se usaba como moneda de pago para saldar deudas, y la nuez moscada llegó a valer más que el oro por kilogramo en los mercados europeos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles fueron las principales rutas comerciales de las especias?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las cuatro rutas históricas más importantes fueron la Ruta de la Seda (Asia Central hacia Europa), la Ruta Árabe (desde India y Ceilán por el mar Arábigo hasta el golfo Pérsico), la Ruta Marítima de las Especias abierta por los portugueses en el siglo XV rodeando África, y la red veneciana mediterránea que redistribuía las especias por Europa. Estas rutas moldearon la geopolítica medieval y detonaron la era de los Descubrimientos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el origen de las especias más comunes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La pimienta negra proviene del suroeste de India (Kerala). La canela es originaria de Sri Lanka (antes Ceilán). El clavo y la nuez moscada son nativos de las Molucas (Indonesia). El azafrán se cultiva principalmente en Irán y también en La Mancha española, siendo la especia más cara del mundo por peso. El cardamomo proviene de Guatemala e India. Estas zonas de origen explican por qué el control de esas regiones fue motivo de guerras coloniales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué especias se usan en las distintas cocinas del mundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cocina india es la que más especias concentra: cúrcuma, cardamomo, comino, cilantro y mezclas como el garam masala. La cocina mediterránea prefiere hierbas aromáticas como orégano, tomillo y azafrán. La mexicana hace un uso intenso del chile en sus múltiples variedades. La cocina del sudeste asiático combina jengibre, lemongrass y galanga. La árabe destaca por el uso de canela, cardamomo y zaatar en platos salados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo cambió el comercio de especias con la llegada de los portugueses a Asia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cuando Vasco de Gama llegó a Calicut (India) en 1498 rodeando el cabo de Buena Esperanza, Portugal rompió el monopolio árabe-veneciano que llevaba siglos controlando el comercio de especias. Los precios en Europa cayeron drásticamente al eliminar intermediarios, y el eje comercial mundial se desplazó del Mediterráneo al Atlántico. España, Países Bajos e Inglaterra compitieron a continuación por el control de las Molucas, desencadenando siglos de colonialismo en el sureste asiático.',
+      },
+    },
+  ],
+};

@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre tiempo atmosférico y clima?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tiempo atmosférico describe las condiciones de la atmósfera en un lugar concreto en un momento dado: temperatura, lluvia, viento, nubes. El clima es el patrón estadístico de esas condiciones a lo largo de décadas (normalmente 30 años o más). Una ola de calor puntual es "tiempo"; que las temperaturas medias de un país hayan subido 1,5°C en un siglo es "cambio climático". La frase habitual es: el tiempo es lo que te pones hoy, el clima es lo que tienes en el armario.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el efecto invernadero?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Sol emite radiación de onda corta que atraviesa la atmósfera y calienta la superficie terrestre. La Tierra reemite ese calor como radiación infrarroja de onda larga. Ciertos gases —vapor de agua, CO₂, metano, óxido nitroso— absorben esa radiación infrarroja y la reenvían hacia la superficie, actuando como una manta que retiene calor. Sin efecto invernadero natural, la temperatura media de la Tierra sería de −18°C en vez de los +15°C actuales. El problema es la intensificación artificial de este efecto por las emisiones humanas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué papel juegan las corrientes oceánicas en el clima?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las corrientes oceánicas redistribuyen el calor alrededor del planeta. El Gulf Stream, por ejemplo, lleva agua cálida tropical hacia el norte de Europa, haciendo que ciudades como Londres o Dublín tengan inviernos mucho más suaves de lo que correspondería a su latitud. El fenómeno El Niño altera las corrientes del Pacífico tropical cada 3–7 años, provocando sequías e inundaciones en distintas regiones. El calentamiento global amenaza con debilitar estas corrientes al alterar la salinidad y temperatura del agua.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué consecuencias tiene un calentamiento global de 2°C?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A +2°C respecto a niveles preindustriales, los modelos climáticos estiman: desaparición del 99% de los arrecifes de coral, aumento del nivel del mar de 40–60 cm, olas de calor que antes ocurrían cada 50 años pasarán a ocurrir cada 5, pérdida de hasta el 18% de las especies evaluadas y riesgo elevado de escasez hídrica para cientos de millones de personas. El Acuerdo de París de 2015 fija como límite "seguro" los +1,5°C, aunque los compromisos actuales de los países apuntan a +2,5–3°C para finales de siglo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo ha evolucionado el CO₂ atmosférico desde la industrialización?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Antes de la Revolución Industrial (siglo XVIII) la concentración de CO₂ era de unas 280 partes por millón (ppm). En 2024 se superaron por primera vez las 425 ppm de media anual, el nivel más alto en al menos 3 millones de años según registros de núcleos de hielo. Este aumento se debe principalmente a la quema de combustibles fósiles (carbón, petróleo, gas), la deforestación y la industria cementera. El CO₂ permanece en la atmósfera entre 300 y 1.000 años.',
+      },
+    },
+  ],
+};

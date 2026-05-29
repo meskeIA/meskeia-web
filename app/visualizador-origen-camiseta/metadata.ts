@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos países participan en fabricar una camiseta barata?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una camiseta de bajo coste puede pasar por cuatro o más países antes de llegar a la tienda. El algodón suele cultivarse en India o EEUU, el hilado y el tinte se realizan en Bangladesh o Pakistán, la confección en Bangladesh o Camboya, y el transporte marítimo parte desde puertos asiáticos. Cada país aporta mano de obra o infraestructura más económica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto cobra el trabajador que cose la camiseta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En países como Bangladesh o Camboya, el salario mínimo textil ronda los 90-130 € al mes (datos 2024). Del precio final de una camiseta de 15€, la mano de obra de confección representa aproximadamente 0,50-1€. Las marcas y la distribución retienen la mayor parte del margen.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el impacto ambiental de fabricar una camiseta de algodón?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Producir una camiseta de algodón de 250 gramos requiere entre 1.500 y 2.700 litros de agua, principalmente en el cultivo. El teñido industrial genera aguas residuales con metales pesados. El transporte marítimo desde Asia añade emisiones de CO₂. El impacto total por prenda equivale aproximadamente a 5-8 kg de CO₂.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la moda rápida y por qué se produce en Asia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La moda rápida (fast fashion) es el modelo de producir colecciones de ropa a bajo coste en ciclos muy cortos, a veces semanales. Se produce en Asia porque los salarios son significativamente más bajos que en Europa o América. Bangladesh, Vietnam e Indonesia concentran más del 60% de la producción global de prendas básicas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se desglosa el precio de una camiseta de 15€?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'De forma aproximada: materias primas (algodón) ~1,5€, hilado y tinte ~1€, confección ~1€, transporte marítimo ~0,5€, aduanas e impuestos ~0,5€, y el resto (10,5€, el 70%) corresponde a márgenes de la marca, distribución, tienda, marketing y beneficios. El coste real de producción raramente supera el 25-30% del precio de venta.',
+      },
+    },
+  ],
+};
