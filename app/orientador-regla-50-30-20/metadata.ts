@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la regla 50/30/20 y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regla 50/30/20 es un método de presupuesto personal popularizado por la senadora Elizabeth Warren en su libro "All Your Worth". Divide los ingresos netos en tres categorías: 50% para necesidades esenciales (alquiler, alimentación, suministros), 30% para deseos y ocio, y el 20% restante para ahorro y pago de deudas. Es una guía orientativa, no una norma rígida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué se considera "necesidad" en la regla 50/30/20?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las necesidades son gastos imprescindibles para vivir y trabajar: alquiler o hipoteca, electricidad, agua, internet, alimentación básica, transporte al trabajo y seguros obligatorios. No incluyen suscripciones de ocio, restaurantes ni ropa no esencial. Si tus necesidades superan el 50% de tus ingresos, conviene revisar gastos fijos o buscar ingresos adicionales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil la regla 50/30/20?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para personas que empiezan a organizar sus finanzas personales, quieren ahorrar de forma sistemática sin presupuestos complicados, o tienen ingresos variables. También sirve como punto de partida para quienes nunca han llevado un registro de gastos, ya que las tres categorías son fáciles de recordar y aplicar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto debería ahorrar al mes según esta regla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regla indica destinar el 20% de los ingresos netos al ahorro y a reducir deudas. Con un salario neto de 1.500 € mensuales, el objetivo sería ahorrar 300 € al mes. Este porcentaje incluye tanto el ahorro para emergencias o jubilación como el pago acelerado de deudas como préstamos personales o tarjetas de crédito.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre esta regla y llevar un presupuesto detallado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regla 50/30/20 es un método simplificado que requiere muy poco seguimiento: solo clasificar los gastos en tres bloques. Un presupuesto detallado, en cambio, asigna cantidades concretas a cada categoría (ropa, ocio, transporte, etc.) y exige un registro más minucioso. La regla 50/30/20 es ideal si buscas una guía rápida; un presupuesto detallado conviene si quieres optimizar cada partida de gasto.',
+      },
+    },
+  ],
+};

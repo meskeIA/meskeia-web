@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre una función lineal y una función exponencial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una función lineal (y = mx + b) crece a una tasa constante: por cada unidad que aumenta x, y sube siempre la misma cantidad. Una función exponencial (y = a·bˣ) crece a una tasa proporcional a su valor actual, lo que produce un crecimiento lento al principio y explosivo después. Por eso la propagación de un virus o el interés compuesto parecen insignificantes al inicio y se vuelven abrumadores más adelante.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué la escala Richter y los decibelios usan una función logarítmica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La percepción humana del sonido y la energía sísmica abarcan rangos de magnitud enormes (del orden de 10¹² o más). La función logarítmica comprime esos rangos en una escala manejable: cada aumento de 1 en la escala Richter equivale a 10 veces más amplitud y 31,6 veces más energía. Los decibelios funcionan igual: 0 dB es el umbral de audición y 120 dB (concierto de rock) implica una intensidad sonora un billón de veces mayor.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué situaciones reales aparece la función cuadrática?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La función cuadrática (y = ax² + bx + c) describe cualquier fenómeno donde una magnitud depende del cuadrado de otra. Los ejemplos más comunes son: la trayectoria de un proyectil (bajo gravedad constante), la distancia de frenado de un vehículo (proporcional al cuadrado de la velocidad), el área de superficies rectangulares en función de uno de sus lados y la energía cinética de un objeto (E = ½mv²).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel de matemáticas es útil este visualizador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El visualizador está diseñado para estudiantes de bachillerato y educación secundaria que estudian álgebra y análisis matemático, aunque no requiere conocimientos previos de cálculo. Los gráficos interactivos permiten entender intuitivamente el comportamiento de cada función antes de abordar las fórmulas formales. También es útil para repaso rápido antes de exámenes de acceso a la universidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el crecimiento exponencial en la propagación de enfermedades infecciosas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En las etapas iniciales de una epidemia, sin inmunidad previa ni medidas de control, cada persona infectada contagia a un número constante de personas (el número básico de reproducción R₀). Si R₀ > 1, el número de infectados sigue una función exponencial: una persona contagia a 3, que contagian a 9, luego 27, 81, etc. Este crecimiento explica por qué una epidemia parece controlada en los primeros días y se desborda repentinamente si no se actúa a tiempo.',
+      },
+    },
+  ],
+};

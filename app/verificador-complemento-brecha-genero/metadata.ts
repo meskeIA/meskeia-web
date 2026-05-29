@@ -56,3 +56,50 @@ export const jsonLd = {
     'Sin registro, gratuito y 100% en el navegador',
   ],
 };
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el complemento por brecha de género en la pensión y a cuánto asciende en 2026?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El complemento por brecha de género es un incremento en la pensión de jubilación, viudedad o incapacidad permanente reconocido por el artículo 60 de la Ley General de la Seguridad Social. En 2026 su importe es de 36,90 euros al mes por cada hijo o hija, con un máximo de 4 hijos (147,60 €/mes). Se actualiza anualmente con el IPC y tributa como rendimiento del trabajo en el IRPF.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Tras la sentencia del Tribunal de Justicia de la Unión Europea de 2025, España igualó el acceso al complemento para hombres y mujeres. Un hombre puede percibirlo si tiene al menos un hijo o hija y en el año del nacimiento o adopción tuvo una carrera de cotización más larga que la de su pareja. Las solicitudes denegadas antes de este cambio normativo pueden reclamarse de forma retroactiva ante el Instituto Nacional de la Seguridad Social.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo saber si tengo derecho al complemento por brecha de género?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los requisitos principales son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente; haber tenido al menos un hijo o hija biológico o adoptado; y acreditar que la maternidad o paternidad interrumpió o redujo la carrera de cotización. El verificador comprueba estas condiciones en 5 preguntas y calcula el importe estimado que correspondería según el número de hijos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se solicita el complemento por brecha de género al INSS?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) mediante el formulario de revisión de pensión. Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. Si la pensión ya está reconocida, el complemento se añade de oficio en muchos casos, pero conviene verificarlo en el resumen de la pensión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿El complemento por brecha de género es compatible con cualquier tipo de pensión?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El complemento es compatible con la pensión de jubilación ordinaria, la jubilación anticipada, la jubilación parcial, la incapacidad permanente total, absoluta o gran invalidez, y la pensión de viudedad. No se aplica a las pensiones no contributivas ni al complemento a mínimos. En caso de recibir más de una pensión, el complemento puede percibirse una sola vez en la pensión principal.',
+      },
+    },
+  ],
+};

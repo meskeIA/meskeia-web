@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la inflación y cómo afecta al poder adquisitivo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inflación es el aumento generalizado y sostenido de los precios de bienes y servicios en una economía. Cuando los precios suben, cada euro compra menos cosas que antes: eso es la pérdida de poder adquisitivo. Por ejemplo, con una inflación media del 3% anual, 1.000 € de hoy equivalen aproximadamente a 744 € en términos de capacidad de compra dentro de diez años.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el IPC y por qué se usa para medir la inflación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Índice de Precios al Consumo (IPC) es el indicador oficial que mide la variación de precios de una cesta representativa de bienes y servicios que compran los hogares: alimentación, vivienda, transporte, ocio, etc. En España lo publica el INE (Instituto Nacional de Estadística) mensualmente. Es el indicador más utilizado para medir la inflación porque refleja directamente el impacto en el coste de vida de las familias.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto ha subido el precio de vida en España desde los años 80 o 90?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Según los datos históricos del IPC del INE, los precios en España se han multiplicado aproximadamente por 4 desde 1985 y por 2,5 desde 1995. Esto significa que algo que costaba 100 € en 1985 cuesta hoy en torno a 400 €. La inflación acumulada fue especialmente intensa en los años 70-80 (llegó al 25% anual) y mucho más moderada desde la entrada en el euro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo puedo calcular el equivalente de una cantidad de dinero en otro año?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La fórmula es: importe ajustado = importe original × (IPC año destino / IPC año origen). La calculadora aplica esta fórmula automáticamente usando los datos oficiales del INE desde 1961 hasta el año más reciente disponible. Solo tienes que introducir la cantidad, el año de origen y el año de destino para obtener el equivalente en poder adquisitivo real.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué mis ahorros en el banco pierden valor si la inflación supera al tipo de interés?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cuando la inflación es mayor que la rentabilidad de tu depósito o cuenta, el rendimiento real es negativo: aunque el saldo nominal crece, la capacidad de compra de ese dinero disminuye. Por ejemplo, si tienes un depósito al 1% pero la inflación es del 4%, pierdes en términos reales un 3% de poder adquisitivo cada año. Por eso los ahorradores buscan inversiones con rendimiento real positivo (por encima de la inflación).',
+      },
+    },
+  ],
+};

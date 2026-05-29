@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto es realmente un billón?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un billón es un millón de millones, es decir, 1.000.000.000.000. Para entenderlo: si ganaras 1.000 € al día, tardarías más de 2.700 años en acumular un billón de euros. Es la escala que suelen manejar los presupuestos nacionales de grandes economías y la deuda pública de países como España.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un millón y mil millones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Mil millones es 1.000 veces más grande que un millón. Si un millón de segundos equivale a unos 11,5 días, mil millones de segundos son casi 32 años. Esta diferencia es habitualmente subestimada porque el cerebro humano no procesa bien las diferencias entre cifras muy grandes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve visualizar escalas numéricas grandes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las comparaciones visuales ayudan a dar contexto a cifras que aparecen en noticias económicas: deuda pública, recortes presupuestarios, beneficios empresariales o patrimonio de las personas más ricas. Convertir cifras abstractas en tiempo, distancia u objetos cotidianos activa la intuición y facilita el pensamiento crítico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tardarías en contar hasta un millón en voz alta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Contando un número por segundo sin pausas, llegar a un millón tomaría aproximadamente 11 días y medio. Contar hasta mil millones llevaría unos 32 años, y hasta un billón unos 31.700 años. Estas estimaciones asumen conteo continuo ininterrumpido, sin dormir ni descansar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la deuda pública de España en perspectiva?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La deuda pública española supera el billón de euros, lo que equivale a más de 20.000 € por cada habitante del país. Representada en billetes de 100 € apilados, alcanzaría una altura de varios miles de kilómetros. El visualizador ofrece comparaciones de este tipo para que la magnitud sea comprensible.',
+      },
+    },
+  ],
+};
