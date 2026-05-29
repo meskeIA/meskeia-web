@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el pensamiento de grupo o groupthink?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El pensamiento de grupo (groupthink) es un fenómeno psicológico descrito por Irving Janis en 1972 en el que el deseo de armonía o conformidad dentro de un grupo suprime el debate, la disidencia y el pensamiento crítico. El resultado son decisiones colectivas de peor calidad que las individuales porque nadie se atreve a cuestionar el consenso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona este test de pensamiento de grupo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El test consta de 10 preguntas sobre comportamientos habituales en tu equipo: si se critican ideas sin consecuencias, si la disidencia es bienvenida, si se buscan perspectivas externas, etc. Cada respuesta puntúa en dos ejes (conformidad y disidencia constructiva) y el resultado se representa en un mapa 2D con un perfil y acciones concretas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este test?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para cualquier persona que trabaje en equipo: líderes, coordinadores de proyecto, miembros de comités, equipos de startup o departamentos corporativos. También sirve como herramienta de reflexión individual para quienes participan en reuniones donde raramente se cuestionan las decisiones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre groupthink y consenso sano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el consenso sano, el acuerdo llega después de un debate real donde se han explorado alternativas y se han escuchado objeciones. En el groupthink, el consenso aparece antes del debate porque los miembros del grupo autocensuran sus dudas para no romper la cohesión. La diferencia clave es si la disidencia fue posible antes de llegar al acuerdo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los síntomas más frecuentes del pensamiento de grupo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Janis identificó ocho síntomas principales: ilusión de invulnerabilidad, racionalización colectiva, creencia en la superioridad moral del grupo, estereotipación de quienes disienten, presión directa sobre los disidentes, autocensura, ilusión de unanimidad y presencia de "guardianes mentales" que filtran la información incómoda.',
+      },
+    },
+  ],
+};

@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/mapa-riesgo-emprendedor/',
   features: ['Test de 10 preguntas sobre exposición y preparación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en análisis de riesgos personales', 'Acciones concretas según tu resultado', 'Funciona 100% en el navegador, sin registro ni instalación', 'Gratuito y sin publicidad', 'Disponible en español'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el mapa de riesgo del emprendedor?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es una herramienta de autoevaluación que mide dos dimensiones clave al emprender: tu nivel de exposición al riesgo (financiera, profesional y personal) y tu grado de preparación ante un posible fracaso. El resultado se representa en un mapa 2D con un perfil personalizado y acciones concretas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé si mi nivel de riesgo al emprender es demasiado alto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El test evalúa factores como si tienes deudas personales, dependientes a tu cargo, ausencia de ingresos alternativos o falta de colchón financiero. Un emprendedor con alta exposición y baja preparación se sitúa en el cuadrante de mayor riesgo, lo que no significa que deba renunciar, sino que necesita un plan de contingencia sólido antes de lanzarse.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve tener un plan B antes de emprender?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El plan B no es pesimismo sino gestión racional de la incertidumbre. Estudios sobre fracaso empresarial muestran que los emprendedores que anticipan escenarios negativos tienen mayor capacidad de recuperación y menor impacto emocional y financiero cuando las cosas no salen como se esperaba. Prepararse para el fracaso también mejora la toma de decisiones durante el proceso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia este test de un análisis DAFO?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El análisis DAFO evalúa el proyecto en sí (fortalezas, debilidades, oportunidades, amenazas). Este mapa de riesgo evalúa al emprendedor como persona: su situación personal, financiera y profesional, y qué tan preparado está para absorber un fracaso. Son complementarios: uno analiza el negocio, el otro analiza al fundador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto colchón financiero se recomienda tener antes de emprender a tiempo completo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No existe una cifra universal, pero muchos asesores de emprendimiento sugieren cubrir entre 6 y 18 meses de gastos personales antes de dejar un empleo estable. El tiempo necesario depende del sector, del ritmo de generación de ingresos del proyecto y de las responsabilidades personales de cada persona. Lo importante es conocer tu propio umbral de resistencia.',
+      },
+    },
+  ],
+};

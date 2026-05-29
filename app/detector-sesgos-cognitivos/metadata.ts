@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué son los sesgos cognitivos y cómo afectan mis decisiones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los sesgos cognitivos son atajos mentales automáticos que el cerebro usa para procesar información con rapidez, pero que a veces producen juicios distorsionados o erróneos. Ejemplos comunes son el sesgo de confirmación (buscar solo lo que confirma nuestra opinión), el sesgo de anclaje (dar demasiado peso al primer dato recibido) o el efecto halo (juzgar todo de alguien por una sola característica positiva). Identificarlos es el primer paso para tomar decisiones más razonadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué consiste la diferencia entre Sistema 1 y Sistema 2 de Kahneman?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Daniel Kahneman describió dos modos de pensamiento en su trabajo sobre heurísticas y sesgos: el Sistema 1 opera de forma rápida, automática e intuitiva; el Sistema 2 es lento, deliberado y analítico. Ambos son necesarios: el Sistema 1 permite responder con agilidad en situaciones rutinarias, mientras que el Sistema 2 es más adecuado para decisiones complejas o de alto impacto. Los problemas surgen cuando usamos el Sistema 1 donde se requiere el Sistema 2.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona este test de sesgos cognitivos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El test plantea 10 situaciones de la vida cotidiana y laboral donde los sesgos cognitivos aparecen con más frecuencia. Para cada situación eliges cómo tiendes a reaccionar. Al terminar, el análisis cruza tus respuestas en dos ejes (automatismo vs. deliberación) y te asigna un perfil de cuadrante con una descripción de tus patrones de pensamiento y acciones recomendadas para mejorar tu toma de decisiones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil identificar los propios sesgos cognitivos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cualquier persona que tome decisiones relevantes se beneficia de conocer sus sesgos: managers, emprendedores, profesionales de la salud, inversores, docentes o simplemente quien quiera mejorar su pensamiento crítico. No se requiere formación en psicología; el test está diseñado para ser comprensible y útil sin terminología técnica, y las recomendaciones son aplicables de forma inmediata en el día a día.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo reducir mis sesgos cognitivos una vez identificados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Aunque eliminarlos por completo no es posible, conocerlos reduce su impacto. Las estrategias más eficaces incluyen ralentizar deliberadamente el proceso de decisión ante situaciones importantes, buscar activamente perspectivas contrarias a la propia, establecer criterios antes de evaluar opciones y pedir opinión a personas con perfiles distintos. El test ofrece recomendaciones concretas adaptadas al perfil obtenido.',
+      },
+    },
+  ],
+};

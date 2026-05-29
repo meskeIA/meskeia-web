@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el WiFi exactamente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El WiFi transmite datos mediante ondas electromagnéticas en las bandas de radiofrecuencia de 2,4 GHz y 5 GHz (y 6 GHz en WiFi 6E). El router convierte los datos en señales de radio, los dispositivos los reciben con sus antenas y los reconvierten en información digital. La comunicación es bidireccional y se organiza en tramas según el estándar IEEE 802.11, negociando velocidad y canal en función de la calidad de la señal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre WiFi de 2,4 GHz y 5 GHz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La banda de 2,4 GHz tiene mayor alcance y penetra mejor los obstáculos (paredes, suelos), pero ofrece velocidades más bajas y está más congestionada porque la comparten otros dispositivos como micrófonos inalámbricos o monitores de bebé. La banda de 5 GHz ofrece velocidades más altas y menos interferencias, pero su alcance es menor y atenúa más al atravesar paredes. Para dispositivos cercanos al router conviene usar 5 GHz; para los más alejados, 2,4 GHz.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el WiFi pierde señal al alejarse del router o al atravesar paredes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La señal WiFi se atenúa con la distancia según la ley del cuadrado inverso: al duplicar la distancia, la potencia se divide por cuatro. Además, los materiales absorben y reflejan las ondas en distinto grado: el hormigón armado, los espejos y los electrodomésticos metálicos son los obstáculos más perjudiciales. El agua también absorbe la señal, por lo que las peceras o las tuberías pueden afectar la cobertura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué mejoras aporta WiFi 6 respecto a versiones anteriores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'WiFi 6 (802.11ax, 2019) introdujo tecnologías como OFDMA (permite servir a varios dispositivos simultáneamente en el mismo canal), MU-MIMO mejorado (hasta 8 flujos simultáneos) y TWT (Target Wake Time, que reduce el consumo energético de los dispositivos conectados). El resultado es mayor eficiencia en entornos con muchos dispositivos conectados, como hogares con decenas de gadgets, aunque la velocidad máxima teórica solo se alcanza en condiciones ideales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los canales WiFi y por qué pueden causar interferencias?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los canales WiFi son subdivisiones del espectro de frecuencias disponible. En 2,4 GHz existen 13 canales en Europa, pero solo los canales 1, 6 y 11 no se solapan entre sí. Si varios routers cercanos usan el mismo canal o canales adyacentes, compiten por el mismo espectro y se generan interferencias que reducen la velocidad y la estabilidad de la conexión. Usar un analizador WiFi y elegir el canal menos congestionado mejora significativamente el rendimiento.',
+      },
+    },
+  ],
+};
