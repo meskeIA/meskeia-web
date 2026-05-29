@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un qubit y en qué se diferencia de un bit clásico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un qubit es la unidad básica de información en computación cuántica. A diferencia de un bit clásico, que solo puede valer 0 o 1, un qubit puede estar en superposición: una combinación de 0 y 1 simultáneamente hasta que se mide. Esto permite que los ordenadores cuánticos procesen muchas posibilidades a la vez, algo imposible con hardware convencional.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué la computación cuántica amenaza el cifrado RSA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El cifrado RSA se basa en la dificultad de factorizar números muy grandes en factores primos, un problema que un ordenador clásico tardaría millones de años en resolver. El algoritmo de Shor, diseñado para ordenadores cuánticos, puede factorizar esos números en tiempo polinómico, lo que rompería RSA en cuestión de horas una vez existan ordenadores cuánticos suficientemente potentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las puertas cuánticas y para qué sirven?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las puertas cuánticas son operaciones matemáticas que manipulan el estado de uno o varios qubits, de forma análoga a como las puertas lógicas clásicas (AND, OR, NOT) operan sobre bits. Ejemplos comunes son la puerta Hadamard (que crea superposición), la puerta CNOT (que entrelaza dos qubits) y la puerta de fase. Las puertas cuánticas son siempre reversibles, a diferencia de la mayoría de puertas clásicas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué aplicaciones prácticas se está usando ya la computación cuántica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Hoy en día los ordenadores cuánticos disponibles (IBM, Google, IonQ) son aún ruidosos y tienen pocos qubits, por lo que se usan principalmente en investigación. Las aplicaciones más prometidas a corto-medio plazo incluyen simulación molecular para descubrir fármacos y materiales, optimización logística, criptografía post-cuántica y modelos financieros de riesgo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el entrelazamiento cuántico y por qué es importante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El entrelazamiento cuántico es un fenómeno por el que dos o más qubits quedan correlacionados de tal manera que el estado de uno determina instantáneamente el del otro, sin importar la distancia física entre ellos. Esta propiedad es fundamental para la teleportación cuántica de información y para aumentar la potencia de cómputo de los algoritmos cuánticos, ya que permite coordinar múltiples qubits de forma eficiente.',
+      },
+    },
+  ],
+};

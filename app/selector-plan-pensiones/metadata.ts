@@ -71,3 +71,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Merece la pena contratar un plan de pensiones en 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de tu tipo marginal de IRPF y de tu horizonte hasta la jubilación. Si tributas al 30 % o más, la deducción fiscal puede ser significativa a corto plazo. Sin embargo, en 2022 el límite de aportación individual se redujo a 1.500 € anuales, lo que limita el beneficio para rentas medias. Para la mayoría de ahorradores con tipo marginal bajo o con necesidad de liquidez en menos de 10 años, un fondo indexado suele ser más flexible y puede ofrecer mejor rentabilidad neta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un plan de pensiones individual y uno de empleo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El plan de empleo lo promueve la empresa y permite aportar hasta 8.500 € anuales adicionales (suma empresa + trabajador), frente a los 1.500 € del plan individual. Ambos deducen en IRPF, pero el de empleo tiene límites más generosos y suele contar con menores comisiones de gestión. Si tu empresa ofrece un plan de empleo con aportación del empleador, es habitualmente la opción más ventajosa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es una EPSV y en qué se diferencia de un plan de pensiones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las EPSV (Entidades de Previsión Social Voluntaria) son la figura equivalente al plan de pensiones en el País Vasco y Navarra, reguladas por la normativa foral. Permiten aportaciones más altas (hasta 5.000 € anuales con deducción en la base del IRPF foral) y tienen condiciones de rescate similares. Solo pueden contratarlas residentes en esos territorios forales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo puedo rescatar un plan de pensiones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los planes de pensiones tienen liquidez muy limitada: solo se puede rescatar al llegar a la jubilación, en caso de desempleo de larga duración, enfermedad grave, fallecimiento o incapacidad permanente. Desde 2025 también es posible rescatar aportaciones con más de 10 años de antigüedad. El rescate tributa como rendimiento del trabajo en IRPF, por lo que hacerlo en un año con rentas altas puede suponer un coste fiscal elevado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué alternativas existen al plan de pensiones para ahorrar de cara a la jubilación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las principales alternativas son los fondos de inversión indexados (sin comisiones de rescate, tributación más favorable en plusvalías al 19-28 %), los planes de ahorro a largo plazo (PALP, con exención si se mantienen 5 años), el seguro de vida-ahorro (PIAS) y los depósitos o cuentas remuneradas para perfiles conservadores. La elección óptima depende de tu tipo marginal actual, el tipo marginal previsto en la jubilación, tu horizonte temporal y tu tolerancia a la iliquidez.',
+      },
+    },
+  ],
+};

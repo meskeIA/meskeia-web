@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en espanol',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos meses de ahorro debería tener un freelance como colchón de emergencia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La recomendación habitual para autónomos es acumular entre 3 y 6 meses de gastos totales (personales + profesionales + cuota RETA). Tres meses cubre imprevistos cortos: una baja, un cliente que no paga o un mes sin contratos. Seis meses proporciona margen para una reestructuración de negocio o una crisis de demanda más prolongada. A mayor variabilidad en los ingresos, más conveniente es apuntar a 6 meses.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué gastos hay que incluir al calcular el colchón de emergencia de un autónomo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El colchón debe cubrir todos los gastos que seguirán existiendo sin ingresos: alquiler o hipoteca, alimentación, suministros, seguros personales, cuota RETA, suscripciones de herramientas profesionales (software, dominio, hosting), y si aplica, salario de empleados o colaboradores fijos. Un error frecuente es calcular solo los gastos personales y olvidar la parte profesional fija.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia el colchón de emergencia del fondo de vacaciones de un autónomo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El colchón de emergencia cubre situaciones no planificadas: enfermedad, pérdida de cliente principal, crisis económica o avería importante. El fondo de vacaciones, en cambio, es un ahorro planificado para descansar sin incurrir en deudas. Idealmente un autónomo gestiona ambos por separado, porque mezclarlos deja al descubierto uno de los dos objetivos cuando hay que usar el dinero.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afecta la cuota RETA al cálculo del colchón de emergencia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cuota de autónomos se paga mensualmente aunque no haya ingresos, lo que la convierte en uno de los gastos más relevantes del colchón. En 2025, la cuota mínima RETA ronda los 200-300 € al mes según la base elegida. Al simular el colchón de emergencia, hay que incluirla como gasto fijo mensual junto al resto, ya que no se puede interrumpir la cotización sin darse de baja como autónomo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo se tarda en construir un colchón de emergencia de 6 meses?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de la capacidad de ahorro mensual. Si los gastos totales son 2.000 € al mes, el objetivo a 6 meses es 12.000 €. Ahorrando 300 € mensuales se alcanza en 40 meses; con 500 € mensuales, en 24 meses. La clave es empezar con una aportación fija automatizada y revisarla al alza cada vez que los ingresos aumenten, antes de elevar el gasto personal.',
+      },
+    },
+  ],
+};
