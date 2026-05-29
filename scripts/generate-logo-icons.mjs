@@ -88,6 +88,25 @@ async function run() {
   writeFileSync(path.join(publicDir, 'favicon-16x16.png'), buf16);
   console.log('  ✓ favicon-16x16.png       (alias de icon-16.png)');
 
+  // favicon.ico (multi-size: 16, 32, 48px — formato ICO con PNGs embebidos)
+  const icoSizes = [16, 32, 48];
+  const icoPngs = icoSizes.map(s => readFileSync(path.join(publicDir, iconFilename(s))));
+  const HEADER = 6, ENTRY = 16;
+  const dirOffset = HEADER + icoSizes.length * ENTRY;
+  let icoOffset = dirOffset;
+  const icoOffsets = icoPngs.map(b => { const o = icoOffset; icoOffset += b.length; return o; });
+  const icoHeader = Buffer.alloc(HEADER);
+  icoHeader.writeUInt16LE(0, 0); icoHeader.writeUInt16LE(1, 2); icoHeader.writeUInt16LE(icoSizes.length, 4);
+  const icoDirs = icoSizes.map((s, i) => {
+    const e = Buffer.alloc(ENTRY);
+    e.writeUInt8(s, 0); e.writeUInt8(s, 1); e.writeUInt8(0, 2); e.writeUInt8(0, 3);
+    e.writeUInt16LE(1, 4); e.writeUInt16LE(32, 6);
+    e.writeUInt32LE(icoPngs[i].length, 8); e.writeUInt32LE(icoOffsets[i], 12);
+    return e;
+  });
+  writeFileSync(path.join(publicDir, 'favicon.ico'), Buffer.concat([icoHeader, ...icoDirs, ...icoPngs]));
+  console.log('  ✓ favicon.ico             16+32+48px');
+
   // logo-meskeIA.png + icon_meskeia.png (512px, sin fondo redondeado)
   await page.setViewportSize({ width: 512, height: 512 });
   await page.setContent(iconHtml(512), { waitUntil: 'networkidle' });
