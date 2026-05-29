@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['BST', 'AVL', 'árboles binarios', 'estructuras de datos'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un árbol binario de búsqueda (BST) y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un BST (Binary Search Tree) es una estructura de datos en la que cada nodo tiene como máximo dos hijos. La regla fundamental es que todos los nodos del subárbol izquierdo tienen valores menores que el nodo raíz, y todos los del subárbol derecho tienen valores mayores. Esto permite buscar, insertar y eliminar elementos en O(log n) de media, ya que en cada paso se descarta la mitad del árbol.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre un BST y un árbol AVL?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un BST estándar puede degenerar en una lista enlazada si se insertan elementos en orden, lo que convierte las operaciones en O(n). El árbol AVL (Adelson-Velsky y Landis, 1962) es un BST auto-balanceado que mantiene un factor de balance de -1, 0 o +1 en cada nodo. Cuando una inserción o borrado desequilibra el árbol, realiza rotaciones (simple o doble) para restaurar el equilibrio, garantizando O(log n) siempre.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las rotaciones LL, RR, LR y RL en un árbol AVL?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las rotaciones reequilibran el árbol tras inserciones o borrados. La rotación LL (simple derecha) corrige un desequilibrio izquierdo-izquierdo; la RR (simple izquierda) corrige uno derecho-derecho. Las rotaciones dobles LR y RL se aplican cuando el desequilibrio ocurre en la dirección opuesta al hijo problemático: LR combina una rotación izquierda sobre el hijo y luego una derecha sobre el nodo desbalanceado; RL hace lo inverso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué recorridos se pueden hacer sobre un árbol binario?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los cuatro recorridos clásicos son: inorden (izquierdo → raíz → derecho), que devuelve los elementos ordenados en un BST; preorden (raíz → izquierdo → derecho), útil para serializar el árbol; postorden (izquierdo → derecho → raíz), usado para liberar memoria o evaluar expresiones; y por niveles (BFS), que visita nodo a nodo de arriba a abajo. El simulador permite ejecutar los cuatro de forma animada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué asignaturas es útil este simulador de árboles?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para las asignaturas de Estructuras de Datos y Algoritmia de grados en Informática, Ingeniería del Software, Matemáticas e Ingeniería de Telecomunicaciones. También lo usan preparadores de entrevistas técnicas en empresas de software, ya que los árboles BST y AVL son uno de los temas más habituales en pruebas de código de selección. El simulador visual ayuda a memorizar el comportamiento de las rotaciones, que en papel resultan difíciles de seguir.',
+      },
+    },
+  ],
+};

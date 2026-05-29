@@ -59,3 +59,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin registro, disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la óptica ondulatoria y en qué se diferencia de la óptica geométrica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La óptica ondulatoria estudia la luz como una onda electromagnética, lo que permite explicar fenómenos como la interferencia, la difracción y la polarización. La óptica geométrica, en cambio, trata la luz como rayos rectilíneos y funciona bien solo cuando los obstáculos son mucho mayores que la longitud de onda. Cuando la luz pasa por rendijas o aberturas pequeñas, los efectos ondulatorios se vuelven imprescindibles para predecir el patrón observado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el experimento de la doble rendija de Young?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el experimento de Young, la luz pasa por dos rendijas separadas una distancia d, generando dos frentes de onda coherentes que interfieren entre sí. Las franjas brillantes aparecen donde las diferencias de camino óptico son múltiplos enteros de la longitud de onda (d·sin θ = m·λ) y las oscuras donde son semienteros. La separación entre franjas aumenta al acercar las rendijas o al usar luz de mayor longitud de onda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué dice la ley de Malus sobre la polarización de la luz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ley de Malus establece que cuando luz polarizada linealmente atraviesa un polarizador, la intensidad transmitida es I = I₀·cos²θ, donde θ es el ángulo entre el plano de polarización de la luz incidente y el eje de transmisión del polarizador. A 0° pasa toda la intensidad, a 45° la mitad y a 90° no pasa nada. Se aplica en pantallas LCD, filtros de fotografía y gafas de sol polarizadas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre luz coherente (láser) y luz incoherente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La luz coherente, como la del láser, tiene todas sus ondas en fase y con la misma longitud de onda, lo que permite observar interferencias estables y nítidas. La luz incoherente, como la solar o la incandescente, combina múltiples longitudes de onda con fases aleatorias; sus patrones de interferencia se promedian y desaparecen. Por eso los experimentos de interferencia requieren fuentes láser o iluminación a través de una rendija muy estrecha.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este visualizador de óptica ondulatoria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para estudiantes de Bachillerato y primer curso universitario que preparan física ondulatoria o óptica. También sirve a docentes que quieren mostrar en clase cómo varían los patrones de difracción e interferencia al cambiar parámetros como la longitud de onda o la separación entre rendijas. Todo funciona en el navegador sin instalar nada.',
+      },
+    },
+  ],
+};

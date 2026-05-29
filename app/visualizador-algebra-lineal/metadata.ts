@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   category: 'EducationalApplication',
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una transformación lineal y cómo se visualiza?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una transformación lineal es una función que convierte vectores en vectores conservando la suma y la multiplicación por escalar. Geométricamente, "deforma" el espacio: estira, rota, refleja o aplana una cuadrícula sin romper las líneas rectas ni desplazar el origen. Este visualizador anima esa deformación de la cuadrícula al cambiar los valores de la matriz 2×2.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué significan los eigenvalores y eigenvectores de una matriz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los eigenvectores son los ejes que la transformación no rota, solo escala; los eigenvalores indican cuánto se estiran o comprimen esos ejes. Si un eigenvalor es negativo, el eje se invierte. Para matrices simétricas 2×2 siempre existen eigenvalores reales, calculables con la fórmula λ = (traza ± √(traza² − 4·det)) / 2.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve el determinante de una matriz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El determinante mide el factor por el que la transformación escala las áreas. Si det = 2, los paralelogramos se duplican en área; si det = 0, la transformación aplana el espacio a una línea o un punto (matriz singular, no invertible). Un det negativo indica que la orientación del espacio se invierte.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este visualizador de álgebra lineal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para estudiantes de matemáticas, ingeniería, física o informática que estudian álgebra lineal por primera vez. También lo usan quienes quieren reforzar la intuición geométrica antes de cursos de aprendizaje automático, gráficos 3D o análisis de datos (PCA), donde las transformaciones matriciales son fundamentales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un producto escalar y un producto vectorial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El producto escalar de dos vectores devuelve un número: u·v = |u||v|cos(θ), donde θ es el ángulo entre ellos. Si el resultado es 0, los vectores son perpendiculares. El producto vectorial, en cambio, devuelve un nuevo vector perpendicular al plano de los dos originales y se usa principalmente en 3D para calcular normales y áreas de triángulos.',
+      },
+    },
+  ],
+};

@@ -60,3 +60,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿De qué está hecho el universo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Según el modelo cosmológico estándar ΛCDM, el universo observable se compone de un 5% de materia bariónica (átomos, estrellas, planetas), un 27% de materia oscura y un 68% de energía oscura. La materia y la energía ordinarias que podemos detectar directamente representan solo una pequeña fracción del total.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la energía oscura y por qué importa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La energía oscura es una forma de energía distribuida uniformemente en el espacio que ejerce una presión negativa, provocando que la expansión del universo se acelere en lugar de frenarse. Fue descubierta en 1998 gracias a la observación de supernovas de tipo Ia y representa el componente dominante del universo (68%). Su naturaleza exacta sigue siendo uno de los mayores misterios de la física.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué pasará al final del universo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los cosmólogos proponen varios escenarios según la densidad y la naturaleza de la energía oscura. El Big Freeze (muerte térmica) es el más aceptado: en billones de años todas las estrellas se apagarán y el universo alcanzará el equilibrio térmico. Otros escenarios incluyen el Big Rip (la energía oscura desgarra toda la materia), el Big Crunch (colapso gravitacional) y el Big Bounce (rebote a un nuevo ciclo).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la tensión de Hubble?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tensión de Hubble es una discrepancia entre dos métodos para medir la tasa de expansión del universo (constante de Hubble H₀). Las mediciones locales basadas en cefeidas y supernovas dan ~73 km/s/Mpc, mientras que las inferidas del fondo cósmico de microondas (CMB) dan ~67 km/s/Mpc. Esta diferencia estadísticamente significativa podría indicar física más allá del modelo ΛCDM estándar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tiene el universo y cómo se sabe?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El universo tiene aproximadamente 13.800 millones de años. Esta edad se determina combinando la medición de la constante de Hubble (tasa de expansión actual), el análisis del fondo cósmico de microondas (CMB) captado por los satélites WMAP y Planck, y el estudio de las estrellas más antiguas conocidas. Estos tres métodos independientes convergen en ese valor con una incertidumbre de unos 100 millones de años.',
+      },
+    },
+  ],
+};

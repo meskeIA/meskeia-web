@@ -65,3 +65,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin registro, completamente en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el número de Reynolds y qué indica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El número de Reynolds es un parámetro adimensional definido como Re = ρvL/μ (densidad × velocidad × longitud característica / viscosidad dinámica). Indica si un fluido se mueve de forma laminar (capas ordenadas, Re < 2300) o turbulenta (caótica, Re > 4000). Entre 2300 y 4000 existe una zona de transición impredecible. Es fundamental en ingeniería hidráulica, aeronáutica y biomedicina.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué curva la pelota en fútbol? ¿Qué es el efecto Magnus?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El efecto Magnus ocurre cuando un objeto gira mientras se desplaza por un fluido. La rotación arrastra el fluido hacia un lado, creando una diferencia de presiones: el lado donde el flujo va en el mismo sentido que la rotación experimenta menor presión, y el opuesto mayor presión. Esta diferencia genera una fuerza perpendicular a la trayectoria, desviando la pelota. La fuerza Magnus es F = ρ·ω×v·r²·π.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es cierto que los aviones vuelan gracias al principio de Bernoulli?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es una simplificación incorrecta. El principio de Bernoulli contribuye parcialmente, pero el mecanismo principal es la circulación descrita por el teorema de Kutta-Joukowski: el ala deflecta el flujo de aire hacia abajo y, por la tercera ley de Newton, el aire empuja el ala hacia arriba. La explicación del "camino igual" (las partículas de aire deben llegar al mismo tiempo por ambos lados) es un mito sin base física.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre vuelo subsónico, transónico y supersónico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los regímenes de vuelo se definen por el número de Mach (M = v/velocidad del sonido). Subsónico: M < 0,8 (aviones comerciales ~M 0,85). Transónico: 0,8 < M < 1,2, zona donde aparecen choques locales sobre el ala. Supersónico: M > 1,2, con ondas de choque cónicas bien definidas (caza militares, Concorde). Hipersónico: M > 5, con efectos aerotermodinámicos extremos (cápsulas de reentrada).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la cavitación y por qué es problemática?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La cavitación ocurre cuando la presión local en un fluido cae por debajo de su presión de vapor: el líquido se evapora localmente formando burbujas. Al recuperar presión, esas burbujas colapsan violentamente generando microexplosiones que erosionan metales con el tiempo. Afecta a hélices de barcos, bombas hidráulicas y turbinas. Para evitarla se aumenta la presión de aspiración o se usan materiales más resistentes.',
+      },
+    },
+  ],
+};

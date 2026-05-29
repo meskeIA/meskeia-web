@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['autómatas finitos', 'DFA NFA', 'lenguajes formales', 'teoría computación'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un autómata finito y para qué se utiliza?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un autómata finito es un modelo matemático que procesa una cadena de símbolos cambiando de estado según reglas de transición predefinidas. Acepta o rechaza la cadena dependiendo de si termina en un estado final. Se usan en compiladores para el análisis léxico (tokenización), en motores de expresiones regulares, en validación de formularios, en protocolos de red y en el diseño de circuitos digitales secuenciales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre un DFA y un NFA?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En un DFA (Autómata Finito Determinista) cada par (estado, símbolo) tiene exactamente una transición definida; la ejecución es unívoca. En un NFA (Autómata Finito No Determinista) puede haber cero, una o varias transiciones para el mismo par, e incluso ε-transiciones que cambian de estado sin consumir símbolo. Aunque el NFA parece más potente, ambos reconocen exactamente los mismos lenguajes regulares; cualquier NFA puede convertirse en un DFA equivalente (construcción de subconjuntos).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las ε-transiciones en un autómata no determinista?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una ε-transición (epsilon-transición) permite al autómata pasar de un estado a otro sin consumir ningún símbolo de la cadena de entrada. Son especialmente útiles al construir autómatas a partir de expresiones regulares (construcción de Thompson), ya que simplifican la unión, concatenación y cierre de Kleene. Para simular un NFA con ε-transiciones se calcula la ε-clausura de cada estado: el conjunto de estados alcanzables solo por ε-transiciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué lenguajes reconocen los autómatas finitos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los autómatas finitos reconocen exactamente los lenguajes regulares, el nivel más bajo de la jerarquía de Chomsky. Son los lenguajes describibles con expresiones regulares. No pueden reconocer lenguajes que requieren memoria ilimitada, como aⁿbⁿ (igual número de aes y bes) o los palíndromos de longitud arbitraria; esos necesitan autómatas de pila o máquinas de Turing. Los compiladores usan autómatas finitos en la fase de análisis léxico pero necesitan gramáticas de contexto libre para el análisis sintáctico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué asignaturas es útil este simulador de autómatas finitos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es una herramienta directa para Lenguajes Formales y Autómatas, Teoría de la Computación y Compiladores en grados de Informática, Matemáticas e Ingeniería. Los 4 ejemplos predefinidos cubren los ejercicios habituales de examen: autómata que acepta cadenas con número par de ceros, cadenas que terminan en "ab", etc. El modo batch permite probar rápidamente un banco de cadenas de prueba, lo que acelera la verificación de diseños propios.',
+      },
+    },
+  ],
+};

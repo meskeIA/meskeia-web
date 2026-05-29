@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es un grupo funcional en química orgánica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un grupo funcional es un átomo o conjunto de átomos dentro de una molécula orgánica que determina su reactividad química y muchas de sus propiedades físicas. Por ejemplo, el grupo hidroxilo (–OH) define a los alcoholes, el grupo carbonilo (C=O) a las cetonas y aldehídos, y el grupo carboxilo (–COOH) a los ácidos carboxílicos. Identificar el grupo funcional permite predecir qué reacciones sufrirá la molécula y con qué otras sustancias reaccionará.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona una reacción de esterificación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La esterificación es la reacción entre un ácido carboxílico y un alcohol para formar un éster y agua: R-COOH + R\'-OH → R-COO-R\' + H₂O. Se cataliza con ácido (H₂SO₄ concentrado) y es reversible. Los ésteres tienen aromas fructales característicos —el acetato de etilo huele a acetona, el acetato de isoamilo a plátano— y son la base de perfumes, aromatizantes y disolventes industriales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué hace especial al benceno y por qué se dice que es aromático?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El benceno (C₆H₆) tiene seis electrones π deslocalizados en un anillo de seis carbonos, lo que le confiere una estabilidad extra llamada aromaticidad. Según la regla de Hückel, una molécula cíclica y plana es aromática si tiene 4n+2 electrones π (n entero), siendo el benceno el caso más sencillo con 6 electrones (n=1). Esta estabilidad hace que el benceno prefiera reacciones de sustitución electrófila aromática (SEA) en lugar de adición, preservando el anillo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre isómeros geométricos y ópticos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los isómeros geométricos (cis/trans) aparecen en dobles enlaces o anillos donde hay impedimento a la rotación: en el 2-buteno cis los dos metilos están en el mismo lado del doble enlace y en el trans en lados opuestos. Los isómeros ópticos (enantiómeros) tienen la misma conectividad pero son imágenes especulares no superponibles, normalmente por un carbono quiral con cuatro sustituyentes diferentes. Los enantiómeros tienen propiedades físicas idénticas pero rotan la luz polarizada en direcciones opuestas y pueden tener actividades biológicas muy distintas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo es útil este visualizador de química orgánica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está pensado principalmente para estudiantes de Bachillerato (2.º curso, asignatura Química) y primeros cursos universitarios de Química, Farmacia, Biología o Ingeniería Química. También resulta útil para cualquier persona que quiera entender cómo funcionan sustancias cotidianas como el vinagre (ácido acético), el jabón (ésteres y jabones), la aspirina (ácido acetilsalicílico) o el nylon (poliamida). Todo funciona en el navegador sin necesidad de instalación.',
+      },
+    },
+  ],
+};

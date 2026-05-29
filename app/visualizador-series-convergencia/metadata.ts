@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   keywords: ['series Taylor', 'convergencia', 'pi series', 'Maclaurin', 'Leibniz', 'Nilakantha'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una serie de Taylor y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una serie de Taylor aproxima cualquier función analítica como una suma infinita de potencias: f(x) = f(a) + f\'(a)(x−a) + f\'\'(a)(x−a)²/2! + … Cuantos más términos se incluyen, más exacta es la aproximación cerca del punto a. Se usa en calculadoras, simulaciones físicas, análisis numérico y en la derivación de fórmulas aproximadas en ingeniería.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se sabe si una serie converge o diverge?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Existen varios criterios: el criterio de la razón compara el cociente |a_{n+1}/a_n|; si el límite es menor que 1 la serie converge, si es mayor diverge. El criterio de comparación contrasta la serie con otra cuya convergencia ya se conoce. Para series alternadas (términos de signo variable) se usa el criterio de Leibniz: si los términos decrecen a 0, la serie converge.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos términos necesita la serie de Leibniz para calcular π con 10 decimales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La serie de Leibniz (π/4 = 1 − 1/3 + 1/5 − …) converge muy lentamente: necesita aproximadamente 5.000 millones de términos para obtener 10 decimales correctos. En cambio, la serie de Nilakantha (π = 3 + 4/(2·3·4) − 4/(4·5·6) + …) converge mucho más rápido y alcanza 10 decimales con unos pocos miles de términos. Los algoritmos modernos usan métodos como la fórmula de Machin o la de Chudnovsky.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el radio de convergencia de una serie de potencias?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El radio de convergencia R es la distancia máxima desde el centro a en la que la serie de potencias Σ cₙ(x−a)ⁿ converge. Para |x−a| < R la serie converge absolutamente; para |x−a| > R diverge. Se calcula con la fórmula de Cauchy-Hadamard: 1/R = lim sup |cₙ|^(1/n). Por ejemplo, la serie de Taylor de eˣ tiene R = ∞, mientras que 1/(1−x) tiene R = 1.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este visualizador de series?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está dirigido a estudiantes de cálculo de segundo ciclo o análisis matemático que necesitan construir intuición sobre la convergencia. Es especialmente útil para entender por qué sen(x) ≈ x para ángulos pequeños (serie de Taylor truncada) o por qué las calculadoras pueden evaluar funciones trascendentes con precisión arbitraria usando polinomios.',
+      },
+    },
+  ],
+};

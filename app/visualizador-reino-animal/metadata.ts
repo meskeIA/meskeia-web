@@ -64,3 +64,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos animales existen en el planeta y cómo se clasifican?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se han descrito aproximadamente 1,5 millones de especies animales, aunque las estimaciones de especies totales (incluyendo las no descubiertas) oscilan entre 8 y 10 millones. El reino Animalia se organiza en dos grandes grupos: los vertebrados (con columna vertebral), que incluyen peces, anfibios, reptiles, aves y mamíferos, y los invertebrados, que agrupan más del 95% de las especies conocidas en fila como artrópodos, moluscos, anélidos, equinodermos y poríferos, entre otros.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre vertebrados e invertebrados?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los vertebrados poseen un esqueleto interno con columna vertebral (notocordio en las fases embrionarias) y cráneo que protege el encéfalo. Los invertebrados carecen de esta estructura; algunos tienen exoesqueleto (artrópodos), concha (moluscos), espículas (esponjas) o endoesqueleto calcáreo (equinodermos). Aunque los vertebrados son los más estudiados, los invertebrados representan la inmensa mayoría de la diversidad animal y ocupan prácticamente todos los ecosistemas del planeta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la filogenia y para qué sirve en biología animal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La filogenia es el estudio de las relaciones evolutivas entre organismos. Un árbol filogenético representa esas relaciones como ramas que comparten un ancestro común: cuanto más cercana es la bifurcación, más reciente es el ancestro compartido. En zoología, la filogenia molecular (comparación de secuencias de ADN y ARN) ha revisado muchas clasificaciones tradicionales basadas en morfología; por ejemplo, ha confirmado que las aves son dinosaurios terópodos y que los cocodrilos están más emparentados con las aves que con los lagartos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué los mamíferos tienen cuatro cámaras en el corazón?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El corazón de cuatro cámaras (dos aurículas + dos ventrículos) separa completamente la sangre oxigenada de la desoxigenada, permitiendo una circulación doble completamente dividida. Esto suministra oxígeno a los tejidos con mayor eficiencia, lo que sostiene el alto metabolismo de mamíferos y aves. Los peces tienen dos cámaras (circulación simple), los anfibios tres (mezcla parcial de sangre), y la mayoría de reptiles también tres, aunque cocodrilos y aves comparten el modelo de cuatro cámaras, lo que refleja su origen evolutivo común.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué filo animal es el más diverso en número de especies?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los artrópodos (filo Arthropoda) son con diferencia el filo más diverso: se han descrito más de un millón de especies, de las cuales unos 900.000 son insectos. Los insectos representan alrededor del 60% de todas las especies animales conocidas. Dentro de los insectos, el orden Coleoptera (escarabajos) es el más numeroso, con unas 400.000 especies descritas, lo que llevó al biólogo J.B.S. Haldane a su famosa observación sobre el "extraordinario gusto de Dios por los escarabajos".',
+      },
+    },
+  ],
+};

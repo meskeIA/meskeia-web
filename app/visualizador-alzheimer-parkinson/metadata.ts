@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el Alzheimer y el Parkinson a nivel molecular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Aunque ambas son enfermedades neurodegenerativas, sus mecanismos moleculares son distintos. El Alzheimer se caracteriza por la acumulación de placas de beta-amiloide (Aβ) extracelulares, derivadas del procesamiento anómalo de la proteína APP, y por los ovillos neurofibrilares de proteína Tau hiperfosforilada en el interior neuronal. El Parkinson, en cambio, implica la acumulación de α-sinucleína mal plegada formando los cuerpos de Lewy, con pérdida específica de neuronas dopaminérgicas en la sustancia negra.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la hipótesis de la cascada amiloide en el Alzheimer?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La hipótesis de la cascada amiloide propone que el evento iniciador del Alzheimer es la acumulación anormal de beta-amiloide (Aβ) en el cerebro, resultado del procesamiento de APP por las enzimas beta y gamma-secretasa en lugar de la vía no amiloidogénica (alfa-secretasa). Este Aβ se agrega en oligómeros tóxicos y placas que desencadenan la hiperfosforilación de Tau, disfunción sináptica, neuroinflamación y muerte neuronal progresiva.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué se pierden neuronas dopaminérgicas en el Parkinson?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el Parkinson, la α-sinucleína adopta una conformación mal plegada que se agrega formando estructuras llamadas cuerpos de Lewy dentro de las neuronas. Estas neuronas afectadas son principalmente las dopaminérgicas de la sustancia negra (pars compacta), que proyectan sus axones al estriado formando la vía nigroestriada. Su degeneración reduce drásticamente los niveles de dopamina en el circuito de los ganglios basales, alterando el control del movimiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este visualizador de Alzheimer y Parkinson?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está dirigido a estudiantes de Biología, Medicina, Farmacia, Neurociencias y afines que deseen entender los mecanismos moleculares de ambas enfermedades. También es útil para profesionales de la salud que quieran refrescar conceptos de neurobiología molecular o para divulgadores científicos. El contenido es exclusivamente educativo: no incluye información sobre síntomas, diagnóstico ni tratamiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el circuito de los ganglios basales y por qué se altera en el Parkinson?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los ganglios basales regulan el movimiento voluntario mediante dos vías opuestas: la vía directa (facilitadora del movimiento) y la vía indirecta (inhibidora). La dopamina proveniente de la sustancia negra activa la vía directa (receptores D1) e inhibe la indirecta (receptores D2), favoreciendo el movimiento fluido. En el Parkinson, la pérdida de dopamina desequilibra este circuito: la vía indirecta queda hiperactivada, inhibiendo el tálamo y reduciendo la activación cortical motora, lo que provoca bradicinesia y rigidez.',
+      },
+    },
+  ],
+};

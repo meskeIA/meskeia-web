@@ -60,3 +60,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin registro, disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona un transistor BJT como interruptor?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un transistor BJT NPN actúa como interruptor cuando la tensión base-emisor supera aproximadamente 0,7 V: en ese momento la corriente de base satura el transistor y permite que circule corriente entre colector y emisor (estado ON). Por debajo de ese umbral el transistor está en corte y no conduce (estado OFF). Este principio es la base de toda la electrónica digital: miles de millones de transistores conmutando a velocidades de gigahercios forman los procesadores modernos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la constante de tiempo τ en un circuito RC?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La constante de tiempo τ = R·C determina la velocidad de carga y descarga de un condensador. Tras un tiempo τ el condensador ha alcanzado el 63,2 % de la tensión final; tras 5τ se considera prácticamente cargado al 99,3 %. Valores altos de R o C producen cargas lentas y se usan en filtros de baja frecuencia; valores bajos permiten respuestas rápidas y filtros de alta frecuencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre una puerta NAND y una puerta AND?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La puerta AND produce salida 1 solo cuando todas sus entradas son 1. La puerta NAND es su complementaria: produce 0 solo cuando todas las entradas son 1 y 1 en cualquier otro caso. La NAND es especialmente importante porque es una puerta lógica universal: cualquier función booleana puede implementarse usando únicamente puertas NAND, lo que simplifica el diseño de circuitos integrados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo pasa un transistor a ser un procesador con miles de millones de transistores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La jerarquía va de menor a mayor complejidad: transistores MOSFET forman puertas lógicas CMOS, las puertas forman flip-flops (biestables), los flip-flops forman registros y contadores, y estos se combinan en unidades aritméticas (ALU), cachés y núcleos de procesamiento. Un procesador moderno como el Apple M2 integra más de 20.000 millones de transistores en un chip de apenas 5 nm de proceso litográfico.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este visualizador de circuitos electrónicos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es ideal para estudiantes de Bachillerato tecnológico, Formación Profesional en electrónica o primeros cursos de ingeniería que quieran entender los fundamentos antes de trabajar con circuitos reales. También sirve a personas curiosas que quieren comprender qué hay dentro de un teléfono o un ordenador. No se necesita instalar ningún software ni tener conocimientos previos de electrónica.',
+      },
+    },
+  ],
+};
