@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { MeskeiaLogo, LegalNotice, ShareCard, Footer } from '@/components';
 import styles from './Developers.module.css';
 
-const MCP_URL = 'https://meskeia.com/api/mcp';
+const MCP_URL = 'https://meskeia.com/api/mcp/';
 
 const CLIENTES = [
   {

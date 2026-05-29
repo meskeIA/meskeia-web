@@ -15,7 +15,7 @@
   "termsOfServiceUrl": "https://meskeia.com/developers/terminos/",
   "transport": {
     "type": "streamable-http",
-    "url": "https://meskeia.com/api/mcp"
+    "url": "https://meskeia.com/api/mcp/"
   },
   "capabilities": {
     "tools": true,

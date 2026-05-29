@@ -32,7 +32,7 @@ export default function TerminosMCPPage() {
             meskeIA pone a disposición pública un <strong>servidor MCP (Model Context Protocol)</strong> que expone más de 160 calculadoras especializadas en áreas fiscal, financiera, laboral y de salud en español.
           </p>
           <p>
-            El servidor es accesible en la URL <code>https://meskeia.com/api/mcp</code> y es compatible con cualquier cliente que implemente el protocolo MCP estándar (Claude Desktop, Cursor, Windsurf y similares).
+            El servidor es accesible en la URL <code>https://meskeia.com/api/mcp/</code> y es compatible con cualquier cliente que implemente el protocolo MCP estándar (Claude Desktop, Cursor, Windsurf y similares).
           </p>
           <p>
             El acceso es <strong>completamente gratuito</strong>, no requiere registro previo ni API key.

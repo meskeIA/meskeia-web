@@ -9,7 +9,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **URL producción** | `https://meskeia.com/api/mcp` |
+| **URL producción** | `https://meskeia.com/api/mcp/` |
 | **Archivo principal** | `app/api/mcp/route.ts` (~9.100 líneas) |
 | **Protocolo** | MCP (Model Context Protocol) — Anthropic |
 | **Transporte** | WebStandardStreamableHTTPServerTransport (stateless) |
