@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Por qué el silicio es el material base de todos los chips y procesadores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El silicio es un semiconductor: su conductividad eléctrica puede controlarse con precisión añadiendo pequeñas impurezas en un proceso llamado dopado. Además, es el segundo elemento más abundante en la corteza terrestre y forma una capa de óxido (SiO₂) estable que actúa como aislante perfecto en los transistores. Esta combinación de abundancia, controlabilidad y compatibilidad con procesos industriales consolidados lo convirtió en el material dominante de la microelectrónica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué significa que un chip sea de 3 nm o 5 nm?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El número de nanómetros hace referencia al nodo tecnológico del proceso de fabricación, que históricamente se relacionaba con el tamaño del transistor. Hoy es más un nombre de marketing que una medida literal: un "chip de 3 nm" no tiene transistores de 3 nm de tamaño exacto, sino que usa ese término para indicar que pertenece a una generación más avanzada que los de 5 nm. Menos nanómetros implica transistores más pequeños, mayor densidad, menor consumo energético y mayor velocidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la Ley de Moore y sigue siendo válida?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Gordon Moore observó en 1965 que el número de transistores en un chip se duplicaba aproximadamente cada dos años, manteniendo el coste constante. Esta observación se cumplió con notable precisión durante décadas y guió la planificación de toda la industria. En la actualidad, los avances se han ralentizado por los límites físicos del silicio: cuando los transistores se acercan al tamaño de unos pocos átomos, los efectos cuánticos causan fugas de corriente incontrolables. La industria busca alternativas como el galio-nitruro, los chips 3D o la computación cuántica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se fabrica un chip de silicio a partir de arena?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El proceso comienza purificando dióxido de silicio (arena) hasta obtener silicio de pureza 99,9999999 %. Ese silicio se funde y se cristaliza en lingotes cilíndricos que se cortan en obleas finas (wafers). Sobre cada oblea se aplican sucesivas capas de materiales mediante fotolitografía: la luz ultravioleta extrema (EUV) proyecta el patrón del circuito sobre una resina sensible, grabando estructuras de apenas unos nanómetros. Tras decenas o cientos de capas, las obleas se cortan en los dados individuales que se ensamblan en los chips.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un semiconductor tipo N y uno tipo P?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El dopado consiste en añadir impurezas al silicio puro para modificar su conducción. El tipo N (negativo) usa átomos como el fósforo, que aportan un electrón libre extra, aumentando los portadores de carga negativa. El tipo P (positivo) usa átomos como el boro, que crean "huecos" o ausencias de electrón que actúan como cargas positivas móviles. Al unir una capa N con una P se forma la unión P-N, que es la base de diodos, transistores y celdas fotovoltaicas.',
+      },
+    },
+  ],
+};

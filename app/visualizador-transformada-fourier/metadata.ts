@@ -60,3 +60,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la Transformada de Fourier y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Transformada de Fourier es una herramienta matemática que descompone cualquier señal compleja en una suma de señales sinusoidales simples, cada una con su propia frecuencia, amplitud y fase. Sirve para analizar qué frecuencias contiene una señal, eliminar ruido, comprimir datos y estudiar sistemas físicos. Es la base de tecnologías cotidianas como el audio digital, la imagen JPEG y la resonancia magnética.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona la compresión MP3 con la Transformada de Fourier?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La compresión MP3 aplica la Transformada de Fourier para descomponer el audio en sus componentes de frecuencia. Después elimina las frecuencias que el oído humano percibe con menor sensibilidad (por encima de ~16 kHz y las enmascaradas por sonidos más intensos). El resultado es un archivo hasta 10 veces más pequeño con una pérdida de calidad prácticamente imperceptible en escucha normal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los epiciclos de Fourier y cómo dibujan señales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los epiciclos de Fourier son círculos giratorios encadenados, donde cada uno representa un componente sinusoidal de la señal: su radio corresponde a la amplitud y su velocidad angular a la frecuencia. Al sumar vectorialmente todos los epiciclos en cada instante, la punta del último traza la señal original. Esta representación geométrica demuestra visualmente que cualquier curva —incluso una figura compleja— puede construirse con suficientes círculos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre la Serie de Fourier y la Transformada de Fourier?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Serie de Fourier descompone señales periódicas (que se repiten indefinidamente) en un conjunto discreto de frecuencias: la fundamental y sus armónicos enteros. La Transformada de Fourier generaliza el concepto a señales no periódicas, produciendo un espectro continuo de frecuencias. En la práctica digital se usa la Transformada Discreta de Fourier (DFT), calculada eficientemente con el algoritmo FFT.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo usa la Transformada de Fourier la compresión de imágenes JPEG?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'JPEG aplica la Transformada Discreta del Coseno (DCT), variante de Fourier, a bloques de 8×8 píxeles. La DCT convierte esos píxeles en coeficientes de frecuencia espacial: los de baja frecuencia representan variaciones suaves de color y los de alta frecuencia, los detalles finos. El estándar descarta o redondea agresivamente los coeficientes de alta frecuencia, ya que el ojo humano los percibe con menor nitidez, logrando ratios de compresión de 10:1 o más.',
+      },
+    },
+  ],
+};

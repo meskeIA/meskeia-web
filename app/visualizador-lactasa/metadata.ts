@@ -25,3 +25,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la lactasa y dónde se produce?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La lactasa (lactasa-florizin hidrolasa, LPH) es una enzima digestiva producida por las células del intestino delgado, concretamente en el borde en cepillo del yeyuno. Su función es hidrolizar la lactosa —el azúcar de la leche— en dos monosacáridos simples: glucosa y galactosa, que el intestino puede absorber directamente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué tantos adultos son intolerantes a la lactosa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Aproximadamente el 65-70% de los humanos adultos reduce la producción de lactasa tras el destete, un proceso llamado no-persistencia de lactasa. Esto es la condición ancestral en nuestra especie. La capacidad de seguir produciendo lactasa en la edad adulta (persistencia) es una mutación genética que surgió hace unos 7.500 años en poblaciones de Europa y África subsahariana que domesticaron el ganado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué pasa exactamente cuando alguien intolerante consume lactosa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sin lactasa suficiente, la lactosa no digerida llega al intestino grueso, donde las bacterias colónicas la fermentan. Este proceso produce gases (hidrógeno, metano, dióxido de carbono) y ácidos grasos de cadena corta que generan hinchazón, flatulencia, dolor abdominal y diarrea osmótica. La intensidad varía según la cantidad consumida y la microbiota de cada persona.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre intolerancia a la lactosa y alergia a la leche?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Son condiciones distintas. La intolerancia a la lactosa es un problema digestivo causado por déficit enzimático, sin implicación del sistema inmunológico. La alergia a la leche es una respuesta inmune mediada por IgE contra proteínas de la leche (principalmente caseínas y lactoalbúmina), puede causar reacciones sistémicas graves y es más frecuente en niños.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Las personas intolerantes pueden tomar suplementos de lactasa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Existen suplementos de lactasa oral (gotas o cápsulas) que se toman justo antes de consumir lácteos para suplir la enzima que el intestino no produce. Su efectividad varía según la dosis de lactosa ingerida y el grado de déficit. Además, algunos lácteos fermentados como el yogur o los quesos curados contienen poca lactosa porque las bacterias ya la han predigerido.',
+      },
+    },
+  ],
+};
