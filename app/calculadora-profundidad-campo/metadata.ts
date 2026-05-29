@@ -43,3 +43,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin publicidad y disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la profundidad de campo en fotografía?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La profundidad de campo (DoF, Depth of Field) es la distancia entre el punto más cercano y el más lejano que aparecen nítidos en una fotografía. Una profundidad de campo reducida (bokeh pronunciado) deja solo el sujeto enfocado y desenfoca el fondo; una profundidad de campo amplia mantiene nítida toda la escena de cerca a lejos. Depende principalmente de tres variables: la apertura del diafragma, la distancia focal del objetivo y la distancia al sujeto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo consigo más desenfoque de fondo (bokeh) en mis fotos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para maximizar el bokeh hay que combinar tres factores: abrir al máximo el diafragma (f/1,4, f/1,8 o f/2,8), usar una focal larga (85 mm, 100 mm o más), y acercarse al sujeto tanto como permita el objetivo. Además, cuanto más lejos esté el fondo del sujeto, más desenfocado aparecerá. Los sensores más grandes (Full Frame) también producen más bokeh que los APS-C o Micro 4/3 con la misma apertura y focal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la distancia hiperfocal y cómo se usa en paisaje?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La distancia hiperfocal es la distancia mínima de enfoque a la que todo desde la mitad de esa distancia hasta el infinito aparece nítido. Al enfocar exactamente en la hiperfocal se maximiza la profundidad de campo para una focal y apertura dadas. En fotografía de paisaje es la técnica estándar: por ejemplo, con un 24 mm a f/8 en Full Frame, la hiperfocal ronda los 3,5 m, lo que significa que todo desde 1,75 m hasta el infinito saldrá nítido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el tamaño del sensor afecta a la profundidad de campo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tamaño del sensor cambia el círculo de confusión máximo aceptable para considerar un punto como "nítido". Un sensor más grande (Full Frame) tiene un círculo de confusión mayor en valor absoluto, por lo que a igual focal y apertura produce menor profundidad de campo que un APS-C o Micro 4/3. En la práctica, para obtener el mismo encuadre en APS-C hay que cerrar más el diafragma o alejarse más del sujeto para conseguir el mismo nivel de desenfoque.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre f/1,8 y f/8 en términos de nitidez?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A f/1,8 la apertura del diafragma es muy grande, entra más luz pero la profundidad de campo es muy reducida: solo un plano estrecho queda nítido y el resto se desenfoca. A f/8 la apertura es más pequeña, la zona nítida se amplía considerablemente y es más fácil tener todo en foco. Para retratos artísticos se prefiere f/1,4-f/2,8; para paisaje y arquitectura, f/8-f/11 suele ser la apertura de mayor resolución y mayor zona nítida.',
+      },
+    },
+  ],
+};

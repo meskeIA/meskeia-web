@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['k-means', 'clustering', 'machine learning', 'IA universidad'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el algoritmo k-means y cómo funciona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'K-means es un algoritmo de aprendizaje no supervisado que agrupa un conjunto de datos en K clusters, donde cada punto queda asignado al centroide más cercano. El proceso alterna dos pasos: asignación (cada punto se asigna al centroide más próximo) y recálculo (cada centroide se mueve al promedio de los puntos de su grupo). Repite hasta que ningún punto cambia de cluster, lo que se llama convergencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo elegir el número de clusters K en k-means?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El método más habitual es el "método del codo" (Elbow Method): se entrena el modelo con distintos valores de K y se representa la inercia (suma de distancias cuadráticas de cada punto a su centroide) en función de K. El punto donde la curva dobla bruscamente, como el codo de un brazo, suele indicar el K óptimo porque añadir más clusters a partir de ahí reduce poco la inercia. También existen criterios estadísticos como el índice de silueta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ventaja tiene la inicialización k-means++ frente a la aleatoria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inicialización aleatoria puede colocar varios centroides muy juntos, provocando que el algoritmo converja a una solución subóptima. K-means++ elige los centroides iniciales de forma más distribuida: el primer centroide se elige al azar y cada centroide siguiente se selecciona con una probabilidad proporcional a la distancia cuadrada al centroide más cercano ya elegido. Esto reduce significativamente el riesgo de quedarse atrapado en un mínimo local y suele converger más rápido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué se usa k-means en problemas reales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'K-means tiene aplicaciones muy variadas: segmentación de clientes según comportamiento de compra, compresión de imágenes agrupando colores similares, detección de anomalías como primer paso de preprocesado, agrupación de documentos o artículos por temática, y análisis exploratorio de datos antes de aplicar algoritmos supervisados. Es uno de los algoritmos de clustering más usados por su sencillez y velocidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las limitaciones del algoritmo k-means?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'K-means asume que los clusters tienen forma esférica y tamaños similares, lo que lo hace poco adecuado para grupos alargados, en forma de luna o con densidades muy distintas. Es sensible a valores atípicos (outliers) porque distorsionan la posición de los centroides. Requiere especificar K de antemano, lo que no siempre es evidente. Para datos con formas irregulares, algoritmos como DBSCAN o clustering espectral ofrecen mejores resultados.',
+      },
+    },
+  ],
+};

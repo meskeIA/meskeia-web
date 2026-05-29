@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['mito IRPF', 'tramos IRPF', 'tipo marginal', 'fiscal España'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Es verdad que si subo de tramo IRPF me quitan más dinero en total?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Este es un mito muy extendido pero matemáticamente falso. En España el IRPF es un impuesto de tramos marginales: al cruzar un umbral, el tipo más alto solo se aplica a los euros que superan ese límite, no a toda la renta. Por tanto, ganar más siempre incrementa el neto que recibes, aunque el porcentaje sobre el exceso sea mayor. Nunca es posible que un aumento de sueldo resulte en menos dinero tras impuestos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué tanta gente cree que subir de tramo sale perjudicial?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La confusión surge al mezclar el concepto de tipo marginal con el de tipo medio. Cuando se dice "si ganas 60.001 € tributas al 45%", se entiende erróneamente que ese 45% se aplica a todos los ingresos, cuando en realidad solo afecta al euro que supera los 60.000 €. El tipo medio siempre es menor que el marginal. La percepción también se ve reforzada por el efecto psicológico del cambio en la nómina cuando se revisa la retención al inicio del año.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los tramos del IRPF estatal en España para 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los tramos estatales del IRPF para 2025 son: 19% hasta 12.450 €, 24% entre 12.450 € y 20.200 €, 30% entre 20.200 € y 35.200 €, 37% entre 35.200 € y 60.000 €, 45% entre 60.000 € y 300.000 €, y 47% por encima de 300.000 €. A estos tipos hay que sumar los tramos autonómicos, que varían según la comunidad de residencia. La base sobre la que se aplican es la base liquidable, no el salario bruto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afecta realmente una subida de sueldo a mi neto después de impuestos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Siempre de forma positiva. Si una subida te lleva a un tramo superior, solo pagarás el tipo más alto sobre el tramo que superas el umbral. Por ejemplo, si estás justo en el límite de 35.200 € y recibes 1.000 € de aumento, los primeros euros hasta 35.200 € tributan al 30% y el resto al 37%. El neto adicional en el tramo 37% sería aproximadamente 630 € de los 1.000 €, lo que siempre es mejor que los 0 € que recibirías sin subida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puede ser que una subida de sueldo me quite dinero neto alguna vez en España?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el sistema de tramos del IRPF español, una subida de renta nunca reduce el neto. Sin embargo, hay situaciones puntuales relacionadas con otros factores donde la renta adicional puede afectar a beneficios ligados a umbrales de renta, como ayudas públicas, becas o prestaciones condicionadas a no superar cierto ingreso. En esos casos no es el impuesto quien penaliza, sino la pérdida de la ayuda al superar el límite establecido para recibirla.',
+      },
+    },
+  ],
+};

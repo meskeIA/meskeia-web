@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['IRPF', 'tramos IRPF', 'tipo marginal', 'AEAT', 'fiscal España'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo funcionan los tramos del IRPF en España en 2025?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El IRPF español es un impuesto progresivo dividido en 6 tramos para 2025: 19% hasta 12.450 €, 24% de 12.450 € a 20.200 €, 30% de 20.200 € a 35.200 €, 37% de 35.200 € a 60.000 €, 45% de 60.000 € a 300.000 €, y 47% por encima de 300.000 €. Cada tipo solo se aplica a la parte de renta que cae dentro de ese tramo, no a la totalidad del salario. Estos son los tipos del tramo estatal; las comunidades autónomas aplican sus propios tipos adicionales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el tipo marginal y el tipo medio del IRPF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tipo marginal es el porcentaje que se aplica al último euro ganado, es decir, el tipo del tramo más alto en que se encuentra tu renta. El tipo medio es el porcentaje efectivo que pagas sobre la totalidad de tu base liquidable: cuota total dividida entre base. Siempre es menor que el marginal porque los tramos inferiores tributan a tipos más bajos. Por ejemplo, con 40.000 € de base, el tipo marginal es el 37% pero el tipo medio puede rondar el 20%.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué pasa con mi cuota si subo de tramo IRPF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al cruzar un tramo, el tipo más alto solo se aplica a la parte de renta que supera el límite del tramo anterior, no a toda tu renta. Por tanto, ganar más siempre deja más neto en tu bolsillo, aunque el incremento tributa al tipo superior. Este es un malentendido muy frecuente: "subir de tramo" no implica pagar más en total, sino que el exceso sobre el umbral queda sujeto al tipo siguiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Estos datos del simulador son válidos para todas las comunidades autónomas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Este simulador muestra exclusivamente los tramos estatales del IRPF, que son iguales para toda España. Sin embargo, la cuota total del IRPF incluye también la parte autonómica, cuyos tipos varían según la comunidad autónoma de residencia. Para conocer tu cuota completa con los tipos de tu comunidad, debes consultar la tabla IRPF completa (estatal + autonómica) de tu comunidad o usar el simulador de la AEAT.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la base liquidable y sobre qué se calculan los tramos del IRPF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La base liquidable es la cantidad sobre la que se aplican los tramos del IRPF. Se obtiene restando al rendimiento neto del trabajo o renta los mínimos personales, familiares y otras deducciones previstas en la ley (mínimo del contribuyente 5.550 €, más reducciones por hijos, mayores, discapacidad, aportaciones a planes de pensiones, etc.). No es lo mismo que el salario bruto: la base liquidable suele ser significativamente inferior.',
+      },
+    },
+  ],
+};

@@ -43,3 +43,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin publicidad y disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el balance de blancos en fotografía y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El balance de blancos (WB, White Balance) es el ajuste de la cámara que compensa la dominante de color de la fuente de luz para que los blancos aparezcan neutros en la imagen. Cada fuente de luz tiene una temperatura de color diferente medida en Kelvin: una vela emite unos 1.800K (luz muy cálida y anaranjada), mientras que un cielo despejado puede llegar a 10.000K (luz muy fría y azulada). Sin el ajuste correcto, las fotos de interior con bombillas incandescentes quedan con dominante naranja y las tomadas en sombra quedan con dominante azul.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la temperatura de color de la luz solar directa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La luz solar directa a mediodía ronda los 5.500-5.600K, que es la referencia estándar de "luz neutra" en fotografía. Por eso el preset "Sol" de las cámaras suele fijarse entre 5.200K y 5.600K. Al amanecer o al atardecer la temperatura baja a 2.500-3.500K (tonos muy cálidos y dorados), y en un día nublado sube a 6.000-7.000K (tonos más fríos y azulados).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué mis fotos de interior con luz artificial salen con tono naranja?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las bombillas incandescentes (tungsteno) tienen una temperatura de color de unos 2.700-3.200K, muy inferior a la luz del día. Si la cámara está configurada en automático o en el preset de "Sol" (5.500K), no compensa correctamente esa dominante cálida y la imagen queda con un tono naranja o amarillo. La solución es seleccionar el preset "Tungsteno" o "Incandescente" en la cámara, o establecer manualmente el WB entre 2.700K y 3.200K.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es mejor corregir el balance de blancos en cámara o en postproceso con RAW?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Si disparas en RAW, el balance de blancos no está "horneado" en el archivo y puede corregirse sin pérdida de calidad en Lightroom, Capture One o cualquier editor RAW. Si disparas en JPEG, la corrección en cámara es preferible porque el procesado posterior degrada la imagen. Para eventos o situaciones sin tiempo de postproceso, acertar el WB en cámara siempre facilita el flujo de trabajo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo conviene usar un balance de blancos incorrecto de forma intencionada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Usar un WB "incorrecto" de forma creativa es una técnica válida. Bajar la temperatura (valores más fríos) crea atmósferas nocturnas, melancólicas o de ciencia ficción. Subir la temperatura (valores más cálidos) potencia la sensación de luz dorada en retratos o paisajes de atardecer. También se usa en fotografía de producto para evocar calidez o frialdad según la marca.',
+      },
+    },
+  ],
+};
