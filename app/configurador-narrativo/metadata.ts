@@ -43,3 +43,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin registro, en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el narrador omnisciente y el narrador limitado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El narrador omnisciente conoce los pensamientos, sentimientos y motivaciones de todos los personajes, así como hechos que ningún personaje sabe. El narrador limitado (o focalizado) solo accede a la mente de un personaje, generalmente el protagonista, y desconoce lo que piensan el resto. Mientras el omnisciente ofrece una visión panorámica, el limitado genera mayor identificación y suspense al restringir la información.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo debo usar la primera persona en una novela?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La primera persona es ideal cuando quieres crear una voz muy distintiva, generar complicidad inmediata con el lector o explorar la subjetividad del protagonista. Es especialmente eficaz en relatos de formación, memorias ficcionalizadas y narradores no fiables. Su principal limitación es que restringe la información a lo que el narrador-personaje puede conocer y observar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es un narrador no fiable y cómo se usa en la escritura creativa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un narrador no fiable es aquel cuya versión de los hechos el lector debe cuestionar: miente, se engaña a sí mismo, omite información o tiene una percepción distorsionada de la realidad. Se usa para crear tensión, giros narrativos y una segunda lectura enriquecedora. Ejemplos clásicos son el narrador de El gran Gatsby (Nick Carraway) o el de El guardián entre el centeno (Holden Caulfield).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Afecta el tiempo verbal (pasado o presente) al ritmo y la tensión de una historia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, de forma significativa. El presente narrativo crea inmediatez y tensión, como si los hechos ocurrieran en tiempo real, y es eficaz en escenas de acción o thrillers. El pasado es la forma más natural y versátil: permite distancia reflexiva y retrospección sin que el lector lo perciba como artificial. La elección también afecta la credibilidad del narrador: un personaje que narra en presente no puede tener retrospección sobre lo que aún no ha sucedido.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué combinación narrativa usan las novelas más conocidas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Hay combinaciones muy consolidadas: Cien años de soledad usa tercera persona + narrador omnisciente + pasado; El guardián entre el centeno usa primera persona + narrador no fiable + pasado; La carretera de Cormac McCarthy usa tercera persona + narrador limitado + presente. No existe una combinación universalmente superior: la elección correcta depende del efecto que el escritor quiera producir en el lector.',
+      },
+    },
+  ],
+};

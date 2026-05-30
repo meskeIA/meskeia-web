@@ -30,3 +30,50 @@ export const jsonLd = generateWebAppSchema({
     'Indicador de progreso con campos completados',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el deseo y la necesidad de un personaje?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El deseo es lo que el personaje cree querer conscientemente: un objetivo externo y concreto que impulsa la acción. La necesidad es lo que realmente le falta a nivel interno para crecer como persona, aunque él mismo no lo sepa al principio. Un buen arco dramático surge precisamente de la tensión entre ambos: el personaje persigue su deseo pero el viaje le obliga a enfrentarse a su necesidad real.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo crear un personaje literario con profundidad psicológica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un personaje con profundidad psicológica necesita al menos tres capas: una superficie visible (apariencia, profesión, forma de hablar), una psicología interna (deseo, miedo, mentira que se cuenta a sí mismo) y una herida de fondo (evento del pasado que explica sus patrones relacionales). La contradicción entre capas —por ejemplo, alguien que predica valentía pero actúa desde el miedo— es lo que hace al personaje creíble y memorable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el arco de personaje y cuántos tipos existen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El arco de personaje describe la transformación interna que experimenta el protagonista a lo largo de la historia. Los tres tipos fundamentales son: el arco positivo (el personaje supera su mentira interna y crece), el arco negativo o de caída (sucumbe a ella o empeora) y el arco plano (no cambia él, sino el mundo que le rodea). No todos los personajes secundarios necesitan un arco; reservarlo para los protagonistas y antagonistas principales hace más eficaz la narrativa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve definir el "tic verbal" y la "voz" de un personaje?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La voz del personaje es el conjunto de rasgos que hacen reconocible su diálogo: vocabulario, longitud de frases, uso de metáforas, registro formal o coloquial. El tic verbal (una muletilla, una expresión recurrente, un tema que siempre evita) añade autenticidad y permite distinguir personajes solo leyendo sus líneas, sin etiquetas de diálogo. En guion, un personaje con voz propia reduce la necesidad de stage directions y acelera la lectura.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la "mentira" del personaje en la construcción narrativa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mentira del personaje es la creencia falsa que sostiene sobre sí mismo o el mundo como mecanismo de defensa, generalmente originada en su herida de fondo. Por ejemplo, un personaje que vivió un abandono puede creer que "no merece ser querido". Esa creencia errónea guía sus decisiones de forma inconsciente y es el núcleo del conflicto interno. El clímax de la historia suele ser el momento en que el personaje acepta o rechaza definitivamente esa mentira.',
+      },
+    },
+  ],
+};

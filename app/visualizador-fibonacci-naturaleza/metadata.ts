@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la secuencia de Fibonacci?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La secuencia de Fibonacci es una serie numérica en la que cada término es la suma de los dos anteriores: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34… Fue descrita por el matemático italiano Leonardo de Pisa (Fibonacci) en el siglo XIII. Al dividir un término entre el anterior, la razón se aproxima cada vez más a φ (phi) = 1,618…, conocido como número o proporción áurea.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué aparece Fibonacci en las plantas y flores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las plantas disponen sus hojas, semillas y pétalos según números de Fibonacci porque esa distribución maximiza la exposición a la luz y minimiza el solapamiento. En los girasoles, las espirales de semillas se cuentan en parejas de números de Fibonacci consecutivos —típicamente 34 y 55, o 55 y 89— lo que permite el empaquetado más eficiente posible. Este fenómeno se llama filotaxis.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la proporción áurea y para qué se usa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La proporción áurea (φ ≈ 1,618) es la relación entre dos cantidades tal que la mayor es a la menor como la suma de ambas es a la mayor. Se aplica en arquitectura (Partenón, pirámides), pintura (obras de Da Vinci), diseño gráfico y tipografía para crear composiciones visualmente equilibradas. También aparece en la espiral logarítmica de conchas de nautilus y galaxias.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Aparece la secuencia de Fibonacci solo en la naturaleza o también en matemáticas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Fibonacci tiene una presencia profunda en las matemáticas puras: los números de Fibonacci son coprimos consecutivos, aparecen en la identidad de Cassini, en la teoría de números y en algoritmos de búsqueda (Fibonacci search). En la naturaleza se observan en piñas, alcachofas, conchas y poblaciones de conejos, que fue el ejemplo original con el que Fibonacci formuló la serie.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se dibuja la espiral dorada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La espiral dorada se construye dibujando cuadrados cuyos lados son números de Fibonacci consecutivos (1, 1, 2, 3, 5, 8…) y trazando un arco de cuarto de círculo en cada uno. Al encadenarse, los arcos forman una espiral logarítmica cuyo factor de crecimiento por vuelta es φ. Es una aproximación a la espiral equiangular que aparece en conchas de nautilus y en el enrrollamiento de las galaxias espirales.',
+      },
+    },
+  ],
+};

@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuánto ocupa el océano en la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El océano cubre el 71% de la superficie terrestre y contiene el 97% de toda el agua del planeta. Su volumen total supera los 1.335 millones de kilómetros cúbicos, lo que lo convierte en el mayor sistema continuo de agua salada del mundo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la zona más profunda del océano y qué hay allí?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Fosa de las Marianas, en el Pacífico, alcanza los 11.034 metros de profundidad: la zona hadalpelagial. A esa profundidad la presión supera las 1.000 atmósferas, no hay luz solar y la temperatura ronda los 2 °C. Aun así, viven organismos como anfípodos, pepinos de mar y bacterias adaptadas a condiciones extremas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto plástico llega al océano cada año?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se estima que entre 8 y 12 millones de toneladas de plástico entran en el océano cada año. Los plásticos se fragmentan con la luz solar en microplásticos de menos de 5 mm que se acumulan en la columna de agua y en los sedimentos marinos, y han sido detectados incluso en las fosas oceánicas más profundas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo regula el océano el clima de la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El océano absorbe aproximadamente el 30% del CO₂ emitido por la actividad humana y más del 90% del exceso de calor generado por el efecto invernadero. Las corrientes termohalinas distribuyen ese calor por todo el planeta, moderando temperaturas y determinando los patrones de lluvia y viento a escala global.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son las cinco zonas de profundidad oceánica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las zonas son: epipelágica (0-200 m, luz solar abundante y mayor biodiversidad), mesopelágica (200-1.000 m, zona crepuscular con bioluminiscencia), batipelágica (1.000-4.000 m, oscuridad total y frío extremo), abisopelagial (4.000-6.000 m, fondos planos con presión aplastante) y hadalpelagial (>6.000 m, fosas oceánicas). Cada zona tiene fauna y condiciones físicas propias.',
+      },
+    },
+  ],
+};

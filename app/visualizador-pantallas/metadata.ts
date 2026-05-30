@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre una pantalla OLED y una LCD?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En una pantalla LCD, una retroiluminación LED ilumina cristales líquidos que filtran el color, por lo que los negros nunca son completamente oscuros. En una pantalla OLED cada píxel emite su propia luz y puede apagarse por completo, logrando negros absolutos, mayor contraste y ángulos de visión más amplios. Como contrapartida, el OLED es más susceptible al "burn-in" si se muestra una imagen estática durante mucho tiempo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el PPI y por qué importa al elegir una pantalla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'PPI (píxeles por pulgada) mide la densidad de píxeles de una pantalla: a mayor PPI, menor es cada píxel y más nítida se percibe la imagen. Un monitor de escritorio suele rondar los 100-110 PPI, mientras que un smartphone de gama alta supera los 400 PPI. Por debajo de unos 90 PPI a distancia normal de uso los píxeles individuales pueden distinguirse a simple vista.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿La luz azul de las pantallas realmente daña los ojos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La luz azul (longitud de onda 415-455 nm) emitida por las pantallas puede interferir con la producción de melatonina y dificultar el sueño cuando se usa por la noche. La fatiga visual está más relacionada con el parpadeo reducido y la distancia inadecuada que con la luz azul en sí. La regla 20-20-20 (cada 20 minutos, mirar a 6 metros durante 20 segundos) es la medida preventiva más recomendada por oftalmólogos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la tecnología MicroLED y en qué se diferencia del OLED?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'MicroLED utiliza diminutos LEDs inorgánicos como píxeles emisores de luz, igual que el OLED, pero sin los materiales orgánicos que causan el burn-in. Ofrece mayor brillo máximo, mayor vida útil y no tiene riesgo de degradación de colores. Sin embargo, su fabricación es muy compleja y costosa, por lo que en 2025 aún está limitada a pantallas de gran tamaño y precio elevado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántos píxeles tiene realmente una pantalla 4K?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una resolución 4K (UHD) tiene 3.840 × 2.160 píxeles, lo que suma aproximadamente 8,3 millones de píxeles en total, cuatro veces más que Full HD (1.920 × 1.080). Cada uno de esos píxeles se compone a su vez de tres subpíxeles (rojo, verde y azul) cuya mezcla aditiva genera cualquier color visible. La resolución 8K dobla nuevamente ese número hasta los 33 millones de píxeles.',
+      },
+    },
+  ],
+};

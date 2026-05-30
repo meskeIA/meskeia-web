@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántos planetas tiene el sistema solar y cuáles son?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El sistema solar tiene 8 planetas reconocidos por la Unión Astronómica Internacional: Mercurio, Venus, Tierra, Marte, Júpiter, Saturno, Urano y Neptuno. Plutón fue reclasificado como planeta enano en 2006. Los cuatro interiores (terrestres) son rocosos y pequeños; los cuatro exteriores son gigantes gaseosos o helados con sistemas de anillos y numerosas lunas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tarda la luz en cruzar el sistema solar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La luz viaja a 299.792 km/s. Desde el Sol hasta la Tierra tarda unos 8 minutos y 20 segundos. Hasta Neptuno, el planeta más lejano, son aproximadamente 4 horas y 10 minutos. La señal de radio de la sonda Voyager 1, la nave humana más lejana (más de 23.000 millones de km), tarda más de 21 horas en llegar a la Tierra.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué Júpiter es tan importante para la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Júpiter actúa como escudo gravitacional del sistema solar interior. Su enorme masa (más de 300 veces la de la Tierra) desvía o captura muchos cometas y asteroides que de otro modo impactarían en los planetas interiores. Se estima que sin Júpiter la Tierra sufriría impactos de gran escala unas 1.000 veces más frecuentes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia de tamaño entre el Sol y los planetas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Sol concentra el 99,86% de toda la masa del sistema solar. Su diámetro (1.392.700 km) es 109 veces el de la Tierra. Júpiter, el mayor planeta, cabe unas 11 veces en el diámetro solar. Si el Sol fuera un balón de baloncesto de 24 cm, la Tierra sería una pequeña canica de 2 mm a 26 metros de distancia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las curiosidades más sorprendentes de los planetas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Algunas: Venus gira en sentido contrario al resto de planetas (rotación retrógrada) y sus días duran más que sus años. Saturno tiene una densidad tan baja que flotaría en el agua. Marte alberga el volcán más alto del sistema solar (Olympus Mons, 22 km) y el cañón más extenso (Valles Marineris, 4.000 km). Urano orbita de lado, con una inclinación axial de 98°.',
+      },
+    },
+  ],
+};
