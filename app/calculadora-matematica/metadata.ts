@@ -42,3 +42,50 @@ export const jsonLd = generateWebAppSchema({
       "En español"
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué operaciones permite hacer esta calculadora matemática avanzada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Permite realizar operaciones con matrices (suma, resta, multiplicación, determinante, inversa), resolver sistemas de ecuaciones lineales, operar con fracciones y simplificar expresiones algebraicas. Todo funciona directamente en el navegador sin necesidad de instalar ningún programa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula el determinante de una matriz con esta herramienta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Selecciona la operación "Determinante" en la sección de matrices, introduce los valores de la matriz cuadrada (2×2 o 3×3) y pulsa calcular. La herramienta aplica la regla de Sarrus para matrices 3×3 y la fórmula ad−bc para matrices 2×2, mostrando el resultado de forma inmediata.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo está pensada esta calculadora?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para estudiantes de secundaria, bachillerato y primeros cursos universitarios que trabajan con álgebra lineal, matrices y sistemas de ecuaciones. También resulta práctica para cualquier persona que necesite resolver cálculos algebraicos de forma rápida y verificar resultados.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre esta calculadora y una calculadora científica convencional?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las calculadoras científicas físicas suelen limitarse a funciones básicas y trigonométricas. Esta herramienta añade operaciones con matrices completas (hasta 3×3), resolución de sistemas de ecuaciones paso a paso y simplificación de expresiones algebraicas simbólicas, funcionalidades que no están disponibles en modelos estándar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es necesario registrarse o pagar para usar la calculadora?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. La calculadora es completamente gratuita y no requiere registro. Funciona al 100 % en el navegador sin descargar ninguna aplicación, y no almacena los datos introducidos.',
+      },
+    },
+  ],
+};

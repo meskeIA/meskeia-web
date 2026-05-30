@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['planificación procesos', 'CPU scheduling', 'sistemas operativos', 'informática universidad'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la planificación de procesos en sistemas operativos y por qué es importante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La planificación de procesos (CPU scheduling) es la función del sistema operativo que decide qué proceso ocupa la CPU en cada momento cuando varios procesos están listos para ejecutarse. Su objetivo es maximizar el uso de la CPU, minimizar los tiempos de espera y respuesta, y garantizar equidad. Sin un planificador eficiente, la CPU quedaría ociosa mientras los procesos esperan, o algunos procesos sufrirían inanición indefinida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre FCFS, SJF y Round Robin?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'FCFS (First Come, First Served) ejecuta los procesos por orden de llegada, sin interrupciones; es simple pero provoca el efecto convoy si un proceso largo bloquea a otros cortos. SJF (Shortest Job First) ejecuta primero el proceso con menor ráfaga de CPU, minimizando el tiempo medio de espera pero pudiendo causar inanición. Round Robin asigna un cuanto de tiempo fijo a cada proceso en turno rotativo, garantizando equidad a costa de mayor sobrecarga por cambios de contexto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la inanición (starvation) y cómo se evita en planificación por prioridad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La inanición ocurre cuando un proceso de baja prioridad no llega a ejecutarse nunca porque continuamente llegan procesos de mayor prioridad. La solución más habitual es el envejecimiento (aging): la prioridad de un proceso aumenta gradualmente cuanto más tiempo lleva esperando, garantizando que eventualmente obtendrá la CPU. Algoritmos como Round Robin no sufren inanición por diseño.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula el tiempo de espera, turnaround y tiempo de respuesta de un proceso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El tiempo de turnaround es el tiempo total desde que el proceso llega hasta que termina (completion time − arrival time). El tiempo de espera es el tiempo que el proceso pasa en la cola de listos sin ejecutarse (turnaround − burst time). El tiempo de respuesta es el tiempo desde la llegada hasta que el proceso recibe la CPU por primera vez. Los planificadores intentan minimizar los promedios de estas métricas en el conjunto de procesos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo es mejor SRTF que SJF?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SRTF (Shortest Remaining Time First) es la versión apropiativa de SJF: si llega un proceso nuevo con ráfaga menor que el tiempo restante del proceso en ejecución, el planificador lo interrumpe. SRTF minimiza el tiempo medio de espera mejor que SJF no apropiativo cuando hay llegadas frecuentes de procesos cortos durante la ejecución de un proceso largo, aunque genera más cambios de contexto y requiere conocer o estimar las ráfagas restantes.',
+      },
+    },
+  ],
+};

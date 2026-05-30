@@ -38,3 +38,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'BusinessApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Dónde se guardan las notas que escribo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las notas se guardan exclusivamente en el almacenamiento local del navegador (localStorage), directamente en tu dispositivo. No se envían a ningún servidor ni se almacenan en la nube. Esto significa que solo tú tienes acceso a ellas y que permanecen disponibles aunque no tengas conexión a internet.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se necesita crear una cuenta o registrarse para usar el bloc de notas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, la herramienta funciona sin registro ni inicio de sesión. Basta con abrir la página para empezar a escribir. Al no requerir cuenta, tampoco almacena datos personales ni instala cookies de seguimiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Las notas se borran si cierro el navegador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No, las notas persisten entre sesiones gracias al guardado automático en localStorage. Se conservan aunque cierres la pestaña o el navegador. La única forma de perderlas es limpiar manualmente los datos del navegador (historial y cookies) o borrarlas desde la propia aplicación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo organizar las notas por categorías o etiquetas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, la herramienta permite organizar las notas por categorías para mantener los apuntes ordenados. Puedes agrupar ideas, tareas, reflexiones o recordatorios en secciones distintas y acceder a cada categoría de forma independiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia esta herramienta de Google Keep o Notion?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A diferencia de Google Keep o Notion, esta herramienta no requiere cuenta, no sincroniza con servidores externos y no recopila datos de uso. Es una solución local y privada, ideal para apuntes rápidos cuando no se quiere depender de servicios en la nube ni aceptar términos de uso de terceros.',
+      },
+    },
+  ],
+};

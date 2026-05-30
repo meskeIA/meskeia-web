@@ -46,3 +46,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['VSEPR', 'geometría molecular', 'pares libres', 'química bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la teoría VSEPR y cómo predice la geometría molecular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La teoría VSEPR (Repulsión de Pares de Electrones de la Capa de Valencia) establece que los pares de electrones alrededor de un átomo central se alejan entre sí para minimizar la repulsión. A partir del número de pares enlazantes y pares libres se deduce la geometría electrónica y, descontando los pares libres, la geometría molecular real (forma observable).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el ángulo del agua (104,5°) es menor que el del metano (109,5°)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El agua tiene geometría electrónica tetraédrica (2 pares enlazantes + 2 pares libres). Los pares libres ocupan más espacio angular que los pares enlazantes porque están más cerca del núcleo y ejercen mayor repulsión, comprimiendo el ángulo H-O-H hasta 104,5°, frente a los 109,5° del metano, que no tiene pares libres.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre geometría electrónica y geometría molecular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La geometría electrónica describe la disposición de todos los pares de electrones (enlazantes y libres) alrededor del átomo central. La geometría molecular solo considera la posición de los átomos, ignorando los pares libres. Por ejemplo, el NH₃ tiene geometría electrónica tetraédrica, pero geometría molecular piramidal trigonal porque uno de los cuatro pares es libre.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué moléculas tienen geometría lineal según VSEPR?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Tienen geometría lineal las moléculas con solo 2 pares enlazantes y ningún par libre (AX₂), como CO₂ (dióxido de carbono) y BeF₂, con ángulo de enlace de 180°. También adoptan geometría lineal moléculas AX₂E₃ como XeF₂, donde 3 pares libres ecuatoriales fuerzan a los 2 átomos F a posiciones axiales opuestas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué relación hay entre VSEPR e hibridación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'VSEPR predice la geometría a partir de la repulsión electrónica; la hibridación es el modelo de enlace que la justifica matemáticamente. Geometría lineal → sp; trigonal plana → sp²; tetraédrica → sp³; bipiramidal trigonal → sp³d; octaédrica → sp³d². Ambos modelos coinciden en sus predicciones geométricas, aunque VSEPR no requiere conocer los orbitales d.',
+      },
+    },
+  ],
+};

@@ -78,3 +78,50 @@ const faqSchema = generateFAQSchema({
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una titulación ácido-base y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una titulación ácido-base (o valoración) es una técnica analítica que consiste en añadir una solución de concentración conocida (titulante) a otra de concentración desconocida (analito) hasta alcanzar el punto de equivalencia. Permite determinar la concentración exacta de un ácido o una base, calcular el pKa de ácidos débiles y comprender la química del pH en soluciones tampón.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre punto de equivalencia y punto final en una valoración?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El punto de equivalencia es el punto teórico donde los moles de ácido y base son estequiométricamente iguales. El punto final es el punto experimental donde el indicador cambia de color. Un buen indicador hace que ambos puntos coincidan prácticamente; si no, se produce un pequeño error de titulación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el pH en el punto de equivalencia no es siempre 7?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Solo es 7 cuando se titulan un ácido fuerte y una base fuerte, porque la sal resultante no se hidroliza. Si se titula un ácido débil con base fuerte, la sal formada es básica y el pH de equivalencia supera 7. Si es ácido fuerte con base débil, la sal es ácida y el pH queda por debajo de 7.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué indicador debo usar en una titulación ácido débil - base fuerte?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El indicador debe tener su rango de viraje dentro del salto vertical de la curva de pH. En titulaciones ácido débil + base fuerte el punto de equivalencia queda entre pH 8 y 10, por lo que la fenolftaleína (viraje pH 8,2–10) es la opción clásica. El naranja de metilo, que vira entre 3 y 4, daría un error importante en estas titulaciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la ecuación de Henderson-Hasselbalch y cuándo se aplica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ecuación pH = pKa + log([A⁻]/[HA]) describe el pH de una solución tampón formada por un ácido débil y su base conjugada. Se aplica en la zona tampón de una curva de titulación, antes de la equivalencia. En el punto donde se ha añadido exactamente la mitad del volumen de equivalencia, [A⁻] = [HA] y pH = pKa, lo que permite determinar experimentalmente el pKa del ácido.',
+      },
+    },
+  ],
+};

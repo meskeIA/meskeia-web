@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['derivada', 'tangente', 'cálculo diferencial', 'EBAU', 'matemáticas', 'Bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la derivada de una función y qué representa geométricamente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La derivada f\'(x) en un punto mide la tasa de cambio instantánea de la función en ese punto. Geométricamente, es la pendiente de la recta tangente a la curva en ese punto: un valor positivo indica que la función crece, un valor negativo que decrece, y cero señala un posible máximo, mínimo o punto de inflexión. Esta interpretación geométrica es la base del cálculo diferencial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre la recta secante y la recta tangente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La recta secante une dos puntos distintos de la curva y su pendiente representa la tasa de cambio media entre ellos. La recta tangente es el caso límite cuando esos dos puntos se acercan hasta coincidir: su pendiente es la tasa de cambio instantánea, es decir, la derivada. El paso de secante a tangente ilustra el concepto de límite que define formalmente la derivada.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se relacionan los máximos y mínimos de una función con su derivada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En un máximo o mínimo local la recta tangente es horizontal, por lo que la derivada vale cero en esos puntos (condición necesaria). Para distinguir si es máximo, mínimo o punto de inflexión se analiza el signo de la derivada a ambos lados: si cambia de positivo a negativo es un máximo local; de negativo a positivo, un mínimo local; si no cambia de signo es un punto de inflexión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo está pensado este simulador de derivadas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El simulador es útil desde el último curso de secundaria hasta primer año de universidad. Es especialmente adecuado para estudiantes de Bachillerato que preparan la selectividad o el examen de admisión universitaria, y también para cursos introductorios de cálculo en ingeniería, física o economía. No requiere conocimientos previos de cálculo: el enfoque es completamente visual e intuitivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se interpreta la curva de la función derivada f\'(x) superpuesta sobre f(x)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La curva de f\'(x) muestra en cada punto x el valor de la pendiente de f en ese punto. Cuando f\'(x) > 0, la función original f crece; cuando f\'(x) < 0, decrece; cuando f\'(x) = 0, hay un extremo o punto de inflexión. Los cruces de f\'(x) con el eje horizontal corresponden exactamente a los máximos y mínimos de f(x), lo que permite leer la geometría de f a partir de la forma de su derivada.',
+      },
+    },
+  ],
+};

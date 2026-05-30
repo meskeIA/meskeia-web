@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['teorema central del límite', 'TCL', 'CLT', 'Monte Carlo', 'estadística', 'distribución muestral', 'EBAU', 'Bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué dice el Teorema Central del Límite?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Teorema Central del Límite (TCL) establece que, si se toman muestras aleatorias de tamaño n suficientemente grande de cualquier distribución con media μ y varianza finita σ², la distribución de la media muestral se aproxima a una distribución normal de media μ y desviación típica σ/√n. Este resultado es fundamental porque permite aplicar la inferencia estadística a poblaciones que no son normales, siempre que el tamaño de muestra sea suficiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A partir de qué tamaño de muestra se puede aplicar el TCL en la práctica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regla práctica más extendida es n ≥ 30 para distribuciones moderadamente asimétricas. Para distribuciones muy asimétricas o con colas pesadas (como la exponencial o la Bernoulli muy sesgada) puede necesitarse n ≥ 100 o más para que la aproximación normal sea razonable. Para distribuciones simétricas como la uniforme, incluso n = 5-10 puede ser suficiente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el TCL es tan importante en estadística e inferencia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El TCL justifica el uso de la distribución normal en el cálculo de intervalos de confianza, contrastes de hipótesis y prácticamente toda la estadística clásica, independientemente de la forma de la distribución original. Sin este resultado, habría que conocer exactamente la distribución de la población para hacer inferencias — algo que en la práctica casi nunca es posible. Es el fundamento teórico de gran parte del análisis estadístico aplicado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el TCL y la Ley de los Grandes Números?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Ley de los Grandes Números dice que la media muestral converge al valor esperado μ cuando n crece — es decir, que la estimación se vuelve más precisa. El TCL va más allá: no solo dice que la media se acerca a μ, sino que describe la forma exacta (normal) y la escala (σ/√n) de la distribución de esa aproximación. La LGN responde al "qué pasa", el TCL responde al "cómo y con qué forma ocurre".',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona la simulación Monte Carlo en este simulador del TCL?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La simulación extrae repetidamente muestras aleatorias de la distribución elegida (uniforme, exponencial, Bernoulli, bimodal) con el tamaño n configurado, calcula la media de cada muestra y acumula esas medias en un histograma. Al ejecutar cientos o miles de repeticiones, el histograma converge visualmente a la curva normal teórica N(μ, σ/√n). Es el mismo principio de Monte Carlo que se usa en finanzas, física y ciencias de datos para aproximar distribuciones analíticamente complejas.',
+      },
+    },
+  ],
+};

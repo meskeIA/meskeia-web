@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué tipos de ecuaciones puedo resolver con esta calculadora?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Puedes resolver ecuaciones lineales de primer grado (ax + b = 0), ecuaciones cuadráticas de segundo grado (ax² + bx + c = 0) y sistemas de dos ecuaciones con dos incógnitas (2×2). La calculadora muestra los pasos de resolución y, en el caso de las cuadráticas, calcula el discriminante para determinar el tipo de soluciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona la resolución paso a paso de ecuaciones cuadráticas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Introduce los coeficientes a, b y c de la ecuación cuadrática. La herramienta aplica la fórmula general (−b ± √(b²−4ac)) / 2a, calcula primero el discriminante y determina si hay dos soluciones reales, una solución doble o soluciones complejas. Cada operación se detalla de forma visible para facilitar el aprendizaje.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el discriminante y para qué sirve en una ecuación cuadrática?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El discriminante es el valor b²−4ac de la fórmula cuadrática. Si es positivo, la ecuación tiene dos soluciones reales distintas; si es cero, tiene una solución doble; si es negativo, las soluciones son números complejos. Conocer el discriminante antes de resolver permite anticipar el tipo de resultado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo ver la gráfica de la ecuación después de resolverla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. Para las ecuaciones cuadráticas se genera automáticamente la gráfica de la parábola correspondiente, marcando los puntos de corte con el eje X (las raíces) y el vértice. Esto ayuda a comprender visualmente la relación entre los coeficientes y la forma de la curva.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ventaja tiene usar esta herramienta frente a resolver las ecuaciones a mano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Resolver a mano es valioso para aprender, pero esta herramienta permite verificar resultados al instante, detectar errores de cálculo y explorar distintos valores de coeficientes de forma ágil. Al mostrar cada paso intermedio, también sirve como guía didáctica para entender el procedimiento correcto.',
+      },
+    },
+  ],
+};

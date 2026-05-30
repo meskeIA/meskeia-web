@@ -66,3 +66,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre e-commerce y marketplace?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En un e-commerce propio (tienda online) tú controlas la marca, los precios y la relación con el cliente, pero debes generar tráfico desde cero. Un marketplace (como Amazon o Etsy) ya tiene audiencia y tráfico, pero cobras comisiones por venta (entre el 8 % y el 20 % según plataforma) y tienes menos control sobre la experiencia del comprador y los datos de cliente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué modelo de negocio es más fácil de empezar con poco capital?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los servicios y la consultoría son los modelos con menor barrera de entrada: no requieren stock, logística ni desarrollo técnico. Con una web básica y una propuesta de valor clara puedes empezar a facturar en semanas. El e-commerce tiene costes de plataforma y marketing, y la tienda física implica alquiler, reformas y personal desde el primer día.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es un SaaS y para quién tiene sentido como modelo de negocio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SaaS (Software as a Service) es un producto digital que se vende por suscripción mensual o anual: el usuario paga por acceder al software, no por comprarlo. Tiene muy buena escalabilidad porque el mismo producto puede usarlo un número ilimitado de clientes sin coste marginal. Requiere habilidades técnicas para desarrollarlo o capital para contratar desarrollo, y suele tardar más tiempo en generar los primeros ingresos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo saber si mi idea de negocio es mejor como tienda física o online?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tienda física tiene ventaja cuando el producto requiere experiencia sensorial (ropa, gastronomía, peluquería), cuando la clientela objetivo es local o cuando el servicio posventa necesita presencia. El e-commerce gana cuando el producto se puede describir bien con fotos y texto, el público es geográficamente disperso o los márgenes permiten absorber los costes de envío y devoluciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas preguntas tiene el test y qué resultado da?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El test consta de 10 preguntas sobre tu perfil emprendedor: habilidades, capital disponible, tolerancia al riesgo, objetivos de escalabilidad y tipo de producto o servicio que quieres ofrecer. Al finalizar indica cuál de los cinco modelos (tienda física, e-commerce, servicios/consultoría, SaaS o marketplace) se adapta mejor a tu situación, con una explicación de los puntos fuertes y débiles para tu caso.',
+      },
+    },
+  ],
+};

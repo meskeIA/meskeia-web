@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['equilibrio químico', 'Le Chatelier', 'Kc', 'química bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el equilibrio químico y cuándo se alcanza?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El equilibrio químico se alcanza cuando las velocidades de la reacción directa e inversa se igualan, de modo que las concentraciones de reactivos y productos permanecen constantes. No significa que la reacción se detenga, sino que avanza al mismo ritmo en ambas direcciones. Solo es posible en sistemas cerrados donde los productos no pueden escapar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué dice el Principio de Le Chatelier?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Principio de Le Chatelier establece que si un sistema en equilibrio recibe una perturbación exterior (cambio de concentración, temperatura o presión), el sistema se desplaza en la dirección que contrarresta esa perturbación para alcanzar un nuevo equilibrio. Por ejemplo, si se añade más reactivo, el equilibrio se desplaza hacia los productos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la constante de equilibrio Kc y qué indica su valor?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Kc es el cociente entre las concentraciones de productos y reactivos elevadas a sus coeficientes estequiométricos en el equilibrio. Un valor de Kc >> 1 indica que el equilibrio favorece los productos; un Kc << 1 indica que favorece los reactivos. La Kc solo cambia con la temperatura, no con las concentraciones ni la presión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afecta un catalizador al equilibrio químico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un catalizador acelera tanto la reacción directa como la inversa en la misma proporción, por lo que no desplaza el equilibrio ni cambia el valor de Kc. Su único efecto es que el sistema alcanza el equilibrio más rápidamente. En la industria (proceso Haber-Bosch para el amoniaco) el catalizador es esencial para que la producción sea viable a escala comercial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo es útil este simulador de equilibrio químico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Este simulador es especialmente útil para estudiantes de segundo curso de química de educación secundaria superior (bachillerato o equivalente) y primeros cursos universitarios de química general. Cubre los contenidos estándar de equilibrio químico, Le Chatelier, cálculo del cociente Q y análisis de reacciones industriales como Haber-Bosch o el proceso de contacto.',
+      },
+    },
+  ],
+};

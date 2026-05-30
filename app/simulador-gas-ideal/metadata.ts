@@ -58,3 +58,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['gas ideal', 'termodinámica', 'PV=nRT', 'Carnot', 'física bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la ley del gas ideal PV=nRT?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ley del gas ideal PV=nRT relaciona la presión (P), el volumen (V), el número de moles (n), la constante de los gases (R = 8,314 J/mol·K) y la temperatura absoluta (T en kelvin). Describe el comportamiento de un gas hipotético cuyos átomos no interactúan entre sí ni tienen volumen propio. Es una buena aproximación para gases reales a presiones bajas y temperaturas altas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre un proceso isotermo, isobárico e isocórico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En un proceso isotermo la temperatura permanece constante (PV = cte); en un proceso isobárico es la presión la que no varía (V/T = cte); y en un proceso isocórico (o isovolumérico) el volumen no cambia (P/T = cte). El proceso adiabático es aquel en que no hay intercambio de calor con el exterior, lo que implica una relación más compleja entre P, V y T que depende del índice adiabático del gas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la eficiencia del ciclo de Carnot y por qué es el máximo teórico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La eficiencia del ciclo de Carnot es η = 1 − T_fría/T_caliente, donde las temperaturas se expresan en kelvin. Representa el límite máximo de eficiencia que puede alcanzar cualquier máquina térmica que opere entre dos focos a esas temperaturas, sin importar el combustible o el diseño. Ninguna máquina real puede superar este límite porque involucraría violar el segundo principio de la termodinámica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia el ciclo Otto del ciclo Diesel?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El ciclo Otto (motor de gasolina) añade calor a volumen constante (combustión rápida y explosiva), mientras que el ciclo Diesel añade calor a presión constante (combustión gradual con inyección de combustible). El Diesel tiene mayor eficiencia teórica a igual relación de compresión, pero opera a relaciones de compresión más altas, lo que lo hace más eficiente en la práctica para vehículos pesados y transporte de larga distancia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo deja de ser válida la aproximación del gas ideal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ley del gas ideal falla cuando las moléculas están muy próximas entre sí: a presiones muy altas o temperaturas muy bajas, las fuerzas intermoleculares y el volumen propio de las moléculas dejan de ser despreciables. En esas condiciones se utilizan ecuaciones de estado más precisas, como la ecuación de Van der Waals. Para la mayoría de los gases a condiciones normales de laboratorio (temperatura ambiente y presión atmosférica), el modelo ideal es suficientemente preciso.',
+      },
+    },
+  ],
+};
