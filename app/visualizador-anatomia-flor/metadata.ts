@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las partes principales de una flor y para qué sirven?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las partes principales de una flor son: los sépalos (protegen el capullo antes de abrirse), los pétalos (atraen a los polinizadores), los estambres (órgano masculino que produce el polen), el pistilo (órgano femenino compuesto por estigma, estilo y ovario) y los nectarios (producen néctar para atraer polinizadores). Cada parte cumple una función específica en la reproducción de la planta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se produce la polinización en las flores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La polinización es el proceso por el que el polen de los estambres llega al estigma del pistilo para fertilizar el óvulo. Puede producirse por insectos (polinización entomófila), por el viento (anemófila), por aves como colibríes (ornitófila) o por el agua (hidrófila). Una vez que el grano de polen germina en el estigma, forma un tubo polínico que transporta los gametos masculinos hasta el óvulo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se transforma una flor en fruto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Tras la fecundación, el ovario de la flor se desarrolla y engorda para convertirse en el fruto. Las paredes del ovario forman el pericarpio (la parte comestible en frutos carnosos) mientras que los óvulos fecundados se convierten en semillas. Los pétalos, sépalos y estambres se marchitan y caen, quedando solo el fruto que protege y nutre a las semillas hasta su dispersión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas especies de plantas con flor existen?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las plantas con flor, denominadas angiospermas, representan el grupo vegetal más diverso de la Tierra con aproximadamente 400.000 especies descritas. Esto supone alrededor del 90% de todas las plantas terrestres conocidas. Aparecieron hace unos 130 millones de años y se diversificaron rápidamente, en parte gracias a su relación coevolutiva con los insectos polinizadores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la flor más grande del mundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Rafflesia arnoldii, nativa de los bosques tropicales de Sumatra e Indonesia, produce la flor individual más grande del mundo, con un diámetro que puede superar el metro y un peso de hasta 10 kg. Es una planta parásita sin hojas, raíces ni tallo propio: vive completamente dentro de los tejidos de su planta huésped y solo emerge cuando florece, emitiendo un olor a carne podrida para atraer a las moscas polinizadoras.',
+      },
+    },
+  ],
+};

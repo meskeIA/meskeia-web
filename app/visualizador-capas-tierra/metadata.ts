@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en espanol',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuántas capas tiene la Tierra y cuáles son?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La Tierra tiene 4 capas principales: la corteza (0-70 km), el manto (70-2.900 km), el núcleo externo (2.900-5.150 km, líquido) y el núcleo interno (5.150-6.371 km, sólido). Cada capa tiene composición, temperatura y presión muy distintas entre sí.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sabemos cómo es el interior de la Tierra si nadie ha llegado allí?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El conocimiento del interior terrestre proviene principalmente del análisis de las ondas sísmicas generadas por terremotos. Las ondas P (compresión) viajan por sólidos y líquidos, mientras que las ondas S (cizalla) solo lo hacen por sólidos. La velocidad y trayectoria de estas ondas varía según la densidad y estado de cada capa, permitiendo deducir su composición y profundidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿A qué temperatura está el núcleo de la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El núcleo interno de la Tierra alcanza temperaturas de entre 5.000 y 6.000 °C, similares a la superficie del Sol. A pesar de esa temperatura extrema, permanece sólido debido a la enorme presión (unas 3,6 millones de atmósferas) ejercida por el peso de todas las capas superiores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué genera el campo magnético de la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El campo magnético terrestre se genera por el efecto dinamo: el núcleo externo, compuesto de hierro y níquel en estado líquido, circula en corrientes convectivas que, combinadas con la rotación del planeta, producen corrientes eléctricas y generan el campo magnético. Este campo nos protege del viento solar y de la radiación cósmica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre corteza continental y oceánica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La corteza continental tiene entre 30 y 70 km de grosor y está compuesta principalmente de granito (roca rica en sílice y aluminio). La corteza oceánica es mucho más delgada (5-10 km) y está formada por basalto, una roca volcánica más densa. Por eso, cuando las placas colisionan, la oceánica se hunde bajo la continental en el proceso llamado subducción.',
+      },
+    },
+  ],
+};

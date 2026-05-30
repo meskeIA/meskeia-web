@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué son las tendencias periódicas y para qué sirven?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las tendencias periódicas son patrones sistemáticos en las propiedades de los elementos a medida que avanzan por la tabla periódica. Las más importantes son la electronegatividad, el radio atómico y la energía de ionización. Permiten predecir el comportamiento químico de los elementos y diseñar materiales con propiedades específicas, desde baterías de litio hasta semiconductores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la electronegatividad y cómo se mide en la escala Pauling?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La electronegatividad mide la tendencia de un átomo a atraer electrones en un enlace químico. La escala Pauling, propuesta por Linus Pauling en 1932, va de 0,7 (francio, menos electronegativo) a 4,0 (flúor, el más electronegativo). Los metales tienen valores bajos y los no metales altos; esta diferencia determina si un enlace es iónico, covalente polar o covalente puro.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué disminuye el radio atómico de izquierda a derecha en un período?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al avanzar de izquierda a derecha en un mismo período, el número de protones aumenta pero los electrones se añaden a la misma capa. La mayor carga nuclear atrae con más fuerza a los electrones, contrayendo la nube electrónica. Por eso el sodio (Na) tiene un radio de 186 pm mientras que el cloro (Cl), en el mismo período, solo tiene 99 pm.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este visualizador de la tabla periódica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es especialmente útil para estudiantes de secundaria y bachillerato que estudian química, así como para universitarios de primeros cursos de ciencias. También sirve a docentes que quieren mostrar en clase patrones visuales difíciles de captar en una tabla estática. No requiere instalación ni registro, por lo que puede usarse directamente en el navegador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre la energía de ionización y la electronegatividad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La energía de ionización es la energía necesaria para arrancar completamente un electrón de un átomo en estado gaseoso, mientras que la electronegatividad describe la capacidad de atraer electrones dentro de un enlace. Ambas aumentan hacia la derecha y arriba de la tabla, pero la energía de ionización muestra irregularidades notables (por ejemplo, el nitrógeno tiene mayor primera energía de ionización que el oxígeno por la estabilidad del orbital semilleno 2p).',
+      },
+    },
+  ],
+};

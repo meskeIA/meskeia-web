@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
     'Estadísticas finales con resumen de errores',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre una monocotiledónea y una dicotiledónea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las monocotiledóneas tienen un solo cotiledón (hoja embrionaria), hojas con nervios paralelos y raíces fasciculadas; ejemplos: trigo, maíz, tulipán. Las dicotiledóneas tienen dos cotiledones, hojas con nervios reticulados y raíz pivotante; ejemplos: rosal, judía, roble. Esta distinción es uno de los criterios diagnósticos clave para clasificar las angiospermas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los seis grandes grupos de plantas que cubre el quiz?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El quiz trabaja con algas (organismos fotosintéticos sin tejidos vasculares verdaderos), briófitos (musgos y hepáticas, sin vasos conductores), pteridófitos (helechos, con vasos pero sin semillas), gimnospermas (pino, abeto, con semillas desnudas), monocotiledóneas y dicotiledóneas (ambas angiospermas, con flores y frutos). Cada grupo tiene criterios diagnósticos propios explicados tras cada respuesta.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo está pensado este quiz de botánica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está orientado principalmente a estudiantes de Bachillerato científico y primer curso universitario de Biología, Farmacia o Ciencias Ambientales, donde la clasificación vegetal es temario habitual. También resulta útil para opositores de secundaria y cualquier persona con curiosidad por la biología vegetal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el modo de práctica por grupo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El modo de práctica por grupo permite seleccionar una categoría concreta (por ejemplo, solo pteridófitos o solo gimnospermas) y recibir únicamente preguntas de ese grupo. Es útil para reforzar los grupos en los que se cometen más errores antes de intentar el modo completo de 40 organismos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es un briófito y en qué se diferencia de un helecho?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los briófitos (musgos, hepáticas, antocerotas) son plantas no vasculares: carecen de xilema y floema, por eso no pueden superar unos pocos centímetros de altura y dependen del agua para la reproducción sexual. Los helechos son pteridófitos: ya poseen tejido vascular (xilema y floema), lo que les permite crecer más y colonizar ambientes más secos, aunque siguen reproducándose mediante esporas en lugar de semillas.',
+      },
+    },
+  ],
+};

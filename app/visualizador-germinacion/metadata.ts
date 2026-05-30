@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la germinación de una semilla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La germinación es el proceso por el cual una semilla latente retoma su actividad metabólica y da lugar a una nueva planta. Comienza con la imbibición (absorción de agua), continúa con la activación enzimática y culmina con la emergencia de la radícula, que es la primera raíz del embrión.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las fases de la germinación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La germinación se divide en tres fases principales: imbibición (absorción rápida de agua que reactiva el metabolismo), activación (síntesis de enzimas que movilizan las reservas del endospermo) y elongación (crecimiento del embrión hasta que la radícula rompe la testa y emerge al exterior). La temperatura, la humedad y el oxígeno son determinantes en cada fase.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué factores influyen en la germinación de las semillas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los tres factores imprescindibles son agua, temperatura adecuada y oxígeno. Algunas especies también necesitan luz (semillas fotoblásticas positivas, como la lechuga) o periodos de frío previo (vernalización). La luz inhibe la germinación en otras especies como las cebollas. El sustrato y la profundidad de siembra también condicionan el éxito germinativo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre germinación epígea e hipógea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En la germinación epígea los cotiledones emergen por encima del suelo (como en las judías o los girasoles), mientras que en la hipógea permanecen bajo tierra (como en los guisantes o el maíz). La diferencia radica en si el hipocótilo o el epicótilo es el segmento que se alarga durante el crecimiento inicial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo tarda en germinar una semilla?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Depende de la especie y las condiciones ambientales. Semillas de rábano o tomate pueden germinar en 3-7 días en condiciones óptimas, mientras que robles o palmeras pueden tardar varios meses. Las semillas del loto sagrado son capaces de germinar tras más de 1.000 años de latencia, lo que las convierte en las de mayor longevidad documentada.',
+      },
+    },
+  ],
+};

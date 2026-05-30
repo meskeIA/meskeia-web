@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre mitosis y meiosis?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mitosis produce dos células hijas idénticas a la célula madre (con el mismo número de cromosomas), y se usa para crecer y reparar tejidos. La meiosis produce cuatro células hijas con la mitad de cromosomas (gametos), y ocurre solo en órganos reproductores para permitir la reproducción sexual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas fases tiene la mitosis?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mitosis tiene 5 fases: profase (condensación de cromosomas), metafase (alineación en el ecuador), anafase (separación de cromátidas), telofase (formación de dos núcleos) y citocinesis (división del citoplasma). En total el proceso dura entre 1 y 3 horas dependiendo del tipo celular.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el crossing-over en la meiosis?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El crossing-over (o entrecruzamiento) es el intercambio de fragmentos entre cromosomas homólogos durante la profase I de la meiosis. Este proceso mezcla el material genético de ambos progenitores, generando nuevas combinaciones de genes que aumentan la diversidad genética en la descendencia.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas divisiones celulares ocurren en el cuerpo humano por segundo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se estima que en el cuerpo humano ocurren aproximadamente 3,8 millones de divisiones celulares por segundo. Esto equivale a unos 330.000 millones de mitosis al día, necesarias para reponer células de la piel, sangre, intestino y otros tejidos que se renuevan continuamente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve estudiar mitosis y meiosis en bachillerato?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mitosis y meiosis son conceptos fundamentales en biología celular y genética, presentes en los currículos de secundaria y bachillerato. Comprender estos procesos es clave para entender el crecimiento y desarrollo de los organismos, la herencia genética, las enfermedades cromosómicas y los avances en medicina y biotecnología.',
+      },
+    },
+  ],
+};

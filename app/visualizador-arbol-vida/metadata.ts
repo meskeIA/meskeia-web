@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el árbol filogenético del reino animal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El árbol filogenético del reino animal es un diagrama que representa las relaciones evolutivas entre los distintos grupos de animales. Muestra cómo todos los animales descienden de un ancestro común y se han ido diversificando a lo largo de más de 540 millones de años, desde la explosión cámbrica hasta la actualidad.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los 12 grandes grupos del reino animal?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los 12 grandes grupos del reino animal incluyen poríferos (esponjas), cnidarios (medusas y corales), platelmintos (gusanos planos), anélidos (lombrices), moluscos (pulpos y caracoles), artrópodos (insectos y arácnidos), equinodermos (estrellas de mar), cefalocordados, urocordados, peces, anfibios y amniotes (reptiles, aves y mamíferos). Cada grupo comparte características evolutivas únicas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas especies animales existen en la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se estima que existen entre 8 y 10 millones de especies animales en la Tierra, aunque solo se han descrito científicamente alrededor de 1,5 millones. Los artrópodos son el grupo más diverso, con más de un millón de especies conocidas, siendo los insectos el grupo más numeroso con unas 900.000 especies descritas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo aparecieron los primeros animales en la historia de la Tierra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los primeros animales multicelulares aparecieron hace unos 600-700 millones de años, pero fue la llamada explosión cámbrica, hace aproximadamente 540 millones de años, cuando surgió la mayoría de los grandes grupos animales en un período geológico relativamente corto. Este evento representa uno de los momentos más importantes en la historia de la vida en la Tierra.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia a los vertebrados del resto de animales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los vertebrados se distinguen por poseer una columna vertebral (espina dorsal) formada por vértebras óseas o cartilaginosas que protege la médula espinal. Además presentan un cráneo que encierra el cerebro, un sistema nervioso central bien desarrollado y, en la mayoría de los casos, un esqueleto interno. A pesar de su complejidad, los vertebrados representan solo el 3-5% de todas las especies animales conocidas.',
+      },
+    },
+  ],
+};

@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la respiración celular y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La respiración celular es el proceso mediante el cual las células descomponen glucosa y oxígeno para producir energía en forma de ATP (adenosín trifosfato). Este proceso ocurre principalmente en las mitocondrias y es fundamental para todas las funciones vitales: movimiento, crecimiento, mantenimiento y reproducción celular. Sin ATP, las células no podrían llevar a cabo ninguna de sus actividades.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las fases de la respiración celular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La respiración celular aeróbica tiene tres fases principales. Primero, la glucólisis ocurre en el citoplasma y descompone la glucosa en dos moléculas de piruvato, generando 2 ATP netos. Después, el ciclo de Krebs (o ciclo del ácido cítrico) tiene lugar en la matriz mitocondrial y produce NADH y FADH₂ como portadores de electrones. Finalmente, la cadena de transporte de electrones en la membrana interna mitocondrial genera la mayor parte de la energía: entre 32 y 34 moléculas de ATP.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas moléculas de ATP produce una molécula de glucosa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La oxidación completa de una molécula de glucosa produce aproximadamente 36-38 moléculas de ATP en condiciones ideales. De estas, solo 2 proceden de la glucólisis, 2 del ciclo de Krebs y las 32-34 restantes de la fosforilación oxidativa en la cadena de transporte de electrones. En la práctica, la eficiencia real en células vivas es algo menor debido a pérdidas por gradiente y otros factores.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre respiración aeróbica y anaeróbica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La respiración aeróbica requiere oxígeno y produce hasta 38 ATP por glucosa, siendo mucho más eficiente. La respiración anaeróbica ocurre sin oxígeno y genera solo 2 ATP, produciendo como subproducto ácido láctico (en músculo) o etanol y CO₂ (en levaduras). Las células recurren a la vía anaeróbica cuando el aporte de oxígeno es insuficiente, como ocurre durante ejercicio intenso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el papel de la mitocondria en la respiración celular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mitocondria es el orgánulo donde ocurren las dos últimas fases de la respiración aeróbica: el ciclo de Krebs en su matriz interna y la cadena de transporte de electrones en su membrana interna (con sus crestas). Su doble membrana crea un gradiente de protoness que permite a la ATP sintasa generar la mayor parte del ATP celular. Por eso se la conoce como la "central energética" de la célula.',
+      },
+    },
+  ],
+};

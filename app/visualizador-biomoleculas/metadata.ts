@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué son las biomoléculas y cuáles son las 4 principales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las biomoléculas son las moléculas orgánicas que forman y sostienen los seres vivos. Las cuatro familias principales son: carbohidratos (fuente de energía rápida y estructura celular), lípidos (reserva energética, membranas, hormonas), proteínas (estructura, transporte, catálisis y defensa) y ácidos nucleicos (ADN y ARN, almacenamiento y expresión de la información genética). Todas contienen carbono, hidrógeno y oxígeno; las proteínas y los ácidos nucleicos también nitrógeno.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre ADN y ARN?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El ADN (ácido desoxirribonucleico) es la molécula que almacena la información genética de forma permanente en el núcleo celular; tiene doble hélice y usa la base timina. El ARN (ácido ribonucleico) es monocatenario, se sintetiza a partir del ADN como copia temporal y se encarga de llevar las instrucciones al ribosoma para fabricar proteínas. Hay varios tipos de ARN: mensajero (ARNm), de transferencia (ARNt) y ribosómico (ARNr), cada uno con una función específica en la síntesis proteica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué los lípidos no se disuelven en agua?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los lípidos son moléculas predominantemente apolares: sus largas cadenas de carbono e hidrógeno no tienen cargas eléctricas que atraigan las moléculas de agua (que sí son polares). Este principio —"lo semejante disuelve a lo semejante"— explica su insolubilidad en agua. Esa misma propiedad es la que hace a los lípidos ideales para formar membranas celulares: la bicapa lipídica crea una barrera impermeable que separa el interior de la célula del medio acuoso exterior.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas proteínas diferentes puede fabricar el cuerpo humano?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se estima que el cuerpo humano fabrica entre 80.000 y 400.000 proteínas distintas. Todas se construyen combinando solo 20 aminoácidos en cadenas de longitud variable (desde decenas hasta miles de unidades). La secuencia exacta de aminoácidos, determinada por el ADN, define la forma tridimensional de la proteína y, por tanto, su función. Una proteína mal plegada puede ser inactiva o incluso tóxica, como ocurre en enfermedades como el Alzheimer o el Parkinson.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la función de los carbohidratos en el cuerpo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los carbohidratos cumplen principalmente dos funciones: energética y estructural. La glucosa es el combustible preferido de las células, especialmente las neuronas, que consumen el 20% de la energía total del cuerpo. El glucógeno actúa como reserva de glucosa en hígado y músculos. En los vegetales, la celulosa (un carbohidrato complejo) forma la pared celular rígida. La quitina, otro carbohidrato estructural, forma el exoesqueleto de insectos y artrópodos.',
+      },
+    },
+  ],
+};
