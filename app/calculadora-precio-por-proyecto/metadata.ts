@@ -48,3 +48,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula el precio de un proyecto freelance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El precio de un proyecto freelance se obtiene multiplicando las horas estimadas por la tarifa horaria y ajustando por factores como complejidad, urgencia y gastos directos. A esto se añade un margen de imprevistos (habitualmente un 10-20%) para cubrir revisiones no previstas o problemas técnicos. El resultado suele expresarse como un rango entre un precio mínimo aceptable y un precio ideal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto debo cobrar por un proyecto si soy autónomo o freelance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No existe una cifra universal: depende de tu tarifa horaria, el tipo de proyecto, su complejidad y el plazo de entrega. Como referencia, un desarrollador web freelance en España cobra entre 30 € y 90 €/h, mientras que diseñadores y consultores se mueven en rangos similares. Lo fundamental es calcular primero cuántas horas reales requiere el proyecto y añadir los gastos asociados antes de presentar un presupuesto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre cobrar por hora y cobrar por proyecto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cobrar por hora traslada el riesgo al cliente: si el proyecto se alarga, cobra más. Cobrar por proyecto fija un precio cerrado, lo que el cliente valora porque controla su presupuesto, pero implica que el profesional asume el riesgo de desviaciones. Por eso es clave estimar con precisión y añadir un margen de imprevistos cuando se trabaja con precio fijo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el margen de imprevistos y cuánto debería incluir?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El margen de imprevistos es un porcentaje adicional sobre el precio base que cubre situaciones no previstas: cambios de alcance del cliente, problemas técnicos inesperados o revisiones extra. Para proyectos cortos y bien definidos se recomienda un 10%; para proyectos complejos o con alcance abierto, un 20-25% es habitual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve el rango de negociación en un presupuesto freelance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El rango de negociación presenta tres cifras: el precio mínimo por debajo del cual el proyecto no es rentable, el precio recomendado que equilibra competitividad y margen, y el precio ideal que maximiza el beneficio. Tener este rango permite ceder en la negociación sin comprometer la viabilidad económica del trabajo.',
+      },
+    },
+  ],
+};

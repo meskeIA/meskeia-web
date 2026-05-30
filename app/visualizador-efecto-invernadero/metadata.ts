@@ -50,3 +50,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el efecto invernadero y por qué es necesario para la vida?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El efecto invernadero es un proceso natural por el que ciertos gases de la atmósfera (principalmente vapor de agua, CO₂ y metano) absorben la radiación infrarroja que emite la superficie terrestre y la reemiten hacia abajo, manteniendo el planeta más cálido. Sin este efecto, la temperatura media de la Tierra sería de unos -18 °C en lugar de los +15 °C actuales, haciendo imposible la vida tal como la conocemos. El problema no es el efecto invernadero en sí, sino su intensificación por las emisiones humanas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son los principales gases de efecto invernadero y cuál tiene más impacto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los principales gases son el vapor de agua (el más abundante de forma natural), el dióxido de carbono (CO₂), el metano (CH₄) y el óxido nitroso (N₂O). El CO₂ es el más relevante desde el punto de vista antropogénico porque persiste siglos en la atmósfera y su concentración ha pasado de 280 ppm antes de la industrialización a más de 425 ppm en la actualidad. El metano tiene un Potencial de Calentamiento Global (GWP) unas 80 veces mayor que el CO₂ a 20 años, pero permanece menos tiempo en la atmósfera.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto ha aumentado el CO₂ atmosférico y qué consecuencias tiene?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La concentración de CO₂ en la atmósfera ha pasado de aproximadamente 280 ppm (partes por millón) en la era preindustrial a más de 425 ppm en 2024, el nivel más alto en al menos 800.000 años según registros de núcleos de hielo. Este aumento se correlaciona con un calentamiento global de aproximadamente 1,2 °C respecto a niveles preindustriales, lo que ya está provocando el deshielo de glaciares, el aumento del nivel del mar, episodios meteorológicos más extremos y alteraciones en los ecosistemas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el efecto invernadero natural y el antropogénico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El efecto invernadero natural es el que mantiene la temperatura terrestre habitable gracias a gases presentes en la atmósfera por procesos geológicos y biológicos. El efecto invernadero antropogénico se refiere al reforzamiento artificial de ese efecto por las emisiones humanas: la quema de combustibles fósiles, la deforestación, la agricultura intensiva y la industria han añadido una cantidad extraordinaria de GEI a la atmósfera en poco más de 200 años, acelerando el calentamiento a un ritmo que los ecosistemas y las sociedades tienen dificultades para absorber.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los "bucles de retroalimentación" climáticos y por qué son importantes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los bucles de retroalimentación (feedback loops) son mecanismos que amplifican o amortiguan el calentamiento inicial. Un ejemplo clave: al derretirse el hielo ártico, desaparece su superficie blanca reflectante y queda expuesto el océano oscuro, que absorbe más calor, acelerando el deshielo. Otro: al calentarse las regiones árticas, el permafrost libera metano atrapado, que intensifica el efecto invernadero. Estos bucles positivos son una de las razones por las que limitar el calentamiento a 1,5 °C es tan urgente: más allá de ciertos umbrales los procesos pueden volverse difíciles de detener.',
+      },
+    },
+  ],
+};

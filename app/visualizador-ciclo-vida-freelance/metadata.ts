@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las fases de un proyecto freelance de principio a fin?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un proyecto freelance pasa por siete fases: captación del cliente (búsqueda y primer contacto), elaboración de la propuesta, negociación de condiciones, ejecución del trabajo, entrega y revisiones, facturación y, finalmente, cobro. La duración real varía mucho según el sector, pero la fase de cobro es habitualmente la más larga e impredecible, con un plazo medio de 82 días en España según datos de morosidad empresarial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué porcentaje del tiempo de un freelance es realmente facturable?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En general, entre el 40 % y el 60 % del tiempo de trabajo de un freelance es facturable directamente. El resto se destina a tareas no facturables: buscar clientes, redactar propuestas, gestionar correos y facturas, formación continua, contabilidad y administración. Este dato es clave para calcular la tarifa hora real: si tu coste mensual es de 3.000 € y solo facturar 80 horas de las 160 que trabajas, tu tarifa mínima debe cubrir las 160 horas reales.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo calculo mi tarifa hora real como freelance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tarifa hora real se calcula dividiendo todos tus costes (personales, fiscales, herramientas, formación, seguros) entre las horas que realmente puedes facturar al mes, no entre las horas totales que trabajas. Por ejemplo, si tienes 2.500 € de costes mensuales y puedes facturar 100 horas al mes, tu tarifa mínima es 25 €/h. A ese mínimo debes añadir un margen de beneficio y un fondo para periodos sin proyectos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es el mayor cuello de botella en un proyecto freelance?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los cuellos de botella más frecuentes son dos: la fase de aprobación de propuesta (el cliente tarda en responder o pide varias rondas de ajuste) y la fase de cobro (facturas con 60-90 días de demora o impagos). La fase de revisiones tras la entrega también puede extenderse indefinidamente si no se ha pactado un número máximo de rondas en el contrato. Definir estos límites por escrito antes de empezar reduce significativamente estos bloqueos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia a un freelance organizado de uno que trabaja sin estructura?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un freelance organizado documenta cada fase del proyecto con hitos y entregables claros, usa contratos escritos con plazos de pago y número de revisiones acordadas, emite facturas el mismo día de la entrega y hace seguimiento sistemático de cobros. Sin esta estructura, es habitual subestimar el tiempo invertido, aceptar revisiones ilimitadas y tener problemas de tesorería por cobros tardíos. La diferencia en ingresos reales puede superar el 30-40 % a igualdad de horas trabajadas.',
+      },
+    },
+  ],
+};
