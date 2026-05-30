@@ -1045,7 +1045,7 @@ export const analyticsRouter = router({
           GROUP BY aplicacion
           HAVING con_duracion >= 3
           ORDER BY duracion_media DESC
-          LIMIT 20
+          LIMIT 100
         `,
         args: [],
       });
@@ -1069,13 +1069,30 @@ export const analyticsRouter = router({
           { label: '2 – 10min',    descripcion: 'Uso real',                             valor: media,       pct: pct(media),       color: '#10b981' },
           { label: '> 10min',      descripcion: 'Uso intensivo',                        valor: larga,       pct: pct(larga),       color: '#8b5cf6' },
         ],
-        topPorDuracion: topRes.rows.map(r => ({
-          aplicacion: String(r.aplicacion),
-          totalUsos: Number(r.total_usos),
-          conDuracion: Number(r.con_duracion),
-          duracionMedia: Number(r.duracion_media),
-          duracionMax: Number(r.duracion_max),
-        })),
+        // Ordenación por índice de engagement combinado:
+        //   MIN(duracion, 30min) × cobertura × log10(1 + con_duracion)
+        // Evita que pestañas olvidadas (pocas sesiones, tiempo enorme) dominen el ranking.
+        topPorDuracion: topRes.rows
+          .map(r => {
+            const totalUsos    = Number(r.total_usos);
+            const conDuracion  = Number(r.con_duracion);
+            const duracionMedia = Number(r.duracion_media);
+            const duracionMax  = Number(r.duracion_max);
+            const score =
+              Math.min(duracionMedia, 1800)          // cap a 30 min
+              * (conDuracion / totalUsos)             // ratio de cobertura
+              * Math.log10(1 + conDuracion);          // fiabilidad por volumen
+            return {
+              aplicacion: String(r.aplicacion),
+              totalUsos,
+              conDuracion,
+              duracionMedia,
+              duracionMax,
+              score,
+            };
+          })
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 20),
       };
     }),
 });
