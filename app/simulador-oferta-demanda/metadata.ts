@@ -60,3 +60,50 @@ export const jsonLd = generateWebAppSchema({
     'desplazadores demanda',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el equilibrio de mercado en oferta y demanda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El equilibrio de mercado es el punto en que la cantidad que los compradores quieren adquirir coincide exactamente con la que los vendedores quieren ofrecer a un precio dado. En ese precio de equilibrio no hay ni escasez ni excedente. Si el precio sube por encima del equilibrio aparece un excedente (sobreoferta); si baja, surge escasez.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ocurre cuando se fija un precio máximo por debajo del equilibrio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un precio máximo (techo de precio) por debajo del equilibrio hace que la cantidad demandada supere a la ofrecida, generando escasez. Aunque beneficia a los consumidores que logran comprar, impide que el mercado se vacíe y puede provocar colas, mercados negros o deterioro de la calidad del bien.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afecta un aumento de la renta a la curva de demanda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para la mayoría de los bienes normales, un aumento de la renta desplaza la curva de demanda hacia la derecha: a cada precio los consumidores quieren comprar más. Esto eleva el precio de equilibrio y la cantidad de equilibrio. Para bienes inferiores (como ciertos alimentos de bajo coste) el efecto es el contrario: la curva se desplaza a la izquierda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué mide el excedente del consumidor?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El excedente del consumidor es la diferencia entre lo que un consumidor estaría dispuesto a pagar por un bien y lo que realmente paga. En el gráfico aparece como el área triangular entre la curva de demanda y la línea horizontal del precio de equilibrio. Cuanto más pronunciada (inelástica) sea la demanda, mayor es ese excedente.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo desplaza la curva de oferta una mejora tecnológica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una mejora tecnológica reduce los costes de producción, lo que permite a los productores ofrecer la misma cantidad a un precio menor —o más cantidad al mismo precio—. La curva de oferta se desplaza hacia la derecha, bajando el precio de equilibrio y aumentando la cantidad de equilibrio. Es uno de los principales motores de la deflación de bienes manufacturados a largo plazo.',
+      },
+    },
+  ],
+};

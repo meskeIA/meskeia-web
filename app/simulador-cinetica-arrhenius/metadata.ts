@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['cinética química', 'Arrhenius', 'energía activación', 'Maxwell-Boltzmann', 'EBAU', 'Bachillerato', 'química'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la ecuación de Arrhenius y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ecuación de Arrhenius (k = A·e^(-Ea/RT)) describe cómo varía la constante de velocidad de una reacción química con la temperatura. Permite predecir cuánto más rápida será una reacción al aumentar la temperatura y calcular la energía de activación Ea que deben superar las moléculas para reaccionar. Es fundamental en química industrial, farmacología y procesos biológicos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué aumentar la temperatura acelera las reacciones químicas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al aumentar la temperatura, las moléculas se mueven más rápido y la distribución de energías cinéticas (Maxwell-Boltzmann) se desplaza hacia valores más altos. Esto hace que una fracción mucho mayor de moléculas supere la barrera de activación Ea en cada colisión. Según la regla aproximada de Van\'t Hoff, por cada 10 °C de aumento la velocidad de reacción se duplica, aunque el factor exacto depende de la Ea de cada reacción.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la energía de activación y cómo se mide experimentalmente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La energía de activación (Ea) es la energía mínima que deben tener las moléculas para que una colisión resulte en reacción. Se mide experimentalmente midiendo la constante de velocidad k a varias temperaturas y trazando la recta de Arrhenius: la gráfica de ln(k) frente a 1/T es una línea recta cuya pendiente es −Ea/R, donde R = 8,314 J/(mol·K). Valores típicos de Ea van de 40 a 200 kJ/mol.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo actúa un catalizador según la teoría de Arrhenius?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un catalizador proporciona un camino de reacción alternativo con una energía de activación menor, lo que aumenta exponencialmente la constante de velocidad k sin cambiar la temperatura. No altera el equilibrio termodinámico ni los productos, pero permite que la reacción llegue al equilibrio mucho más deprisa. En el simulador se puede observar cómo reducir Ea desplaza la barrera hacia la izquierda en la distribución de Maxwell-Boltzmann.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo está pensado este simulador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está diseñado principalmente para estudiantes de química en el último año de educación secundaria (equivalente a Bachillerato en España o preparatoria en Latinoamérica) y para primeros cursos universitarios de química o ingeniería. También resulta útil para cualquier persona que quiera comprender visualmente por qué el fuego prende más rápido a mayor temperatura, por qué los alimentos se conservan mejor en el frigorífico o cómo funcionan los catalizadores industriales.',
+      },
+    },
+  ],
+};

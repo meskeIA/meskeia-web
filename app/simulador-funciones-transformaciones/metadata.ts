@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['funciones', 'transformaciones', 'traslación', 'amplitud', 'frecuencia', 'Bachillerato', 'álgebra', 'gráficas'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué son las transformaciones de funciones matemáticas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las transformaciones de funciones son operaciones que modifican la forma o posición de la gráfica de una función base. La fórmula general es f(x) = a·g(b·(x−c))+d, donde: a controla la amplitud (estiramiento vertical o reflexión), b la frecuencia o compresión horizontal, c el desplazamiento horizontal y d el desplazamiento vertical. Entender estas transformaciones permite analizar y dibujar rápidamente cualquier familia de funciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afecta el parámetro "a" a la gráfica de una función?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El parámetro a multiplica verticalmente todos los valores de la función. Si |a| > 1 la gráfica se estira verticalmente (mayor amplitud); si 0 < |a| < 1 se comprime; si a < 0 se produce una reflexión respecto al eje X (la gráfica se voltea). Por ejemplo, en y = 2·sen(x) la amplitud pasa de 1 a 2, mientras que en y = −sen(x) la onda queda invertida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre traslación horizontal y vertical en una función?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La traslación vertical suma una constante d a todos los valores: f(x) = g(x) + d mueve la gráfica d unidades hacia arriba (d > 0) o hacia abajo (d < 0). La traslación horizontal reemplaza x por (x−c): f(x) = g(x−c) desplaza la gráfica c unidades a la derecha (c > 0) o a la izquierda (c < 0). Un error frecuente es invertir el signo en la traslación horizontal: g(x−2) se mueve a la DERECHA dos unidades, no a la izquierda.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este simulador de transformaciones?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para estudiantes de secundaria, preparatoria y Bachillerato que estudian álgebra y precálculo, así como para cualquier persona que quiera reforzar la comprensión gráfica de las funciones. También puede usarlo el profesorado para explicar conceptos en clase de forma visual. No requiere instalación ni registro: funciona directamente en el navegador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué funciones base se pueden explorar en el simulador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El simulador incluye cinco funciones base: seno (periódica, ideal para ver amplitud y frecuencia), coseno (similar al seno con desfase de 90°), cuadrática x² (parábola, buena para traslaciones), valor absoluto |x| (en V, ilustra reflexiones) y raíz cuadrada √x (rama creciente, muestra estiramientos y compresiones). Cada una resalta distintas propiedades de los cuatro parámetros a, b, c y d.',
+      },
+    },
+  ],
+};

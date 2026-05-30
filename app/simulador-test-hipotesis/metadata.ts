@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['test de hipótesis', 'p-valor', 'alfa', 'beta', 'potencia', 'EBAU', 'Bachillerato', 'estadística'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el p-valor en un contraste de hipótesis?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El p-valor es la probabilidad de obtener un resultado tan extremo como el observado, o más, asumiendo que H₀ es cierta. No mide la probabilidad de que H₀ sea verdadera. Si el p-valor es menor que el nivel de significación α, se rechaza H₀. El simulador colorea el área del p-valor bajo la curva de H₀ para que la comparación con α sea inmediata.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre el error tipo I y el error tipo II?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El error tipo I (α) ocurre cuando rechazas H₀ siendo cierta —un falso positivo—. El error tipo II (β) ocurre cuando no rechazas H₀ siendo falsa —un falso negativo—. Reducir α (ser más exigente) aumenta automáticamente β porque las regiones de rechazo se encogen. El simulador muestra ambas áreas superpuestas para hacer visible ese compromiso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la potencia de un test estadístico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La potencia es la probabilidad de rechazar H₀ cuando H₁ es realmente cierta, y se calcula como 1 − β. Una potencia del 80% significa que, si el efecto real existe, el test lo detectará el 80% de las veces. La potencia aumenta con muestras más grandes, con efectos más grandes (mayor diferencia entre μ₀ y μ₁) o usando un nivel α menos restrictivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo se usa un test bilateral y cuándo uno unilateral?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un test bilateral comprueba si la media difiere de μ₀ en cualquier dirección (H₁: μ ≠ μ₀) y reparte α entre ambas colas. Un test unilateral (derecho o izquierdo) solo detecta diferencias en una dirección específica (H₁: μ > μ₀ o μ < μ₀) y concentra toda la región de rechazo en una cola. El test unilateral es más potente para detectar el efecto esperado, pero no detecta desviaciones en el sentido opuesto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este simulador de test de hipótesis?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está orientado a estudiantes de Bachillerato y universitarios que cursan estadística inferencial, a candidatos a la EBAU con bloque de estadística y a profesores que buscan material visual para explicar conceptos abstractos como α, β y potencia. También es útil para investigadores que quieren intuir el efecto de cambiar el tamaño muestral o el nivel de significación antes de diseñar un experimento.',
+      },
+    },
+  ],
+};

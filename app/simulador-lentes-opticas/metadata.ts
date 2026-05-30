@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['lentes ópticas', 'trazado de rayos', 'óptica', 'imagen real', 'imagen virtual', 'EBAU', 'Bachillerato', 'física'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre una lente convergente y una divergente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una lente convergente (convexa) tiene distancia focal positiva y hace que los rayos paralelos se concentren en su foco posterior, formando imágenes reales cuando el objeto está más allá del foco. Una lente divergente (cóncava) tiene distancia focal negativa y hace que los rayos se separen como si proviniesen de un foco virtual situado delante de la lente; siempre forma imágenes virtuales, derechas y más pequeñas que el objeto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la ecuación de Gauss y cómo se aplica a las lentes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ecuación de Gauss para lentes delgadas es 1/s + 1/s\' = 1/f, donde s es la distancia del objeto a la lente, s\' es la distancia de la imagen a la lente y f es la distancia focal. Si s\' resulta positiva, la imagen es real (se forma al otro lado de la lente); si es negativa, la imagen es virtual (se forma en el mismo lado que el objeto). El simulador aplica esta ecuación en tiempo real al mover los controles.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo se forma una imagen real y cuándo una virtual en una lente convergente?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En una lente convergente, si el objeto está más allá del foco (s > f), la imagen es real, invertida y se forma al otro lado de la lente. Si el objeto está entre el foco y la lente (s < f), los rayos refractados divergen y la imagen resultante es virtual, derecha y ampliada —como ocurre con una lupa—. Cuando el objeto está exactamente en el foco (s = f), los rayos salen paralelos y no forman imagen.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve el trazado de los tres rayos principales?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El método de los tres rayos principales permite localizar gráficamente la imagen sin cálculos: el rayo paralelo al eje que tras la lente pasa por el foco posterior; el rayo que pasa por el centro óptico sin desviarse; y el rayo que pasa por el foco anterior y sale paralelo al eje. La intersección de los dos primeros (o sus prolongaciones, para imágenes virtuales) determina la posición y tamaño de la imagen.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué asignaturas se estudia la óptica geométrica de lentes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La óptica geométrica con lentes delgadas forma parte del currículo de Física de 2.º de Bachillerato y es contenido frecuente en la EBAU. También aparece en Física General universitaria y en asignaturas de Instrumentación Óptica o Fotónica. La ecuación de Gauss y el trazado de rayos son las herramientas básicas tanto para resolver problemas de examen como para entender el funcionamiento de cámaras, microscopios y telescopios.',
+      },
+    },
+  ],
+};

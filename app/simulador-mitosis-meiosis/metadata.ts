@@ -59,3 +59,50 @@ export const jsonLd = generateWebAppSchema({
     'célula',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre mitosis y meiosis?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mitosis produce dos células hijas idénticas a la célula madre, con el mismo número de cromosomas (2n), y sirve para el crecimiento y regeneración de tejidos. La meiosis, en cambio, produce cuatro células hijas con la mitad de cromosomas (n), llamadas gametos, y es exclusiva de la reproducción sexual. Además, la meiosis incluye el crossing-over, que genera variabilidad genética.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ocurre en el crossing-over y por qué es importante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El crossing-over o sobrecruzamiento ocurre durante la profase I de la meiosis, cuando cromosomas homólogos intercambian segmentos de ADN en puntos llamados quiasmas. Este proceso mezcla material genético de ambos progenitores, generando nuevas combinaciones de alelos en los gametos. Es el principal mecanismo de variabilidad genética en los organismos de reproducción sexual.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas fases tiene la mitosis y en qué consiste cada una?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La mitosis tiene 6 etapas: interfase (duplicación del ADN), profase (condensación de cromosomas y formación del huso), metafase (alineación de cromosomas en el ecuador), anafase (separación de cromátidas hacia los polos), telofase (reconstitución de núcleos) y citocinesis (división del citoplasma). Al final se obtienen dos células hijas diploides (2n) genéticamente idénticas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve aprender mitosis y meiosis en el examen de acceso a la universidad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La división celular es uno de los temas centrales de biología en los exámenes de acceso a la universidad (EBAU/Selectividad). Las preguntas suelen pedir identificar fases, explicar la formación de gametos, calcular el número de cromosomas resultantes o comparar ambos procesos. Dominar las diferencias entre mitosis y meiosis, y el papel del crossing-over, es fundamental para obtener buena puntuación.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el huso acromático y qué función cumple en la división celular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El huso acromático es una estructura formada por microtúbulos proteicos que se ensambla durante la mitosis y la meiosis. Su función es capturar los cromosomas por sus centrómeros y arrastrarlos hacia los polos de la célula durante la anafase. Sin un huso funcional, los cromosomas no se distribuirían correctamente, provocando células con número anómalo de cromosomas (aneuploidía).',
+      },
+    },
+  ],
+};

@@ -53,3 +53,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es una cadena trófica y cuáles son sus niveles?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una cadena trófica es la secuencia de organismos en la que cada uno se alimenta del anterior, transfiriendo energía y materia. Los niveles son: productores (plantas y algas que fotosintetizan), consumidores primarios (herbívoros), consumidores secundarios (carnívoros que comen herbívoros), consumidores terciarios (carnívoros que comen carnívoros) y descomponedores (hongos y bacterias que reciclan materia orgánica). En un ecosistema real coexisten múltiples cadenas formando una red trófica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la regla del 10% en ecología?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La regla del 10% establece que solo aproximadamente el 10% de la energía de un nivel trófico se transfiere al nivel superior; el 90% restante se pierde como calor en la respiración celular o queda en biomasa no consumida. Propuesta por Raymond Lindeman en 1942, esta regla explica por qué las cadenas tróficas tienen pocos eslabones (habitualmente 4-5) y por qué hay muchos más productores que depredadores en cualquier ecosistema.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es una cascada trófica y cómo afecta al ecosistema?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una cascada trófica es el efecto en cadena que provoca el aumento o la disminución drástica de una especie sobre los demás niveles del ecosistema. Por ejemplo, la eliminación de un depredador tope provoca explosión de herbívoros, que devoran la vegetación y reducen la biodiversidad. El caso más estudiado es la reintroducción del lobo en Yellowstone (1995), que restableció el equilibrio vegetal al controlar a los ciervos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es una especie clave y por qué su pérdida es tan grave?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una especie clave es aquella cuya influencia en el ecosistema es desproporcionadamente grande respecto a su biomasa. Su eliminación provoca una reestructuración profunda del ecosistema, a veces su colapso. Las nutrias marinas son un ejemplo clásico: al comer erizos de mar evitan que estos devoren los bosques de kelp, que dan cobijo a cientos de especies. El concepto fue introducido por el ecólogo Robert Paine en 1969.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿En qué se diferencia una pirámide trófica de energía de la de biomasa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La pirámide de energía muestra el flujo de energía (kcal/m²/año) entre niveles y siempre tiene forma triangular ascendente hacia la base, ya que la energía solo puede decrecer hacia arriba. La pirámide de biomasa representa la masa total de organismos vivos por nivel y puede invertirse en ecosistemas acuáticos donde el fitoplancton (productores con alta tasa de reproducción) puede tener menos biomasa instantánea que los zooplancton que los consumen.',
+      },
+    },
+  ],
+};

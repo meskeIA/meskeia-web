@@ -44,3 +44,50 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito, sin publicidad y disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el triángulo de exposición en fotografía?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El triángulo de exposición es el modelo que relaciona los tres parámetros que determinan la exposición de una fotografía: ISO (sensibilidad del sensor), apertura de diafragma (f-stop, que controla la cantidad de luz que entra) y velocidad de obturación (tiempo que el sensor queda expuesto a la luz). Modificar cualquiera de los tres afecta a los otros dos si se quiere mantener la misma exposición, y cada uno produce efectos visuales distintos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afecta el ISO a la calidad de una fotografía?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un ISO bajo (100-400) produce imágenes limpias con poco ruido digital, ideal para condiciones de buena luz. Un ISO alto (3200 o más) amplifica la señal del sensor para fotografiar con poca luz, pero introduce ruido (grano digital visible). En la práctica, conviene usar el ISO más bajo posible para la escena y compensar con apertura o velocidad de obturación cuando sea factible.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el bokeh y cómo se controla con la apertura del diafragma?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El bokeh es el desenfoque estético del fondo de una imagen. Se produce porque una apertura grande (número f bajo, como f/1.8) crea una profundidad de campo muy reducida: el sujeto queda enfocado y el fondo aparece difuminado suavemente. Una apertura pequeña (f/11 o f/16) aumenta la profundidad de campo y mantiene nítido todo el plano, lo que se prefiere en fotografía de paisaje.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve el modo compensado en el simulador de fotografía?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El modo compensado permite fijar un parámetro (ISO, apertura o velocidad) mientras los otros dos se reajustan automáticamente para mantener una exposición correcta. Es la forma más didáctica de entender el triángulo de exposición: por ejemplo, si subes la velocidad de obturación para congelar movimiento, el simulador muestra cómo debe bajar el número f o subir el ISO para compensar la luz perdida.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre el modo automático de una cámara y el modo manual?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En modo automático la cámara decide los tres parámetros del triángulo de exposición según el fotómetro interno, priorizando una exposición técnicamente correcta pero sin criterio creativo. En modo manual el fotógrafo controla ISO, apertura y velocidad de forma independiente, lo que permite decisiones creativas como congelar o mostrar movimiento, crear bokeh o controlar el grano. Los modos semimanuales (Av, Tv, P) son puntos intermedios.',
+      },
+    },
+  ],
+};

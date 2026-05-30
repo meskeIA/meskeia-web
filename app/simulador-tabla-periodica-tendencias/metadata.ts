@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['tabla periódica', 'electronegatividad', 'radio atómico', 'energía de ionización', 'afinidad electrónica', 'tendencias periódicas', 'EBAU', 'Bachillerato', 'química'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Cómo varía la electronegatividad a lo largo de la tabla periódica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La electronegatividad aumenta de izquierda a derecha en un período (al crecer la carga nuclear efectiva) y disminuye de arriba abajo en un grupo (al aumentar el radio atómico y el apantallamiento). El flúor (F) es el elemento más electronegativo con un valor de 3,98 en la escala de Pauling, y el cesio (Cs) uno de los menos electronegativos con 0,79.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué disminuye el radio atómico al avanzar en un período?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al avanzar de izquierda a derecha en un período, se añaden protones al núcleo sin cambiar el nivel de energía principal de los electrones de valencia. La mayor carga nuclear efectiva atrae con más fuerza la nube electrónica hacia el núcleo, comprimiendo el átomo. Por eso el radio atómico disminuye dentro de un mismo período.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la energía de ionización y cómo se relaciona con la tabla periódica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La energía de primera ionización es la energía necesaria para arrancar el electrón más externo de un átomo gaseoso en estado fundamental. Aumenta de izquierda a derecha en un período (electrones más retenidos por mayor Z efectivo) y disminuye al bajar en un grupo (electrones más alejados del núcleo). Existen excepciones notables en Be-B y N-O debidas a la configuración electrónica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve un heatmap de tendencias periódicas frente a una tabla de valores?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El heatmap codifica los valores numéricos en colores (de azul frío a rojo caliente), lo que permite detectar de un vistazo los patrones de aumento y disminución en grupos y períodos. Una tabla de 118 números requiere leerlos uno a uno; el mapa de calor revela la tendencia global y las anomalías como el hidrógeno o los lantánidos en segundos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué propiedad de la tabla periódica es más importante para Bachillerato y selectividad?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las cinco propiedades más frecuentes en exámenes de selectividad (EBAU/EVAU) son radio atómico, electronegatividad, primera energía de ionización, afinidad electrónica y punto de fusión. La electronegatividad y la energía de ionización suelen aparecer en preguntas de razonamiento sobre tipo de enlace y reactividad, mientras que el radio atómico es clave para explicar variaciones de tamaño y densidad.',
+      },
+    },
+  ],
+};

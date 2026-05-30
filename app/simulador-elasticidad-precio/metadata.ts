@@ -56,3 +56,50 @@ export const jsonLd = generateWebAppSchema({
     'simulador economía',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la elasticidad-precio de la demanda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La elasticidad-precio de la demanda (Ed) mide cuánto varía porcentualmente la cantidad demandada de un bien ante un cambio del 1% en su precio. Un valor |Ed| > 1 indica demanda elástica (los consumidores son muy sensibles al precio); |Ed| < 1 indica demanda inelástica (poco sensibles). El coeficiente se calcula como: Ed = (Δ%cantidad) / (Δ%precio).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo conviene subir el precio para aumentar los ingresos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Solo conviene subir el precio cuando la demanda es inelástica (|Ed| < 1), porque la pérdida de ventas es proporcionalmente menor que el aumento del precio, resultando en mayor ingreso total. Con demanda elástica ocurre lo contrario: la subida de precio provoca una caída de ventas tan grande que el ingreso total baja.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué la insulina tiene elasticidad casi cero?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La insulina es un medicamento imprescindible para las personas con diabetes: no existen sustitutos directos y no consumirla pone en riesgo la vida. Esto hace que la demanda sea casi perfectamente inelástica (|Ed| ≈ 0,1): aunque el precio suba drásticamente, los pacientes seguirán comprando prácticamente la misma cantidad. Es el ejemplo más extremo de inelasticidad en consumo real.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre elasticidad de demanda y elasticidad de oferta?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La elasticidad de demanda mide la respuesta de los compradores ante un cambio de precio; la de oferta mide la respuesta de los productores. Una oferta inelástica (difícil de ampliar a corto plazo, como el suelo urbano) hace que subidas de demanda se traduzcan principalmente en subidas de precio. Una oferta elástica (fácil de escalar, como la manufactura) absorbe el aumento de demanda con más cantidad y poco cambio de precio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué factores hacen que una demanda sea más elástica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cuatro factores aumentan la elasticidad: 1) Existencia de sustitutos cercanos (si hay alternativas, los consumidores las usan al subir el precio). 2) El bien representa un gasto alto sobre la renta (más incentivo para buscar alternativas). 3) Se trata de un bien de lujo, no de primera necesidad. 4) El horizonte temporal es largo (a largo plazo siempre hay más alternativas disponibles).',
+      },
+    },
+  ],
+};

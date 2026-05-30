@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['curva de Phillips', 'inflación', 'desempleo', 'NAIRU', 'estanflación', 'macroeconomía', 'Bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la curva de Phillips y qué relación establece?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La curva de Phillips describe una relación inversa entre la tasa de inflación y la tasa de desempleo a corto plazo: cuando el desempleo baja, la mayor actividad económica tiende a presionar los precios al alza; cuando el desempleo sube, la inflación suele moderarse. Fue formulada por A.W. Phillips en 1958 a partir de datos del Reino Unido 1861-1957.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el NAIRU y por qué es importante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El NAIRU (Non-Accelerating Inflation Rate of Unemployment) es la tasa de desempleo a la que la inflación se mantiene estable, sin acelerarse ni desacelerarse. Si el desempleo real cae por debajo del NAIRU, la inflación tiende a subir; por encima, tiende a bajar. Es un concepto central para los bancos centrales al calibrar la política monetaria, aunque no es directamente observable.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué la estanflación de los 70 "rompió" la curva de Phillips?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En los años 70, los shocks del petróleo de la OPEP (1973 y 1979) provocaron alta inflación y alto desempleo simultáneamente, algo que la curva de Phillips original no preveía. Este fenómeno, la estanflación, mostró que los shocks de oferta pueden desplazar la curva, haciendo que para cada nivel de desempleo la inflación sea mayor. Friedman y Phelps ya habían advertido en 1968 que las expectativas adaptativas limitaban la validez de la curva a largo plazo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afectan las expectativas de inflación a la curva de Phillips?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En el modelo de Friedman-Phelps, si los trabajadores y empresas esperan más inflación, la negocian en salarios y contratos, desplazando hacia arriba la curva de corto plazo. Así, una política monetaria expansiva puede reducir el desempleo a corto plazo, pero a largo plazo solo genera más inflación sin reducción permanente del paro. La curva de largo plazo es vertical en el NAIRU.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve este simulador en la preparación de un examen de economía?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Permite visualizar de forma interactiva los cuatro cuadrantes económicos (recesión, estanflación, sobrecalentamiento y equilibrio ideal), mover los sliders de desempleo e inflación esperada y reproducir episodios históricos reales como la estanflación de 1973 o la crisis española de 2013. Facilita entender de forma intuitiva conceptos abstractos del temario de macroeconomía de Bachillerato y universidad.',
+      },
+    },
+  ],
+};

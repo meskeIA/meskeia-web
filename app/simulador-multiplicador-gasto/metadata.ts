@@ -47,3 +47,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['multiplicador keynesiano', 'gasto público', 'PMC', 'macroeconomía', 'política fiscal'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el multiplicador keynesiano del gasto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El multiplicador keynesiano describe cómo un aumento inicial del gasto (público o privado) genera un incremento del PIB mayor que el gasto original. Cada euro inyectado se convierte en renta para alguien, parte de la cual se vuelve a gastar, generando nuevas rentas en sucesivas rondas. La fórmula básica es k = 1 / (1 − PMC), donde PMC es la propensión marginal a consumir.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo afectan los impuestos al efecto multiplicador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los impuestos reducen la renta disponible en cada ronda de consumo, lo que disminuye el valor del multiplicador. Con un tipo impositivo t, la fórmula es k = 1 / (1 − PMC(1 − t)). Un tipo impositivo del 25% puede reducir el multiplicador de 4 (economía cerrada sin impuestos) a aproximadamente 2,7, amortiguando el impacto total del estímulo fiscal.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué papel juegan las importaciones en el multiplicador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las importaciones "filtran" renta fuera del circuito económico doméstico: parte de cada ronda de gasto se destina a comprar bienes del exterior en lugar de producción nacional. En economías muy abiertas, la propensión marginal a importar reduce notablemente el multiplicador. La fórmula completa es k = 1 / (1 − PMC(1 − t) + m), donde m es la propensión marginal a importar.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué el multiplicador es mayor en una recesión que en pleno empleo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'En una recesión existen recursos productivos ociosos (trabajadores desempleados, capacidad instalada sin usar), por lo que el gasto adicional puede traducirse en mayor producción real sin generar inflación. En cambio, cerca del pleno empleo la economía tiene poca capacidad sobrante y el estímulo fiscal acaba generando más inflación que producción real, reduciendo el multiplicador efectivo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tarda en agotarse el efecto multiplicador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Teóricamente el proceso se extiende infinitas rondas, pero en la práctica más del 90% del impacto se concentra en las primeras 8-10 rondas. Con un multiplicador de 2,5, tras 5 rondas ya se ha acumulado aproximadamente el 75% del impacto total. Los retardos temporales reales (meses entre decisiones y gasto) hacen que el efecto completo tarde entre 1 y 2 años en materializarse.',
+      },
+    },
+  ],
+};

@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['ecuación de Bernoulli', 'fluidos', 'efecto Venturi', 'presión', 'caudal', 'EBAU', 'Bachillerato', 'física'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué dice la ecuación de Bernoulli y cuál es su significado físico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ecuación de Bernoulli establece que en un fluido ideal en movimiento la suma P + ½ρv² + ρgh es constante a lo largo de una línea de corriente. Físicamente, expresa la conservación de la energía por unidad de volumen: la presión estática P, la presión dinámica ½ρv² y la presión hidrostática ρgh se intercambian entre sí sin pérdidas. Cuando el fluido se acelera (por ejemplo, al entrar en un tubo más estrecho), su presión cae para mantener la suma constante.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué un avión vuela gracias a Bernoulli?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El perfil alar de un avión tiene la cara superior más curvada que la inferior, lo que obliga al aire a recorrer más distancia y a fluir más rápido por encima del ala. Según Bernoulli, a mayor velocidad, menor presión, por lo que la presión bajo el ala supera a la de encima y genera una fuerza neta hacia arriba llamada sustentación. En la práctica intervienen también la deflexión de aire hacia abajo (principio de acción-reacción) y la viscosidad, pero Bernoulli es la aproximación más intuitiva.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es el efecto Venturi y dónde se aplica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El efecto Venturi es la caída de presión que experimenta un fluido al pasar por un estrechamiento de la tubería: al reducirse la sección, la velocidad aumenta (ecuación de continuidad A·v = cte) y la presión desciende. Se aplica en carburadores de motores, inyectores de combustible, venturímetros de medición de caudal, nebulizadores médicos y en el diseño de arterias artificiales para predecir zonas de trombosis.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las limitaciones reales de la ecuación de Bernoulli?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Bernoulli asume fluido ideal (sin viscosidad), flujo estacionario (la velocidad no cambia con el tiempo), incompresible (densidad constante) y a lo largo de una línea de corriente. En la realidad, la viscosidad disipa energía (pérdidas de Darcy-Weisbach), el flujo turbulento invalida el modelo, y a velocidades próximas a la del sonido la densidad varía notablemente. Para agua y aire a velocidades moderadas es una aproximación muy precisa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se relacionan la ecuación de continuidad y Bernoulli?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ambas ecuaciones se aplican juntas para resolver cualquier problema de fluidos. La ecuación de continuidad (A₁v₁ = A₂v₂ para fluido incompresible) impone la conservación de la masa: si la sección se reduce a la mitad, la velocidad se duplica. Ese cambio de velocidad se sustituye luego en Bernoulli para calcular la presión resultante. Son complementarias: continuidad dice cuánto cambia la velocidad; Bernoulli dice cuánto cambia la presión en consecuencia.',
+      },
+    },
+  ],
+};

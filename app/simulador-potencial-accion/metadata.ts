@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['potencial de acción', 'neurona', 'despolarización', 'todo o nada', 'EBAU', 'Bachillerato', 'biología'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el potencial de acción de una neurona?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El potencial de acción es una señal eléctrica que recorre el axón de una neurona cuando el estímulo supera un umbral de voltaje (típicamente −55 mV). Consiste en una rápida despolarización (entrada de Na⁺ que eleva el potencial hasta +40 mV) seguida de una repolarización (salida de K⁺) e hiperpolarización transitoria antes de recuperar el potencial de reposo (−70 mV). Es la forma en que las neuronas transmiten información.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué significa la ley del "todo o nada" en neurociencia?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La ley del "todo o nada" establece que una neurona o dispara un potencial de acción completo o no dispara nada, independientemente de la intensidad del estímulo supraumbral. Un estímulo que no alcanza el umbral produce solo una respuesta local subumbral que se desvanece sin propagarse. Esta ley explica por qué la información en el sistema nervioso se codifica en frecuencia de disparos, no en amplitud.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuáles son las fases del potencial de acción?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las fases son: (1) potencial de reposo (−70 mV), (2) despolarización rápida cuando los canales de Na⁺ se abren y el voltaje sube hasta +40 mV, (3) repolarización por apertura de canales de K⁺ y cierre de canales de Na⁺, (4) hiperpolarización por debajo del potencial de reposo, y (5) retorno al reposo. Después existe un periodo refractario absoluto (imposible disparar) y uno relativo (se necesita un estímulo más intenso).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué sirve este simulador en Bachillerato y preparatoria?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El simulador permite visualizar interactivamente las 5 fases del potencial de acción ajustando la intensidad y duración del estímulo, el umbral y las conductancias. Esto ayuda a comprender conceptos del temario de Biología de 2.º de Bachillerato (España) y de preparatoria en Latinoamérica: la ley del "todo o nada", los periodos refractarios y los canales iónicos. Es especialmente útil para preparar la EBAU/PAES y exámenes universitarios de fisiología.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre periodo refractario absoluto y relativo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Durante el periodo refractario absoluto (≈1-2 ms tras el disparo), los canales de Na⁺ están inactivados y es imposible generar otro potencial de acción por grande que sea el estímulo. En el periodo refractario relativo los canales de K⁺ siguen abiertos, el potencial está en hiperpolarización y solo un estímulo más intenso que el umbral normal puede desencadenar un nuevo disparo. Esta diferencia determina la frecuencia máxima de disparo de una neurona.',
+      },
+    },
+  ],
+};

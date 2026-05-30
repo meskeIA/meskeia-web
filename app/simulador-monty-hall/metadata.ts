@@ -59,3 +59,50 @@ export const jsonLd = generateWebAppSchema({
     'divulgación matemática',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿En qué consiste el Problema de Monty Hall?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El Problema de Monty Hall es un clásico de probabilidad condicional. Un concursante elige una de tres puertas: detrás de una hay un coche y detrás de las otras dos hay cabras. El presentador (que sabe dónde está el coche) abre una de las puertas no elegidas revelando una cabra y ofrece cambiar de puerta. La pregunta es: ¿conviene cambiar? La respuesta contraintuitiva es que cambiar dobla la probabilidad de ganar, pasando de 1/3 a 2/3.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué cambiar de puerta aumenta la probabilidad al doble?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Al elegir la primera puerta, la probabilidad de haber acertado es 1/3. Eso significa que con probabilidad 2/3 el coche está en las otras dos puertas. Cuando Monty elimina una cabra, esa probabilidad de 2/3 se concentra en la única puerta restante que no elegiste. Por eso cambiar gana el 66,7 % de las veces y quedarse solo el 33,3 %. Es un resultado correcto aunque sorprenda a la intuición.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuántas simulaciones se necesitan para verificar el resultado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Con 100 simulaciones ya se aprecia la tendencia (la estrategia "cambia siempre" ronda el 60-70 % de victorias). Con 1.000 simulaciones el resultado converge visiblemente al 2/3 teórico. Con 10.000 simulaciones (el máximo de este simulador) la diferencia entre ambas estrategias es estadísticamente contundente y el error relativo cae por debajo del 2 %.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Tiene alguna relación el Problema de Monty Hall con el teorema de Bayes?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El Problema de Monty Hall es un ejemplo directo de probabilidad condicional y puede resolverse formalmente con el teorema de Bayes: la probabilidad de que el coche esté en la puerta alternativa actualiza a 2/3 una vez que el presentador ha abierto una cabra. Es uno de los ejemplos más citados en cursos de estadística y probabilidad para ilustrar cómo nueva información (la acción del presentador) modifica las probabilidades previas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Es realmente una paradoja o solo parece contraintuitivo?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es contraintuitivo pero no es una paradoja lógica: tiene una respuesta matemáticamente inequívoca. La confusión surge porque la mayoría de personas asume erróneamente que las dos puertas restantes tienen probabilidades iguales (50/50), ignorando que Monty actúa con información. Miles de simulaciones y la demostración formal de Bayes confirman que cambiar de puerta es la estrategia óptima. Hasta matemáticos y académicos contestaron incorrectamente cuando Marilyn vos Savant publicó el problema en 1990.',
+      },
+    },
+  ],
+};

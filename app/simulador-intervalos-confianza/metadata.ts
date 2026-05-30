@@ -51,3 +51,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['intervalo de confianza', 'IC', 't de Student', 'z', 'inferencia estadística', 'EBAU', 'Bachillerato'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué significa exactamente un intervalo de confianza al 95%?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un intervalo de confianza al 95% no significa que la media poblacional μ caiga dentro de ese intervalo con probabilidad 95%. Significa que si repitieras el muestreo muchas veces, aproximadamente el 95% de los intervalos construidos de esa manera contendrían el verdadero μ. El simulador lo demuestra visualmente generando 100 muestras y mostrando cuántos de sus IC contienen realmente μ.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuándo debo usar la distribución z y cuándo la t de Student?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se usa z (distribución normal estándar) cuando la desviación típica poblacional σ es conocida. Se usa t de Student cuando σ es desconocida y se estima con la desviación muestral s. En la práctica, con muestras grandes (n > 30) la diferencia es pequeña, pero para muestras pequeñas la t de Student produce intervalos más anchos para compensar la incertidumbre adicional.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Por qué aumentar el nivel de confianza hace el intervalo más ancho?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Para estar más seguro de que el intervalo contiene μ, necesitas ampliarlo. Al pasar del 95% al 99% de confianza, el valor crítico z (o t) aumenta —de 1,96 a 2,576 con z—, lo que multiplica el margen de error y produce un intervalo más ancho. Mayor confianza implica menos precisión, y viceversa.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para qué nivel educativo está pensado este simulador?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está diseñado principalmente para estudiantes de Bachillerato y universitarios de primer ciclo que estudian estadística inferencial. También resulta útil para preparar la EBAU, asignaturas de Métodos Estadísticos en Ciencias o Sociales, y para cualquier persona que quiera entender de forma visual un concepto que suele resultar contraintuitivo en los libros de texto.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo reduce el tamaño muestral el margen de error?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El margen de error es proporcional a σ/√n (el error estándar). Al multiplicar n por 4, el margen se reduce a la mitad; al multiplicarlo por 100, se divide por 10. Esta relación explica por qué encuestas con muestras grandes tienen márgenes de error tan pequeños, aunque la población sea de millones de personas.',
+      },
+    },
+  ],
+};
