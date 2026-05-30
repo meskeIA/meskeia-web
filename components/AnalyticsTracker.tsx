@@ -145,23 +145,28 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
           sesion_id: sessionId,
         });
 
-        // sendBeacon es más fiable que fetch para eventos de salida
-        // Se envía aunque el navegador esté cerrando la página
-        if (navigator.sendBeacon) {
-          const blob = new Blob([data], { type: 'application/json' });
-          const sent = navigator.sendBeacon(`${API_BASE}/duration`, blob);
-          if (sent) {
-            console.log(`✅ Duración registrada (sendBeacon): ${durationSeconds}s`);
-          }
-        } else {
-          // Fallback para navegadores sin sendBeacon
+        // sendBeacon con text/plain evita preflight en iOS Safari (application/json lo bloquea)
+        const beaconFallback = () => {
           fetch(`${API_BASE}/duration`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: data,
             keepalive: true,
           }).catch(() => {});
-          console.log(`✅ Duración registrada (fetch): ${durationSeconds}s`);
+          console.log(`✅ Duración registrada (fetch fallback): ${durationSeconds}s`);
+        };
+
+        if (navigator.sendBeacon) {
+          const blob = new Blob([data], { type: 'text/plain' });
+          const sent = navigator.sendBeacon(`${API_BASE}/duration`, blob);
+          if (sent) {
+            console.log(`✅ Duración registrada (sendBeacon): ${durationSeconds}s`);
+          } else {
+            // sendBeacon rechazado por el browser → fallback a fetch
+            beaconFallback();
+          }
+        } else {
+          beaconFallback();
         }
       }
     };

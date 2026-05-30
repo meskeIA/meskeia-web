@@ -18,7 +18,10 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
   try {
-    const datos = await request.json();
+    // Leer como texto y parsear manualmente: sendBeacon en iOS envía text/plain,
+    // fetch envía application/json — ambos llevan JSON como cuerpo
+    const raw = await request.text();
+    const datos = JSON.parse(raw);
 
     // Validar campos obligatorios
     if (!datos.aplicacion || typeof datos.aplicacion !== 'string' || datos.duracion_segundos === undefined) {

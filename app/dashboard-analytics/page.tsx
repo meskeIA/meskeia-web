@@ -686,7 +686,7 @@ export default function DashboardAnalyticsPage() {
                               </div>
                               {pct !== null && (
                                 <span style={{ fontSize: '0.8rem', color: pct >= 0 ? '#22c55e' : '#ef4444', fontWeight: 600, minWidth: '45px' }}>
-                                  {pct >= 0 ? '↑' : '↓'}{Math.abs(pct)}%
+                                  {pct >= 0 ? '+' : '-'}{Math.abs(pct)}%
                                 </span>
                               )}
                             </div>
