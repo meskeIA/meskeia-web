@@ -144,6 +144,9 @@ export default function DashboardAnalyticsPage() {
   // tRPC: Tendencias históricas (mensual 2026, canales, LATAM)
   const tendenciasQuery = trpc.analytics.getTendencias.useQuery({ excluir_mi_ip: filtroIPActivo });
 
+  // tRPC: Distribución de duraciones de visita
+  const distribucionQuery = trpc.analytics.getDistribucionDuraciones.useQuery({ excluir_mi_ip: filtroIPActivo });
+
   // tRPC: Obtener configuración de IP
   const ipConfigQuery = trpc.analytics.getIPConfig.useQuery(
     { ip_actual: typeof window !== 'undefined' ? window.location.hostname : 'unknown' },
@@ -938,6 +941,87 @@ export default function DashboardAnalyticsPage() {
               </section>
             )}
           </div>
+
+          {/* Distribución de duraciones */}
+          {distribucionQuery.data && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>⏱️ Distribución de Duración de Visitas</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
+                Total: <strong>{formatearNumero(distribucionQuery.data.total)}</strong> visitas —{' '}
+                <strong style={{ color: '#10b981' }}>
+                  {distribucionQuery.data.buckets.slice(2).reduce((s, b) => s + b.pct, 0).toFixed(1)}%
+                </strong>{' '}
+                con duración registrada ≥ 30s
+              </p>
+
+              {/* Barras horizontales por bucket */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+                {distribucionQuery.data.buckets.map(b => (
+                  <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '110px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', flexShrink: 0 }}>
+                      {b.label}
+                    </div>
+                    <div style={{ flex: 1, background: 'var(--bg-primary)', borderRadius: '4px', height: '20px', overflow: 'hidden' }}>
+                      <div style={{ width: `${b.pct}%`, height: '100%', background: b.color, borderRadius: '4px', minWidth: b.valor > 0 ? '4px' : '0' }} />
+                    </div>
+                    <div style={{ width: '48px', textAlign: 'right', fontSize: '0.85rem', fontWeight: 700, color: b.color, flexShrink: 0 }}>
+                      {b.pct}%
+                    </div>
+                    <div style={{ width: '70px', textAlign: 'right', fontSize: '0.8rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+                      {formatearNumero(b.valor)} vis.
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+                      {b.descripcion}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Top apps por duración media */}
+              {distribucionQuery.data.topPorDuracion.length > 0 && (
+                <>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
+                    🏅 Apps con mayor tiempo medio de uso
+                  </h3>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Aplicación</th>
+                          <th>Usos totales</th>
+                          <th>Con duración</th>
+                          <th>Tiempo medio</th>
+                          <th>Tiempo máx.</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {distribucionQuery.data.topPorDuracion.map((app, idx) => {
+                          const fmtSeg = (s: number) => {
+                            if (!s) return '-';
+                            if (s < 60) return `${s}s`;
+                            const m = Math.floor(s / 60);
+                            const r = s % 60;
+                            return r > 0 ? `${m}m ${r}s` : `${m}m`;
+                          };
+                          return (
+                            <tr key={app.aplicacion}>
+                              <td>{idx + 1}</td>
+                              <td><strong>{app.aplicacion}</strong></td>
+                              <td>{formatearNumero(app.totalUsos)}</td>
+                              <td>{formatearNumero(app.conDuracion)}</td>
+                              <td style={{ fontWeight: 700, color: '#10b981' }}>{fmtSeg(app.duracionMedia)}</td>
+                              <td style={{ color: 'var(--text-secondary)' }}>{fmtSeg(app.duracionMax)}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </section>
+          )}
         </div>
       )}
 

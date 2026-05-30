@@ -993,4 +993,89 @@ export const analyticsRouter = router({
         latam: latamPorMes,
       };
     }),
+
+  /**
+   * Distribución de duraciones de visita
+   * Buckets: sin registro (NULL) / 2-30s / 30s-2min / 2-10min / >10min
+   */
+  getDistribucionDuraciones: publicProcedure
+    .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+
+      let ipExcluida = '';
+      if (input.excluir_mi_ip) {
+        try {
+          const r = await client.execute({ sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`, args: [] });
+          if (r.rows.length > 0) ipExcluida = String(r.rows[0].valor);
+        } catch { /* ignorar */ }
+      }
+
+      const ipFiltro = ipExcluida
+        ? ` AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != '${ipExcluida}')`
+        : ` AND (es_propio IS NULL OR es_propio = 0)`;
+      const botFiltro = ` AND modo NOT IN ('bot', 'mcp')`;
+
+      const res = await client.execute({
+        sql: `
+          SELECT
+            COUNT(*) as total,
+            COUNT(CASE WHEN duracion_segundos IS NULL THEN 1 END) as sin_registro,
+            COUNT(CASE WHEN duracion_segundos IS NOT NULL AND duracion_segundos <= 30 THEN 1 END) as rebote,
+            COUNT(CASE WHEN duracion_segundos > 30 AND duracion_segundos <= 120 THEN 1 END) as corta,
+            COUNT(CASE WHEN duracion_segundos > 120 AND duracion_segundos <= 600 THEN 1 END) as media,
+            COUNT(CASE WHEN duracion_segundos > 600 THEN 1 END) as larga
+          FROM uso_aplicaciones
+          WHERE 1=1 ${ipFiltro}${botFiltro}
+        `,
+        args: [],
+      });
+
+      const topRes = await client.execute({
+        sql: `
+          SELECT
+            aplicacion,
+            COUNT(*) as total_usos,
+            COUNT(CASE WHEN duracion_segundos IS NOT NULL THEN 1 END) as con_duracion,
+            CAST(ROUND(AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END)) AS INTEGER) as duracion_media,
+            MAX(duracion_segundos) as duracion_max
+          FROM uso_aplicaciones
+          WHERE 1=1 ${ipFiltro}${botFiltro}
+          GROUP BY aplicacion
+          HAVING con_duracion >= 3
+          ORDER BY duracion_media DESC
+          LIMIT 20
+        `,
+        args: [],
+      });
+
+      const row = res.rows[0];
+      const total = Number(row.total);
+      const pct = (n: number) => total > 0 ? Math.round(n / total * 1000) / 10 : 0;
+
+      const sinRegistro = Number(row.sin_registro);
+      const rebote = Number(row.rebote);
+      const corta = Number(row.corta);
+      const media = Number(row.media);
+      const larga = Number(row.larga);
+
+      return {
+        total,
+        buckets: [
+          { label: 'Sin registro', descripcion: 'Visita < 2s o sin evento de salida', valor: sinRegistro, pct: pct(sinRegistro), color: '#9ca3af' },
+          { label: '2 – 30s',      descripcion: 'Rebote rápido',                       valor: rebote,      pct: pct(rebote),      color: '#f59e0b' },
+          { label: '30s – 2min',   descripcion: 'Exploración',                          valor: corta,       pct: pct(corta),       color: '#3b82f6' },
+          { label: '2 – 10min',    descripcion: 'Uso real',                             valor: media,       pct: pct(media),       color: '#10b981' },
+          { label: '> 10min',      descripcion: 'Uso intensivo',                        valor: larga,       pct: pct(larga),       color: '#8b5cf6' },
+        ],
+        topPorDuracion: topRes.rows.map(r => ({
+          aplicacion: String(r.aplicacion),
+          totalUsos: Number(r.total_usos),
+          conDuracion: Number(r.con_duracion),
+          duracionMedia: Number(r.duracion_media),
+          duracionMax: Number(r.duracion_max),
+        })),
+      };
+    }),
 });
