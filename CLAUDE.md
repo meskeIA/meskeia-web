@@ -262,19 +262,22 @@ Las cifras del catálogo (número de apps, visualizadores, cursos, etc.) **solo 
 Toda app nueva DEBE incluir Schema.org JSON-LD para que Google y las IAs (ChatGPT, Perplexity, Gemini) reconozcan correctamente el contenido. Habilita rich snippets en SERP.
 
 **Está automatizado en el template** (`templates/app-base/`):
-- `metadata.template.ts` exporta `jsonLd` usando `generateWebAppSchema` desde `lib/schema-templates.ts`
-- `layout.template.ts` importa `jsonLd` y renderiza `<script type="application/ld+json">` antes del `{children}`
+- `metadata.template.ts` exporta `jsonLd` (WebApplication) Y `faqJsonLd` (FAQPage)
+- `layout.template.ts` inyecta ambos `<script type="application/ld+json">` antes del `{children}`
 
 **Solo hay que** rellenar correctamente al crear la app:
 - `name`: nombre claro y descriptivo
 - `description`: 1-2 frases sobre qué hace y para quién
 - `url`: URL absoluta completa con barra final (`https://meskeia.com/[slug]/`)
-- `category`: una de `EducationalApplication` (cursos, simuladores, glosarios, calculadoras académicas), `FinanceApplication` (apps con cálculo financiero), `UtilityApplication` (conversores, generadores) o `BusinessApplication`
+- `category`: una de `EducationalApplication`, `FinanceApplication`, `UtilityApplication` o `BusinessApplication`
 - `features`: 4-8 características reales de la app
+- **`faqJsonLd`**: 5 preguntas reales que un usuario escribiría en Bing/Google/ChatGPT con respuestas de 2-4 frases y datos concretos. Sin mencionar "meskeIA". Variadas: qué es, cómo funciona, para quién, diferencia con alternativas, dato clave.
 
-**Verificación**: tras el build, comprobar que `.next/server/app/[slug].html` contiene `"@type":"WebApplication"`. Idealmente validar 1 app con Google Rich Results Test (https://search.google.com/test/rich-results) cuando esté en producción.
+**Por qué FAQPage es obligatorio desde 2026-05-30**: Google deprecó FAQPage para rich snippets pero Bing Copilot, ChatGPT, Perplexity y Gemini SÍ usan FAQPage para grounding queries. Es la señal estructurada más directa para aparecer en respuestas de IAs. La campaña masiva de retrofit cubrió 826/842 apps existentes — las nuevas deben incluirlo desde el origen.
 
-**Apps existentes sin JSON-LD**: NO retrofit masivo. Solo añadir si una app concreta empieza a tener tráfico relevante (>15-20 visitas/mes).
+**Verificación**: tras el build, comprobar que `.next/server/app/[slug].html` contiene `"@type":"WebApplication"` Y `"@type":"FAQPage"`.
+
+**Apps existentes sin JSON-LD/FAQPage**: usar `node scripts/faq-progress.mjs` para identificar. Solo hacer retrofit si la app tiene tráfico relevante.
 
 ### 1.quinquies Neutralidad editorial (OBLIGATORIO desde 2026-05-12)
 

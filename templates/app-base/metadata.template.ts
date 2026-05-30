@@ -40,3 +40,36 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+// FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿[Pregunta real que haría un usuario sobre esta app]?',
+      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta 2-4 frases con datos concretos]' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿[Cómo funciona / qué calcula / para quién es útil]?',
+      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿[Diferencia con alternativas / dato clave]?',
+      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿[Pregunta sobre nivel educativo / audiencia objetivo]?',
+      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿[Pregunta técnica o conceptual específica del tema]?',
+      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
+    },
+  ],
+};
