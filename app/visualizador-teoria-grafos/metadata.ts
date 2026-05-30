@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la teoría de grafos y para qué sirve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La teoría de grafos es una rama de las matemáticas discretas que estudia estructuras formadas por nodos (vértices) y conexiones (aristas). Se aplica en redes de transporte, redes sociales, circuitos electrónicos, planificación de rutas y algoritmos de búsqueda. Muchos problemas de informática y logística se modelan con grafos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el algoritmo de Dijkstra?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El algoritmo de Dijkstra encuentra el camino más corto entre dos nodos de un grafo con pesos no negativos. Parte del nodo origen y expande siempre el nodo con menor coste acumulado hasta llegar al destino. Tiene complejidad O((V + E) log V) con una cola de prioridad, donde V son vértices y E aristas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre un camino de Euler y un camino de Hamilton?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un camino de Euler recorre cada arista del grafo exactamente una vez; existe si el grafo tiene exactamente 0 o 2 vértices de grado impar. Un camino de Hamilton visita cada vértice exactamente una vez. Aunque visualmente parecidos, determinar si existe un camino hamiltoniano es un problema NP-completo, mientras que el euleriano se resuelve en tiempo polinomial.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los Puentes de Königsberg y por qué son famosos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El problema de los Puentes de Königsberg (actual Kaliningrado) preguntaba si era posible recorrer los 7 puentes de la ciudad cruzando cada uno solo una vez. En 1736, Leonhard Euler demostró que era imposible porque más de 2 vértices del grafo tenían grado impar. Este análisis fundó formalmente la teoría de grafos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Quién debería estudiar teoría de grafos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es fundamental para estudiantes de informática, matemáticas e ingeniería. También resulta útil para quienes trabajan en análisis de redes sociales, ciberseguridad, bases de datos (SQL y NoSQL de grafos como Neo4j) y optimización logística. Es materia habitual en grados universitarios de ciencias e ingeniería.',
+      },
+    },
+  ],
+};

@@ -49,3 +49,50 @@ export const jsonLd = generateWebAppSchema({
     'Disponible en español',
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es la energía libre de Gibbs y cuándo indica que una reacción es espontánea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La energía libre de Gibbs (ΔG) mide la energía disponible para realizar trabajo útil en una reacción a presión constante. La fórmula es ΔG = ΔH − TΔS, donde ΔH es la variación de entalpía, T la temperatura absoluta y ΔS la variación de entropía. Si ΔG < 0, la reacción es espontánea (exergónica); si ΔG > 0, no es espontánea en esa dirección. A ΔG = 0 el sistema está en equilibrio.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo funciona el principio de Le Chatelier en la síntesis de amoniaco?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El principio de Le Chatelier establece que si un sistema en equilibrio sufre una perturbación (cambio de temperatura, presión o concentración), se desplaza para contrarrestarla. En el proceso Haber-Bosch (N₂ + 3H₂ ⇌ 2NH₃), aumentar la presión favorece el lado con menos moles de gas (productos), mientras que bajar la temperatura favorece la reacción exotérmica. Sin embargo, temperaturas demasiado bajas hacen la reacción tan lenta que se usa un catalizador de hierro para acelerar el proceso.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué papel juega un catalizador en la termodinámica de una reacción?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un catalizador reduce la energía de activación (Ea), es decir, la barrera energética que los reactivos deben superar para transformarse en productos. Esto acelera tanto la reacción directa como la inversa por igual, de modo que el catalizador no cambia ΔH ni la posición del equilibrio (Kₑq), solo permite llegar al equilibrio más rápidamente. El diagrama de entalpía interactivo permite ver visualmente cómo cambia la barrera con y sin catalizador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este visualizador de termodinámica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está orientado a estudiantes de bachillerato y universidad que cursen química general, fisicoquímica o termodinámica. Resulta especialmente útil para entender de forma visual conceptos abstractos como ΔG, ΔS o Kₑq, que suelen resultar difíciles solo con ecuaciones. No requiere instalación ni registro, y funciona completamente en el navegador.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuál es la diferencia entre una reacción exotérmica y una espontánea?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Una reacción exotérmica (ΔH < 0) libera calor, pero eso no garantiza que sea espontánea. La espontaneidad la determina ΔG, que también depende de la entropía (ΔS) y la temperatura. Por ejemplo, hay reacciones endotérmicas (ΔH > 0) que son espontáneas a temperatura elevada porque el término −TΔS es muy negativo. La tabla de los cuatro casos ΔH/ΔS del visualizador resume cuándo cada combinación produce o no espontaneidad.',
+      },
+    },
+  ],
+};

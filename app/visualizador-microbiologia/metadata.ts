@@ -41,3 +41,50 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre bacterias Gram positivas y Gram negativas?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La tinción de Gram clasifica las bacterias según la composición de su pared celular. Las bacterias Gram positivas tienen una gruesa capa de peptidoglicano que retiene el colorante violeta de cristal, apareciendo de color morado al microscopio. Las Gram negativas tienen una capa de peptidoglicano delgada rodeada por una membrana externa adicional que no retiene el colorante, por lo que aparecen en rojo tras la contratinción. Esta diferencia es clínicamente relevante porque determina la eficacia de distintos antibióticos: la penicilina actúa principalmente sobre Gram positivas, mientras que las polimixinas son efectivas contra Gram negativas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo crecen las bacterias y qué es la curva de crecimiento logístico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Las bacterias se reproducen por división binaria: una célula se divide en dos, generando crecimiento exponencial. Sin embargo, en condiciones reales la disponibilidad de nutrientes y la acumulación de desechos limitan el crecimiento. El modelo logístico describe esto con la ecuación dN/dt = r·N·(1 − N/K), donde r es la tasa de crecimiento y K la capacidad de carga del medio. La curva resultante tiene forma de S (sigmoide): fase lag, fase exponencial, fase estacionaria y fase de declive.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los tres dominios de la vida y quién los propuso?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El biólogo Carl Woese propuso en 1977, a partir del análisis del ARN ribosomal 16S, que la vida se divide en tres dominios fundamentales: Bacteria, Archaea y Eukarya. Bacteria y Archaea son organismos procariotas (sin núcleo definido), pero difieren profundamente en la composición de sus membranas y en su bioquímica. Los eucariotas (Eukarya) poseen núcleo y orgánulos membranosos. La teoría endosimbiótica explica que las mitocondrias y los cloroplastos de las células eucariotas tienen origen bacteriano.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la conjugación bacteriana y por qué es relevante en resistencia a antibióticos?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La conjugación es un mecanismo de transferencia horizontal de genes en el que una bacteria dona material genético (generalmente un plásmido) a otra mediante un contacto físico llamado pili. Es uno de los principales mecanismos por los que los genes de resistencia a antibióticos se propagan entre bacterias de la misma especie o incluso entre especies distintas. Esto explica por qué la resistencia puede diseminarse rápidamente en un hospital o en la comunidad sin que intervenga la reproducción clásica.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este visualizador de microbiología?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Está orientado a estudiantes de bachillerato y primeros cursos universitarios de biología, farmacia, medicina y ciencias de la salud. Permite explorar de forma visual e interactiva conceptos como morfología bacteriana, tinción de Gram, crecimiento logístico y los tres dominios de la vida, sin necesidad de software especializado ni registro. También resulta útil para docentes que busquen recursos didácticos dinámicos para sus clases de microbiología.',
+      },
+    },
+  ],
+};
