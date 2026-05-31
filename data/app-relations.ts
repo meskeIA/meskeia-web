@@ -3418,6 +3418,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-rentabilidad-alquiler/', icon: '🏘️', name: 'Rentabilidad Alquiler', description: 'ROI si inviertes en un piso' },
     { url: '/estimador-hipoteca/', icon: '🏠', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
+  'orientador-ayuda-vivienda-rural': [
+    { url: '/simulador-bono-joven-alquiler/', icon: '🏠', name: 'Bono Joven Alquiler 2026-2030', description: 'Si todavía alquilas mientras buscas vivienda para comprar, el Bono Joven de alquiler (hasta 300 €/mes) puede ser compatible con esta ayuda' },
+    { url: '/orientador-aval-ico/', icon: '🏦', name: 'Orientador Aval ICO', description: 'El aval del Estado para el 20% de entrada puede complementarse con esta ayuda para zonas rurales' },
+    { url: '/estimador-hipoteca/', icon: '📊', name: 'Estimador Hipoteca', description: 'Con la ayuda cubriendo hasta 15.000 €, la hipoteca será menor: calcula la cuota mensual resultante' },
+    { url: '/orientador-alquiler-vs-compra/', icon: '🔑', name: 'Alquiler vs Compra', description: 'Analiza si con esta ayuda la compra rural supera financieramente al alquiler en tu caso concreto' },
+  ],
   'orientador-aval-ico': [
     { url: '/simulador-bono-joven-alquiler/', icon: '🏠', name: 'Bono Joven Alquiler', description: 'Hasta 250 €/mes durante 2 años' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },

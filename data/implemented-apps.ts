@@ -120,6 +120,7 @@ export const implementedAppsUrls = [
   "/orientador-regla-50-30-20/",     // Distribución presupuesto 50/30/20
   "/estimador-fire/",               // Independencia financiera, retiro anticipado
   "/orientador-alquiler-vs-compra/", // Análisis alquiler vs compra vivienda
+  "/orientador-ayuda-vivienda-rural/", // Ayuda 1ª vivienda zona rural RD 326/2026: hasta 15.000€ o 20% precio
   "/estimador-coste-plazos/",       // Coste real financiación a plazos, TAE oculta
   "/estimador-deuda/",              // Método bola de nieve vs avalancha
   "/comparador-vehiculos/",           // Comparador: contado vs financiación vs renting vs leasing
