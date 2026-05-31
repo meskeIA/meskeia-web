@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-05-25
-> **Apps totales**: 978 | **Suites**: 13
+> **Última actualización**: 2026-05-31
+> **Apps totales**: 986 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -49,6 +49,12 @@
 - [x] **npm audit: vuln `ws` moderate corregida** — `ws 8.0.0–8.20.0` en `@libsql/isomorphic-ws` (GHSA-58qx-3vcg-4xpx). Corregida con `npm audit fix`. *(resuelto: 2026-05-25)*
 
 - [x] **Actualizaciones menores** — `@anthropic-ai/sdk` 0.96→0.98, `@tanstack/react-query` 5.100.10→5.100.14, `@types/react` 19.2.14→19.2.15, `baseline-browser-mapping` 2.10.30→2.10.32. Build 1.273 páginas OK. *(resuelto: 2026-05-25)*
+
+- [x] **Actualizaciones menores** — `@anthropic-ai/sdk` 0.98.0→0.100.1, `baseline-browser-mapping` 2.10.32→2.10.33, `resend` 6.12.3→6.12.4. Build 1.281 páginas OK. *(resuelto: 2026-05-31)*
+
+- [x] **Disclaimer `orientador-ayuda-vivienda-rural` corregido** — severity="medium"→"critical" (suites inmobiliaria+finanzas → nivel 1 CRÍTICO). *(resuelto: 2026-05-31)*
+
+- [x] **npm audit: vuln `tmp` high corregida** — Path Traversal en `tmp` (prefix/postfix no saneado). Corregida con `npm audit fix` sin --force. *(resuelto: 2026-05-31)*
 
 - [ ] **npm audit: vuln `uuid/exceljs` moderate pendiente** — `exceljs >=3.5.0` depende de `uuid <11.1.1` (GHSA-w5hq-g745-h8pq, buffer bounds check). Fix requiere `npm audit fix --force` con downgrade a `exceljs@3.4.0` (breaking change desde 4.4.0). Riesgo bajo para nuestro uso (lectura/escritura Excel, no generación UUID con buf). Pospuesto hasta que exceljs publique versión >=4.x con uuid corregido. *(detectado: 2026-05-25)*
 
