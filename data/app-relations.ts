@@ -1132,6 +1132,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales' },
     { url: '/visualizador-reino-fungi/', icon: '🍄', name: 'El Reino Fungi', description: 'Hongos: el tercer reino — ni plantas ni animales' },
   ],
+  'falsos-amigos-ingles': [
+    { url: '/quiz-mitos-ciencia/', icon: '🔬', name: 'Quiz Mitos y Realidades de la Ciencia', description: 'Otro clásico del pensamiento crítico: palabras que no significan lo que parece, conceptos que no son lo que creemos.' },
+    { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Para quienes quieren dominar el lenguaje en profundidad: las figuras retóricas completan el vocabulario avanzado.' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz Literatura Universal', description: 'Los falsos amigos aparecen también en las traducciones literarias: dominar el vocabulario bilingüe ayuda a leer a los autores en original.' },
+    { url: '/visualizador-historia/historia-descubrimientos-cientificos/', icon: '🔭', name: 'Historia de los Descubrimientos Científicos', description: 'Muchos términos científicos son falsos amigos: "theory" en inglés científico tiene mucho más peso que "teoría" coloquial en español.' },
+  ],
   'quiz-mitos-ciencia': [
     { url: '/quiz-biologia-molecular/', icon: '🧬', name: 'Quiz Biología Molecular', description: 'Si los mitos de biología te engancharon, el quiz de ADN, ARN y replicación llevará ese conocimiento al siguiente nivel' },
     { url: '/visualizador-historia/historia-descubrimientos-cientificos/', icon: '🔭', name: 'Historia de los Descubrimientos Científicos', description: 'Cómo la ciencia ha ido desmontando los mitos a lo largo de la historia: de la Tierra plana al ADN' },

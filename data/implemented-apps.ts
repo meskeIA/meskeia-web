@@ -1120,6 +1120,7 @@ export const implementedAppsUrls = [
   "/calculadora-fov-video/",               // FOV horizontal/vertical/diagonal, comparativa 4 sensores
   "/visualizador-reino-vegetal/",         // Árbol interactivo criptógamas/fanerógamas, 16 grupos, tabla comparativa y ciclos de vida
   "/visualizador-adaptaciones-plantas/",  // 6 hábitats extremos, 8 mecanismos adaptativos, 5 géneros carnívoras
+  "/falsos-amigos-ingles/",               // 75 pares falsos amigos español-inglés, catálogo buscable + práctica flashcard
   "/quiz-mitos-ciencia/",                 // 25 afirmaciones Verdad/Mito: cuerpo humano, animales, física, historia, biología
   "/quiz-biologia-molecular/",            // 30 preguntas: ADN/ARN, replicación, transcripción, traducción, mutaciones
   "/quiz-tipos-plantas/",                 // 40 organismos, 6 grupos taxonómicos, 3 modos de juego
