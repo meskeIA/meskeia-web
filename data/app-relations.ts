@@ -1132,6 +1132,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-tipos-plantas/', icon: '🌿', name: 'Quiz Tipos de Plantas', description: 'Clasifica 40 organismos vegetales' },
     { url: '/visualizador-reino-fungi/', icon: '🍄', name: 'El Reino Fungi', description: 'Hongos: el tercer reino — ni plantas ni animales' },
   ],
+  'quiz-mitos-ciencia': [
+    { url: '/quiz-biologia-molecular/', icon: '🧬', name: 'Quiz Biología Molecular', description: 'Si los mitos de biología te engancharon, el quiz de ADN, ARN y replicación llevará ese conocimiento al siguiente nivel' },
+    { url: '/visualizador-historia/historia-descubrimientos-cientificos/', icon: '🔭', name: 'Historia de los Descubrimientos Científicos', description: 'Cómo la ciencia ha ido desmontando los mitos a lo largo de la historia: de la Tierra plana al ADN' },
+    { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'El mito de que "descendemos de los chimpancés" tiene su respuesta completa en la cronología de la evolución homínida' },
+    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'El Sistema Nervioso', description: 'El mito del "10% del cerebro" requiere entender cómo funciona realmente el cerebro: neuronas, regiones y neurotransmisores' },
+  ],
   'quiz-biologia-molecular': [
     { url: '/simulador-genetica/', icon: '🧬', name: 'Simulador Genética', description: 'Cruces mendelianos y Punnett' },
     { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'Neuronas y neurotransmisores' },
