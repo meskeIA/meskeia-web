@@ -941,6 +941,11 @@ export const implementedAppsUrls = [
   "/visualizador-historia/primera-guerra-mundial/", // Primera Guerra Mundial 1914→1919, 10 hitos, 6 eras
   "/visualizador-historia/segunda-guerra-mundial/", // Segunda Guerra Mundial 1939→1945, 10 hitos, 6 eras
   "/visualizador-historia/civilizaciones-precolombinas/", // Civilizaciones Precolombinas 250→1532, 10 hitos, 6 eras
+  "/visualizador-historia/maya/", // Civilización Maya -2000→1500, 10 hitos, 6 eras
+  "/visualizador-historia/azteca/", // Imperio Azteca 1200→1521, 10 hitos, 6 eras
+  "/visualizador-historia/inca/", // Imperio Inca 1200→1572, 10 hitos, 6 eras
+  "/visualizador-historia/olmeca/", // Civilización Olmeca -1600→-400, 10 hitos, 6 eras
+  "/visualizador-historia/tolteca/", // Imperio Tolteca 700→1200, 10 hitos, 6 eras
   "/visualizador-historia/espana-antigua/",       // España Antigua 1100 a.C.→409 d.C.: íberos, celtas, Cartago, Roma, emperadores hispanos
   "/visualizador-historia/espana-medieval/",     // España Medieval 409→1492, 10 hitos, 6 eras
   "/visualizador-historia/edad-media-europea/",  // Edad Media Europea 476→1453, 10 hitos, 6 eras
