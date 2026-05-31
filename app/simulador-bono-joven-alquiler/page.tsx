@@ -30,8 +30,8 @@ const REQUISITOS: Requisito[] = [
   },
   {
     id: 'ingresos',
-    pregunta: 'Tus ingresos no superan 3 veces el IPREM (24.318,84 €/año en 2024)',
-    explicacion: 'El límite es 3 × IPREM anual. En 2024, el IPREM mensual es de 600 € (14 pagas = 8.400 €/año). 3 × 8.400 = 25.200 € brutos anuales.',
+    pregunta: 'Tus ingresos están dentro del límite establecido por tu Comunidad Autónoma',
+    explicacion: 'El Plan Estatal 2026-2030 establece un límite de ingresos máximos, pero cada Comunidad Autónoma puede concretar o ajustar ese umbral en su convocatoria. Consulta la convocatoria de tu CA para conocer el límite exacto aplicable.',
     bloqueante: true,
   },
   {
@@ -67,9 +67,14 @@ const REQUISITOS: Requisito[] = [
 ];
 
 type EstadoRequisito = 'si' | 'no' | 'pendiente';
+type TipoVivienda = 'vivienda' | 'habitacion';
+
+const BONO: Record<TipoVivienda, number> = { vivienda: 300, habitacion: 200 };
+const DURACION_MAX_MESES = 48; // hasta 4 años (2 + renovación 2)
 
 export default function SimuladorBonoJovenAlquilerPage() {
   const [alquilMensual, setAlquilMensual] = useState('');
+  const [tipoVivienda, setTipoVivienda] = useState<TipoVivienda>('vivienda');
   const [estados, setEstados] = useState<Record<string, EstadoRequisito>>(
     Object.fromEntries(REQUISITOS.map(r => [r.id, 'pendiente']))
   );
@@ -92,9 +97,11 @@ export default function SimuladorBonoJovenAlquilerPage() {
   }, [estados]);
 
   const alquilerNum = parseFloat(alquilMensual.replace(',', '.')) || 0;
-  const bonificacionMensual = 250;
-  const totalAyuda = bonificacionMensual * 24;
-  const alquilerConBono = Math.max(0, alquilerNum - bonificacionMensual);
+  const bonificacionMaxima = BONO[tipoVivienda];
+  // El bono no puede superar el 60% de la renta mensual (RD 326/2026)
+  const bonificacionEfectiva = alquilerNum > 0 ? Math.min(bonificacionMaxima, alquilerNum * 0.6) : bonificacionMaxima;
+  const totalAyudaMax = bonificacionMaxima * DURACION_MAX_MESES;
+  const alquilerConBono = Math.max(0, alquilerNum - bonificacionEfectiva);
 
   const iconoEstado = (estado: EstadoRequisito) => {
     if (estado === 'si') return '✅';
@@ -109,8 +116,8 @@ export default function SimuladorBonoJovenAlquilerPage() {
       <header className={styles.hero}>
         <div className={styles.heroIcon} aria-hidden="true">🏠</div>
         <h1 className={styles.title}>Simulador Bono Joven Alquiler</h1>
-        <p className={styles.subtitle}>Comprueba si puedes recibir hasta 250 €/mes durante 2 años</p>
-        <p className={styles.heroLaw}>Real Decreto 42/2022 · Plan Estatal de Vivienda 2022-2025</p>
+        <p className={styles.subtitle}>Comprueba si puedes recibir hasta 300 €/mes (vivienda) o 200 €/mes (habitación) durante hasta 4 años</p>
+        <p className={styles.heroLaw}>Real Decreto 326/2026, de 22 de abril · Plan Estatal de Vivienda 2026-2030</p>
       </header>
 
       <RegionBadge variant="es-only" />
@@ -122,12 +129,32 @@ export default function SimuladorBonoJovenAlquilerPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        context="Bono Joven al Alquiler: la convocatoria, requisitos y cuantías exactas pueden variar según la Comunidad Autónoma y el año de solicitud. Consulta siempre con tu CA antes de tomar decisiones económicas."
+        context="Bono Joven al Alquiler 2026-2030 (RD 326/2026): las cuantías son orientativas. Los requisitos concretos, límite de ingresos y condiciones específicas los fija cada Comunidad Autónoma en su convocatoria. Consulta siempre con tu CA antes de tomar decisiones económicas."
       />
 
       {/* Sección de tu alquiler */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>💶 Tu alquiler actual</h2>
+
+        <div className={styles.field}>
+          <span className={styles.label}>¿Alquilas una vivienda completa o una habitación?</span>
+          <div className={styles.tipoSelector}>
+            <button
+              className={`${styles.tipoBtn} ${tipoVivienda === 'vivienda' ? styles.tipoBtnActivo : ''}`}
+              onClick={() => setTipoVivienda('vivienda')}
+              aria-pressed={tipoVivienda === 'vivienda'}
+            >
+              🏠 Vivienda completa <span className={styles.tipoBono}>hasta 300 €/mes</span>
+            </button>
+            <button
+              className={`${styles.tipoBtn} ${tipoVivienda === 'habitacion' ? styles.tipoBtnActivo : ''}`}
+              onClick={() => setTipoVivienda('habitacion')}
+              aria-pressed={tipoVivienda === 'habitacion'}
+            >
+              🛏️ Habitación (piso compartido) <span className={styles.tipoBono}>hasta 200 €/mes</span>
+            </button>
+          </div>
+        </div>
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="alquiler">Renta mensual del alquiler</label>
@@ -151,16 +178,19 @@ export default function SimuladorBonoJovenAlquilerPage() {
         {alquilerNum > 0 && (
           <div className={styles.ahorroPanel}>
             <div className={styles.ahorroCard}>
-              <span className={styles.ahorroValor}>{formatCurrency(bonificacionMensual)}</span>
+              <span className={styles.ahorroValor}>{formatCurrency(bonificacionEfectiva)}</span>
               <span className={styles.ahorroLabel}>Ayuda mensual</span>
+              {bonificacionEfectiva < bonificacionMaxima && (
+                <span className={styles.ahorroNota}>Límite: 60% de la renta</span>
+              )}
             </div>
             <div className={styles.ahorroCard}>
               <span className={styles.ahorroValor}>{formatCurrency(alquilerConBono)}</span>
               <span className={styles.ahorroLabel}>Tu pago real</span>
             </div>
             <div className={styles.ahorroCard}>
-              <span className={styles.ahorroValor}>{formatCurrency(totalAyuda)}</span>
-              <span className={styles.ahorroLabel}>Total en 2 años</span>
+              <span className={styles.ahorroValor}>{formatCurrency(totalAyudaMax)}</span>
+              <span className={styles.ahorroLabel}>Máximo en 4 años</span>
             </div>
           </div>
         )}
@@ -218,7 +248,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <div className={styles.resultadoIcon} aria-hidden="true">🎉</div>
               <h3 className={styles.resultadoTitulo}>¡Cumples todos los requisitos!</h3>
               <p className={styles.resultadoTexto}>
-                En principio puedes solicitar el Bono Joven al Alquiler y recibir hasta <strong>250 €/mes durante 2 años</strong>.
+                En principio puedes solicitar el Bono Joven al Alquiler y recibir hasta <strong>{formatCurrency(bonificacionMaxima)}/mes durante hasta 4 años</strong> (2 años renovables).
                 El siguiente paso es contactar con la oficina de vivienda de tu Comunidad Autónoma para tramitar la solicitud.
               </p>
             </div>
@@ -286,9 +316,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>Bono Joven al Alquiler (estatal)</td>
-                  <td>Hasta 250 €/mes</td>
-                  <td>2 años</td>
+                  <td>Bono Joven al Alquiler 2026-2030 (estatal)</td>
+                  <td>Hasta 300 €/mes (vivienda) · 200 €/mes (habitación)</td>
+                  <td>Hasta 4 años (2+2)</td>
                   <td>≤35 años</td>
                 </tr>
                 <tr>
@@ -321,12 +351,12 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👩‍🎓</span>
               <h3>Recién graduada, 23 años</h3>
-              <p>Alquiler de 500 €/mes. Con el bono paga 250 €/mes real. En 2 años ahorra 6.000 €, una cantidad clave para estabilizarse laboralmente.</p>
+              <p>Alquiler de 600 €/mes (vivienda). Bono de 300 €/mes (el 50%, por debajo del límite del 60%). Paga 300 €/mes real. En 4 años ahorra 14.400 €.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👨‍💼</span>
               <h3>Trabajador de 32 años</h3>
-              <p>Alquiler de 750 €/mes en zona tensionada. Si su CA amplía el límite a 900 €, puede acceder al bono y pagar solo 500 €/mes reales.</p>
+              <p>Alquiler de 800 €/mes. El bono máximo es 300 €/mes (el 37,5% de la renta, dentro del límite del 60%). Paga 500 €/mes reales.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👫</span>
@@ -336,7 +366,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🏙️</span>
               <h3>Habitación en piso compartido</h3>
-              <p>Algunas CCAA permiten solicitar el bono por habitaciones en piso compartido, no solo por pisos completos. Consulta la normativa de tu CA.</p>
+              <p>El Plan 2026-2030 incluye expresamente la modalidad de habitación: hasta 200 €/mes. Alquiler de 350 €/mes por habitación → bono de 200 €/mes (57%, dentro del límite del 60%).</p>
             </div>
           </div>
         </section>
@@ -351,7 +381,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si cumplo 36 años mientras cobro el bono?</h3>
-              <p>En general, si cumples los requisitos al inicio, el bono se mantiene durante todo el período de 2 años aunque cumplas 36 años durante el cobro. Consulta con tu CA para confirmarlo.</p>
+              <p>En general, si cumples los requisitos al inicio, el bono se mantiene durante todo el período (hasta 4 años) aunque cumplas 36 años durante el cobro. Consulta con tu CA para confirmarlo, ya que la renovación tras los 2 primeros años puede requerir nueva evaluación.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Es compatible el bono con otras ayudas?</h3>
@@ -375,7 +405,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si mis ingresos suben durante el cobro?</h3>
-              <p>Algunas CCAA realizan comprobaciones periódicas de ingresos. Si superas el límite de 3 veces el IPREM durante el cobro, podrías perder la ayuda. Informa siempre a tu CA de cambios relevantes.</p>
+              <p>Algunas CCAA realizan comprobaciones periódicas de ingresos. Si superas el límite de ingresos establecido por tu CA durante el cobro, podrías perder la ayuda. Informa siempre a tu CA de cualquier cambio relevante en tu situación económica.</p>
             </div>
           </div>
         </section>

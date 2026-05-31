@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador Bono Joven Alquiler — Comprueba tu Elegibilidad | meskeIA',
   description:
-    'Comprueba si cumples los requisitos del Bono Joven Alquiler: 18-35 años, ingresos ≤ 3× IPREM. Calcula cuánto puedes ahorrar: hasta €250/mes durante 2 años (€6.000 total).',
+    'Simulador Bono Joven Alquiler 2026-2030 (RD 326/2026): comprueba elegibilidad y calcula tu ayuda. Hasta 300 €/mes vivienda o 200 €/mes habitación durante hasta 4 años. Plan Estatal de Vivienda 2026-2030.',
   keywords:
-    'bono joven alquiler, ayuda alquiler joven, requisitos bono alquiler joven, 250 euros alquiler joven, elegibilidad bono alquiler, plan vivienda jóvenes, subsidio alquiler joven españa 2026',
+    'bono joven alquiler 2026, ayuda alquiler joven plan estatal vivienda 2026-2030, requisitos bono alquiler joven, 300 euros alquiler joven, elegibilidad bono alquiler, real decreto 326/2026, subsidio alquiler joven españa',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Simulador Bono Joven Alquiler",
-  description: "Comprueba si cumples los requisitos del Bono Joven Alquiler: 18-35 años, ingresos ≤ 3× IPREM. Calcula cuánto puedes ahorrar: hasta €250/mes durante 2 años (€6.000 total).",
+  name: "Simulador Bono Joven Alquiler 2026-2030",
+  description: "Simulador del Bono Joven Alquiler (Plan Estatal de Vivienda 2026-2030, RD 326/2026): comprueba si cumples los requisitos y calcula tu ayuda mensual. Hasta 300 €/mes para vivienda completa o 200 €/mes para habitación en piso compartido, durante hasta 4 años.",
   url: "https://meskeia.com/simulador-bono-joven-alquiler/",
   category: 'FinanceApplication',
   features: [],
@@ -49,18 +49,18 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Qué es el Bono Joven Alquiler y cuánto dinero da?',
+      name: '¿Qué es el Bono Joven Alquiler 2026 y cuánto dinero da?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Bono Joven Alquiler es una ayuda directa del Gobierno de España destinada a jóvenes de 18 a 35 años para cubrir parte del coste del alquiler de su vivienda habitual. La cuantía máxima es de 250 € al mes durante un máximo de 2 años, lo que supone hasta 6.000 € en total. El importe concreto no puede superar el 50% del alquiler mensual que paga el beneficiario.',
+        text: 'El Bono Joven Alquiler es una ayuda directa del Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026) para jóvenes de 18 a 35 años. La cuantía máxima es de 300 €/mes para vivienda completa o 200 €/mes para habitación en piso compartido, durante hasta 4 años (2 años renovables por otros 2). El importe no puede superar el 60% de la renta mensual.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Cuáles son los requisitos de ingresos para pedir el Bono Alquiler Joven?',
+      name: '¿Cuáles son los requisitos de ingresos para pedir el Bono Alquiler Joven 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los ingresos anuales del solicitante no pueden superar 3 veces el IPREM (Indicador Público de Renta de Efectos Múltiples), lo que equivale aproximadamente a 24.318 € brutos anuales según el IPREM vigente. En algunos casos, si se tienen hijos a cargo, discapacidad o la vivienda está en zona de mercado tensionado, el límite puede ampliarse hasta 4 o 5 veces el IPREM según la comunidad autónoma.',
+        text: 'El Plan Estatal de Vivienda 2026-2030 establece un límite de ingresos máximos, pero cada Comunidad Autónoma concreta ese umbral en su propia convocatoria. Los requisitos exactos pueden variar según la CA. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el límite de ingresos aplicable.',
       },
     },
     {
