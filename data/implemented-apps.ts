@@ -57,6 +57,7 @@ export const implementedAppsUrls = [
   "/visualizador-anatomia-vuelo/",
   "/visualizador-mapa-especias/",
   "/visualizador-clima/",
+  "/visualizador-colores-cielo/",
   "/visualizador-produccion-energia/",
   "/visualizador-oceano/",
   "/visualizador-cerebro/",

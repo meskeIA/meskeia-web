@@ -1031,10 +1031,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
   ],
   'visualizador-optica': [
+    { url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'La dispersión de Rayleigh y Mie explica cada fase del cielo' },
     { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes de la física' },
     { url: '/visualizador-pantallas/', icon: '🖥️', name: 'Cómo Funciona una Pantalla', description: 'Píxeles y resoluciones' },
     { url: '/visualizador-escala-universo/', icon: '🔬', name: 'La Escala del Universo', description: 'Del quark a la galaxia' },
-    { url: '/visualizador-como-funciona-wifi/', icon: '📶', name: 'Cómo Funciona el WiFi', description: 'Ondas y frecuencias' },
   ],
   'visualizador-estados-materia': [
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
@@ -2300,6 +2300,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conversor-formatos': conversionDatosApps.filter(a => a.url !== '/conversor-formatos/'),
 
   // DISEÑO
+  'visualizador-colores-cielo': [
+    { url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Calcula la hora dorada y azul exactas para tu ubicación y fecha' },
+    { url: '/creador-paletas/', icon: '🎨', name: 'Creador de Paletas', description: 'Genera paletas de color armónicas para diseño web y branding' },
+    { url: '/conversor-colores/', icon: '🔄', name: 'Conversor de Colores', description: 'Convierte entre HEX, RGB, HSL, CMYK y otros espacios de color' },
+    { url: '/generador-gradientes/', icon: '🌅', name: 'Generador de Gradientes', description: 'Crea gradientes CSS a partir de los colores del cielo que hayas copiado' },
+    { url: '/visualizador-optica/', icon: '💡', name: 'Óptica y la Luz', description: 'La física detrás del color: reflexión, refracción y descomposición espectral' },
+  ],
   'conversor-colores': disenoColoresApps.filter(a => a.url !== '/conversor-colores/'),
   'creador-paletas': disenoColoresApps.filter(a => a.url !== '/creador-paletas/'),
   'generador-gradientes': disenoColoresApps.filter(a => a.url !== '/generador-gradientes/'),
@@ -2750,7 +2757,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'prueba-microfono': [{ url: '/sonometro/', icon: '🔊', name: 'Sonómetro', description: 'Medir decibelios' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir luz ambiente' }],
   'sonometro': [{ url: '/analizador-espectro/', icon: '📊', name: 'Analizador Espectro', description: 'Visualiza frecuencias' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }, { url: '/metronomo/', icon: '🎵', name: 'Metrónomo', description: 'Tempo musical' }],
   'luxometro': [{ url: '/golden-hour/', icon: '🌅', name: 'Golden Hour', description: 'Hora dorada y azul' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/conversor-colores/', icon: '🎨', name: 'Conversor Colores', description: 'HEX, RGB, HSL' }],
-  'golden-hour': [{ url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
+  'golden-hour': [{ url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'Paleta HEX y física de cada fase: golden hour, hora azul, amanecer' }, { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'Triángulo de exposición: ISO, apertura, velocidad' }, { url: '/luxometro/', icon: '💡', name: 'Luxómetro', description: 'Medir intensidad de luz' }, { url: '/informacion-tiempo/', icon: '🌤️', name: 'Info Tiempo', description: 'Previsión meteorológica' }],
   'mi-ip': [{ url: '/prueba-camara/', icon: '📷', name: 'Prueba Cámara', description: 'Test de webcam' }, { url: '/prueba-microfono/', icon: '🎤', name: 'Prueba Micrófono', description: 'Test de audio' }],
   'metronomo': [
     { url: '/transpositor-acordes/', icon: '🎵', name: 'Transpositor de Acordes', description: 'Cambia la tonalidad de tu canción' },
