@@ -379,7 +379,13 @@
   border-radius: 0 2px 2px 0;
 }
 
-/* Geo List */
+/* Geo Grid + List */
+.geoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 32px;
+}
+
 .geoList {
   display: flex;
   flex-direction: column;
@@ -581,6 +587,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .geoGrid {
+    grid-template-columns: 1fr;
+  }
+
   .container {
     padding: 10px;
     padding-top: 80px;

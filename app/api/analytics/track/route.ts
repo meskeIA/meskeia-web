@@ -141,10 +141,8 @@ export async function POST(request: NextRequest) {
     const modo = (esBot || esBotIP) ? 'bot' : (truncar(datos.modo, 20) || 'web');
 
     // RGPD: Geolocalización solo país, vía headers de Vercel (sin servicios externos)
-    // Vercel proporciona estos headers automáticamente en Edge Runtime
-    const pais = request.headers.get('x-vercel-ip-country-name') ||
-                 request.headers.get('x-vercel-ip-country') ||
-                 null;
+    // Siempre código ISO alpha-2 (x-vercel-ip-country) para consistencia en DB
+    const pais = request.headers.get('x-vercel-ip-country') || null;
 
     // RGPD: No almacenar ciudad (dato demasiado específico)
     const ciudad: string | null = null;

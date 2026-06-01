@@ -825,14 +825,27 @@ export default function DashboardAnalyticsPage() {
           {datos.estadisticas.geografia.paises.length > 0 && (
             <section className={styles.section}>
               <h2>🌍 Top Países</h2>
-              <div className={styles.geoList}>
-                {datos.estadisticas.geografia.paises.slice(0, 10).map((pais: any, idx) => (
-                  <div key={String(pais.pais)} className={styles.geoItem}>
-                    <span className={styles.geoRank}>#{idx + 1}</span>
-                    <span className={styles.geoName}>{pais.pais}</span>
-                    <span className={styles.geoCount}>{formatearNumero(Number(pais.total))}</span>
+              <div className={styles.geoGrid}>
+                <div className={styles.geoList}>
+                  {datos.estadisticas.geografia.paises.slice(0, 10).map((p: { pais: string; total: number }, idx) => (
+                    <div key={String(p.pais)} className={styles.geoItem}>
+                      <span className={styles.geoRank}>#{idx + 1}</span>
+                      <span className={styles.geoName}>{p.pais}</span>
+                      <span className={styles.geoCount}>{formatearNumero(Number(p.total))}</span>
+                    </div>
+                  ))}
+                </div>
+                {datos.estadisticas.geografia.paises.length > 10 && (
+                  <div className={styles.geoList}>
+                    {datos.estadisticas.geografia.paises.slice(10, 20).map((p: { pais: string; total: number }, idx) => (
+                      <div key={String(p.pais)} className={styles.geoItem}>
+                        <span className={styles.geoRank}>#{idx + 11}</span>
+                        <span className={styles.geoName}>{p.pais}</span>
+                        <span className={styles.geoCount}>{formatearNumero(Number(p.total))}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             </section>
           )}
