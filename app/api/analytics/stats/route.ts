@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
       paisesSql += ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
       paisesArgs.push(ipExcluida);
     }
-    paisesSql += ' GROUP BY pais ORDER BY total DESC LIMIT 20';
+    paisesSql += ' GROUP BY 1 ORDER BY total DESC LIMIT 20';
     const paisesResult = await client.execute({ sql: paisesSql, args: paisesArgs });
 
     let ciudadesSql = `
