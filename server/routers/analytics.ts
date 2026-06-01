@@ -196,8 +196,56 @@ export const analyticsRouter = router({
       });
 
       // Estadísticas geográficas (con filtro de IP si está activo)
+      // CASE normaliza nombres completos históricos ("Spain") a código ISO ("ES")
       let paisesSql = `
-        SELECT pais, COUNT(*) as total
+        SELECT
+          CASE pais
+            WHEN 'Spain' THEN 'ES'
+            WHEN 'United States' THEN 'US'
+            WHEN 'Mexico' THEN 'MX'
+            WHEN 'Argentina' THEN 'AR'
+            WHEN 'Colombia' THEN 'CO'
+            WHEN 'Bolivia' THEN 'BO'
+            WHEN 'Ecuador' THEN 'EC'
+            WHEN 'Chile' THEN 'CL'
+            WHEN 'Peru' THEN 'PE'
+            WHEN 'Venezuela' THEN 'VE'
+            WHEN 'Guatemala' THEN 'GT'
+            WHEN 'Costa Rica' THEN 'CR'
+            WHEN 'Honduras' THEN 'HN'
+            WHEN 'El Salvador' THEN 'SV'
+            WHEN 'Nicaragua' THEN 'NI'
+            WHEN 'Panama' THEN 'PA'
+            WHEN 'Cuba' THEN 'CU'
+            WHEN 'Dominican Republic' THEN 'DO'
+            WHEN 'Puerto Rico' THEN 'PR'
+            WHEN 'Uruguay' THEN 'UY'
+            WHEN 'Paraguay' THEN 'PY'
+            WHEN 'Brazil' THEN 'BR'
+            WHEN 'Portugal' THEN 'PT'
+            WHEN 'France' THEN 'FR'
+            WHEN 'Germany' THEN 'DE'
+            WHEN 'United Kingdom' THEN 'GB'
+            WHEN 'Italy' THEN 'IT'
+            WHEN 'Netherlands' THEN 'NL'
+            WHEN 'Belgium' THEN 'BE'
+            WHEN 'Switzerland' THEN 'CH'
+            WHEN 'Sweden' THEN 'SE'
+            WHEN 'Norway' THEN 'NO'
+            WHEN 'Denmark' THEN 'DK'
+            WHEN 'Finland' THEN 'FI'
+            WHEN 'Poland' THEN 'PL'
+            WHEN 'Russia' THEN 'RU'
+            WHEN 'Turkey' THEN 'TR'
+            WHEN 'Canada' THEN 'CA'
+            WHEN 'Australia' THEN 'AU'
+            WHEN 'Japan' THEN 'JP'
+            WHEN 'China' THEN 'CN'
+            WHEN 'India' THEN 'IN'
+            WHEN 'South Korea' THEN 'KR'
+            ELSE pais
+          END as pais,
+          COUNT(*) as total
         FROM uso_aplicaciones
         WHERE pais IS NOT NULL AND pais != ''
       `;
@@ -206,7 +254,7 @@ export const analyticsRouter = router({
         paisesSql += ' AND (ip_address IS NULL OR ip_address != ?)';
         paisesArgs.push(ipExcluida);
       }
-      paisesSql += ' GROUP BY pais ORDER BY total DESC LIMIT 10';
+      paisesSql += ' GROUP BY 1 ORDER BY total DESC LIMIT 20';
       const paisesResult = await client.execute({ sql: paisesSql, args: paisesArgs });
 
       let ciudadesSql = `
