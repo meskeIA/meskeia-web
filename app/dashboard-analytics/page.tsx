@@ -114,6 +114,31 @@ interface IPConfig {
   activo: boolean;
 }
 
+const NOMBRES_PAIS: Record<string, string> = {
+  AD: 'Andorra', AE: 'Emiratos Árabes', AF: 'Afganistán', AL: 'Albania',
+  AR: 'Argentina', AT: 'Austria', AU: 'Australia', AZ: 'Azerbaiyán',
+  BA: 'Bosnia-Herzegovina', BE: 'Bélgica', BG: 'Bulgaria', BO: 'Bolivia',
+  BR: 'Brasil', BY: 'Bielorrusia', CA: 'Canadá', CH: 'Suiza',
+  CL: 'Chile', CN: 'China', CO: 'Colombia', CR: 'Costa Rica',
+  CU: 'Cuba', CZ: 'Chequia', DE: 'Alemania', DK: 'Dinamarca',
+  DO: 'Rep. Dominicana', DZ: 'Argelia', EC: 'Ecuador', EE: 'Estonia',
+  EG: 'Egipto', ES: 'España', FI: 'Finlandia', FR: 'Francia',
+  GB: 'Reino Unido', GR: 'Grecia', GT: 'Guatemala', HK: 'Hong Kong',
+  HN: 'Honduras', HR: 'Croacia', HU: 'Hungría', ID: 'Indonesia',
+  IE: 'Irlanda', IL: 'Israel', IN: 'India', IQ: 'Irak',
+  IR: 'Irán', IT: 'Italia', JP: 'Japón', KR: 'Corea del Sur',
+  KZ: 'Kazajistán', LT: 'Lituania', LU: 'Luxemburgo', LV: 'Letonia',
+  MA: 'Marruecos', MX: 'México', MY: 'Malasia', NI: 'Nicaragua',
+  NL: 'Países Bajos', NO: 'Noruega', NZ: 'Nueva Zelanda', PA: 'Panamá',
+  PE: 'Perú', PH: 'Filipinas', PK: 'Pakistán', PL: 'Polonia',
+  PR: 'Puerto Rico', PT: 'Portugal', PY: 'Paraguay', RO: 'Rumanía',
+  RS: 'Serbia', RU: 'Rusia', SA: 'Arabia Saudí', SE: 'Suecia',
+  SG: 'Singapur', SK: 'Eslovaquia', SV: 'El Salvador', TH: 'Tailandia',
+  TR: 'Türkiye', TW: 'Taiwán', UA: 'Ucrania', US: 'Estados Unidos',
+  UY: 'Uruguay', UZ: 'Uzbekistán', VE: 'Venezuela', VN: 'Vietnam',
+  ZA: 'Sudáfrica',
+};
+
 export default function DashboardAnalyticsPage() {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
@@ -830,7 +855,7 @@ export default function DashboardAnalyticsPage() {
                   {datos.estadisticas.geografia.paises.slice(0, 10).map((p: { pais: string; total: number }, idx) => (
                     <div key={String(p.pais)} className={styles.geoItem}>
                       <span className={styles.geoRank}>#{idx + 1}</span>
-                      <span className={styles.geoName}>{p.pais}</span>
+                      <span className={styles.geoName}>{NOMBRES_PAIS[p.pais] ?? p.pais}</span>
                       <span className={styles.geoCount}>{formatearNumero(Number(p.total))}</span>
                     </div>
                   ))}
@@ -840,7 +865,7 @@ export default function DashboardAnalyticsPage() {
                     {datos.estadisticas.geografia.paises.slice(10, 20).map((p: { pais: string; total: number }, idx) => (
                       <div key={String(p.pais)} className={styles.geoItem}>
                         <span className={styles.geoRank}>#{idx + 11}</span>
-                        <span className={styles.geoName}>{p.pais}</span>
+                        <span className={styles.geoName}>{NOMBRES_PAIS[p.pais] ?? p.pais}</span>
                         <span className={styles.geoCount}>{formatearNumero(Number(p.total))}</span>
                       </div>
                     ))}
