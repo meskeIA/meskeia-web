@@ -2358,7 +2358,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-regla-de-tres': matematicasBasicasApps.filter(a => a.url !== '/calculadora-regla-de-tres/'),
   'calculadora-mcd-mcm': matematicasBasicasApps.filter(a => a.url !== '/calculadora-mcd-mcm/'),
   'algebra-ecuaciones': matematicasAvanzadasApps.filter(a => a.url !== '/algebra-ecuaciones/'),
-  'calculadora-geometria': matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-geometria/'),
+  'calculadora-geometria': [
+    ...matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-geometria/'),
+    { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Visualiza y calcula volúmenes de esfera, cubo, cilindro, cono y pirámide con sliders interactivos' },
+  ],
   'calculadora-trigonometria': matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-trigonometria/'),
   'calculadora-calculo': matematicasAvanzadasApps.filter(a => a.url !== '/calculadora-calculo/'),
   'calculadora-estadistica': [...estadisticaApps.filter(a => a.url !== '/calculadora-estadistica/'), matematicasBasicasApps[0]],
@@ -3881,12 +3884,19 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-series-convergencia/', icon: '♾️', name: 'Series y Convergencia', description: 'Las series de Taylor aproximan seno y coseno con polinomios' },
     { url: '/visualizador-transformada-fourier/', icon: '〰️', name: 'Transformada de Fourier', description: 'La Transformada de Fourier descompone señales en suma de senos y cosenos' },
     { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las cónicas se describen con funciones trigonométricas en coordenadas polares' },
+    { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'La trigonometría define las relaciones entre radios, alturas y volúmenes de esfera, cono y cilindro' },
   ],
   'visualizador-geometria-analitica': [
     { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Las coordenadas polares y las cónicas usan seno y coseno como base' },
     { url: '/visualizador-algebra-lineal/', icon: '🔢', name: 'Álgebra Lineal', description: 'Las transformaciones lineales cambian la forma de las cónicas en el plano' },
     { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Geometría Fractal', description: 'Las cónicas son formas euclidianas; los fractales exploran geometrías más complejas' },
-    { url: '/visualizador-topologia/', icon: '🍩', name: 'Topología', description: 'La topología generaliza la geometría: ¿qué propiedades se conservan bajo deformación continua?' },
+    { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Las secciones cónicas (elipse, parábola) generan las figuras de revolución: esfera, cono, cilindro' },
+  ],
+  'visualizador-volumenes': [
+    { url: '/calculadora-geometria/', icon: '📏', name: 'Geometría', description: 'Áreas, perímetros y volúmenes de figuras planas y sólidos' },
+    { url: '/visualizador-geometria-analitica/', icon: '📉', name: 'Geometría Analítica', description: 'Las secciones cónicas (elipse, parábola) dan lugar a las figuras de revolución' },
+    { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Sin y cos relacionan ángulos con las proporciones de esferas y cilindros' },
+    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Geometría Fractal', description: 'Cuando el volumen fractal supera la dimensión euclidiana clásica' },
   ],
   'visualizador-algebra-lineal': [
     { url: '/visualizador-matrices/', icon: '📊', name: 'Matrices y Transformaciones', description: 'Las matrices son la representación algebraica de las transformaciones lineales' },
