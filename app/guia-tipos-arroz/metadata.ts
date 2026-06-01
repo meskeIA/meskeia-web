@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
-    canonical: 'https://meskeia.com/guia-tipos-arroz',
+    canonical: 'https://meskeia.com/guia-tipos-arroz/',
   },
   robots: {
     index: true,

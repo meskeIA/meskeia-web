@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
-    canonical: 'https://meskeia.com/guia-frutas-exoticas',
+    canonical: 'https://meskeia.com/guia-frutas-exoticas/',
   },
 };
 

@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
-    canonical: 'https://meskeia.com/guia-tipos-pasta',
+    canonical: 'https://meskeia.com/guia-tipos-pasta/',
   },
   robots: {
     index: true,

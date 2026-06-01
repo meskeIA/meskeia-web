@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     }]
   },
   alternates: {
-    canonical: 'https://meskeia.com/comparador-coste-vida',
+    canonical: 'https://meskeia.com/comparador-coste-vida/',
   },
 };
 

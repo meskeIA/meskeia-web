@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     }]
   },
   alternates: {
-    canonical: 'https://meskeia.com/estimador-reformas-hogar',
+    canonical: 'https://meskeia.com/estimador-reformas-hogar/',
   },
 };
 
