@@ -2672,6 +2672,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-puntos-azucar/', icon: '🍬', name: 'Repostería: Puntos del Azúcar', description: 'Fases de cocción del azúcar de almíbar a caramelo' },
   ],
   'lista-compras': cocinaApps.filter(a => a.url !== '/lista-compras/'),
+  'guia-productos-limpieza': [
+    { url: '/calculadora-pintura/', icon: '🎨', name: 'Calculadora Pintura', description: 'Litros y tipos de pintura por superficie' },
+    { url: '/estimador-reformas-hogar/', icon: '🏗️', name: 'Estimador Reformas', description: 'Presupuesto de reformas por tipo y m²' },
+    { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Seguro del Hogar', description: '¿Qué cobertura de hogar necesitas?' },
+    { url: '/calculadora-piscinas/', icon: '🏊', name: 'Calculadora Piscinas', description: 'Dosis de cloro, pH y mantenimiento del agua' },
+  ],
   'calculadora-pintura': hogarApps.filter(a => a.url !== '/calculadora-pintura/'),
   'calculadora-gasto-energetico': hogarApps.filter(a => a.url !== '/calculadora-gasto-energetico/'),
   'calculadora-huella-carbono': hogarApps.filter(a => a.url !== '/calculadora-huella-carbono/'),

@@ -150,6 +150,7 @@ export const implementedAppsUrls = [
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
   "/planificador-mudanzas/",         // Mudanza: tareas, inventario, presupuesto
   "/estimador-reformas-hogar/",    // Reformas: presupuesto estimado por tipo y m²
+  "/guia-productos-limpieza/",    // 9 productos domésticos: usos, contraindicaciones y mezclas peligrosas
   "/calculadora-huella-carbono/",    // Huella de carbono personal
 
   // Matemáticas y Estadística (13 implementadas)
