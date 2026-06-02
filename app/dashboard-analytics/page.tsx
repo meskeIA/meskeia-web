@@ -142,6 +142,7 @@ const NOMBRES_PAIS: Record<string, string> = {
 export default function DashboardAnalyticsPage() {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
+  const [filtroApp, setFiltroApp] = useState('');
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
   const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'bot'>('todos');
 
@@ -152,6 +153,12 @@ export default function DashboardAnalyticsPage() {
   const statsQuery = trpc.analytics.getStats.useQuery(
     { limite: 500, excluir_mi_ip: filtroIPActivo },
     { enabled: true } // Siempre habilitado
+  );
+
+  // tRPC: Estadísticas por app (sin límite de 500 registros)
+  const appStatsQuery = trpc.analytics.getAppStats.useQuery(
+    { aplicacion: appSeleccionada, excluir_mi_ip: filtroIPActivo },
+    { enabled: !!appSeleccionada }
   );
 
   // tRPC: Tendencia de uso últimos 30 días (calculada en DB)
@@ -1108,21 +1115,31 @@ export default function DashboardAnalyticsPage() {
           <section className={styles.section}>
             <h2>🔍 Estadísticas por Aplicación</h2>
 
-            {/* Selector de aplicación */}
+            {/* Selector de aplicación con búsqueda */}
             <div className={styles.appSelector}>
-              <label htmlFor="app-select">Selecciona una aplicación:</label>
+              <label>Selecciona una aplicación:</label>
+              <input
+                type="text"
+                placeholder="Buscar por nombre..."
+                value={filtroApp}
+                onChange={(e) => setFiltroApp(e.target.value)}
+                className={styles.searchApp}
+              />
               <select
-                id="app-select"
                 value={appSeleccionada}
-                onChange={(e) => setAppSeleccionada(e.target.value)}
+                onChange={(e) => { setAppSeleccionada(e.target.value); setFiltroApp(''); }}
                 className={styles.selectApp}
               >
-                <option value="">-- Todas las aplicaciones --</option>
-                {datos.ranking_aplicaciones.map((app: any) => (
-                  <option key={String(app.aplicacion)} value={String(app.aplicacion)}>
-                    {app.aplicacion} ({app.total_usos} usos)
-                  </option>
-                ))}
+                <option value="">-- Selecciona una aplicación --</option>
+                {datos.ranking_aplicaciones
+                  .filter((app: any) =>
+                    !filtroApp || String(app.aplicacion).toLowerCase().includes(filtroApp.toLowerCase())
+                  )
+                  .map((app: any) => (
+                    <option key={String(app.aplicacion)} value={String(app.aplicacion)}>
+                      {app.aplicacion} ({app.total_usos} usos)
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -1131,22 +1148,14 @@ export default function DashboardAnalyticsPage() {
               <>
                 {(() => {
                   const appData = datos.ranking_aplicaciones.find((a: any) => a.aplicacion === appSeleccionada);
-                  const registrosApp = datos.data.filter((r: any) => r.aplicacion === appSeleccionada);
-                  const registrosHoy = registrosApp.filter((r: any) => {
-                    const partes = r.timestamp.split(', '); // formato: "DD/MM/YYYY, HH:MM:SS"
-                    if (partes.length !== 2) return false;
-                    const [fecha] = partes;
-                    const [dia, mes, anio] = fecha.split('/');
-                    const fechaRegistro = new Date(`${anio}-${mes}-${dia}`);
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-                    return fechaRegistro >= hoy;
-                  });
-
+                  const appStats = appStatsQuery.data;
+                  const registrosApp = appStats?.registros ?? [];
+                  const usosHoy = appStats?.usos_hoy ?? 0;
                   const dispositivosApp = {
-                    movil: registrosApp.filter((r: any) => r.tipo_dispositivo === 'movil').length,
-                    escritorio: registrosApp.filter((r: any) => r.tipo_dispositivo === 'escritorio').length,
+                    movil: appStats?.dispositivos.movil ?? 0,
+                    escritorio: appStats?.dispositivos.escritorio ?? 0,
                   };
+                  const totalDispositivos = dispositivosApp.movil + dispositivosApp.escritorio;
 
                   return (
                     <>
@@ -1161,7 +1170,7 @@ export default function DashboardAnalyticsPage() {
                         <div className={`${styles.statCard} ${styles.highlight}`}>
                           <div className={styles.statIcon}>🔥</div>
                           <div className={styles.statContent}>
-                            <h3>{formatearNumero(registrosHoy.length)}</h3>
+                            <h3>{formatearNumero(usosHoy)}</h3>
                             <p>Usos de Hoy</p>
                           </div>
                         </div>
@@ -1175,7 +1184,7 @@ export default function DashboardAnalyticsPage() {
                         <div className={styles.statCard}>
                           <div className={styles.statIcon}>📅</div>
                           <div className={styles.statContent}>
-                            <h3>{appData?.ultimo_uso ? String(appData.ultimo_uso).split(' ')[0] : '-'}</h3>
+                            <h3>{appData?.ultimo_uso ? String(appData.ultimo_uso).split(', ')[0] : '-'}</h3>
                             <p>Último Uso</p>
                           </div>
                         </div>
@@ -1187,28 +1196,28 @@ export default function DashboardAnalyticsPage() {
                           <span className={styles.deviceIcon}>📱</span>
                           <div>
                             <strong>{formatearNumero(dispositivosApp.movil)}</strong>
-                            <span>Móvil ({registrosApp.length > 0 ? Math.round((dispositivosApp.movil / registrosApp.length) * 100) : 0}%)</span>
+                            <span>Móvil ({totalDispositivos > 0 ? Math.round((dispositivosApp.movil / totalDispositivos) * 100) : 0}%)</span>
                           </div>
                           <div
                             className={styles.progressBar}
-                            style={{ '--progress': `${registrosApp.length > 0 ? (dispositivosApp.movil / registrosApp.length) * 100 : 0}%` } as React.CSSProperties}
+                            style={{ '--progress': `${totalDispositivos > 0 ? (dispositivosApp.movil / totalDispositivos) * 100 : 0}%` } as React.CSSProperties}
                           ></div>
                         </div>
                         <div className={styles.deviceCard}>
                           <span className={styles.deviceIcon}>🖥️</span>
                           <div>
                             <strong>{formatearNumero(dispositivosApp.escritorio)}</strong>
-                            <span>Escritorio ({registrosApp.length > 0 ? Math.round((dispositivosApp.escritorio / registrosApp.length) * 100) : 0}%)</span>
+                            <span>Escritorio ({totalDispositivos > 0 ? Math.round((dispositivosApp.escritorio / totalDispositivos) * 100) : 0}%)</span>
                           </div>
                           <div
                             className={styles.progressBar}
-                            style={{ '--progress': `${registrosApp.length > 0 ? (dispositivosApp.escritorio / registrosApp.length) * 100 : 0}%` } as React.CSSProperties}
+                            style={{ '--progress': `${totalDispositivos > 0 ? (dispositivosApp.escritorio / totalDispositivos) * 100 : 0}%` } as React.CSSProperties}
                           ></div>
                         </div>
                       </div>
 
                       {/* Últimos registros de esta app */}
-                      <h3 className={styles.appRegistrosTitle}>📋 Últimos 20 registros de {appSeleccionada}</h3>
+                      <h3 className={styles.appRegistrosTitle}>📋 Últimos 100 registros de {appSeleccionada}</h3>
                       <div className={styles.tableContainer}>
                         <table className={styles.table}>
                           <thead>
@@ -1222,17 +1231,17 @@ export default function DashboardAnalyticsPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {registrosApp.slice(0, 20).map((registro: any) => (
-                              <tr key={registro.id}>
-                                <td>{registro.id}</td>
-                                <td>{registro.timestamp}</td>
+                            {registrosApp.map((registro: any) => (
+                              <tr key={String(registro.id)}>
+                                <td>{String(registro.id)}</td>
+                                <td>{String(registro.timestamp)}</td>
                                 <td>
                                   {registro.duracion_segundos
-                                    ? `${Math.floor(registro.duracion_segundos / 60)}m ${registro.duracion_segundos % 60}s`
+                                    ? `${Math.floor(Number(registro.duracion_segundos) / 60)}m ${Number(registro.duracion_segundos) % 60}s`
                                     : '-'}
                                 </td>
-                                <td>{registro.pais || '-'}</td>
-                                <td>{registro.ciudad || '-'}</td>
+                                <td>{String(registro.pais || '-')}</td>
+                                <td>{String(registro.ciudad || '-')}</td>
                                 <td>{registro.tipo_dispositivo === 'movil' ? '📱' : '🖥️'}</td>
                               </tr>
                             ))}

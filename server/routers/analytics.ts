@@ -159,21 +159,25 @@ export const analyticsRouter = router({
       const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
 
       // Ranking de aplicaciones (con filtro de IP si está activo)
+      // - ultimo_uso via subconsulta con MAX(id) para evitar error de orden en DD/MM/YYYY
+      // - duracion_promedio excluye sesiones > 2h (7200s) para evitar distorsión por tabs abandonadas
       let rankingSql = `
         SELECT
-          aplicacion,
+          u1.aplicacion,
           COUNT(*) as total_usos,
-          MAX(timestamp) as ultimo_uso,
-          AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) as duracion_promedio_segundos
-        FROM uso_aplicaciones
+          (SELECT u2.timestamp FROM uso_aplicaciones u2
+           WHERE u2.aplicacion = u1.aplicacion ORDER BY u2.id DESC LIMIT 1) as ultimo_uso,
+          AVG(CASE WHEN u1.duracion_segundos IS NOT NULL AND u1.duracion_segundos <= 7200
+              THEN u1.duracion_segundos END) as duracion_promedio_segundos
+        FROM uso_aplicaciones u1
         WHERE 1=1
       `;
       const rankingArgs: string[] = [];
       if (ipExcluida) {
-        rankingSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        rankingSql += ' AND (u1.ip_address IS NULL OR u1.ip_address != ?)';
         rankingArgs.push(ipExcluida);
       }
-      rankingSql += ' GROUP BY aplicacion ORDER BY total_usos DESC';
+      rankingSql += ' GROUP BY u1.aplicacion ORDER BY total_usos DESC';
 
       const rankingResult = await client.execute({ sql: rankingSql, args: rankingArgs });
 
@@ -407,6 +411,67 @@ export const analyticsRouter = router({
         registros_mostrados: registros.length,
         ranking_aplicaciones: rankingAplicaciones,
         data: registros,
+      };
+    }),
+
+  /**
+   * Procedure: getAppStats
+   * Estadísticas completas de una app específica (sin límite de 500 registros)
+   * Reemplaza el filtrado client-side de datos.data en la pestaña Por Aplicación
+   */
+  getAppStats: publicProcedure
+    .input(z.object({
+      aplicacion: z.string(),
+      excluir_mi_ip: z.boolean().default(false),
+    }))
+    .query(async ({ input }) => {
+      await initializeDatabase();
+      const client = getTursoClient();
+      const { aplicacion, excluir_mi_ip } = input;
+
+      let ipExcluida = '';
+      if (excluir_mi_ip) {
+        try {
+          const configResult = await client.execute({
+            sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+            args: [],
+          });
+          if (configResult.rows.length > 0) ipExcluida = String(configResult.rows[0].valor);
+        } catch { /* ignorar */ }
+      }
+
+      const ipWhere = ipExcluida ? ' AND (ip_address IS NULL OR ip_address != ?)' : '';
+      const ipArgs: string[] = ipExcluida ? [ipExcluida] : [];
+
+      // Fecha de hoy en formato DD/MM/YYYY para filtrar con LIKE (evita el bug de MAX string)
+      const ahora = new Date();
+      const fechaHoy = `${String(ahora.getDate()).padStart(2, '0')}/${String(ahora.getMonth() + 1).padStart(2, '0')}/${ahora.getFullYear()}`;
+
+      const [todayResult, deviceResult, registrosResult] = await Promise.all([
+        // Usos de hoy (sin límite, exacto)
+        client.execute({
+          sql: `SELECT COUNT(*) as total FROM uso_aplicaciones WHERE aplicacion = ? AND timestamp LIKE ?${ipWhere}`,
+          args: [aplicacion, `${fechaHoy}%`, ...ipArgs],
+        }),
+        // Split dispositivos (todos los registros, sin límite)
+        client.execute({
+          sql: `SELECT tipo_dispositivo, COUNT(*) as total FROM uso_aplicaciones WHERE aplicacion = ?${ipWhere} GROUP BY tipo_dispositivo`,
+          args: [aplicacion, ...ipArgs],
+        }),
+        // Últimos 100 registros para la tabla
+        client.execute({
+          sql: `SELECT id, timestamp, duracion_segundos, tipo_dispositivo, pais, ciudad FROM uso_aplicaciones WHERE aplicacion = ?${ipWhere} ORDER BY id DESC LIMIT 100`,
+          args: [aplicacion, ...ipArgs],
+        }),
+      ]);
+
+      const movil = Number(deviceResult.rows.find(r => r.tipo_dispositivo === 'movil')?.total) || 0;
+      const escritorio = Number(deviceResult.rows.find(r => r.tipo_dispositivo === 'escritorio')?.total) || 0;
+
+      return {
+        usos_hoy: Number(todayResult.rows[0]?.total) || 0,
+        dispositivos: { movil, escritorio },
+        registros: registrosResult.rows,
       };
     }),
 
