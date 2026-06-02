@@ -639,6 +639,30 @@ export default function DashboardAnalyticsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Segunda fila: apps distintas por período */}
+              <div className={styles.appsDistintasGrid}>
+                <div className={styles.appsDistintasCard}>
+                  <span className={styles.appsDistintasIcono}>🧩</span>
+                  <span className={styles.appsDistintasValor}>{formatearNumero(datos.comparativa.hoy.apps_distintas ?? 0)}</span>
+                  <span className={styles.appsDistintasLabel}>apps distintas hoy</span>
+                </div>
+                <div className={styles.appsDistintasCard}>
+                  <span className={styles.appsDistintasIcono}>🧩</span>
+                  <span className={styles.appsDistintasValor}>{formatearNumero(datos.comparativa.ayer.apps_distintas ?? 0)}</span>
+                  <span className={styles.appsDistintasLabel}>apps distintas ayer</span>
+                </div>
+                <div className={styles.appsDistintasCard}>
+                  <span className={styles.appsDistintasIcono}>🧩</span>
+                  <span className={styles.appsDistintasValor}>{formatearNumero(datos.comparativa.semana.apps_distintas ?? 0)}</span>
+                  <span className={styles.appsDistintasLabel}>apps distintas 7 días</span>
+                </div>
+                <div className={styles.appsDistintasCard}>
+                  <span className={styles.appsDistintasIcono}>🧩</span>
+                  <span className={styles.appsDistintasValor}>{formatearNumero(datos.comparativa.mes.apps_distintas ?? 0)}</span>
+                  <span className={styles.appsDistintasLabel}>apps distintas este mes</span>
+                </div>
+              </div>
             </section>
           )}
 

@@ -689,6 +689,10 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .appsDistintasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .comparativaCard {
     padding: 16px;
   }
@@ -701,6 +705,10 @@
 @media (max-width: 480px) {
   .comparativaGrid {
     grid-template-columns: 1fr;
+  }
+
+  .appsDistintasGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -723,6 +731,45 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+/* Segunda fila: apps distintas por período */
+.appsDistintasGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.appsDistintasCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+.appsDistintasIcono {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.appsDistintasValor {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.appsDistintasLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+[data-theme='dark'] .appsDistintasCard {
+  background: var(--bg-card);
 }
 
 .comparativaCard {

@@ -291,9 +291,9 @@ export const analyticsRouter = router({
       const inicioMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
       const finMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
 
-      const contarEnRango = async (fechaInicio: Date, fechaFin: Date): Promise<number> => {
+      const contarEnRango = async (fechaInicio: Date, fechaFin: Date): Promise<{ usos: number; apps: number }> => {
         let sqlCount = `
-          SELECT COUNT(*) as total
+          SELECT COUNT(*) as total, COUNT(DISTINCT aplicacion) as apps_distintas
           FROM uso_aplicaciones
           WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
             AND substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) <= ?
@@ -309,15 +309,26 @@ export const analyticsRouter = router({
         }
 
         const result = await client.execute({ sql: sqlCount, args: argsCount });
-        return Number(result.rows[0]?.total) || 0;
+        return {
+          usos: Number(result.rows[0]?.total) || 0,
+          apps: Number(result.rows[0]?.apps_distintas) || 0,
+        };
       };
 
-      const usosHoy = await contarEnRango(hoy, hoy);
-      const usosAyer = await contarEnRango(ayer, ayer);
-      const usosUltimos7Dias = await contarEnRango(hace7Dias, hoy);
-      const usosSemanaAnterior = await contarEnRango(hace14Dias, hace7Dias);
-      const usosMesActual = await contarEnRango(inicioMesActual, hoy);
-      const usosMesAnterior = await contarEnRango(inicioMesAnterior, finMesAnterior);
+      const [rHoy, rAyer, rSemana, rSemanaAnterior, rMes, rMesAnterior] = await Promise.all([
+        contarEnRango(hoy, hoy),
+        contarEnRango(ayer, ayer),
+        contarEnRango(hace7Dias, hoy),
+        contarEnRango(hace14Dias, hace7Dias),
+        contarEnRango(inicioMesActual, hoy),
+        contarEnRango(inicioMesAnterior, finMesAnterior),
+      ]);
+      const usosHoy = rHoy.usos;
+      const usosAyer = rAyer.usos;
+      const usosUltimos7Dias = rSemana.usos;
+      const usosSemanaAnterior = rSemanaAnterior.usos;
+      const usosMesActual = rMes.usos;
+      const usosMesAnterior = rMesAnterior.usos;
 
       const calcularVariacion = (actual: number, anterior: number) => {
         if (anterior === 0) {
@@ -329,7 +340,8 @@ export const analyticsRouter = router({
       };
 
       const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
-      const usosAnteayer = await contarEnRango(anteayer, anteayer);
+      const rAnteayer = await contarEnRango(anteayer, anteayer);
+      const usosAnteayer = rAnteayer.usos;
 
       // Visitas que llegaron por un enlace compartido (?ref=share)
       let sharesSql = `
@@ -348,22 +360,26 @@ export const analyticsRouter = router({
       const comparativa = {
         hoy: {
           usos: usosHoy,
+          apps_distintas: rHoy.apps,
           comparacion: calcularVariacion(usosHoy, usosAyer),
           etiqueta: 'vs ayer',
         },
         ayer: {
           usos: usosAyer,
+          apps_distintas: rAyer.apps,
           comparacion: calcularVariacion(usosAyer, usosAnteayer),
           etiqueta: 'vs anteayer',
           fecha: formatoEspanol(ayer),
         },
         semana: {
           usos: usosUltimos7Dias,
+          apps_distintas: rSemana.apps,
           comparacion: calcularVariacion(usosUltimos7Dias, usosSemanaAnterior),
           etiqueta: 'vs semana anterior',
         },
         mes: {
           usos: usosMesActual,
+          apps_distintas: rMes.apps,
           comparacion: calcularVariacion(usosMesActual, usosMesAnterior),
           etiqueta: 'vs mes anterior',
         },
