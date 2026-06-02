@@ -176,8 +176,8 @@ export default function AnalyticsTracker({ applicationName, appName }: Analytics
       if (document.hidden) {
         // Usuario salió de la app (minimizó, cambió de pestaña, etc.)
         console.log('[Analytics] Usuario salió de la app');
+        registerDuration(); // Registrar ANTES de marcar inactivo (isActive debe ser true)
         isActive = false;
-        registerDuration();
       } else {
         // Usuario volvió a la app
         console.log('[Analytics] Usuario volvió a la app');
