@@ -143,6 +143,8 @@ export default function DashboardAnalyticsPage() {
   const [tabActiva, setTabActiva] = useState<'general' | 'tecnico' | 'ranking' | 'aplicacion' | 'registros' | 'resumen' | 'navegacion'>('general');
   const [appSeleccionada, setAppSeleccionada] = useState<string>('');
   const [filtroApp, setFiltroApp] = useState('');
+  const [mostrarDropdown, setMostrarDropdown] = useState(false);
+  const comboboxRef = useRef<HTMLDivElement>(null);
   const [filtroIPActivo, setFiltroIPActivo] = useState(true);
   const [filtroModo, setFiltroModo] = useState<'todos' | 'web' | 'referral-ia' | 'chatgpt' | 'mcp' | 'bot'>('todos');
 
@@ -240,6 +242,18 @@ export default function DashboardAnalyticsPage() {
       setFiltroIPActivo(prefLocal === 'true');
     }
   }, []);
+
+  // Cerrar dropdown al hacer clic fuera del combobox
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (comboboxRef.current && !comboboxRef.current.contains(e.target as Node)) {
+        setMostrarDropdown(false);
+        if (!appSeleccionada) setFiltroApp('');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [appSeleccionada]);
 
   const formatearNumero = (num: number) => {
     return num.toLocaleString('es-ES');
@@ -1139,32 +1153,55 @@ export default function DashboardAnalyticsPage() {
           <section className={styles.section}>
             <h2>🔍 Estadísticas por Aplicación</h2>
 
-            {/* Selector de aplicación con búsqueda */}
+            {/* Combobox con búsqueda integrada */}
             <div className={styles.appSelector}>
               <label>Selecciona una aplicación:</label>
-              <input
-                type="text"
-                placeholder="Buscar por nombre..."
-                value={filtroApp}
-                onChange={(e) => setFiltroApp(e.target.value)}
-                className={styles.searchApp}
-              />
-              <select
-                value={appSeleccionada}
-                onChange={(e) => { setAppSeleccionada(e.target.value); setFiltroApp(''); }}
-                className={styles.selectApp}
-              >
-                <option value="">-- Selecciona una aplicación --</option>
-                {datos.ranking_aplicaciones
-                  .filter((app: any) =>
-                    !filtroApp || String(app.aplicacion).toLowerCase().includes(filtroApp.toLowerCase())
-                  )
-                  .map((app: any) => (
-                    <option key={String(app.aplicacion)} value={String(app.aplicacion)}>
-                      {app.aplicacion} ({app.total_usos} usos)
-                    </option>
-                  ))}
-              </select>
+              <div className={styles.combobox} ref={comboboxRef}>
+                <input
+                  type="text"
+                  placeholder={appSeleccionada || 'Buscar o selecciona una app...'}
+                  value={filtroApp}
+                  onChange={(e) => { setFiltroApp(e.target.value); setMostrarDropdown(true); }}
+                  onFocus={() => setMostrarDropdown(true)}
+                  className={styles.comboboxInput}
+                  autoComplete="off"
+                />
+                {appSeleccionada && !filtroApp && (
+                  <button
+                    className={styles.comboboxClear}
+                    onClick={() => { setAppSeleccionada(''); setFiltroApp(''); }}
+                    aria-label="Limpiar selección"
+                  >✕</button>
+                )}
+                {mostrarDropdown && (
+                  <div className={styles.comboboxDropdown}>
+                    {datos.ranking_aplicaciones
+                      .filter((app: any) =>
+                        !filtroApp || String(app.aplicacion).toLowerCase().includes(filtroApp.toLowerCase())
+                      )
+                      .slice(0, 50)
+                      .map((app: any) => (
+                        <div
+                          key={String(app.aplicacion)}
+                          className={`${styles.comboboxOption} ${appSeleccionada === app.aplicacion ? styles.comboboxOptionActive : ''}`}
+                          onMouseDown={() => {
+                            setAppSeleccionada(String(app.aplicacion));
+                            setFiltroApp('');
+                            setMostrarDropdown(false);
+                          }}
+                        >
+                          <span className={styles.comboboxOptionName}>{app.aplicacion}</span>
+                          <span className={styles.comboboxOptionUsos}>{app.total_usos} usos</span>
+                        </div>
+                      ))}
+                    {datos.ranking_aplicaciones.filter((app: any) =>
+                      !filtroApp || String(app.aplicacion).toLowerCase().includes(filtroApp.toLowerCase())
+                    ).length === 0 && (
+                      <div className={styles.comboboxEmpty}>Sin resultados para &ldquo;{filtroApp}&rdquo;</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Estadísticas de la app seleccionada */}
