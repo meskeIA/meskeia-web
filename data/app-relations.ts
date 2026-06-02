@@ -2853,7 +2853,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // INFORMÁTICA Y PROGRAMACIÓN
   'quiz-complejidad-algoritmos': informaticaApps.filter(a => a.url !== '/quiz-complejidad-algoritmos/'),
-  'visualizador-arquitectura-computador': informaticaApps.filter(a => a.url !== '/visualizador-arquitectura-computador/'),
+  'visualizador-arquitectura-computador': [
+    ...informaticaApps.filter(a => a.url !== '/visualizador-arquitectura-computador/').slice(0, 3),
+    { url: '/comparador-velocidad-almacenamiento/', icon: '⚡', name: 'Velocidad de Almacenamiento', description: 'HDD, SSD NVMe, USB y UFS: tiempos reales de transferencia y jerarquía de velocidades' },
+  ],
   'visualizador-algoritmos': informaticaApps.filter(a => a.url !== '/visualizador-algoritmos/'),
   'playground-sql': informaticaApps.filter(a => a.url !== '/playground-sql/'),
   'simulador-puertas-logicas': [
@@ -4133,6 +4136,11 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-internet-60-segundos/', icon: '🌐', name: 'Internet en 60 Segundos', description: 'El viaje de un paquete HTTP desde el navegador hasta el servidor: DNS, TCP, IP y Ethernet en acción' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'TLS 1.3 protege cada conexión TCP: sin la capa de criptografía, las redes serían completamente inseguras' },
     { url: '/visualizador-sistemas-operativos/', icon: '🖥️', name: 'Sistemas Operativos', description: 'El SO gestiona la pila TCP/IP mediante syscalls y sockets — la red es un recurso más que administra el kernel' },
+  ],
+  'comparador-velocidad-almacenamiento': [
+    { url: '/visualizador-arquitectura-computador/', icon: '🖥️', name: 'Arquitectura de Computador', description: 'Von Neumann, CPU, memoria caché y jerarquía de memoria — el contexto hardware del almacenamiento' },
+    { url: '/visualizador-sistemas-operativos/', icon: '💻', name: 'Sistemas Operativos', description: 'El SO gestiona el acceso al disco: caché de página, scheduler de I/O y sistema de ficheros' },
+    { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'Velocidad de red vs velocidad de disco: Gigabit Ethernet (125 MB/s) vs NVMe Gen 4 (7.000 MB/s)' },
   ],
   'visualizador-sistemas-operativos': [
     { url: '/visualizador-redes-computadoras/', icon: '🌐', name: 'Redes de Computadoras', description: 'El SO implementa la pila TCP/IP: los sockets y syscalls son el puente entre las apps y la red física' },

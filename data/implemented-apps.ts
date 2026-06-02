@@ -150,6 +150,7 @@ export const implementedAppsUrls = [
   "/planificador-boda/",             // Wedding planner: checklist, presupuesto, timeline
   "/planificador-mudanzas/",         // Mudanza: tareas, inventario, presupuesto
   "/estimador-reformas-hogar/",    // Reformas: presupuesto estimado por tipo y m²
+  "/comparador-velocidad-almacenamiento/", // HDD/SSD/NVMe/USB/UFS: tiempo de transferencia con slider logarítmico 1MB-1TB
   "/guia-productos-limpieza/",    // 9 productos domésticos: usos, contraindicaciones y mezclas peligrosas
   "/calculadora-huella-carbono/",    // Huella de carbono personal
 
