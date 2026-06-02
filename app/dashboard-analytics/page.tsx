@@ -1133,7 +1133,7 @@ export default function DashboardAnalyticsPage() {
                   const appData = datos.ranking_aplicaciones.find((a: any) => a.aplicacion === appSeleccionada);
                   const registrosApp = datos.data.filter((r: any) => r.aplicacion === appSeleccionada);
                   const registrosHoy = registrosApp.filter((r: any) => {
-                    const partes = r.timestamp.split(' ');
+                    const partes = r.timestamp.split(', '); // formato: "DD/MM/YYYY, HH:MM:SS"
                     if (partes.length !== 2) return false;
                     const [fecha] = partes;
                     const [dia, mes, anio] = fecha.split('/');
