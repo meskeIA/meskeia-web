@@ -70,6 +70,22 @@ const guias = [
     tools: 5,
   },
   {
+    slug: 'accesibilidad',
+    icon: '♿',
+    title: 'Accesibilidad Digital',
+    description:
+      'Kit de apoyos visuales para autismo, TDAH y dislexia. Herramientas de regulación emocional, comunicación, lectura y rutinas. Sin registro ni instalación.',
+    tools: 9,
+  },
+  {
+    slug: 'herencias',
+    icon: '📜',
+    title: 'Gestionar una Herencia',
+    description:
+      'Documentos, impuestos y plazos para tramitar una herencia en España. Impuesto de sucesiones por comunidad autónoma, donaciones y plusvalía municipal.',
+    tools: 4,
+  },
+  {
     slug: 'pensar-mejor',
     icon: '🧠',
     title: 'Pensar Mejor',
