@@ -169,17 +169,26 @@ export default function DashboardAnalyticsPage() {
     { enabled: true }
   );
 
-  // tRPC: Resumen por origen (nueva pestaña)
-  const resumenQuery = trpc.analytics.getResumen.useQuery({});
+  // tRPC: Resumen por origen — lazy: solo carga cuando el tab está activo
+  const resumenQuery = trpc.analytics.getResumen.useQuery(
+    {},
+    { enabled: tabActiva === 'resumen' }
+  );
 
-  // tRPC: Navegación (apps por sesión, pares from→to, apps puente)
-  const navegacionQuery = trpc.analytics.getNavegacion.useQuery({ dias: 14 });
+  // tRPC: Navegación — lazy: solo carga cuando el tab está activo
+  const navegacionQuery = trpc.analytics.getNavegacion.useQuery(
+    { dias: 14 },
+    { enabled: tabActiva === 'navegacion' }
+  );
 
   // tRPC: Tendencias históricas (mensual 2026, canales, LATAM)
   const tendenciasQuery = trpc.analytics.getTendencias.useQuery({ excluir_mi_ip: filtroIPActivo });
 
-  // tRPC: Distribución de duraciones de visita
-  const distribucionQuery = trpc.analytics.getDistribucionDuraciones.useQuery({ excluir_mi_ip: filtroIPActivo });
+  // tRPC: Distribución de duraciones — lazy: solo carga cuando el tab está activo
+  const distribucionQuery = trpc.analytics.getDistribucionDuraciones.useQuery(
+    { excluir_mi_ip: filtroIPActivo },
+    { enabled: tabActiva === 'tecnico' }
+  );
 
   // tRPC: Obtener configuración de IP
   const ipConfigQuery = trpc.analytics.getIPConfig.useQuery(
@@ -201,7 +210,7 @@ export default function DashboardAnalyticsPage() {
 
   // Variables derivadas de los queries
   const datos = statsQuery.data || null;
-  const loading = statsQuery.isLoading || statsQuery.isFetching || resumenQuery.isFetching || tendencia30Query.isFetching;
+  const loading = statsQuery.isLoading || statsQuery.isFetching || tendencia30Query.isFetching;
   const error = statsQuery.error?.message || null;
   const ipConfig = ipConfigQuery.data?.data || null;
   const actualizandoIP = updateIPMutation.isPending;
