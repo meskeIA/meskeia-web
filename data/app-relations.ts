@@ -2439,6 +2439,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Qué modelo elegir según tu caso de uso' },
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor o dejar de pensar?' },
   ],
+  'comparador-asistentes-codigo': [
+    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'ChatGPT, Claude, Gemini, Copilot, Mistral — comparativa general' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones efectivas para cualquier IA' },
+    { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuenta tokens y calcula costes de API' },
+    { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son buenas?' },
+  ],
   'arbol-decision-ia': [
     { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo Funcionan los LLMs', description: 'Tokens, embeddings, atención y parámetros avanzados' },
     { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cómo dividen el texto en tokens los LLMs' },
@@ -4320,10 +4326,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   // Herramientas de Referencia
   'visualizador-comparador-ia': [
+    { url: '/comparador-asistentes-codigo/', icon: '⌨️', name: 'Asistentes de Código IA', description: 'Claude Code, Copilot, Gemini Code Assist y Codex — cuál usar para programar' },
     { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Ya elegiste tu IA — ahora crea instrucciones que funcionen de verdad' },
     { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son específicas o vagas?' },
-    { url: '/visualizador-impacto-ia-sectores/', icon: '🏭', name: 'Impacto de la IA en los Sectores', description: 'Qué empleos están en riesgo y cuáles emergen con la automatización' },
-    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Las IAs generativas son el último capítulo de la evolución de internet' },
+    { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuenta tokens y calcula costes de API en tiempo real' },
   ],
   // Cronologías Sociedad y Cultura — Grupo 6
   'visualizador-historia-economia-espana': [
