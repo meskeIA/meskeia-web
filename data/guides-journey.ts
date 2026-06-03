@@ -115,4 +115,13 @@ export const guidesJourney: GuideJourney[] = [
     toolsCount: 14,
     available: true,
   },
+  {
+    id: 'programar-con-ia',
+    name: 'Guía para Programar con IA',
+    icon: '🚀',
+    description: 'Tengo una idea para una web, app o script. ¿Por dónde empiezo? Elige herramientas, aprende a dar instrucciones y construye algo real',
+    url: '/guia/programar-con-ia/',
+    toolsCount: 6,
+    available: true,
+  },
 ];
