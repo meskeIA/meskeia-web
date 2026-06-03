@@ -633,7 +633,8 @@ export const implementedAppsUrls = [
   "/diagnostico-brecha-ia/",               // Reflexión: brecha IA — criterio propio + aprovechamiento IA, 10 preguntas, perfil + acciones
   "/evaluador-prompts/",                   // Reflexión: prompt engineering — calidad instrucciones + procesamiento salida, 10 preguntas, perfil + acciones
   "/arbol-decision-ia/",                 // Árbol de decisión visual
-  "/comparador-asistentes-codigo/",      // Claude Code vs Copilot vs Gemini Code Assist vs Codex — 4 tabs: comparativa, acceso, perfiles, combinaciones IDE + algoritmo Gini/ID3 + 3 datasets editables + clasificador
+  "/comparador-asistentes-codigo/",      // Claude Code vs Copilot
+  "/comparador-ides-ia/",               // Cursor vs Windsurf vs VS Code vs Zed vs JetBrains — 4 tabs con cross-link a asistentes vs Gemini Code Assist vs Codex — 4 tabs: comparativa, acceso, perfiles, combinaciones IDE + algoritmo Gini/ID3 + 3 datasets editables + clasificador
   "/constructor-prompts/",               // Wizard 5 pasos: construye prompts efectivos para cualquier IA (modelo, objetivo, rol, formato, restricciones)
   "/tokenizador-ia/",                    // Tokenizador visual BPE + stats en tiempo real + calculadora de costes con precios editables (6 modelos)
   "/test-dependencia-tecnologica/",        // Reflexión: dependencia tecnológica — autonomía real + adaptabilidad, 10 preguntas, perfil + acciones

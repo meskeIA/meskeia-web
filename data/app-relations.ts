@@ -2439,11 +2439,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Qué modelo elegir según tu caso de uso' },
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor o dejar de pensar?' },
   ],
+  'comparador-ides-ia': [
+    { url: '/comparador-asistentes-codigo/', icon: '⌨️', name: 'Asistentes de Código IA', description: 'Claude Code, Copilot, Gemini Code Assist y Codex — cuál asistente añadir a tu IDE' },
+    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'ChatGPT, Claude, Gemini — comparativa general más allá del código' },
+    { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuántos tokens usa tu código y cuánto cuesta la API' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones efectivas para tu asistente de código' },
+  ],
   'comparador-asistentes-codigo': [
+    { url: '/comparador-ides-ia/', icon: '🖥️', name: 'IDEs con IA 2026', description: 'Cursor, Windsurf, VS Code, Zed — dónde instalar tu asistente' },
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'ChatGPT, Claude, Gemini, Copilot, Mistral — comparativa general' },
     { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones efectivas para cualquier IA' },
     { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuenta tokens y calcula costes de API' },
-    { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son buenas?' },
   ],
   'arbol-decision-ia': [
     { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo Funcionan los LLMs', description: 'Tokens, embeddings, atención y parámetros avanzados' },
