@@ -77,6 +77,14 @@ const guias = [
       'Herramientas de reflexión profesional: conócete, decide mejor y emprende con criterio. Tests basados en Kahneman, Csikszentmihalyi, Bezos y Osterwalder.',
     tools: 14,
   },
+  {
+    slug: 'programar-con-ia',
+    icon: '🚀',
+    title: 'Programar con IA',
+    description:
+      'Tengo una idea para una web, app o script. Nunca lo he hecho solo. ¿Por dónde empiezo? Elige tus herramientas, aprende a dar instrucciones y construye algo real paso a paso.',
+    tools: 6,
+  },
 ];
 
 export default function GuiasIndexPage() {

@@ -2439,6 +2439,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Qué modelo elegir según tu caso de uso' },
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor o dejar de pensar?' },
   ],
+  'guia-programar-con-ia': [
+    { url: '/comparador-ides-ia/', icon: '🖥️', name: 'IDEs con IA 2026', description: 'Cursor, Windsurf, VS Code, Zed — cuál usar para empezar' },
+    { url: '/comparador-asistentes-codigo/', icon: '⌨️', name: 'Asistentes de Código IA', description: 'Claude Code, Copilot, Gemini — cuál añadir a tu IDE' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones claras para la IA paso a paso' },
+    { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son lo suficientemente buenas?' },
+  ],
   'comparador-ides-ia': [
     { url: '/comparador-asistentes-codigo/', icon: '⌨️', name: 'Asistentes de Código IA', description: 'Claude Code, Copilot, Gemini Code Assist y Codex — cuál asistente añadir a tu IDE' },
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'ChatGPT, Claude, Gemini — comparativa general más allá del código' },
