@@ -297,44 +297,57 @@ export const analyticsRouter = router({
       const inicioMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
       const finMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
 
-      const contarEnRango = async (fechaInicio: Date, fechaFin: Date): Promise<{ usos: number; apps: number }> => {
-        let sqlCount = `
-          SELECT COUNT(*) as total, COUNT(DISTINCT aplicacion) as apps_distintas
+      // Comparativa temporal consolidada en UNA sola consulta (antes eran 7 round-trips).
+      // Agregación condicional sobre la fecha reordenada a YYYYMMDD. Las claves de fecha
+      // son valores generados en servidor (8 dígitos), seguras para embeber en el SQL.
+      // El WHERE fo >= inicioMesAnterior limita el escaneo al rango necesario.
+      const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
+      const fmtOrd = (f: Date) =>
+        `${f.getFullYear()}${String(f.getMonth() + 1).padStart(2, '0')}${String(f.getDate()).padStart(2, '0')}`;
+      const hoyS = fmtOrd(hoy), ayerS = fmtOrd(ayer), anteayerS = fmtOrd(anteayer);
+      const hace7S = fmtOrd(hace7Dias), hace14S = fmtOrd(hace14Dias);
+      const iMesS = fmtOrd(inicioMesActual), iMesAntS = fmtOrd(inicioMesAnterior), fMesAntS = fmtOrd(finMesAnterior);
+
+      let compSql = `
+        SELECT
+          SUM(CASE WHEN fo = '${hoyS}' THEN 1 ELSE 0 END) as usos_hoy,
+          SUM(CASE WHEN fo = '${ayerS}' THEN 1 ELSE 0 END) as usos_ayer,
+          SUM(CASE WHEN fo = '${anteayerS}' THEN 1 ELSE 0 END) as usos_anteayer,
+          SUM(CASE WHEN fo >= '${hace7S}' AND fo <= '${hoyS}' THEN 1 ELSE 0 END) as usos_semana,
+          SUM(CASE WHEN fo >= '${hace14S}' AND fo <= '${hace7S}' THEN 1 ELSE 0 END) as usos_semana_ant,
+          SUM(CASE WHEN fo >= '${iMesS}' AND fo <= '${hoyS}' THEN 1 ELSE 0 END) as usos_mes,
+          SUM(CASE WHEN fo >= '${iMesAntS}' AND fo <= '${fMesAntS}' THEN 1 ELSE 0 END) as usos_mes_ant,
+          COUNT(DISTINCT CASE WHEN fo = '${hoyS}' THEN aplicacion END) as apps_hoy,
+          COUNT(DISTINCT CASE WHEN fo = '${ayerS}' THEN aplicacion END) as apps_ayer,
+          COUNT(DISTINCT CASE WHEN fo >= '${hace7S}' AND fo <= '${hoyS}' THEN aplicacion END) as apps_semana,
+          COUNT(DISTINCT CASE WHEN fo >= '${iMesS}' AND fo <= '${hoyS}' THEN aplicacion END) as apps_mes
+        FROM (
+          SELECT
+            substr(timestamp,7,4) || substr(timestamp,4,2) || substr(timestamp,1,2) as fo,
+            aplicacion, ip_address
           FROM uso_aplicaciones
-          WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
-            AND substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) <= ?
-        `;
-        const argsCount: string[] = [
-          `${fechaInicio.getFullYear()}${String(fechaInicio.getMonth() + 1).padStart(2, '0')}${String(fechaInicio.getDate()).padStart(2, '0')}`,
-          `${fechaFin.getFullYear()}${String(fechaFin.getMonth() + 1).padStart(2, '0')}${String(fechaFin.getDate()).padStart(2, '0')}`,
-        ];
+        )
+        WHERE fo >= '${iMesAntS}'
+      `;
+      const compArgs: string[] = [];
+      if (ipExcluida) {
+        compSql += ' AND (ip_address IS NULL OR ip_address != ?)';
+        compArgs.push(ipExcluida);
+      }
+      const compRes = await client.execute({ sql: compSql, args: compArgs });
+      const cmp = compRes.rows[0];
 
-        if (ipExcluida) {
-          sqlCount += ' AND (ip_address IS NULL OR ip_address != ?)';
-          argsCount.push(ipExcluida);
-        }
-
-        const result = await client.execute({ sql: sqlCount, args: argsCount });
-        return {
-          usos: Number(result.rows[0]?.total) || 0,
-          apps: Number(result.rows[0]?.apps_distintas) || 0,
-        };
-      };
-
-      const [rHoy, rAyer, rSemana, rSemanaAnterior, rMes, rMesAnterior] = await Promise.all([
-        contarEnRango(hoy, hoy),
-        contarEnRango(ayer, ayer),
-        contarEnRango(hace7Dias, hoy),
-        contarEnRango(hace14Dias, hace7Dias),
-        contarEnRango(inicioMesActual, hoy),
-        contarEnRango(inicioMesAnterior, finMesAnterior),
-      ]);
+      const rHoy = { usos: Number(cmp.usos_hoy) || 0, apps: Number(cmp.apps_hoy) || 0 };
+      const rAyer = { usos: Number(cmp.usos_ayer) || 0, apps: Number(cmp.apps_ayer) || 0 };
+      const rSemana = { usos: Number(cmp.usos_semana) || 0, apps: Number(cmp.apps_semana) || 0 };
+      const rMes = { usos: Number(cmp.usos_mes) || 0, apps: Number(cmp.apps_mes) || 0 };
       const usosHoy = rHoy.usos;
       const usosAyer = rAyer.usos;
       const usosUltimos7Dias = rSemana.usos;
-      const usosSemanaAnterior = rSemanaAnterior.usos;
+      const usosSemanaAnterior = Number(cmp.usos_semana_ant) || 0;
       const usosMesActual = rMes.usos;
-      const usosMesAnterior = rMesAnterior.usos;
+      const usosMesAnterior = Number(cmp.usos_mes_ant) || 0;
+      const usosAnteayer = Number(cmp.usos_anteayer) || 0;
 
       const calcularVariacion = (actual: number, anterior: number) => {
         if (anterior === 0) {
@@ -344,10 +357,6 @@ export const analyticsRouter = router({
         const tendencia = porcentaje > 0 ? ('up' as const) : porcentaje < 0 ? ('down' as const) : ('neutral' as const);
         return { porcentaje: Math.abs(porcentaje), tendencia };
       };
-
-      const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
-      const rAnteayer = await contarEnRango(anteayer, anteayer);
-      const usosAnteayer = rAnteayer.usos;
 
       // Visitas que llegaron por un enlace compartido (?ref=share)
       let sharesSql = `

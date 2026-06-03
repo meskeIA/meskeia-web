@@ -35,11 +35,31 @@ export function getTursoClient() {
   return tursoClient;
 }
 
+// Promesa de inicialización cacheada: garantiza que los CREATE TABLE/INDEX
+// se ejecutan UNA sola vez por instancia de función serverless (cold start),
+// no en cada llamada a un procedure. Antes costaba ~863ms por cada query.
+let initPromise: Promise<boolean> | null = null;
+
 /**
- * Inicializa la base de datos creando las tablas necesarias
- * Se ejecuta automáticamente en el primer request
+ * Inicializa la base de datos creando las tablas necesarias.
+ * Idempotente y cacheado: solo hace el trabajo real la primera vez.
  */
-export async function initializeDatabase() {
+export function initializeDatabase(): Promise<boolean> {
+  if (!initPromise) {
+    initPromise = doInitializeDatabase().catch((err) => {
+      // Si falla, permitir reintento en la siguiente llamada
+      initPromise = null;
+      throw err;
+    });
+  }
+  return initPromise;
+}
+
+/**
+ * Trabajo real de inicialización (CREATE TABLE / INDEX).
+ * No llamar directamente — usar initializeDatabase().
+ */
+async function doInitializeDatabase(): Promise<boolean> {
   const client = getTursoClient();
 
   // Crear tabla de uso de aplicaciones (compatible con esquema anterior)
