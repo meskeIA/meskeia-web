@@ -2428,10 +2428,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/auditoria-habilidades-mercado/', icon: '🎯', name: 'Habilidades vs Mercado', description: '¿Lo que sabes es lo que se necesita?' },
   ],
   'evaluador-prompts': [
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea prompts paso a paso para cualquier IA' },
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor?' },
     { url: '/mapa-automatizacion-personal/', icon: '🗺️', name: 'Automatización Personal', description: '¿Qué automatizar y qué proteger?' },
-    { url: '/test-dependencia-tecnologica/', icon: '🔗', name: 'Dependencia Tecnológica', description: '¿Podrías trabajar sin IA?' },
-    { url: '/detector-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: '¿Decides bien o decides rápido?' },
+    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs', description: 'ChatGPT, Claude, Gemini y más — guía interactiva' },
+  ],
+  'constructor-prompts': [
+    { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son buenas?' },
+    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Qué modelo elegir según tu caso de uso' },
+    { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor o dejar de pensar?' },
+    { url: '/mapa-automatizacion-personal/', icon: '🗺️', name: 'Automatización Personal', description: '¿Qué automatizar y qué proteger?' },
   ],
   'test-dependencia-tecnologica': [
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor?' },
@@ -4302,10 +4308,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   // Herramientas de Referencia
   'visualizador-comparador-ia': [
-    { url: '/visualizador-impacto-ia-sectores/', icon: '🏭', name: 'Impacto de la IA en los Sectores', description: 'Qué empleos están en riesgo y cuáles emergen con la automatización: el contexto laboral de estas IAs' },
-    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Las IAs generativas son el último capítulo de la evolución de internet que empezó con ARPANET en 1969' },
-    { url: '/visualizador-historia/informatica/', icon: '💾', name: 'Historia de la Informática', description: 'Los LLMs son la culminación de décadas de investigación en computación, redes neuronales e inteligencia artificial' },
-    { url: '/visualizador-historia/matematicas/', icon: '📐', name: 'Historia de las Matemáticas', description: 'El álgebra lineal, la estadística bayesiana y el cálculo son los pilares matemáticos de los modelos de IA' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Ya elegiste tu IA — ahora crea instrucciones que funcionen de verdad' },
+    { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son específicas o vagas?' },
+    { url: '/visualizador-impacto-ia-sectores/', icon: '🏭', name: 'Impacto de la IA en los Sectores', description: 'Qué empleos están en riesgo y cuáles emergen con la automatización' },
+    { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Las IAs generativas son el último capítulo de la evolución de internet' },
   ],
   // Cronologías Sociedad y Cultura — Grupo 6
   'visualizador-historia-economia-espana': [
