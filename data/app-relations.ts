@@ -1536,9 +1536,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-llm-funcionamiento': [
     { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuenta los tokens de tu texto y calcula el coste de API' },
-    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones efectivas para cualquier LLM' },
+    { url: '/arbol-decision-ia/', icon: '🌳', name: 'Árbol de Decisión', description: 'Visualiza cómo una máquina aprende a clasificar datos' },
     { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'IA y Redes Neuronales', description: 'Las redes que hacen posibles los transformers' },
-    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Tabla comparativa de GPT-4o, Claude, Gemini y más' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones efectivas para cualquier LLM' },
   ],
   'visualizador-ciclo-economico': [
     { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Cómo el BCE usa los tipos para modular el ciclo' },
@@ -2438,6 +2438,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuántos tokens usa tu prompt y cuánto cuesta' },
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Qué modelo elegir según tu caso de uso' },
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor o dejar de pensar?' },
+  ],
+  'arbol-decision-ia': [
+    { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo Funcionan los LLMs', description: 'Tokens, embeddings, atención y parámetros avanzados' },
+    { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cómo dividen el texto en tokens los LLMs' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'IA y Redes Neuronales', description: 'Cómo aprenden las redes neuronales' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones paso a paso para IAs' },
   ],
   'tokenizador-ia': [
     { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones paso a paso para cualquier IA' },
