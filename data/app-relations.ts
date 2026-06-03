@@ -1535,10 +1535,10 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-deuda-publica/', icon: '📊', name: 'Deuda Pública', description: 'El coste económico del cambio climático' },
   ],
   'visualizador-llm-funcionamiento': [
-    { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'La computación cuántica podría acelerar los LLMs' },
+    { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuenta los tokens de tu texto y calcula el coste de API' },
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones efectivas para cualquier LLM' },
     { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'IA y Redes Neuronales', description: 'Las redes que hacen posibles los transformers' },
-    { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Cómo se protegen las comunicaciones con los LLMs' },
-    { url: '/curso-optimizacion-ia/', icon: '📊', name: 'Curso GEO/AEO', description: 'Optimiza tu contenido para que los LLMs te citen' },
+    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Tabla comparativa de GPT-4o, Claude, Gemini y más' },
   ],
   'visualizador-ciclo-economico': [
     { url: '/visualizador-tipos-interes-bce/', icon: '🏦', name: 'Tipos de Interés BCE', description: 'Cómo el BCE usa los tipos para modular el ciclo' },
@@ -2435,9 +2435,15 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'constructor-prompts': [
     { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son buenas?' },
+    { url: '/tokenizador-ia/', icon: '🔤', name: 'Tokenizador Visual', description: 'Cuántos tokens usa tu prompt y cuánto cuesta' },
     { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Qué modelo elegir según tu caso de uso' },
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor o dejar de pensar?' },
-    { url: '/mapa-automatizacion-personal/', icon: '🗺️', name: 'Automatización Personal', description: '¿Qué automatizar y qué proteger?' },
+  ],
+  'tokenizador-ia': [
+    { url: '/constructor-prompts/', icon: '🧱', name: 'Constructor de Prompts', description: 'Crea instrucciones paso a paso para cualquier IA' },
+    { url: '/evaluador-prompts/', icon: '💬', name: 'Evaluador de Prompts', description: '¿Tus instrucciones a la IA son específicas o vagas?' },
+    { url: '/visualizador-comparador-ia/', icon: '🗂️', name: 'Comparador de IAs 2026', description: 'Cuál es el modelo más adecuado para tu caso' },
+    { url: '/visualizador-llm-funcionamiento/', icon: '🤖', name: 'Cómo Funcionan los LLMs', description: 'Tokens, embeddings, atención y temperatura explicados' },
   ],
   'test-dependencia-tecnologica': [
     { url: '/diagnostico-brecha-ia/', icon: '🧠', name: 'Brecha IA', description: '¿Usas la IA para pensar mejor?' },
