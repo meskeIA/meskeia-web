@@ -179,6 +179,44 @@ function elegirToken(distribucion: DistribucionTemp[]): string {
   return distribucion[distribucion.length - 1].palabra;
 }
 
+// Nucleus sampling: palabras cuya probabilidad acumulada (de mayor a menor) cubre topP*100 %
+function calcularNucleo(dist: DistribucionTemp[], topP: number): Set<string> {
+  const sorted = [...dist].sort((a, b) => b.prob - a.prob);
+  const nucleo = new Set<string>();
+  let acum = 0;
+  for (const d of sorted) {
+    if (acum >= topP * 100) break;
+    nucleo.add(d.palabra);
+    acum += d.prob;
+  }
+  return nucleo;
+}
+
+function getEjemploPenalizacion(freq: number, pres: number): { titulo: string; texto: string } {
+  const total = (freq + pres) / 2;
+  if (total < 0.3) return {
+    titulo: 'Sin penalización — repetición frecuente',
+    texto: 'El modelo respondió. La respuesta del modelo fue larga. El modelo siguió respondiendo y la respuesta del modelo continuó repitiéndose sin variación.',
+  };
+  if (total < 1.2) return {
+    titulo: 'Penalización moderada — equilibrio natural',
+    texto: 'El modelo respondió con detalle. La contestación resultó extensa. El asistente continuó generando texto relevante sin repetir las mismas palabras.',
+  };
+  return {
+    titulo: 'Penalización alta — vocabulario muy diverso',
+    texto: 'El sistema emitió información pertinente. La comunicación resultó amplia. El agente prosiguió elaborando contenido enriquecido, evitando reutilizar términos previos.',
+  };
+}
+
+const TABLA_RECOMENDACIONES = [
+  { tarea: 'Código / SQL', temp: '0.1', topP: '0.9', freq: '0', pres: '0', nota: 'Máxima precisión, sin creatividad' },
+  { tarea: 'Preguntas factuales', temp: '0.0', topP: '—', freq: '0', pres: '0', nota: 'Totalmente determinista' },
+  { tarea: 'Emails profesionales', temp: '0.5', topP: '0.9', freq: '0.1', pres: '0', nota: 'Coherente y sin repeticiones' },
+  { tarea: 'Redacción creativa', temp: '0.9', topP: '0.95', freq: '0.3', pres: '0.1', nota: 'Variedad sin caos' },
+  { tarea: 'Brainstorming / ideas', temp: '1.2', topP: '0.95', freq: '0.5', pres: '0.3', nota: 'Máxima diversidad temática' },
+  { tarea: 'Chatbot conversacional', temp: '0.7', topP: '0.9', freq: '0.1', pres: '0.1', nota: 'Natural y variado' },
+];
+
 // Frase de atención
 const FRASE_ATENCION = ['El', 'banco', 'está', 'cerca', 'del', 'río'];
 
@@ -229,6 +267,13 @@ export default function VisualizadorLlmFuncionamiento() {
   const [temperatura, setTemperatura] = useState(1.0);
   const [textoGenerado, setTextoGenerado] = useState('El cielo es...');
   const distribucion = getDistribucion(temperatura);
+
+  // Sección 5: Parámetros avanzados
+  const [topP, setTopP] = useState(0.9);
+  const [freqPenalty, setFreqPenalty] = useState(0.0);
+  const [presPenalty, setPresPenalty] = useState(0.0);
+  const nucleo = calcularNucleo(distribucion, topP);
+  const ejemploPenalizacion = getEjemploPenalizacion(freqPenalty, presPenalty);
 
   const handleTextoChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextoInput(e.target.value);
@@ -706,6 +751,134 @@ export default function VisualizadorLlmFuncionamiento() {
               >
                 🔄 Reiniciar
               </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Sección 5: Parámetros Avanzados ──────────────────── */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon} aria-hidden="true">⚙️</span>
+            <div>
+              <h2 className={styles.sectionTitle}>Parámetros avanzados — top-p, frequency y presence penalty</h2>
+              <p className={styles.sectionSubtitle}>
+                Además de la temperatura, hay tres parámetros que controlan la diversidad y la repetición. Ajústalos para ver su efecto.
+              </p>
+            </div>
+          </div>
+
+          {/* top-p */}
+          <div className={styles.paramBloque}>
+            <div className={styles.paramCabecera}>
+              <span className={styles.paramNombre}>top-p <span className={styles.paramAlias}>(nucleus sampling)</span></span>
+              <span className={styles.paramValorBadge}>{topP.toFixed(2)}</span>
+            </div>
+            <p className={styles.paramDesc}>
+              Solo considera las palabras cuya probabilidad acumulada (de mayor a menor) no supera este valor.
+              Las palabras fuera del núcleo quedan excluidas sin importar su probabilidad individual.
+            </p>
+            <input
+              type="range" min={0.1} max={1.0} step={0.05}
+              value={topP} onChange={(e) => setTopP(parseFloat(e.target.value))}
+              className={styles.paramSlider}
+              aria-label={`top-p: ${topP.toFixed(2)}`}
+            />
+            <div className={styles.paramTicksRow}>
+              <span>0.1 — solo la más probable</span>
+              <span>0.9 — estándar</span>
+              <span>1.0 — todas</span>
+            </div>
+            <p className={styles.paramSubDesc}>
+              Distribución actual (temperatura {temperatura.toFixed(1)}) — palabras en el núcleo marcadas:
+            </p>
+            <div className={styles.nucleoWrapper} role="list" aria-label="Distribución con nucleus sampling">
+              {[...distribucion].sort((a, b) => b.prob - a.prob).map((d) => {
+                const enNucleo = nucleo.has(d.palabra);
+                return (
+                  <div key={d.palabra} className={`${styles.nucleoFila} ${enNucleo ? styles.nucleoFilaActiva : styles.nucleoFilaFuera}`}
+                    role="listitem" aria-label={`${d.palabra}: ${d.prob}% — ${enNucleo ? 'en el núcleo' : 'excluida'}`}>
+                    <span className={styles.nucleoPalabra}>{d.palabra}</span>
+                    <div className={styles.probBarraWrapper}>
+                      <div className={styles.barraProb} style={{ width: `${d.prob}%`, opacity: enNucleo ? 1 : 0.25 }} />
+                    </div>
+                    <span className={styles.probPorcentaje}>{d.prob}%</span>
+                    <span className={styles.nucleoBadge}>{enNucleo ? '✓ núcleo' : '✗ fuera'}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className={styles.warningBox} style={{ marginTop: '0.75rem' }}>
+              <span aria-hidden="true">💡</span>
+              <span>Normalmente se ajusta <strong>temperature O top-p</strong>, no los dos a la vez. Combinarlos puede producir resultados impredecibles.</span>
+            </div>
+          </div>
+
+          {/* frequency_penalty y presence_penalty */}
+          <div className={styles.paramBloque}>
+            <div className={styles.penaltyGrid}>
+              <div>
+                <div className={styles.paramCabecera}>
+                  <span className={styles.paramNombre}>frequency_penalty</span>
+                  <span className={styles.paramValorBadge}>{freqPenalty.toFixed(1)}</span>
+                </div>
+                <p className={styles.paramDesc}>
+                  Reduce la probabilidad de cada palabra <em>proporcionalmente</em> a cuántas veces ya apareció en el texto generado.
+                </p>
+                <input type="range" min={0} max={2} step={0.1} value={freqPenalty}
+                  onChange={(e) => setFreqPenalty(parseFloat(e.target.value))}
+                  className={styles.paramSlider} aria-label={`frequency_penalty: ${freqPenalty.toFixed(1)}`} />
+                <div className={styles.paramTicksRow}><span>0 sin efecto</span><span>2 máximo</span></div>
+              </div>
+              <div>
+                <div className={styles.paramCabecera}>
+                  <span className={styles.paramNombre}>presence_penalty</span>
+                  <span className={styles.paramValorBadge}>{presPenalty.toFixed(1)}</span>
+                </div>
+                <p className={styles.paramDesc}>
+                  Penaliza palabras que ya aparecieron <em>al menos una vez</em>, sin importar cuántas. Favorece nuevos temas.
+                </p>
+                <input type="range" min={0} max={2} step={0.1} value={presPenalty}
+                  onChange={(e) => setPresPenalty(parseFloat(e.target.value))}
+                  className={styles.paramSlider} aria-label={`presence_penalty: ${presPenalty.toFixed(1)}`} />
+                <div className={styles.paramTicksRow}><span>0 sin efecto</span><span>2 máximo</span></div>
+              </div>
+            </div>
+            <div className={styles.penaltyEjemplo} role="status" aria-live="polite">
+              <p className={`${styles.penaltyTitulo} ${(freqPenalty + presPenalty) < 0.3 ? styles.penaltyTituloMal : (freqPenalty + presPenalty) > 2 ? styles.penaltyTituloAlto : styles.penaltyTituloBien}`}>
+                {(freqPenalty + presPenalty) < 0.3 ? '❌' : (freqPenalty + presPenalty) > 2 ? '⚠️' : '✅'} {ejemploPenalizacion.titulo}
+              </p>
+              <p className={styles.penaltyTexto}>&ldquo;{ejemploPenalizacion.texto}&rdquo;</p>
+            </div>
+          </div>
+
+          {/* Tabla de recomendaciones */}
+          <div className={styles.paramBloque}>
+            <h3 className={styles.paramTitulo}>Configuraciones recomendadas por caso de uso</h3>
+            <div className={styles.tablaRecomWrapper}>
+              <table className={styles.tablaRecom} aria-label="Configuraciones recomendadas de parámetros por tarea">
+                <thead>
+                  <tr>
+                    <th className={styles.thRecom}>Tarea</th>
+                    <th className={styles.thRecom}>temperature</th>
+                    <th className={styles.thRecom}>top-p</th>
+                    <th className={styles.thRecom}>freq_pen</th>
+                    <th className={styles.thRecom}>pres_pen</th>
+                    <th className={styles.thRecom}>Por qué</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TABLA_RECOMENDACIONES.map((r) => (
+                    <tr key={r.tarea} className={styles.trRecom}>
+                      <td className={styles.tdRecom}><strong>{r.tarea}</strong></td>
+                      <td className={styles.tdRecom}>{r.temp}</td>
+                      <td className={styles.tdRecom}>{r.topP}</td>
+                      <td className={styles.tdRecom}>{r.freq}</td>
+                      <td className={styles.tdRecom}>{r.pres}</td>
+                      <td className={styles.tdRecom} style={{ fontSize: '0.78rem', color: 'var(--text-secondary, #666)' }}>{r.nota}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
