@@ -159,14 +159,14 @@ export const analyticsRouter = router({
       const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
 
       // Ranking de aplicaciones (con filtro de IP si está activo)
-      // - ultimo_uso via subconsulta con MAX(id) para evitar error de orden en DD/MM/YYYY
+      // - ultimo_uso: MAX sobre "YYYYMMDD" (reordenando substr) → ordena correctamente entre meses
+      //   sin subconsulta correlacionada (que causaba N queries por app → lentitud crítica)
       // - duracion_promedio excluye sesiones > 2h (7200s) para evitar distorsión por tabs abandonadas
       let rankingSql = `
         SELECT
           u1.aplicacion,
           COUNT(*) as total_usos,
-          (SELECT u2.timestamp FROM uso_aplicaciones u2
-           WHERE u2.aplicacion = u1.aplicacion ORDER BY u2.id DESC LIMIT 1) as ultimo_uso,
+          MAX(substr(u1.timestamp,7,4) || substr(u1.timestamp,4,2) || substr(u1.timestamp,1,2)) as ultimo_uso,
           AVG(CASE WHEN u1.duracion_segundos IS NOT NULL AND u1.duracion_segundos <= 7200
               THEN u1.duracion_segundos END) as duracion_promedio_segundos
         FROM uso_aplicaciones u1
@@ -187,10 +187,16 @@ export const analyticsRouter = router({
         if (usos >= 50) estado = '✅ Activa';
         else if (usos >= 10) estado = '⚠️ Bajo uso';
 
+        // Convertir "20260602" (YYYYMMDD) → "02/06/2026" para mostrar
+        const raw = String(app.ultimo_uso || '');
+        const ultimo_uso = raw.length === 8
+          ? `${raw.slice(6, 8)}/${raw.slice(4, 6)}/${raw.slice(0, 4)}`
+          : raw;
+
         return {
           aplicacion: app.aplicacion,
           total_usos: usos,
-          ultimo_uso: app.ultimo_uso,
+          ultimo_uso,
           duracion_promedio_segundos: Number(app.duracion_promedio_segundos) || 0,
           duracion_promedio_formato: formatearDuracion(
             Math.round(Number(app.duracion_promedio_segundos) || 0)
