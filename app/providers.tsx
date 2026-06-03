@@ -17,7 +17,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             // Configuración por defecto para queries
-            staleTime: 60 * 1000, // 1 minuto
+            // 10 min: el dashboard se consulta unas pocas veces al día y no
+            // necesita datos "al segundo". Evita re-consultar Turso al navegar
+            // entre pestañas. Botón "Actualizar Datos" fuerza refresco manual.
+            staleTime: 10 * 60 * 1000, // 10 minutos
             refetchOnWindowFocus: false,
           },
         },
