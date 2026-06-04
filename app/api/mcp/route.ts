@@ -250,7 +250,7 @@ async function registrarUsoMCP(tool: string, aiCaller: string): Promise<void> {
 // Avisos legales — se añaden al final de respuestas según categoría de riesgo
 // ---------------------------------------------------------------------------
 const AVISO_FISCAL =
-  '\n\n---\n⚠️ *Aviso legal: resultado orientativo generado automáticamente. ' +
+  '\n\n---\n⚠️ *Aviso legal: resultado orientativo generado automáticamente. Datos normativos: ejercicio fiscal 2025 — verificar vigencia antes de actuar. ' +
   'No constituye asesoramiento fiscal ni jurídico. meskeIA no asume responsabilidad ' +
   'por decisiones tomadas en base a estos datos. Consulte a un asesor fiscal colegiado ' +
   'o a la Agencia Tributaria (aeat.es) para su caso concreto.*';
@@ -304,6 +304,7 @@ function crearServidorMCP(): McpServer {
       personas: z.number().int().positive().optional()
         .describe('Número de personas entre las que dividir la cuenta. Por defecto 1.'),
     },
+    { title: 'Calcula la propina de una cuenta de restaurante y la divide entre', readOnlyHint: true },
     async ({ monto, porcentaje, pais, personas }, extra) => {
       // Detectar qué IA llama (para analytics)
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
@@ -378,6 +379,7 @@ function crearServidorMCP(): McpServer {
         'variation → valor final'
       ),
     },
+    { title: 'Realiza cálculos con porcentajes. Cinco modos disponibles', readOnlyHint: true },
     async ({ modo, valor1, valor2 }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_porcentaje', aiCaller);
@@ -421,6 +423,7 @@ function crearServidorMCP(): McpServer {
       precioCombustible: z.number().positive()
         .describe('Precio del combustible en €/litro (ej: 1.65 para 1,65 €/L)'),
     },
+    { title: 'Calculadora de combustible con dos modos', readOnlyHint: true },
     async ({ modo, kilometros, litros, distanciaKm, consumoL100km, precioCombustible }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_combustible', aiCaller);
@@ -469,6 +472,7 @@ function crearServidorMCP(): McpServer {
       alturaCm: z.number().positive().max(300)
         .describe('Altura en centímetros (ej: 175)'),
     },
+    { title: 'Calcula el Índice de Masa Corporal (IMC) a partir del peso y la altura', readOnlyHint: true },
     async ({ pesoKg, alturaCm }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_imc', aiCaller);
@@ -516,6 +520,7 @@ function crearServidorMCP(): McpServer {
       frecuenciaCapitalizacion: z.enum(['anual', 'semestral', 'trimestral', 'mensual']).optional()
         .describe('Frecuencia de capitalización de intereses (por defecto anual)'),
     },
+    { title: 'Simula el crecimiento de una inversión o ahorro con interés compuesto', readOnlyHint: true },
     async ({ capitalInicial, tasaAnual, anos, aportacionPeriodica, frecuenciaCapitalizacion }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_interes_compuesto', aiCaller);
@@ -558,6 +563,7 @@ function crearServidorMCP(): McpServer {
       fechaFin: z.string()
         .describe('Fecha final en formato YYYY-MM-DD o "hoy"'),
     },
+    { title: 'Calcula cuánto tiempo hay entre dos fechas', readOnlyHint: true },
     async ({ fechaInicio, fechaFin }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_diferencia_fechas', aiCaller);
@@ -593,6 +599,7 @@ function crearServidorMCP(): McpServer {
       unidad: z.enum(['dias', 'semanas', 'meses', 'anios'])
         .describe('Unidad de tiempo: dias, semanas, meses o anios'),
     },
+    { title: 'Suma o resta días, semanas, meses o años a una fecha para obtener', readOnlyHint: true },
     async ({ fechaBase, operacion, cantidad, unidad }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_fecha_resultado', aiCaller);
@@ -626,6 +633,7 @@ function crearServidorMCP(): McpServer {
       fecha: z.string()
         .describe('Fecha a consultar en formato YYYY-MM-DD o "hoy"'),
     },
+    { title: 'Dice qué día de la semana (lunes, martes...) cae una fecha concreta', readOnlyHint: true },
     async ({ fecha }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_dia_semana', aiCaller);
@@ -654,6 +662,7 @@ function crearServidorMCP(): McpServer {
       fechaReferencia: z.string().optional()
         .describe('Fecha en la que calcular la edad en formato YYYY-MM-DD o "hoy". Por defecto hoy.'),
     },
+    { title: 'Calcula la edad exacta en años, meses y días a partir de una', readOnlyHint: true },
     async ({ fechaNacimiento, fechaReferencia }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_edad', aiCaller);
@@ -717,6 +726,7 @@ function crearServidorMCP(): McpServer {
           '3 = de 2.007.380 a 4.020.770 €, 4 = más de 4.020.770 €. Por defecto 1.'
         ),
     },
+    { title: 'Calcula el Impuesto de Donaciones (ISD) en España con precisión', readOnlyHint: true },
     async ({ valorDonacion, ccaa, grupo, cargas, escrituraPublica, discapacidad, patrimonioIdx }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_donaciones', aiCaller);
@@ -812,6 +822,7 @@ function crearServidorMCP(): McpServer {
           '"quitar" = el importe ya incluye IVA y quieres extraer la base y la cuota.'
         ),
     },
+    { title: 'Calcula el IVA español (21%, 10%, 4% o 0%)', readOnlyHint: true },
     async ({ importe, tipoIVA, modo }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_iva', aiCaller);
@@ -862,6 +873,7 @@ function crearServidorMCP(): McpServer {
           '"tributario" = LGT art. 26, liquidaciones con la AEAT (4,0625% en 2026).'
         ),
     },
+    { title: 'Calcula intereses de demora en España con normativa actualizada 2026', readOnlyHint: true },
     async ({ importeDeuda, fechaInicio, fechaFin, tipoInteres }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_interes_demora', aiCaller);
@@ -931,6 +943,7 @@ function crearServidorMCP(): McpServer {
       edadActual: z.number().int().min(16).max(80).optional()
         .describe('Edad actual del trabajador en años (opcional, solo informativo para calcular años hasta jubilación)'),
     },
+    { title: 'Estima la pensión pública de jubilación en España (Seguridad', readOnlyHint: true },
     async ({ baseCotizacionMensual, anosCotizados, edadActual }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pension_publica', aiCaller);
@@ -1025,6 +1038,7 @@ function crearServidorMCP(): McpServer {
       incluyeAjuar: z.boolean().optional()
         .describe('Si la base imponible incluye ya el ajuar doméstico o si hay que sumarlo (3% de la masa hereditaria). Por defecto false.'),
     },
+    { title: 'Calcula el Impuesto de Sucesiones (ISD) en España con precisión', readOnlyHint: true },
     async ({ baseImponible, ccaa, grupo, edadHeredero, discapacidad, patrimonioIdx, viviendaHabitual, seguroVida, incluyeAjuar }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_sucesiones', aiCaller);
@@ -1136,6 +1150,7 @@ function crearServidorMCP(): McpServer {
       ingresosMensuales: z.number().positive().optional()
         .describe('Ingresos netos mensuales del solicitante en euros. Permite calcular el ratio de endeudamiento (recomendable ≤30%).'),
     },
+    { title: 'Calcula una hipoteca española con sistema francés (cuota constante)', readOnlyHint: true },
     async ({ precioVivienda, entrada, plazoAnios, tipoHipoteca, interesAnual, euribor, diferencial, plazoFijoMixta, ingresosMensuales }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_hipoteca', aiCaller);
@@ -1221,6 +1236,7 @@ function crearServidorMCP(): McpServer {
       comisionApertura: z.number().min(0).max(5).optional()
         .describe('Comisión de apertura en % sobre el capital. Afecta al cálculo de TAE. Por defecto 0.'),
     },
+    { title: 'Calcula un préstamo personal o financiero con tres sistemas de', readOnlyHint: true },
     async ({ capital, plazoMeses, tin, sistema, comisionApertura }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_prestamo', aiCaller);
@@ -1302,6 +1318,7 @@ function crearServidorMCP(): McpServer {
       tipoMunicipalIIVTNU: z.number().min(0).max(30).optional()
         .describe('Tipo impositivo que aplica el Ayuntamiento en la plusvalía municipal (0%-30%). Por defecto 25% orientativo si no se conoce.'),
     },
+    { title: 'Calcula todos los gastos de compraventa de un inmueble en España', readOnlyHint: true },
     async ({ precioInmueble, ccaa, tipoTransmision, tipoInmueble, perfilComprador, precioCompraOriginal, aniosTenencia, valorCatastralSuelo, vendedorMayor65, esViviendaHabitual, tipoMunicipalIIVTNU }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_compraventa_inmueble', aiCaller);
@@ -1399,6 +1416,7 @@ function crearServidorMCP(): McpServer {
       fechaAmortizacion: z.string().optional()
         .describe('Fecha en que se hace la amortización anticipada en formato YYYY-MM-DD'),
     },
+    { title: 'Calcula el efecto de una amortización anticipada de hipoteca o', readOnlyHint: true },
     async ({ capitalInicial, plazoAnios, tin, importeAmortizacion, mesesTranscurridos, fechaInicio, fechaAmortizacion }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_amortizacion_anticipada', aiCaller);
@@ -1460,6 +1478,7 @@ function crearServidorMCP(): McpServer {
       rentabilidadAnual: z.number().min(0).max(15).optional()
         .describe('Rentabilidad anual esperada del ahorro/inversión en %. Por defecto 4%.'),
     },
+    { title: 'Calcula la brecha económica de jubilación', readOnlyHint: true },
     async ({ sueldoNetoMensual, pensionEstimadaMensual, edadActual, edadJubilacion, anosJubilado, rentabilidadAnual }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_brecha_jubilacion', aiCaller);
@@ -1512,6 +1531,7 @@ function crearServidorMCP(): McpServer {
       flujosCaja: z.array(z.number()).min(1).max(30)
         .describe('Flujos de caja anuales en euros, del año 1 en adelante. Pueden ser positivos (ingresos) o negativos (pérdidas). Ejemplo: [10000, 15000, 20000] para 3 años.'),
     },
+    { title: 'Calcula el VAN (Valor Actual Neto) y la TIR (Tasa Interna de', readOnlyHint: true },
     async ({ inversionInicial, tasaDescuento, flujosCaja }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_tir_van', aiCaller);
@@ -1571,6 +1591,7 @@ function crearServidorMCP(): McpServer {
       tasaRetiro: z.number().min(1).max(10).optional()
         .describe('Tasa de retiro segura anual en %. Por defecto 4% (regla del 4% de Trinity Study). Una tasa menor (3-3,5%) es más conservadora.'),
     },
+    { title: 'Calcula el objetivo de independencia financiera (FIRE — Financial', readOnlyHint: true },
     async ({ gastosAnuales, ingresosAnuales, patrimonioActual, rentabilidadAnual, tasaRetiro }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_fire', aiCaller);
@@ -1633,6 +1654,7 @@ function crearServidorMCP(): McpServer {
       ingresosMensualesPropios: z.number().min(0).optional()
         .describe('Ingresos mensuales propios del beneficiario por trabajo o pensión (€). Determina acceso a los porcentajes del 60% y 70%.'),
     },
+    { title: 'Calcula de forma orientativa la pensión de viudedad en España', readOnlyHint: true },
     async ({ situacionCausante, baseCotizacionMedia, pensionCausante, edadBeneficiario, tieneCargas, ingresosMensualesPropios }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pension_viudedad', aiCaller);
@@ -1687,6 +1709,7 @@ function crearServidorMCP(): McpServer {
       tieneConyuge: z.boolean().optional()
         .describe('Si hay cónyuge o pareja de hecho superviviente. Afecta al usufructo viudal.'),
     },
+    { title: 'Calcula la herencia forzosa (legítima) según el régimen de', readOnlyHint: true },
     async ({ patrimonioNeto, regimen, numHijos, tieneConyuge }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_legitimas', aiCaller);
@@ -1758,6 +1781,7 @@ function crearServidorMCP(): McpServer {
       totalGastosMensuales: z.number().min(0).optional()
         .describe('Total de gastos mensuales deducibles en euros (cuota autónomo, seguros, software, oficina, gestoría...). Si los conoces, úsalo directamente.'),
     },
+    { title: 'Calcula la tarifa ideal (€/hora, €/día, €/semana) para un', readOnlyHint: true },
     async ({ ingresoNetoMensual, horasSemanales, diasVacaciones, diasFestivos, diasEnfermedad, porcentajeOcupacion, tipoIRPF, tipoIVA, margenBeneficio, totalGastosMensuales }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_tarifa_freelance', aiCaller);
@@ -1825,6 +1849,7 @@ function crearServidorMCP(): McpServer {
       entradaInicial: z.number().min(0).optional()
         .describe('Pago inicial o entrada en euros. Por defecto 0.'),
     },
+    { title: 'Calcula el coste real de financiar una compra a plazos', readOnlyHint: true },
     async ({ precioContado, cuotaMensual, numeroCuotas, entradaInicial }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_coste_aplazado', aiCaller);
@@ -1878,6 +1903,7 @@ function crearServidorMCP(): McpServer {
       valorVidaCliente: z.number().min(0).optional()
         .describe('Valor de vida del cliente (CLV) en euros. Si se proporciona, calcula el ratio CLV/CAC para evaluar si el coste de adquisición es sostenible.'),
     },
+    { title: 'Calcula el ROI (Retorno sobre la Inversión) por canal de', readOnlyHint: true },
     async ({ canales, valorVidaCliente }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_roi_marketing', aiCaller);
@@ -1934,6 +1960,7 @@ function crearServidorMCP(): McpServer {
       potenciaContratadaKW: z.number().min(0).optional()
         .describe('Potencia contratada en kW. Habitual: 3.45, 4.6, 5.75, 6.9, 8.05 kW. Por defecto 4.6 kW.'),
     },
+    { title: 'Calcula el consumo eléctrico mensual del hogar y la factura estimada', readOnlyHint: true },
     async ({ electrodomesticos, preciokWh, potenciaContratadaKW }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_gasto_energetico', aiCaller);
@@ -1990,6 +2017,7 @@ function crearServidorMCP(): McpServer {
       tamanoPerro: z.enum(['pequeno', 'mediano', 'grande', 'gigante']).optional()
         .describe('Tamaño del perro (solo si tipoMascota="perro"): "pequeno" <10kg, "mediano" 10-25kg, "grande" 25-45kg, "gigante" >45kg. Por defecto "mediano".'),
     },
+    { title: 'Convierte la edad de un perro o gato a años humanos equivalentes', readOnlyHint: true },
     async ({ edadMascota, tipoMascota, tamanoPerro }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('convertir_edad_mascota', aiCaller);
@@ -2043,6 +2071,7 @@ function crearServidorMCP(): McpServer {
       relacionSegundaVariable: z.enum(['directa', 'inversa']).optional()
         .describe('Relación de la segunda variable: "directa" (más D → más X) o "inversa" (más D → menos X). Solo para tipo "compuesta".'),
     },
+    { title: 'Resuelve reglas de tres simples (directa e inversa) y compuestas', readOnlyHint: true },
     async ({ tipo, a, b, c, d, e, relacionSegundaVariable }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_regla_tres', aiCaller);
@@ -2111,6 +2140,7 @@ function crearServidorMCP(): McpServer {
       anos: z.number().int().min(1).max(40).optional()
         .describe('Horizonte temporal de comparación en años. Por defecto 15.'),
     },
+    { title: 'Compara financieramente alquilar vs comprar una vivienda en', readOnlyHint: true },
     async ({ precioVivienda, entrada, tipoInteres, alquilerMensual, plazoHipoteca, ibi, comunidadMensual, seguroAnual, mantenimientoPct, incrementoAlquilerPct, rentabilidadInversionPct, revalorizacionPct, anos }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('comparar_alquiler_compra', aiCaller);
@@ -2173,6 +2203,7 @@ function crearServidorMCP(): McpServer {
       pensionOrdinaria: z.number().positive()
         .describe('Pensión mensual estimada si te jubilaras a la edad ordinaria (€/mes). Puedes estimarla con calcular_pension_publica.'),
     },
+    { title: 'Calcula el impacto económico de jubilarse anticipadamente en España', readOnlyHint: true },
     async ({ anosCotizados, mesesAnticipacion, tipo, pensionOrdinaria }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_jubilacion_anticipada', aiCaller);
@@ -2245,6 +2276,7 @@ function crearServidorMCP(): McpServer {
       objetivoGanancia: z.number().min(0).optional()
         .describe('Objetivo de ganancia mensual deseado en euros. Opcional — calcula las unidades necesarias para alcanzarlo.'),
     },
+    { title: 'Calcula el punto de equilibrio (break-even) de un negocio o', readOnlyHint: true },
     async ({ precioVenta, costoVariable, costosFijos, ventasActuales, objetivoGanancia }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_break_even', aiCaller);
@@ -2312,6 +2344,7 @@ function crearServidorMCP(): McpServer {
       pagas: z.union([z.literal(12), z.literal(14)]).optional()
         .describe('Número de pagas al año: 12 o 14. Por defecto 14.'),
     },
+    { title: 'Estima el sueldo neto mensual/anual a partir del salario bruto anual', readOnlyHint: true },
     async ({ brutoAnual, situacion, numHijos, hijosMenores3, pagas }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_sueldo_neto', aiCaller);
@@ -2379,6 +2412,7 @@ function crearServidorMCP(): McpServer {
       esTrabajador: z.boolean().optional()
         .describe('¿Tiene rendimientos del trabajo? Para aplicar gastos deducibles (2.000 €) y reducción RNT. Por defecto true.'),
     },
+    { title: 'Estima la cuota diferencial del IRPF (a pagar o a devolver)', readOnlyHint: true },
     async ({ rendimientosTrabajo, rendimientosCapitalMobiliario, rendimientosCapitalInmobiliario, gananciasPLargo, gananciasPCorto, retenciones, situacion, numHijos, hijosMenores3, esTrabajador }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_irpf', aiCaller);
@@ -2438,6 +2472,7 @@ function crearServidorMCP(): McpServer {
       baseElegida: z.enum(['minima', 'maxima']).optional()
         .describe('"minima" (por defecto) o "maxima" — puedes elegir cualquier base dentro del rango del tramo, pero esta tool calcula para los extremos.'),
     },
+    { title: 'Calcula la cuota mensual de la Seguridad Social para autónomos', readOnlyHint: true },
     async ({ rendimientoNetoMensual, esNuevoAutonomo, baseElegida }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_cuota_autonomo', aiCaller);
@@ -2503,6 +2538,7 @@ function crearServidorMCP(): McpServer {
       saldoCompensacion: z.number().min(0).optional()
         .describe('Pérdidas patrimoniales de ejercicios anteriores pendientes de compensar (€). Reducen la base imponible. Por defecto 0.'),
     },
+    { title: 'Calcula el impuesto IRPF sobre la ganancia patrimonial por venta', readOnlyHint: true },
     async ({ precioCompra, gastosCompra, precioVenta, gastosVenta, fechaCompra, fechaVenta, tipoActivo, saldoCompensacion }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_plusvalias_irpf', aiCaller);
@@ -2574,6 +2610,7 @@ function crearServidorMCP(): McpServer {
       unidadDestino: z.string()
         .describe('Unidad destino. Ejemplos: "mi", "kg", "F", "acre", "BTU"'),
     },
+    { title: 'Convierte entre unidades de medida en 12 categorías', readOnlyHint: true },
     async ({ valor, categoria, unidadOrigen, unidadDestino }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('convertir_unidades', aiCaller);
@@ -2636,6 +2673,7 @@ function crearServidorMCP(): McpServer {
           '"volumen" (superávit +400 kcal, 25P/50C/25G%)'
         ),
     },
+    { title: 'Calcula las necesidades calóricas diarias y la distribución', readOnlyHint: true },
     async ({ peso, altura, edad, sexo, nivelActividad, objetivo }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_macros', aiCaller);
@@ -2702,6 +2740,7 @@ function crearServidorMCP(): McpServer {
       anoDestino: z.number().int().min(1961).max(2025)
         .describe('Año al que se quiere convertir (1961-2025). Puede ser anterior al año origen para calcular hacia atrás.'),
     },
+    { title: 'Calcula el equivalente en poder adquisitivo de una cantidad', readOnlyHint: true },
     async ({ cantidad, anoOrigen, anoDestino }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_inflacion', aiCaller);
@@ -2757,6 +2796,7 @@ function crearServidorMCP(): McpServer {
       beneficiosExtra: z.number().min(0).optional()
         .describe('Beneficios extra anuales en euros: seguro médico, tickets restaurante, formación, etc. Por defecto 0.'),
     },
+    { title: 'Calcula el coste real total de contratar un empleado en España', readOnlyHint: true },
     async ({ salarioBrutoAnual, tipoContrato, sector, beneficiosExtra }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_coste_empleado', aiCaller);
@@ -2837,6 +2877,7 @@ function crearServidorMCP(): McpServer {
       pagas: z.number().int().min(12).max(14).optional()
         .describe('Número de pagas totales al año: 12, 13 o 14. Por defecto 14.'),
     },
+    { title: 'Calcula los conceptos del finiquito al terminar una relación', readOnlyHint: true },
     async ({ salarioBrutoMensual, motivoFiniquito, fechaInicio, fechaBaja, diasVacacionesAnuales, diasVacacionesDisfrutados, pagas }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_finiquito', aiCaller);
@@ -2900,6 +2941,7 @@ function crearServidorMCP(): McpServer {
       numHijos: z.number().int().min(0).max(10).optional()
         .describe('Número de hijos a cargo (afecta a los topes mínimos y máximos). Por defecto 0.'),
     },
+    { title: 'Calcula la cuantía y duración de la prestación contributiva por', readOnlyHint: true },
     async ({ diasCotizados, baseReguladoraMensual, numHijos }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pension_desempleo', aiCaller);
@@ -2979,6 +3021,7 @@ function crearServidorMCP(): McpServer {
       reinvierteTotalEnVivienda: z.boolean().optional()
         .describe('¿El vendedor va a reinvertir el importe en una nueva vivienda habitual? Exención total o parcial del IRPF (art. 38 LIRPF, plazo de 2 años). Por defecto false.'),
     },
+    { title: 'Calcula todos los costes e impuestos del VENDEDOR al vender un', readOnlyHint: true },
     async ({ precioVenta, precioCompra, gastosCompraOriginal, aniosTenencia, valorCatastralSuelo, tipoMunicipalIIVTNU, comisionInmobiliaria, gastosGestoria, vendedorMayor65, esViviendaHabitual, reinvierteTotalEnVivienda }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_venta_inmueble', aiCaller);
@@ -3066,6 +3109,7 @@ function crearServidorMCP(): McpServer {
       })).min(1).max(10)
         .describe('Lista de herederos con sus datos. Mínimo 1, máximo 10.'),
     },
+    { title: 'Divide una masa hereditaria entre varios herederos y calcula el', readOnlyHint: true },
     async ({ masaHereditaria, herederos }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_herencia_conjunta', aiCaller);
@@ -3139,6 +3183,7 @@ function crearServidorMCP(): McpServer {
       seguroVidaActual: z.number().min(0).optional()
         .describe('Capital de seguros de vida existentes en euros. Por defecto 0.'),
     },
+    { title: 'Calcula el capital de seguro de vida necesario para proteger', readOnlyHint: true },
     async ({ edad, ingresoAnual, edadJubilacion, ingresoConyuge, hipotecaPendiente, otrasDeudas, numHijos, edadHijoMenor, ahorrosActuales, seguroVidaActual }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_seguro_vida', aiCaller);
@@ -3207,6 +3252,7 @@ function crearServidorMCP(): McpServer {
       repartirDividendos: z.boolean().optional()
         .describe('¿La SL va a repartir dividendos al socio? Si es false, el beneficio queda acumulado en la SL. Por defecto true.'),
     },
+    { title: 'Compara la carga fiscal total de operar como autónomo persona', readOnlyHint: true },
     async ({ beneficioAnual, gastosDeducibles, tipoIS, repartirDividendos }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('comparar_autonomo_vs_sl', aiCaller);
@@ -3286,6 +3332,7 @@ function crearServidorMCP(): McpServer {
       hijosMenores3: z.number().int().min(0).max(5).optional()
         .describe('Número de hijos menores de 3 años. Por defecto 0.'),
     },
+    { title: 'Compara el IRPF total entre presentar la declaración de forma', readOnlyHint: true },
     async ({ salarioBruto1, salarioBruto2, retenciones1, retenciones2, otrosRendimientos1, otrosRendimientos2, numHijos, hijosMenores3 }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_declaracion_conjunta', aiCaller);
@@ -3357,6 +3404,7 @@ function crearServidorMCP(): McpServer {
       pagas: z.number().int().min(12).max(14).optional()
         .describe('Número de pagas al año (12 o 14). Por defecto 14.'),
     },
+    { title: 'Calcula el impacto real en el salario neto de una subida salarial', readOnlyHint: true },
     async ({ salarioBrutoActual, salarioBrutoNuevo, subirBruto, pagas }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_subida_salarial', aiCaller);
@@ -3415,6 +3463,7 @@ function crearServidorMCP(): McpServer {
       actividadAgricola: z.boolean().optional()
         .describe('¿Actividad agrícola, ganadera, forestal o pesquera? Aplica 2% en lugar del 20%. Por defecto false.'),
     },
+    { title: 'Calcula el pago fraccionado trimestral del IRPF para autónomos en', readOnlyHint: true },
     async ({ trimestre, ingresosAcumulados, gastosDeduciblesAcumulados, cuotasSSAcumuladas, retencionesSoportadasAcumuladas, pagosFraccionadosAnteriores, actividadAgricola }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pago_fraccionado', aiCaller);
@@ -3472,6 +3521,7 @@ function crearServidorMCP(): McpServer {
       empresaPagaDiasEspera: z.boolean().optional()
         .describe('¿La empresa cubre los 3 días de espera según convenio colectivo? Por defecto false.'),
     },
+    { title: 'Calcula el subsidio por incapacidad temporal (baja médica) para', readOnlyHint: true },
     async ({ salarioBrutoMensual, tipoBaja, diasBaja, empresaPagaDiasEspera }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_baja_medica', aiCaller);
@@ -3529,6 +3579,7 @@ function crearServidorMCP(): McpServer {
       cuotaCarenciaParcial: z.number().positive().optional()
         .describe('Cuota mensual acordada durante la carencia parcial en euros. Solo para tipo "parcial".'),
     },
+    { title: 'Calcula el impacto económico de un período de carencia en una', readOnlyHint: true },
     async ({ capitalPendiente, tasaAnual, plazoRestanteMeses, mesesCarencia, tipoCarencia, cuotaCarenciaParcial }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_periodo_carencia', aiCaller);
@@ -3594,6 +3645,7 @@ function crearServidorMCP(): McpServer {
       tipoMarginalIRPF: z.number().min(0).max(50).optional()
         .describe('Tipo marginal IRPF para calcular el ahorro fiscal en porcentaje. Por defecto 30%.'),
     },
+    { title: 'Calcula la compensación o deducción fiscal por uso de vehículo', readOnlyHint: true },
     async ({ perfil, kmProfesionalesAnuales, compensacionRecibidaPorKm, costeRealPorKm, totalGastosVehiculo, usoExclusivoActividad, tipoMarginalIRPF }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_kilometraje', aiCaller);
@@ -3671,6 +3723,7 @@ function crearServidorMCP(): McpServer {
       valorPresenteConocido: z.number().positive().optional()
         .describe('Para calcular el valor futuro: capital presente conocido en euros.'),
     },
+    { title: 'Calcula el valor presente (valor actual) de', readOnlyHint: true },
     async ({ modo, tasaAnual, importe, periodos, periodicidad, tipoRenta, valorPresenteConocido }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_valor_presente', aiCaller);
@@ -3724,6 +3777,7 @@ function crearServidorMCP(): McpServer {
       capitalActual: z.number().min(0).optional()
         .describe('Capital ya acumulado en el plan en euros. Por defecto 0.'),
     },
+    { title: 'Calcula el ahorro fiscal anual por aportaciones a plan de', readOnlyHint: true },
     async ({ rendimientosNetos, aportacionIndividual, aportacionEmpresarial, edadActual, edadJubilacion, rentabilidadAnual, capitalActual }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_plan_pensiones', aiCaller);
@@ -3790,6 +3844,7 @@ function crearServidorMCP(): McpServer {
       usoExclusivoActividad: z.boolean().optional()
         .describe('¿El vehículo es de uso exclusivo para la actividad? Afecta al IVA deducible. Por defecto false.'),
     },
+    { title: 'Compara el coste total de adquirir un vehículo mediante leasing', readOnlyHint: true },
     async ({ precioVehiculo, mesesContrato, cuotaLeasingMensual, valorResidual, cuotaRentingMensual, entradaCompra, tasaPrestamoCompra, tipoFiscal, tipoImpuesto, usoExclusivoActividad }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_leasing', aiCaller);
@@ -3850,6 +3905,7 @@ function crearServidorMCP(): McpServer {
       tasaHipoteca: z.number().positive().optional().describe('Tipo de interés anual de la hipoteca en porcentaje. Por defecto 3.5%.'),
       aniosHipoteca: z.number().positive().optional().describe('Plazo de la hipoteca en años. Por defecto 25.'),
     },
+    { title: 'Calcula la rentabilidad bruta, neta, cash flow mensual y payback', readOnlyHint: true },
     async ({ precioCompra, alquilerMensual, porcentajeGastosCompra, reforma, tasaOcupacion, ibi, comunidad, seguro, mantenimiento, conHipoteca, capitalHipoteca, tasaHipoteca, aniosHipoteca }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_rentabilidad_alquiler', aiCaller);
@@ -3905,6 +3961,7 @@ function crearServidorMCP(): McpServer {
       pagoExtraMensual: z.number().min(0).optional()
         .describe('Pago extra mensual adicional sobre los mínimos en euros. Por defecto 0.'),
     },
+    { title: 'Compara los métodos Avalancha (mayor interés primero) y Bola de', readOnlyHint: true },
     async ({ deudas, pagoExtraMensual }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_estrategia_deuda', aiCaller);
@@ -3972,6 +4029,7 @@ function crearServidorMCP(): McpServer {
       porcentajeGastosCompra: z.number().min(5).max(15).optional()
         .describe('Porcentaje de gastos de compra a reservar de los ahorros (notaría, impuestos, registro). Por defecto 10%.'),
     },
+    { title: 'Estima el máximo préstamo hipotecario que un hogar puede asumir', readOnlyHint: true },
     async ({ ingresosMensualesNetos, ahorrosDisponibles, otrasDeudasMensuales, tasaInteres, plazo, umbralEsfuerzo, porcentajeGastosCompra }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_capacidad_hipoteca', aiCaller);
@@ -4034,6 +4092,7 @@ function crearServidorMCP(): McpServer {
       capitalInicial: z.number().min(0).optional()
         .describe('Capital inicial ya disponible para el objetivo en euros. Por defecto 0.'),
     },
+    { title: 'Responde dos preguntas complementarias sobre objetivos de ahorro', readOnlyHint: true },
     async ({ objetivoEuros, ahorroMensual, mesesObjetivo, rentabilidadAnual, capitalInicial }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_objetivo_ahorro', aiCaller);
@@ -4095,6 +4154,7 @@ function crearServidorMCP(): McpServer {
       capitalInicial: z.number().positive().optional()
         .describe('Capital inicial en euros (opcional, para mostrar importes absolutos en la tabla de dobles).'),
     },
+    { title: 'Aplica la Regla del 72, la heurística financiera más conocida', readOnlyHint: true },
     async ({ tipoInteres, aniosParaDoblar, capitalInicial }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_regla_72', aiCaller);
@@ -4161,6 +4221,7 @@ function crearServidorMCP(): McpServer {
       decimales: z.number().int().min(0).max(6).optional()
         .describe('Número de decimales para los resultados. Por defecto 4.'),
     },
+    { title: 'Calcula los principales descriptores estadísticos de un conjunto', readOnlyHint: true },
     async ({ valores, nombre, decimales }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_estadisticas', aiCaller);
@@ -4232,6 +4293,7 @@ function crearServidorMCP(): McpServer {
       metodo: z.enum(['regla4', 'anualidad']).optional()
         .describe('Método de estimación del capital: "regla4" (capital = gasto_anual/4%) o "anualidad" (valor presente de renta). Por defecto "anualidad".'),
     },
+    { title: 'Calcula cuánto capital privado necesitas acumular y cuánto debes', readOnlyHint: true },
     async ({ rentaDeseadaMensual, pensionPublicaEstimada, edadActual, edadJubilacion, esperanzaVida, rentabilidadAcumulacion, rentabilidadRetiro, capitalYaAcumulado, metodo }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pension_complementaria', aiCaller);
@@ -4302,6 +4364,7 @@ function crearServidorMCP(): McpServer {
       otrosIngresos: z.number().min(0).optional()
         .describe('Otros ingresos anuales del contribuyente en euros (para calcular tipo marginal). Por defecto 0.'),
     },
+    { title: 'Calcula el rendimiento neto del capital inmobiliario, los gastos', readOnlyHint: true },
     async ({ alquilerMensual, mesesAlquilados, precioCompra, valorCatastral, ibi, comunidad, seguro, reparaciones, interesesHipoteca, otrosGastos, arrendatarioEmpresa, otrosIngresos }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_retencion_alquiler', aiCaller);
@@ -4363,6 +4426,7 @@ function crearServidorMCP(): McpServer {
       numeros: z.array(z.number().int().positive().max(1e12)).min(2).max(10)
         .describe('Lista de 2 a 10 números enteros positivos. Ejemplo: [12, 18, 24]'),
     },
+    { title: 'Calcula el Máximo Común Divisor (MCD) y el Mínimo Común Múltiplo', readOnlyHint: true },
     async ({ numeros }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_mcd_mcm', aiCaller);
@@ -4446,6 +4510,7 @@ function crearServidorMCP(): McpServer {
       deduccionesAutonimicas: z.number().min(0).optional()
         .describe('Deducciones autonómicas aplicables (alquiler habitual, rehabilitación, etc.) (€)'),
     },
+    { title: 'Simula si la declaración de la Renta (IRPF) saldrá a pagar o a', readOnlyHint: true },
     async ({ rendimientosTrabajoAnuales, retencionesTrabajoAnuales, rendimientosActividadesEconomicas, retencionesActividadesEconomicas, pagosFraccionados, rendimientosCapitalMobiliario, retencionesCapitalMobiliario, rendimientosCapitalInmobiliario, retencionesCapitalInmobiliario, gananciasPatrimoniales, edad, numHijos, hijosMenures3, ascendientes65, discapacidad, deduccionMaternidad, deduccionesAutonimicas }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_devolucion_irpf', aiCaller);
@@ -4524,6 +4589,7 @@ function crearServidorMCP(): McpServer {
       porcentajeConstante: z.number().min(1).max(100).optional()
         .describe('Porcentaje de amortización para el método "porcentaje_constante" (%). Si no se indica, se usa el doble del coeficiente lineal.'),
     },
+    { title: 'Genera la tabla de amortización contable y fiscal de un activo', readOnlyHint: true },
     async ({ costeAdquisicion, vidaUtil, valorResidual, metodo, grupoRIS, tipoImpuesto, porcentajeConstante }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_amortizacion_contable', aiCaller);
@@ -4597,6 +4663,7 @@ function crearServidorMCP(): McpServer {
       comisionPactadaPct: z.number().min(0).optional()
         .describe('Comisión pactada en escritura (%). Si es menor que el máximo legal, se aplica la pactada. No puede superar el máximo legal.'),
     },
+    { title: 'Calcula la comisión por amortización anticipada (total o parcial)', readOnlyHint: true },
     async ({ capitalAmortizar, tipoHipoteca, anioVidaHipoteca, regulacion, aniosPeriodoFijo, comisionPactadaPct }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_penalizacion_hipoteca', aiCaller);
@@ -4671,6 +4738,7 @@ function crearServidorMCP(): McpServer {
       costosFijosMensuales: z.number().min(0).optional()
         .describe('Costes fijos mensuales (€). Si se indica, calcula el punto de equilibrio: unidades mínimas para cubrir costes fijos.'),
     },
+    { title: 'Calcula el precio de venta óptimo, margen comercial y markup para', readOnlyHint: true },
     async ({ modo, costeUnitario, precioVentaSinIVA, margenObjetivoPct, tipoIVA, unidades, costosFijosMensuales }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_precio_venta', aiCaller);
@@ -4737,6 +4805,7 @@ function crearServidorMCP(): McpServer {
       compensacionAnterior: z.number().min(0).optional()
         .describe('Saldo a compensar de trimestres anteriores (resultado negativo previo no pedido a devolver) (€)'),
     },
+    { title: 'Calcula la autoliquidación trimestral del IVA (Modelo 303) para', readOnlyHint: true },
     async ({ trimestre, anioFiscal, baseImponibleEmitidas21, baseImponibleEmitidas10, baseImponibleEmitidas4, baseImponibleRecibidas21, baseImponibleRecibidas10, baseImponibleRecibidas4, compensacionAnterior }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_modelo_303', aiCaller);
@@ -4819,6 +4888,7 @@ function crearServidorMCP(): McpServer {
       pctTiempoSinFacturar: z.number().min(0).max(100).optional()
         .describe('Solo freelance: porcentaje de tiempo sin trabajo o con impagos (%). Reduce las horas facturables efectivas. Por defecto 0.'),
     },
+    { title: 'Calcula las horas realmente trabajadas al año, descontando', readOnlyHint: true },
     async ({ perfil, salarioBrutoAnual, horasPorDia, diasVacaciones, festivos, festivosLocales, diasBaja, diasFormacion, otrasAusencias, horasNoFacturablesSemanales, pctTiempoSinFacturar }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_horas_efectivas', aiCaller);
@@ -4877,6 +4947,7 @@ function crearServidorMCP(): McpServer {
       nuevaCuotaMensual: z.number().positive().optional()
         .describe('Nueva cuota mensual si se sube la cuota (€). Debe ser mayor que la cuota actual. Simula el ahorro en tiempo e intereses.'),
     },
+    { title: 'Calcula cuántos pagos (meses) quedan para liquidar un préstamo o', readOnlyHint: true },
     async ({ capitalPendiente, cuotaMensual, tasaAnual, pagoExtraordinario, nuevaCuotaMensual }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_numero_pagos', aiCaller);
@@ -4940,6 +5011,7 @@ function crearServidorMCP(): McpServer {
       tipoIVA: z.number().min(0).max(100).optional()
         .describe('Tipo de IVA a aplicar (%). Por defecto 21. Empresas con IVA deducible pueden usar 0 para ver el precio sin IVA.'),
     },
+    { title: 'Calcula el Impuesto Especial sobre Determinados Medios de', readOnlyHint: true },
     async ({ precioSinIVA, emisionesCO2, tipoVehiculo, tipoIVA }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_impuesto_matriculacion', aiCaller);
@@ -4995,6 +5067,7 @@ Encadenable con: calcular_irpf, calcular_autonomo, calcular_irpf_devolucion.`,
       hijos: z.number().int().min(0).optional().describe('Número de hijos (para el mínimo familiar en IRPF). Por defecto 0.'),
       salarioBruto: z.number().min(0).optional().describe('Salario bruto anual para el escenario combinado (€). Si se omite, se usa el 50% del beneficio.'),
     },
+    { title: 'dividendo_empresarial', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('dividendo_empresarial', aiCaller);
@@ -5044,6 +5117,7 @@ Encadenable con: calcular_cuota_autonomo, calcular_baja_medica, calcular_irpf.`,
       edad: z.number().int().min(16).max(80).optional().describe('Edad del autónomo al solicitar la prestación. Por defecto 45.'),
       tieneEmpleados: z.boolean().optional().describe('¿Tiene trabajadores a cargo? El cese colectivo puede flexibilizar el acceso. Por defecto false.'),
     },
+    { title: 'cese_actividad_autonomo', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('cese_actividad_autonomo', aiCaller);
@@ -5098,6 +5172,7 @@ Encadenable con: calcular_hipoteca, calcular_irpf, calcular_devolucion_irpf.`,
       // Modo alquiler_habitual
       rendimientoNetoAlquiler: z.number().optional().describe('[alquiler_habitual] Rendimiento neto del alquiler (ingresos - gastos deducibles) (€). Puede ser negativo.'),
     },
+    { title: 'deduccion_vivienda', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('deduccion_vivienda', aiCaller);
@@ -5160,6 +5235,7 @@ Encadenable con: calcular_plusvalias_irpf, calcular_reequilibrio_cartera.`,
       frecuenciaCupon: z.enum(['anual', 'semestral', 'trimestral']).optional().describe('Frecuencia de pago de cupones. Por defecto anual.'),
       valorEntrada: z.number().positive().describe('Para calcular_tir: precio de mercado (€). Para calcular_precio: TIR/yield (%).'),
     },
+    { title: 'rendimiento_bono', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('rendimiento_bono', aiCaller);
@@ -5212,6 +5288,7 @@ Encadenable con: calcular_fire, calcular_plusvalias_irpf, calcular_rendimiento_b
       nuevoCapital: z.number().min(0).optional().describe('Nuevo capital disponible para aportar (€). Relevante para estrategia solo_comprar. Por defecto 0.'),
       umbralDesviacion: z.number().min(0).max(50).optional().describe('Umbral de desviación (pp) para activar operación. Por defecto 5%.'),
     },
+    { title: 'reequilibrio_cartera', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('reequilibrio_cartera', aiCaller);
@@ -5263,6 +5340,7 @@ Encadenable con: calcular_irpf, calcular_modelo_303, calcular_interes_demora.`,
       modalidad: z.enum(['aplazamiento', 'fraccionamiento']).optional().describe('Modalidad de pago diferido. Por defecto aplazamiento.'),
       fechaInicio: z.string().optional().describe('Fecha de inicio del aplazamiento (YYYY-MM-DD). Por defecto hoy.'),
     },
+    { title: 'pago_aplazado_aeat', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('pago_aplazado_aeat', aiCaller);
@@ -5318,6 +5396,7 @@ Encadenable con: calcular_sueldo_neto, calcular_baja_medica, calcular_irpf.`,
       discapacidadHijo: z.boolean().optional().describe('¿Hijo con discapacidad ≥33%? (+2 semanas adicionales). Por defecto false.'),
       diasHospitalizacion: z.number().int().min(0).optional().describe('Días de hospitalización tras el parto (para semanas adicionales, máx. 13 semanas). Por defecto 0.'),
     },
+    { title: 'permiso_parental', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('permiso_parental', aiCaller);
@@ -5374,6 +5453,7 @@ Encadenable con: calcular_irpf, calcular_devolucion_irpf, calcular_plusvalias_ir
       valorVenta: z.number().min(0).optional().describe('Valor de venta de la acción (€) para calcular la plusvalía posterior. Por defecto 0 (sin venta).'),
       masDeUnAnoHastaVenta: z.boolean().optional().describe('¿Han transcurrido más de 1 año entre el ejercicio/vesting y la venta? Por defecto true.'),
     },
+    { title: 'calcular_stock_options', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_stock_options', aiCaller);
@@ -5434,6 +5514,7 @@ Encadenable con: calcular_finiquito, calcular_pension_publica, calcular_baja_med
       duracionMeses: z.number().int().positive().describe('Duración solicitada de la excedencia (meses)'),
       edad: z.number().int().min(16).max(70).optional().describe('Edad del trabajador (para orientar sobre impacto en jubilación). Por defecto 35.'),
     },
+    { title: 'calcular_excedencia', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_excedencia', aiCaller);
@@ -5485,6 +5566,7 @@ Encadenable con: calcular_finiquito, calcular_pension_desempleo, calcular_irpf.`
       fechaExtincion: z.string().optional().describe('Fecha de extinción del contrato (YYYY-MM-DD). Por defecto: hoy.'),
       tieneAntiguedadPreReforma2012: z.boolean().optional().describe('¿El trabajador tenía antigüedad antes del 12/02/2012? (Activa el cálculo dual 45+33 días). Por defecto false.'),
     },
+    { title: 'calcular_indemnizacion_despido', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_indemnizacion_despido', aiCaller);
@@ -5536,6 +5618,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       compensacion: z.enum(['monetaria', 'descanso']).optional().describe('Compensación por horas extra: monetaria (pago) o descanso equivalente. Por defecto monetaria.'),
       recargoSalarialPct: z.number().min(0).optional().describe('Recargo sobre el valor de la hora ordinaria (%). Ej: 25 para el 25%. Por defecto 0 (igual que hora ordinaria, mínimo legal).'),
     },
+    { title: 'calcular_horas_extra', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_horas_extra', aiCaller);
@@ -5595,6 +5678,7 @@ Encadenable con: calcular_irpf, calcular_sueldo_neto, calcular_coste_empleado.`,
       alojamientoSinFactura: z.number().min(0).optional().describe('Gasto de alojamiento sin factura (€) — tributa íntegramente'),
       dietasAbonadasTotal: z.number().min(0).optional().describe('Importe total abonado por la empresa en dietas (€) — para calcular el exceso tributable'),
     },
+    { title: 'calcular_plus_distancia', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_plus_distancia', aiCaller);
@@ -5650,6 +5734,7 @@ Encadenable con: calcular_baja_medica, calcular_permiso_parental, calcular_sueld
       fraccionReduccion: z.number().min(0.01).max(0.99).describe('Fracción de reducción (entre 0 y 1). Ej: 0.5 para media jornada, 0.125 para 1/8 de jornada'),
       menosDe24MesesEnReduccion: z.boolean().optional().describe('¿Lleva menos de 24 meses en reducción de jornada? (primeros 24 meses: cotización SS a base completa). Por defecto true.'),
     },
+    { title: 'calcular_reduccion_jornada', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_reduccion_jornada', aiCaller);
@@ -5696,6 +5781,7 @@ Encadenable con: calcular_plusvalias_irpf, calcular_retencion_alquiler, calcular
       gastosDeducibles: z.array(z.object({ concepto: z.string(), importe: z.number() })).optional().describe('[Solo UE/EEE en alquiler_inmueble] Gastos deducibles (IBI, intereses hipoteca, amortización, etc.)'),
       retencionPracticada: z.number().min(0).optional().describe('Retención ya practicada por el pagador (€). Para calcular cuota diferencial.'),
     },
+    { title: 'calcular_irpf_no_residente', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_irpf_no_residente', aiCaller);
@@ -5745,6 +5831,7 @@ Encadenable con: calcular_irpf, calcular_cuota_autonomo, calcular_modelo_303.`,
       masDeL70PctConRetencion: z.boolean().optional().describe('¿Más del 70% de los ingresos provienen de clientes obligados a retener? (exime de presentar el modelo 130). Por defecto false.'),
       anioEjercicio: z.number().int().optional().describe('Año del ejercicio. Por defecto año actual.'),
     },
+    { title: 'calcular_modelo_130', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_modelo_130', aiCaller);
@@ -5803,6 +5890,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       vehiculoElectrico: z.boolean().optional().describe('¿Es vehículo eléctrico? (tipo reducido 15% en lugar de 20%). Por defecto false.'),
       pctUsoPrivado: z.number().min(0).max(100).optional().describe('Porcentaje de uso privado del vehículo de empresa (%). Por defecto 100%.'),
     },
+    { title: 'calcular_conceptos_cotizables', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_conceptos_cotizables', aiCaller);
@@ -5853,6 +5941,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       pagas: z.enum(['12', '14']).optional().describe('Número de pagas anuales para el cálculo del SMI (12 o 14). Por defecto 14 (oficial LEC).'),
       reduccionCargasFamiliares: z.number().min(0).max(15).optional().describe('Porcentaje de reducción por cargas familiares acordado judicialmente (0-15%). Solo si el juez lo ha autorizado.'),
     },
+    { title: 'Calcula el importe máximo embargable del salario según la escala', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_embargo_salario', aiCaller);
@@ -5908,6 +5997,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tieneConyuge: z.boolean().optional().describe('¿Tiene cónyuge a cargo? Afecta a la pensión mínima garantizada.'),
       ultimaBaseCotizacion: z.number().positive().optional().describe('Última base de cotización mensual (€). Necesaria para calcular el complemento de Gran Invalidez.'),
     },
+    { title: 'Calcula la cuantía de la pensión de incapacidad permanente', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pension_incapacidad', aiCaller);
@@ -5962,6 +6052,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tieneHijos: z.boolean().optional().describe('¿Tiene hijos a cargo? Relevante para menores de 35 años.'),
       haCapitalizadoAnteriormente: z.boolean().optional().describe('¿Ha capitalizado el desempleo en los últimos 4 años? Si es true, no puede volver a capitalizar.'),
     },
+    { title: 'Calcula el importe del pago único (capitalización) de la', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_capitalizar_desempleo', aiCaller);
@@ -6016,6 +6107,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         retencionesPracticadas: z.number().min(0).describe('Retenciones practicadas por este pagador en el año (€)'),
       })).min(1).describe('Lista de todos los pagadores del año'),
     },
+    { title: 'Determina si existe obligación de declarar IRPF con más de un', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_irpf_segunda_pagador', aiCaller);
@@ -6070,6 +6162,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       diasDietasExtranjeroPernoctando: z.number().min(0).optional().describe('Días en extranjero con pernocta (límite 91,35 €/día)'),
       otrosGastosAcreditados: z.number().min(0).optional().describe('Otros gastos deducibles acreditados (amortizaciones, compras, etc.) (€)'),
     },
+    { title: 'Calcula los gastos deducibles en el IRPF para autónomos en', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_deduccion_autonomo_irpf', aiCaller);
@@ -6131,6 +6224,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       cuantiaPensionMadre: z.number().positive().optional().describe('Para hombres: cuantía mensual de la pensión de la madre de los hijos (€/mes). Necesaria para verificar la brecha.'),
       madrePcibeComplemento: z.boolean().optional().describe('Para hombres: ¿la madre ya percibe este complemento? Si es true, el hombre no puede acceder.'),
     },
+    { title: 'Calcula el complemento de pensión para la reducción de la brecha', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_complemento_brecha_genero', aiCaller);
@@ -6183,6 +6277,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       horasNocturnasMes: z.number().min(0).optional().describe('Horas nocturnas trabajadas al mes (entre 22h y 6h). Si se indica, tiene prioridad.'),
       salariosAbsorbeNocturnidad: z.boolean().optional().describe('¿El salario ya incorpora la nocturnidad? Si es true, no se calcula plus adicional.'),
     },
+    { title: 'Calcula el plus de nocturnidad (horas trabajadas entre 22h y 6h),', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_plus_nocturnidad', aiCaller);
@@ -6233,6 +6328,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tipoCarencia: z.enum(['total', 'parcial_solo_intereses']).describe('Tipo de carencia: total (no se paga nada, intereses capitalizados) o parcial_solo_intereses (solo se pagan intereses)'),
       duracionCarenciaMeses: z.number().positive().describe('Duración del período de carencia (meses)'),
     },
+    { title: 'Calcula el impacto financiero de aplicar una carencia hipotecaria', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_moratoria_hipoteca', aiCaller);
@@ -6293,6 +6389,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       retencionesYPagosFraccionados: z.number().min(0).optional().describe('Retenciones y pagos fraccionados (modelo 202) ya realizados en el ejercicio (€)'),
       tipoIS: z.number().min(0).max(50).optional().describe('Tipo impositivo IS (%) — si no se indica, se usa el del régimen seleccionado'),
     },
+    { title: 'Calcula la cuota del Impuesto sobre Sociedades (IS) en España', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_impuesto_sociedades', aiCaller);
@@ -6356,6 +6453,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       anioActual: z.number().optional().describe('Año actual del ejercicio (necesario si se indica anioInicioActividad)'),
       tipoIVA: z.number().min(0).max(21).optional().describe('Tipo de IVA aplicable (%). Por defecto 21%.'),
     },
+    { title: 'Calcula la retención de IRPF en facturas de autónomos', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_retencion_profesional', aiCaller);
@@ -6410,6 +6508,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       rentasTrabajoAnuales: z.number().min(0).optional().describe('Rentas del trabajo anuales de toda la unidad de convivencia (€/año)'),
       otrasRentasAnuales: z.number().min(0).optional().describe('Otras rentas anuales (capital, actividades económicas, prestaciones...) (€/año)'),
     },
+    { title: 'Calcula la cuantía del Ingreso Mínimo Vital (IMV) según la', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_ingreso_minimo_vital', aiCaller);
@@ -6465,6 +6564,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       prontoPago: z.boolean().optional().describe('¿Paga en período voluntario sin aplazamiento? Reduce la sanción un 25% adicional.'),
       pctPerjuicioEconomico: z.number().min(0).max(100).optional().describe('Porcentaje del perjuicio económico (cuota defraudada / base imponible × 100). Para graduar infracciones graves.'),
     },
+    { title: 'Calcula la sanción tributaria aplicable según la LGT', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_sancion_tributaria', aiCaller);
@@ -6518,6 +6618,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       pagoEnVoluntario: z.boolean().optional().describe('¿Va a pagar en el período voluntario? Permite aplicar la reducción del 25% sobre el recargo. Por defecto: true.'),
       diasRetraso: z.number().min(0).optional().describe('Días exactos de retraso (para cálculo preciso de intereses si supera 12 meses)'),
     },
+    { title: 'Calcula el recargo por presentación de declaraciones tributarias', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_recargo_presentacion_tardia', aiCaller);
@@ -6563,6 +6664,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       diasMesBaseCotizacion: z.number().optional().describe('Número de días del mes de la base de cotización (para el divisor diario). Por defecto 30.'),
       complementoDiasDespera: z.boolean().optional().describe('¿El convenio obliga a pagar complemento los 3 primeros días (período de espera)? Por defecto false.'),
     },
+    { title: 'Calcula el complemento empresarial durante una baja por', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_complemento_it_empresa', aiCaller);
@@ -6620,6 +6722,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       vehiculoEficienteEnergeticamente: z.boolean().optional().describe('¿Es vehículo eficiente energéticamente? Aplica reducción del 30% en la retribución en especie IRPF.'),
       tipoIS: z.number().optional().describe('Tipo IS de la empresa (%). Por defecto 25%.'),
     },
+    { title: 'Calcula el tratamiento fiscal completo del vehículo de empresa', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_vehiculo_empresa_fiscal', aiCaller);
@@ -6681,6 +6784,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       baseCotizacionAnualRGSS: z.number().min(0).optional().describe('Base de cotización anual total en el Régimen General (€) — para calcular las cuotas CC del RGSS (4,7%)'),
       cuotasCCAnualesRGSS: z.number().min(0).optional().describe('Cuotas de contingencias comunes pagadas en el RGSS durante el año (€) — alternativa a baseCotizacionAnualRGSS'),
     },
+    { title: 'Calcula la devolución por exceso de cotizaciones SS en', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_excedente_cotizacion_ss', aiCaller);
@@ -6736,6 +6840,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       }).describe('Gastos deducibles del arrendamiento'),
       excesoGastosPendientesAniosAnt: z.number().min(0).optional().describe('Exceso de intereses/reparación de años anteriores pendiente de compensar (EUR)'),
     },
+    { title: 'Calcula el rendimiento neto del capital inmobiliario en IRPF', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_rendimiento_capital_inmobiliario', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularRendimientoCapitalInmobiliario(args as Parameters<typeof calcularRendimientoCapitalInmobiliario>[0]);
@@ -6770,6 +6875,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       importeAnual: z.number().positive().describe('Importe anual de la pensión (EUR)'),
       baseLiquidableGeneralPagador: z.number().min(0).optional().describe('Base liquidable general del pagador (sin descontar la pensión) — necesario para calcular el ahorro fiscal del art. 64 en alimentos a hijos'),
     },
+    { title: 'Calcula el tratamiento fiscal en IRPF de las pensiones de', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_pension_alimenticia_irpf', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularPensionAlimenticiaIRPF(args);
@@ -6809,6 +6915,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       abonoAnticipado: z.boolean().optional().describe('¿Solicitó abono anticipado (modelo 140)?'),
       importeAbonoAnticipadoCobrado: z.number().min(0).optional().describe('Importe ya cobrado como abono anticipado en el ejercicio (EUR)'),
     },
+    { title: 'Calcula la deducción por maternidad (LIRPF art', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_deduccion_maternidad_irpf', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularDeduccionMaternidadIRPF(args as Parameters<typeof calcularDeduccionMaternidadIRPF>[0]);
@@ -6850,6 +6957,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       cotizacionesSSTotales: z.number().min(0).describe('Cotizaciones SS totales del contribuyente en el ejercicio (EUR) — límite de las deducciones'),
       importeAbonoAnticipadoCobrado: z.number().min(0).optional().describe('Importe ya cobrado como abono anticipado modelo 143 (EUR)'),
     },
+    { title: 'Calcula las deducciones en cuota del IRPF por familia numerosa y', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_deduccion_familia_numerosa', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularDeduccionFamiliaNumerosa(args as Parameters<typeof calcularDeduccionFamiliaNumerosa>[0]);
@@ -6885,6 +6993,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       amortizacionContableEjercicio: z.number().min(0).optional().describe('Amortización contable registrada en el ejercicio (EUR) — para verificar si excede el máximo fiscal'),
       anosTranscurridos: z.number().int().min(0).optional().describe('Años transcurridos desde la adquisición — para calcular el valor neto fiscal'),
     },
+    { title: 'Calcula la amortización fiscal deducible de activos intangibles', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_amortizacion_intangibles', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularAmortizacionIntangibles(args as Parameters<typeof calcularAmortizacionIntangibles>[0]);
@@ -6921,6 +7030,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       grupoSuperaUmbralMasterFile: z.boolean().optional().describe('¿El grupo empresarial supera los 45 M EUR de facturación mundial?'),
       tipoIS: z.number().min(0).max(100).optional().describe('Tipo IS del contribuyente (% — por defecto 25%)'),
     },
+    { title: 'Analiza si una operación entre entidades vinculadas (LIS art', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_operaciones_vinculadas', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularOperacionesVinculadas(args as Parameters<typeof calcularOperacionesVinculadas>[0]);
@@ -6959,6 +7069,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         pctPlasticoRecicladoAcreditado: z.number().min(0).max(100).describe('Porcentaje de plástico reciclado postconsumo acreditado por entidad ENAC (0-100%)'),
       })).min(1).describe('Líneas de envases a declarar'),
     },
+    { title: 'Calcula el Impuesto Especial sobre Envases de Plástico No', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_impuesto_plasticos', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularImpuestoPlasticos(args as Parameters<typeof calcularImpuestoPlasticos>[0]);
@@ -7003,6 +7114,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       fondosPropiosStartup: z.number().min(0).optional().describe('Fondos propios de la startup al inicio del ejercicio (EUR)'),
       valorAccionesEntregadasEmpleados: z.number().min(0).optional().describe('Valor de acciones/participaciones entregadas a empleados en el ejercicio (EUR)'),
     },
+    { title: 'Calcula y resume los incentivos fiscales de la Ley de Startups', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_beneficios_tributarios_startup', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularBeneficiosTributariosStartup(args as Parameters<typeof calcularBeneficiosTributariosStartup>[0]);
@@ -7050,6 +7162,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         superaUmbralCapitalizacion: z.boolean().describe('La sociedad emisora tiene capitalización > 1.000 M EUR a 1 dic año anterior'),
       })).min(1).describe('Lista de operaciones a analizar'),
     },
+    { title: 'Calcula el Impuesto sobre Transacciones Financieras (ITF, "Tasa', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_impuesto_transacciones_financieras', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularImpuestoTransaccionesFinancieras({ operaciones: args.operaciones });
@@ -7089,6 +7202,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       porcentajeProrrataReceptor: z.number().min(0).max(100).optional().describe('Porcentaje de prorrata definitiva del receptor (0-100, por defecto 100%)'),
       importeTotalFactura: z.number().positive().optional().describe('Importe total de la factura — requerido para supuesto electronicos_empresario'),
     },
+    { title: 'Determina si una operación está sujeta a inversión del sujeto', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_inversion_sujeto_pasivo_iva', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularInversionSujetoPasivoIVA(args as Parameters<typeof calcularInversionSujetoPasivoIVA>[0]);
@@ -7131,6 +7245,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tieneSubstanciaEconomica: z.boolean().optional().describe('¿La ENR tiene sustancia económica real (medios, empleados propios)?'),
       enUEconMotivosValidos: z.boolean().optional().describe('¿La ENR está en la UE/EEE con motivos económicos válidos?'),
     },
+    { title: 'Calcula la imputación de rentas por Transparencia Fiscal', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_transparencia_fiscal_internacional', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularTransparenciaFiscalInternacional(args as Parameters<typeof calcularTransparenciaFiscalInternacional>[0]);
@@ -7168,6 +7283,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       volumenIngresosPrevio: z.number().min(0).optional().describe('Volumen de ingresos del ejercicio anterior (EUR) — para verificar límites'),
       volumenComprasPrevio: z.number().min(0).optional().describe('Volumen de compras del ejercicio anterior (EUR)'),
     },
+    { title: 'Calcula la cuota trimestral de IVA a ingresar en el Régimen', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_regimen_simplificado_iva', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularRegimenSimplificadoIVA({ ...args, trimestre: args.trimestre as TrimestreISP });
@@ -7203,6 +7319,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         tipoRetencionAplicado: z.number().min(0).max(100).optional().describe('Tipo de retención efectivo aplicado (%). Obligatorio para categoría "trabajo"'),
       })).min(1).describe('Líneas de retención a declarar'),
     },
+    { title: 'Calcula el importe total a ingresar en el Modelo 111 (retenciones', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_modelo_111', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularModelo111(args as Parameters<typeof calcularModelo111>[0]);
@@ -7238,6 +7355,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       hijosACargo: z.number().int().min(0).describe('Número de hijos menores de 26 años a cargo (0, 1, 2 o más)'),
       edad60oMas: z.boolean().optional().describe('¿El autónomo tiene 60 o más años en el momento del cese?'),
     },
+    { title: 'Calcula la prestación por cese de actividad de autónomos', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_prestacion_cese_actividad', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularPrestacionCeseActividad(args);
@@ -7277,6 +7395,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       plantillaEmpresa: z.number().int().positive().optional().describe('Plantilla total de la empresa (para calcular umbrales colectivos)'),
       trabajadoresAfectados: z.number().int().positive().optional().describe('Número de trabajadores afectados por la MSCT'),
     },
+    { title: 'Calcula los derechos económicos del trabajador ante una', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_modificacion_sustancial_condiciones', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularModificacionSustancialCondiciones(args as Parameters<typeof calcularModificacionSustancialCondiciones>[0]);
@@ -7317,6 +7436,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       pensionInferiorConyuge: z.boolean().optional().describe('Para hombres: ¿su pensión es inferior a la del cónyuge o pareja de hecho?'),
       pensionMensualBase: z.number().positive().describe('Pensión contributiva mensual reconocida antes del complemento (EUR)'),
     },
+    { title: 'Calcula el complemento de pensión por brecha de género (LGSS art', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_complemento_pension_brecha_genero', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularComplementoPensionBrechaGenero(args as Parameters<typeof calcularComplementoPensionBrechaGenero>[0]);
@@ -7355,6 +7475,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       cuotaSSAnual: z.number().min(0).optional().describe('Cuota SS anual en España (EUR) — deducible del salario bruto'),
       anoRegimen: z.number().min(1).max(6).optional().describe('Año del régimen (1-6) — para informar sobre duración restante'),
     },
+    { title: 'Calcula la tributación bajo el régimen especial de trabajadores', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_regimen_impatriados', aiCaller);
@@ -7375,6 +7496,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       precioVentaPublicoConIVA: z.number().positive().optional().describe('Precio de venta al público con IVA incluido (EUR) — para calcular margen real'),
       margenComercialPct: z.number().positive().optional().describe('Margen comercial bruto sobre el coste neto (%) — alternativa al precio de venta'),
     },
+    { title: 'Calcula el recargo de equivalencia del IVA que paga el', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_recargo_equivalencia', aiCaller);
@@ -7394,6 +7516,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       gastosDeducibles: z.number().min(0).optional().describe('Gastos deducibles asociados al rendimiento (EUR)'),
       tipoMarginal: z.number().min(0).max(50).optional().describe('Tipo marginal IRPF del contribuyente (%) — para calcular el ahorro fiscal estimado. Default: 37%'),
     },
+    { title: 'Calcula la reducción del 30% sobre rendimientos del trabajo o', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_reduccion_irregular_irpf', aiCaller);
@@ -7415,6 +7538,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       importeReinvertido: z.number().min(0).optional().describe('Importe reinvertido en la nueva vivienda (EUR) — solo si situacion=reinversion_parcial'),
       mayor65anos: z.boolean().optional().describe('¿El vendedor tiene más de 65 años? → ganancia exenta sin necesidad de reinvertir'),
     },
+    { title: 'Calcula la exención por reinversión en vivienda habitual (LIRPF art', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_exencion_reinversion_vivienda', aiCaller);
@@ -7435,6 +7559,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       edadTrabajador: z.number().min(55).max(70).optional().describe('Edad del trabajador (años) — para verificar requisitos de acceso'),
       anosCotizados: z.number().min(0).max(50).optional().describe('Años cotizados — requisito mínimo 33 años (36 si el relevo es a tiempo parcial)'),
     },
+    { title: 'Calcula los efectos económicos de la jubilación parcial (LGSS arts', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_jubilacion_parcial', aiCaller);
@@ -7460,6 +7585,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       }).optional().describe('Gastos del traslado a cargo de la empresa — si decisión = aceptar'),
       zonaDestino: z.enum(['espana', 'extranjero']).optional().describe('Zona del destino para el cálculo de dietas exentas. Default: espana'),
     },
+    { title: 'Calcula los derechos y costes de la movilidad geográfica (ET art', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_movilidad_geografica', aiCaller);
@@ -7478,6 +7604,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       valorAdquisicionDerechos: z.number().min(0).optional().describe('Valor de adquisición de los derechos (EUR) — solo para transmision_plena_derechos (calcula ganancia patrimonial)'),
       retencionesPracticadas: z.number().min(0).optional().describe('Retenciones ya practicadas por el pagador (EUR)'),
     },
+    { title: 'Calcula la tributación IRPF de los ingresos por derechos de', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_derechos_autor_irpf', aiCaller);
@@ -7499,6 +7626,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       gastosTransmision: z.number().min(0).optional().describe('Gastos de transmisión (EUR): notaría, agencia, plusvalía municipal...'),
       valorTransmisionesAnterioresConAbatimiento: z.number().min(0).optional().describe('Valor acumulado de transmisiones anteriores sobre las que ya se aplicó abatimiento (EUR) — para verificar el límite de 400.000 EUR'),
     },
+    { title: 'Calcula la reducción por coeficientes de abatimiento sobre', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_coeficientes_abatimiento', aiCaller);
@@ -7525,6 +7653,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       saldoPositivoRCM: z.number().min(0).optional().describe('Saldo positivo de rendimientos del capital mobiliario del período (EUR) — para calcular compensación con pérdidas cripto'),
       tipoMarginalIRPF: z.number().min(0).max(100).optional().describe('Tipo marginal IRPF del contribuyente (%) — solo informativo'),
     },
+    { title: 'Calcula ganancias y pérdidas patrimoniales por transmisión de', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_ganancia_criptomonedas', aiCaller);
@@ -7548,6 +7677,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tiempoParcial: z.boolean().optional().describe('¿Contrato a tiempo parcial?'),
       pctJornada: z.number().min(1).max(99).optional().describe('Porcentaje de jornada en tiempo parcial (%) — solo si tiempoParcial=true'),
     },
+    { title: 'Calcula bonificaciones y reducciones en cuotas SS empresariales', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_bonificacion_contratacion', aiCaller);
@@ -7572,6 +7702,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       cuotaIntegra: z.number().min(0).describe('Cuota íntegra ajustada del IS del período (EUR) — necesaria para calcular el límite de aplicación'),
       solicitarMonetizacion: z.boolean().optional().describe('¿Solicitar abono AEAT (monetización) si no hay suficiente cuota? Descuento del 20% sobre importe monetizable'),
     },
+    { title: 'Calcula la deducción fiscal por I+D+i en el Impuesto sobre', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_deduccion_idi', aiCaller);
@@ -7599,6 +7730,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       prorrataProvisoriaAplicada: z.number().min(0).max(100).optional().describe('Prorrata provisional aplicada en los trimestres anteriores (%) — para calcular regularización anual'),
       ivaDeducidoProvisional: z.number().min(0).optional().describe('IVA ya deducido en los trimestres anteriores con la prorrata provisional (EUR)'),
     },
+    { title: 'Calcula la prorrata del IVA (general o especial) cuando el sujeto', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_prorrata_iva', aiCaller);
@@ -7625,6 +7757,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         })).min(1),
       })).min(1).describe('Lista de terceros con sus operaciones del año'),
     },
+    { title: 'Determina qué operaciones con clientes/proveedores superan el', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_modelo_347', aiCaller);
@@ -7655,6 +7788,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       retribucionDireccionSuperior50pct: z.boolean().describe('¿La retribución por funciones de dirección supera el 50% de los rendimientos netos totales del transmitente?'),
       tipoIS: z.number().min(0).max(50).optional().describe('Tipo IS de la empresa (%) — solo informativo'),
     },
+    { title: 'Calcula la reducción del 95% (o más en PV/Navarra) en el ISD por', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_empresa_familiar_isd', aiCaller);
@@ -7686,6 +7820,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       precioPagadoTrabajador: z.number().min(0).optional().describe('Precio pagado por el trabajador (EUR) — si paga algo'),
       tipoRetencionTrabajador: z.number().min(0).max(50).optional().describe('Tipo de retención IRPF del trabajador (%) — para calcular el ingreso a cuenta. Default: 15%'),
     },
+    { title: 'Calcula la valoración IRPF de las retribuciones en especie más', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_retribucion_especie', aiCaller);
@@ -7705,6 +7840,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       cuotaIPAutonomicoLiquida: z.number().min(0).optional().describe('Cuota líquida ya pagada en el Impuesto sobre el Patrimonio autonómico (EUR) — se deduce del ITSGF'),
       ccaaTieneIPEfectivo: z.boolean().optional().describe('¿La CCAA tiene IP vigente y efectivo (no bonificado al 100%)? Si true, la cuota IP reduce el ITSGF'),
     },
+    { title: 'Calcula la cuota del Impuesto Temporal de Solidaridad de las', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_impuesto_grandes_fortunas', aiCaller);
@@ -7725,6 +7861,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       reduccion: z.enum(['ninguna','joven','vpo','familia_numerosa','discapacidad']).optional().describe('Tipo de reducción si el comprador cumple los requisitos. Default: ninguna'),
       edadComprador: z.number().min(18).max(100).optional().describe('Edad del comprador (para reducción joven)'),
     },
+    { title: 'Calcula el Impuesto sobre Actos Jurídicos Documentados (AJD —', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_ajd_ccaa', aiCaller);
@@ -7764,6 +7901,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       edadActual: z.number().min(0).max(120).optional().describe('Edad actual del contribuyente — para evaluar posible exención art. 7.v LIRPF (≥65 años)'),
       capitaldart7v: z.boolean().optional().describe('¿El capital procede de una ganancia patrimonial acogida a la exención del art. 7.v LIRPF (transmisión de bienes por mayores de 65 años)?'),
     },
+    { title: 'Calcula la tributación en IRPF de rentas vitalicias y temporales', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_renta_vitalicia_irpf', aiCaller);
@@ -7806,6 +7944,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tipoMarginalIRPFEmpleado: z.number().min(0).max(60).describe('Tipo marginal IRPF del empleado (%) — para cuantificar el ahorro fiscal en IRPF'),
       tipoISEmpresa: z.number().min(0).max(35).optional().describe('Tipo IS de la empresa (%) para cuantificar el ahorro fiscal en IS. Default: 25%'),
     },
+    { title: 'Calcula el beneficio fiscal de los planes de pensiones de empleo', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_plan_pension_empresa', aiCaller);
@@ -7850,6 +7989,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       declaradoImprocedente: z.boolean().optional().describe('¿Ha sido declarado improcedente por el juzgado? Si es true, calcula la indemnización de 33 días/año (máx. 24 meses) y la diferencia a pagar adicionalmente. Default: false'),
       fechaInicioContrato: z.string().optional().describe('Fecha de inicio del contrato (YYYY-MM-DD o YYYY-MM) — para detectar si hay período anterior al 12/02/2012 (reforma laboral)'),
     },
+    { title: 'Calcula la indemnización y el preaviso del despido por causas', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_despido_objetivo', aiCaller);
@@ -7897,6 +8037,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       diasConsumidos: z.number().min(0).optional().describe('Días de prestación de desempleo ya consumidos por este trabajador antes del ERTE. Importa para saber si aplica el 70% (primeros 180 días) o el 50% (desde el día 181). Default: 0'),
       exoneracionCotizacionSS: z.boolean().optional().describe('¿La empresa está exonerada de cotizar SS por las horas reducidas? Aplica en MECAS y ERTE de fuerza mayor. Default: false'),
     },
+    { title: 'Calcula el impacto económico de un ERTE por reducción de jornada', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_erte_reduccion', aiCaller);
@@ -7950,6 +8091,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         gastosEstanciaJustificados: z.number().min(0).optional().describe('Gastos de hotel/estancia con factura (€) — exentos sin límite si hay pernocta y factura'),
       })).optional().describe('Gastos de manutención y estancia'),
     },
+    { title: 'Calcula la parte exenta y sujeta a IRPF de las dietas y', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_dietas_irpf', aiCaller);
@@ -7999,6 +8141,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       gastosAdicionales: z.number().min(0).optional().describe('Gastos adicionales: corretaje, timbre (AJD letras), etc. (€)'),
       tipoFiscalEmpresa: z.number().min(0).max(35).optional().describe('Tipo IS o IRPF de la empresa cedente (%) para calcular el ahorro fiscal. Default: 25%'),
     },
+    { title: 'Calcula el coste real (TAE) del descuento de efectos comerciales', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_descuento_efectos', aiCaller);
@@ -8050,6 +8193,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       esERD: z.boolean().optional().describe('¿Es empresa de reducida dimensión (ERD)? Cifra de negocios < 10 millones €. Las ERD pueden dotación global adicional del 1%. Default: false'),
       saldoTotalDeudoresCierre: z.number().min(0).optional().describe('Saldo total de deudores al cierre del ejercicio (€) — solo necesario si esERD=true, para calcular la dotación global del 1%'),
     },
+    { title: 'Calcula la deducibilidad en el IS de las provisiones por créditos', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_provision_insolvencias', aiCaller);
@@ -8101,6 +8245,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       precioAdquisicion: z.number().positive().optional().describe('Precio de adquisición original del inmueble (€) — para calcular el método real'),
       precioTransmision: z.number().positive().optional().describe('Precio de transmisión (venta) del inmueble (€) — para calcular el método real'),
     },
+    { title: 'Calcula el IIVTNU (plusvalía municipal) usando los dos métodos', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_iivtnu_plusvalia_municipal', aiCaller);
@@ -8143,6 +8288,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       otrosGastos: z.number().min(0).optional().describe('Otros gastos necesarios: administración, suministros pagados por arrendador (€/año)'),
       tipoMarginalIRPF: z.number().min(0).max(60).optional().describe('Tipo marginal IRPF del arrendador (%) para calcular el ahorro fiscal estimado'),
     },
+    { title: 'Calcula el rendimiento neto reducido del capital inmobiliario por', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_reduccion_arrendamiento_irpf', aiCaller);
@@ -8192,6 +8338,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       cumpleCarencia: z.boolean().optional().describe('¿Cumple el período de carencia requerido según su edad? Default: true (asume que sí cumple)'),
       situacionLaboral: z.enum(['trabajador_cuenta_ajena', 'autonomo', 'desempleado_sin_derecho']).optional().describe('Situación laboral del progenitor'),
     },
+    { title: 'Calcula la prestación por nacimiento/adopción', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_prestacion_maternidad_paternidad', aiCaller);
@@ -8233,6 +8380,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tipoReduccion: z.enum(['ninguna','joven','vivienda_habitual_bajo_valor','familia_numerosa','discapacidad','vpo']).optional().describe('Tipo de reducción a aplicar si el comprador cumple los requisitos. Default: ninguna'),
       edadComprador: z.number().min(18).max(100).optional().describe('Edad del comprador en años (necesario para la reducción por joven)'),
     },
+    { title: 'Calcula el Impuesto sobre Transmisiones Patrimoniales (ITP) en la', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_itp_ccaa', aiCaller);
@@ -8272,6 +8420,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       })).min(1).describe('Lista de inmuebles sujetos a imputación de rentas'),
       tipoMarginalIRPF: z.number().min(0).max(60).optional().describe('Tipo marginal IRPF del contribuyente (%) para calcular la cuota estimada. Default: 30%'),
     },
+    { title: 'Calcula la imputación de rentas inmobiliarias (LIRPF art', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_imputacion_rentas_inmuebles', aiCaller);
@@ -8314,6 +8463,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       edadContribuyente: z.number().min(18).max(100).optional().describe('Edad del contribuyente (para verificar límites de edad en deducciones de jóvenes)'),
       baseImponibleTotal: z.number().min(0).optional().describe('Base imponible total del contribuyente (€) — para verificar límites de renta'),
     },
+    { title: 'Calcula las deducciones autonómicas por vivienda habitual en el', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_deduccion_vivienda_ccaa', aiCaller);
@@ -8362,6 +8512,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       aplicarReduccionIrregularidad: z.boolean().optional().describe('¿Aplicar reducción por irregularidad del 30% (ingresos generados en más de 2 años)? Default: false'),
       tipoMarginalIRPF: z.number().min(0).max(60).optional().describe('Tipo marginal IRPF (%) para estimar la cuota. Default: 30%'),
     },
+    { title: 'Calcula el rendimiento neto de actividades económicas en el', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_estimacion_objetiva', aiCaller);
@@ -8411,6 +8562,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       pctPlusNocturnidadConvenio: z.number().min(0).max(100).optional().describe('Porcentaje del plus de nocturnidad según convenio colectivo (%). Si no hay convenio, el ET no fija mínimo — rango habitual: 20-35%. Default: 25%'),
       diasLaborablesSemanales: z.number().min(1).max(7).optional().describe('Días laborables por semana (Default: 5). Usar 6 si trabaja 6 días/semana'),
     },
+    { title: 'Calcula las horas nocturnas acumuladas en esquemas de turnos', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_nocturnidad_turno_rotativo', aiCaller);
@@ -8459,6 +8611,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       rendimientosNetosEjercicio: z.number().min(0).describe('Rendimientos netos del trabajo + actividades económicas del ejercicio (EUR). Base para calcular el límite del 30%'),
       excesoAnterioresPendiente: z.number().min(0).optional().describe('Exceso de aportaciones no deducido en ejercicios anteriores (EUR). Puede trasladarse hasta 5 años'),
     },
+    { title: 'Calcula la reducción de la base imponible general del IRPF por', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_reduccion_plan_pensiones_irpf', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularReduccionPlanPensionesIRPF({
@@ -8515,6 +8668,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       })).min(1).describe('Lista de BINs pendientes de compensar, de ejercicios anteriores'),
       tipoIS: z.number().min(1).max(35).optional().describe('Tipo del IS del contribuyente (%). Default: 25%'),
     },
+    { title: 'Calcula el importe de bases imponibles negativas (BINs)', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_compensacion_bases_negativas_is', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularCompensacionBasesNegativasIS({
@@ -8582,6 +8736,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       dietasPagadasConTarjeta: z.number().min(0).optional().describe('Importe de dietas pagadas con tarjeta/transferencia (fuera del municipio) ya aplicando los límites del RIRPF: 26,67 EUR/día sin pernocta, 53,34 EUR/día con pernocta (EUR/año)'),
       saldoDeudoresFinAnio: z.number().min(0).optional().describe('Saldo de clientes/deudores al cierre del ejercicio (EUR). Solo para ED Simplificada: permite deducir provisión global del 5%'),
     },
+    { title: 'Calcula los gastos fiscalmente deducibles en el IRPF para un', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_gastos_deducibles_autonomo', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularGastosDeduciblesAutonomo({
@@ -8642,6 +8797,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tipoCDI: z.number().min(0).max(30).optional().describe('Para no residentes: tipo del CDI aplicable (%). Si no hay convenio, se aplica el tipo general del 19%'),
       otrosRdtoAhorroEjercicio: z.number().min(0).optional().describe('Para persona física: otros rendimientos del capital mobiliario del ahorro en el ejercicio (EUR). Para calcular la escala progresiva acumulada'),
     },
+    { title: 'Calcula la retención e IRPF/IS aplicable a dividendos según el', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_retencion_dividendos', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularRetencionDividendos({
@@ -8695,6 +8851,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         porcentaje: z.number().min(0).max(100).describe('Porcentaje de bonificación sobre la cuota íntegra (%)'),
       })).optional().describe('Lista de bonificaciones aplicables al inmueble. Se aplican de forma secuencial sobre la cuota restante'),
     },
+    { title: 'Calcula el Impuesto sobre Bienes Inmuebles (IBI) a partir del', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_ibi', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularIBI({
@@ -8745,6 +8902,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       presentoAnosAnteriores: z.boolean().optional().describe('¿El contribuyente presentó el Modelo 720 en ejercicios anteriores?'),
       bienesNoDeclaradosPrescripcion: z.number().min(0).optional().describe('Valor estimado de bienes que debieron declararse y no se declararon (EUR). Para análisis de riesgo de imputación como ganancia patrimonial no justificada'),
     },
+    { title: 'Analiza la obligación de presentar el Modelo 720 (declaración de', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_modelo720', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularModelo720({
@@ -8805,6 +8963,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       anosDesdeContingencia: z.number().min(0).optional().describe('Años transcurridos desde que ocurrió la contingencia. La reducción del 40% solo puede aplicarse en los 2 años siguientes'),
       otrosRdtTrabajoEjercicio: z.number().min(0).optional().describe('Otros rendimientos del trabajo (nómina, pensión SS) en el mismo ejercicio (EUR). Para calcular el tipo marginal real del rescate'),
     },
+    { title: 'Calcula la tributación del rescate de un plan de pensiones en', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_rescate_plan_pensiones', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularRescatePlanPensiones({
@@ -8861,6 +9020,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       impuestoSubyacente: z.number().min(0).optional().describe('IS pagado por la filial extranjera proporcional al dividendo distribuido (EUR). Para la deducción indirecta art. 32'),
       tipoISEspanol: z.number().min(1).max(35).optional().describe('Tipo del IS español del contribuyente (%). Default: 25%'),
     },
+    { title: 'Calcula la eliminación de la doble imposición internacional en el', readOnlyHint: true },
     async (args, extra) => {
       await registrarUsoMCP('calcular_deduccion_doble_imposicion_is', extra?.authInfo?.clientId ?? 'mcp-client');
       const resultado = calcularDeduccionDobleImposicionIS({
@@ -8929,6 +9089,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       zbe: z.boolean().optional()
         .describe('true si la ciudad tiene Zona de Bajas Emisiones activa (Madrid, Barcelona, Valencia...). Por defecto: false'),
     },
+    { title: 'Recomienda el segmento (urbano, compacto, SUV, familiar) y la', readOnlyHint: true },
     async ({ kmAnuales, usoPrincipal, pasajeros, presupuesto, carga, zona, zbe }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('recomendar_vehiculo', aiCaller);
@@ -9018,6 +9179,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       costeCargador: z.number().min(0).optional()
         .describe('Coste de instalación del cargador doméstico en euros. Por defecto: 800'),
     },
+    { title: 'Calcula el año en que un coche eléctrico empieza a ser más barato', readOnlyHint: true },
     async ({ precioElectrico, precioGasolina, kmAnuales, subsidioMoves, consumoElectrico, consumoGasolina, precioLuz, precioGasolinaLitro, costeCargador }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_breakeven_electrico', aiCaller);
@@ -9082,6 +9244,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       autonomiaPhevKm: z.number().min(0).optional()
         .describe('Solo para PHEV: autonomía eléctrica en km. ≥40km → etiqueta CERO, <40km → ECO. Por defecto: 0'),
     },
+    { title: 'Calcula la etiqueta medioambiental DGT (CERO, ECO, C, B o Sin', readOnlyHint: true },
     async ({ combustible, anioMatriculacion, autonomiaPhevKm }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('consultar_etiqueta_dgt', aiCaller);
@@ -9162,6 +9325,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
           'm43 = Micro 4/3 (factor ×2,0)'
         ),
     },
+    { title: 'Calcula la profundidad de campo (DoF) para una combinación de', readOnlyHint: true },
     async ({ focal_mm, apertura, distancia_m, sensor }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_profundidad_campo', aiCaller);
@@ -9217,6 +9381,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tiempo_elegido_s: z.number().positive()
         .describe('Tiempo de exposición que quieres evaluar, en segundos (ej. 20 para 20 segundos)'),
     },
+    { title: 'Calcula el tiempo máximo de exposición sin estelas de estrellas', readOnlyHint: true },
     async ({ focal_mm, apertura, sensor, megapixeles, declinacion_grados, tiempo_elegido_s }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_astrofoto_exposicion', aiCaller);
@@ -9275,6 +9440,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
           'ISO sin unidades (ej. 800), f-number para apertura (ej. 5.6), segundos para obturador (ej. 0.002)'
         ),
     },
+    { title: 'Calcula exposiciones fotográficas equivalentes variando uno de', readOnlyHint: true },
     async ({ iso_base, apertura_base, obturador_base_s, parametro_fijo, nuevo_valor }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_exposicion_equivalente', aiCaller);
@@ -9323,6 +9489,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       distancia_objetivo_km: z.number().positive()
         .describe('Distancia para la que se quiere predecir el tiempo en kilómetros (ej. 42.195 para maratón)'),
     },
+    { title: 'Predice el tiempo de carrera en cualquier distancia usando la', readOnlyHint: true },
     async ({ distancia_base_km, tiempo_base_s, distancia_objetivo_km }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_prediccion_running', aiCaller);
@@ -9364,6 +9531,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       fc_maxima: z.number().positive().optional()
         .describe('FCmáx medida en un test de esfuerzo en ppm. Opcional: si no se indica, se estima con 220−edad'),
     },
+    { title: 'Calcula las 5 zonas de frecuencia cardíaca personalizadas con la', readOnlyHint: true },
     async ({ edad, fc_reposo, fc_maxima }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_zonas_cardiacas', aiCaller);
@@ -9403,6 +9571,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       repeticiones: z.number().int().positive()
         .describe('Número de repeticiones completadas con ese peso (idealmente 1-12 para mayor precisión)'),
     },
+    { title: 'Calcula la repetición máxima (1RM) en cualquier ejercicio de', readOnlyHint: true },
     async ({ peso_kg, repeticiones }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_1rm_gimnasio', aiCaller);
@@ -9445,6 +9614,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tiempo_min: z.number().positive().optional()
         .describe('Tiempo empleado en subir ese desnivel en minutos (para calcular VAM). Opcional'),
     },
+    { title: 'Analiza el rendimiento en ciclismo', readOnlyHint: true },
     async ({ peso_kg, ftp_w, desnivel_m, tiempo_min }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_potencia_ciclismo', aiCaller);
@@ -9483,6 +9653,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       tiempo_s: z.number().positive()
         .describe('Tiempo empleado en segundos (ej. 3000 para 50 minutos)'),
     },
+    { title: 'Calcula el pace (ritmo por kilómetro), velocidad media, splits', readOnlyHint: true },
     async ({ distancia_km, tiempo_s }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_pace_running', aiCaller);
@@ -9527,6 +9698,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       metros_largo: z.number().int().optional()
         .describe('Longitud del largo en metros: 25 (defecto) o 50'),
     },
+    { title: 'Calcula el índice SWOLF (segundos + brazadas por largo) como', readOnlyHint: true },
     async ({ tiempo_s_largo, brazadas_largo, metros_largo }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_swolf_natacion', aiCaller);
@@ -9564,6 +9736,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       fps: z.number().positive()
         .describe('Frame rate de grabación (ej. 24, 25, 30, 50, 60, 120, 240)'),
     },
+    { title: 'Calcula la velocidad de obturación correcta para vídeo según la', readOnlyHint: true },
     async ({ fps }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_regla_180_video', aiCaller);
@@ -9601,6 +9774,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       duracion_grabacion_s: z.number().positive().optional()
         .describe('Duración del clip grabado en segundos. Opcional: si se indica, calcula la duración ralentizada'),
     },
+    { title: 'Calcula el factor de ralentización de un vídeo slow motion a', readOnlyHint: true },
     async ({ fps_grabacion, fps_reproduccion, duracion_grabacion_s }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_camara_lenta', aiCaller);
@@ -9636,6 +9810,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       obturador_actual_s: z.number().positive()
         .describe('Velocidad de obturación actual en segundos (ej. 0.002 para 1/500, 0.004 para 1/250)'),
     },
+    { title: 'Calcula qué filtro ND necesitas para cumplir la regla de los 180°', readOnlyHint: true },
     async ({ fps, obturador_actual_s }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_filtro_nd_video', aiCaller);
@@ -9679,6 +9854,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       codec: z.enum(['h264', 'h265', 'prores422', 'raw']).optional()
         .describe('Códec de vídeo. Por defecto h264'),
     },
+    { title: 'Estima el bitrate necesario y el tamaño de archivo de un vídeo', readOnlyHint: true },
     async ({ resolucion, fps, duracion_min, codec }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_bitrate_video', aiCaller);
@@ -9718,6 +9894,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       sensor: z.enum(['ff', 'apsc15', 'apsc16', 'm43']).optional()
         .describe('Tipo de sensor: ff = Full Frame, apsc15 = APS-C Nikon/Sony, apsc16 = APS-C Canon, m43 = Micro 4/3. Por defecto ff'),
     },
+    { title: 'Calcula el ángulo de campo (FOV) horizontal, vertical y diagonal', readOnlyHint: true },
     async ({ focal_mm, sensor }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_fov_video', aiCaller);
@@ -9760,6 +9937,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       peso_porcion_g: z.number().positive().optional()
         .describe('Peso de cada pieza/porción en gramos. Opcional: calcula el número de porciones.'),
     },
+    { title: 'calcular_porcentaje_panadero', readOnlyHint: true },
     async ({ harina_g, ingredientes, peso_porcion_g }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_porcentaje_panadero', aiCaller);
@@ -9795,6 +9973,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       agua_g: z.number().positive().optional().describe('Gramos de agua. Requerido si modo=calcular_porcentaje.'),
       hidratacion_pct: z.number().positive().optional().describe('Porcentaje de hidratación objetivo. Requerido si modo=calcular_agua.'),
     },
+    { title: 'Calcula la hidratación de una masa de pan o los gramos de agua', readOnlyHint: true },
     async ({ modo, harina_g, agua_g, hidratacion_pct }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_hidratacion_pan', aiCaller);
@@ -9830,6 +10009,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       hidratacion_mm_pct: z.number().positive().optional()
         .describe('Hidratación de tu masa madre en % (agua/harina × 100). Por defecto 100 (igual de harina que agua).'),
     },
+    { title: 'Calcula cuánta masa madre activa usar para sustituir levadura', readOnlyHint: true },
     async ({ tipo_levadura, levadura_g, hidratacion_mm_pct }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_sustitucion_masa_madre', aiCaller);
@@ -9871,6 +10051,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       t_preferment_c: z.number().optional()
         .describe('Temperatura del preferment (poolish, levain, biga) si la receta lo usa. Activa la fórmula de 4 factores.'),
     },
+    { title: 'Calcula la temperatura exacta del agua de amasado para alcanzar', readOnlyHint: true },
     async ({ ddt_objetivo_c, t_ambiente_c, t_harina_c, tipo_amasadora, t_preferment_c }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_temperatura_masa', aiCaller);
@@ -9906,6 +10087,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       temperatura_c: z.number()
         .describe('Temperatura del almíbar en °C medida con termómetro de cocina. Rango útil: 100–200°C.'),
     },
+    { title: 'Identifica la fase de cocción del azúcar según la temperatura en', readOnlyHint: true },
     async ({ temperatura_c }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_puntos_azucar', aiCaller);
@@ -9948,6 +10130,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       unidad: z.enum(['gramos', 'hojas']).optional()
         .describe('Unidad de medida. hojas solo aplica para tipos hoja_*. Por defecto gramos.'),
     },
+    { title: 'Convierte entre tipos de gelatina según el bloom strength', readOnlyHint: true },
     async ({ tipo_origen, cantidad, unidad }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_sustitucion_gelatina', aiCaller);
@@ -9988,6 +10171,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
       total_g: z.number().positive().optional()
         .describe('Gramos totales de ganache a preparar. Por defecto 200g.'),
     },
+    { title: 'Calcula las proporciones exactas de chocolate y nata para un', readOnlyHint: true },
     async ({ tipo_chocolate, textura, total_g }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_ganache', aiCaller);
@@ -10035,6 +10219,7 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
           .describe('Categoría para escala: levadura e impulsores no escalan linealmente. Por defecto normal.'),
       })).describe('Lista de ingredientes de la receta original.'),
     },
+    { title: 'Escala una receta a más o menos raciones', readOnlyHint: true },
     async ({ raciones_original, raciones_nueva, ingredientes }, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('escalar_receta', aiCaller);
