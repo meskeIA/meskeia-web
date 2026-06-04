@@ -44,7 +44,7 @@ export default function PrivacidadPage() {
         <article className={styles.legalDocument}>
           <div className={styles.documentHeader}>
             <h1 className={styles.documentTitle}>Política de Privacidad</h1>
-            <p className={styles.lastUpdated}>Última actualización: 27 de abril de 2026</p>
+            <p className={styles.lastUpdated}>Última actualización: 4 de junio de 2026</p>
           </div>
 
           <InfoBox type="success" title="COMPROMISO DE PRIVACIDAD" icon="🔒">
@@ -136,7 +136,27 @@ export default function PrivacidadPage() {
             </ul>
           </InfoBox>
 
-          <h2>5. Sus Derechos (RGPD)</h2>
+          <h2>5. Retención de Datos</h2>
+
+          <InfoBox type="info" title="PERÍODO DE CONSERVACIÓN" icon="📅">
+            <p><strong>Datos de analytics (Turso):</strong> Los registros de uso anónimos se conservan un máximo de <strong>24 meses</strong>. Una vez al año se eliminan los registros con más de 12 meses de antigüedad, por lo que en cualquier momento el histórico disponible es de entre 12 y 24 meses.</p>
+            <p><strong>Datos del servidor MCP:</strong> Los parámetros recibidos en las llamadas a las herramientas del servidor MCP (cuando se usa meskeIA desde Claude, Mistral u otros clientes de IA) se procesan en memoria para generar la respuesta y <strong>no se almacenan en ningún soporte</strong>.</p>
+            <p><strong>Datos locales (localStorage):</strong> Permanecen en su dispositivo hasta que usted los elimine. No tienen caducidad automática.</p>
+          </InfoBox>
+
+          <h2>6. Terceros y Procesadores</h2>
+
+          <InfoBox type="info" title="ÚNICO PROCESADOR EXTERNO" icon="🔗">
+            <p><strong>Turso</strong> (turso.tech) es el único servicio externo que procesa datos en nombre de meskeIA. Actúa como base de datos para las estadísticas de uso anónimas descritas en la sección 4.</p>
+            <ul>
+              <li>Los datos transferidos a Turso son <strong>exclusivamente estadísticas anónimas y agregadas</strong></li>
+              <li>meskeIA <strong>no vende, cede ni comparte</strong> ningún dato con terceros con fines comerciales o publicitarios</li>
+              <li>No se utilizan servicios de analítica de terceros (Google Analytics u otros) que instalen scripts en su navegador</li>
+              <li>El servidor MCP no transfiere datos de usuario a ningún servicio externo adicional</li>
+            </ul>
+          </InfoBox>
+
+          <h2>7. Sus Derechos (RGPD)</h2>
 
           <InfoBox type="info" title="DERECHOS SEGÚN RGPD" icon="⚖️">
             <p>Según el Reglamento General de Protección de Datos, usted tiene los siguientes derechos:</p>
@@ -179,7 +199,7 @@ export default function PrivacidadPage() {
             </tbody>
           </table>
 
-          <h2>6. Seguridad de los Datos</h2>
+          <h2>8. Seguridad de los Datos</h2>
 
           <InfoBox type="success" title="MÁXIMA SEGURIDAD POR DISEÑO" icon="🛡️">
             <p><strong>La mejor protección es no recopilar datos.</strong> Al procesar todo localmente:</p>
@@ -191,7 +211,7 @@ export default function PrivacidadPage() {
             </ul>
           </InfoBox>
 
-          <h2>7. Cookies</h2>
+          <h2>9. Cookies</h2>
 
           <InfoBox type="success" title="SIN COOKIES DE SEGUIMIENTO" icon="🍪">
             <p><strong>meskeIA NO utiliza cookies de seguimiento ni de terceros.</strong></p>
