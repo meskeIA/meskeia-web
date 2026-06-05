@@ -1,0 +1,16 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Delegum">
+  <defs>
+    <linearGradient id="delegumGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6FA3DA"/>
+      <stop offset="1" stop-color="#3F70AE"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#delegumGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <!-- D exterior -->
+    <path d="M26 18 L58 18 C94 18 106 40 106 60 C106 80 94 102 58 102 L26 102 Z"/>
+    <!-- D interior concéntrica -->
+    <path d="M44 36 L58 36 C82 36 86 50 86 60 C86 70 82 84 58 84 L44 84 Z"/>
+    <!-- vástago interior -->
+    <path d="M60 50 L60 70"/>
+  </g>
+</svg>
