@@ -63,7 +63,7 @@ export default function DelegumPage() {
             <div className={styles.connectionBox}>
               <div className={styles.connectionRow}>
                 <span className={styles.label}>URL del servidor</span>
-                <code className={styles.code}>https://meskeia.com/api/mcp/delegum/</code>
+                <code className={styles.code}>https://delegum.com/api/mcp/</code>
               </div>
               <div className={styles.connectionRow}>
                 <span className={styles.label}>Autenticación</span>

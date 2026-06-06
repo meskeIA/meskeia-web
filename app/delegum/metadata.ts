@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     title: 'Delegum — Tu asesoría fiscal, laboral y financiera para asistentes de IA',
     description:
       'Conecta Delegum a Claude, ChatGPT o Mistral y resuelve consultas reales de fiscalidad, laboral y finanzas con cálculos normativos de España (2025).',
-    url: 'https://meskeia.com/delegum/',
-    siteName: 'meskeIA',
+    url: 'https://delegum.com/',
+    siteName: 'Delegum',
     locale: 'es_ES',
   },
   twitter: {
@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   },
   other: {
     'application-name': 'Delegum',
+  },
+  alternates: {
+    canonical: 'https://delegum.com/',
   },
   // Favicon/app-icon propios de Delegum, solo en esta ruta (no afectan al resto de meskeia.com)
   icons: {
@@ -44,7 +47,7 @@ export const jsonLd = generateWebAppSchema({
   name: 'Delegum',
   description:
     'Servidor MCP (Model Context Protocol) que actúa como asesoría digital fiscal, laboral y financiera para España. Orquesta varios cálculos en consultas de escenario (autónomo, nómina, vivienda, herencia, jubilación, despido) y devuelve análisis integrados con normativa 2025.',
-  url: 'https://meskeia.com/delegum/',
+  url: 'https://delegum.com/',
   category: 'FinanceApplication',
   features: [
     'Consultas de escenario que integran varios cálculos en una sola respuesta',
@@ -74,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Cómo conecto Delegum a mi asistente de IA?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Añade la URL https://meskeia.com/api/mcp/delegum/ (con barra final) como servidor MCP en tu cliente. En Claude Desktop se hace en Configuración → Desarrollador → Servidores MCP. No requiere instalación, registro ni autenticación.',
+        text: 'Añade la URL https://delegum.com/api/mcp/ (con barra final) como servidor MCP en tu cliente. En Claude Desktop se hace en Configuración → Desarrollador → Servidores MCP. No requiere instalación, registro ni autenticación.',
       },
     },
     {
