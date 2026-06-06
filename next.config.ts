@@ -98,6 +98,24 @@ const nextConfig: NextConfig = {
   },
 
   // ============================================================================
+  // REWRITES POR HOST - delegum.com sirve la marca Delegum desde este mismo proyecto
+  //   delegum.com/          → landing /delegum
+  //   delegum.com/api/mcp/  → servidor MCP Delegum (/api/mcp/delegum)
+  // La condición `host` garantiza que meskeia.com NO se ve afectado.
+  // Dormidos hasta que delegum.com apunte a Vercel; activos en cuanto resuelva el DNS.
+  // ============================================================================
+  async rewrites() {
+    const has = [{ type: 'host' as const, value: '(www\\.)?delegum\\.com' }];
+    return {
+      beforeFiles: [
+        { source: '/', has, destination: '/delegum' },
+        { source: '/api/mcp', has, destination: '/api/mcp/delegum' },
+        { source: '/api/mcp/', has, destination: '/api/mcp/delegum' },
+      ],
+    };
+  },
+
+  // ============================================================================
   // TURBOPACK - Configuración para sql.js (WebAssembly SQLite)
   // ============================================================================
   // sql.js intenta importar 'fs' que no existe en el browser
