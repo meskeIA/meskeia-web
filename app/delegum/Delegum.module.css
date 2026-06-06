@@ -3,7 +3,8 @@
 .container {
   max-width: 860px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  /* Margen superior amplio: el header fijo de meskeIA se solapaba con el hero marino */
+  padding: 5.5rem 1.5rem 4rem;
 }
 
 .document {
@@ -324,6 +325,13 @@
   background: #2a2410;
   border-color: #4a3f1a;
   color: #d4c483;
+}
+
+/* Tablet/móvil: el header fijo se apila (más alto) → más margen superior */
+@media (max-width: 768px) {
+  .container {
+    padding-top: 8rem;
+  }
 }
 
 /* Mobile */
