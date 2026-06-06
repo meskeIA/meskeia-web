@@ -29,6 +29,14 @@ export const metadata: Metadata = {
   other: {
     'application-name': 'Delegum',
   },
+  // Favicon/app-icon propios de Delegum, solo en esta ruta (no afectan al resto de meskeia.com)
+  icons: {
+    icon: [
+      { url: '/delegum/favicon.svg', type: 'image/svg+xml' },
+      { url: '/delegum/favicon-32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/delegum/app-icon-180.png',
+  },
 };
 
 // Schema.org JSON-LD para indexación por buscadores e IAs

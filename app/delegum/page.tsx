@@ -17,15 +17,18 @@ export default function DelegumPage() {
 
           {/* Hero */}
           <div className={styles.hero}>
-            <Image
-              src="/delegum-logo.svg"
-              alt="Logo de Delegum"
-              width={96}
-              height={96}
-              className={styles.heroLogo}
-              priority
-            />
-            <h1 className={styles.title}>Delegum</h1>
+            <div className={styles.heroLockup}>
+              <Image
+                src="/delegum/simbolo-blanco.svg"
+                alt=""
+                aria-hidden="true"
+                width={76}
+                height={76}
+                className={styles.heroSymbol}
+                priority
+              />
+              <h1 className={styles.heroWordmark}>Delegum</h1>
+            </div>
             <p className={styles.subtitle}>
               Tu asesoría digital fiscal, laboral y financiera para España.
               Conecta Delegum a tu asistente de IA y resuelve consultas reales —

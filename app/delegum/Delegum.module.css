@@ -1,3 +1,5 @@
+/* Paleta oficial Delegum: Marino #16244C · Oro #BE9A4E (acento de excepción) */
+
 .container {
   max-width: 860px;
   margin: 0 auto;
@@ -10,35 +12,43 @@
   gap: 3rem;
 }
 
-/* Hero — gradiente azul Delegum (distinto del hero plano de meskeIA) */
+/* Hero — marino plano (color de marca, sin degradado) */
 .hero {
-  background: linear-gradient(135deg, #6FA3DA 0%, #3F70AE 100%);
+  background: #16244C;
   color: #fff;
   border-radius: 12px;
-  padding: 2.5rem 2rem;
+  padding: 2.75rem 2rem;
   text-align: center;
 }
 
-.heroLogo {
-  background: #fff;
-  border-radius: 16px;
-  padding: 0.6rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+.heroLockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
 }
 
-.title {
-  font-size: 2.25rem;
+.heroSymbol {
+  flex-shrink: 0;
+}
+
+.heroWordmark {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 2.75rem;
   font-weight: 700;
-  margin: 0 0 0.75rem;
+  letter-spacing: -0.01em;
+  margin: 0;
   color: #fff;
-  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .subtitle {
   font-size: 1.05rem;
-  opacity: 0.95;
-  margin: 0 0 1.25rem;
+  opacity: 0.92;
+  margin: 0 auto 1.25rem;
+  max-width: 620px;
   line-height: 1.6;
 }
 
@@ -46,8 +56,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
   padding: 0.35rem 1rem;
   font-size: 0.875rem;
@@ -69,10 +79,11 @@
 }
 
 .sectionTitle {
+  font-family: var(--font-sora), system-ui, sans-serif;
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
-  border-bottom: 2px solid #4275B2;
+  border-bottom: 2px solid #16244C;
   padding-bottom: 0.5rem;
   margin: 0;
 }
@@ -112,8 +123,8 @@
 }
 
 .code {
-  background: #eef4fb;
-  color: #3F70AE;
+  background: #eef1f7;
+  color: #16244C;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
@@ -130,14 +141,14 @@
   color: var(--text-secondary);
   font-size: 0.875rem;
   background: #f8fafc;
-  border-left: 3px solid #6FA3DA;
+  border-left: 3px solid #16244C;
   padding: 0.75rem 1rem;
   border-radius: 0 6px 6px 0;
   margin: 0;
   line-height: 1.6;
 }
 
-/* Consultas de escenario — grid de tarjetas */
+/* Consultas de escenario — grid con acento oro (notarial) */
 .scenarioGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -150,7 +161,7 @@
   gap: 0.35rem;
   background: var(--bg-card);
   border: 1px solid #e2e8f0;
-  border-top: 3px solid #4275B2;
+  border-top: 3px solid #BE9A4E;
   border-radius: 8px;
   padding: 1.1rem 1.25rem;
 }
@@ -160,8 +171,9 @@
 }
 
 .scenarioName {
+  font-family: var(--font-sora), system-ui, sans-serif;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0;
 }
@@ -169,8 +181,8 @@
 .scenarioTool {
   font-family: 'Courier New', monospace;
   font-size: 0.78rem;
-  color: #3F70AE;
-  background: #eef4fb;
+  color: #16244C;
+  background: #eef1f7;
   padding: 0.1rem 0.45rem;
   border-radius: 4px;
   align-self: flex-start;
@@ -192,9 +204,9 @@
 
 .toolTag {
   font-size: 0.85rem;
-  color: #3F70AE;
-  background: #eef4fb;
-  border: 1px solid #d4e3f4;
+  color: #16244C;
+  background: #eef1f7;
+  border: 1px solid #d6deea;
   border-radius: 16px;
   padding: 0.3rem 0.85rem;
 }
@@ -209,7 +221,7 @@
 .exampleCard {
   background: var(--bg-card);
   border: 1px solid #e2e8f0;
-  border-left: 3px solid #6FA3DA;
+  border-left: 3px solid #16244C;
   border-radius: 0 8px 8px 0;
   padding: 0.85rem 1.25rem;
   display: flex;
@@ -220,7 +232,7 @@
 .exampleTag {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #4275B2;
+  color: #16244C;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -254,36 +266,35 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: #4275B2;
+  color: #16244C;
   font-weight: 700;
 }
 
 /* Aviso legal */
 .disclaimer {
-  background: #fef9e7;
-  border: 1px solid #f4e2a1;
+  background: #fbf7ec;
+  border: 1px solid #e7d9b4;
   border-radius: 8px;
   padding: 1rem 1.25rem;
   font-size: 0.9rem;
-  color: #6b5b1f;
+  color: #6b5b2f;
   line-height: 1.6;
 }
 
 .link {
-  color: #3F70AE;
+  color: #16244C;
   text-decoration: underline;
 }
 
 /* Dark mode */
 [data-theme='dark'] .connectionBox,
-[data-theme='dark'] .categoryCard,
 [data-theme='dark'] .scenarioCard,
 [data-theme='dark'] .exampleCard {
   border-color: #374151;
 }
 
 [data-theme='dark'] .scenarioCard {
-  border-top-color: #4275B2;
+  border-top-color: #BE9A4E;
 }
 
 [data-theme='dark'] .connectionRow {
@@ -294,11 +305,15 @@
 [data-theme='dark'] .scenarioTool,
 [data-theme='dark'] .toolTag {
   background: #1e293b;
-  color: #8ab4e0;
+  color: #9db4dd;
 }
 
 [data-theme='dark'] .toolTag {
   border-color: #374151;
+}
+
+[data-theme='dark'] .sectionTitle {
+  border-bottom-color: #3a4a73;
 }
 
 [data-theme='dark'] .note {
@@ -314,11 +329,11 @@
 /* Mobile */
 @media (max-width: 600px) {
   .hero {
-    padding: 2rem 1.25rem;
+    padding: 2.25rem 1.25rem;
   }
 
-  .title {
-    font-size: 1.75rem;
+  .heroWordmark {
+    font-size: 2.1rem;
   }
 
   .scenarioGrid {
