@@ -276,14 +276,32 @@ function conAviso(texto: string, aviso: string) {
   return { content: [{ type: 'text' as const, text: texto + aviso }] };
 }
 
+// Instrucciones a nivel de servidor: la IA cliente las recibe en `initialize`.
+// Refuerzan que el aviso legal de cada respuesta se muestre SIEMPRE en pantalla,
+// ya que el disclaimer viaja en el payload pero su presentación la decide el cliente.
+const INSTRUCCIONES_MESKEIA =
+  'meskeIA ofrece herramientas de cálculo orientativas (fiscalidad, finanzas, salud, deporte, ' +
+  'fotografía y más) basadas en normativa española del ejercicio 2025 y fórmulas de referencia. ' +
+  'Muchas respuestas incluyen un AVISO LEGAL (marcado con ⚠️) al final. ' +
+  'Cuando una respuesta contenga ese aviso —especialmente en temas fiscales, financieros, de salud ' +
+  'o jurídicos— debes mostrarlo SIEMPRE de forma visible y literal al usuario, sin resumirlo, ' +
+  'omitirlo ni reformularlo. Los resultados son orientativos, no constituyen asesoramiento ' +
+  'profesional ni sustituyen los cálculos oficiales: recuerda al usuario que verifique las ' +
+  'decisiones importantes con un profesional cualificado o el organismo oficial correspondiente.';
+
 // ---------------------------------------------------------------------------
 // Función para crear el servidor MCP con todas sus herramientas
 // ---------------------------------------------------------------------------
 function crearServidorMCP(): McpServer {
-  const servidor = new McpServer({
-    name: 'meskeIA',
-    version: '1.0.0',
-  });
+  const servidor = new McpServer(
+    {
+      name: 'meskeIA',
+      version: '1.0.0',
+    },
+    {
+      instructions: INSTRUCCIONES_MESKEIA,
+    },
+  );
 
   // ------------------------------------------------------------------
   // TOOL: calcular_propina

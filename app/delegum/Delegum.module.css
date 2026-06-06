@@ -287,6 +287,38 @@
   text-decoration: underline;
 }
 
+/* Página de aviso legal */
+.legalUpdated {
+  margin: -1.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.legalList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.legalList li {
+  padding-left: 1.5rem;
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.legalList li::before {
+  content: '•';
+  position: absolute;
+  left: 0.25rem;
+  color: #16244C;
+  font-weight: 700;
+}
+
 /* Dark mode */
 [data-theme='dark'] .connectionBox,
 [data-theme='dark'] .scenarioCard,

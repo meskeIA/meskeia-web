@@ -109,6 +109,7 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         { source: '/', has, destination: '/delegum' },
+        { source: '/aviso-legal', has, destination: '/delegum/aviso-legal' },
         { source: '/api/mcp', has, destination: '/api/mcp/delegum' },
         { source: '/api/mcp/', has, destination: '/api/mcp/delegum' },
       ],

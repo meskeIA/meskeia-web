@@ -103,6 +103,20 @@ function conAviso(texto: string, aviso: string) {
   return { content: [{ type: 'text' as const, text: texto + aviso }] };
 }
 
+// Instrucciones a nivel de servidor: la IA cliente las recibe en `initialize`.
+// Refuerzan que el aviso legal de cada respuesta se muestre SIEMPRE en pantalla,
+// ya que el disclaimer viaja en el payload pero su presentación la decide el cliente.
+const INSTRUCCIONES_DELEGUM =
+  'Delegum es un asistente orientativo de fiscalidad, derecho laboral y finanzas en España; ' +
+  'no es un despacho profesional ni emite asesoramiento vinculante. ' +
+  'Cada herramienta devuelve un cálculo basado en normativa española del ejercicio 2025, ' +
+  'acompañado de un AVISO LEGAL (marcado con ⚖️) al final de la respuesta. ' +
+  'Al presentar cualquier resultado al usuario debes mostrar SIEMPRE ese aviso legal de forma ' +
+  'visible y literal: no lo resumas, no lo omitas ni lo reformules. ' +
+  'Recuerda siempre al usuario que los resultados son orientativos y que, para decisiones reales, ' +
+  'debe consultar a un profesional colegiado (asesor fiscal, graduado social o abogado) ' +
+  'o al organismo oficial correspondiente (AEAT, SEPE o Seguridad Social).';
+
 function errorMcp(err: unknown) {
   return {
     content: [{ type: 'text' as const, text: `❌ Error: ${err instanceof Error ? err.message : String(err)}` }],
@@ -125,10 +139,15 @@ const ENUM_SITUACION = ['soltero', 'casado_sin_ingresos', 'casado_con_ingresos']
 // Creación del servidor Delegum con su personalidad de «gestoría».
 // ---------------------------------------------------------------------------
 function crearServidorDelegum(): McpServer {
-  const servidor = new McpServer({
-    name: 'Delegum',
-    version: '1.0.0',
-  });
+  const servidor = new McpServer(
+    {
+      name: 'Delegum',
+      version: '1.0.0',
+    },
+    {
+      instructions: INSTRUCCIONES_DELEGUM,
+    },
+  );
 
   // ════════════════════════════════════════════════════════════════════════
   // HERRAMIENTAS DE ESCENARIO — el diferencial de Delegum.
