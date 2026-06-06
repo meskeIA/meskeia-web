@@ -48,6 +48,16 @@ import {
   type TipoInmuebleMCP,
   type PerfilCompradorMCP,
 } from '@/lib/calculadoras/compraventa';
+// ── Autónomo del día a día (Bloque A — segunda vuelta) ────────────────────────
+import { calcularModelo130, type TrimestreModelo130 } from '@/lib/calculadoras/modelo130';
+import { calcularModelo303, type Trimestre303 } from '@/lib/calculadoras/modelo303';
+import {
+  calcularGastosDeduciblesAutonomo,
+  type ModalidadEstimacionDirectaGA,
+  type UsoVivienda,
+  type ActividadTransporte,
+} from '@/lib/calculadoras/gastosDeduciblesAutonomo';
+import { calcularTarifaFreelance } from '@/lib/calculadoras/tarifaFreelance';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
@@ -1101,6 +1111,246 @@ function crearServidorDelegum(): McpServer {
           );
         }
         return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // BLOQUE A — AUTÓNOMO DEL DÍA A DÍA (segunda vuelta).
+  // Las declaraciones trimestrales y la planificación recurrente que cualquier
+  // autónomo necesita: pago fraccionado IRPF (130), IVA trimestral (303),
+  // gastos deducibles y tarifa freelance.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_modelo_130 ──────────────────────────────────────────────────
+  servidor.tool(
+    'calcular_modelo_130',
+    'Calcula el pago fraccionado trimestral del IRPF de un autónomo en estimación directa (Modelo 130). ' +
+    'Fórmula: 20% del rendimiento neto acumulado (ingresos − gastos) desde el 1 de enero, menos las retenciones ' +
+    'soportadas y los pagos fraccionados de trimestres anteriores. Si más del 70% de los ingresos provienen de ' +
+    'clientes que retienen, no hay obligación de presentarlo. Para una visión global del autónomo usa "consulta_autonomo".',
+    {
+      trimestre: z.enum(['T1', 'T2', 'T3', 'T4']).describe('Trimestre del pago fraccionado: T1 (ene-mar), T2 (abr-jun), T3 (jul-sep), T4 (oct-dic)'),
+      ingresos_acumulados: z.number().min(0).describe('Ingresos (facturación) acumulados desde el 1 de enero hasta el fin del trimestre, en euros'),
+      gastos_deducibles_acumulados: z.number().min(0).describe('Gastos deducibles acumulados desde el 1 de enero, en euros (compras, cuota de autónomo, alquileres, suministros, amortizaciones...)'),
+      retenciones_acumuladas: z.number().min(0).optional().describe('Retenciones practicadas por clientes acumuladas en el período, en euros. Por defecto 0.'),
+      pagos_fraccionados_anteriores: z.number().min(0).optional().describe('Suma de los Modelo 130 ya ingresados en trimestres anteriores del mismo año, en euros. Por defecto 0.'),
+      mas_70pct_con_retencion: z.boolean().optional().describe('¿Más del 70% de los ingresos vienen de clientes obligados a retener? (exime de presentar el Modelo 130). Por defecto false.'),
+    },
+    { title: 'Calcula el pago fraccionado trimestral de IRPF del autónomo (Modelo 130)', readOnlyHint: true },
+    async ({ trimestre, ingresos_acumulados, gastos_deducibles_acumulados, retenciones_acumuladas, pagos_fraccionados_anteriores, mas_70pct_con_retencion }, extra) => {
+      await registrarUsoDelegum('calcular_modelo_130', getCaller(extra));
+      try {
+        const r = calcularModelo130({
+          trimestre: trimestre as TrimestreModelo130,
+          ingresosAcumulados: ingresos_acumulados,
+          gastosDeduciblesAcumulados: gastos_deducibles_acumulados,
+          retencionesAcumuladas: retenciones_acumuladas ?? 0,
+          pagosFraccionadosAnteriores: pagos_fraccionados_anteriores ?? 0,
+          masDeL70PctConRetencion: mas_70pct_con_retencion,
+        });
+        const lineas = [
+          `📋 **Modelo 130 — Pago fraccionado IRPF del autónomo (${r.trimestre})**`,
+          `📅 Plazo de presentación: ${r.plazoPresentacion}`,
+          '',
+          `💶 Ingresos acumulados: ${fmt(r.ingresosAcumulados)} €`,
+          `💸 Gastos deducibles acumulados: −${fmt(r.gastosDeduciblesAcumulados)} €`,
+          `📊 Rendimiento neto acumulado: **${fmt(r.rendimientoNetoAcumulado)} €**`,
+          '',
+          `🧮 Cuota bruta (20%): ${fmt(r.cuotaBruta)} €`,
+          `➖ Retenciones soportadas: −${fmt(r.retencionesAcumuladas)} €`,
+          `➖ Pagos fraccionados anteriores: −${fmt(r.pagosFraccionadosAnteriores)} €`,
+          '',
+          r.obligacionPresentar
+            ? `💰 **Cuota a ingresar (Modelo 130): ${fmt(r.cuotaAIngresar)} €**`
+            : `ℹ️ No hay obligación de presentar: ${r.motivoNoObligacion}`,
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_modelo_303 ──────────────────────────────────────────────────
+  servidor.tool(
+    'calcular_modelo_303',
+    'Calcula la autoliquidación trimestral del IVA (Modelo 303) de autónomos y empresas. IVA devengado ' +
+    '(repercutido en facturas emitidas) menos IVA soportado deducible (facturas recibidas) = cuota a liquidar. ' +
+    'Si es positiva, a ingresar; si es negativa, a compensar (o a devolver en el T4). Acepta bases por tipo (21/10/4%).',
+    {
+      trimestre: z.enum(['T1', 'T2', 'T3', 'T4']).describe('Trimestre de la liquidación: T1 (ene-mar), T2 (abr-jun), T3 (jul-sep), T4 (oct-dic)'),
+      base_emitidas_21: z.number().min(0).optional().describe('Base imponible de facturas emitidas al 21% (€)'),
+      base_emitidas_10: z.number().min(0).optional().describe('Base imponible de facturas emitidas al 10% (€)'),
+      base_emitidas_4: z.number().min(0).optional().describe('Base imponible de facturas emitidas al 4% (€)'),
+      base_recibidas_21: z.number().min(0).optional().describe('Base imponible de facturas recibidas deducibles al 21% (€)'),
+      base_recibidas_10: z.number().min(0).optional().describe('Base imponible de facturas recibidas deducibles al 10% (€)'),
+      base_recibidas_4: z.number().min(0).optional().describe('Base imponible de facturas recibidas deducibles al 4% (€)'),
+      compensacion_anterior: z.number().min(0).optional().describe('Saldo a compensar de trimestres anteriores (resultado negativo previo no solicitado a devolver), en euros'),
+    },
+    { title: 'Calcula la autoliquidación trimestral del IVA (Modelo 303)', readOnlyHint: true },
+    async ({ trimestre, base_emitidas_21, base_emitidas_10, base_emitidas_4, base_recibidas_21, base_recibidas_10, base_recibidas_4, compensacion_anterior }, extra) => {
+      await registrarUsoDelegum('calcular_modelo_303', getCaller(extra));
+      try {
+        const r = calcularModelo303({
+          trimestre: trimestre as Trimestre303,
+          baseImponibleEmitidas21: base_emitidas_21,
+          baseImponibleEmitidas10: base_emitidas_10,
+          baseImponibleEmitidas4: base_emitidas_4,
+          baseImponibleRecibidas21: base_recibidas_21,
+          baseImponibleRecibidas10: base_recibidas_10,
+          baseImponibleRecibidas4: base_recibidas_4,
+          compensacionAnterior: compensacion_anterior,
+        });
+        const lineas = [
+          `🧾 **Modelo 303 — IVA trimestral (${r.trimestre} / ${r.anioFiscal})**`,
+          '',
+          `📤 IVA devengado (repercutido): **${fmt(r.ivaDevengadoTotal)} €** sobre base ${fmt(r.baseImponibleDevengada)} €`,
+          `📥 IVA soportado deducible: **${fmt(r.ivaSoportadoTotal)} €** sobre base ${fmt(r.baseImponibleDeducible)} €`,
+          '',
+          `⚖️ Cuota diferencial: ${fmt(r.cuotaDiferencial)} €`,
+          r.compensacionAplicada > 0 ? `🔄 Compensación trimestre anterior: −${fmt(r.compensacionAplicada)} €` : '',
+          '',
+          r.aIngresar
+            ? `💰 **Resultado: a ingresar ${fmt(r.resultadoFinal)} €**`
+            : r.aCompensar
+              ? r.puedesolicitarDevolucion
+                ? `💚 **Resultado: a devolver o compensar ${fmt(Math.abs(r.resultadoFinal))} €** (en el T4 puedes solicitar la devolución)`
+                : `🔄 **Resultado: a compensar ${fmt(Math.abs(r.resultadoFinal))} €** (se traslada al siguiente trimestre)`
+              : `⚖️ **Resultado: liquidación a cero**`,
+          '',
+          `📅 Fecha límite de presentación: **${r.fechaLimite}**`,
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_gastos_deducibles_autonomo ──────────────────────────────────
+  servidor.tool(
+    'calcular_gastos_deducibles_autonomo',
+    'Calcula los gastos fiscalmente deducibles en el IRPF de un autónomo en estimación directa (normal o ' +
+    'simplificada). Aplica las reglas especiales: suministros de la vivienda habitual (% de afectación × 30%), ' +
+    'vehículo (50% uso mixto / 100% transporte exclusivo), seguros médicos (límite 500 €/persona), amortizaciones ' +
+    'y provisión global del 5% en estimación directa simplificada.',
+    {
+      modalidad: z.enum(['normal', 'simplificada']).describe('Modalidad de estimación directa'),
+      tipo_local: z.enum(['local_independiente', 'vivienda_habitual']).describe('"local_independiente" (100% deducible) o "vivienda_habitual" (% por afectación)'),
+      pct_vivienda_afecta: z.number().min(0).max(100).optional().describe('Solo si tipo_local=vivienda_habitual: % de la vivienda destinado a la actividad (m² despacho / m² total × 100)'),
+      gasto_local: z.number().min(0).optional().describe('Gastos de local o alquiler de oficina (€/año)'),
+      gastos_suministros: z.number().min(0).optional().describe('Suministros: luz, agua, gas, internet (€/año)'),
+      cuota_autonomo: z.number().min(0).optional().describe('Cuota de autónomo (RETA) pagada en el año (€/año). 100% deducible.'),
+      gastos_compras: z.number().min(0).optional().describe('Compras de materiales y mercaderías (€/año)'),
+      gastos_personal: z.number().min(0).optional().describe('Nóminas de empleados + SS empresa (€/año)'),
+      gastos_financieros: z.number().min(0).optional().describe('Intereses de préstamos de la actividad y comisiones bancarias (€/año)'),
+      amortizaciones: z.number().min(0).optional().describe('Amortización de inmovilizado: equipos, mobiliario, software (€/año)'),
+      otros_gastos: z.number().min(0).optional().describe('Otros gastos deducibles: formación, suscripciones, gestoría... (€/año)'),
+      gastos_vehiculo: z.number().min(0).optional().describe('Total de gastos del vehículo: combustible, seguro, ITV, reparaciones (€/año)'),
+      vehiculo_uso_exclusivo: z.boolean().optional().describe('¿El vehículo se dedica exclusivamente a la actividad (transporte/reparto)? true=100% deducible, false=50% (uso mixto). Por defecto false.'),
+      saldo_deudores_fin_anio: z.number().min(0).optional().describe('Saldo de clientes/deudores al cierre del ejercicio (€). Solo en ED simplificada: permite deducir la provisión global del 5%.'),
+    },
+    { title: 'Calcula los gastos deducibles en el IRPF del autónomo (estimación directa)', readOnlyHint: true },
+    async ({ modalidad, tipo_local, pct_vivienda_afecta, gasto_local, gastos_suministros, cuota_autonomo, gastos_compras, gastos_personal, gastos_financieros, amortizaciones, otros_gastos, gastos_vehiculo, vehiculo_uso_exclusivo, saldo_deudores_fin_anio }, extra) => {
+      await registrarUsoDelegum('calcular_gastos_deducibles_autonomo', getCaller(extra));
+      try {
+        const r = calcularGastosDeduciblesAutonomo({
+          modalidad: modalidad as ModalidadEstimacionDirectaGA,
+          tipoLocal: tipo_local as UsoVivienda,
+          pctViviendaAfecta: pct_vivienda_afecta,
+          gastoLocal: gasto_local,
+          gastosSubministros: gastos_suministros,
+          cuotaAutonomo: cuota_autonomo,
+          gastosCompras: gastos_compras,
+          gastosPersonal: gastos_personal,
+          gastosFinancieros: gastos_financieros,
+          amortizaciones: amortizaciones,
+          otrosGastos: otros_gastos,
+          vehiculo: gastos_vehiculo !== undefined
+            ? {
+                totalGastosVehiculo: gastos_vehiculo,
+                tipoActividad: (vehiculo_uso_exclusivo ? 'si_exclusivo' : 'no_exclusivo') as ActividadTransporte,
+              }
+            : undefined,
+          saldoDeudoresFinAnio: saldo_deudores_fin_anio,
+        });
+        const lineas = [
+          `📑 **Gastos deducibles del autónomo — ED ${r.modalidad}**`,
+          '',
+          ...r.lineas.map(l =>
+            `  • ${l.concepto}: ${fmt(l.gastoTotal)} € × ${l.porcentajeDeducible}% = **${fmt(l.importeDeducible)} €**${l.nota ? ` _(${l.nota})_` : ''}`
+          ),
+          '',
+          `💰 **Total gastos deducibles: ${fmt(r.totalGastosDeducibles)} €**`,
+          r.provisionGlobalED5pct > 0 ? `  • Provisión global 5% (ED simplificada): ${fmt(r.provisionGlobalED5pct)} €` : '',
+          r.provisionGlobalED5pct > 0 ? `  • **Total con provisión: ${fmt(r.totalGastosConProvision)} €**` : '',
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_tarifa_freelance ────────────────────────────────────────────
+  servidor.tool(
+    'calcular_tarifa_freelance',
+    'Calcula la tarifa que debería cobrar un freelance o autónomo (€/hora, €/día, €/semana) para alcanzar el ' +
+    'ingreso neto que desea. Parte del neto objetivo, suma gastos, aplica IRPF, IVA y margen, y ajusta por los ' +
+    'días realmente facturables (descontando fines de semana, vacaciones, festivos, bajas y % de ocupación). ' +
+    'Devuelve tarifas con y sin IVA y la proyección anual.',
+    {
+      ingreso_neto_mensual: z.number().positive().describe('Ingreso neto mensual deseado en euros (lo que quieres llevarte a casa)'),
+      horas_semanales: z.number().min(1).max(80).optional().describe('Horas de trabajo por semana. Por defecto 40.'),
+      dias_vacaciones: z.number().int().min(0).max(60).optional().describe('Días de vacaciones al año. Por defecto 22.'),
+      dias_festivos: z.number().int().min(0).max(20).optional().describe('Días festivos al año. Por defecto 14.'),
+      dias_enfermedad: z.number().int().min(0).max(30).optional().describe('Días de baja previstos al año. Por defecto 5.'),
+      porcentaje_ocupacion: z.number().min(10).max(100).optional().describe('% de días laborables que realmente se facturan (el resto es captación, admin, formación). Por defecto 70.'),
+      tipo_irpf: z.number().min(0).max(50).optional().describe('Tipo de IRPF estimado en %. Por defecto 21.'),
+      tipo_iva: z.number().min(0).max(21).optional().describe('Tipo de IVA de tus facturas en %. Por defecto 21 (0 si estás exento).'),
+      margen_beneficio: z.number().min(0).max(100).optional().describe('Margen de beneficio adicional sobre costes en %. Por defecto 15.'),
+      gastos_mensuales: z.number().min(0).optional().describe('Total de gastos mensuales deducibles en euros (cuota de autónomo, seguros, software, oficina, gestoría...).'),
+    },
+    { title: 'Calcula la tarifa ideal (€/hora, €/día, €/semana) del freelance', readOnlyHint: true },
+    async ({ ingreso_neto_mensual, horas_semanales, dias_vacaciones, dias_festivos, dias_enfermedad, porcentaje_ocupacion, tipo_irpf, tipo_iva, margen_beneficio, gastos_mensuales }, extra) => {
+      await registrarUsoDelegum('calcular_tarifa_freelance', getCaller(extra));
+      try {
+        const r = calcularTarifaFreelance({
+          ingresoNetoMensual: ingreso_neto_mensual,
+          horasSemanales: horas_semanales,
+          diasVacaciones: dias_vacaciones,
+          diasFestivos: dias_festivos,
+          diasEnfermedad: dias_enfermedad,
+          porcentajeOcupacion: porcentaje_ocupacion,
+          tipoIRPF: tipo_irpf,
+          tipoIVA: tipo_iva,
+          margenBeneficio: margen_beneficio,
+          gastosFijos: gastos_mensuales ? [{ concepto: 'Gastos totales', importe: gastos_mensuales }] : [],
+        });
+        const lineas = [
+          `💼 **Tarifa freelance / autónomo**`,
+          '',
+          `📅 Días facturables al año: ${r.diasFacturablesAno.toFixed(1).replace('.', ',')} · ⏰ Horas facturables: ${r.horasFacturablesMes.toFixed(1).replace('.', ',')}/mes`,
+          `💸 Gastos mensuales deducibles: ${fmt(r.totalGastosMensuales)} €`,
+          '',
+          `🏷️ **Tarifas sin IVA (lo que cobras)**`,
+          `  • Por hora: **${fmt(r.tarifaHora)} €/h** · Por día: ${fmt(r.tarifaDia)} € · Por semana: ${fmt(r.tarifaSemana)} €`,
+          `🧾 **Tarifas con IVA (lo que paga el cliente)**`,
+          `  • Por hora: **${fmt(r.tarifaHoraConIVA)} €/h** · Por día: ${fmt(r.tarifaDiaConIVA)} € · Por semana: ${fmt(r.tarifaSemanaConIVA)} €`,
+          '',
+          `📊 **Proyección anual**: facturación ${fmt(r.facturacionAnual)} € · IRPF estimado ${fmt(r.irpfAnual)} € · beneficio neto **${fmt(r.beneficioNetoAnual)} €**`,
+        ];
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
       }
