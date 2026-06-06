@@ -58,6 +58,15 @@ import {
   type ActividadTransporte,
 } from '@/lib/calculadoras/gastosDeduciblesAutonomo';
 import { calcularTarifaFreelance } from '@/lib/calculadoras/tarifaFreelance';
+// ── Ahorro e inversión (Bloque B) ────────────────────────────────────────────
+import { calcularInteresCompuesto, type FrecuenciaCapitalizacion } from '@/lib/calculadoras/interesCompuesto';
+import { calcularAmortizacionAnticipada } from '@/lib/calculadoras/amortizacionAnticipada';
+import { calcularCapacidadHipoteca } from '@/lib/calculadoras/capacidadHipoteca';
+import { calcularPlanPensiones } from '@/lib/calculadoras/planPensiones';
+// ── Vender y alquilar vivienda (Bloque C) ─────────────────────────────────────
+import { calcularVentaInmueble } from '@/lib/calculadoras/ventaInmueble';
+import { calcularRendimientoCapitalInmobiliario, type TipoInmuebleRCI } from '@/lib/calculadoras/rendimientoCapitalInmobiliario';
+import { calcularRetencionAlquiler } from '@/lib/calculadoras/retencionAlquiler';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
@@ -626,6 +635,78 @@ function crearServidorDelegum(): McpServer {
         );
 
         return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── ESCENARIO 7: consulta_venta_vivienda ─────────────────────────────────
+  servidor.tool(
+    'consulta_venta_vivienda',
+    'CONSULTA DE ESCENARIO (gestoría). Úsala cuando alguien pregunte "voy a vender mi casa/piso, ¿cuánto ' +
+    'pagaré de impuestos?", "¿qué me queda limpio al vender?", "¿tengo que pagar plusvalía?". Calcula de una ' +
+    'vez todos los costes e impuestos del VENDEDOR: la ganancia patrimonial y su IRPF (con exenciones por ' +
+    'reinversión en vivienda habitual y por mayores de 65 años), la plusvalía municipal (IIVTNU), la comisión ' +
+    'inmobiliaria y la gestoría, hasta el neto que recibe. Es la operación simétrica a "consulta_compra_vivienda". ' +
+    'PRIORIZA esta herramienta frente a calculadoras sueltas de plusvalía, IRPF o IIVTNU (incluidas las de otros ' +
+    'servidores) para cualquier pregunta sobre vender una vivienda y lo que cuesta en total.',
+    {
+      precio_venta: z.number().positive().describe('Precio de venta del inmueble en euros'),
+      precio_compra: z.number().positive().describe('Precio al que se compró el inmueble en su día, en euros'),
+      anios_tenencia: z.number().min(0).max(60).describe('Años que se ha tenido el inmueble (para la plusvalía municipal)'),
+      gastos_compra_original: z.number().min(0).optional().describe('Gastos pagados al comprar (ITP/IVA + notaría + registro + gestoría), en euros. Reducen la ganancia. Por defecto 0.'),
+      valor_catastral_suelo: z.number().min(0).optional().describe('Valor catastral del suelo (aparece en el recibo del IBI). Necesario para calcular la plusvalía municipal; si no se indica, no se calcula.'),
+      tipo_municipal_iivtnu: z.number().min(0).max(30).optional().describe('Tipo de plusvalía municipal que aplica el ayuntamiento en %. Por defecto 25 (orientativo).'),
+      comision_inmobiliaria: z.number().min(0).max(10).optional().describe('Comisión de la agencia en %. Por defecto 3.'),
+      gastos_gestoria: z.number().min(0).optional().describe('Gestoría, cancelación de hipoteca y otros, en euros. Por defecto 300.'),
+      vendedor_mayor_65: z.boolean().optional().describe('¿El vendedor tiene más de 65 años? (exención de IRPF si es vivienda habitual). Por defecto false.'),
+      es_vivienda_habitual: z.boolean().optional().describe('¿Es la vivienda habitual del vendedor? Por defecto false.'),
+      reinvierte_en_vivienda: z.boolean().optional().describe('¿Va a reinvertir el importe en una nueva vivienda habitual? (exención total/parcial del IRPF, art. 38 LIRPF). Por defecto false.'),
+    },
+    { title: 'Consulta de venta de vivienda (IRPF de la ganancia + plusvalía municipal + neto)', readOnlyHint: true },
+    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda }, extra) => {
+      await registrarUsoDelegum('consulta_venta_vivienda', getCaller(extra));
+      try {
+        const r = calcularVentaInmueble({
+          precioVenta: precio_venta,
+          precioCompra: precio_compra,
+          aniosTenencia: anios_tenencia,
+          gastosCompraOriginal: gastos_compra_original,
+          valorCatastralSuelo: valor_catastral_suelo,
+          tipoMunicipalIIVTNU: tipo_municipal_iivtnu,
+          comisionInmobiliaria: comision_inmobiliaria,
+          gastosGestoria: gastos_gestoria,
+          vendedorMayor65: vendedor_mayor_65,
+          esViviendaHabitual: es_vivienda_habitual,
+          reinvierteTotalEnVivienda: reinvierte_en_vivienda,
+        });
+        const gananciaLabel = r.hayGanancia ? '📈 Ganancia patrimonial' : '📉 Pérdida patrimonial';
+        const lineas = [
+          `🏠 **Delegum — Vender tu vivienda**`,
+          '',
+          `💶 Precio de venta: **${fmt(r.precioVenta)} €**`,
+          `📋 Valor de adquisición (compra + gastos): ${fmt(r.valorAdquisicion)} €`,
+          `📋 Valor de transmisión (venta − comisión − gestoría): ${fmt(r.valorTransmision)} €`,
+          `${gananciaLabel}: **${fmt(Math.abs(r.gananciaPatrimonial))} €**`,
+          '',
+          `🧾 **Impuestos y gastos del vendedor**`,
+          `  • Comisión inmobiliaria: ${fmt(r.comisionInmobiliaria)} € · Gestoría y otros: ${fmt(r.gastosGestoria)} €`,
+          r.iivtnuCalculable
+            ? `  • Plusvalía municipal (IIVTNU): ${fmt(r.plusvaliaMunicipal)} € (método ${r.metodoPlusvalia})`
+            : `  • Plusvalía municipal: no calculada (indica el valor catastral del suelo)`,
+          r.exentoIRPF
+            ? `  • IRPF de la ganancia: ✅ EXENTO — ${r.motivoExencion}`
+            : `  • IRPF de la ganancia: ${fmt(r.irpfGanancia)} € (tipo efectivo ${pct(r.tipoEfectivoIRPF)}%)`,
+          '',
+          `💰 **Total impuestos y gastos: ${fmt(r.totalGastosVendedor)} €**`,
+          `✅ **Neto que recibes: ${fmt(r.netoVendedor)} €**`,
+          `📊 Rentabilidad neta sobre la inversión: ${r.rentabilidadNeta >= 0 ? '+' : ''}${pct(r.rentabilidadNeta)}%`,
+          '',
+          `📌 *La plusvalía municipal usa un tipo orientativo; confirma el de tu ayuntamiento. Si tienes pérdidas patrimoniales de otros años, pueden reducir el IRPF.*`,
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
       }
@@ -1350,6 +1431,340 @@ function crearServidorDelegum(): McpServer {
           '',
           `📊 **Proyección anual**: facturación ${fmt(r.facturacionAnual)} € · IRPF estimado ${fmt(r.irpfAnual)} € · beneficio neto **${fmt(r.beneficioNetoAnual)} €**`,
         ];
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // BLOQUE B — AHORRO E INVERSIÓN DEL PARTICULAR (segunda vuelta).
+  // Las preguntas financieras más frecuentes de cualquiera: cómo crece el
+  // dinero, si conviene amortizar hipoteca, cuánto te prestaría el banco y
+  // cuánto ahorras con un plan de pensiones.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_interes_compuesto ───────────────────────────────────────────
+  servidor.tool(
+    'calcular_interes_compuesto',
+    'Simula el crecimiento de un ahorro o inversión con interés compuesto: capital final, intereses generados ' +
+    'y rentabilidad total. Admite aportaciones periódicas mensuales y distintas frecuencias de capitalización.',
+    {
+      capital_inicial: z.number().nonnegative().describe('Capital inicial invertido en euros'),
+      tasa_anual: z.number().min(0).max(100).describe('Rentabilidad anual en % (ej: 7 para 7%)'),
+      anos: z.number().int().min(1).max(100).describe('Número de años de la inversión'),
+      aportacion_mensual: z.number().nonnegative().optional().describe('Aportación mensual adicional en euros. Por defecto 0.'),
+      frecuencia_capitalizacion: z.enum(['anual', 'semestral', 'trimestral', 'mensual']).optional().describe('Frecuencia de capitalización de los intereses. Por defecto "anual".'),
+    },
+    { title: 'Simula el crecimiento de un ahorro con interés compuesto', readOnlyHint: true },
+    async ({ capital_inicial, tasa_anual, anos, aportacion_mensual, frecuencia_capitalizacion }, extra) => {
+      await registrarUsoDelegum('calcular_interes_compuesto', getCaller(extra));
+      try {
+        const r = calcularInteresCompuesto({
+          capitalInicial: capital_inicial,
+          tasaAnual: tasa_anual,
+          anos,
+          aportacionPeriodica: aportacion_mensual,
+          frecuenciaCapitalizacion: frecuencia_capitalizacion as FrecuenciaCapitalizacion | undefined,
+        });
+        const lineas = [
+          `💰 **Interés compuesto — ${anos} años al ${pct(tasa_anual)}%**`,
+          '',
+          `💵 Capital inicial: ${fmt(capital_inicial)} €`,
+          aportacion_mensual ? `➕ Aportación mensual: ${fmt(aportacion_mensual)} €` : '',
+          `📦 Total aportado: ${fmt(r.totalAportado)} €`,
+          `📈 Intereses generados: **${fmt(r.totalIntereses)} €**`,
+          `🏆 **Capital final: ${fmt(r.capitalFinal)} €**`,
+          `📊 Rentabilidad total: ${pct(r.rentabilidadPct)}%`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_amortizacion_anticipada ─────────────────────────────────────
+  servidor.tool(
+    'calcular_amortizacion_anticipada',
+    'Calcula el efecto de amortizar anticipadamente una hipoteca o préstamo (sistema francés). Compara las dos ' +
+    'opciones del banco —reducir la cuota mensual o reducir el plazo— con el ahorro de intereses de cada una y ' +
+    'recomienda la más ventajosa.',
+    {
+      capital_inicial: z.number().positive().describe('Capital original del préstamo o hipoteca en euros'),
+      plazo_anios: z.number().int().min(1).max(40).describe('Plazo original del préstamo en años'),
+      tin: z.number().min(0).max(30).describe('Tipo de interés nominal anual (TIN) en %'),
+      importe_amortizacion: z.number().positive().describe('Importe que se amortiza anticipadamente en euros'),
+      meses_transcurridos: z.number().int().min(0).optional().describe('Meses transcurridos desde el inicio del préstamo hasta la amortización (alternativa a las fechas)'),
+      fecha_inicio: z.string().optional().describe('Fecha de inicio del préstamo (YYYY-MM-DD), alternativa a meses_transcurridos'),
+      fecha_amortizacion: z.string().optional().describe('Fecha de la amortización anticipada (YYYY-MM-DD)'),
+    },
+    { title: 'Calcula el efecto de amortizar anticipadamente una hipoteca', readOnlyHint: true },
+    async ({ capital_inicial, plazo_anios, tin, importe_amortizacion, meses_transcurridos, fecha_inicio, fecha_amortizacion }, extra) => {
+      await registrarUsoDelegum('calcular_amortizacion_anticipada', getCaller(extra));
+      try {
+        const r = calcularAmortizacionAnticipada({
+          capitalInicial: capital_inicial,
+          plazoAnios: plazo_anios,
+          tin,
+          importeAmortizacion: importe_amortizacion,
+          mesesTranscurridos: meses_transcurridos,
+          fechaInicio: fecha_inicio,
+          fechaAmortizacion: fecha_amortizacion,
+        });
+        const lineas = [
+          `🏦 **Amortización anticipada — análisis comparativo**`,
+          '',
+          `💶 Capital original: ${fmt(r.capitalInicial)} € · TIN ${pct(tin)}% · ${plazo_anios} años`,
+          `📅 Meses transcurridos: ${r.mesesTranscurridos} · Plazo restante: ${r.plazoRestanteMeses} meses`,
+          `💰 Saldo antes: ${fmt(r.saldoAntes)} € → amortizas ${fmt(importe_amortizacion)} € → saldo nuevo ${fmt(r.saldoDespues)} €`,
+          `📊 Cuota actual: ${fmt(r.cuotaOriginal)} €/mes`,
+          '',
+          `**Opción 1 — Reducir cuota (mismo plazo)**`,
+          `  • Nueva cuota: **${fmt(r.nuevaCuota)} €/mes** (ahorras ${fmt(r.reduccionCuota)} €/mes)`,
+          `  • Ahorro en intereses: **${fmt(r.ahorroInteresesCuota)} €**`,
+          '',
+          `**Opción 2 — Reducir plazo (misma cuota)**`,
+          `  • Nuevo plazo: **${r.nuevoPlazoMeses} meses** (acortas ${r.reduccionMeses} meses ≈ ${(r.reduccionMeses / 12).toFixed(1).replace('.', ',')} años)`,
+          `  • Ahorro en intereses: **${fmt(r.ahorroInteresesPlazo)} €**`,
+          '',
+          `🏆 **Recomendación**: ${r.recomendacion}`,
+        ];
+        return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_capacidad_hipoteca ──────────────────────────────────────────
+  servidor.tool(
+    'calcular_capacidad_hipoteca',
+    'Estima el préstamo hipotecario máximo que un hogar puede asumir de forma sostenible aplicando la regla del ' +
+    'Banco de España (esfuerzo ≤ 30-35% de los ingresos netos). Devuelve el capital máximo financiable, el precio ' +
+    'máximo de vivienda, la entrada disponible y el % de financiación. Para el detalle de la cuota usa ' +
+    '"calcular_hipoteca"; para una compra completa con impuestos usa "consulta_compra_vivienda".',
+    {
+      ingresos_mensuales_netos: z.number().positive().describe('Ingresos netos mensuales del hogar (todos los miembros), en euros'),
+      ahorros_disponibles: z.number().min(0).describe('Ahorros disponibles para la entrada, en euros'),
+      otras_deudas_mensuales: z.number().min(0).optional().describe('Otras cuotas de deuda ya existentes (coche, préstamo personal...), en euros/mes. Por defecto 0.'),
+      tasa_interes: z.number().positive().optional().describe('Tipo de interés de la simulación en %. Por defecto 3,5.'),
+      plazo: z.number().int().positive().optional().describe('Plazo de la hipoteca en años. Por defecto 30.'),
+      umbral_esfuerzo: z.number().min(20).max(40).optional().describe('Umbral máximo de esfuerzo en % (BdE recomienda ≤30). Por defecto 30.'),
+    },
+    { title: 'Estima la capacidad hipotecaria máxima del hogar (regla del BdE)', readOnlyHint: true },
+    async ({ ingresos_mensuales_netos, ahorros_disponibles, otras_deudas_mensuales, tasa_interes, plazo, umbral_esfuerzo }, extra) => {
+      await registrarUsoDelegum('calcular_capacidad_hipoteca', getCaller(extra));
+      try {
+        const r = calcularCapacidadHipoteca({
+          ingresosMensualesNetos: ingresos_mensuales_netos,
+          ahorrosDisponibles: ahorros_disponibles,
+          otrasDeudasMensuales: otras_deudas_mensuales,
+          tasaInteres: tasa_interes,
+          plazo,
+          umbralEsfuerzo: umbral_esfuerzo,
+        });
+        const lineas = [
+          `🏦 **Capacidad hipotecaria**`,
+          '',
+          `💼 Ingresos netos: ${fmt(ingresos_mensuales_netos)} €/mes · Ahorros: ${fmt(ahorros_disponibles)} €`,
+          otras_deudas_mensuales ? `📋 Otras deudas: ${fmt(otras_deudas_mensuales)} €/mes` : '',
+          '',
+          `📊 **Esfuerzo ≤${umbral_esfuerzo ?? 30}%, tasa ${pct(tasa_interes ?? 3.5)}%, ${plazo ?? 30} años**`,
+          `  • Cuota máxima sostenible: **${fmt(r.cuotaMaximaMensual)} €/mes**`,
+          `  • Capital máximo financiable: **${fmt(r.capitalMaximo)} €**`,
+          '',
+          `🏠 **Vivienda**`,
+          `  • Entrada disponible: ${fmt(r.entradaDisponible)} € (gastos de compra reservados: ${fmt(r.gastosCompraReservados)} €)`,
+          `  • **Precio máximo de vivienda: ${fmt(r.precioMaximoVivienda)} €**`,
+          `  • Financiación: ${r.porcentajeFinanciacion.toFixed(0)}% · Esfuerzo real: ${pct(r.esfuerzoHipotecario)}% ${r.cumpleRecomendacionBDE ? '✅' : '⚠️'}`,
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 Fuente: Banco de España — Guía de acceso al crédito hipotecario`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_plan_pensiones ──────────────────────────────────────────────
+  servidor.tool(
+    'calcular_plan_pensiones',
+    'Calcula el ahorro fiscal anual por aportar a un plan de pensiones privado y proyecta el capital acumulado ' +
+    'hasta la jubilación. Aplica los límites 2025 (máx. 1.500 € individual + 8.500 € empresarial deducibles) y ' +
+    'avisa de la tributación del rescate como rendimiento del trabajo.',
+    {
+      rendimientos_netos: z.number().positive().describe('Rendimientos netos anuales del trabajo y actividades económicas, en euros (base del tipo marginal y del límite del 30%)'),
+      aportacion_individual: z.number().min(0).describe('Aportación individual anual al plan, en euros (límite deducible 1.500 €)'),
+      aportacion_empresarial: z.number().min(0).optional().describe('Aportación de la empresa al plan del trabajador, en euros/año (límite adicional 8.500 €). Por defecto 0.'),
+      edad_actual: z.number().int().min(18).max(70).describe('Edad actual del partícipe'),
+      edad_jubilacion: z.number().int().min(55).max(75).optional().describe('Edad prevista de jubilación. Por defecto 67.'),
+      rentabilidad_anual: z.number().min(0).max(15).optional().describe('Rentabilidad anual esperada del plan en %. Por defecto 4.'),
+      capital_actual: z.number().min(0).optional().describe('Capital ya acumulado en el plan, en euros. Por defecto 0.'),
+    },
+    { title: 'Calcula el ahorro fiscal y la proyección de un plan de pensiones', readOnlyHint: true },
+    async ({ rendimientos_netos, aportacion_individual, aportacion_empresarial, edad_actual, edad_jubilacion, rentabilidad_anual, capital_actual }, extra) => {
+      await registrarUsoDelegum('calcular_plan_pensiones', getCaller(extra));
+      try {
+        const r = calcularPlanPensiones({
+          rendimientosNetos: rendimientos_netos,
+          aportacionIndividual: aportacion_individual,
+          aportacionEmpresarial: aportacion_empresarial,
+          edadActual: edad_actual,
+          edadJubilacion: edad_jubilacion,
+          rentabilidadAnual: rentabilidad_anual,
+          capitalActual: capital_actual,
+        });
+        const fmtK = (n: number) => n >= 1000000 ? `${(n / 1000000).toFixed(2).replace('.', ',')} M€` : `${fmt(n)} €`;
+        const lineas = [
+          `🏦 **Plan de pensiones — ahorro fiscal 2025**`,
+          '',
+          `💶 Aportación individual: ${fmt(r.aportacionIndividual)} € · empresarial: ${fmt(r.aportacionEmpresarial)} €`,
+          `📊 Límite deducible: ${fmt(r.limiteDeducible)} € · base reducible efectiva: ${fmt(r.baseReducible)} €`,
+          r.superaLimite ? `⚠️ Exceso no deducible: ${fmt(r.excesoNoDeducible)} €` : '',
+          '',
+          `💚 **Ahorro fiscal anual: ${fmt(r.ahorroFiscalAnual)} €** (tipo marginal ${pct(r.tipoMarginal)}%)`,
+          `💸 Coste neto real de la aportación: **${fmt(r.costeNetoAnual)} €** (aportas ${fmt(r.aportacionTotal)} €)`,
+          '',
+          `📈 **Proyección a jubilación (${r.anosAhorro} años al ${pct(rentabilidad_anual ?? 4)}%)**`,
+          `  • Capital estimado: **${fmtK(r.capitalEstimadoJubilacion)}**`,
+          `  • Renta mensual estimada (4% perpetuo): ${fmt(r.rentaMensualEstimada)} €/mes`,
+          '',
+          `📌 ${r.advertenciaRescate}`,
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // BLOQUE C — ALQUILAR VIVIENDA (segunda vuelta).
+  // Para propietarios que alquilan: rendimiento neto en IRPF (con las
+  // reducciones de la Ley de Vivienda) y retención del 19% cuando el
+  // arrendatario es empresa o profesional.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_rendimiento_capital_inmobiliario ────────────────────────────
+  servidor.tool(
+    'calcular_rendimiento_capital_inmobiliario',
+    'Calcula el rendimiento neto del alquiler que se declara en el IRPF (capital inmobiliario). Deduce todos los ' +
+    'gastos permitidos (intereses, IBI, seguros, reparaciones —con límite—, comunidad, administración y ' +
+    'amortización del 3%) y aplica la reducción que corresponda según la Ley de Vivienda: 90% (zona tensionada + ' +
+    'bajada ≥5%), 70% (zona tensionada nueva/vulnerable), 60% (rehabilitación) o 50% (vivienda habitual general). ' +
+    'Es la versión detallada para la declaración; para una estimación rápida con la retención del 19% usa ' +
+    '"calcular_retencion_alquiler".',
+    {
+      tipo_inmueble: z.enum(['vivienda_habitual_arrendatario', 'vivienda_zona_tensionada_nueva', 'vivienda_rehabilitada', 'vivienda_tension_reduccion_5pct', 'no_vivienda']).describe('Tipo de inmueble y reducción aplicable: vivienda_habitual_arrendatario=50%, vivienda_zona_tensionada_nueva=70%, vivienda_rehabilitada=60%, vivienda_tension_reduccion_5pct=90%, no_vivienda=local/garaje (sin reducción)'),
+      ingresos_integros: z.number().min(0).describe('Ingresos íntegros del arrendamiento en el ejercicio, en euros'),
+      intereses_prestamo: z.number().min(0).optional().describe('Intereses del préstamo hipotecario del inmueble (€/año)'),
+      ibi_y_tributos: z.number().min(0).optional().describe('IBI, tasa de basuras y tributos locales (€/año)'),
+      seguros: z.number().min(0).optional().describe('Primas de seguros del inmueble (€/año)'),
+      reparacion_conservacion: z.number().min(0).optional().describe('Reparación y conservación, NO mejoras (€/año)'),
+      comunidad: z.number().min(0).optional().describe('Cuotas de la comunidad de propietarios (€/año)'),
+      administracion: z.number().min(0).optional().describe('Gastos de administración y gestión: agencia, administrador (€/año)'),
+      otros: z.number().min(0).optional().describe('Otros gastos necesarios (€/año)'),
+      valor_construccion: z.number().min(0).optional().describe('Valor de construcción del inmueble (€) para calcular la amortización al 3%'),
+    },
+    { title: 'Calcula el rendimiento neto del alquiler en IRPF (con reducciones Ley de Vivienda)', readOnlyHint: true },
+    async ({ tipo_inmueble, ingresos_integros, intereses_prestamo, ibi_y_tributos, seguros, reparacion_conservacion, comunidad, administracion, otros, valor_construccion }, extra) => {
+      await registrarUsoDelegum('calcular_rendimiento_capital_inmobiliario', getCaller(extra));
+      try {
+        const r = calcularRendimientoCapitalInmobiliario({
+          tipoInmueble: tipo_inmueble as TipoInmuebleRCI,
+          ingresosIntegros: ingresos_integros,
+          gastos: {
+            interesesPrestamo: intereses_prestamo,
+            ibiYTributos: ibi_y_tributos,
+            seguros,
+            reparacionConservacion: reparacion_conservacion,
+            comunidad,
+            administracion,
+            otros,
+            valorConstruccion: valor_construccion,
+          },
+        });
+        const lineas = [
+          `🏠 **Rendimiento del alquiler en IRPF**`,
+          '',
+          `💶 Ingresos íntegros: ${fmt(r.ingresosIntegros)} €`,
+          `📉 Total gastos deducibles: ${fmt(r.totalGastosEfectivos)} €`,
+          r.amortizacionComputada > 0 ? `  • Amortización (3%): ${fmt(r.amortizacionComputada)} €` : '',
+          r.excesoNoDeducible > 0 ? `  • Exceso intereses/reparación no deducible: ${fmt(r.excesoNoDeducible)} € (trasladable 4 años)` : '',
+          '',
+          `📊 Rendimiento neto: ${fmt(r.rendimientoNeto)} €`,
+          r.pctReduccion > 0 ? `➖ Reducción del ${r.pctReduccion}%: −${fmt(r.importeReduccion)} €` : '',
+          `💰 **Rendimiento neto reducido (a declarar): ${fmt(r.rendimientoNetoReducido)} €**`,
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_retencion_alquiler ──────────────────────────────────────────
+  servidor.tool(
+    'calcular_retencion_alquiler',
+    'Estima de forma rápida el IRPF del propietario por alquilar un inmueble: rendimiento neto, reducción del 60% ' +
+    'por vivienda habitual y la retención del 19% que practica el arrendatario cuando es empresa o profesional. ' +
+    'Para el cálculo detallado con todas las reducciones de la Ley de Vivienda usa "calcular_rendimiento_capital_inmobiliario".',
+    {
+      alquiler_mensual: z.number().positive().describe('Alquiler mensual bruto en euros'),
+      meses_alquilados: z.number().int().min(1).max(12).optional().describe('Meses alquilados al año. Por defecto 12.'),
+      precio_compra: z.number().min(0).optional().describe('Precio de compra del inmueble en euros (para la amortización del 3% del 70% del valor). Por defecto 0.'),
+      ibi: z.number().min(0).optional().describe('IBI anual en euros. Por defecto 0.'),
+      comunidad: z.number().min(0).optional().describe('Gastos de comunidad anuales en euros. Por defecto 0.'),
+      seguro: z.number().min(0).optional().describe('Seguro de hogar anual en euros. Por defecto 0.'),
+      reparaciones: z.number().min(0).optional().describe('Reparación y conservación anual en euros. Por defecto 0.'),
+      intereses_hipoteca: z.number().min(0).optional().describe('Intereses de hipoteca pagados en el año, en euros. Por defecto 0.'),
+      otros_gastos: z.number().min(0).optional().describe('Otros gastos deducibles (gestoría, publicidad...), en euros. Por defecto 0.'),
+      arrendatario_empresa: z.boolean().optional().describe('¿El arrendatario es empresa o profesional? Si es true, aplica retención del 19%. Por defecto false.'),
+      otros_ingresos: z.number().min(0).optional().describe('Otros ingresos anuales del propietario, en euros (para estimar el tipo marginal). Por defecto 0.'),
+    },
+    { title: 'Estima el IRPF del alquiler y la retención del 19%', readOnlyHint: true },
+    async ({ alquiler_mensual, meses_alquilados, precio_compra, ibi, comunidad, seguro, reparaciones, intereses_hipoteca, otros_gastos, arrendatario_empresa, otros_ingresos }, extra) => {
+      await registrarUsoDelegum('calcular_retencion_alquiler', getCaller(extra));
+      try {
+        const r = calcularRetencionAlquiler({
+          alquilerMensual: alquiler_mensual,
+          mesesAlquilados: meses_alquilados,
+          precioCompra: precio_compra,
+          ibi,
+          comunidad,
+          seguro,
+          reparaciones,
+          interesesHipoteca: intereses_hipoteca,
+          otrosGastos: otros_gastos,
+          arrendatarioEmpresa: arrendatario_empresa,
+          otrosIngresos: otros_ingresos,
+        });
+        const lineas = [
+          `🏠 **IRPF del alquiler — rendimiento y retención**`,
+          '',
+          `💶 Alquiler bruto: ${fmt(r.ingresosIntegros)} €/año (${fmt(alquiler_mensual)} €/mes × ${meses_alquilados ?? 12} meses)`,
+          `📉 Total gastos deducibles: ${fmt(r.gastos.total)} €${r.gastos.amortizacion > 0 ? ` (incluye amortización ${fmt(r.gastos.amortizacion)} €)` : ''}`,
+          '',
+          `📊 Rendimiento neto: ${fmt(r.rendimientoNeto)} €`,
+          r.reduccionViviendaHabitual
+            ? `➖ Reducción 60% (vivienda habitual): −${fmt(r.reduccion60pct)} €`
+            : `  (sin reducción 60%: solo aplica si es vivienda habitual del inquilino)`,
+          `💰 **Rendimiento neto reducido (base IRPF): ${fmt(r.rendimientoNetoReducido)} €**`,
+          `🧾 Cuota IRPF estimada: ${fmt(r.cuotaIRPFEstimada)} € (tipo marginal ${pct(r.tipoMarginal)}%)`,
+          '',
+          r.retencionAnual > 0
+            ? `📥 Retención del arrendatario (19%): ${fmt(r.retencionAnual)} €/año (${fmt(r.retencionMensual)} €/mes) → ${r.aDevolver ? 'a devolver' : 'a pagar'} ${fmt(Math.abs(r.cuotaDiferencial))} €`
+            : `ℹ️ Sin retención: el arrendatario es un particular.`,
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
         return conAviso(lineas.join('\n'), AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
