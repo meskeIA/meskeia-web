@@ -79,6 +79,14 @@ import {
 import { calcularReduccionJornada, type MotivoReduccionJornada } from '@/lib/calculadoras/reduccionJornada';
 import { calcularBajaMedica, type TipoBaja } from '@/lib/calculadoras/bajaMedica';
 import { calcularExcedencia, type TipoExcedencia } from '@/lib/calculadoras/excedencia';
+// ── Otras pensiones (Bloque F) ────────────────────────────────────────────────
+import { calcularPensionViudedad, type SituacionCausante } from '@/lib/calculadoras/pensionViudedad';
+import { calcularJubilacionAnticipada, type TipoJubilacionAnticipada } from '@/lib/calculadoras/jubilacionAnticipada';
+import {
+  calcularPensionIncapacidad,
+  type GradoIncapacidad,
+  type OrigenContingencia,
+} from '@/lib/calculadoras/pensionIncapacidad';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
@@ -2089,6 +2097,161 @@ function crearServidorDelegum(): McpServer {
           `💰 **Coste total en ingresos no percibidos: ${fmt(r.costeTotalIngresosNoPecibidos)} €**`,
           r.plazoNuevaExcedenciaVoluntaria ? `⏰ Nueva excedencia voluntaria posible tras ${r.plazoNuevaExcedenciaVoluntaria} meses` : '',
           '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // BLOQUE F — OTRAS PENSIONES DE LA SEGURIDAD SOCIAL (segunda vuelta).
+  // Completa la familia de jubilación con las prestaciones que más se consultan
+  // tras la pensión ordinaria: viudedad, jubilación anticipada e incapacidad.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_pension_viudedad ────────────────────────────────────────────
+  servidor.tool(
+    'calcular_pension_viudedad',
+    'Estima la pensión de viudedad: base reguladora, porcentaje aplicable (52%, 60% o 70% según cargas familiares ' +
+    'e ingresos del beneficiario), pensión mínima garantizada y pensión final con el tope de la Seguridad Social. ' +
+    'Distingue si el causante estaba en activo, jubilado o no de alta.',
+    {
+      situacion_causante: z.enum(['activo', 'jubilado', 'no-alta']).describe('"activo" = de alta en SS al fallecer · "jubilado" = percibía pensión de jubilación · "no-alta" = no estaba de alta'),
+      edad_beneficiario: z.number().int().min(0).max(100).describe('Edad del beneficiario (viudo/a) en años'),
+      base_cotizacion_media: z.number().positive().optional().describe('Base de cotización media mensual del causante en los últimos 2 años (€). Obligatoria si el causante estaba "activo" o "no-alta".'),
+      pension_causante: z.number().positive().optional().describe('Pensión de jubilación mensual del causante (€). Obligatoria si el causante estaba "jubilado".'),
+      tiene_cargas: z.boolean().optional().describe('¿El beneficiario tiene cargas familiares (hijos <26 o con discapacidad a cargo)? Puede elevar el porcentaje al 70%. Por defecto false.'),
+      ingresos_mensuales_propios: z.number().min(0).optional().describe('Ingresos mensuales propios del beneficiario por trabajo o pensión (€). Determinan el acceso a los porcentajes del 60% y 70%.'),
+    },
+    { title: 'Estima la pensión de viudedad (porcentaje, mínimos y pensión final)', readOnlyHint: true },
+    async ({ situacion_causante, edad_beneficiario, base_cotizacion_media, pension_causante, tiene_cargas, ingresos_mensuales_propios }, extra) => {
+      await registrarUsoDelegum('calcular_pension_viudedad', getCaller(extra));
+      try {
+        const r = calcularPensionViudedad({
+          situacionCausante: situacion_causante as SituacionCausante,
+          edadBeneficiario: edad_beneficiario,
+          baseCotizacionMedia: base_cotizacion_media,
+          pensionCausante: pension_causante,
+          tieneCargas: tiene_cargas,
+          ingresosMensualesPropios: ingresos_mensuales_propios,
+        });
+        const lineas = [
+          `🕊️ **Pensión de viudedad**`,
+          '',
+          `📦 Base reguladora: ${fmt(r.baseReguladora)} €/mes`,
+          `📏 Porcentaje aplicado: **${r.porcentajeAplicable}%** — ${r.razonPorcentaje}`,
+          `💶 Pensión bruta calculada: ${fmt(r.pensionBruta)} €/mes · mínima garantizada: ${fmt(r.pensionMinima)} €/mes`,
+          '',
+          `💰 **Pensión final: ${fmt(r.pensionFinal)} €/mes** (${fmt(r.pensionFinal * 14)} €/año, 14 pagas)`,
+          `💵 Estimación neta tras IRPF: ~${fmt(r.pensionNetaAprox)} €/mes`,
+          '',
+          ...r.notas.map(n => `ℹ️ ${n}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_jubilacion_anticipada ───────────────────────────────────────
+  servidor.tool(
+    'calcular_jubilacion_anticipada',
+    'Calcula el impacto de jubilarse antes de la edad ordinaria: comprueba si es posible (según años cotizados y ' +
+    'modalidad), aplica el coeficiente reductor trimestre a trimestre y devuelve la pensión reducida y la pérdida ' +
+    'mensual/anual. Voluntaria: hasta 2 años antes, ≥35 años cotizados. Involuntaria (despido/ERTE): hasta 4 años ' +
+    'antes, ≥33 años. Necesita la pensión ordinaria estimada (puedes obtenerla con "consulta_jubilacion").',
+    {
+      anos_cotizados: z.number().min(0).max(50).describe('Años cotizados a la Seguridad Social'),
+      meses_anticipacion: z.number().int().min(1).max(48).describe('Meses de anticipación respecto a la edad ordinaria de jubilación'),
+      tipo: z.enum(['voluntaria', 'involuntaria']).describe('"voluntaria" = el trabajador decide jubilarse antes. "involuntaria" = causa ajena (despido colectivo, ERTE, cierre); coeficientes reductores menores.'),
+      pension_ordinaria: z.number().positive().describe('Pensión mensual estimada si se jubilara a la edad ordinaria (€/mes)'),
+    },
+    { title: 'Calcula el impacto de la jubilación anticipada (coeficientes y pérdida)', readOnlyHint: true },
+    async ({ anos_cotizados, meses_anticipacion, tipo, pension_ordinaria }, extra) => {
+      await registrarUsoDelegum('calcular_jubilacion_anticipada', getCaller(extra));
+      try {
+        const r = calcularJubilacionAnticipada({
+          anosCotizados: anos_cotizados,
+          mesesAnticipacion: meses_anticipacion,
+          tipo: tipo as TipoJubilacionAnticipada,
+          pensionOrdinaria: pension_ordinaria,
+        });
+        const lineas = [
+          `👴 **Jubilación anticipada — modalidad ${tipo}**`,
+          '',
+          `📊 Años cotizados: ${anos_cotizados} · anticipación: ${meses_anticipacion} meses (${r.trimestreAnticipacion} trimestres)`,
+          `🎯 Edad ordinaria según cotización: ${r.edadOrdinaria}`,
+          '',
+          r.posible
+            ? `✅ **Jubilación anticipada POSIBLE**`
+            : `❌ **No es posible**: ${r.motivoImpedimento} (mínimo ${r.anosMinimosRequeridos} años cotizados, máx. ${r.maxMesesPermitidos} meses de anticipación)`,
+        ];
+        if (r.posible) {
+          lineas.push(
+            '',
+            `📉 Reducción total aplicada: **${pct(r.reduccionTotal)}%**`,
+            `💰 **Pensión con reducción: ${fmt(r.pensionConReduccion)} €/mes**`,
+            `💸 Pérdida: ${fmt(r.perdidaMensual)} €/mes (${fmt(r.perdidaAnual)} €/año, 14 pagas)`,
+          );
+        }
+        lineas.push('', `📚 ${r.fuenteDatos}`);
+        return conAviso(lineas.filter(l => l !== '').join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_pension_incapacidad ─────────────────────────────────────────
+  servidor.tool(
+    'calcular_pension_incapacidad',
+    'Calcula la prestación por incapacidad permanente (parcial, total, absoluta o gran invalidez): base reguladora, ' +
+    'porcentaje aplicado, recargo por edad ≥55 años en la incapacidad total y complemento de gran invalidez. La IP ' +
+    'parcial se abona como indemnización a tanto alzado; el resto, como pensión mensual.',
+    {
+      grado_incapacidad: z.enum(['parcial', 'total', 'absoluta', 'gran_invalidez']).describe('Grado de incapacidad permanente declarado'),
+      origen_contingencia: z.enum(['comun', 'profesional']).describe('"comun" = enfermedad común o accidente no laboral. "profesional" = accidente de trabajo o enfermedad profesional.'),
+      suma_bases_cotizacion: z.number().positive().describe('Suma de las bases de cotización del período de referencia (€). Comunes: últimas 112 mensualidades (8 años). Profesionales: últimas 12 mensualidades.'),
+      edad: z.number().min(16).max(100).describe('Edad del beneficiario en años (relevante para el recargo del 20% en IP total con ≥55 años)'),
+      tiene_conyuge: z.boolean().optional().describe('¿Tiene cónyuge a cargo? Afecta a la pensión mínima garantizada. Por defecto false.'),
+      ultima_base_cotizacion: z.number().positive().optional().describe('Última base de cotización mensual (€). Necesaria para el complemento de gran invalidez.'),
+    },
+    { title: 'Calcula la pensión de incapacidad permanente', readOnlyHint: true },
+    async ({ grado_incapacidad, origen_contingencia, suma_bases_cotizacion, edad, tiene_conyuge, ultima_base_cotizacion }, extra) => {
+      await registrarUsoDelegum('calcular_pension_incapacidad', getCaller(extra));
+      try {
+        const r = calcularPensionIncapacidad({
+          gradoIncapacidad: grado_incapacidad as GradoIncapacidad,
+          origenContingencia: origen_contingencia as OrigenContingencia,
+          sumaBasesCotizacion: suma_bases_cotizacion,
+          edad,
+          tieneConyuge: tiene_conyuge,
+          ultimaBaseCotizacion: ultima_base_cotizacion,
+        });
+        const gradoDesc: Record<string, string> = {
+          parcial: 'IP Parcial', total: 'IP Total (IPT)', absoluta: 'IP Absoluta (IPA)', gran_invalidez: 'Gran Invalidez (GI)',
+        };
+        const esParcial = r.gradoIncapacidad === 'parcial';
+        const lineas = [
+          `🦽 **Incapacidad permanente — ${gradoDesc[r.gradoIncapacidad]}**`,
+          '',
+          `📦 Base reguladora: ${fmt(r.baseReguladora)} €/mes`,
+          esParcial
+            ? `💰 **Indemnización a tanto alzado: ${fmt(r.indemnizacionTotalIPParcial ?? 0)} €**`
+            : [
+                `📏 Porcentaje aplicado: **${r.porcentajeAplicado}%**${r.recargo55Anios ? ' (incluye recargo del 20% por edad ≥55)' : ''}`,
+                r.complementoGranInvalidez ? `➕ Complemento gran invalidez: ${fmt(r.complementoGranInvalidez)} €/mes` : '',
+                `🛡️ Pensión mínima garantizada: ${fmt(r.pensionMinimaGarantizada)} €/mes`,
+                `💰 **Pensión efectiva: ${fmt(r.cuantiaEfectivaMensual)} €/mes** (${fmt(r.cuantiaAnual14Pagas)} €/año, 14 pagas)`,
+              ].filter(l => l !== '').join('\n'),
+          '',
+          `ℹ️ ${r.explicacion}`,
           ...r.advertencias.map(a => `⚠️ ${a}`),
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
