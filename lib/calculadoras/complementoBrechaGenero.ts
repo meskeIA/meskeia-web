@@ -1,117 +1,99 @@
 /**
- * Calculadora de Complemento para la Reducción de la Brecha de Género — lógica pura
- * Usada por: MCP server (calcular_complemento_brecha_genero)
+ * Calculadora del Complemento para la Reducción de la Brecha de Género — lógica pura
+ * Usada por: MCP meskeIA y MCP Delegum (calcular_complemento_brecha_genero)
+ *            y, como referencia normativa, por la app /verificador-complemento-brecha-genero
  *
- * Calcula el complemento de pensión por hijos/as para la reducción de la brecha
- * de género (antiguo "complemento de maternidad"), regulado por el RDL 3/2021
- * (Sentencia TJUE C-450/18) y el RD 364/2021.
+ * Complemento de pensión por hijos/as para la reducción de la brecha de género
+ * (antiguo "complemento de maternidad"), regulado por el art. 60 LGSS en la redacción
+ * dada por el RDL 3/2021 y revalorizado anualmente.
  *
- * Contexto histórico:
- *   - Antes de RDL 3/2021: "complemento de maternidad" solo para mujeres.
- *   - TJUE (C-450/18, 12/12/2019): el complemento solo para mujeres es contrario
- *     a la Directiva 79/7/CEE de igualdad.
- *   - RDL 3/2021 (26/01/2021): crea el nuevo "complemento para la reducción de la
- *     brecha de género" accesible a hombres y mujeres bajo condiciones distintas.
+ * ── Doctrina vigente (IMPORTANTE) ───────────────────────────────────────────────
+ *   - RDL 3/2021 (04/02/2021): crea el complemento de brecha de género, accesible a
+ *     hombres y mujeres, pero EXIGÍA a los hombres requisitos adicionales (interrupción
+ *     de jornada en los 2 años previos al nacimiento Y pensión inferior a la de la madre).
+ *   - STJUE C-623/23 (15/05/2025) y STS de 09/07/2025: declaran que esos requisitos
+ *     adicionales para los hombres son contrarios al principio de igualdad de trato
+ *     (Directiva 79/7/CEE). El complemento debe reconocerse a hombres y mujeres EN LAS
+ *     MISMAS CONDICIONES. El INSS asumió este criterio en 2025.
+ *   - Por tanto, esta calculadora NO aplica ya requisitos extra a los hombres. Los
+ *     requisitos son idénticos para ambos sexos.
  *
- * Requisitos y cuantía (LGSS art. 60, desde 04/02/2021):
+ * ── Requisitos (idénticos para hombre y mujer desde la doctrina 2025) ────────────
+ *   1. Ser beneficiario de una pensión contributiva: jubilación, incapacidad
+ *      permanente o viudedad. (Las no contributivas quedan fuera.)
+ *   2. Hecho causante de la pensión a partir del 04/02/2021.
+ *   3. Tener al menos 1 hijo/a nacido con vida o adoptado antes del hecho causante.
+ *   4. Que el otro progenitor no perciba el complemento por los mismos hijos
+ *      (incompatibilidad: solo uno de los dos). En caso de concurrencia, la SS lo
+ *      reconoce al progenitor con pensión pública de menor cuantía.
  *
- * MUJERES:
- *   - Haber tenido 2 o más hijos/as
- *   - Ser beneficiaria de pensión de jubilación, viudedad o IP con inicio ≥ 04/02/2021
- *   - Que haya una brecha entre la pensión propia y la del exCónyuge/cónyuge ≥ 15%
- *     (solo aplica la condición de brecha para las nuevas altas, no para pensiones
- *     causadas antes de 04/02/2021 que siguen con las antiguas reglas)
- *   - Para pensiones causadas ANTES de 04/02/2021: las mujeres con ≥ 2 hijos que
- *     cobren pensión contributiva de jubilación, IP o viudedad siguen cobrando el
- *     complemento de maternidad (régimen transitorio)
+ * ── Cuantía y cómputo ────────────────────────────────────────────────────────────
+ *   - Importe FIJO por hijo/a (no porcentaje), con un máximo de 4 hijos computables.
+ *   - Se abona en 14 pagas.
+ *   - NO computa a efectos del límite máximo de pensiones públicas.
+ *   - Tributa en IRPF como rendimiento del trabajo.
+ *   - Histórico de cuantías mensuales por hijo: 27,00 € (2021), 30,40 € (2023),
+ *     33,20 € (2024), 35,90 € (2025), 36,90 € (2026).
  *
- * HOMBRES:
- *   - Haber tenido 2 o más hijos/as
- *   - La pensión de viudedad o jubilación/IP debe ser inferior a la de la madre
- *     de los hijos (prueba de brecha de género ≥ 15%)
- *   - Solo si la madre no percibe el complemento o lo pierde
+ * Los importes y la doctrina se centralizan en data/fiscal/pensiones.ts.
  *
- * Cuantía por hijo (2025):
- *   - 378 €/año por cada hijo (≥ 2), es decir, 27 €/mes (14 pagas)
- *   - Límite: la cuantía del complemento no puede exceder el 50% de la pensión base
- *
- * Nota: Las cuantías se actualizan anualmente con el IPC.
- *
- * Fuente: LGSS art. 60 (redacción RDL 3/2021) + RD 364/2021 — vigente 2025
- * Verificado: 2025-01-15
+ * Fuente: art. 60 LGSS (RDL 3/2021) + RDL 3/2026 + STJUE C-623/23 + STS 09/07/2025
  *
  * Encadenable con: calcular_pension_publica, calcular_pension_viudedad, calcular_jubilacion_anticipada
  */
 
-// ─── Constantes 2025 ────────────────────────────────────────────────────────────
-
-const COMPLEMENTO_POR_HIJO_ANUAL_2025 = 378;  // €/año por hijo (≥ 2)
-const COMPLEMENTO_POR_HIJO_MENSUAL_2025 = 27; // €/mes (14 pagas)
-const MINIMO_HIJOS_PARA_COMPLEMENTO = 2;
-const PCT_LIMITE_SOBRE_PENSION = 50;           // % máximo del complemento sobre la pensión base
-const PCT_BRECHA_MINIMA_HOMBRES = 15;          // % mínimo de brecha de pensión para hombres
+import {
+  COMPLEMENTO_BRECHA_GENERO_2026,
+  COMPLEMENTO_BRECHA_GENERO_META,
+} from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
 export type SexoBeneficiario = 'mujer' | 'hombre';
-export type TipoPensionBG = 'jubilacion' | 'incapacidad_permanente' | 'viudedad';
-export type RegimenTransitorio = 'antes_04_02_2021' | 'desde_04_02_2021';
+export type TipoPensionBG = 'jubilacion' | 'incapacidad_permanente' | 'viudedad' | 'no_contributiva' | 'ninguna';
+export type FechaHechoCausante = 'antes_2021' | 'desde_2021' | 'sin_iniciar';
+export type EstadoOtroProgenitor = 'no_percibe' | 'percibe' | 'denegado' | 'no_aplica';
 
 export interface ParametrosComplementoBrechaGenero {
-  /** Sexo del beneficiario */
+  /** Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho) */
   sexo: SexoBeneficiario;
-  /** Número de hijos/as */
+  /** Número de hijos/as nacidos con vida o adoptados antes del hecho causante */
   numHijos: number;
-  /** Tipo de pensión que se percibe */
+  /** Tipo de pensión que se percibe o se va a percibir */
   tipoPension: TipoPensionBG;
-  /** Cuantía mensual de la pensión base del beneficiario (€/mes) */
-  cuantiaPensionBeneficiario: number;
-  /** ¿La pensión se causó antes del 04/02/2021? (afecta al régimen aplicable) */
-  pensionAntesDe2021?: boolean;
-  /**
-   * Para hombres: cuantía mensual de la pensión de la madre de los hijos (€/mes).
-   * Necesaria para verificar la condición de brecha.
-   */
-  cuantiaPensionMadre?: number;
-  /**
-   * Para hombres: ¿La madre percibe el complemento?
-   * Si la madre ya cobra el complemento, el hombre no puede acceder.
-   */
-  madrePcibeComplemento?: boolean;
+  /** Momento del hecho causante de la pensión. Por defecto 'desde_2021'. */
+  fechaHechoCausante?: FechaHechoCausante;
+  /** Situación del otro progenitor respecto al complemento. Por defecto 'no_percibe'. */
+  otroProgenitor?: EstadoOtroProgenitor;
+  /** Cuantía mensual de la pensión base del beneficiario (€/mes). Opcional: para mostrar la pensión total con complemento. */
+  cuantiaPensionBeneficiario?: number;
 }
 
 export interface ResultadoComplementoBrechaGenero {
-  /** Sexo del beneficiario */
   sexo: SexoBeneficiario;
-  /** Número de hijos */
   numHijos: number;
-  /** Tipo de pensión */
   tipoPension: TipoPensionBG;
-  /** ¿Cumple el requisito mínimo de hijos? */
-  cumpleRequisitosHijos: boolean;
-  /** ¿Cumple el requisito de brecha de género (solo hombres)? */
-  cumpleRequisitoBrechaHombres?: boolean;
-  /** Brecha porcentual calculada (solo hombres) (%) */
-  brechaCalculadaPct?: number;
-  /** ¿Puede acceder al complemento? */
+  /** ¿Procede el complemento? */
   tieneDerechoComplemento: boolean;
-  /** Motivo de no acceso (si aplica) */
-  motivoSinDerecho?: string;
-  /** Complemento por hijo anual (€) */
-  complementoPorHijoAnual: number;
-  /** Complemento calculado antes de aplicar el límite (€/mes) */
-  complementoBrutoMensual: number;
-  /** Límite máximo del complemento (50% de la pensión base) (€/mes) */
-  limiteMaximoComplemento: number;
-  /** **Complemento efectivo mensual (€/mes)** */
-  complementoEfectivoMensual: number;
-  /** Complemento efectivo anual (14 pagas) (€/año) */
-  complementoEfectivoAnual: number;
-  /** Pensión total mensual con complemento (€/mes) */
-  pensionTotalMensual: number;
-  /** Régimen aplicable */
-  regimenAplicable: RegimenTransitorio;
-  /** Advertencias */
+  /** Nº de hijos computables (mínimo derecho, máximo 4) */
+  hijosComputables: number;
+  /** Cuantía mensual por hijo aplicada (€/mes, año vigente) */
+  cuantiaPorHijoMensual: number;
+  /** Complemento mensual total (€/mes) */
+  complementoMensual: number;
+  /** Complemento anual total (14 pagas) (€/año) */
+  complementoAnual: number;
+  /** Motivo de la resolución (procede o no, y por qué) */
+  motivo: string;
+  /** ¿El caso encaja en una posible reclamación retroactiva (p. ej. denegación previa a hombre)? */
+  esReclamacion: boolean;
+  /** Paso siguiente recomendado */
+  pasoSiguiente: string;
+  /** Cuantía de la pensión base aportada (si la hubo) (€/mes) */
+  cuantiaPensionBeneficiario?: number;
+  /** Pensión total mensual con complemento (si se aportó la pensión base) (€/mes) */
+  pensionTotalMensual?: number;
+  /** Advertencias y notas legales */
   advertencias: string[];
   /** Fuente normativa */
   fuenteDatos: string;
@@ -119,107 +101,137 @@ export interface ResultadoComplementoBrechaGenero {
 
 // ─── Función principal ─────────────────────────────────────────────────────────
 
-export function calcularComplementoBrechaGenero(p: ParametrosComplementoBrechaGenero): ResultadoComplementoBrechaGenero {
+export function calcularComplementoBrechaGenero(
+  p: ParametrosComplementoBrechaGenero,
+): ResultadoComplementoBrechaGenero {
   if (p.numHijos < 0) throw new Error('El número de hijos no puede ser negativo.');
-  if (p.cuantiaPensionBeneficiario <= 0) throw new Error('La cuantía de la pensión debe ser mayor que cero.');
-
-  const r = (n: number) => Math.round(n * 100) / 100;
-
-  const cumpleRequisitosHijos = p.numHijos >= MINIMO_HIJOS_PARA_COMPLEMENTO;
-  const pensionAntesDe2021 = p.pensionAntesDe2021 ?? false;
-  const regimenAplicable: RegimenTransitorio = pensionAntesDe2021 ? 'antes_04_02_2021' : 'desde_04_02_2021';
-  const advertencias: string[] = [];
-
-  let tieneDerechoComplemento = true;
-  let motivoSinDerecho: string | undefined;
-  let cumpleRequisitoBrechaHombres: boolean | undefined;
-  let brechaCalculadaPct: number | undefined;
-
-  if (!cumpleRequisitosHijos) {
-    tieneDerechoComplemento = false;
-    motivoSinDerecho = `Se requieren mínimo ${MINIMO_HIJOS_PARA_COMPLEMENTO} hijos/as (tiene ${p.numHijos}).`;
-  } else if (p.sexo === 'hombre') {
-    // Hombres: condición de brecha
-    if (p.madrePcibeComplemento) {
-      tieneDerechoComplemento = false;
-      motivoSinDerecho = 'La madre de los hijos ya percibe el complemento. El hombre no puede acceder simultáneamente.';
-    } else if (p.cuantiaPensionMadre !== undefined) {
-      const cuantiaMadre = p.cuantiaPensionMadre;
-      if (cuantiaMadre > 0 && p.cuantiaPensionBeneficiario < cuantiaMadre) {
-        brechaCalculadaPct = r((cuantiaMadre - p.cuantiaPensionBeneficiario) / cuantiaMadre * 100);
-        cumpleRequisitoBrechaHombres = brechaCalculadaPct >= PCT_BRECHA_MINIMA_HOMBRES;
-        if (!cumpleRequisitoBrechaHombres) {
-          tieneDerechoComplemento = false;
-          motivoSinDerecho = `La brecha de pensión (${brechaCalculadaPct}%) es inferior al mínimo requerido (${PCT_BRECHA_MINIMA_HOMBRES}%).`;
-        }
-      } else if (p.cuantiaPensionBeneficiario >= cuantiaMadre) {
-        brechaCalculadaPct = 0;
-        cumpleRequisitoBrechaHombres = false;
-        tieneDerechoComplemento = false;
-        motivoSinDerecho = 'La pensión del beneficiario no es inferior a la de la madre. No existe brecha de género.';
-      }
-    } else {
-      // Sin datos de la pensión de la madre
-      advertencias.push('Para hombres, es necesario conocer la pensión de la madre de los hijos para verificar la condición de brecha (≥ 15%). El resultado asume que cumple la condición.');
-    }
+  if (p.cuantiaPensionBeneficiario !== undefined && p.cuantiaPensionBeneficiario < 0) {
+    throw new Error('La cuantía de la pensión no puede ser negativa.');
   }
 
-  if (!tieneDerechoComplemento) {
-    return {
-      sexo: p.sexo,
-      numHijos: p.numHijos,
-      tipoPension: p.tipoPension,
-      cumpleRequisitosHijos,
-      cumpleRequisitoBrechaHombres,
-      brechaCalculadaPct,
-      tieneDerechoComplemento: false,
-      motivoSinDerecho,
-      complementoPorHijoAnual: COMPLEMENTO_POR_HIJO_ANUAL_2025,
-      complementoBrutoMensual: 0,
-      limiteMaximoComplemento: r(p.cuantiaPensionBeneficiario * PCT_LIMITE_SOBRE_PENSION / 100),
-      complementoEfectivoMensual: 0,
-      complementoEfectivoAnual: 0,
-      pensionTotalMensual: r(p.cuantiaPensionBeneficiario),
-      regimenAplicable,
-      advertencias,
-      fuenteDatos: 'LGSS art. 60 (RDL 3/2021) + RD 364/2021 — vigente 2025',
-    };
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+  const { cuantiaPorHijoMensual, maxHijos, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
+  const fecha = p.fechaHechoCausante ?? 'desde_2021';
+  const otroProgenitor = p.otroProgenitor ?? 'no_percibe';
+
+  const hijosComputables = Math.min(p.numHijos, maxHijos);
+  const complementoMensual = r2(hijosComputables * cuantiaPorHijoMensual);
+  const complementoAnual = r2(complementoMensual * pagasAnuales);
+
+  const fuenteDatos = COMPLEMENTO_BRECHA_GENERO_META.fuente;
+  const advertenciasBase = [
+    'El complemento se abona en 14 pagas y NO computa a efectos del límite máximo de pensiones públicas: se suma aunque ya se perciba la pensión máxima.',
+    'El complemento tributa en IRPF como rendimiento del trabajo.',
+    'Desde la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en igualdad de condiciones: ya no se exigen requisitos adicionales a los hombres.',
+  ];
+
+  // Helper para construir un resultado de "no procede"
+  const noProcede = (motivo: string, pasoSiguiente: string, advertencias: string[] = []): ResultadoComplementoBrechaGenero => ({
+    sexo: p.sexo,
+    numHijos: p.numHijos,
+    tipoPension: p.tipoPension,
+    tieneDerechoComplemento: false,
+    hijosComputables: 0,
+    cuantiaPorHijoMensual,
+    complementoMensual: 0,
+    complementoAnual: 0,
+    motivo,
+    esReclamacion: false,
+    pasoSiguiente,
+    cuantiaPensionBeneficiario: p.cuantiaPensionBeneficiario,
+    pensionTotalMensual: p.cuantiaPensionBeneficiario !== undefined ? r2(p.cuantiaPensionBeneficiario) : undefined,
+    advertencias,
+    fuenteDatos,
+  });
+
+  // Caso 1: la pensión no es contributiva elegible
+  if (p.tipoPension === 'no_contributiva') {
+    return noProcede(
+      'El complemento solo se aplica a pensiones contributivas (jubilación, incapacidad permanente o viudedad). Las pensiones no contributivas no dan acceso.',
+      'Si en el futuro accedes a una pensión contributiva y tienes hijos, revisa entonces tu derecho.',
+    );
+  }
+  if (p.tipoPension === 'ninguna') {
+    return noProcede(
+      'El complemento se reconoce únicamente sobre una pensión ya causada.',
+      'Cuando solicites jubilación, incapacidad permanente o viudedad, recuerda revisar este derecho.',
+    );
   }
 
-  const complementoBrutoMensual = r(p.numHijos * COMPLEMENTO_POR_HIJO_MENSUAL_2025);
-  const limiteMaximoComplemento = r(p.cuantiaPensionBeneficiario * PCT_LIMITE_SOBRE_PENSION / 100);
-  const complementoEfectivoMensual = r(Math.min(complementoBrutoMensual, limiteMaximoComplemento));
-  const complementoEfectivoAnual = r(complementoEfectivoMensual * 14);
-  const pensionTotalMensual = r(p.cuantiaPensionBeneficiario + complementoEfectivoMensual);
-
-  advertencias.push(`Cuantía 2025: ${COMPLEMENTO_POR_HIJO_MENSUAL_2025} €/mes (${COMPLEMENTO_POR_HIJO_ANUAL_2025} €/año) por cada hijo a partir del ${MINIMO_HIJOS_PARA_COMPLEMENTO}º. Se actualiza anualmente con el IPC.`);
-  advertencias.push(`Límite: el complemento no puede superar el ${PCT_LIMITE_SOBRE_PENSION}% de la pensión base (${limiteMaximoComplemento.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €/mes).`);
-  advertencias.push('El complemento tributa en IRPF como rendimiento del trabajo. Se incluye en la base de cotización de pensionistas que trabajen.');
-
-  if (pensionAntesDe2021 && p.sexo === 'mujer') {
-    advertencias.push('Régimen transitorio: para pensiones causadas antes del 04/02/2021, las mujeres continúan con el "complemento de maternidad" anterior (art. 60 LGSS en redacción vigente en la fecha del hecho causante).');
+  // Caso 2: hecho causante anterior al 04-feb-2021
+  if (fecha === 'antes_2021') {
+    return noProcede(
+      'La pensión se causó antes del 4 de febrero de 2021, fecha de entrada en vigor del complemento por brecha de género (RDL 3/2021). Para hechos causantes anteriores se aplicaba el antiguo complemento de maternidad, con reglas distintas.',
+      'Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un profesional: la doctrina TJUE 2019 (caso WA) también afectó a aquel régimen.',
+    );
+  }
+  if (fecha === 'sin_iniciar') {
+    return noProcede(
+      'Aún no hay una pensión causada. El complemento se reconoce al solicitar la pensión.',
+      'Al solicitar la pensión, marca expresamente que pides el complemento del art. 60 LGSS.',
+    );
   }
 
-  if (complementoBrutoMensual > limiteMaximoComplemento) {
-    advertencias.push(`El complemento calculado (${complementoBrutoMensual.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €/mes) supera el límite del ${PCT_LIMITE_SOBRE_PENSION}% de la pensión base. Se aplica el límite.`);
+  // Caso 3: sin hijos computables
+  if (p.numHijos === 0) {
+    return noProcede(
+      'El complemento exige al menos un hijo o hija nacido con vida o adoptado antes del hecho causante de la pensión.',
+      'Sin hijos computables no procede este complemento.',
+    );
   }
+
+  // Caso 4: el otro progenitor ya percibe el complemento → incompatible
+  if (otroProgenitor === 'percibe') {
+    return noProcede(
+      'Cada hijo o hija solo genera el complemento para uno de los progenitores. Si el otro progenitor ya lo percibe por los mismos hijos, no puede reconocerse de nuevo.',
+      'En caso de concurrencia, la SS lo reconoce al progenitor con la pensión pública de menor cuantía. Si tu pensión es inferior, conviene revisar la asignación con un asesor.',
+      [COMPLEMENTO_BRECHA_GENERO_META.nota],
+    );
+  }
+
+  // Caso 5: denegación previa (típicamente a un hombre antes de la doctrina 2025) → reclamación
+  const esReclamacion = otroProgenitor === 'denegado';
+
+  const pensionTotalMensual = p.cuantiaPensionBeneficiario !== undefined
+    ? r2(p.cuantiaPensionBeneficiario + complementoMensual)
+    : undefined;
+
+  const motivo = esReclamacion
+    ? 'Tras la STJUE C-623/23 (15-may-2025) y la doctrina del Tribunal Supremo (09-jul-2025), las denegaciones previas a hombres por no cumplir requisitos adicionales son revisables. El complemento debe reconocerse en las mismas condiciones que a las mujeres.'
+    : (p.sexo === 'hombre'
+        ? 'Tras la doctrina TJUE/TS 2025, los hombres tienen derecho al complemento en las mismas condiciones que las mujeres. Se cumplen los requisitos básicos del art. 60 LGSS.'
+        : 'Se cumplen los requisitos básicos del art. 60 LGSS para el reconocimiento del complemento.');
+
+  const pasoSiguiente = esReclamacion
+    ? 'Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la STJUE C-623/23 y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.'
+    : 'Si ya cobras la pensión y el complemento no aparece en tu nómina, presenta una solicitud expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.';
+
+  const advertencias = [...advertenciasBase];
+  advertencias.push(
+    `Cuantía vigente (${COMPLEMENTO_BRECHA_GENERO_META.vigencia}): ${cuantiaPorHijoMensual.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €/mes por hijo, máximo ${maxHijos} hijos. Se revaloriza anualmente.`,
+  );
+  if (p.numHijos > maxHijos) {
+    advertencias.push(
+      `Se computan ${maxHijos} hijos como máximo, aunque tengas ${p.numHijos}.`,
+    );
+  }
+  advertencias.push(COMPLEMENTO_BRECHA_GENERO_META.nota);
 
   return {
     sexo: p.sexo,
     numHijos: p.numHijos,
     tipoPension: p.tipoPension,
-    cumpleRequisitosHijos,
-    cumpleRequisitoBrechaHombres,
-    brechaCalculadaPct,
     tieneDerechoComplemento: true,
-    complementoPorHijoAnual: COMPLEMENTO_POR_HIJO_ANUAL_2025,
-    complementoBrutoMensual,
-    limiteMaximoComplemento,
-    complementoEfectivoMensual,
-    complementoEfectivoAnual,
+    hijosComputables,
+    cuantiaPorHijoMensual,
+    complementoMensual,
+    complementoAnual,
+    motivo,
+    esReclamacion,
+    pasoSiguiente,
+    cuantiaPensionBeneficiario: p.cuantiaPensionBeneficiario,
     pensionTotalMensual,
-    regimenAplicable,
     advertencias,
-    fuenteDatos: 'LGSS art. 60 (RDL 3/2021) + RD 364/2021 — vigente 2025',
+    fuenteDatos,
   };
 }

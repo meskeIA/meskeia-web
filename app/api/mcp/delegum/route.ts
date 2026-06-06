@@ -30,6 +30,7 @@ import { calcularFiniquito, type MotivoFiniquito } from '@/lib/calculadoras/fini
 import { calcularPensionDesempleo } from '@/lib/calculadoras/pensionDesempleo';
 import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
+import { calcularComplementoBrechaGenero, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 import {
   calcularSucesion,
   type GrupoParentescoIS,
@@ -1212,6 +1213,53 @@ function crearServidorDelegum(): McpServer {
           );
         }
         return conAviso(lineas.join('\n'), AVISO_FINANCIERO);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_complemento_brecha_genero ───────────────────────────────────
+  servidor.tool(
+    'calcular_complemento_brecha_genero',
+    'Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (36,90 €/mes en 2026, máximo 4 hijos, 14 pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el 04/02/2021, al menos 1 hijo y que el otro progenitor no lo perciba por los mismos hijos.',
+    {
+      sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho)'),
+      num_hijos: z.number().int().min(0).describe('Número de hijos/as nacidos con vida o adoptados antes del hecho causante'),
+      tipo_pension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad', 'no_contributiva', 'ninguna']).describe('Tipo de pensión. Solo las contributivas dan acceso.'),
+      fecha_hecho_causante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe('Momento del hecho causante. El complemento exige hecho causante desde el 04/02/2021. Por defecto desde_2021.'),
+      otro_progenitor: z.enum(['no_percibe', 'percibe', 'denegado', 'no_aplica']).optional().describe('Situación del otro progenitor: no_percibe, percibe (incompatible), denegado (posible reclamación), no_aplica. Por defecto no_percibe.'),
+      cuantia_pension_mensual: z.number().positive().optional().describe('Cuantía mensual de la pensión base (€/mes). Opcional: para mostrar la pensión total con complemento.'),
+    },
+    { title: 'Calcula el complemento de pensión por brecha de género', readOnlyHint: true },
+    async ({ sexo, num_hijos, tipo_pension, fecha_hecho_causante, otro_progenitor, cuantia_pension_mensual }, extra) => {
+      await registrarUsoDelegum('calcular_complemento_brecha_genero', getCaller(extra));
+      try {
+        const r = calcularComplementoBrechaGenero({
+          sexo: sexo as SexoBeneficiarioBG,
+          numHijos: num_hijos,
+          tipoPension: tipo_pension as TipoPensionBG,
+          fechaHechoCausante: fecha_hecho_causante,
+          otroProgenitor: otro_progenitor,
+          cuantiaPensionBeneficiario: cuantia_pension_mensual,
+        });
+        const lineas = [
+          `👶 **Complemento por Brecha de Género (art. 60 LGSS)**`,
+          `Beneficiario: ${sexo === 'mujer' ? 'Mujer' : 'Hombre'} · Hijos: ${r.numHijos}`,
+          '',
+          r.tieneDerechoComplemento
+            ? [
+                r.esReclamacion ? `🔄 **Posible reclamación retroactiva**` : `✅ **Tiene derecho al complemento**`,
+                `Hijos computables: ${r.hijosComputables} (máx. 4) · ${fmt(r.cuantiaPorHijoMensual)} €/mes por hijo`,
+                `💰 **Complemento: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año, 14 pagas)**`,
+                r.pensionTotalMensual !== undefined ? `Pensión total con complemento: **${fmt(r.pensionTotalMensual)} €/mes**` : null,
+              ].filter(l => l !== null).join('\n')
+            : `❌ **No procede ahora:** ${r.motivo}`,
+          '',
+          r.tieneDerechoComplemento ? `ℹ️ ${r.motivo}` : null,
+          `👉 ${r.pasoSiguiente}`,
+        ].filter(l => l !== null);
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
       } catch (err) {
         return errorMcp(err);
       }

@@ -176,7 +176,6 @@ import { calcularRegimenSimplificadoIVA, type TrimestreISP } from '@/lib/calcula
 import { calcularModelo111, type CategoriaModelo111 } from '@/lib/calculadoras/modelo111';
 import { calcularPrestacionCeseActividad, type TipoCeseActividad } from '@/lib/calculadoras/prestacionCeseActividad';
 import { calcularModificacionSustancialCondiciones, type TipoMSCT, type DecisionTrabajadorMSCT } from '@/lib/calculadoras/modificacionSustancialCondiciones';
-import { calcularComplementoPensionBrechaGenero, type TipoPensionComplemento, type SexoBeneficiario as SexoBeneficiarioBG } from '@/lib/calculadoras/complementoPensionBrechaGenero';
 // ── Lote S:
 import { calcularRendimientoCapitalInmobiliario, type TipoInmuebleRCI } from '@/lib/calculadoras/rendimientoCapitalInmobiliario';
 import { calcularPensionAlimenticiaIRPF, type TipoPensionIRPF, type RolContribuyente } from '@/lib/calculadoras/pensionAlimenticiaIRPF';
@@ -6232,50 +6231,55 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
   // ── Lote L: calcular_complemento_brecha_genero ───────────────────────────────
   servidor.tool(
     'calcular_complemento_brecha_genero',
-    'Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, RDL 3/2021). Aplica a hombres y mujeres con 2 o más hijos que cobran pensión de jubilación, IP o viudedad.',
+    'Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS — RDL 3/2021). Importe fijo por hijo/a (36,90 €/mes en 2026, máximo 4 hijos, 14 pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el 04/02/2021, al menos 1 hijo, y que el otro progenitor no lo perciba por los mismos hijos.',
     {
-      sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario de la pensión'),
-      numHijos: z.number().min(0).describe('Número de hijos/as del beneficiario'),
-      tipoPension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad']).describe('Tipo de pensión contributiva que se percibe'),
-      cuantiaPensionBeneficiario: z.number().positive().describe('Cuantía mensual de la pensión base del beneficiario (€/mes, 14 pagas)'),
-      pensionAntesDe2021: z.boolean().optional().describe('¿La pensión se causó antes del 04/02/2021? Afecta al régimen aplicable (transitorio vs nuevo).'),
-      cuantiaPensionMadre: z.number().positive().optional().describe('Para hombres: cuantía mensual de la pensión de la madre de los hijos (€/mes). Necesaria para verificar la brecha.'),
-      madrePcibeComplemento: z.boolean().optional().describe('Para hombres: ¿la madre ya percibe este complemento? Si es true, el hombre no puede acceder.'),
+      sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho)'),
+      numHijos: z.number().min(0).describe('Número de hijos/as nacidos con vida o adoptados antes del hecho causante'),
+      tipoPension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad', 'no_contributiva', 'ninguna']).describe('Tipo de pensión. Solo las contributivas (jubilacion, incapacidad_permanente, viudedad) dan acceso.'),
+      fechaHechoCausante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe('Momento del hecho causante de la pensión. El complemento exige hecho causante desde el 04/02/2021. Por defecto desde_2021.'),
+      otroProgenitor: z.enum(['no_percibe', 'percibe', 'denegado', 'no_aplica']).optional().describe('Situación del otro progenitor: no_percibe (no lo cobra), percibe (incompatible), denegado (denegación previa → posible reclamación), no_aplica. Por defecto no_percibe.'),
+      cuantiaPensionBeneficiario: z.number().positive().optional().describe('Cuantía mensual de la pensión base del beneficiario (€/mes, 14 pagas). Opcional: para mostrar la pensión total con complemento.'),
     },
-    { title: 'Calcula el complemento de pensión para la reducción de la brecha', readOnlyHint: true },
+    { title: 'Calcula el complemento de pensión para la reducción de la brecha de género', readOnlyHint: true },
     async (args, extra) => {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_complemento_brecha_genero', aiCaller);
       const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const sexoMap: Record<string, SexoBeneficiario> = { mujer: 'mujer', hombre: 'hombre' };
-      const tipoPensionMap: Record<string, TipoPensionBG> = { jubilacion: 'jubilacion', incapacidad_permanente: 'incapacidad_permanente', viudedad: 'viudedad' };
+      const tipoPensionMap: Record<string, TipoPensionBG> = {
+        jubilacion: 'jubilacion', incapacidad_permanente: 'incapacidad_permanente', viudedad: 'viudedad',
+        no_contributiva: 'no_contributiva', ninguna: 'ninguna',
+      };
       const r = calcularComplementoBrechaGenero({
         sexo: sexoMap[args.sexo],
         numHijos: args.numHijos,
         tipoPension: tipoPensionMap[args.tipoPension],
+        fechaHechoCausante: args.fechaHechoCausante,
+        otroProgenitor: args.otroProgenitor,
         cuantiaPensionBeneficiario: args.cuantiaPensionBeneficiario,
-        pensionAntesDe2021: args.pensionAntesDe2021,
-        cuantiaPensionMadre: args.cuantiaPensionMadre,
-        madrePcibeComplemento: args.madrePcibeComplemento,
       });
-      const tipoPensionDesc: Record<string, string> = { jubilacion: 'Jubilación', incapacidad_permanente: 'Incapacidad Permanente', viudedad: 'Viudedad' };
+      const tipoPensionDesc: Record<string, string> = {
+        jubilacion: 'Jubilación', incapacidad_permanente: 'Incapacidad Permanente', viudedad: 'Viudedad',
+        no_contributiva: 'No contributiva', ninguna: 'Sin pensión causada',
+      };
       const lineas = [
-        `👶 **Complemento para la Reducción de la Brecha de Género (RDL 3/2021)**`,
+        `👶 **Complemento para la Reducción de la Brecha de Género (art. 60 LGSS)**`,
         '',
         `Beneficiario: ${args.sexo === 'mujer' ? 'Mujer' : 'Hombre'} | Hijos: ${r.numHijos} | Pensión: ${tipoPensionDesc[r.tipoPension]}`,
-        `Cuantía pensión base: ${fmt(args.cuantiaPensionBeneficiario)} €/mes`,
+        args.cuantiaPensionBeneficiario !== undefined ? `Cuantía pensión base: ${fmt(args.cuantiaPensionBeneficiario)} €/mes` : null,
         '',
         r.tieneDerechoComplemento
           ? [
-              `✅ **Tiene derecho al complemento**`,
-              `Complemento por hijo: ${fmt(r.complementoPorHijoAnual)} €/año (${fmt(r.complementoEfectivoMensual / r.numHijos > 0 ? r.complementoEfectivoMensual / r.numHijos : 0)} €/mes cada uno)`,
-              `Complemento bruto calculado: ${fmt(r.complementoBrutoMensual)} €/mes`,
-              `Límite máximo (50% pensión): ${fmt(r.limiteMaximoComplemento)} €/mes`,
-              `💰 **Complemento efectivo: ${fmt(r.complementoEfectivoMensual)} €/mes (${fmt(r.complementoEfectivoAnual)} €/año)**`,
-              `Pensión total con complemento: **${fmt(r.pensionTotalMensual)} €/mes**`,
-            ].join('\n')
-          : `❌ **Sin derecho al complemento**: ${r.motivoSinDerecho}`,
-        r.brechaCalculadaPct !== undefined ? `Brecha de pensión calculada: ${r.brechaCalculadaPct}%` : null,
+              r.esReclamacion ? `🔄 **Posible reclamación retroactiva**` : `✅ **Tiene derecho al complemento**`,
+              `Hijos computables: ${r.hijosComputables} (máximo 4)`,
+              `Cuantía por hijo: ${fmt(r.cuantiaPorHijoMensual)} €/mes`,
+              `💰 **Complemento: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año en 14 pagas)**`,
+              r.pensionTotalMensual !== undefined ? `Pensión total con complemento: **${fmt(r.pensionTotalMensual)} €/mes**` : null,
+            ].filter(l => l !== null).join('\n')
+          : `❌ **No procede ahora**: ${r.motivo}`,
+        '',
+        r.tieneDerechoComplemento ? `ℹ️ ${r.motivo}` : null,
+        `👉 **Paso siguiente:** ${r.pasoSiguiente}`,
         '',
         ...r.advertencias.map(a => `⚠️ ${a}`),
         `📎 ${r.fuenteDatos}`,
@@ -7432,43 +7436,6 @@ Encadenable con: calcular_sueldo_neto, calcular_coste_empleado, calcular_irpf.`,
         resultado.decisionTrabajador === 'rescindir' ? `- Tope 9 mensualidades: ${resultado.capMaximoMensualidades.toLocaleString('es-ES')} EUR` : null,
         resultado.decisionTrabajador === 'rescindir' ? `- **Indemnización final: ${resultado.indemnizacionFinal.toLocaleString('es-ES')} EUR**` : null,
         resultado.decisionTrabajador === 'impugnar' ? `- Plazo de impugnación: **${resultado.plazoImpugnacionDiasHabiles} días hábiles** desde la notificación` : null,
-        '',
-        '### Advertencias',
-        ...resultado.advertencias.map(a => `- ${a}`),
-        '',
-        `*Fuente: ${resultado.fuenteDatos}*`,
-      ].filter(l => l !== null && l !== '');
-      return conAviso(lineas.join('\n'), AVISO_FISCAL);
-    }
-  );
-
-  servidor.tool(
-    'calcular_complemento_pension_brecha_genero',
-    'Calcula el complemento de pensión por brecha de género (LGSS art. 60 — RDL 3/2021). Mujeres con 2+ hijos: complemento mensual por cada hijo a partir del 2.º (presunción legal de brecha por maternidad). Hombres con 2+ hijos: solo si interrumpieron jornada en los 2 años previos al nacimiento/adopción Y su pensión es inferior a la del cónyuge. Importe 2025: ~33,20 EUR/mes por hijo adicional, abonado en 14 pagas.',
-    {
-      tipoPension: z.enum(['jubilacion', 'incapacidad_permanente', 'viudedad'] as [TipoPensionComplemento, ...TipoPensionComplemento[]]).describe('Tipo de pensión del beneficiario'),
-      sexo: z.enum(['mujer', 'hombre'] as [SexoBeneficiarioBG, ...SexoBeneficiarioBG[]]).describe('Sexo del beneficiario'),
-      numHijos: z.number().int().min(0).describe('Número de hijos o hijas biológicos o adoptados'),
-      acreditaBrechaGenero: z.boolean().optional().describe('Para mujeres: ¿acredita brecha de género? (por defecto true — presunción legal)'),
-      hombresInterrumpioJornada: z.boolean().optional().describe('Para hombres: ¿interrumpió o redujo jornada en los 2 años previos al nacimiento/adopción?'),
-      pensionInferiorConyuge: z.boolean().optional().describe('Para hombres: ¿su pensión es inferior a la del cónyuge o pareja de hecho?'),
-      pensionMensualBase: z.number().positive().describe('Pensión contributiva mensual reconocida antes del complemento (EUR)'),
-    },
-    { title: 'Calcula el complemento de pensión por brecha de género (LGSS art', readOnlyHint: true },
-    async (args, extra) => {
-      await registrarUsoMCP('calcular_complemento_pension_brecha_genero', extra?.authInfo?.clientId ?? 'mcp-client');
-      const resultado = calcularComplementoPensionBrechaGenero(args as Parameters<typeof calcularComplementoPensionBrechaGenero>[0]);
-      const lineas = [
-        '## Complemento de Pensión por Brecha de Género (LGSS art. 60)',
-        '',
-        `- Tipo de pensión: ${resultado.tipoPension} | Sexo: ${resultado.sexo}`,
-        `- Número de hijos: ${resultado.numHijos}`,
-        `- **Tiene derecho al complemento**: ${resultado.tieneDerechoComplemento ? 'Sí' : 'No'}`,
-        resultado.motivoDenegacion ? `- **Motivo denegación**: ${resultado.motivoDenegacion}` : null,
-        resultado.tieneDerechoComplemento ? `- Hijos que generan complemento (desde el 2.º): ${resultado.hijosQueGeneranComplemento}` : null,
-        resultado.tieneDerechoComplemento ? `- **Complemento mensual: ${resultado.cuotaComplementoMensual.toLocaleString('es-ES')} EUR/mes**` : null,
-        resultado.tieneDerechoComplemento ? `- Complemento anual (14 pagas): ${resultado.cuotaComplementoAnual.toLocaleString('es-ES')} EUR` : null,
-        resultado.tieneDerechoComplemento ? `- **Pensión total mensual: ${resultado.pensionTotalMensual.toLocaleString('es-ES')} EUR/mes**` : null,
         '',
         '### Advertencias',
         ...resultado.advertencias.map(a => `- ${a}`),
