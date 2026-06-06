@@ -166,7 +166,7 @@ export default function DelegumPage() {
               en normativa española del ejercicio 2025 y pueden no contemplar todas las particularidades de tu caso.
               No constituyen asesoramiento fiscal, laboral ni jurídico vinculante. Para decisiones reales, consulta
               a un asesor colegiado, a un graduado social o a la Agencia Tributaria.{' '}
-              Consulta el <a href="/aviso-legal" className={styles.link}>Aviso Legal y Términos de Uso</a> completo.
+              Consulta el <a href="aviso-legal" className={styles.link}>Aviso Legal y Términos de Uso</a> completo.
             </div>
           </section>
 
