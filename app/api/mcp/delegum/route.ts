@@ -67,6 +67,18 @@ import { calcularPlanPensiones } from '@/lib/calculadoras/planPensiones';
 import { calcularVentaInmueble } from '@/lib/calculadoras/ventaInmueble';
 import { calcularRendimientoCapitalInmobiliario, type TipoInmuebleRCI } from '@/lib/calculadoras/rendimientoCapitalInmobiliario';
 import { calcularRetencionAlquiler } from '@/lib/calculadoras/retencionAlquiler';
+// ── Bolsa y criptomonedas (Bloque D) ──────────────────────────────────────────
+import { calcularPlusvaliasIRPF, type TipoActivo } from '@/lib/calculadoras/plusvaliasIRPF';
+import { calcularGananciaCriptomonedas, type TipoOperacionCripto } from '@/lib/calculadoras/gananciaCriptomonedas';
+// ── Laboral familiar y bajas (Bloque E) ───────────────────────────────────────
+import {
+  calcularPrestacionMaternidadPaternidad,
+  type EdadProgenitor,
+  type SituacionLaboralMP,
+} from '@/lib/calculadoras/prestacionMaternidadPaternidad';
+import { calcularReduccionJornada, type MotivoReduccionJornada } from '@/lib/calculadoras/reduccionJornada';
+import { calcularBajaMedica, type TipoBaja } from '@/lib/calculadoras/bajaMedica';
+import { calcularExcedencia, type TipoExcedencia } from '@/lib/calculadoras/excedencia';
 
 // ---------------------------------------------------------------------------
 // Analytics: reutilizamos el mismo sistema que las apps web y el MCP meskeIA.
@@ -1766,6 +1778,321 @@ function crearServidorDelegum(): McpServer {
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
         return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // BLOQUE D — BOLSA Y CRIPTOMONEDAS (segunda vuelta).
+  // La fiscalidad de las ganancias patrimoniales cada vez más presente en la
+  // declaración: venta de acciones/fondos y operaciones con criptomonedas.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_plusvalias_irpf ─────────────────────────────────────────────
+  servidor.tool(
+    'calcular_plusvalias_irpf',
+    'Calcula el IRPF sobre la ganancia patrimonial por vender acciones, fondos de inversión, inmuebles u otros ' +
+    'activos. Determina la ganancia neta (con gastos), si es a largo plazo (>12 meses), la tributación en la base ' +
+    'del ahorro (tramos 19-30%), el tipo efectivo y la ganancia tras impuestos. Permite compensar pérdidas de ' +
+    'ejercicios anteriores.',
+    {
+      precio_compra: z.number().positive().describe('Precio de compra del activo en euros'),
+      precio_venta: z.number().positive().describe('Precio de venta del activo en euros'),
+      fecha_compra: z.string().describe('Fecha de compra en formato YYYY-MM-DD'),
+      fecha_venta: z.string().describe('Fecha de venta en formato YYYY-MM-DD'),
+      gastos_compra: z.number().min(0).optional().describe('Gastos de compra: comisiones de bróker, notaría (inmuebles)... (€). Por defecto 0.'),
+      gastos_venta: z.number().min(0).optional().describe('Gastos de venta: comisiones, notaría... (€). Por defecto 0.'),
+      tipo_activo: z.enum(['acciones', 'fondos', 'inmueble', 'otro']).optional().describe('Tipo de activo (solo informativo). Por defecto "otro".'),
+      saldo_compensacion: z.number().min(0).optional().describe('Pérdidas patrimoniales de ejercicios anteriores pendientes de compensar (€). Por defecto 0.'),
+    },
+    { title: 'Calcula el IRPF de la ganancia patrimonial por venta de activos', readOnlyHint: true },
+    async ({ precio_compra, precio_venta, fecha_compra, fecha_venta, gastos_compra, gastos_venta, tipo_activo, saldo_compensacion }, extra) => {
+      await registrarUsoDelegum('calcular_plusvalias_irpf', getCaller(extra));
+      try {
+        const r = calcularPlusvaliasIRPF({
+          precioCompra: precio_compra,
+          precioVenta: precio_venta,
+          fechaCompra: fecha_compra,
+          fechaVenta: fecha_venta,
+          gastosCompra: gastos_compra,
+          gastosVenta: gastos_venta,
+          tipoActivo: tipo_activo as TipoActivo | undefined,
+          saldoCompensacion: saldo_compensacion,
+        });
+        const plazo = r.esLargoPlazo ? 'largo plazo (>12 meses)' : 'corto plazo (≤12 meses)';
+        const signo = r.esGanancia ? '📈 Ganancia' : '📉 Pérdida';
+        const lineas = [
+          `💹 **Plusvalías IRPF — ${tipo_activo ?? 'activo'}**`,
+          '',
+          `📅 Días transcurridos: ${r.diasTranscurridos} (${plazo})`,
+          `💶 Valor de adquisición (+ gastos): ${fmt(r.precioAdquisicion)} € · transmisión (− gastos): ${fmt(r.precioTransmision)} €`,
+          `${signo} patrimonial neta: **${fmt(Math.abs(r.gananciaNeta))} €**`,
+          r.saldoCompensado > 0 ? `✂️ Pérdidas compensadas: ${fmt(r.saldoCompensado)} €` : '',
+          '',
+          r.esGanancia
+            ? [
+                `🏛️ IRPF (tipo efectivo ${pct(r.tipoEfectivo)}%): **${fmt(r.cuotaIRPF)} €**`,
+                `✅ **Ganancia neta tras impuestos: ${fmt(r.gananciaNeta_DI)} €**`,
+                `📊 Rentabilidad neta: ${pct(r.rentabilidadNetaImpuestos)}%`,
+              ].join('\n')
+            : `✅ La pérdida patrimonial puede compensarse con ganancias de los próximos 4 ejercicios.`,
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_ganancia_criptomonedas ──────────────────────────────────────
+  servidor.tool(
+    'calcular_ganancia_criptomonedas',
+    'Calcula la ganancia o pérdida patrimonial por una operación con criptomonedas (venta a euros, permuta entre ' +
+    'criptos, pago con cripto o donación) y su tributación en la base del ahorro del IRPF (19-30%). Aplica el ' +
+    'criterio FIFO en la adquisición. Si hay pérdida, indica cuánto se puede compensar y lo que queda pendiente.',
+    {
+      tipo_operacion: z.enum(['venta', 'permuta', 'pago', 'donacion']).optional().describe('"venta" (cripto→euros), "permuta" (cripto→cripto), "pago" con cripto o "donacion". Por defecto "venta".'),
+      unidades: z.number().positive().describe('Número de unidades transmitidas (ej: 0,5 BTC)'),
+      precio_adquisicion_unitario: z.number().positive().describe('Precio de adquisición por unidad en euros (el más antiguo, criterio FIFO)'),
+      precio_transmision_unitario: z.number().positive().describe('Precio de transmisión por unidad en euros (precio de venta o valor de mercado en permutas/pagos)'),
+      gastos_adquisicion: z.number().min(0).optional().describe('Comisiones de compra totales en euros. Por defecto 0.'),
+      gastos_transmision: z.number().min(0).optional().describe('Comisiones de venta totales en euros. Por defecto 0.'),
+      saldo_positivo_rcm: z.number().min(0).optional().describe('Saldo positivo de rendimientos del capital mobiliario del período (€), para compensar pérdidas (límite 25%). Por defecto 0.'),
+    },
+    { title: 'Calcula la ganancia o pérdida en IRPF por operaciones con criptomonedas', readOnlyHint: true },
+    async ({ tipo_operacion, unidades, precio_adquisicion_unitario, precio_transmision_unitario, gastos_adquisicion, gastos_transmision, saldo_positivo_rcm }, extra) => {
+      await registrarUsoDelegum('calcular_ganancia_criptomonedas', getCaller(extra));
+      try {
+        const r = calcularGananciaCriptomonedas({
+          operaciones: [{
+            tipoOperacion: (tipo_operacion ?? 'venta') as TipoOperacionCripto,
+            unidades,
+            precioAdquisicionUnitario: precio_adquisicion_unitario,
+            precioTransmisionUnitario: precio_transmision_unitario,
+            gastosAdquisicion: gastos_adquisicion,
+            gastosTransmision: gastos_transmision,
+          }],
+          saldoPositivoRCM: saldo_positivo_rcm,
+        });
+        const esGanancia = r.saldoNeto >= 0;
+        const lineas = [
+          `🪙 **Criptomonedas — ${(tipo_operacion ?? 'venta')} (${unidades} uds.)**`,
+          '',
+          `💶 Valor de adquisición: ${fmt(r.detalleOperaciones[0]?.valorAdquisicion ?? 0)} € · transmisión: ${fmt(r.detalleOperaciones[0]?.valorTransmision ?? 0)} €`,
+          esGanancia
+            ? `📈 **Ganancia patrimonial: ${fmt(r.saldoNeto)} €**`
+            : `📉 **Pérdida patrimonial: ${fmt(Math.abs(r.saldoNeto))} €**`,
+          '',
+          esGanancia
+            ? `🏛️ **Cuota IRPF estimada (base del ahorro): ${fmt(r.cuotaTributaria)} €**`
+            : [
+                r.compensacionRCMPosible > 0 ? `✂️ Compensable con rendimientos del capital mobiliario: ${fmt(r.compensacionRCMPosible)} €` : '',
+                r.perdidaPendienteCompensacion > 0 ? `⏭️ Pérdida pendiente de compensar (4 ejercicios): ${fmt(r.perdidaPendienteCompensacion)} €` : '',
+              ].filter(l => l !== '').join('\n'),
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ════════════════════════════════════════════════════════════════════════
+  // BLOQUE E — LABORAL FAMILIAR Y BAJAS (segunda vuelta).
+  // Situaciones laborales muy frecuentes con impacto económico: nacimiento,
+  // reducción de jornada por cuidado, baja médica y excedencia.
+  // ════════════════════════════════════════════════════════════════════════
+
+  // ── calcular_prestacion_maternidad_paternidad ────────────────────────────
+  servidor.tool(
+    'calcular_prestacion_maternidad_paternidad',
+    'Calcula la prestación por nacimiento/adopción (maternidad/paternidad) de un progenitor. Desde 2021 ambos ' +
+    'tienen 16 semanas iguales al 100% de la base reguladora. Devuelve la cuantía diaria y mensual, la duración ' +
+    'total (con extras por parto múltiple o discapacidad), las 6 semanas obligatorias y las flexibles, y verifica ' +
+    'el período de carencia según la edad.',
+    {
+      base_cotizacion_mensual: z.number().positive().describe('Base de cotización mensual del mes anterior al inicio de la prestación (€)'),
+      edad_progenitor: z.enum(['menor_21', 'entre_21_y_26', 'mayor_26']).describe('Tramo de edad del progenitor (determina la carencia exigida)'),
+      numero_hijos: z.number().int().min(1).optional().describe('Número de hijos en el parto (1=simple, 2+=múltiple, suma semanas). Por defecto 1.'),
+      hijo_con_discapacidad: z.boolean().optional().describe('¿Algún hijo con discapacidad ≥33%? (añade 2 semanas). Por defecto false.'),
+      cumple_carencia: z.boolean().optional().describe('¿Cumple el período de carencia exigido? Por defecto true.'),
+      situacion_laboral: z.enum(['trabajador_cuenta_ajena', 'autonomo', 'desempleado_sin_derecho']).optional().describe('Situación laboral del progenitor. Por defecto trabajador por cuenta ajena.'),
+    },
+    { title: 'Calcula la prestación por nacimiento/adopción (maternidad/paternidad)', readOnlyHint: true },
+    async ({ base_cotizacion_mensual, edad_progenitor, numero_hijos, hijo_con_discapacidad, cumple_carencia, situacion_laboral }, extra) => {
+      await registrarUsoDelegum('calcular_prestacion_maternidad_paternidad', getCaller(extra));
+      try {
+        const r = calcularPrestacionMaternidadPaternidad({
+          baseCotizacionMensual: base_cotizacion_mensual,
+          edadProgenitor: edad_progenitor as EdadProgenitor,
+          numerosHijos: numero_hijos,
+          hijoConDiscapacidad: hijo_con_discapacidad,
+          cumpleCarencia: cumple_carencia,
+          situacionLaboral: situacion_laboral as SituacionLaboralMP | undefined,
+        });
+        const semanas = r.semanasBase + r.semanasAdicionalMultiple + r.semanasAdicionalDiscapacidad;
+        const lineas = [
+          `👶 **Prestación por maternidad/paternidad**`,
+          '',
+          `🗓️ Duración total: **${r.duracionTotalDias} días (${semanas} semanas)**`,
+          `  • ${r.diasObligatorios} días obligatorios (primeras 6 semanas tras el parto)`,
+          `  • ${r.diasFlexibles} días flexibles (hasta los 12 meses del menor)`,
+          '',
+          `📦 Base reguladora diaria: ${fmt(r.baseReguladoraDiaria)} €${r.limitadaPorBaseMaxima ? ' (limitada por base máxima)' : ''}`,
+          `💰 Cuantía: ${fmt(r.cuantiaDiaria)} €/día · ${fmt(r.cuantiaMensual)} €/mes`,
+          `💰 **Prestación total del período: ${fmt(r.cuotaTotalPrestacion)} €**`,
+          r.cumpleCarencia ? '✅ Cumple el período de carencia' : '❌ No cumple la carencia — sin derecho a prestación',
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_reduccion_jornada ───────────────────────────────────────────
+  servidor.tool(
+    'calcular_reduccion_jornada',
+    'Calcula el impacto económico de una reducción de jornada por guarda legal (cuidado de hijo menor de 12 años, ' +
+    'familiar dependiente o hijo con discapacidad grave). La reducción permitida va de 1/8 a 1/2 de la jornada y el ' +
+    'salario baja proporcionalmente. Indica el salario reducido, la merma mensual/anual y cómo queda la cotización ' +
+    'a la Seguridad Social (los primeros 24 meses se mantiene la base completa).',
+    {
+      motivo: z.enum(['hijo_menor_12', 'discapacidad_familiar', 'familiar_dependiente', 'hijo_discapacidad_grave', 'otro']).describe('Motivo de la reducción de jornada'),
+      salario_bruto_mensual_completo: z.number().positive().describe('Salario bruto mensual a jornada completa (€)'),
+      horas_semanales_completas: z.number().positive().describe('Horas semanales a jornada completa según contrato'),
+      fraccion_reduccion: z.number().min(0.01).max(0.99).describe('Fracción de reducción (entre 0 y 1). Ej: 0,5 = media jornada; 0,125 = 1/8'),
+      menos_de_24_meses: z.boolean().optional().describe('¿Lleva menos de 24 meses en reducción? (en ese tramo la cotización SS se mantiene a base completa). Por defecto true.'),
+    },
+    { title: 'Calcula el impacto de una reducción de jornada por guarda legal', readOnlyHint: true },
+    async ({ motivo, salario_bruto_mensual_completo, horas_semanales_completas, fraccion_reduccion, menos_de_24_meses }, extra) => {
+      await registrarUsoDelegum('calcular_reduccion_jornada', getCaller(extra));
+      try {
+        const r = calcularReduccionJornada({
+          motivo: motivo as MotivoReduccionJornada,
+          salarioBrutoMensualCompleto: salario_bruto_mensual_completo,
+          horasSemanalesCompletas: horas_semanales_completas,
+          fraccionReduccion: fraccion_reduccion,
+          menosDe24MesesEnReduccion: menos_de_24_meses,
+        });
+        const lineas = [
+          `⏱️ **Reducción de jornada — ${pct(r.pctJornadaReducida)}% (trabajas el ${pct(r.pctJornadaTrabajada)}%)**`,
+          `📋 Motivo: ${r.motivo.replace(/_/g, ' ')} · rango legal ${r.reduccionMinimaPermitida}%–${r.reduccionMaximaPermitida}% ${r.dentroRangoLegal ? '✅' : '❌ fuera de rango'}`,
+          '',
+          `⏰ Jornada tras reducción: ${r.horasSemanalesTrasReduccion.toFixed(1).replace('.', ',')} h/sem`,
+          `💶 Salario bruto reducido: **${fmt(r.salarioBrutoMensualReducido)} €/mes**`,
+          `💸 Merma: −${fmt(r.mermaMensualBruta)} €/mes (−${fmt(r.mermaAnualBruta)} €/año)`,
+          '',
+          `📊 Cotización SS: ${r.baseSSCompleta ? '✅ base de jornada completa (primeros 24 meses)' : '⚠️ base reducida (tras 24 meses)'}`,
+          `💡 ${r.detalleCotizacionSS}`,
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_baja_medica ─────────────────────────────────────────────────
+  servidor.tool(
+    'calcular_baja_medica',
+    'Calcula el subsidio por incapacidad temporal (baja médica) de un trabajador por cuenta ajena: contingencia ' +
+    'común (60% de la base los días 4-20, 75% a partir del día 21) o accidente laboral (75% desde el primer día). ' +
+    'Devuelve el subsidio diario, mensual y total para los días de baja, y la pérdida respecto al salario habitual.',
+    {
+      salario_bruto_mensual: z.number().positive().describe('Salario bruto mensual del trabajador (€)'),
+      tipo_baja: z.enum(['comun', 'accidente_laboral']).describe('"comun" = enfermedad o accidente no laboral. "accidente_laboral" = accidente de trabajo o enfermedad profesional.'),
+      dias_baja: z.number().int().min(1).max(730).optional().describe('Número de días de baja a simular. Por defecto 30.'),
+      empresa_paga_dias_espera: z.boolean().optional().describe('¿La empresa cubre los 3 días de espera (según convenio)? Por defecto false.'),
+    },
+    { title: 'Calcula el subsidio por baja médica (incapacidad temporal)', readOnlyHint: true },
+    async ({ salario_bruto_mensual, tipo_baja, dias_baja, empresa_paga_dias_espera }, extra) => {
+      await registrarUsoDelegum('calcular_baja_medica', getCaller(extra));
+      try {
+        const r = calcularBajaMedica({
+          salarioBrutoMensual: salario_bruto_mensual,
+          tipoBaja: tipo_baja as TipoBaja,
+          diasBaja: dias_baja,
+          empresaPagaDiasEspera: empresa_paga_dias_espera,
+        });
+        const tipoTexto = tipo_baja === 'accidente_laboral' ? 'accidente laboral / EP' : 'contingencia común';
+        const lineas = [
+          `🏥 **Baja médica — ${tipoTexto}**`,
+          '',
+          `💼 Salario bruto: ${fmt(salario_bruto_mensual)} €/mes · base diaria ${fmt(r.baseCotizacionDiaria)} €`,
+          `📅 Días de baja: ${r.diasBaja}`,
+          '',
+          `📊 **Subsidio por período**`,
+          ...r.desglose.map(d => d.pct === 0
+            ? `  • ${d.periodo}: sin subsidio (${d.dias} días)`
+            : `  • ${d.periodo}: ${fmt(d.importeDiario)} €/día × ${d.dias} días = ${fmt(d.total)} €`),
+          '',
+          `💶 **Total subsidio en ${r.diasBaja} días: ${fmt(r.totalSubsidio)} €**`,
+          `📆 Equivalente mensual: ${fmt(r.subsidioMensualEquivalente)} €`,
+          `📉 Pérdida frente al salario habitual: ${fmt(r.perdidaEstimada)} €/mes`,
+        ];
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── calcular_excedencia ──────────────────────────────────────────────────
+  servidor.tool(
+    'calcular_excedencia',
+    'Calcula los derechos y el coste de una excedencia laboral: voluntaria (4 meses–5 años, sin reserva de puesto ' +
+    'ni cotización), forzosa, cuidado de hijo (máx. 3 años, primer año con reserva de puesto y cómputo a la SS) o ' +
+    'cuidado de familiar (máx. 2 años). Indica la reserva de puesto, los meses que computan para la Seguridad Social ' +
+    'y el coste total en ingresos no percibidos.',
+    {
+      tipo: z.enum(['voluntaria', 'forzosa', 'cuidado_hijo', 'cuidado_familiar']).describe('Tipo de excedencia'),
+      antiguedad_anios: z.number().min(0).describe('Antigüedad del trabajador en la empresa (años)'),
+      salario_bruto_mensual: z.number().positive().describe('Salario bruto mensual actual (€)'),
+      duracion_meses: z.number().int().positive().describe('Duración solicitada de la excedencia (meses)'),
+      edad: z.number().int().min(16).max(70).optional().describe('Edad del trabajador (orienta sobre el impacto en la jubilación). Por defecto 35.'),
+    },
+    { title: 'Calcula los derechos y el coste de una excedencia laboral', readOnlyHint: true },
+    async ({ tipo, antiguedad_anios, salario_bruto_mensual, duracion_meses, edad }, extra) => {
+      await registrarUsoDelegum('calcular_excedencia', getCaller(extra));
+      try {
+        const r = calcularExcedencia({
+          tipo: tipo as TipoExcedencia,
+          antiguedadAnios: antiguedad_anios,
+          salarioBrutoMensual: salario_bruto_mensual,
+          duracionMeses: duracion_meses,
+          edad,
+        });
+        const lineas = [
+          `🏖️ **Excedencia ${r.tipo.replace('_', ' ')} — ${r.duracionSolicitadaMeses} meses**`,
+          '',
+          r.cumpleRequisitos
+            ? `✅ Cumple los requisitos de acceso`
+            : `❌ No cumple requisitos: ${r.motivoIncumplimiento}`,
+          `📅 Duración permitida: ${r.duracionMinimaMeses}–${r.duracionMaximaMeses > 0 ? r.duracionMaximaMeses : '∞'} meses`,
+          `🔒 Reserva de puesto: ${r.reservaPuestoExacto ? `puesto exacto (${r.mesesReservaPuestoExacto} meses)` : r.reservaGrupoProfesional ? 'mismo grupo profesional' : 'solo preferencia de reingreso'}`,
+          '',
+          `📊 Cómputo a la Seguridad Social: ${r.cotizaDurante ? '✅' : '❌'} **${r.mesesComputablesSSTotal} meses** · ${r.detalleCotizacion}`,
+          `💸 Salario no percibido: ${fmt(r.salerioMensualPerdido)} €/mes`,
+          `💰 **Coste total en ingresos no percibidos: ${fmt(r.costeTotalIngresosNoPecibidos)} €**`,
+          r.plazoNuevaExcedenciaVoluntaria ? `⏰ Nueva excedencia voluntaria posible tras ${r.plazoNuevaExcedenciaVoluntaria} meses` : '',
+          '',
+          ...r.advertencias.map(a => `⚠️ ${a}`),
+          `📚 ${r.fuenteDatos}`,
+        ].filter(l => l !== '');
+        return conAviso(lineas.join('\n'), AVISO_LABORAL);
       } catch (err) {
         return errorMcp(err);
       }
