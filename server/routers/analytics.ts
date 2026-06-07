@@ -6,6 +6,15 @@
 import { z } from 'zod';
 import { router, publicProcedure } from '../trpc';
 import { getTursoClient, initializeDatabase, formatearDuracion } from '@/lib/turso';
+import {
+  agregarRegistros,
+  computarRollupPendientes,
+  leerIpExcluida,
+  nuevoGlobal,
+  CAMPOS_ROLLUP,
+  FECHA_EXPR,
+  type GlobalAcc,
+} from '@/lib/analytics-rollup';
 
 /**
  * Helper: Anonimizar IP (RGPD compliance)
@@ -40,6 +49,265 @@ function getClientIPFromRequest(req: Request | undefined): string {
   return 'unknown';
 }
 
+/**
+ * Cálculo de getStats vía AGREGADOS (rollup) — ruta rápida del dashboard.
+ *
+ * Combina los días CERRADOS (≤ anteayer, pre-agregados en rollup_*) con la
+ * ventana VIVA [ayer, hoy] (consultada en directo, pocas filas). Devuelve el
+ * MISMO shape que la ruta en vivo original. Solo se usa cuando no hay filtros de
+ * aplicación/fecha (el caso del dashboard); con filtros se mantiene el cálculo
+ * en vivo. ipConfigurada es la IP del propietario (de config), usada SIEMPRE para
+ * clasificar; excluir_mi_ip decide solo si se leen las filas es_miip=1.
+ */
+async function getStatsPorRollup(
+  client: ReturnType<typeof getTursoClient>,
+  input: { aplicacion?: string; desde?: string; hasta?: string; limite: number; excluir_mi_ip: boolean },
+  ipConfigurada: string
+) {
+  const { limite, excluir_mi_ip } = input;
+  const ipExcluida = excluir_mi_ip ? ipConfigurada : '';
+  const soloResto = !!(excluir_mi_ip && ipConfigurada); // excluir es_miip=1
+  const miipWhere = soloResto ? ' AND es_miip = 0' : '';
+  const miipList: (0 | 1)[] = soloResto ? [0] : [0, 1];
+
+  // On-demand defensivo: rellenar huecos de días cerrados (acotado para no bloquear)
+  try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear la lectura */ }
+
+  // Fechas (idénticas al cálculo original)
+  const ahora = new Date();
+  const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+  const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
+  const hace7 = new Date(hoy); hace7.setDate(hoy.getDate() - 7);
+  const hace14 = new Date(hoy); hace14.setDate(hoy.getDate() - 14);
+  const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const iMesAnt = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+  const fMesAnt = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+
+  const ord = (d: Date) =>
+    `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const hoyOrd = ord(hoy), ayerOrd = ord(ayer), anteayerOrd = ord(anteayer);
+  const hace7Ord = ord(hace7), hace14Ord = ord(hace14);
+  const iMesOrd = ord(iMes), iMesAntOrd = ord(iMesAnt), fMesAntOrd = ord(fMesAnt);
+  const fechasVivas = [ayerOrd, hoyOrd];
+
+  const formatoEspanol = (f: Date): string =>
+    `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`;
+
+  // ── Lecturas: todas independientes → en PARALELO (1 round-trip de latencia,
+  //    no ~10 secuenciales). Todas son baratas (tablas rollup pequeñas + ventana
+  //    viva de 2 días + registros recientes por PK). ──
+  let muSql = `SELECT MIN(timestamp) pu, MAX(timestamp) uu FROM uso_aplicaciones WHERE 1=1`;
+  const muArgs: string[] = [];
+  if (ipExcluida) { muSql += ' AND (ip_address IS NULL OR ip_address != ?)'; muArgs.push(ipExcluida); }
+
+  let regSql = 'SELECT * FROM uso_aplicaciones WHERE 1=1';
+  const regArgs: (string | number)[] = [];
+  if (ipExcluida) { regSql += ' AND (ip_address IS NULL OR ip_address != ?)'; regArgs.push(ipExcluida); }
+  regSql += ' ORDER BY id DESC LIMIT ?'; regArgs.push(limite);
+
+  const [vivoRes, gcRes, appsAcumRes, muRes, rankRes, paisRes, ciudadRes, compRes, appsSemCerrRes, appsMesCerrRes, registrosResult] = await Promise.all([
+    client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
+    client.execute(
+      `SELECT COALESCE(SUM(usos),0) usos, COALESCE(SUM(movil),0) movil, COALESCE(SUM(escritorio),0) escritorio,
+              COALESCE(SUM(recurrentes),0) recurrentes, COALESCE(SUM(nuevos),0) nuevos,
+              COALESCE(SUM(suma_dur),0) suma_dur, COALESCE(SUM(count_dur),0) count_dur,
+              COALESCE(SUM(por_compartir),0) por_compartir
+       FROM rollup_dia WHERE 1=1${miipWhere}`
+    ),
+    client.execute(`SELECT aplicacion FROM rollup_app_acum WHERE 1=1${miipWhere} GROUP BY aplicacion`),
+    client.execute({ sql: muSql, args: muArgs }),
+    client.execute(
+      `SELECT aplicacion, SUM(usos) usos, SUM(suma_dur_cap) sdc, SUM(count_dur_cap) cdc, MAX(ultimo_ord) ult
+       FROM rollup_app_acum WHERE 1=1${miipWhere} GROUP BY aplicacion`
+    ),
+    client.execute(`SELECT pais, SUM(usos) usos FROM rollup_pais_acum WHERE 1=1${miipWhere} GROUP BY pais`),
+    client.execute(`SELECT ciudad, SUM(usos) usos FROM rollup_ciudad_acum WHERE 1=1${miipWhere} GROUP BY ciudad`),
+    client.execute({
+      sql: `SELECT
+          COALESCE(SUM(CASE WHEN fecha_ord = ? THEN usos END),0) anteayer,
+          COALESCE(SUM(CASE WHEN fecha_ord BETWEEN ? AND ? THEN usos END),0) sem_cerr,
+          COALESCE(SUM(CASE WHEN fecha_ord BETWEEN ? AND ? THEN usos END),0) sem_ant,
+          COALESCE(SUM(CASE WHEN fecha_ord BETWEEN ? AND ? THEN usos END),0) mes_cerr,
+          COALESCE(SUM(CASE WHEN fecha_ord BETWEEN ? AND ? THEN usos END),0) mes_ant
+        FROM rollup_dia WHERE 1=1${miipWhere}`,
+      args: [anteayerOrd, hace7Ord, anteayerOrd, hace14Ord, hace7Ord, iMesOrd, anteayerOrd, iMesAntOrd, fMesAntOrd],
+    }),
+    client.execute({ sql: `SELECT DISTINCT aplicacion FROM rollup_dia_app WHERE fecha_ord BETWEEN ? AND ?${miipWhere}`, args: [hace7Ord, anteayerOrd] }),
+    client.execute({ sql: `SELECT DISTINCT aplicacion FROM rollup_dia_app WHERE fecha_ord BETWEEN ? AND ?${miipWhere}`, args: [iMesOrd, anteayerOrd] }),
+    client.execute({ sql: regSql, args: regArgs }),
+  ]);
+
+  const vivo = agregarRegistros(vivoRes.rows, ipConfigurada);
+
+  const sumarGlobalVivo = (fechas: string[]): GlobalAcc => {
+    const acc = nuevoGlobal();
+    for (const f of fechas) {
+      const pair = vivo.gMap.get(f); if (!pair) continue;
+      for (const m of miipList) {
+        const g = pair[m];
+        acc.usos += g.usos; acc.movil += g.movil; acc.escritorio += g.escritorio;
+        acc.recurrentes += g.recurrentes; acc.nuevos += g.nuevos;
+        acc.suma_dur += g.suma_dur; acc.count_dur += g.count_dur;
+        acc.por_compartir += g.por_compartir;
+      }
+    }
+    return acc;
+  };
+  const vivoUsos = (fechas: string[]): number => {
+    let s = 0;
+    for (const f of fechas) { const p = vivo.gMap.get(f); if (!p) continue; for (const m of miipList) s += p[m].usos; }
+    return s;
+  };
+  const appsVivo = (fechas: string[]): Set<string> => {
+    const s = new Set<string>();
+    for (const f of fechas) { const p = vivo.appMap.get(f); if (!p) continue; for (const m of miipList) for (const a of p[m].keys()) s.add(a); }
+    return s;
+  };
+
+  // ── Globales all-time: cerrado (rollup_dia) + vivo ──
+  const gc = gcRes.rows[0];
+  const gv = sumarGlobalVivo(fechasVivas);
+  const total = Number(gc.usos) + gv.usos;
+  const totalMovil = Number(gc.movil) + gv.movil;
+  const totalEscritorio = Number(gc.escritorio) + gv.escritorio;
+  const totalRecurrentes = Number(gc.recurrentes) + gv.recurrentes;
+  const totalNuevos = Number(gc.nuevos) + gv.nuevos;
+  const sumaDur = Number(gc.suma_dur) + gv.suma_dur;
+  const countDur = Number(gc.count_dur) + gv.count_dur;
+  const duracionPromedio = countDur > 0 ? sumaDur / countDur : 0;
+  const totalPorCompartir = Number(gc.por_compartir) + gv.por_compartir;
+
+  const porcentajeMovil = total > 0 ? Math.round((totalMovil / total) * 1000) / 10 : 0;
+  const porcentajeEscritorio = total > 0 ? Math.round((totalEscritorio / total) * 1000) / 10 : 0;
+  const porcentajeRecurrentes = total > 0 ? Math.round((totalRecurrentes / total) * 1000) / 10 : 0;
+
+  // total_aplicaciones (distinct all-time): apps acumuladas + vivas
+  const appsSet = new Set<string>();
+  for (const r of appsAcumRes.rows) appsSet.add(String(r.aplicacion));
+  for (const a of appsVivo(fechasVivas)) appsSet.add(a);
+  const totalAplicaciones = appsSet.size;
+
+  // primer/ultimo uso: MIN/MAX textual (con índice → barato), igual que el original
+  const primer_uso = muRes.rows[0]?.pu ?? null;
+  const ultimo_uso = muRes.rows[0]?.uu ?? null;
+
+  // ── Ranking de apps: acumulado + vivo ──
+  type RankAcc = { usos: number; sdc: number; cdc: number; ult: string };
+  const rankMap = new Map<string, RankAcc>();
+  for (const r of rankRes.rows) {
+    rankMap.set(String(r.aplicacion), {
+      usos: Number(r.usos), sdc: Number(r.sdc), cdc: Number(r.cdc), ult: String(r.ult || ''),
+    });
+  }
+  for (const f of fechasVivas) {
+    const pair = vivo.appMap.get(f); if (!pair) continue;
+    for (const m of miipList) for (const [app, a] of pair[m]) {
+      let acc = rankMap.get(app);
+      if (!acc) { acc = { usos: 0, sdc: 0, cdc: 0, ult: '' }; rankMap.set(app, acc); }
+      acc.usos += a.usos; acc.sdc += a.suma_dur_cap; acc.cdc += a.count_dur_cap;
+      if (f > acc.ult) acc.ult = f;
+    }
+  }
+  const rankingAplicaciones = [...rankMap.entries()]
+    .map(([aplicacion, a]) => {
+      const usos = a.usos;
+      let estado = '⚠️ Muy bajo';
+      if (usos >= 50) estado = '✅ Activa'; else if (usos >= 10) estado = '⚠️ Bajo uso';
+      const raw = a.ult;
+      const ultimoUso = raw.length === 8 ? `${raw.slice(6, 8)}/${raw.slice(4, 6)}/${raw.slice(0, 4)}` : raw;
+      const durProm = a.cdc > 0 ? a.sdc / a.cdc : 0;
+      return {
+        aplicacion, total_usos: usos, ultimo_uso: ultimoUso,
+        duracion_promedio_segundos: durProm,
+        duracion_promedio_formato: formatearDuracion(Math.round(durProm)),
+        estado,
+      };
+    })
+    .sort((x, y) => y.total_usos - x.total_usos);
+
+  // ── Geografía: países (top 20) y ciudades (top 10) ──
+  const paisAcc = new Map<string, number>();
+  for (const r of paisRes.rows) paisAcc.set(String(r.pais), Number(r.usos));
+  for (const f of fechasVivas) { const p = vivo.paisMap.get(f); if (!p) continue; for (const m of miipList) for (const [k, u] of p[m]) paisAcc.set(k, (paisAcc.get(k) || 0) + u); }
+  const paises = [...paisAcc.entries()].map(([pais, total]) => ({ pais, total })).sort((a, b) => b.total - a.total).slice(0, 20);
+
+  const ciudadAcc = new Map<string, number>();
+  for (const r of ciudadRes.rows) ciudadAcc.set(String(r.ciudad), Number(r.usos));
+  for (const f of fechasVivas) { const p = vivo.ciudadMap.get(f); if (!p) continue; for (const m of miipList) for (const [k, u] of p[m]) ciudadAcc.set(k, (ciudadAcc.get(k) || 0) + u); }
+  const ciudades = [...ciudadAcc.entries()].map(([ciudad, total]) => ({ ciudad, total })).sort((a, b) => b.total - a.total).slice(0, 10);
+
+  // ── Comparativa temporal ── (porciones cerradas ya leídas en paralelo)
+  const cc = compRes.rows[0];
+
+  const usosHoy = vivoUsos([hoyOrd]);
+  const usosAyer = vivoUsos([ayerOrd]);
+  const usosAnteayer = Number(cc.anteayer);
+  const usosSemana = Number(cc.sem_cerr) + vivoUsos([ayerOrd, hoyOrd]);
+  const usosSemanaAnt = Number(cc.sem_ant);
+  const usosMes = Number(cc.mes_cerr) + vivoUsos([ayerOrd, hoyOrd]);
+  const usosMesAnt = Number(cc.mes_ant);
+
+  // apps_distintas por período (cerrado por rango ya leído en paralelo + vivo)
+  const appsHoy = appsVivo([hoyOrd]).size;
+  const appsAyer = appsVivo([ayerOrd]).size;
+  const setSem = appsVivo([ayerOrd, hoyOrd]); for (const r of appsSemCerrRes.rows) setSem.add(String(r.aplicacion));
+  const setMes = appsVivo([ayerOrd, hoyOrd]); for (const r of appsMesCerrRes.rows) setMes.add(String(r.aplicacion));
+
+  const calcularVariacion = (actual: number, anterior: number) => {
+    if (anterior === 0) return { porcentaje: actual > 0 ? 100 : 0, tendencia: actual > 0 ? ('up' as const) : ('neutral' as const) };
+    const porcentaje = Math.round(((actual - anterior) / anterior) * 100);
+    const tendencia = porcentaje > 0 ? ('up' as const) : porcentaje < 0 ? ('down' as const) : ('neutral' as const);
+    return { porcentaje: Math.abs(porcentaje), tendencia };
+  };
+
+  const comparativa = {
+    hoy: { usos: usosHoy, apps_distintas: appsHoy, comparacion: calcularVariacion(usosHoy, usosAyer), etiqueta: 'vs ayer' },
+    ayer: { usos: usosAyer, apps_distintas: appsAyer, comparacion: calcularVariacion(usosAyer, usosAnteayer), etiqueta: 'vs anteayer', fecha: formatoEspanol(ayer) },
+    semana: { usos: usosSemana, apps_distintas: setSem.size, comparacion: calcularVariacion(usosSemana, usosSemanaAnt), etiqueta: 'vs semana anterior' },
+    mes: { usos: usosMes, apps_distintas: setMes.size, comparacion: calcularVariacion(usosMes, usosMesAnt), etiqueta: 'vs mes anterior' },
+    detalles: { ayer: usosAyer, anteayer: usosAnteayer, semanaAnterior: usosSemanaAnt, mesAnterior: usosMesAnt },
+  };
+
+  // ── Registros recientes (ya leídos en paralelo, usan PK — baratos) ──
+  const registros = registrosResult.rows.map((row) => ({
+    ...row,
+    modo: (row.modo as string | null) ?? 'web',
+    datos_adicionales: row.datos_adicionales ? JSON.parse(row.datos_adicionales as string) : null,
+  }));
+
+  return {
+    status: 'success',
+    version: 'v4-rollup',
+    filtros: {
+      aplicacion: input.aplicacion, desde: input.desde, hasta: input.hasta,
+      limite, excluir_mi_ip, ip_excluida: ipExcluida || null,
+    },
+    estadisticas: {
+      total_usos: total,
+      total_aplicaciones: totalAplicaciones,
+      primer_uso,
+      ultimo_uso,
+      duracion_promedio_segundos: Math.round(duracionPromedio * 10) / 10,
+      duracion_promedio_formato: formatearDuracion(Math.round(duracionPromedio)),
+      dispositivos: {
+        movil: { total: totalMovil, porcentaje: porcentajeMovil },
+        escritorio: { total: totalEscritorio, porcentaje: porcentajeEscritorio },
+      },
+      usuarios: {
+        nuevos: { total: totalNuevos, porcentaje: Math.round((100 - porcentajeRecurrentes) * 10) / 10 },
+        recurrentes: { total: totalRecurrentes, porcentaje: porcentajeRecurrentes },
+      },
+      por_compartir: totalPorCompartir,
+      geografia: { paises, ciudades },
+    },
+    comparativa,
+    registros_mostrados: registros.length,
+    ranking_aplicaciones: rankingAplicaciones,
+    data: registros,
+  };
+}
+
 export const analyticsRouter = router({
   /**
    * Procedure: getStats
@@ -61,6 +329,13 @@ export const analyticsRouter = router({
       const client = getTursoClient();
 
       const { aplicacion, desde, hasta, limite, excluir_mi_ip } = input;
+
+      // RUTA RÁPIDA: sin filtros de app/fecha (caso del dashboard) → vía rollup.
+      // Con filtros, se mantiene el cálculo en vivo de más abajo (fallback).
+      if (!aplicacion && !desde && !hasta) {
+        const ipConfigurada = await leerIpExcluida(client);
+        return await getStatsPorRollup(client, input, ipConfigurada);
+      }
 
       // Obtener IP excluida si el filtro está activo
       let ipExcluida = '';

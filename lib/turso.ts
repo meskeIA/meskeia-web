@@ -137,6 +137,122 @@ async function doInitializeDatabase(): Promise<boolean> {
     // Columna ya existe — ignorar
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // Tablas de AGREGADOS (rollup) — pre-calculan métricas por día CERRADO.
+  // Motivo: los GROUP BY/AVG sobre la tabla cruda cuestan 3-5 s cada uno
+  // (cold start hasta 23 s → roza el timeout de Vercel). El dashboard lee estos
+  // agregados (cientos de filas) en lugar de escanear los registros crudos.
+  // El día en curso NO se pre-agrega: se consulta en vivo (pocas filas) y se
+  // combina, para que "hoy" siga en tiempo real.
+  //
+  // Dimensión `es_miip` (0 = resto, 1 = IP del propietario): permite reconstruir
+  // tanto "excluir mi IP" (es_miip=0) como "incluir todo" (suma de ambos) con
+  // paridad exacta frente al getStats actual.
+  // Clave de fecha: `fecha_ord` = YYYYMMDD (mismo reordenamiento que el router).
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Métricas globales del día
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_dia (
+      fecha_ord TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      usos INTEGER NOT NULL DEFAULT 0,
+      movil INTEGER NOT NULL DEFAULT 0,
+      escritorio INTEGER NOT NULL DEFAULT 0,
+      recurrentes INTEGER NOT NULL DEFAULT 0,
+      nuevos INTEGER NOT NULL DEFAULT 0,
+      suma_dur REAL NOT NULL DEFAULT 0,
+      count_dur INTEGER NOT NULL DEFAULT 0,
+      por_compartir INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (fecha_ord, es_miip)
+    )
+  `);
+
+  // Conteo por origen (web / claude.ai / … / mcp / bot / mi-ip) — para getResumen.
+  // El origen 'mi-ip' YA representa la porción propia → no necesita es_miip.
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_dia_origen (
+      fecha_ord TEXT NOT NULL,
+      origen TEXT NOT NULL,
+      usos INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (fecha_ord, origen)
+    )
+  `);
+
+  // Conteo por aplicación (ranking) — duración con cap 7200 s como el router
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_dia_app (
+      fecha_ord TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      aplicacion TEXT NOT NULL,
+      usos INTEGER NOT NULL DEFAULT 0,
+      suma_dur_cap REAL NOT NULL DEFAULT 0,
+      count_dur_cap INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (fecha_ord, es_miip, aplicacion)
+    )
+  `);
+
+  // Conteo por país (ISO normalizado) y por ciudad
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_dia_pais (
+      fecha_ord TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      pais TEXT NOT NULL,
+      usos INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (fecha_ord, es_miip, pais)
+    )
+  `);
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_dia_ciudad (
+      fecha_ord TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      ciudad TEXT NOT NULL,
+      usos INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (fecha_ord, es_miip, ciudad)
+    )
+  `);
+
+  // Control: qué días cerrados ya están computados (idempotencia + detección de huecos)
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_control (
+      fecha_ord TEXT PRIMARY KEY,
+      computado_at TEXT DEFAULT (datetime('now', 'localtime'))
+    )
+  `);
+
+  // ── Tablas ACUMULADAS (all-time) — derivadas de las diarias en el cron/backfill ──
+  // Motivo: el ranking/geografía de getStats son all-time. Re-agregar las tablas
+  // diarias (~miles de filas) en cada carga sería lento. Estas tablas tienen una
+  // fila por (entidad, es_miip) → pocas filas → lectura instantánea. Se recalculan
+  // en background (no en la ruta de lectura del dashboard).
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_app_acum (
+      aplicacion TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      usos INTEGER NOT NULL DEFAULT 0,
+      suma_dur_cap REAL NOT NULL DEFAULT 0,
+      count_dur_cap INTEGER NOT NULL DEFAULT 0,
+      ultimo_ord TEXT,
+      PRIMARY KEY (aplicacion, es_miip)
+    )
+  `);
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_pais_acum (
+      pais TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      usos INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (pais, es_miip)
+    )
+  `);
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS rollup_ciudad_acum (
+      ciudad TEXT NOT NULL,
+      es_miip INTEGER NOT NULL DEFAULT 0,
+      usos INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (ciudad, es_miip)
+    )
+  `);
+
   return true;
 }
 

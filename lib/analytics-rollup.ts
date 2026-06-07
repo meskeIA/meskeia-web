@@ -1,0 +1,372 @@
+/**
+ * Cómputo de las tablas de AGREGADOS (rollup) de analytics.
+ *
+ * Pre-calcula, por DÍA CERRADO, las métricas que el dashboard antes obtenía
+ * escaneando la tabla cruda con GROUP BY/AVG (3-5 s por query, hasta 23 s en
+ * frío). El día en curso NO se pre-agrega aquí: el router lo consulta en vivo.
+ *
+ * Fuente ÚNICA de la lógica de agregación: la usan el endpoint /api/analytics/rollup
+ * (cron + on-demand) y el script de backfill (vía ese endpoint). La clasificación
+ * de origen y la normalización de país replican EXACTAMENTE las de
+ * server/routers/analytics.ts para garantizar paridad de números.
+ */
+
+import type { Client } from '@libsql/client';
+
+// Plataformas IA conocidas — debe coincidir con getResumen (analytics.ts)
+export const PLATAFORMAS_IA = [
+  'claude.ai',
+  'perplexity.ai',
+  'chatgpt.com',
+  'gemini.google.com',
+  'copilot.microsoft.com',
+  'you.com',
+  'phind.com',
+  'poe.com',
+];
+
+// Normalización de nombres de país completos → ISO alpha-2.
+// Debe coincidir con el CASE de getStats (analytics.ts). Los registros nuevos ya
+// llegan como ISO (x-vercel-ip-country); esto cubre históricos con nombre completo.
+const NORMALIZAR_PAIS: Record<string, string> = {
+  'Spain': 'ES', 'United States': 'US', 'Mexico': 'MX', 'Argentina': 'AR',
+  'Colombia': 'CO', 'Bolivia': 'BO', 'Ecuador': 'EC', 'Chile': 'CL',
+  'Peru': 'PE', 'Venezuela': 'VE', 'Guatemala': 'GT', 'Costa Rica': 'CR',
+  'Honduras': 'HN', 'El Salvador': 'SV', 'Nicaragua': 'NI', 'Panama': 'PA',
+  'Cuba': 'CU', 'Dominican Republic': 'DO', 'Puerto Rico': 'PR', 'Uruguay': 'UY',
+  'Paraguay': 'PY', 'Brazil': 'BR', 'Portugal': 'PT', 'France': 'FR',
+  'Germany': 'DE', 'United Kingdom': 'GB', 'Italy': 'IT', 'Netherlands': 'NL',
+  'Belgium': 'BE', 'Switzerland': 'CH', 'Sweden': 'SE', 'Norway': 'NO',
+  'Denmark': 'DK', 'Finland': 'FI', 'Poland': 'PL', 'Russia': 'RU',
+  'Turkey': 'TR', 'Canada': 'CA', 'Australia': 'AU', 'Japan': 'JP',
+  'China': 'CN', 'India': 'IN', 'South Korea': 'KR',
+};
+
+/** Convierte "DD/MM/YYYY, HH:MM:SS" → "YYYYMMDD" (clave fecha_ord), o null. */
+export function timestampAFechaOrd(ts: string): string | null {
+  const m = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!m) return null;
+  return `${m[3]}${m[2].padStart(2, '0')}${m[1].padStart(2, '0')}`;
+}
+
+/** "YYYYMMDD" de hoy según hora local del servidor. */
+export function hoyFechaOrd(d: Date = new Date()): string {
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Clasifica el origen de un registro — replica getResumen (analytics.ts:590-611). */
+function clasificarOrigen(
+  modo: string,
+  ip: string,
+  ipExcluida: string,
+  datosAd: Record<string, unknown> | null
+): string {
+  if (ipExcluida && ip === ipExcluida) return 'mi-ip';
+  if (modo === 'bot') return 'bot';
+  if (modo === 'mcp') return 'mcp';
+  if (modo === 'referral-ia') {
+    const hostname = (datosAd?.referrer_ia as string) || null;
+    if (hostname) return hostname; // conocida o desconocida: se agrega tal cual
+    return 'ia-sin-detalle';
+  }
+  return 'web';
+}
+
+// ── Acumuladores en memoria ────────────────────────────────────────────────
+export type GlobalAcc = {
+  usos: number; movil: number; escritorio: number;
+  recurrentes: number; nuevos: number;
+  suma_dur: number; count_dur: number; por_compartir: number;
+};
+export type AppAcc = { usos: number; suma_dur_cap: number; count_dur_cap: number };
+
+/** Resultado de agregar registros: mapas por fecha_ord → es_miip(0|1) → datos. */
+export type RollupMaps = {
+  gMap: Map<string, [GlobalAcc, GlobalAcc]>;
+  appMap: Map<string, [Map<string, AppAcc>, Map<string, AppAcc>]>;
+  paisMap: Map<string, [Map<string, number>, Map<string, number>]>;
+  ciudadMap: Map<string, [Map<string, number>, Map<string, number>]>;
+  origenMap: Map<string, Map<string, number>>; // sin es_miip
+};
+
+export const nuevoGlobal = (): GlobalAcc => ({
+  usos: 0, movil: 0, escritorio: 0, recurrentes: 0, nuevos: 0,
+  suma_dur: 0, count_dur: 0, por_compartir: 0,
+});
+
+/** Expresión SQL que reordena el timestamp "DD/MM/YYYY,…" a "YYYYMMDD". */
+export const FECHA_EXPR = `substr(timestamp,7,4)||substr(timestamp,4,2)||substr(timestamp,1,2)`;
+
+/** Campos crudos mínimos que necesita la agregación. */
+export const CAMPOS_ROLLUP =
+  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales`;
+
+/**
+ * Agrega un conjunto de registros crudos en los mapas del rollup.
+ * Lógica ÚNICA compartida por el cómputo de días cerrados (computarRollupRango)
+ * y por la ventana viva [ayer, hoy] del router → garantiza paridad de números.
+ */
+export function agregarRegistros(
+  rows: Iterable<Record<string, unknown>>,
+  ipExcluida: string
+): RollupMaps {
+  const gMap: RollupMaps['gMap'] = new Map();
+  const appMap: RollupMaps['appMap'] = new Map();
+  const paisMap: RollupMaps['paisMap'] = new Map();
+  const ciudadMap: RollupMaps['ciudadMap'] = new Map();
+  const origenMap: RollupMaps['origenMap'] = new Map();
+
+  for (const row of rows) {
+    const ts = String(row.timestamp || '');
+    const fechaOrd = timestampAFechaOrd(ts);
+    if (!fechaOrd) continue;
+
+    const ip = String(row.ip_address || '');
+    const miip = ipExcluida && ip === ipExcluida ? 1 : 0;
+    const dispositivo = String(row.tipo_dispositivo || '');
+    const recurrente = Number(row.es_recurrente) === 1;
+    const durRaw = row.duracion_segundos;
+    const dur = durRaw === null || durRaw === undefined ? null : Number(durRaw);
+    const modo = String(row.modo || 'web');
+    const app = String(row.aplicacion || '');
+    const rawDatos = row.datos_adicionales ? String(row.datos_adicionales) : '';
+    let datosAd: Record<string, unknown> | null = null;
+    if (rawDatos) { try { datosAd = JSON.parse(rawDatos); } catch { /* ignorar */ } }
+
+    // ── Global ──
+    if (!gMap.has(fechaOrd)) gMap.set(fechaOrd, [nuevoGlobal(), nuevoGlobal()]);
+    const g = gMap.get(fechaOrd)![miip];
+    g.usos++;
+    if (dispositivo === 'movil') g.movil++;
+    else if (dispositivo === 'escritorio') g.escritorio++;
+    if (recurrente) g.recurrentes++; else g.nuevos++;
+    if (dur !== null) { g.suma_dur += dur; g.count_dur++; }
+    // por_compartir: replica el LIKE '%"ref":"share"%' del router sobre el JSON crudo
+    if (rawDatos.includes('"ref":"share"')) g.por_compartir++;
+
+    // ── App (ranking, duración con cap 7200) ──
+    if (!appMap.has(fechaOrd)) appMap.set(fechaOrd, [new Map(), new Map()]);
+    const appBucket = appMap.get(fechaOrd)![miip];
+    let a = appBucket.get(app);
+    if (!a) { a = { usos: 0, suma_dur_cap: 0, count_dur_cap: 0 }; appBucket.set(app, a); }
+    a.usos++;
+    if (dur !== null && dur <= 7200) { a.suma_dur_cap += dur; a.count_dur_cap++; }
+
+    // ── País (ISO normalizado, solo válidos) ──
+    const pais = String(row.pais || '');
+    if (pais && pais !== '') {
+      const paisIso = NORMALIZAR_PAIS[pais] ?? pais;
+      if (!paisMap.has(fechaOrd)) paisMap.set(fechaOrd, [new Map(), new Map()]);
+      const pb = paisMap.get(fechaOrd)![miip];
+      pb.set(paisIso, (pb.get(paisIso) || 0) + 1);
+    }
+
+    // ── Ciudad (solo válidas) ──
+    const ciudad = String(row.ciudad || '');
+    if (ciudad && ciudad !== '') {
+      if (!ciudadMap.has(fechaOrd)) ciudadMap.set(fechaOrd, [new Map(), new Map()]);
+      const cb = ciudadMap.get(fechaOrd)![miip];
+      cb.set(ciudad, (cb.get(ciudad) || 0) + 1);
+    }
+
+    // ── Origen (para getResumen; incluye 'mi-ip' como valor propio) ──
+    const origen = clasificarOrigen(modo, ip, ipExcluida, datosAd);
+    if (!origenMap.has(fechaOrd)) origenMap.set(fechaOrd, new Map());
+    const ob = origenMap.get(fechaOrd)!;
+    ob.set(origen, (ob.get(origen) || 0) + 1);
+  }
+
+  return { gMap, appMap, paisMap, ciudadMap, origenMap };
+}
+
+/**
+ * Computa el rollup para el rango [desdeOrd, hastaOrd] (ambos YYYYMMDD, inclusive).
+ * Idempotente: borra las filas previas de esos días y reinserta. Marca rollup_control.
+ * Devuelve la lista de fecha_ord efectivamente procesadas (días con datos).
+ */
+export async function computarRollupRango(
+  client: Client,
+  desdeOrd: string,
+  hastaOrd: string,
+  ipExcluida: string
+): Promise<string[]> {
+  const res = await client.execute({
+    sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ? AND ${FECHA_EXPR} <= ?`,
+    args: [desdeOrd, hastaOrd],
+  });
+
+  const { gMap, appMap, paisMap, ciudadMap, origenMap } = agregarRegistros(res.rows, ipExcluida);
+  const diasConDatos = Array.from(gMap.keys()).sort();
+
+  // ── Persistir: borrar el rango (idempotencia) + insertar agregados en lotes ──
+  const stmts: { sql: string; args: (string | number)[] }[] = [];
+
+  // Borrado idempotente de todo el rango pedido (no solo días con datos)
+  for (const tabla of ['rollup_dia', 'rollup_dia_origen', 'rollup_dia_app', 'rollup_dia_pais', 'rollup_dia_ciudad', 'rollup_control']) {
+    stmts.push({
+      sql: `DELETE FROM ${tabla} WHERE fecha_ord >= ? AND fecha_ord <= ?`,
+      args: [desdeOrd, hastaOrd],
+    });
+  }
+
+  for (const [fecha, pair] of gMap) {
+    for (let miip = 0 as 0 | 1; miip <= 1; miip = (miip + 1) as 0 | 1) {
+      const g = pair[miip];
+      if (g.usos === 0) continue;
+      stmts.push({
+        sql: `INSERT INTO rollup_dia (fecha_ord, es_miip, usos, movil, escritorio, recurrentes, nuevos, suma_dur, count_dur, por_compartir)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [fecha, miip, g.usos, g.movil, g.escritorio, g.recurrentes, g.nuevos, g.suma_dur, g.count_dur, g.por_compartir],
+      });
+    }
+  }
+  for (const [fecha, pair] of appMap) {
+    for (let miip = 0 as 0 | 1; miip <= 1; miip = (miip + 1) as 0 | 1) {
+      for (const [app, a] of pair[miip]) {
+        stmts.push({
+          sql: `INSERT INTO rollup_dia_app (fecha_ord, es_miip, aplicacion, usos, suma_dur_cap, count_dur_cap)
+                VALUES (?, ?, ?, ?, ?, ?)`,
+          args: [fecha, miip, app, a.usos, a.suma_dur_cap, a.count_dur_cap],
+        });
+      }
+    }
+  }
+  for (const [fecha, pair] of paisMap) {
+    for (let miip = 0 as 0 | 1; miip <= 1; miip = (miip + 1) as 0 | 1) {
+      for (const [pais, usos] of pair[miip]) {
+        stmts.push({ sql: `INSERT INTO rollup_dia_pais (fecha_ord, es_miip, pais, usos) VALUES (?, ?, ?, ?)`, args: [fecha, miip, pais, usos] });
+      }
+    }
+  }
+  for (const [fecha, pair] of ciudadMap) {
+    for (let miip = 0 as 0 | 1; miip <= 1; miip = (miip + 1) as 0 | 1) {
+      for (const [ciudad, usos] of pair[miip]) {
+        stmts.push({ sql: `INSERT INTO rollup_dia_ciudad (fecha_ord, es_miip, ciudad, usos) VALUES (?, ?, ?, ?)`, args: [fecha, miip, ciudad, usos] });
+      }
+    }
+  }
+  for (const [fecha, ob] of origenMap) {
+    for (const [origen, usos] of ob) {
+      stmts.push({ sql: `INSERT INTO rollup_dia_origen (fecha_ord, origen, usos) VALUES (?, ?, ?)`, args: [fecha, origen, usos] });
+    }
+  }
+  // Marcar TODOS los días del rango como computados (incluidos los sin datos:
+  // así no se reintentan eternamente). computado_at por defecto.
+  for (const fecha of enumerarDias(desdeOrd, hastaOrd)) {
+    stmts.push({ sql: `INSERT INTO rollup_control (fecha_ord) VALUES (?)`, args: [fecha] });
+  }
+
+  // Ejecutar en lotes para no saturar un único batch
+  const LOTE = 500;
+  for (let i = 0; i < stmts.length; i += LOTE) {
+    await client.batch(stmts.slice(i, i + LOTE), 'write');
+  }
+
+  return diasConDatos;
+}
+
+/**
+ * Recalcula las tablas ACUMULADAS (all-time) desde las diarias.
+ * Se ejecuta en background (cron/backfill), donde el coste del GROUP BY no afecta
+ * a la latencia del dashboard. DELETE + INSERT...SELECT (idempotente).
+ */
+export async function derivarAcumulados(client: Client): Promise<void> {
+  await client.batch([
+    `DELETE FROM rollup_app_acum`,
+    `INSERT INTO rollup_app_acum (aplicacion, es_miip, usos, suma_dur_cap, count_dur_cap, ultimo_ord)
+       SELECT aplicacion, es_miip, SUM(usos), SUM(suma_dur_cap), SUM(count_dur_cap), MAX(fecha_ord)
+       FROM rollup_dia_app GROUP BY aplicacion, es_miip`,
+    `DELETE FROM rollup_pais_acum`,
+    `INSERT INTO rollup_pais_acum (pais, es_miip, usos)
+       SELECT pais, es_miip, SUM(usos) FROM rollup_dia_pais GROUP BY pais, es_miip`,
+    `DELETE FROM rollup_ciudad_acum`,
+    `INSERT INTO rollup_ciudad_acum (ciudad, es_miip, usos)
+       SELECT ciudad, es_miip, SUM(usos) FROM rollup_dia_ciudad GROUP BY ciudad, es_miip`,
+  ], 'write');
+}
+
+/** Enumera los días YYYYMMDD entre desde y hasta (inclusive). */
+function enumerarDias(desdeOrd: string, hastaOrd: string): string[] {
+  const toDate = (o: string) => new Date(Number(o.slice(0, 4)), Number(o.slice(4, 6)) - 1, Number(o.slice(6, 8)));
+  const dias: string[] = [];
+  const d = toDate(desdeOrd);
+  const fin = toDate(hastaOrd);
+  while (d <= fin) {
+    dias.push(hoyFechaOrd(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return dias;
+}
+
+/**
+ * Límite superior de días que se consideran "cerrados" para el rollup.
+ * Es ANTEAYER (hoy-2), no ayer: deja un margen de 1 día que absorbe cualquier
+ * desfase de zona horaria entre el runtime que escribe el timestamp (Vercel/UTC)
+ * y el que computa el rollup (cron Vercel/UTC o backfill local/Madrid). El router
+ * consulta [ayer, hoy] en vivo, así que el usuario siempre ve esos dos días al día.
+ */
+export function limiteCerradoOrd(d: Date = new Date()): string {
+  const x = new Date(d);
+  x.setDate(x.getDate() - 2);
+  return hoyFechaOrd(x);
+}
+
+/**
+ * Computa los días CERRADOS (≤ anteayer) que aún no estén en rollup_control.
+ * Usado por el cron y el on-demand defensivo. Devuelve nº de días procesados.
+ * `maxDias` acota el trabajo por invocación (lotes de backfill).
+ */
+export async function computarRollupPendientes(
+  client: Client,
+  ipExcluida: string,
+  maxDias = 400
+): Promise<{ procesados: number; desde: string | null; hasta: string | null }> {
+  const tope = limiteCerradoOrd(); // anteayer
+
+  // Último día ya computado (tabla pequeña → barato). Es el camino habitual:
+  // si ya estamos al día, salimos con UNA sola query, sin tocar la tabla cruda.
+  const lastRes = await client.execute(
+    `SELECT MAX(fecha_ord) AS m FROM rollup_control WHERE fecha_ord <= ?`,
+    [tope]
+  );
+  const lastOrd = lastRes.rows[0]?.m ? String(lastRes.rows[0].m) : null;
+
+  let desde: string;
+  if (lastOrd) {
+    if (lastOrd >= tope) return { procesados: 0, desde: null, hasta: null }; // al día
+    const d = new Date(Number(lastOrd.slice(0, 4)), Number(lastOrd.slice(4, 6)) - 1, Number(lastOrd.slice(6, 8)));
+    d.setDate(d.getDate() + 1);
+    desde = hoyFechaOrd(d);
+  } else {
+    // Primera vez (rollup_control vacío): arrancar desde el día más antiguo con datos
+    const minRes = await client.execute(
+      `SELECT MIN(substr(timestamp,7,4)||substr(timestamp,4,2)||substr(timestamp,1,2)) AS m FROM uso_aplicaciones`
+    );
+    const minOrd = minRes.rows[0]?.m ? String(minRes.rows[0].m) : null;
+    if (!minOrd) return { procesados: 0, desde: null, hasta: null };
+    desde = minOrd;
+  }
+  if (desde > tope) return { procesados: 0, desde: null, hasta: null }; // nada pendiente
+
+  // Acotar a maxDias días por invocación
+  const todos = enumerarDias(desde, tope);
+  const lote = todos.slice(0, maxDias);
+  const hasta = lote[lote.length - 1];
+
+  await computarRollupRango(client, desde, hasta, ipExcluida);
+  await derivarAcumulados(client);
+  return { procesados: lote.length, desde, hasta };
+}
+
+/** Lee la IP excluida de analytics_config (o '' si no hay). */
+export async function leerIpExcluida(client: Client): Promise<string> {
+  try {
+    const r = await client.execute({
+      sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
+      args: [],
+    });
+    return r.rows.length > 0 ? String(r.rows[0].valor) : '';
+  } catch {
+    return '';
+  }
+}
