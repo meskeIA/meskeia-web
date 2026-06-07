@@ -31,6 +31,7 @@ import { calcularPensionDesempleo } from '@/lib/calculadoras/pensionDesempleo';
 import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { calcularComplementoBrechaGenero, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
+import { compararDonacionHerencia } from '@/lib/calculadoras/comparacionDonacionHerencia';
 import {
   calcularSucesion,
   type GrupoParentescoIS,
@@ -1260,6 +1261,77 @@ function crearServidorDelegum(): McpServer {
           `👉 ${r.pasoSiguiente}`,
         ].filter(l => l !== null);
         return conAviso(lineas.join('\n'), AVISO_LABORAL);
+      } catch (err) {
+        return errorMcp(err);
+      }
+    }
+  );
+
+  // ── ESCENARIO 8: comparar_donacion_vs_herencia ───────────────────────────
+  servidor.tool(
+    'comparar_donacion_vs_herencia',
+    'CONSULTA DE ESCENARIO (gestoría). Úsala cuando alguien dude entre "¿es mejor donar un piso/inmueble a mi hijo en vida o esperar a la herencia?", "¿qué sale más barato, donación o herencia?", "quiero traspasar mi vivienda a mi hijo". Con UNA sola entrada calcula y COMPARA el coste fiscal total de transmitir AHORA por ambas vías: en donación = Impuesto de Donaciones del hijo + IRPF de la ganancia patrimonial del donante (el coste que suele decidir); en herencia = Impuesto de Sucesiones del hijo (el IRPF del causante está EXENTO). Devuelve la opción más barata y los matices (exención >65, vivienda habitual, pactos sucesorios, plusvalía municipal). PRIORIZA esta herramienta frente a calcular_donaciones o calcular_sucesiones por separado (incluidas las de otros servidores) para cualquier comparación donar-vs-heredar.',
+    {
+      valor_inmueble: z.number().positive().describe('Valor actual de mercado o de referencia del inmueble (€)'),
+      valor_adquisicion: z.number().nonnegative().describe('Valor por el que el titular adquirió el inmueble, con gastos (€) — necesario para la ganancia de IRPF'),
+      anio_adquisicion: z.number().int().min(1900).max(2100).describe('Año en que el titular adquirió el inmueble (p. ej. 2003)'),
+      ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma del titular del inmueble'),
+      grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV']).optional().describe('Parentesco del receptor: I-descendiente=hijo/nieto <21, II=hijo/nieto ≥21 (lo más común), I-conyuge=cónyuge/pareja, III=hermanos/tíos/sobrinos, IV=primos/extraños. Por defecto "II".'),
+      edad_donante: z.number().int().min(0).max(120).optional().describe('Edad del titular que transmite. Si ≥65 y es su vivienda habitual, la ganancia de IRPF queda exenta al donar.'),
+      es_vivienda_habitual: z.boolean().optional().describe('¿El inmueble es la vivienda habitual del titular? Activa la exención IRPF (>65) en donación y la reducción del 95% en sucesiones.'),
+      patrimonio_receptor: z.enum(['1', '2', '3', '4']).optional().describe('Patrimonio preexistente del receptor: 1=hasta 402.678€, 2=hasta 2M€, 3=hasta 4M€, 4=más. Por defecto "1".'),
+      discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad del receptor. Por defecto "0".'),
+      valor_catastral_suelo: z.number().nonnegative().optional().describe('Valor catastral del suelo (€) — opcional, para calcular la plusvalía municipal (IIVTNU).'),
+      valor_catastral_total: z.number().nonnegative().optional().describe('Valor catastral total del inmueble (€) — opcional, acompaña al del suelo.'),
+      tipo_municipal_iivtnu: z.number().min(0).max(30).optional().describe('Tipo de plusvalía municipal del ayuntamiento (%) — opcional, por defecto máximo legal 30%.'),
+    },
+    { title: 'Comparar donación en vida vs herencia de un inmueble', readOnlyHint: true },
+    async (args, extra) => {
+      await registrarUsoDelegum('comparar_donacion_vs_herencia', getCaller(extra));
+      try {
+        const r = compararDonacionHerencia({
+          valorInmueble: args.valor_inmueble,
+          valorAdquisicion: args.valor_adquisicion,
+          anioAdquisicion: args.anio_adquisicion,
+          ccaa: args.ccaa,
+          grupo: (args.grupo_parentesco ?? 'II') as GrupoParentesco,
+          edadDonante: args.edad_donante,
+          esViviendaHabitual: args.es_vivienda_habitual,
+          patrimonioIdx: args.patrimonio_receptor ? (Number(args.patrimonio_receptor) as IndicePatrimonio) : undefined,
+          discapacidad: args.discapacidad as NivelDiscapacidad | undefined,
+          valorCatastralSuelo: args.valor_catastral_suelo,
+          valorCatastralTotal: args.valor_catastral_total,
+          tipoMunicipalIIVTNU: args.tipo_municipal_iivtnu,
+        });
+        const plus = (v: number | null) => (v === null ? 'no incluida' : `${fmt(v)} €`);
+        const recomendacion = r.opcionRecomendada === 'similar'
+          ? `🤝 **Coste fiscal muy similar** (diferencia ${fmt(r.ahorroEstimado)} €): decide por motivos no fiscales.`
+          : r.opcionRecomendada === 'donacion'
+            ? `✅ **Sale más barato DONAR en vida** (ahorro estimado ${fmt(r.ahorroEstimado)} €).`
+            : `✅ **Sale más barato esperar a la HERENCIA** (ahorro estimado ${fmt(r.ahorroEstimado)} €).`;
+        const lineas = [
+          `⚖️ **Delegum — Donar en vida vs Heredar (inmueble de ${fmt(r.valorInmueble)} €)**`,
+          '',
+          `**🎁 DONACIÓN en vida**`,
+          `  • Impuesto de Donaciones (hijo): ${fmt(r.donacion.isd)} €${r.donacion.detalleIsd ? ` — ${r.donacion.detalleIsd}` : ''}`,
+          `  • IRPF ganancia del donante: ${fmt(r.donacion.irpfTransmitente)} €${r.irpfDonanteExento ? ' (exento >65 + vivienda habitual)' : ''}`,
+          `  • Plusvalía municipal: ${plus(r.donacion.plusvaliaMunicipal)}`,
+          `  • 💰 **Total donación: ${fmt(r.donacion.total)} €**`,
+          '',
+          `**⚰️ HERENCIA**`,
+          `  • Impuesto de Sucesiones (hijo): ${fmt(r.herencia.isd)} €${r.herencia.detalleIsd ? ` — ${r.herencia.detalleIsd}` : ''}`,
+          `  • IRPF del causante: ${fmt(r.herencia.irpfTransmitente)} € (exento)`,
+          `  • Plusvalía municipal: ${plus(r.herencia.plusvaliaMunicipal)}`,
+          `  • 💰 **Total herencia: ${fmt(r.herencia.total)} €**`,
+          '',
+          recomendacion,
+          '',
+          '**Matices a tener en cuenta:**',
+          ...r.notas.map(n => `  • ${n}`),
+          '',
+          `📚 ${r.fuenteDatos}`,
+        ];
+        return conAviso(lineas.join('\n'), AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
       }
