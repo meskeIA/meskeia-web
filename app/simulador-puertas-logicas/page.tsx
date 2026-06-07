@@ -291,7 +291,9 @@ export default function SimuladorPuertasLogicasPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Simulador de Puertas Lógicas</h1>
         <p className={styles.subtitle}>
-          Tablas de verdad, circuitos digitales y expresiones booleanas
+          Tablas de verdad, circuitos digitales y expresiones booleanas. Puertas
+          lógicas (también llamadas <strong>compuertas lógicas</strong>): AND, OR,
+          NOT, NAND, NOR, XOR y XNOR.
         </p>
       </header>
 
@@ -666,7 +668,7 @@ export default function SimuladorPuertasLogicasPage() {
       {/* Educational Section */}
       <EducationalSection
         title="Fundamentos de Lógica Digital"
-        subtitle="Todo lo que necesitas saber sobre puertas lógicas, álgebra de Boole y circuitos digitales"
+        subtitle="Todo lo que necesitas saber sobre puertas lógicas (compuertas lógicas), álgebra de Boole y circuitos digitales"
         icon="🔌"
       >
         {/* Sección 1: Tabla Comparativa */}
@@ -808,6 +810,12 @@ export default function SimuladorPuertasLogicasPage() {
         <section>
           <h3>Preguntas Frecuentes</h3>
           <div className={styles.faqList}>
+            <div className={styles.faqItem}>
+              <h4>¿Es lo mismo una puerta lógica que una compuerta lógica?</h4>
+              <p>Sí, son <strong>el mismo componente</strong>: un circuito que recibe entradas binarias (0 y 1) y devuelve una salida según una operación lógica. La única diferencia es el término regional: en España se dice <strong>puerta lógica</strong> y en buena parte de Hispanoamérica (México, Colombia, Argentina...) se dice <strong>compuerta lógica</strong>. Ambas traducen el inglés <em>logic gate</em>.</p>
+              <p className={styles.faqTip}>💡 Este simulador funciona igual con cualquiera de los dos nombres: las 7 puertas (o compuertas) AND, OR, NOT, NAND, NOR, XOR y XNOR son universales.</p>
+            </div>
+
             <div className={styles.faqItem}>
               <h4>¿Qué es el Álgebra de Boole y para qué sirve?</h4>
               <p>El Álgebra de Boole (1854) es el sistema matemático que describe los circuitos digitales. Trabaja con solo dos valores (0 y 1) y tres operaciones básicas (AND, OR, NOT). Permite simplificar expresiones lógicas para reducir el número de puertas y ahorrar coste, energía y espacio en silicio.</p>

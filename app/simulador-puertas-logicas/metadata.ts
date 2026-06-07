@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Simulador de Puertas Lógicas - AND, OR, NOT, NAND, XOR | meskeIA',
-  description: 'Simulador interactivo de puertas lógicas y compuertas lógicas: tablas de verdad, circuitos predefinidos (Half Adder, Full Adder, Multiplexor) y expresiones booleanas. Para electrónica digital.',
-  keywords: 'puertas lógicas, compuertas lógicas, AND, OR, NOT, NAND, NOR, XOR, XNOR, tabla de verdad, circuitos digitales, electrónica digital, álgebra booleana, half adder, full adder, multiplexor, simulador, universidad',
+  title: 'Simulador de Puertas Lógicas (Compuertas) - AND, OR, NOT, XOR | meskeIA',
+  description: 'Simulador de puertas lógicas y compuertas lógicas online: tablas de verdad, circuitos predefinidos (Half Adder, Full Adder, Multiplexor) y expresiones booleanas. Para electrónica digital.',
+  keywords: 'simulador de compuertas lógicas, simulador de puertas lógicas, compuertas lógicas, puertas lógicas, AND, OR, NOT, NAND, NOR, XOR, XNOR, tabla de verdad, circuitos digitales, electrónica digital, álgebra booleana, half adder, full adder, multiplexor, simulador, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Simulador de Puertas Lógicas | meskeIA',
-    description: 'Tablas de verdad, circuitos predefinidos y expresiones booleanas. Para estudiantes de electrónica digital.',
+    title: 'Simulador de Puertas Lógicas (Compuertas) | meskeIA',
+    description: 'Tablas de verdad, circuitos predefinidos y expresiones booleanas. Puertas o compuertas lógicas para estudiantes de electrónica digital.',
     url: 'https://meskeia.com/simulador-puertas-logicas/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,15 +28,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Simulador de Puertas Lógicas | meskeIA',
-    description: 'Simula puertas lógicas, genera tablas de verdad y prueba circuitos digitales.',
+    title: 'Simulador de Puertas Lógicas (Compuertas) | meskeIA',
+    description: 'Simula puertas o compuertas lógicas, genera tablas de verdad y prueba circuitos digitales.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Simulador de Puertas Lógicas',
-  description: 'Simulador interactivo de puertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR) con tablas de verdad, circuitos digitales predefinidos (Half Adder, Full Adder, Multiplexor) y evaluador de expresiones booleanas.',
+  name: 'Simulador de Puertas Lógicas (Compuertas)',
+  description: 'Simulador interactivo de puertas lógicas, también llamadas compuertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), con tablas de verdad, circuitos digitales predefinidos (Half Adder, Full Adder, Multiplexor) y evaluador de expresiones booleanas.',
   url: 'https://meskeia.com/simulador-puertas-logicas/',
   category: 'EducationalApplication',
   features: [
@@ -49,13 +49,21 @@ export const jsonLd = generateWebAppSchema({
     'Gratuito y sin publicidad',
     'En español',
   ],
-  keywords: ['puertas lógicas', 'electrónica digital', 'álgebra booleana', 'tablas verdad', 'universidad', 'FP'],
+  keywords: ['compuertas lógicas', 'puertas lógicas', 'electrónica digital', 'álgebra booleana', 'tablas verdad', 'universidad', 'FP'],
 });
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Es lo mismo una puerta lógica que una compuerta lógica?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, son exactamente el mismo componente: un circuito que recibe una o varias entradas binarias (0 y 1) y devuelve una salida según una operación lógica (AND, OR, NOT...). La diferencia es solo el término regional: en España se dice "puerta lógica" y en gran parte de Hispanoamérica (México, Colombia, Argentina...) se dice "compuerta lógica". Ambas traducen el inglés "logic gate".',
+      },
+    },
     {
       '@type': 'Question',
       name: '¿Qué es el Álgebra de Boole y para qué sirve?',
