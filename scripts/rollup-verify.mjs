@@ -33,13 +33,80 @@ const ok = (n) => console.log(`  ✅ ${n}`);
 const fail = (n, ref, got) => { console.log(`  ❌ ${n}: referencia=${ref}  rollup=${got}`); fallos++; };
 const cmp = (n, ref, got, tol = 0) => { (Math.abs(Number(ref) - Number(got)) <= tol) ? ok(`${n} (${got})`) : fail(n, ref, got); };
 
-async function llamarGetStats(excluir) {
+async function llamarTRPC(proc, payload) {
   // tRPC SIN superjson: input plano y respuesta en result.data (sin .json)
-  const input = encodeURIComponent(JSON.stringify({ '0': { limite: 500, excluir_mi_ip: excluir } }));
-  const res = await fetch(`${BASE}/api/trpc/analytics.getStats?batch=1&input=${input}`);
+  const input = encodeURIComponent(JSON.stringify({ '0': payload }));
+  const res = await fetch(`${BASE}/api/trpc/analytics.${proc}?batch=1&input=${input}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
   const j = await res.json();
   return j[0].result.data;
+}
+const llamarGetStats = (excluir) => llamarTRPC('getStats', { limite: 500, excluir_mi_ip: excluir });
+
+// Clasificación de origen — réplica de getResumen (para la referencia cruda)
+const PLAT_IA = ['claude.ai', 'perplexity.ai', 'chatgpt.com', 'gemini.google.com', 'copilot.microsoft.com', 'you.com', 'phind.com', 'poe.com'];
+function clasificarOrigen(modo, ip, ipExcluida, datosAd) {
+  if (ipExcluida && ip === ipExcluida) return 'mi-ip';
+  if (modo === 'bot') return 'bot';
+  if (modo === 'mcp') return 'mcp';
+  if (modo === 'referral-ia') { const h = datosAd?.referrer_ia || null; return h || 'ia-sin-detalle'; }
+  return 'web';
+}
+
+async function verificarResumen() {
+  console.log(`\n═══ getResumen (origen × período) ═══`);
+  const cfg = await client.execute(`SELECT valor FROM analytics_config WHERE clave='ip_excluida'`);
+  const ipExcluida = cfg.rows.length ? String(cfg.rows[0].valor) : '';
+
+  // Referencia cruda
+  const ahora = new Date();
+  const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+  const hace7 = new Date(hoy); hace7.setDate(hoy.getDate() - 7);
+  const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const parse = (ts) => { const m = String(ts).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; };
+  const rows = (await client.execute(`SELECT timestamp, modo, datos_adicionales, ip_address FROM uso_aplicaciones`)).rows;
+  const ref = {};
+  const nf = () => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
+  for (const r of rows) {
+    const f = parse(r.timestamp); if (!f) continue;
+    let dAd = null; try { if (r.datos_adicionales) dAd = JSON.parse(String(r.datos_adicionales)); } catch {}
+    const o = clasificarOrigen(String(r.modo || 'web'), String(r.ip_address || ''), ipExcluida, dAd);
+    if (!ref[o]) ref[o] = nf();
+    const c = ref[o];
+    if (f >= hoy) c.hoy++; if (f >= ayer && f < hoy) c.ayer++;
+    if (f >= hace7) c.semana++; if (f >= iMes) c.mes++; c.total++;
+  }
+  const refTotalReal = nf();
+  for (const [k, v] of Object.entries(ref)) if (k !== 'bot' && k !== 'mi-ip') for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) refTotalReal[p] += v[p];
+
+  const got = await llamarTRPC('getResumen', {});
+  for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) cmp(`totalReal.${p}`, refTotalReal[p], got.totalReal[p]);
+  // Suma de todas las filas == suma de toda la referencia
+  const refTotalAll = Object.values(ref).reduce((a, v) => a + v.total, 0);
+  const gotTotalAll = got.filas.reduce((a, f) => a + f.total, 0);
+  cmp('suma filas (total)', refTotalAll, gotTotalAll);
+  // Fila web y mi-ip por separado
+  const gWeb = got.filas.find((f) => f.origen === 'Web');
+  cmp('fila Web.total', ref['web']?.total || 0, gWeb?.total || 0);
+  const gMiip = got.filas.find((f) => f.origen === 'Mi IP');
+  cmp('fila Mi IP.total', ref['mi-ip']?.total || 0, gMiip?.total || 0);
+}
+
+async function verificarTendencia(excluir) {
+  console.log(`\n═══ getTendencia30Dias (excluir=${excluir}) ═══`);
+  const cfg = await client.execute(`SELECT valor FROM analytics_config WHERE clave='ip_excluida'`);
+  const ipExcluida = excluir && cfg.rows.length ? String(cfg.rows[0].valor) : '';
+  const ipF = ipExcluida ? ` AND (ip_address IS NULL OR ip_address != '${ipExcluida.replace(/'/g, "''")}')` : '';
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const inicio = new Date(hoy); inicio.setDate(hoy.getDate() - 29);
+  const inicioOrd = ord(inicio);
+  const refRows = (await client.execute(`SELECT ${ordExpr} fo, COUNT(*) t FROM uso_aplicaciones WHERE ${ordExpr} >= '${inicioOrd}'${ipF} GROUP BY fo`)).rows;
+  const refTotal = refRows.reduce((a, r) => a + Number(r.t), 0);
+  const got = await llamarTRPC('getTendencia30Dias', { excluir_mi_ip: excluir });
+  const gotTotal = got.dias.reduce((a, d) => a + d.usos, 0);
+  cmp('suma 30 días', refTotal, gotTotal);
+  cmp('nº días', 30, got.dias.length);
 }
 
 // fecha_ord helpers
@@ -144,6 +211,9 @@ async function verificarModo(excluir) {
 console.log('🔍 Verificación de paridad del rollup\n');
 await verificarModo(true);
 await verificarModo(false);
+await verificarResumen();
+await verificarTendencia(true);
+await verificarTendencia(false);
 
 console.log(`\n${fallos === 0 ? '✅ PARIDAD TOTAL — seguro desplegar' : `❌ ${fallos} discrepancias — NO desplegar`}`);
 process.exit(fallos === 0 ? 0 : 1);

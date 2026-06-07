@@ -806,25 +806,15 @@ export const analyticsRouter = router({
         // Ignorar si la tabla no existe
       }
 
-      // Obtener todos los registros (solo campos necesarios)
-      const result = await client.execute({
-        sql: `SELECT timestamp, modo, datos_adicionales, ip_address FROM uso_aplicaciones ORDER BY id DESC`,
-        args: [],
-      });
-
       // Rangos de fechas (inicio del día, sin hora)
       const ahora = new Date();
       const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
       const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
       const hace7Dias = new Date(hoy); hace7Dias.setDate(hoy.getDate() - 7);
       const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-
-      // Parsear timestamp español "DD/MM/YYYY, HH:MM:SS" → Date (solo fecha)
-      const parsearFecha = (ts: string): Date | null => {
-        const m = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-        if (!m) return null;
-        return new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
-      };
+      const ord = (d: Date) =>
+        `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+      const hoyOrd = ord(hoy), ayerOrd = ord(ayer), hace7Ord = ord(hace7Dias), iMesOrd = ord(inicioMes);
 
       type Conteo = { hoy: number; ayer: number; semana: number; mes: number; total: number };
       const conteos: Record<string, Conteo> = {};
@@ -847,51 +837,44 @@ export const analyticsRouter = router({
         (k) => { conteos[k] = nuevaFila(); }
       );
 
-      for (const row of result.rows) {
-        const ts = String(row.timestamp || '');
-        const fecha = parsearFecha(ts);
-        if (!fecha) continue;
+      // Vía rollup: días cerrados agregados por origen (rollup_dia_origen ya incluye
+      // 'mi-ip'/'bot'/etc.) + ventana viva [ayer, hoy] con la MISMA clasificación.
+      const [cerrRes, vivoRes] = await Promise.all([
+        client.execute({
+          sql: `SELECT origen, SUM(usos) total,
+                  SUM(CASE WHEN fecha_ord >= ? THEN usos ELSE 0 END) mes,
+                  SUM(CASE WHEN fecha_ord >= ? THEN usos ELSE 0 END) sem
+                FROM rollup_dia_origen GROUP BY origen`,
+          args: [iMesOrd, hace7Ord],
+        }),
+        client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
+      ]);
+      const vivo = agregarRegistros(vivoRes.rows, ipExcluida);
 
-        const modo = String(row.modo || 'web');
-        const ip = String(row.ip_address || '');
-
-        let datosAd: Record<string, string> | null = null;
-        try {
-          if (row.datos_adicionales) {
-            datosAd = JSON.parse(String(row.datos_adicionales));
-          }
-        } catch { /* ignorar JSON inválido */ }
-
-        // Clasificar origen
-        let origen: string;
-        if (ipExcluida && ip === ipExcluida) {
-          origen = 'mi-ip';
-        } else if (modo === 'bot') {
-          origen = 'bot';
-        } else if (modo === 'mcp') {
-          origen = 'mcp';
-        } else if (modo === 'referral-ia') {
-          const hostname = datosAd?.referrer_ia || null;
-          if (hostname && PLATAFORMAS_IA.includes(hostname)) {
-            origen = hostname;
-          } else if (hostname) {
-            // Plataforma IA desconocida — agregar dinámicamente
-            if (!conteos[hostname]) conteos[hostname] = nuevaFila();
-            origen = hostname;
-          } else {
-            origen = 'ia-sin-detalle';
-          }
-        } else {
-          origen = 'web';
-        }
-
-        // Acumular en los períodos que corresponda
+      // Cargar porciones cerradas (total/mes/semana; hoy y ayer van por la ventana viva)
+      for (const r of cerrRes.rows) {
+        const origen = String(r.origen);
+        if (!conteos[origen]) conteos[origen] = nuevaFila();
         const c = conteos[origen];
-        if (fecha >= hoy)      c.hoy++;
-        if (fecha >= ayer && fecha < hoy) c.ayer++;
-        if (fecha >= hace7Dias) c.semana++;
-        if (fecha >= inicioMes) c.mes++;
-        c.total++;
+        c.total += Number(r.total);
+        c.mes += Number(r.mes);
+        c.semana += Number(r.sem);
+      }
+
+      // Cargar ventana viva (ayer y hoy)
+      const oHoy = vivo.origenMap.get(hoyOrd) || new Map<string, number>();
+      const oAyer = vivo.origenMap.get(ayerOrd) || new Map<string, number>();
+      const ayerEnMes = ayerOrd >= iMesOrd; // si hoy es día 1 del mes, ayer no cuenta en "mes"
+      for (const origen of new Set([...oHoy.keys(), ...oAyer.keys()])) {
+        if (!conteos[origen]) conteos[origen] = nuevaFila();
+        const c = conteos[origen];
+        const vHoy = oHoy.get(origen) || 0;
+        const vAyer = oAyer.get(origen) || 0;
+        c.hoy += vHoy;
+        c.ayer += vAyer;
+        c.semana += vHoy + vAyer;               // ayer y hoy siempre ≥ hace7
+        c.mes += vHoy + (ayerEnMes ? vAyer : 0);
+        c.total += vHoy + vAyer;
       }
 
       // Construir filas en orden fijo
@@ -975,29 +958,26 @@ export const analyticsRouter = router({
       inicio.setDate(hoy.getDate() - 29);
       const inicioStr = `${inicio.getFullYear()}${String(inicio.getMonth() + 1).padStart(2, '0')}${String(inicio.getDate()).padStart(2, '0')}`;
 
-      // Agrupar por día usando la clave YYYYMMDD (ordena bien entre meses y años)
-      let sql = `
-        SELECT
-          substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) AS fecha_ord,
-          COUNT(*) AS usos
-        FROM uso_aplicaciones
-        WHERE substr(timestamp, 7, 4) || substr(timestamp, 4, 2) || substr(timestamp, 1, 2) >= ?
-      `;
-      const args: string[] = [inicioStr];
+      // Vía rollup: días cerrados (rollup_dia, ya por día) + ventana viva [ayer, hoy]
+      const miipWhere = (input.excluir_mi_ip && ipExcluida) ? ' AND es_miip = 0' : '';
+      const miipList: (0 | 1)[] = (input.excluir_mi_ip && ipExcluida) ? [0] : [0, 1];
+      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const ayerOrd = `${ayer.getFullYear()}${String(ayer.getMonth() + 1).padStart(2, '0')}${String(ayer.getDate()).padStart(2, '0')}`;
 
-      if (ipExcluida) {
-        sql += ' AND (ip_address IS NULL OR ip_address != ?)';
-        args.push(ipExcluida);
-      }
+      const [cerrRes, vivoRes] = await Promise.all([
+        client.execute({ sql: `SELECT fecha_ord, SUM(usos) usos FROM rollup_dia WHERE fecha_ord >= ?${miipWhere} GROUP BY fecha_ord`, args: [inicioStr] }),
+        client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
+      ]);
+      const vivo = agregarRegistros(vivoRes.rows, ipExcluida);
 
-      sql += ' GROUP BY fecha_ord ORDER BY fecha_ord ASC';
-
-      const result = await client.execute({ sql, args });
-
-      // Mapa YYYYMMDD → usos
+      // Mapa YYYYMMDD → usos: cerrados + ventana viva (sin solape: rollup ≤ anteayer, vivo ≥ ayer)
       const mapaUsos: Record<string, number> = {};
-      for (const row of result.rows) {
+      for (const row of cerrRes.rows) {
         mapaUsos[String(row.fecha_ord)] = Number(row.usos);
+      }
+      for (const [f, pair] of vivo.gMap) {
+        let u = 0; for (const m of miipList) u += pair[m].usos;
+        mapaUsos[f] = (mapaUsos[f] || 0) + u;
       }
 
       // Construir array completo de 30 días con ceros para días sin registros
