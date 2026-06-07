@@ -156,7 +156,13 @@ const INSTRUCCIONES_DELEGUM =
   'visible y literal: no lo resumas, no lo omitas ni lo reformules. ' +
   'Recuerda siempre al usuario que los resultados son orientativos y que, para decisiones reales, ' +
   'debe consultar a un profesional colegiado (asesor fiscal, graduado social o abogado) ' +
-  'o al organismo oficial correspondiente (AEAT, SEPE o Seguridad Social).';
+  'o al organismo oficial correspondiente (AEAT, SEPE o Seguridad Social). ' +
+  'REGLA DE ORQUESTACIÓN: cuando exista una herramienta de escenario o de comparación que ya cubra ' +
+  'la pregunta del usuario (su nombre empieza por "consulta_" o "comparar_"), úsala SIEMPRE en lugar de ' +
+  'combinar varias calculadoras sueltas y sumar los resultados a mano. En particular, ante "¿es mejor donar ' +
+  'o heredar un inmueble?" usa "comparar_donacion_vs_herencia"; no montes la comparación con calcular_donaciones, ' +
+  'calcular_sucesiones o calcular_plusvalias_irpf por separado, porque omitirías costes (IRPF del donante) o ' +
+  'reducciones (vivienda habitual) que la herramienta de escenario ya integra correctamente.';
 
 function errorMcp(err: unknown) {
   return {
@@ -1103,7 +1109,10 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'calcular_sucesiones',
     'Calcula el Impuesto de Sucesiones (ISD) de un heredero individual con reducciones y bonificaciones ' +
-    'autonómicas. Para la consulta general de herencia usa "consulta_herencia".',
+    'autonómicas. Para la consulta general de herencia usa "consulta_herencia". ' +
+    'IMPORTANTE: si el usuario está comparando donar en vida vs esperar a la herencia de un inmueble, ' +
+    'NO uses esta herramienta suelta ni la sumes a mano con otras: usa directamente ' +
+    '"comparar_donacion_vs_herencia", que integra ISD, IRPF del donante y plusvalía municipal en una sola respuesta.',
     {
       valor_herencia: z.number().positive().describe('Valor neto recibido por el heredero en euros'),
       ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma del fallecido'),
@@ -1143,7 +1152,10 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'calcular_donaciones',
     'Calcula el Impuesto de Donaciones (ISD) en España con la tarifa estatal o catalana, coeficientes por ' +
-    'patrimonio y bonificaciones autonómicas. Para donaciones en vida entre familiares.',
+    'patrimonio y bonificaciones autonómicas. Para donaciones en vida entre familiares. ' +
+    'IMPORTANTE: si el usuario está comparando donar en vida vs esperar a la herencia de un inmueble, ' +
+    'NO uses esta herramienta suelta ni la sumes a mano con otras: usa directamente ' +
+    '"comparar_donacion_vs_herencia", que integra ISD, IRPF del donante y plusvalía municipal en una sola respuesta.',
     {
       valor_donacion: z.number().positive().describe('Valor de la donación en euros'),
       ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma del donatario (quien recibe)'),
@@ -1924,7 +1936,10 @@ function crearServidorDelegum(): McpServer {
     'Calcula el IRPF sobre la ganancia patrimonial por vender acciones, fondos de inversión, inmuebles u otros ' +
     'activos. Determina la ganancia neta (con gastos), si es a largo plazo (>12 meses), la tributación en la base ' +
     'del ahorro (tramos 19-30%), el tipo efectivo y la ganancia tras impuestos. Permite compensar pérdidas de ' +
-    'ejercicios anteriores.',
+    'ejercicios anteriores. ' +
+    'IMPORTANTE: si el usuario está comparando donar en vida vs esperar a la herencia de un inmueble, ' +
+    'NO uses esta herramienta para estimar el IRPF del donante por tu cuenta: usa directamente ' +
+    '"comparar_donacion_vs_herencia", que ya incluye ese IRPF junto al ISD y la plusvalía municipal.',
     {
       precio_compra: z.number().positive().describe('Precio de compra del activo en euros'),
       precio_venta: z.number().positive().describe('Precio de venta del activo en euros'),
