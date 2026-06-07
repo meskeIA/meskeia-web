@@ -10,6 +10,7 @@
     "lint": "eslint",
     "test": "npx playwright test",
     "test:unit": "npx playwright test tests/formatters.spec.ts",
+    "test:calc": "npx playwright test tests/calculadoras-invariantes.spec.ts",
     "test:a11y": "npx playwright test tests/accessibility.spec.ts",
     "generate:llm-index": "node scripts/generate-llm-index.js",
     "analyze": "set ANALYZE=true && npm run build"
