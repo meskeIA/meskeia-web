@@ -1032,7 +1032,6 @@ function crearServidorDelegum(): McpServer {
           `🏖️ Vacaciones pendientes (${r.diasVacacionesPendientes} días): ${fmt(r.vacacionesPendientes)} €`,
           `🎁 Pagas extras prorrateadas: ${fmt(r.pagasExtrasProporcionales)} €`,
           `💵 Salarios pendientes: ${fmt(r.salariosAtrasados)} €`,
-          r.indemnizacion > 0 ? `💸 Indemnización: ${fmt(r.indemnizacion)} €` : '',
           `💰 **Total finiquito bruto: ${fmt(r.totalFiniquitoBruto)} €**`,
           `ℹ️ ${r.notaTributacion}`,
         ].filter(l => l !== '').join('\n');

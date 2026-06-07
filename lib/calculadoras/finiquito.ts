@@ -2,8 +2,8 @@
  * Calculadora de Finiquito — lógica pura sin React ni DOM
  * Usada por: MCP server (calcular_finiquito)
  *
- * Calcula los conceptos que componen el finiquito:
- * - Indemnización por despido (si aplica)
+ * Calcula los conceptos que componen el finiquito (NO la indemnización
+ * por despido, que se calcula aparte en indemnizacionDespido.ts):
  * - Vacaciones no disfrutadas
  * - Parte proporcional de pagas extras
  * - Salarios pendientes de cobro
@@ -44,14 +44,6 @@ export interface ResultadoFiniquito {
   /** Años y días de antigüedad */
   antiguedadAnios: number;
   antiguedadDias: number;
-  /** Indemnización por despido (€) */
-  indemnizacion: number;
-  /** Días de indemnización aplicados por año */
-  diasIndemnizacionPorAnio: number;
-  /** Máximo de mensualidades aplicado */
-  maxMensualidades: number;
-  /** Si se aplicó el límite de mensualidades */
-  limitadoPorMensualidades: boolean;
   /** Vacaciones no disfrutadas (€) */
   vacacionesPendientes: number;
   /** Días de vacaciones pendientes */
@@ -98,48 +90,11 @@ export function calcularFiniquito(p: ParametrosFiniquito): ResultadoFiniquito {
   const salarioDiario = p.salarioBrutoMensual / 30;
   const pagas = p.pagas ?? 14;
 
-  // ─── 1. Indemnización ────────────────────────────────────────────────────────
+  // NOTA: el finiquito NO incluye la indemnización por despido. Esta se calcula
+  // de forma independiente en indemnizacionDespido.ts (calcular_indemnizacion_despido).
+  // Mezclarla aquí provocaba doble conteo en consulta_despido.
 
-  let diasIndemnizacionPorAnio = 0;
-  let maxMensualidades = 0;
-
-  switch (p.motivoFiniquito) {
-    case 'despido_improcedente':
-      diasIndemnizacionPorAnio = 33;
-      maxMensualidades = 24;
-      break;
-    case 'despido_objetivo':
-      diasIndemnizacionPorAnio = 20;
-      maxMensualidades = 12;
-      break;
-    case 'fin_contrato_temporal':
-      diasIndemnizacionPorAnio = 12;
-      maxMensualidades = 0; // sin límite mensualidades explícito en ET
-      break;
-    default:
-      diasIndemnizacionPorAnio = 0;
-      maxMensualidades = 0;
-  }
-
-  let indemnizacion = 0;
-  let limitadoPorMensualidades = false;
-
-  if (diasIndemnizacionPorAnio > 0) {
-    // Pro-rata por fracción de año
-    const indemnizacionBruta = r(salarioDiario * diasIndemnizacionPorAnio * aniosTotales);
-    const topeMensualidades = maxMensualidades > 0
-      ? r(p.salarioBrutoMensual * maxMensualidades)
-      : Infinity;
-
-    if (maxMensualidades > 0 && indemnizacionBruta > topeMensualidades) {
-      indemnizacion = topeMensualidades;
-      limitadoPorMensualidades = true;
-    } else {
-      indemnizacion = indemnizacionBruta;
-    }
-  }
-
-  // ─── 2. Vacaciones no disfrutadas ───────────────────────────────────────────
+  // ─── 1. Vacaciones no disfrutadas ───────────────────────────────────────────
 
   const diasVacacionesAnuales = p.diasVacacionesAnuales ?? 22; // días laborables mínimo legal
   const diasVacacionesDisfrutados = p.diasVacacionesDisfrutados ?? 0;
@@ -154,7 +109,7 @@ export function calcularFiniquito(p: ParametrosFiniquito): ResultadoFiniquito {
   const diasVacacionesPendientes = Math.max(0, vacacionesDevengadas - diasVacacionesDisfrutados);
   const vacacionesPendientes = r(salarioDiario * diasVacacionesPendientes);
 
-  // ─── 3. Parte proporcional pagas extras ─────────────────────────────────────
+  // ─── 2. Parte proporcional pagas extras ─────────────────────────────────────
 
   const pagasExtra = pagas - 12;
   let pagasExtrasProporcionales = 0;
@@ -177,32 +132,27 @@ export function calcularFiniquito(p: ParametrosFiniquito): ResultadoFiniquito {
     pagasExtrasProporcionales = r(p.salarioBrutoMensual * pagasExtra * (mesesProporcionales / 6));
   }
 
-  // ─── 4. Salarios pendientes ──────────────────────────────────────────────────
+  // ─── 3. Salarios pendientes ──────────────────────────────────────────────────
 
   const diaDelMes = fechaBaja.getDate();
   const salariosAtrasados = r(salarioDiario * diaDelMes);
 
   // ─── Total ───────────────────────────────────────────────────────────────────
 
-  const totalFiniquitoBruto = r(indemnizacion + vacacionesPendientes + pagasExtrasProporcionales + salariosAtrasados);
+  const totalFiniquitoBruto = r(vacacionesPendientes + pagasExtrasProporcionales + salariosAtrasados);
 
-  // Nota tributación (la indemnización por despido improcedente está exenta hasta 180.000 €)
-  let notaTributacion = '';
-  if (p.motivoFiniquito === 'despido_improcedente') {
-    notaTributacion = 'La indemnización por despido improcedente está EXENTA de IRPF hasta 180.000 € (art. 7.e LIRPF). Vacaciones y pagas extras sí tributan.';
-  } else if (p.motivoFiniquito === 'despido_objetivo') {
-    notaTributacion = 'La indemnización por despido objetivo (causas ETOP) está EXENTA de IRPF hasta 180.000 € (art. 7.e LIRPF). Vacaciones y pagas extras sí tributan.';
-  } else {
-    notaTributacion = 'Todas las cantidades del finiquito (vacaciones + pagas proporcionales + salarios) tributan como rendimientos del trabajo en IRPF.';
+  // Nota tributación: el finiquito (vacaciones + pagas + salarios) tributa siempre como
+  // rendimiento del trabajo. La indemnización por despido se calcula aparte y puede estar exenta.
+  let notaTributacion =
+    'El finiquito (vacaciones + pagas extras proporcionales + salarios pendientes) tributa como rendimiento del trabajo en IRPF.';
+  if (p.motivoFiniquito === 'despido_improcedente' || p.motivoFiniquito === 'despido_objetivo') {
+    notaTributacion +=
+      ' La indemnización por despido se calcula aparte (calcular_indemnizacion_despido) y está EXENTA de IRPF hasta 180.000 € (art. 7.e LIRPF).';
   }
 
   return {
     antiguedadAnios,
     antiguedadDias,
-    indemnizacion,
-    diasIndemnizacionPorAnio,
-    maxMensualidades,
-    limitadoPorMensualidades,
     vacacionesPendientes,
     diasVacacionesPendientes: r(diasVacacionesPendientes),
     pagasExtrasProporcionales,
