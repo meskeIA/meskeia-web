@@ -1,0 +1,209 @@
+{
+  "_meta": {
+    "descripcion": "Glosario de dualidad terminologica espanol de Espana <-> espanol de Latam para deteccion de candidatas SEO. Cada par recoge un termino de DOMINIO (probable nombre o keyword de una app meskeIA) que se dice distinto a cada lado del Atlantico. Sirve para 2 cosas: (1) detectar apps existentes que solo usan una variante y pierden el otro mercado, (2) escribir apps NUEVAS ya con ambos terminos desde el origen.",
+    "actualizado": "2026-06-07",
+    "origen": "Descubierto a raiz de simulador-puertas-logicas: rankeaba por 'simulador de compuertas logicas' (Latam) pese a usar solo 'puertas logicas' (Espana) en el contenido visible. Ver commit 884248b4.",
+    "como_ampliar": "Anadir un par cuando en Search Console aparezca una consulta con impresiones reales que use una variante regional distinta a la del title/H1 de la app. No anadir terminos universales (hipoteca, IMC, porcentaje) ni inventar pares sin evidencia de busqueda.",
+    "regla_de_aplicacion": "El fix es BARATO y aditivo: anadir el sinonimo en title, subtitulo, keywords, JSON-LD y una FAQ de terminologia. NUNCA reemplazar el H1 ni machacar el texto (keyword stuffing). NO aplicar a apps fiscales-Espana (RegionBadge es-only): ahi el publico correcto es Espana.",
+    "campos": {
+      "dominio": "area tematica para agrupar",
+      "es": "variantes usadas en Espana (incluye singular/plural)",
+      "latam": "variantes usadas en Hispanoamerica",
+      "nota": "termino ingles de origen u observacion"
+    }
+  },
+  "pares": [
+    {
+      "dominio": "informatica",
+      "es": ["puerta logica", "puertas logicas"],
+      "latam": ["compuerta logica", "compuertas logicas"],
+      "nota": "logic gate. RESUELTO en simulador-puertas-logicas (884248b4)"
+    },
+    {
+      "dominio": "informatica",
+      "es": ["ordenador", "ordenadores"],
+      "latam": ["computadora", "computadoras", "computador", "computadores"],
+      "nota": "computer"
+    },
+    {
+      "dominio": "informatica",
+      "es": ["raton"],
+      "latam": ["mouse"],
+      "nota": "mouse (periferico)"
+    },
+    {
+      "dominio": "informatica",
+      "es": ["disco duro"],
+      "latam": ["disco rigido"],
+      "nota": "hard disk"
+    },
+    {
+      "dominio": "tecnologia",
+      "es": ["movil", "telefono movil"],
+      "latam": ["celular", "telefono celular"],
+      "nota": "mobile phone. 'movil' choca con otros sentidos; usar con contexto telefono"
+    },
+    {
+      "dominio": "tecnologia",
+      "es": ["gafas"],
+      "latam": ["lentes", "anteojos"],
+      "nota": "glasses"
+    },
+    {
+      "dominio": "finanzas",
+      "es": ["tipo de interes", "tipos de interes"],
+      "latam": ["tasa de interes", "tasas de interes"],
+      "nota": "interest rate. ALTA PRIORIDAD: afecta a muchas apps de finanzas"
+    },
+    {
+      "dominio": "finanzas",
+      "es": ["deposito a plazo", "deposito a plazo fijo"],
+      "latam": ["plazo fijo"],
+      "nota": "term deposit"
+    },
+    {
+      "dominio": "vivienda",
+      "es": ["alquiler", "alquilar"],
+      "latam": ["arriendo", "arrendar"],
+      "nota": "rent. Se omite 'renta/rentar' porque choca con renta=ingreso/IRPF (declaracion de la renta)"
+    },
+    {
+      "dominio": "vivienda",
+      "es": ["nevera", "frigorifico"],
+      "latam": ["heladera", "refrigerador", "nevera"],
+      "nota": "fridge"
+    },
+    {
+      "dominio": "vivienda",
+      "es": ["fontaneria", "fontanero"],
+      "latam": ["plomeria", "plomero"],
+      "nota": "plumbing"
+    },
+    {
+      "dominio": "vivienda",
+      "es": ["piscina"],
+      "latam": ["alberca", "pileta"],
+      "nota": "swimming pool"
+    },
+    {
+      "dominio": "vehiculos",
+      "es": ["coche", "coches"],
+      "latam": ["carro", "carros", "auto", "autos"],
+      "nota": "car"
+    },
+    {
+      "dominio": "vehiculos",
+      "es": ["conducir"],
+      "latam": ["manejar"],
+      "nota": "to drive. 'manejar' tiene otros sentidos; revisar contexto vehiculo"
+    },
+    {
+      "dominio": "vehiculos",
+      "es": ["matricula", "matricula del coche"],
+      "latam": ["placa", "patente", "chapa"],
+      "nota": "license plate. 'matricula' choca con matricula universitaria; revisar"
+    },
+    {
+      "dominio": "vehiculos",
+      "es": ["aparcar", "aparcamiento"],
+      "latam": ["estacionar", "estacionamiento", "parquear"],
+      "nota": "to park"
+    },
+    {
+      "dominio": "viajes",
+      "es": ["billete", "billetes"],
+      "latam": ["boleto", "boletos", "pasaje", "pasajes"],
+      "nota": "ticket. 'billete' tambien = banknote; revisar contexto transporte/avion"
+    },
+    {
+      "dominio": "viajes",
+      "es": ["autobus"],
+      "latam": ["bus", "camion", "guagua", "colectivo"],
+      "nota": "bus. variantes muy regionales (camion=MX, guagua=Caribe)"
+    },
+    {
+      "dominio": "viajes",
+      "es": ["conducir", "carnet de conducir"],
+      "latam": ["licencia de conducir", "licencia de manejo"],
+      "nota": "driving license"
+    },
+    {
+      "dominio": "trabajo",
+      "es": ["nomina", "nominas"],
+      "latam": ["planilla", "recibo de pago", "recibo de sueldo"],
+      "nota": "payslip. nomina es-only estructural en apps fiscales; revisar es-only"
+    },
+    {
+      "dominio": "trabajo",
+      "es": ["curriculum", "cv"],
+      "latam": ["hoja de vida"],
+      "nota": "resume / CV"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["patata", "patatas"],
+      "latam": ["papa", "papas"],
+      "nota": "potato. 'papa' choca con papa(padre); revisar contexto cocina"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["zumo"],
+      "latam": ["jugo"],
+      "nota": "juice"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["melocoton", "melocotones"],
+      "latam": ["durazno", "duraznos"],
+      "nota": "peach"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["judia", "judias", "judia verde"],
+      "latam": ["frijol", "frijoles", "poroto", "porotos", "ejote", "chaucha"],
+      "nota": "bean"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["guisante", "guisantes"],
+      "latam": ["arveja", "arvejas", "chicharo", "chicharos"],
+      "nota": "pea"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["aguacate"],
+      "latam": ["palta"],
+      "nota": "avocado"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["maiz", "mazorca"],
+      "latam": ["choclo", "elote", "jojoto"],
+      "nota": "corn"
+    },
+    {
+      "dominio": "cocina",
+      "es": ["tarta", "tartas"],
+      "latam": ["torta", "tortas", "pastel", "pasteles", "queque"],
+      "nota": "cake. muchas variantes; revisar contexto reposteria"
+    },
+    {
+      "dominio": "salud",
+      "es": ["resfriado"],
+      "latam": ["resfrio", "gripa"],
+      "nota": "cold"
+    },
+    {
+      "dominio": "salud",
+      "es": ["tirita", "tiritas"],
+      "latam": ["curita", "curitas", "bandita"],
+      "nota": "band-aid"
+    },
+    {
+      "dominio": "educacion",
+      "es": ["bachillerato", "eso", "selectividad", "ebau", "evau"],
+      "latam": ["preparatoria", "secundaria", "educacion media", "examen de admision"],
+      "nota": "ya cubierto por la regla Latam-friendly del CLAUDE.md; incluido para deteccion en apps antiguas"
+    }
+  ]
+}
