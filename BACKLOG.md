@@ -87,6 +87,7 @@
     - ✅ `sql.js` 1.14.0 → 1.14.1 **completado** (2026-03-09).
     - ✅ `@types/node` 22.19.13 → 22.19.15 **completado** (2026-03-09). No subir a v25 (no LTS).
     - ✅ `dompurify` + `minimatch` + 8 vuln transitivas más resueltas con `npm audit fix` sin --force (2026-05-11). Solo `package-lock.json` modificado, build OK.
+    - ✅ `next`+`@next/bundle-analyzer`+`eslint-config-next` 16.2.6→16.2.7, `react`+`react-dom` 19.2.6→19.2.7, `@tanstack/react-query` 5.100.14→5.101.0, `@types/react` 19.2.15→19.2.17, `@anthropic-ai/sdk` 0.100.1→0.102.0, `js-yaml` 4.1.1→4.2.0, `baseline-browser-mapping` 2.10.33→2.10.34, `@types/node` 22.19.19→22.19.20 (parche, sigue en v22 LTS). Build 1.161 páginas OK. **completado** (2026-06-08).
 
 - [x] **ai-index.json: texto desactualizado** — Corregido a 250 apps, suites actualizadas, fecha 2026-03-01. *(resuelto: 2026-03-01)*
 
