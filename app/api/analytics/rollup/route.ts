@@ -47,6 +47,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const max = Math.min(Math.max(parseInt(searchParams.get('max') || '60', 10) || 60, 1), 400);
 
+    // rebuild=1: fuerza recompute total (cambio de semántica de columnas). Vacía
+    // rollup_control para que se recomputen todos los días; el DELETE+INSERT por
+    // rango de computarRollupRango sobrescribe los datos viejos.
+    if (searchParams.get('rebuild') === '1') {
+      await client.execute(`DELETE FROM rollup_control`);
+    }
+
     const ipExcluida = await leerIpExcluida(client);
     const t0 = Date.now();
     const { procesados, desde, hasta } = await computarRollupPendientes(client, ipExcluida, max);

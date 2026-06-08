@@ -54,31 +54,45 @@ export function hoyFechaOrd(d: Date = new Date()): string {
   return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 }
 
-/** Clasifica el origen de un registro — replica getResumen (analytics.ts:590-611). */
-function clasificarOrigen(
-  modo: string,
-  ip: string,
-  ipExcluida: string,
-  datosAd: Record<string, unknown> | null
-): string {
-  if (ipExcluida && ip === ipExcluida) return 'mi-ip';
+/** Cap único de duración para todas las medias (30 min). Evita que pestañas
+ *  olvidadas (hasta 51 h registradas) distorsionen los promedios. */
+export const CAP_DUR = 1800;
+
+/** Orígenes que cuentan como "visita con página" (universo U2, base de duración).
+ *  Excluye mcp (llamada API sin página) y bot/propio. */
+const U2_SET = new Set(['web', 'chatgpt', 'copilot', 'otras-ia', 'pwa', 'redes']);
+
+/**
+ * Clasifica el origen REAL del registro (sin considerar si es propio).
+ * Modelo unificado: web / chatgpt / copilot / otras-ia / mcp / pwa / redes / bot.
+ * Limpia el modo espurio 'chatgpt' y agrupa las plataformas IA sin volumen en 'otras-ia'.
+ */
+function clasificarOrigenReal(modo: string, datosAd: Record<string, unknown> | null): string {
   if (modo === 'bot') return 'bot';
   if (modo === 'mcp') return 'mcp';
+  if (modo === 'chatgpt') return 'chatgpt'; // modo espurio legacy → IA ChatGPT
   if (modo === 'referral-ia') {
-    const hostname = (datosAd?.referrer_ia as string) || null;
-    if (hostname) return hostname; // conocida o desconocida: se agrega tal cual
-    return 'ia-sin-detalle';
+    const ref = (datosAd?.referrer_ia as string) || null;
+    if (ref === 'chatgpt.com') return 'chatgpt';
+    if (ref === 'copilot.microsoft.com') return 'copilot';
+    return 'otras-ia';
   }
+  if (modo === 'pwa') return 'pwa';
+  if (modo === 'referral-social') return 'redes';
   return 'web';
 }
 
 // ── Acumuladores en memoria ────────────────────────────────────────────────
+// Conteos en universo U1 (tráfico real, excluye bots; propio por dimensión).
+// Duración con cap 1800 (U2 emerge solo: bot/mcp tienen duración nula).
+// Buckets b_* en universo U2 (con página): excluyen mcp explícitamente.
 export type GlobalAcc = {
   usos: number; movil: number; escritorio: number;
   recurrentes: number; nuevos: number;
   suma_dur: number; count_dur: number; por_compartir: number;
+  b_sinreg: number; b_rebote: number; b_corta: number; b_media: number; b_larga: number;
 };
-export type AppAcc = { usos: number; suma_dur_cap: number; count_dur_cap: number };
+export type AppAcc = { usos: number; suma_dur_cap: number; count_dur_cap: number; max_dur: number };
 
 /** Resultado de agregar registros: mapas por fecha_ord → es_miip(0|1) → datos. */
 export type RollupMaps = {
@@ -92,6 +106,7 @@ export type RollupMaps = {
 export const nuevoGlobal = (): GlobalAcc => ({
   usos: 0, movil: 0, escritorio: 0, recurrentes: 0, nuevos: 0,
   suma_dur: 0, count_dur: 0, por_compartir: 0,
+  b_sinreg: 0, b_rebote: 0, b_corta: 0, b_media: 0, b_larga: 0,
 });
 
 /** Expresión SQL que reordena el timestamp "DD/MM/YYYY,…" a "YYYYMMDD". */
@@ -99,7 +114,7 @@ export const FECHA_EXPR = `substr(timestamp,7,4)||substr(timestamp,4,2)||substr(
 
 /** Campos crudos mínimos que necesita la agregación. */
 export const CAMPOS_ROLLUP =
-  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales`;
+  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales, es_propio`;
 
 /**
  * Agrega un conjunto de registros crudos en los mapas del rollup.
@@ -122,7 +137,6 @@ export function agregarRegistros(
     if (!fechaOrd) continue;
 
     const ip = String(row.ip_address || '');
-    const miip = ipExcluida && ip === ipExcluida ? 1 : 0;
     const dispositivo = String(row.tipo_dispositivo || '');
     const recurrente = Number(row.es_recurrente) === 1;
     const durRaw = row.duracion_segundos;
@@ -133,47 +147,62 @@ export function agregarRegistros(
     let datosAd: Record<string, unknown> | null = null;
     if (rawDatos) { try { datosAd = JSON.parse(rawDatos); } catch { /* ignorar */ } }
 
+    // Criterio unificado de "visita propia": es_propio=1 OR IP del propietario
+    const propio = Number(row.es_propio) === 1 || (!!ipExcluida && ip === ipExcluida);
+    const origenReal = clasificarOrigenReal(modo, datosAd);
+
+    // ── Origen para getResumen: prioridad propio > bot > resto ──
+    const origenResumen = propio ? 'propio' : origenReal;
+    if (!origenMap.has(fechaOrd)) origenMap.set(fechaOrd, new Map());
+    const ob = origenMap.get(fechaOrd)!;
+    ob.set(origenResumen, (ob.get(origenResumen) || 0) + 1);
+
+    // Conteos U1 (tráfico real): excluir SOLO bots no-propios. Dimensión idx = propio.
+    if (origenReal === 'bot' && !propio) continue;
+    const idx: 0 | 1 = propio ? 1 : 0;
+    const durCap = dur !== null ? Math.min(dur, CAP_DUR) : null;
+
     // ── Global ──
     if (!gMap.has(fechaOrd)) gMap.set(fechaOrd, [nuevoGlobal(), nuevoGlobal()]);
-    const g = gMap.get(fechaOrd)![miip];
+    const g = gMap.get(fechaOrd)![idx];
     g.usos++;
     if (dispositivo === 'movil') g.movil++;
     else if (dispositivo === 'escritorio') g.escritorio++;
     if (recurrente) g.recurrentes++; else g.nuevos++;
-    if (dur !== null) { g.suma_dur += dur; g.count_dur++; }
-    // por_compartir: replica el LIKE '%"ref":"share"%' del router sobre el JSON crudo
+    if (durCap !== null) { g.suma_dur += durCap; g.count_dur++; }
     if (rawDatos.includes('"ref":"share"')) g.por_compartir++;
 
-    // ── App (ranking, duración con cap 7200) ──
-    if (!appMap.has(fechaOrd)) appMap.set(fechaOrd, [new Map(), new Map()]);
-    const appBucket = appMap.get(fechaOrd)![miip];
-    let a = appBucket.get(app);
-    if (!a) { a = { usos: 0, suma_dur_cap: 0, count_dur_cap: 0 }; appBucket.set(app, a); }
-    a.usos++;
-    if (dur !== null && dur <= 7200) { a.suma_dur_cap += dur; a.count_dur_cap++; }
+    // ── Buckets de duración (universo U2: con página; excluye mcp) ──
+    if (U2_SET.has(origenReal)) {
+      if (dur === null) g.b_sinreg++;
+      else if (dur <= 30) g.b_rebote++;
+      else if (dur <= 120) g.b_corta++;
+      else if (dur <= 600) g.b_media++;
+      else g.b_larga++;
+    }
 
-    // ── País (ISO normalizado, solo válidos) ──
+    // ── App (ranking + topPorDuracion; duración con cap 1800, max real) ──
+    if (!appMap.has(fechaOrd)) appMap.set(fechaOrd, [new Map(), new Map()]);
+    const appBucket = appMap.get(fechaOrd)![idx];
+    let a = appBucket.get(app);
+    if (!a) { a = { usos: 0, suma_dur_cap: 0, count_dur_cap: 0, max_dur: 0 }; appBucket.set(app, a); }
+    a.usos++;
+    if (dur !== null) { a.suma_dur_cap += Math.min(dur, CAP_DUR); a.count_dur_cap++; if (dur > a.max_dur) a.max_dur = dur; }
+
+    // ── País / Ciudad (U1, ISO normalizado, solo válidos) ──
     const pais = String(row.pais || '');
-    if (pais && pais !== '') {
+    if (pais !== '') {
       const paisIso = NORMALIZAR_PAIS[pais] ?? pais;
       if (!paisMap.has(fechaOrd)) paisMap.set(fechaOrd, [new Map(), new Map()]);
-      const pb = paisMap.get(fechaOrd)![miip];
+      const pb = paisMap.get(fechaOrd)![idx];
       pb.set(paisIso, (pb.get(paisIso) || 0) + 1);
     }
-
-    // ── Ciudad (solo válidas) ──
     const ciudad = String(row.ciudad || '');
-    if (ciudad && ciudad !== '') {
+    if (ciudad !== '') {
       if (!ciudadMap.has(fechaOrd)) ciudadMap.set(fechaOrd, [new Map(), new Map()]);
-      const cb = ciudadMap.get(fechaOrd)![miip];
+      const cb = ciudadMap.get(fechaOrd)![idx];
       cb.set(ciudad, (cb.get(ciudad) || 0) + 1);
     }
-
-    // ── Origen (para getResumen; incluye 'mi-ip' como valor propio) ──
-    const origen = clasificarOrigen(modo, ip, ipExcluida, datosAd);
-    if (!origenMap.has(fechaOrd)) origenMap.set(fechaOrd, new Map());
-    const ob = origenMap.get(fechaOrd)!;
-    ob.set(origen, (ob.get(origen) || 0) + 1);
   }
 
   return { gMap, appMap, paisMap, ciudadMap, origenMap };
@@ -214,9 +243,9 @@ export async function computarRollupRango(
       const g = pair[miip];
       if (g.usos === 0) continue;
       stmts.push({
-        sql: `INSERT INTO rollup_dia (fecha_ord, es_miip, usos, movil, escritorio, recurrentes, nuevos, suma_dur, count_dur, por_compartir)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        args: [fecha, miip, g.usos, g.movil, g.escritorio, g.recurrentes, g.nuevos, g.suma_dur, g.count_dur, g.por_compartir],
+        sql: `INSERT INTO rollup_dia (fecha_ord, es_miip, usos, movil, escritorio, recurrentes, nuevos, suma_dur, count_dur, por_compartir, b_sinreg, b_rebote, b_corta, b_media, b_larga)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [fecha, miip, g.usos, g.movil, g.escritorio, g.recurrentes, g.nuevos, g.suma_dur, g.count_dur, g.por_compartir, g.b_sinreg, g.b_rebote, g.b_corta, g.b_media, g.b_larga],
       });
     }
   }
@@ -224,9 +253,9 @@ export async function computarRollupRango(
     for (let miip = 0 as 0 | 1; miip <= 1; miip = (miip + 1) as 0 | 1) {
       for (const [app, a] of pair[miip]) {
         stmts.push({
-          sql: `INSERT INTO rollup_dia_app (fecha_ord, es_miip, aplicacion, usos, suma_dur_cap, count_dur_cap)
-                VALUES (?, ?, ?, ?, ?, ?)`,
-          args: [fecha, miip, app, a.usos, a.suma_dur_cap, a.count_dur_cap],
+          sql: `INSERT INTO rollup_dia_app (fecha_ord, es_miip, aplicacion, usos, suma_dur_cap, count_dur_cap, max_dur)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          args: [fecha, miip, app, a.usos, a.suma_dur_cap, a.count_dur_cap, a.max_dur],
         });
       }
     }
@@ -273,8 +302,8 @@ export async function computarRollupRango(
 export async function derivarAcumulados(client: Client): Promise<void> {
   await client.batch([
     `DELETE FROM rollup_app_acum`,
-    `INSERT INTO rollup_app_acum (aplicacion, es_miip, usos, suma_dur_cap, count_dur_cap, ultimo_ord)
-       SELECT aplicacion, es_miip, SUM(usos), SUM(suma_dur_cap), SUM(count_dur_cap), MAX(fecha_ord)
+    `INSERT INTO rollup_app_acum (aplicacion, es_miip, usos, suma_dur_cap, count_dur_cap, ultimo_ord, max_dur)
+       SELECT aplicacion, es_miip, SUM(usos), SUM(suma_dur_cap), SUM(count_dur_cap), MAX(fecha_ord), MAX(max_dur)
        FROM rollup_dia_app GROUP BY aplicacion, es_miip`,
     `DELETE FROM rollup_pais_acum`,
     `INSERT INTO rollup_pais_acum (pais, es_miip, usos)

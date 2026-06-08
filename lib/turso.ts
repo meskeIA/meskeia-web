@@ -164,9 +164,18 @@ async function doInitializeDatabase(): Promise<boolean> {
       suma_dur REAL NOT NULL DEFAULT 0,
       count_dur INTEGER NOT NULL DEFAULT 0,
       por_compartir INTEGER NOT NULL DEFAULT 0,
+      b_sinreg INTEGER NOT NULL DEFAULT 0,
+      b_rebote INTEGER NOT NULL DEFAULT 0,
+      b_corta INTEGER NOT NULL DEFAULT 0,
+      b_media INTEGER NOT NULL DEFAULT 0,
+      b_larga INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY (fecha_ord, es_miip)
     )
   `);
+  // Migración idempotente: columnas de buckets de duración (BD de producción ya existente)
+  for (const col of ['b_sinreg', 'b_rebote', 'b_corta', 'b_media', 'b_larga']) {
+    try { await client.execute(`ALTER TABLE rollup_dia ADD COLUMN ${col} INTEGER NOT NULL DEFAULT 0`); } catch { /* ya existe */ }
+  }
 
   // Conteo por origen (web / claude.ai / … / mcp / bot / mi-ip) — para getResumen.
   // El origen 'mi-ip' YA representa la porción propia → no necesita es_miip.
@@ -188,9 +197,11 @@ async function doInitializeDatabase(): Promise<boolean> {
       usos INTEGER NOT NULL DEFAULT 0,
       suma_dur_cap REAL NOT NULL DEFAULT 0,
       count_dur_cap INTEGER NOT NULL DEFAULT 0,
+      max_dur INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY (fecha_ord, es_miip, aplicacion)
     )
   `);
+  try { await client.execute(`ALTER TABLE rollup_dia_app ADD COLUMN max_dur INTEGER NOT NULL DEFAULT 0`); } catch { /* ya existe */ }
 
   // Conteo por país (ISO normalizado) y por ciudad
   await client.execute(`
@@ -233,9 +244,11 @@ async function doInitializeDatabase(): Promise<boolean> {
       suma_dur_cap REAL NOT NULL DEFAULT 0,
       count_dur_cap INTEGER NOT NULL DEFAULT 0,
       ultimo_ord TEXT,
+      max_dur INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY (aplicacion, es_miip)
     )
   `);
+  try { await client.execute(`ALTER TABLE rollup_app_acum ADD COLUMN max_dur INTEGER NOT NULL DEFAULT 0`); } catch { /* ya existe */ }
   await client.execute(`
     CREATE TABLE IF NOT EXISTS rollup_pais_acum (
       pais TEXT NOT NULL,

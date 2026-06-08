@@ -97,13 +97,15 @@ async function getStatsPorRollup(
   // ── Lecturas: todas independientes → en PARALELO (1 round-trip de latencia,
   //    no ~10 secuenciales). Todas son baratas (tablas rollup pequeñas + ventana
   //    viva de 2 días + registros recientes por PK). ──
+  // Filtro "no propio" unificado: es_propio=0 Y (ip != IP del propietario)
+  const propioSql = ' AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != ?)';
   let muSql = `SELECT MIN(timestamp) pu, MAX(timestamp) uu FROM uso_aplicaciones WHERE 1=1`;
   const muArgs: string[] = [];
-  if (ipExcluida) { muSql += ' AND (ip_address IS NULL OR ip_address != ?)'; muArgs.push(ipExcluida); }
+  if (ipExcluida) { muSql += propioSql; muArgs.push(ipExcluida); }
 
   let regSql = 'SELECT * FROM uso_aplicaciones WHERE 1=1';
   const regArgs: (string | number)[] = [];
-  if (ipExcluida) { regSql += ' AND (ip_address IS NULL OR ip_address != ?)'; regArgs.push(ipExcluida); }
+  if (ipExcluida) { regSql += propioSql; regArgs.push(ipExcluida); }
   regSql += ' ORDER BY id DESC LIMIT ?'; regArgs.push(limite);
 
   const [vivoRes, gcRes, appsAcumRes, muRes, rankRes, paisRes, ciudadRes, compRes, appsSemCerrRes, appsMesCerrRes, registrosResult] = await Promise.all([
@@ -820,20 +822,8 @@ export const analyticsRouter = router({
       const conteos: Record<string, Conteo> = {};
       const nuevaFila = (): Conteo => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
 
-      // Plataformas IA conocidas (en orden de visualización)
-      const PLATAFORMAS_IA = [
-        'claude.ai',
-        'perplexity.ai',
-        'chatgpt.com',
-        'gemini.google.com',
-        'copilot.microsoft.com',
-        'you.com',
-        'phind.com',
-        'poe.com',
-      ];
-
-      // Pre-inicializar todas las filas conocidas
-      ['web', ...PLATAFORMAS_IA, 'ia-sin-detalle', 'mcp', 'bot', 'mi-ip'].forEach(
+      // Categorías del modelo unificado (claves que produce el rollup)
+      ['web', 'chatgpt', 'copilot', 'otras-ia', 'mcp', 'pwa', 'redes', 'bot', 'propio'].forEach(
         (k) => { conteos[k] = nuevaFila(); }
       );
 
@@ -877,34 +867,19 @@ export const analyticsRouter = router({
         c.total += vHoy + vAyer;
       }
 
-      // Construir filas en orden fijo
+      // Filas en orden fijo (modelo unificado). Grupos compatibles con el frontend:
+      // 'ia' (fondo teal), 'bot'/'miip' (gris). 'web'/'mcp'/'pwa'/'redes' sin estilo.
       const filasOrden: Array<{ key: string; label: string; icono: string; grupo: string }> = [
-        { key: 'web',                   label: 'Web',               icono: '🌐', grupo: 'web' },
-        { key: 'claude.ai',             label: 'claude.ai',         icono: '🤖', grupo: 'ia' },
-        { key: 'perplexity.ai',         label: 'perplexity.ai',     icono: '🤖', grupo: 'ia' },
-        { key: 'chatgpt.com',           label: 'chatgpt.com',       icono: '🤖', grupo: 'ia' },
-        { key: 'gemini.google.com',     label: 'gemini.google',     icono: '🤖', grupo: 'ia' },
-        { key: 'copilot.microsoft.com', label: 'copilot',           icono: '🤖', grupo: 'ia' },
-        { key: 'you.com',               label: 'you.com',           icono: '🤖', grupo: 'ia' },
-        { key: 'phind.com',             label: 'phind.com',         icono: '🤖', grupo: 'ia' },
-        { key: 'poe.com',               label: 'poe.com',           icono: '🤖', grupo: 'ia' },
-        { key: 'ia-sin-detalle',        label: 'IA sin detalle',    icono: '🤖', grupo: 'ia' },
-        { key: 'mcp',                   label: 'IA / MCP',          icono: '🔗', grupo: 'mcp' },
-        { key: 'bot',                   label: 'Bots',              icono: '🕷️', grupo: 'bot' },
-        { key: 'mi-ip',                 label: 'Mi IP',             icono: '🏠', grupo: 'miip' },
+        { key: 'web',      label: 'Web',                 icono: '🌐', grupo: 'web' },
+        { key: 'chatgpt',  label: 'IA · ChatGPT',        icono: '🤖', grupo: 'ia' },
+        { key: 'copilot',  label: 'IA · Copilot',        icono: '🤖', grupo: 'ia' },
+        { key: 'otras-ia', label: 'IA · Otras',          icono: '🤖', grupo: 'ia' },
+        { key: 'mcp',      label: 'IA / MCP',            icono: '🔗', grupo: 'mcp' },
+        { key: 'pwa',      label: 'App instalada (PWA)', icono: '📱', grupo: 'pwa' },
+        { key: 'redes',    label: 'Redes sociales',      icono: '📣', grupo: 'redes' },
+        { key: 'bot',      label: 'Bots',                icono: '🕷️', grupo: 'bot' },
+        { key: 'propio',   label: 'Propio',              icono: '🏠', grupo: 'miip' },
       ];
-
-      // Añadir plataformas IA desconocidas que hayan aparecido en los datos
-      const conocidas = new Set(filasOrden.map(f => f.key));
-      for (const key of Object.keys(conteos)) {
-        if (!conocidas.has(key) && conteos[key].total > 0) {
-          filasOrden.splice(
-            filasOrden.findIndex(f => f.key === 'ia-sin-detalle'),
-            0,
-            { key, label: key, icono: '🤖', grupo: 'ia' }
-          );
-        }
-      }
 
       const filas = filasOrden.map(({ key, label, icono, grupo }) => ({
         origen: label,
@@ -913,8 +888,8 @@ export const analyticsRouter = router({
         ...(conteos[key] || nuevaFila()),
       }));
 
-      // Total Real = todo excepto Bots y Mi IP
-      const excluirDeTotalReal = new Set(['bot', 'mi-ip']);
+      // Total Real = todo excepto Bots y Propio (web + IA + MCP + PWA + Redes)
+      const excluirDeTotalReal = new Set(['bot', 'propio']);
       const totalReal = nuevaFila();
       for (const [key, vals] of Object.entries(conteos)) {
         if (!excluirDeTotalReal.has(key)) {
@@ -1402,62 +1377,61 @@ export const analyticsRouter = router({
     .query(async ({ input }) => {
       await initializeDatabase();
       const client = getTursoClient();
+      const ipConfigurada = await leerIpExcluida(client);
+      const soloResto = !!(input.excluir_mi_ip && ipConfigurada);
+      const miipWhere = soloResto ? ' AND es_miip = 0' : '';
+      const miipList: (0 | 1)[] = soloResto ? [0] : [0, 1];
 
-      let ipExcluida = '';
-      if (input.excluir_mi_ip) {
-        try {
-          const r = await client.execute({ sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`, args: [] });
-          if (r.rows.length > 0) ipExcluida = String(r.rows[0].valor);
-        } catch { /* ignorar */ }
+      // On-demand defensivo (1 query si está al día)
+      try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear */ }
+
+      const ahora = new Date();
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const ordF = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+      const hoyOrd = ordF(hoy), ayerOrd = ordF(ayer);
+      const fechasVivas = [ayerOrd, hoyOrd];
+
+      // Buckets (rollup_dia, universo U2) + apps (rollup_app_acum) + ventana viva
+      const [bRes, appRes, vivoRes] = await Promise.all([
+        client.execute(`SELECT COALESCE(SUM(b_sinreg),0) sr, COALESCE(SUM(b_rebote),0) rb, COALESCE(SUM(b_corta),0) co, COALESCE(SUM(b_media),0) me, COALESCE(SUM(b_larga),0) la FROM rollup_dia WHERE 1=1${miipWhere}`),
+        client.execute(`SELECT aplicacion, SUM(usos) usos, SUM(suma_dur_cap) sdc, SUM(count_dur_cap) cdc, MAX(max_dur) mx FROM rollup_app_acum WHERE 1=1${miipWhere} GROUP BY aplicacion`),
+        client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
+      ]);
+      const vivo = agregarRegistros(vivoRes.rows, ipConfigurada);
+
+      const b0 = bRes.rows[0];
+      let sinRegistro = Number(b0.sr), rebote = Number(b0.rb), corta = Number(b0.co), media = Number(b0.me), larga = Number(b0.la);
+      for (const f of fechasVivas) {
+        const pair = vivo.gMap.get(f); if (!pair) continue;
+        for (const m of miipList) { const g = pair[m]; sinRegistro += g.b_sinreg; rebote += g.b_rebote; corta += g.b_corta; media += g.b_media; larga += g.b_larga; }
       }
-
-      const ipFiltro = ipExcluida
-        ? ` AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != '${ipExcluida}')`
-        : ` AND (es_propio IS NULL OR es_propio = 0)`;
-      const botFiltro = ` AND modo NOT IN ('bot', 'mcp')`;
-
-      const res = await client.execute({
-        sql: `
-          SELECT
-            COUNT(*) as total,
-            COUNT(CASE WHEN duracion_segundos IS NULL THEN 1 END) as sin_registro,
-            COUNT(CASE WHEN duracion_segundos IS NOT NULL AND duracion_segundos <= 30 THEN 1 END) as rebote,
-            COUNT(CASE WHEN duracion_segundos > 30 AND duracion_segundos <= 120 THEN 1 END) as corta,
-            COUNT(CASE WHEN duracion_segundos > 120 AND duracion_segundos <= 600 THEN 1 END) as media,
-            COUNT(CASE WHEN duracion_segundos > 600 THEN 1 END) as larga
-          FROM uso_aplicaciones
-          WHERE 1=1 ${ipFiltro}${botFiltro}
-        `,
-        args: [],
-      });
-
-      const topRes = await client.execute({
-        sql: `
-          SELECT
-            aplicacion,
-            COUNT(*) as total_usos,
-            COUNT(CASE WHEN duracion_segundos IS NOT NULL THEN 1 END) as con_duracion,
-            CAST(ROUND(AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END)) AS INTEGER) as duracion_media,
-            MAX(duracion_segundos) as duracion_max
-          FROM uso_aplicaciones
-          WHERE 1=1 ${ipFiltro}${botFiltro}
-          GROUP BY aplicacion
-          HAVING con_duracion >= 3
-          ORDER BY duracion_media DESC
-          LIMIT 100
-        `,
-        args: [],
-      });
-
-      const row = res.rows[0];
-      const total = Number(row.total);
+      const total = sinRegistro + rebote + corta + media + larga;
       const pct = (n: number) => total > 0 ? Math.round(n / total * 1000) / 10 : 0;
 
-      const sinRegistro = Number(row.sin_registro);
-      const rebote = Number(row.rebote);
-      const corta = Number(row.corta);
-      const media = Number(row.media);
-      const larga = Number(row.larga);
+      // topPorDuracion: acumulado + vivo. Duración media con cap 1.800 (ya aplicado en el rollup).
+      type DA = { usos: number; sdc: number; cdc: number; mx: number };
+      const appMap = new Map<string, DA>();
+      for (const r of appRes.rows) appMap.set(String(r.aplicacion), { usos: Number(r.usos), sdc: Number(r.sdc), cdc: Number(r.cdc), mx: Number(r.mx) || 0 });
+      for (const f of fechasVivas) {
+        const pair = vivo.appMap.get(f); if (!pair) continue;
+        for (const m of miipList) for (const [app, a] of pair[m]) {
+          let d = appMap.get(app);
+          if (!d) { d = { usos: 0, sdc: 0, cdc: 0, mx: 0 }; appMap.set(app, d); }
+          d.usos += a.usos; d.sdc += a.suma_dur_cap; d.cdc += a.count_dur_cap; if (a.max_dur > d.mx) d.mx = a.max_dur;
+        }
+      }
+
+      const topPorDuracion = [...appMap.entries()]
+        .filter(([, d]) => d.cdc >= 3)
+        .map(([aplicacion, d]) => {
+          const duracionMedia = d.cdc > 0 ? Math.round(d.sdc / d.cdc) : 0;
+          // Índice de engagement: media(cap30min) × cobertura × log10(1+con_duración)
+          const score = Math.min(duracionMedia, 1800) * (d.cdc / d.usos) * Math.log10(1 + d.cdc);
+          return { aplicacion, totalUsos: d.usos, conDuracion: d.cdc, duracionMedia, duracionMax: d.mx, score };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 20);
 
       return {
         total,
@@ -1468,30 +1442,7 @@ export const analyticsRouter = router({
           { label: '2 – 10min',    descripcion: 'Uso real',                             valor: media,       pct: pct(media),       color: '#10b981' },
           { label: '> 10min',      descripcion: 'Uso intensivo',                        valor: larga,       pct: pct(larga),       color: '#8b5cf6' },
         ],
-        // Ordenación por índice de engagement combinado:
-        //   MIN(duracion, 30min) × cobertura × log10(1 + con_duracion)
-        // Evita que pestañas olvidadas (pocas sesiones, tiempo enorme) dominen el ranking.
-        topPorDuracion: topRes.rows
-          .map(r => {
-            const totalUsos    = Number(r.total_usos);
-            const conDuracion  = Number(r.con_duracion);
-            const duracionMedia = Number(r.duracion_media);
-            const duracionMax  = Number(r.duracion_max);
-            const score =
-              Math.min(duracionMedia, 1800)          // cap a 30 min
-              * (conDuracion / totalUsos)             // ratio de cobertura
-              * Math.log10(1 + conDuracion);          // fiabilidad por volumen
-            return {
-              aplicacion: String(r.aplicacion),
-              totalUsos,
-              conDuracion,
-              duracionMedia,
-              duracionMax,
-              score,
-            };
-          })
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 20),
+        topPorDuracion,
       };
     }),
 });

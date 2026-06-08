@@ -1,15 +1,16 @@
 /**
- * Verificación de PARIDAD del rollup de analytics.
+ * Verificación de PARIDAD del rollup de analytics (modelo unificado).
  *
- * Compara la salida del endpoint tRPC getStats (ruta rollup, sistema completo:
- * tablas rollup_* + ventana viva + helper) contra números de REFERENCIA
- * calculados con queries crudas directas sobre uso_aplicaciones — réplica exacta
- * del getStats original. Si no coinciden, NO desplegar.
+ * Compara la salida de los endpoints tRPC (vía rollup) contra números de
+ * REFERENCIA calculados con queries crudas que aplican el MISMO modelo:
+ *   - Visita propia = es_propio=1 OR ip=IP_actual
+ *   - U1 "tráfico real" = todo excepto bot y propio (conteos)
+ *   - U2 "con página" = U1 excepto mcp (duración/buckets)
+ *   - Cap único de duración = 1.800s
  *
- * Requiere dev server corriendo y el backfill ya ejecutado:
- *   1) npm run dev
- *   2) node scripts/rollup-backfill.mjs
- *   3) node scripts/rollup-verify.mjs
+ * Requiere dev server + rollup recomputado (?rebuild=1):
+ *   1) npm run dev   2) GET /api/analytics/rollup?rebuild=1&max=400 (x-api-key)
+ *   3) node scripts/rollup-verify.mjs http://localhost:3050
  */
 
 import { createClient } from '@libsql/client';
@@ -19,201 +20,170 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-
 const env = readFileSync(resolve(ROOT, '.env.local'), 'utf8');
 for (const line of env.split('\n')) {
   const m = line.match(/^([A-Z_]+)=(.*)$/);
   if (m) process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
 }
 const client = createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN });
-const BASE = (process.argv[2] || 'http://localhost:3000').replace(/\/$/, '');
+const BASE = (process.argv[2] || 'http://localhost:3050').replace(/\/$/, '');
+const CAP = 1800;
 
 let fallos = 0;
 const ok = (n) => console.log(`  ✅ ${n}`);
 const fail = (n, ref, got) => { console.log(`  ❌ ${n}: referencia=${ref}  rollup=${got}`); fallos++; };
 const cmp = (n, ref, got, tol = 0) => { (Math.abs(Number(ref) - Number(got)) <= tol) ? ok(`${n} (${got})`) : fail(n, ref, got); };
 
-async function llamarTRPC(proc, payload) {
-  // tRPC SIN superjson: input plano y respuesta en result.data (sin .json)
+async function trpc(proc, payload) {
   const input = encodeURIComponent(JSON.stringify({ '0': payload }));
   const res = await fetch(`${BASE}/api/trpc/analytics.${proc}?batch=1&input=${input}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-  const j = await res.json();
-  return j[0].result.data;
+  return (await res.json())[0].result.data;
 }
-const llamarGetStats = (excluir) => llamarTRPC('getStats', { limite: 500, excluir_mi_ip: excluir });
 
-// Clasificación de origen — réplica de getResumen (para la referencia cruda)
-const PLAT_IA = ['claude.ai', 'perplexity.ai', 'chatgpt.com', 'gemini.google.com', 'copilot.microsoft.com', 'you.com', 'phind.com', 'poe.com'];
-function clasificarOrigen(modo, ip, ipExcluida, datosAd) {
-  if (ipExcluida && ip === ipExcluida) return 'mi-ip';
+const ordExpr = `substr(timestamp,7,4)||substr(timestamp,4,2)||substr(timestamp,1,2)`;
+const ord = (d) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+
+let IPX = '';
+const NORM = { Spain: 'ES', 'United States': 'US', Mexico: 'MX', Argentina: 'AR', Colombia: 'CO', Bolivia: 'BO', Ecuador: 'EC', Chile: 'CL', Peru: 'PE', Venezuela: 'VE', Guatemala: 'GT', 'Costa Rica': 'CR', Honduras: 'HN', 'El Salvador': 'SV', Nicaragua: 'NI', Panama: 'PA', Cuba: 'CU', 'Dominican Republic': 'DO', 'Puerto Rico': 'PR', Uruguay: 'UY', Paraguay: 'PY', Brazil: 'BR', Portugal: 'PT', France: 'FR', Germany: 'DE', 'United Kingdom': 'GB', Italy: 'IT', Netherlands: 'NL', Belgium: 'BE', Switzerland: 'CH', Sweden: 'SE', Norway: 'NO', Denmark: 'DK', Finland: 'FI', Poland: 'PL', Russia: 'RU', Turkey: 'TR', Canada: 'CA', Australia: 'AU', Japan: 'JP', China: 'CN', India: 'IN', 'South Korea': 'KR' };
+
+// Filtros SQL del modelo (bot∩propio=0 verificado → simplificados).
+// "no propio" maneja NULL como el código real: NOT(0 OR NULL)=NULL excluiría mal
+// las filas con ip NULL, por eso se escribe con IS NULL explícito.
+const noPropio = () => `(es_propio IS NULL OR es_propio=0) AND (ip_address IS NULL OR ip_address!='${IPX.replace(/'/g, "''")}')`;
+const whereU1 = (excluir) => `(modo IS NULL OR modo!='bot')${excluir ? ` AND ${noPropio()}` : ''}`;
+const whereU2 = (excluir) => `(modo IS NULL OR modo NOT IN ('bot','mcp'))${excluir ? ` AND ${noPropio()}` : ''}`;
+const num = async (sql) => Number((await client.execute(sql)).rows[0].n);
+
+function clasificarOrigenReal(modo, ref) {
   if (modo === 'bot') return 'bot';
   if (modo === 'mcp') return 'mcp';
-  if (modo === 'referral-ia') { const h = datosAd?.referrer_ia || null; return h || 'ia-sin-detalle'; }
+  if (modo === 'chatgpt') return 'chatgpt';
+  if (modo === 'referral-ia') return ref === 'chatgpt.com' ? 'chatgpt' : ref === 'copilot.microsoft.com' ? 'copilot' : 'otras-ia';
+  if (modo === 'pwa') return 'pwa';
+  if (modo === 'referral-social') return 'redes';
   return 'web';
+}
+
+async function verificarStats(excluir) {
+  console.log(`\n═══ getStats (excluir=${excluir}) ═══`);
+  const w = whereU1(excluir);
+  const got = await trpc('getStats', { limite: 500, excluir_mi_ip: excluir });
+
+  cmp('total_usos', await num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${w}`), got.estadisticas.total_usos);
+  cmp('total_aplicaciones', await num(`SELECT COUNT(DISTINCT aplicacion) n FROM uso_aplicaciones WHERE ${w}`), got.estadisticas.total_aplicaciones);
+  const dur = (await client.execute(`SELECT AVG(CASE WHEN duracion_segundos IS NOT NULL THEN MIN(duracion_segundos,${CAP}) END) d FROM uso_aplicaciones WHERE ${w}`)).rows[0].d;
+  cmp('duracion_promedio (cap1800)', Math.round((Number(dur) || 0) * 10) / 10, got.estadisticas.duracion_promedio_segundos, 0.2);
+  cmp('movil', await num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${w} AND tipo_dispositivo='movil'`), got.estadisticas.dispositivos.movil.total);
+  cmp('escritorio', await num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${w} AND tipo_dispositivo='escritorio'`), got.estadisticas.dispositivos.escritorio.total);
+  cmp('recurrentes', await num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${w} AND es_recurrente=1`), got.estadisticas.usuarios.recurrentes.total);
+  cmp('por_compartir', await num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${w} AND datos_adicionales LIKE '%"ref":"share"%'`), got.estadisticas.por_compartir);
+
+  // Ranking por app (usos + duración media cap1800)
+  const rk = await client.execute(`SELECT aplicacion, COUNT(*) usos, AVG(CASE WHEN duracion_segundos IS NOT NULL THEN MIN(duracion_segundos,${CAP}) END) dur FROM uso_aplicaciones WHERE ${w} GROUP BY aplicacion`);
+  const refRank = new Map(rk.rows.map(r => [String(r.aplicacion), { usos: Number(r.usos), dur: Number(r.dur) || 0 }]));
+  const gotRank = new Map(got.ranking_aplicaciones.map(a => [a.aplicacion, { usos: a.total_usos, dur: a.duracion_promedio_segundos }]));
+  let rf = 0;
+  if (refRank.size !== gotRank.size) fail('ranking nº apps', refRank.size, gotRank.size);
+  for (const [app, ref] of refRank) {
+    const g = gotRank.get(app);
+    if (!g || ref.usos !== g.usos || Math.abs(ref.dur - g.dur) > 0.5) { rf++; if (rf <= 4) console.log(`  ❌ ranking ${app}: ref=${JSON.stringify(ref)} got=${JSON.stringify(g)}`); }
+  }
+  rf === 0 ? ok(`ranking (${gotRank.size} apps)`) : fallos++;
+
+  // Comparativa (usos por período)
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+  const ante = new Date(hoy); ante.setDate(hoy.getDate() - 2);
+  const h7 = new Date(hoy); h7.setDate(hoy.getDate() - 7);
+  const h14 = new Date(hoy); h14.setDate(hoy.getDate() - 14);
+  const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const iMesA = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+  const fMesA = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+  const cont = async (a, b) => num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${ordExpr}>='${ord(a)}' AND ${ordExpr}<='${ord(b)}' AND ${w}`);
+  cmp('comp.hoy', await cont(hoy, hoy), got.comparativa.hoy.usos);
+  cmp('comp.semana', await cont(h7, hoy), got.comparativa.semana.usos);
+  cmp('comp.mes', await cont(iMes, hoy), got.comparativa.mes.usos);
+  cmp('comp.detalles.anteayer', await cont(ante, ante), got.comparativa.detalles.anteayer);
+  cmp('comp.detalles.semAnt', await cont(h14, h7), got.comparativa.detalles.semanaAnterior);
+  cmp('comp.detalles.mesAnt', await cont(iMesA, fMesA), got.comparativa.detalles.mesAnterior);
 }
 
 async function verificarResumen() {
   console.log(`\n═══ getResumen (origen × período) ═══`);
-  const cfg = await client.execute(`SELECT valor FROM analytics_config WHERE clave='ip_excluida'`);
-  const ipExcluida = cfg.rows.length ? String(cfg.rows[0].valor) : '';
-
-  // Referencia cruda
-  const ahora = new Date();
-  const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
   const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-  const hace7 = new Date(hoy); hace7.setDate(hoy.getDate() - 7);
+  const h7 = new Date(hoy); h7.setDate(hoy.getDate() - 7);
   const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
   const parse = (ts) => { const m = String(ts).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; };
-  const rows = (await client.execute(`SELECT timestamp, modo, datos_adicionales, ip_address FROM uso_aplicaciones`)).rows;
-  const ref = {};
-  const nf = () => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
+  const rows = (await client.execute(`SELECT timestamp, modo, datos_adicionales, ip_address, es_propio FROM uso_aplicaciones`)).rows;
+  const ref = {}; const nf = () => ({ hoy: 0, ayer: 0, semana: 0, mes: 0, total: 0 });
   for (const r of rows) {
     const f = parse(r.timestamp); if (!f) continue;
     let dAd = null; try { if (r.datos_adicionales) dAd = JSON.parse(String(r.datos_adicionales)); } catch {}
-    const o = clasificarOrigen(String(r.modo || 'web'), String(r.ip_address || ''), ipExcluida, dAd);
+    const propio = Number(r.es_propio) === 1 || String(r.ip_address || '') === IPX;
+    const oReal = clasificarOrigenReal(String(r.modo || 'web'), dAd?.referrer_ia);
+    const o = propio ? 'propio' : oReal;
     if (!ref[o]) ref[o] = nf();
     const c = ref[o];
     if (f >= hoy) c.hoy++; if (f >= ayer && f < hoy) c.ayer++;
-    if (f >= hace7) c.semana++; if (f >= iMes) c.mes++; c.total++;
+    if (f >= h7) c.semana++; if (f >= iMes) c.mes++; c.total++;
   }
-  const refTotalReal = nf();
-  for (const [k, v] of Object.entries(ref)) if (k !== 'bot' && k !== 'mi-ip') for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) refTotalReal[p] += v[p];
+  const tr = nf();
+  for (const [k, v] of Object.entries(ref)) if (k !== 'bot' && k !== 'propio') for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) tr[p] += v[p];
 
-  const got = await llamarTRPC('getResumen', {});
-  for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) cmp(`totalReal.${p}`, refTotalReal[p], got.totalReal[p]);
-  // Suma de todas las filas == suma de toda la referencia
-  const refTotalAll = Object.values(ref).reduce((a, v) => a + v.total, 0);
-  const gotTotalAll = got.filas.reduce((a, f) => a + f.total, 0);
-  cmp('suma filas (total)', refTotalAll, gotTotalAll);
-  // Fila web y mi-ip por separado
-  const gWeb = got.filas.find((f) => f.origen === 'Web');
-  cmp('fila Web.total', ref['web']?.total || 0, gWeb?.total || 0);
-  const gMiip = got.filas.find((f) => f.origen === 'Mi IP');
-  cmp('fila Mi IP.total', ref['mi-ip']?.total || 0, gMiip?.total || 0);
+  const got = await trpc('getResumen', {});
+  for (const p of ['hoy', 'ayer', 'semana', 'mes', 'total']) cmp(`totalReal.${p}`, tr[p], got.totalReal[p]);
+  cmp('suma filas total', Object.values(ref).reduce((a, v) => a + v.total, 0), got.filas.reduce((a, f) => a + f.total, 0));
+  cmp('fila Web', ref['web']?.total || 0, got.filas.find(f => f.origen === 'Web')?.total || 0);
+  cmp('fila Propio', ref['propio']?.total || 0, got.filas.find(f => f.origen === 'Propio')?.total || 0);
+  cmp('fila MCP', ref['mcp']?.total || 0, got.filas.find(f => f.origen === 'IA / MCP')?.total || 0);
+  cmp('fila PWA', ref['pwa']?.total || 0, got.filas.find(f => f.origen.includes('PWA'))?.total || 0);
 }
 
 async function verificarTendencia(excluir) {
   console.log(`\n═══ getTendencia30Dias (excluir=${excluir}) ═══`);
-  const cfg = await client.execute(`SELECT valor FROM analytics_config WHERE clave='ip_excluida'`);
-  const ipExcluida = excluir && cfg.rows.length ? String(cfg.rows[0].valor) : '';
-  const ipF = ipExcluida ? ` AND (ip_address IS NULL OR ip_address != '${ipExcluida.replace(/'/g, "''")}')` : '';
   const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
   const inicio = new Date(hoy); inicio.setDate(hoy.getDate() - 29);
-  const inicioOrd = ord(inicio);
-  const refRows = (await client.execute(`SELECT ${ordExpr} fo, COUNT(*) t FROM uso_aplicaciones WHERE ${ordExpr} >= '${inicioOrd}'${ipF} GROUP BY fo`)).rows;
-  const refTotal = refRows.reduce((a, r) => a + Number(r.t), 0);
-  const got = await llamarTRPC('getTendencia30Dias', { excluir_mi_ip: excluir });
-  const gotTotal = got.dias.reduce((a, d) => a + d.usos, 0);
-  cmp('suma 30 días', refTotal, gotTotal);
+  const ref = await num(`SELECT COUNT(*) n FROM uso_aplicaciones WHERE ${ordExpr}>='${ord(inicio)}' AND ${whereU1(excluir)}`);
+  const got = await trpc('getTendencia30Dias', { excluir_mi_ip: excluir });
+  cmp('suma 30 días', ref, got.dias.reduce((a, d) => a + d.usos, 0));
   cmp('nº días', 30, got.dias.length);
 }
 
-// fecha_ord helpers
-const ordExpr = `substr(timestamp,7,4)||substr(timestamp,4,2)||substr(timestamp,1,2)`;
-const ord = (d) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-
-async function verificarModo(excluir) {
-  console.log(`\n═══ Modo excluir_mi_ip = ${excluir} ═══`);
-
-  // IP excluida configurada
-  const cfg = await client.execute(`SELECT valor FROM analytics_config WHERE clave='ip_excluida'`);
-  const ipExcluida = excluir && cfg.rows.length ? String(cfg.rows[0].valor) : '';
-  const ipF = ipExcluida ? ` AND (ip_address IS NULL OR ip_address != '${ipExcluida.replace(/'/g, "''")}')` : '';
-
-  const rollup = await llamarGetStats(excluir);
-
-  // ── Globales ──
-  const s = (await client.execute(`
-    SELECT COUNT(*) total, COUNT(DISTINCT aplicacion) apps,
-      AVG(CASE WHEN duracion_segundos IS NOT NULL THEN duracion_segundos END) dur,
-      SUM(CASE WHEN tipo_dispositivo='movil' THEN 1 ELSE 0 END) movil,
-      SUM(CASE WHEN tipo_dispositivo='escritorio' THEN 1 ELSE 0 END) escritorio,
-      SUM(CASE WHEN es_recurrente=1 THEN 1 ELSE 0 END) rec,
-      SUM(CASE WHEN es_recurrente=0 THEN 1 ELSE 0 END) nue
-    FROM uso_aplicaciones WHERE 1=1${ipF}`)).rows[0];
-
-  cmp('total_usos', s.total, rollup.estadisticas.total_usos);
-  cmp('total_aplicaciones', s.apps, rollup.estadisticas.total_aplicaciones);
-  cmp('duracion_promedio_seg', Math.round((Number(s.dur) || 0) * 10) / 10, rollup.estadisticas.duracion_promedio_segundos, 0.2);
-  cmp('movil', s.movil, rollup.estadisticas.dispositivos.movil.total);
-  cmp('escritorio', s.escritorio, rollup.estadisticas.dispositivos.escritorio.total);
-  cmp('recurrentes', s.rec, rollup.estadisticas.usuarios.recurrentes.total);
-  cmp('nuevos', s.nue, rollup.estadisticas.usuarios.nuevos.total);
-
-  const sh = (await client.execute(`SELECT COUNT(*) t FROM uso_aplicaciones WHERE datos_adicionales LIKE '%"ref":"share"%'${ipF}`)).rows[0];
-  cmp('por_compartir', sh.t, rollup.estadisticas.por_compartir);
-
-  // ── Ranking (por app) ──
-  const rk = await client.execute(`
-    SELECT aplicacion, COUNT(*) usos,
-      AVG(CASE WHEN duracion_segundos IS NOT NULL AND duracion_segundos<=7200 THEN duracion_segundos END) dur
-    FROM uso_aplicaciones WHERE 1=1${ipF} GROUP BY aplicacion`);
-  const refRank = new Map();
-  for (const r of rk.rows) refRank.set(String(r.aplicacion), { usos: Number(r.usos), dur: Number(r.dur) || 0 });
-  const gotRank = new Map();
-  for (const a of rollup.ranking_aplicaciones) gotRank.set(a.aplicacion, { usos: a.total_usos, dur: a.duracion_promedio_segundos });
-
-  let rankFails = 0;
-  if (refRank.size !== gotRank.size) { fail('ranking nº apps', refRank.size, gotRank.size); }
-  for (const [app, ref] of refRank) {
-    const got = gotRank.get(app);
-    if (!got) { rankFails++; if (rankFails <= 5) console.log(`  ❌ ranking falta app: ${app}`); continue; }
-    if (ref.usos !== got.usos) { rankFails++; if (rankFails <= 5) console.log(`  ❌ ranking ${app} usos: ${ref.usos} vs ${got.usos}`); }
-    else if (Math.abs(ref.dur - got.dur) > 0.5) { rankFails++; if (rankFails <= 5) console.log(`  ❌ ranking ${app} dur: ${ref.dur} vs ${got.dur}`); }
-  }
-  if (rankFails === 0) ok(`ranking (${gotRank.size} apps, usos+duración)`); else { fallos++; console.log(`  ❌ ranking: ${rankFails} discrepancias`); }
-
-  // ── Países (top por clave) ── referencia normalizada (Spain→ES, etc.) como el getStats original
-  const NORM = { Spain: 'ES', 'United States': 'US', Mexico: 'MX', Argentina: 'AR', Colombia: 'CO', Bolivia: 'BO', Ecuador: 'EC', Chile: 'CL', Peru: 'PE', Venezuela: 'VE', Guatemala: 'GT', 'Costa Rica': 'CR', Honduras: 'HN', 'El Salvador': 'SV', Nicaragua: 'NI', Panama: 'PA', Cuba: 'CU', 'Dominican Republic': 'DO', 'Puerto Rico': 'PR', Uruguay: 'UY', Paraguay: 'PY', Brazil: 'BR', Portugal: 'PT', France: 'FR', Germany: 'DE', 'United Kingdom': 'GB', Italy: 'IT', Netherlands: 'NL', Belgium: 'BE', Switzerland: 'CH', Sweden: 'SE', Norway: 'NO', Denmark: 'DK', Finland: 'FI', Poland: 'PL', Russia: 'RU', Turkey: 'TR', Canada: 'CA', Australia: 'AU', Japan: 'JP', China: 'CN', India: 'IN', 'South Korea': 'KR' };
-  const gotPais = new Map(rollup.estadisticas.geografia.paises.map((p) => [p.pais, Number(p.total)]));
-  const refPaisRows = (await client.execute(`SELECT pais, COUNT(*) t FROM uso_aplicaciones WHERE pais IS NOT NULL AND pais != ''${ipF} GROUP BY pais`)).rows;
-  const refPais = new Map();
-  for (const r of refPaisRows) { const k = NORM[String(r.pais)] ?? String(r.pais); refPais.set(k, (refPais.get(k) || 0) + Number(r.t)); }
-  let paisFails = 0;
-  for (const [pais, total] of gotPais) {
-    if (refPais.get(pais) !== total) { paisFails++; if (paisFails <= 5) console.log(`  ❌ país ${pais}: ref=${refPais.get(pais)} rollup=${total}`); }
-  }
-  if (paisFails === 0) ok(`países top (${gotPais.size}, normalizados)`); else fallos++;
-
-  // ── Comparativa temporal (usos) ──
-  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-  const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
-  const anteayer = new Date(hoy); anteayer.setDate(hoy.getDate() - 2);
-  const hace7 = new Date(hoy); hace7.setDate(hoy.getDate() - 7);
-  const hace14 = new Date(hoy); hace14.setDate(hoy.getDate() - 14);
-  const iMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-  const iMesAnt = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-  const fMesAnt = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
-
-  const contar = async (d1, d2) => Number((await client.execute({
-    sql: `SELECT COUNT(*) t FROM uso_aplicaciones WHERE ${ordExpr} >= ? AND ${ordExpr} <= ?${ipF}`,
-    args: [ord(d1), ord(d2)],
-  })).rows[0].t);
-
-  cmp('comparativa.hoy.usos', await contar(hoy, hoy), rollup.comparativa.hoy.usos);
-  cmp('comparativa.ayer.usos', await contar(ayer, ayer), rollup.comparativa.ayer.usos);
-  cmp('comparativa.semana.usos', await contar(hace7, hoy), rollup.comparativa.semana.usos);
-  cmp('comparativa.mes.usos', await contar(iMes, hoy), rollup.comparativa.mes.usos);
-  cmp('detalles.anteayer', await contar(anteayer, anteayer), rollup.comparativa.detalles.anteayer);
-  cmp('detalles.semanaAnterior', await contar(hace14, hace7), rollup.comparativa.detalles.semanaAnterior);
-  cmp('detalles.mesAnterior', await contar(iMesAnt, fMesAnt), rollup.comparativa.detalles.mesAnterior);
-
-  // apps_distintas
-  const contarApps = async (d1, d2) => Number((await client.execute({
-    sql: `SELECT COUNT(DISTINCT aplicacion) t FROM uso_aplicaciones WHERE ${ordExpr} >= ? AND ${ordExpr} <= ?${ipF}`,
-    args: [ord(d1), ord(d2)],
-  })).rows[0].t);
-  cmp('apps_distintas.semana', await contarApps(hace7, hoy), rollup.comparativa.semana.apps_distintas);
-  cmp('apps_distintas.mes', await contarApps(iMes, hoy), rollup.comparativa.mes.apps_distintas);
+async function verificarDistribucion(excluir) {
+  console.log(`\n═══ getDistribucionDuraciones (excluir=${excluir}) ═══`);
+  const w = whereU2(excluir);
+  const r = (await client.execute(`SELECT
+    COUNT(*) total,
+    COUNT(CASE WHEN duracion_segundos IS NULL THEN 1 END) sr,
+    COUNT(CASE WHEN duracion_segundos IS NOT NULL AND duracion_segundos<=30 THEN 1 END) rb,
+    COUNT(CASE WHEN duracion_segundos>30 AND duracion_segundos<=120 THEN 1 END) co,
+    COUNT(CASE WHEN duracion_segundos>120 AND duracion_segundos<=600 THEN 1 END) me,
+    COUNT(CASE WHEN duracion_segundos>600 THEN 1 END) la
+    FROM uso_aplicaciones WHERE ${w}`)).rows[0];
+  const got = await trpc('getDistribucionDuraciones', { excluir_mi_ip: excluir });
+  cmp('total U2', r.total, got.total);
+  cmp('bucket sin registro', r.sr, got.buckets[0].valor);
+  cmp('bucket 2-30s', r.rb, got.buckets[1].valor);
+  cmp('bucket 30s-2min', r.co, got.buckets[2].valor);
+  cmp('bucket 2-10min', r.me, got.buckets[3].valor);
+  cmp('bucket >10min', r.la, got.buckets[4].valor);
+  // nº de apps en el top (con_duracion≥3) — referencia
+  const nApps = await num(`SELECT COUNT(*) n FROM (SELECT aplicacion FROM uso_aplicaciones WHERE ${w} AND duracion_segundos IS NOT NULL GROUP BY aplicacion HAVING COUNT(*)>=3)`);
+  cmp('top apps con_dur≥3 (≥ devueltas)', Math.min(nApps, 20), got.topPorDuracion.length, 0);
 }
 
-console.log('🔍 Verificación de paridad del rollup\n');
-await verificarModo(true);
-await verificarModo(false);
+console.log('🔍 Verificación de paridad — modelo unificado\n');
+IPX = String((await client.execute(`SELECT valor FROM analytics_config WHERE clave='ip_excluida'`)).rows[0]?.valor || '');
+console.log(`IP propietario: ${IPX}`);
+await verificarStats(true);
+await verificarStats(false);
 await verificarResumen();
 await verificarTendencia(true);
 await verificarTendencia(false);
+await verificarDistribucion(true);
+await verificarDistribucion(false);
 
 console.log(`\n${fallos === 0 ? '✅ PARIDAD TOTAL — seguro desplegar' : `❌ ${fallos} discrepancias — NO desplegar`}`);
 process.exit(fallos === 0 ? 0 : 1);
