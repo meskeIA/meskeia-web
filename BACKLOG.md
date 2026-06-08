@@ -1,7 +1,7 @@
 # BACKLOG.md - meskeIA Web
 
-> **Última actualización**: 2026-05-31
-> **Apps totales**: 986 | **Suites**: 13
+> **Última actualización**: 2026-06-08
+> **Apps totales**: 995 | **Suites**: 13
 > **Uso**: Claude Code lee este fichero al inicio de cada sesión y trabaja la siguiente tarea disponible.
 
 ---
@@ -57,6 +57,12 @@
 - [x] **npm audit: vuln `tmp` high corregida** — Path Traversal en `tmp` (prefix/postfix no saneado). Corregida con `npm audit fix` sin --force. *(resuelto: 2026-05-31)*
 
 - [ ] **npm audit: vuln `uuid/exceljs` moderate pendiente** — `exceljs >=3.5.0` depende de `uuid <11.1.1` (GHSA-w5hq-g745-h8pq, buffer bounds check). Fix requiere `npm audit fix --force` con downgrade a `exceljs@3.4.0` (breaking change desde 4.4.0). Riesgo bajo para nuestro uso (lectura/escritura Excel, no generación UUID con buf). Pospuesto hasta que exceljs publique versión >=4.x con uuid corregido. *(detectado: 2026-05-25)*
+
+- [x] **npm audit: vuln `hono` moderate REAPARECIDA — corregida** — 4 CVEs moderados en `hono@4.12.18` (IP restriction bypass IPv6, Set-Cookie injection en cookie helper, JWT middleware acepta cualquier scheme, `app.mount()` enrutado incorrecto con paths percent-encoded). Llegaba transitivamente vía `@modelcontextprotocol/sdk@1.29.0` → `@hono/node-server`. Ya se había resuelto el 2026-05-11 (mismo patrón de reaparición que `brace-expansion` en 2026-05-17). Corregida con `npm audit fix` sin --force — solo `package-lock.json` modificado, build 1.161 páginas OK. De 5 a 4 vuln moderadas (las 4 restantes son deuda aceptada / ya trackeadas). *(detectado y resuelto: 2026-06-08)*
+
+- [x] **Disclaimer `guia-productos-limpieza` corregido** — severity="high"→"critical" (suites `[inmobiliaria, salud]` exigen Nivel 1 CRÍTICO según DISCLAIMER-POLICY.md). `variant="general"` y `collapsible={false}` ya eran correctos (mismo patrón que `adaptacion-hogar`, `planificador-boda`). Detectado por `audit-disclaimers.mjs --solo-criticos`. *(detectado y resuelto: 2026-06-08)*
+
+> Nota: `visualizador-cancer` sigue marcado como "urgente" por el script de auditoría (severity="critical" cuando el nivel esperado por sus suites sería "high"), pero es una **decisión intencional del usuario documentada en este mismo BACKLOG** (resuelto 2026-05-04 y 2026-05-11) — no constituye incidencia real, no reabrir.
 
 - [ ] **Actualizar dependencias (Fase 6)**: `npm outdated` → evaluar actualizaciones. Priorizar: Next.js, React, Chart.js. Sesión dedicada por alto riesgo de breaking changes.
   - *Impacto*: Rendimiento, seguridad, compatibilidad futura

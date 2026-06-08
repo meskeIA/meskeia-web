@@ -521,7 +521,7 @@ export default function GuiaProductosLimpiezaPage() {
 
       <DisclaimerCard
         variant="general"
-        severity="high"
+        severity="critical"
         collapsible={false}
         context="guia-productos-limpieza"
       >
