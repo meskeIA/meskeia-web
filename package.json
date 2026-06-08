@@ -12,6 +12,7 @@
     "test:unit": "npx playwright test tests/formatters.spec.ts",
     "test:calc": "npx playwright test --config playwright.calc.config.ts",
     "test:a11y": "npx playwright test tests/accessibility.spec.ts",
+    "audit:fiscal": "node scripts/fiscal-audit/audit.mjs",
     "generate:llm-index": "node scripts/generate-llm-index.js",
     "analyze": "set ANALYZE=true && npm run build"
   },
