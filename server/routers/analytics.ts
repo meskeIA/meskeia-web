@@ -1265,107 +1265,82 @@ export const analyticsRouter = router({
    */
   getTendencias: publicProcedure
     .input(z.object({ excluir_mi_ip: z.boolean().default(false) }))
-    .query(async ({ input }) => {
+    .query(async () => {
       await initializeDatabase();
       const client = getTursoClient();
+      const ipConfigurada = await leerIpExcluida(client);
+      try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear */ }
 
-      let ipExcluida = '';
-      if (input.excluir_mi_ip) {
-        try {
-          const r = await client.execute({ sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`, args: [] });
-          if (r.rows.length > 0) ipExcluida = String(r.rows[0].valor);
-        } catch { /* ignorar */ }
+      // Tendencias = imagen visual del tráfico REAL (siempre sin propio ni bots).
+      // Universo: web+ia+pwa+redes (excluye mcp, como el cálculo original).
+      // Sesiones por mes: APROXIMACIÓN (suma de sesiones-únicas-por-día); el error
+      // por sesiones que cruzan medianoche es despreciable para una tendencia visual.
+      const ahora = new Date();
+      const anio = String(ahora.getFullYear());
+      const mesAct = `${anio}-${String(ahora.getMonth() + 1).padStart(2, '0')}`;
+      const mAnt = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+      const mesAnt = `${mAnt.getFullYear()}-${String(mAnt.getMonth() + 1).padStart(2, '0')}`;
+
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      const ayer = new Date(hoy); ayer.setDate(hoy.getDate() - 1);
+      const ordF = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+      const ayerOrd = ordF(ayer);
+      const fechasVivas = [ayerOrd, ordF(hoy)];
+      const ordAMes = (o: string) => `${o.slice(0, 4)}-${o.slice(4, 6)}`;
+
+      const mesExpr = `substr(fecha_ord,1,4)||'-'||substr(fecha_ord,5,2)`;
+      const U2_SQL = `('web','chatgpt','copilot','otras-ia','pwa','redes')`;
+      const LATAM = new Set(['MX', 'CO', 'AR', 'BO', 'EC', 'PE', 'CL', 'CR', 'VE', 'UY', 'PY', 'GT', 'HN', 'SV', 'NI', 'DO', 'CU', 'PA', 'PR']);
+      const canalDe = (o: string) => o === 'web' ? 'web' : o === 'redes' ? 'social' : o === 'pwa' ? 'pwa' : 'ia';
+
+      const [origenRes, sesRes, paisRes, vivoRes] = await Promise.all([
+        client.execute(`SELECT ${mesExpr} mes, origen, SUM(usos) v FROM rollup_dia_origen WHERE substr(fecha_ord,1,4)='${anio}' AND origen IN ${U2_SQL} GROUP BY mes, origen`),
+        client.execute(`SELECT ${mesExpr} mes, SUM(sesiones) s FROM rollup_dia WHERE es_miip=0 AND substr(fecha_ord,1,4)='${anio}' GROUP BY mes`),
+        client.execute(`SELECT ${mesExpr} mes, pais, SUM(usos) v FROM rollup_dia_pais WHERE es_miip=0 GROUP BY mes, pais`),
+        client.execute({ sql: `SELECT ${CAMPOS_ROLLUP} FROM uso_aplicaciones WHERE ${FECHA_EXPR} >= ?`, args: [ayerOrd] }),
+      ]);
+      const vivo = agregarRegistros(vivoRes.rows, ipConfigurada);
+
+      type MesAcc = { visitas: number; sesiones: number; paises: Set<string>; canales: Record<string, number>; latamTotal: number; latamN: number };
+      const meses = new Map<string, MesAcc>();
+      const getMes = (m: string): MesAcc => {
+        let x = meses.get(m);
+        if (!x) { x = { visitas: 0, sesiones: 0, paises: new Set(), canales: { web: 0, ia: 0, social: 0, pwa: 0 }, latamTotal: 0, latamN: 0 }; meses.set(m, x); }
+        return x;
+      };
+
+      // Días cerrados
+      for (const r of origenRes.rows) { const m = getMes(String(r.mes)); const v = Number(r.v); m.visitas += v; m.latamTotal += v; m.canales[canalDe(String(r.origen))] += v; }
+      for (const r of sesRes.rows) getMes(String(r.mes)).sesiones += Number(r.s);
+      for (const r of paisRes.rows) { const m = getMes(String(r.mes)); const pais = String(r.pais); m.paises.add(pais); if (LATAM.has(pais)) m.latamN += Number(r.v); }
+
+      // Ventana viva [ayer, hoy] (es_miip=0 = sin propio)
+      for (const f of fechasVivas) {
+        const mesF = ordAMes(f);
+        const ob = vivo.origenMap.get(f);
+        if (ob) for (const [origen, v] of ob) {
+          if (!['web', 'chatgpt', 'copilot', 'otras-ia', 'pwa', 'redes'].includes(origen)) continue;
+          const m = getMes(mesF); m.visitas += v; m.latamTotal += v; m.canales[canalDe(origen)] += v;
+        }
+        const g = vivo.gMap.get(f); if (g) getMes(mesF).sesiones += g[0].sesiones;
+        const pb = vivo.paisMap.get(f); if (pb) for (const [pais, v] of pb[0]) { const m = getMes(mesF); m.paises.add(pais); if (LATAM.has(pais)) m.latamN += v; }
       }
 
-      const ahora = new Date();
-      const mesActual = String(ahora.getMonth() + 1).padStart(2, '0');
-      const anioActual = String(ahora.getFullYear());
-      const mesAnteriorDate = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
-      const mesAnterior = String(mesAnteriorDate.getMonth() + 1).padStart(2, '0');
-      const anioAnterior = String(mesAnteriorDate.getFullYear());
+      const mensual = [...meses.entries()]
+        .filter(([m]) => m.startsWith(anio))
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([mes, d]) => ({ mes, visitas: d.visitas, sesiones: d.sesiones, paises: d.paises.size }));
 
-      const ipFiltro = ipExcluida
-        ? ` AND (es_propio IS NULL OR es_propio = 0) AND (ip_address IS NULL OR ip_address != '${ipExcluida}')`
-        : ` AND (es_propio IS NULL OR es_propio = 0)`;
-      const botFiltro = ` AND modo NOT IN ('bot', 'mcp')`;
+      const cMes = meses.get(mesAct);
+      const canales = cMes ? { ...cMes.canales } : { web: 0, ia: 0, social: 0, pwa: 0 };
 
-      // 1. Evolución mensual 2026
-      const mensualRes = await client.execute({
-        sql: `
-          SELECT
-            substr(timestamp,7,4) || '-' || substr(timestamp,4,2) as mes,
-            COUNT(*) as visitas,
-            COUNT(DISTINCT sesion_id) as sesiones,
-            COUNT(DISTINCT pais) as paises
-          FROM uso_aplicaciones
-          WHERE substr(timestamp,7,4) = '${anioActual}'
-            ${ipFiltro}${botFiltro}
-          GROUP BY mes
-          ORDER BY mes
-        `,
-        args: [],
+      const latam = [mesAnt, mesAct].map(mes => {
+        const d = meses.get(mes);
+        const total = d?.latamTotal || 0, lat = d?.latamN || 0;
+        return { mes, total, latam: lat, pct: total > 0 ? Math.round((lat / total) * 1000) / 10 : 0 };
       });
 
-      // 2. Canal de tráfico mes actual
-      const canalRes = await client.execute({
-        sql: `
-          SELECT
-            CASE
-              WHEN modo = 'referral-ia' THEN 'ia'
-              WHEN modo = 'referral-social' THEN 'social'
-              WHEN modo = 'pwa' THEN 'pwa'
-              ELSE 'web'
-            END as canal,
-            COUNT(*) as visitas
-          FROM uso_aplicaciones
-          WHERE substr(timestamp,7,4) = '${anioActual}'
-            AND substr(timestamp,4,2) = '${mesActual}'
-            ${ipFiltro}${botFiltro}
-          GROUP BY canal
-          ORDER BY visitas DESC
-        `,
-        args: [],
-      });
-
-      // 3. % LATAM mes actual y mes anterior
-      const paisesLatam = `'MX','CO','AR','BO','EC','PE','CL','CR','VE','UY','PY','GT','HN','SV','NI','DO','CU','PA','PR'`;
-      const latamRes = await client.execute({
-        sql: `
-          SELECT
-            substr(timestamp,7,4) || '-' || substr(timestamp,4,2) as mes,
-            COUNT(*) as total,
-            SUM(CASE WHEN pais IN (${paisesLatam}) THEN 1 ELSE 0 END) as latam
-          FROM uso_aplicaciones
-          WHERE (
-            (substr(timestamp,7,4) = '${anioActual}' AND substr(timestamp,4,2) = '${mesActual}')
-            OR (substr(timestamp,7,4) = '${anioAnterior}' AND substr(timestamp,4,2) = '${mesAnterior}')
-          )
-          ${ipFiltro}${botFiltro}
-          GROUP BY mes
-          ORDER BY mes
-        `,
-        args: [],
-      });
-
-      const latamPorMes = latamRes.rows.map(r => ({
-        mes: String(r.mes),
-        total: Number(r.total),
-        latam: Number(r.latam),
-        pct: Number(r.total) > 0 ? Math.round((Number(r.latam) / Number(r.total)) * 1000) / 10 : 0,
-      }));
-
-      return {
-        mensual: mensualRes.rows.map(r => ({
-          mes: String(r.mes),
-          visitas: Number(r.visitas),
-          sesiones: Number(r.sesiones),
-          paises: Number(r.paises),
-        })),
-        canales: Object.fromEntries(
-          canalRes.rows.map(r => [String(r.canal), Number(r.visitas)])
-        ) as Record<string, number>,
-        latam: latamPorMes,
-      };
+      return { mensual, canales, latam };
     }),
 
   /**

@@ -91,6 +91,7 @@ export type GlobalAcc = {
   recurrentes: number; nuevos: number;
   suma_dur: number; count_dur: number; por_compartir: number;
   b_sinreg: number; b_rebote: number; b_corta: number; b_media: number; b_larga: number;
+  sesiones: number; // nº de sesiones distintas del día (se rellena al final)
 };
 export type AppAcc = { usos: number; suma_dur_cap: number; count_dur_cap: number; max_dur: number };
 
@@ -107,6 +108,7 @@ export const nuevoGlobal = (): GlobalAcc => ({
   usos: 0, movil: 0, escritorio: 0, recurrentes: 0, nuevos: 0,
   suma_dur: 0, count_dur: 0, por_compartir: 0,
   b_sinreg: 0, b_rebote: 0, b_corta: 0, b_media: 0, b_larga: 0,
+  sesiones: 0,
 });
 
 /** Expresión SQL que reordena el timestamp "DD/MM/YYYY,…" a "YYYYMMDD". */
@@ -114,7 +116,7 @@ export const FECHA_EXPR = `substr(timestamp,7,4)||substr(timestamp,4,2)||substr(
 
 /** Campos crudos mínimos que necesita la agregación. */
 export const CAMPOS_ROLLUP =
-  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales, es_propio`;
+  `timestamp, tipo_dispositivo, es_recurrente, duracion_segundos, ip_address, pais, ciudad, modo, aplicacion, datos_adicionales, es_propio, sesion_id`;
 
 /**
  * Agrega un conjunto de registros crudos en los mapas del rollup.
@@ -130,6 +132,8 @@ export function agregarRegistros(
   const paisMap: RollupMaps['paisMap'] = new Map();
   const ciudadMap: RollupMaps['ciudadMap'] = new Map();
   const origenMap: RollupMaps['origenMap'] = new Map();
+  // Sesiones distintas por (fecha, idx) — para getTendencias (aproximación)
+  const sesSets = new Map<string, [Set<string>, Set<string>]>();
 
   for (const row of rows) {
     const ts = String(row.timestamp || '');
@@ -172,6 +176,13 @@ export function agregarRegistros(
     if (durCap !== null) { g.suma_dur += durCap; g.count_dur++; }
     if (rawDatos.includes('"ref":"share"')) g.por_compartir++;
 
+    // Sesiones distintas del día (para getTendencias)
+    const sesId = String(row.sesion_id || '');
+    if (sesId !== '') {
+      if (!sesSets.has(fechaOrd)) sesSets.set(fechaOrd, [new Set(), new Set()]);
+      sesSets.get(fechaOrd)![idx].add(sesId);
+    }
+
     // ── Buckets de duración (universo U2: con página; excluye mcp) ──
     if (U2_SET.has(origenReal)) {
       if (dur === null) g.b_sinreg++;
@@ -203,6 +214,14 @@ export function agregarRegistros(
       const cb = ciudadMap.get(fechaOrd)![idx];
       cb.set(ciudad, (cb.get(ciudad) || 0) + 1);
     }
+  }
+
+  // Volcar el nº de sesiones distintas a cada GlobalAcc
+  for (const [fecha, sets] of sesSets) {
+    const pair = gMap.get(fecha);
+    if (!pair) continue;
+    pair[0].sesiones = sets[0].size;
+    pair[1].sesiones = sets[1].size;
   }
 
   return { gMap, appMap, paisMap, ciudadMap, origenMap };
@@ -243,9 +262,9 @@ export async function computarRollupRango(
       const g = pair[miip];
       if (g.usos === 0) continue;
       stmts.push({
-        sql: `INSERT INTO rollup_dia (fecha_ord, es_miip, usos, movil, escritorio, recurrentes, nuevos, suma_dur, count_dur, por_compartir, b_sinreg, b_rebote, b_corta, b_media, b_larga)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        args: [fecha, miip, g.usos, g.movil, g.escritorio, g.recurrentes, g.nuevos, g.suma_dur, g.count_dur, g.por_compartir, g.b_sinreg, g.b_rebote, g.b_corta, g.b_media, g.b_larga],
+        sql: `INSERT INTO rollup_dia (fecha_ord, es_miip, usos, movil, escritorio, recurrentes, nuevos, suma_dur, count_dur, por_compartir, b_sinreg, b_rebote, b_corta, b_media, b_larga, sesiones)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [fecha, miip, g.usos, g.movil, g.escritorio, g.recurrentes, g.nuevos, g.suma_dur, g.count_dur, g.por_compartir, g.b_sinreg, g.b_rebote, g.b_corta, g.b_media, g.b_larga, g.sesiones],
       });
     }
   }

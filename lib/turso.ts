@@ -169,11 +169,14 @@ async function doInitializeDatabase(): Promise<boolean> {
       b_corta INTEGER NOT NULL DEFAULT 0,
       b_media INTEGER NOT NULL DEFAULT 0,
       b_larga INTEGER NOT NULL DEFAULT 0,
+      sesiones INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY (fecha_ord, es_miip)
     )
   `);
-  // Migración idempotente: columnas de buckets de duración (BD de producción ya existente)
-  for (const col of ['b_sinreg', 'b_rebote', 'b_corta', 'b_media', 'b_larga']) {
+  // Migración idempotente: columnas nuevas (BD de producción ya existente).
+  // `sesiones` = nº de sesiones distintas del día (aproximación para getTendencias:
+  //  la suma mensual ≈ COUNT DISTINCT mensual, con error mínimo por sesiones que cruzan medianoche).
+  for (const col of ['b_sinreg', 'b_rebote', 'b_corta', 'b_media', 'b_larga', 'sesiones']) {
     try { await client.execute(`ALTER TABLE rollup_dia ADD COLUMN ${col} INTEGER NOT NULL DEFAULT 0`); } catch { /* ya existe */ }
   }
 
