@@ -35,6 +35,10 @@ import { calcularBrechaJubilacion } from '../lib/calculadoras/brechaJubilacion';
 import { calcularVentaInmueble } from '../lib/calculadoras/ventaInmueble';
 import { compararDonacionHerencia } from '../lib/calculadoras/comparacionDonacionHerencia';
 import { calcularPensionDesempleo } from '../lib/calculadoras/pensionDesempleo';
+import { calcularIVA } from '../lib/calculadoras/iva';
+import { calcularModelo130 } from '../lib/calculadoras/modelo130';
+import { calcularModelo303 } from '../lib/calculadoras/modelo303';
+import { calcularInteresCompuesto } from '../lib/calculadoras/interesCompuesto';
 
 /** Redondeo a 2 decimales idéntico al de las calculadoras */
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -659,5 +663,189 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
     // La cuota general sigue calculada (no se oculta)
     expect(res.cuotaMensualGeneral).toBeCloseTo(427.21, 2);
     expect(res.cuotaConTarifaPlana).toBeCloseTo(80, 2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularIVA
+// Aritmética pura: base × tipo, sin tablas externas. Verificación interna.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularIVA (Capa 1 · aritmética)', () => {
+  test('GOLDEN-N: añadir IVA general 21% sobre 1.000 € → cuota 210 €, total 1.210 €', () => {
+    const res = calcularIVA({ importe: 1000, tipoIVA: 21, modo: 'anadir' });
+    expect(res.baseImponible).toBeCloseTo(1000, 2);
+    expect(res.cuotaIVA).toBeCloseTo(210, 2);
+    expect(res.totalConIVA).toBeCloseTo(1210, 2);
+    expect(res.tipoIVA).toBe(21);
+  });
+
+  test('GOLDEN-O: quitar IVA reducido 10% de 110 € → base 100 €, cuota 10 €', () => {
+    const res = calcularIVA({ importe: 110, tipoIVA: 10, modo: 'quitar' });
+    expect(res.baseImponible).toBeCloseTo(100, 2);
+    expect(res.cuotaIVA).toBeCloseTo(10, 2);
+    expect(res.totalConIVA).toBeCloseTo(110, 2);
+  });
+
+  test('GOLDEN-P: quitar IVA general 21% de 363 € → base 300 €, cuota 63 €', () => {
+    const res = calcularIVA({ importe: 363, tipoIVA: 21, modo: 'quitar' });
+    expect(res.baseImponible).toBeCloseTo(300, 2);
+    expect(res.cuotaIVA).toBeCloseTo(63, 2);
+    expect(res.totalConIVA).toBeCloseTo(363, 2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularModelo130
+// Fórmula RIRPF art. 110: 20% rendimiento neto - retenciones - pagos previos.
+// Verificación interna (no existe simulador AEAT abierto para el 130).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularModelo130 (Capa 1 · RIRPF art. 110)', () => {
+  test('GOLDEN-Q: T1 ingresos=15.000 € gastos=5.000 € sin retenciones → cuota 2.000 €', () => {
+    const res = calcularModelo130({
+      trimestre: 'T1', ingresosAcumulados: 15000,
+      gastosDeduciblesAcumulados: 5000, retencionesAcumuladas: 0, pagosFraccionadosAnteriores: 0,
+    });
+    expect(res.rendimientoNetoAcumulado).toBeCloseTo(10000, 2);
+    expect(res.cuotaBruta).toBeCloseTo(2000, 2);
+    expect(res.cuotaAIngresar).toBeCloseTo(2000, 2);
+    expect(res.obligacionPresentar).toBe(true);
+  });
+
+  test('GOLDEN-R: T2 ingresos=30k gastos=10k retenciones=1k previos=2k → cuota 1.000 €', () => {
+    const res = calcularModelo130({
+      trimestre: 'T2', ingresosAcumulados: 30000,
+      gastosDeduciblesAcumulados: 10000, retencionesAcumuladas: 1000, pagosFraccionadosAnteriores: 2000,
+    });
+    expect(res.rendimientoNetoAcumulado).toBeCloseTo(20000, 2);
+    expect(res.cuotaBruta).toBeCloseTo(4000, 2);
+    // 4.000 - 1.000 retenciones - 2.000 previos = 1.000
+    expect(res.cuotaAIngresar).toBeCloseTo(1000, 2);
+  });
+
+  test('GOLDEN-S: gastos > ingresos → rendimiento negativo → cuota 0 (no devuelve)', () => {
+    const res = calcularModelo130({
+      trimestre: 'T3', ingresosAcumulados: 5000,
+      gastosDeduciblesAcumulados: 6000, retencionesAcumuladas: 0, pagosFraccionadosAnteriores: 0,
+    });
+    expect(res.rendimientoNetoAcumulado).toBeCloseTo(-1000, 2);
+    expect(res.cuotaBruta).toBeCloseTo(0, 2);
+    expect(res.cuotaAIngresar).toBeCloseTo(0, 2);
+  });
+
+  test('GOLDEN-T: retenciones cubren toda la cuota → cuota 0 (las retenciones absorben el 20%)', () => {
+    const res = calcularModelo130({
+      trimestre: 'T3', ingresosAcumulados: 9000,
+      gastosDeduciblesAcumulados: 0, retencionesAcumuladas: 1800, pagosFraccionadosAnteriores: 0,
+    });
+    expect(res.cuotaBruta).toBeCloseTo(1800, 2);   // 9.000 × 20%
+    expect(res.cuotaAIngresar).toBeCloseTo(0, 2);   // 1.800 - 1.800 = 0
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularModelo303
+// Ley 37/1992 IVA: devengado - soportado = diferencial. Aritmética pura.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularModelo303 (Capa 1 · Ley IVA 37/1992)', () => {
+  test('GOLDEN-U: T1 solo 21%, emit=10.000 € recib=3.000 € → diferencial 1.470 € (a ingresar)', () => {
+    const res = calcularModelo303({
+      trimestre: 'T1', baseImponibleEmitidas21: 10000, baseImponibleRecibidas21: 3000,
+    });
+    expect(res.ivaDevengadoTotal).toBeCloseTo(2100, 2);
+    expect(res.ivaSoportadoTotal).toBeCloseTo(630, 2);
+    expect(res.cuotaDiferencial).toBeCloseTo(1470, 2);
+    expect(res.resultadoFinal).toBeCloseTo(1470, 2);
+    expect(res.aIngresar).toBe(true);
+    expect(res.aCompensar).toBe(false);
+  });
+
+  test('GOLDEN-V: T2 mix tipos (21%+10%) emit=7.000 € recib=1.000 € → diferencial 1.040 €', () => {
+    const res = calcularModelo303({
+      trimestre: 'T2',
+      baseImponibleEmitidas21: 5000, baseImponibleEmitidas10: 2000,
+      baseImponibleRecibidas21: 1000,
+    });
+    // devengado = 5000×0.21 + 2000×0.10 = 1050+200 = 1250
+    expect(res.ivaDevengadoTotal).toBeCloseTo(1250, 2);
+    expect(res.ivaSoportadoTotal).toBeCloseTo(210, 2);
+    expect(res.cuotaDiferencial).toBeCloseTo(1040, 2);
+    expect(res.resultadoFinal).toBeCloseTo(1040, 2);
+  });
+
+  test('GOLDEN-W: T4 IVA soportado > devengado → resultado negativo → puede solicitar devolución', () => {
+    const res = calcularModelo303({
+      trimestre: 'T4', baseImponibleEmitidas21: 1000, baseImponibleRecibidas21: 5000,
+    });
+    expect(res.ivaDevengadoTotal).toBeCloseTo(210, 2);
+    expect(res.ivaSoportadoTotal).toBeCloseTo(1050, 2);
+    expect(res.cuotaDiferencial).toBeCloseTo(-840, 2);
+    expect(res.resultadoFinal).toBeCloseTo(-840, 2);
+    expect(res.aCompensar).toBe(true);
+    expect(res.puedesolicitarDevolucion).toBe(true);
+  });
+
+  test('GOLDEN-X: T2 con compensación anterior 500 € → resultadoFinal 970 €', () => {
+    const res = calcularModelo303({
+      trimestre: 'T2',
+      baseImponibleEmitidas21: 10000, baseImponibleRecibidas21: 3000,
+      compensacionAnterior: 500,
+    });
+    expect(res.cuotaDiferencial).toBeCloseTo(1470, 2);
+    expect(res.compensacionAplicada).toBeCloseTo(500, 2);
+    expect(res.resultadoFinal).toBeCloseTo(970, 2);
+    expect(res.aIngresar).toBe(true);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularInteresCompuesto
+// Fórmula exponencial estándar + anualidades. Verificación interna.
+// Nota: aportacionPeriodica se interpreta siempre como €/mes
+// (la función la convierte a aportación por período internamente).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularInteresCompuesto (Capa 1 · fórmula exponencial)', () => {
+  test('GOLDEN-Y: 10.000 € al 5% anual durante 10 años sin aportaciones → 16.288,95 €', () => {
+    const res = calcularInteresCompuesto({ capitalInicial: 10000, tasaAnual: 5, anos: 10 });
+    expect(res.capitalFinal).toBeCloseTo(16288.95, 2);
+    expect(res.totalAportado).toBeCloseTo(10000, 2);
+    expect(res.totalIntereses).toBeCloseTo(6288.95, 2);
+    expect(res.rentabilidadPct).toBeCloseTo(62.9, 1);
+  });
+
+  test('GOLDEN-Z: 1.000 € al 6% mensual, 5 años, 100 €/mes aportación → 8.325,85 €', () => {
+    const res = calcularInteresCompuesto({
+      capitalInicial: 1000, tasaAnual: 6, anos: 5,
+      aportacionPeriodica: 100, frecuenciaCapitalizacion: 'mensual',
+    });
+    expect(res.capitalFinal).toBeCloseTo(8325.85, 2);
+    expect(res.totalAportado).toBeCloseTo(7000, 2);    // 1000 + 100×12×5
+    expect(res.totalIntereses).toBeCloseTo(1325.85, 2);
+    expect(res.rentabilidadPct).toBeCloseTo(18.9, 1);
+  });
+
+  test('GOLDEN-AA: tasa 0% — el capital final = total aportado, intereses exactamente 0', () => {
+    const res = calcularInteresCompuesto({
+      capitalInicial: 5000, tasaAnual: 0, anos: 3, aportacionPeriodica: 200,
+    });
+    expect(res.capitalFinal).toBeCloseTo(12200, 2);    // 5000 + 200×12×3
+    expect(res.totalAportado).toBeCloseTo(12200, 2);
+    expect(res.totalIntereses).toBeCloseTo(0, 2);
+    expect(res.rentabilidadPct).toBeCloseTo(0, 1);
+  });
+
+  test('GOLDEN-AB: 10.000 € al 7% trimestral 20 años sin aport → 40.063,92 € (efecto capitalización)', () => {
+    const res = calcularInteresCompuesto({
+      capitalInicial: 10000, tasaAnual: 7, anos: 20,
+      frecuenciaCapitalizacion: 'trimestral',
+    });
+    // trimestral > anual por mismo tipo nominal → capital mayor que 7% anual puro
+    expect(res.capitalFinal).toBeCloseTo(40063.92, 2);
+    expect(res.totalAportado).toBeCloseTo(10000, 2);
+    expect(res.totalIntereses).toBeCloseTo(30063.92, 2);
+    expect(res.rentabilidadPct).toBeCloseTo(300.6, 1);
   });
 });
