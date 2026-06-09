@@ -12,11 +12,12 @@
 
 // IPREM 2025 (Real Decreto 145/2024 o RDL equivalente)
 const IPREM_2025 = {
-  diario: 20,        // €/día (7.200€/año ÷ 360 días)
-  mensual: 600,      // €/mes (12 pagas)
-  anual14: 8400,     // €/año (con 14 pagas = referencia para cálculo de topes)
-  // IPREM diario (14 pagas) = 8.400 / 365 = 23,01€/día
-  diario14: 23.01,
+  diario: 20,          // €/día (7.200€/año ÷ 360 días)
+  mensual: 600,        // €/mes (12 pagas)
+  anual14: 8400,       // €/año (con 14 pagas = referencia para cálculo de topes)
+  // La SS usa año de 360 días (30 días × 12 meses) para el cálculo de topes:
+  // 8.400 / 360 = 23,33 €/día. Verificado contra simulador SEPE 2026-06-09.
+  diario14: 8400 / 360,
 };
 
 // Tabla días cotizados → días de prestación (LGSS art. 269)
@@ -32,17 +33,17 @@ const TABLA_DURACION = [
 ];
 
 // Topes mensuales (30 días × IPREM diario 14 pagas × porcentaje)
-// = 30 × 23,01 × factor
+// = 30 × 23,33 × factor. Verificado contra simulador SEPE 2026-06-09.
 const TOPES_2025 = {
   maximo: {
-    sinHijos: Math.round(30 * IPREM_2025.diario14 * 1.75),   // 175% = 1.208 €
-    con1Hijo: Math.round(30 * IPREM_2025.diario14 * 2.00),   // 200% = 1.381 €
-    con2Hijos: Math.round(30 * IPREM_2025.diario14 * 2.25),  // 225% = 1.553 €
+    sinHijos: Math.round(30 * IPREM_2025.diario14 * 1.75),   // 175% = 1.225 €
+    con1Hijo: Math.round(30 * IPREM_2025.diario14 * 2.00),   // 200% = 1.400 €
+    con2Hijos: Math.round(30 * IPREM_2025.diario14 * 2.25),  // 225% = 1.575 €
   },
   minimo: {
-    sinHijos: Math.round(30 * IPREM_2025.diario14 * 0.80),   // 80%  = 553 €
-    con1Hijo: Math.round(30 * IPREM_2025.diario14 * 1.07),   // 107% = 739 €
-    con2Hijos: Math.round(30 * IPREM_2025.diario14 * 1.20),  // 120% = 829 €
+    sinHijos: Math.round(30 * IPREM_2025.diario14 * 0.80),   // 80%  = 560 €
+    con1Hijo: Math.round(30 * IPREM_2025.diario14 * 1.07),   // 107% = 749 €
+    con2Hijos: Math.round(30 * IPREM_2025.diario14 * 1.20),  // 120% = 840 €
   },
 };
 
@@ -142,7 +143,9 @@ export function calcularPensionDesempleo(p: ParametrosPensionDesempleo): Resulta
   // ─── Cuantías ────────────────────────────────────────────────────────────────
 
   const cuantiaPrimeros6 = r(p.baseReguladoraMensual * 0.70);
-  const cuantiaResto = r(p.baseReguladoraMensual * 0.50);
+  // Art. 270.1 LGSS: 60 % a partir del día 181 (reformado; antes 50 %).
+  // Verificado contra simulador SEPE 2026-06-09.
+  const cuantiaResto = r(p.baseReguladoraMensual * 0.60);
 
   // Topes según número de hijos
   let topeMaximo: number;

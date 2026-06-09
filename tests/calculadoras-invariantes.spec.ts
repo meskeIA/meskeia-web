@@ -34,6 +34,7 @@ import { calcularPensionPublica } from '../lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '../lib/calculadoras/brechaJubilacion';
 import { calcularVentaInmueble } from '../lib/calculadoras/ventaInmueble';
 import { compararDonacionHerencia } from '../lib/calculadoras/comparacionDonacionHerencia';
+import { calcularPensionDesempleo } from '../lib/calculadoras/pensionDesempleo';
 
 /** Redondeo a 2 decimales idéntico al de las calculadoras */
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -406,5 +407,257 @@ test.describe('Invariantes de composición — comparar_donacion_vs_herencia', (
     } else if (r.opcionRecomendada === 'herencia') {
       expect(r.herencia.total).toBeLessThan(r.donacion.total);
     }
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularIndemnizacionDespido
+//
+// Valores verificados internamente contra la fórmula del ET (RDL 2/2015):
+//   improcedente: 33 días × salarioDiario × antigüedad, tope 24 mensualidades
+//   objetivo:     20 días × salarioDiario × antigüedad, tope 12 mensualidades
+//
+// Verificado por el usuario en Google Sheets el 2026-06-09.
+// Fecha fija en fechaExtincion para que el test sea reproducible.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularIndemnizacionDespido (Capa 1)', () => {
+  const FI_CORTA = '2020-01-01';
+  const FI_LARGA = '2001-06-09';
+  const FE       = '2026-06-09'; // fecha fija: 2351 días / 9131 días
+
+  test('GOLDEN-A: improcedente 30k ~6,44 años → 17.458,03 € (sin tope)', () => {
+    const res = calcularIndemnizacionDespido({
+      tipoDespido: 'improcedente',
+      salarioBrutoAnual: 30000,
+      fechaInicio: FI_CORTA,
+      fechaExtincion: FE,
+    });
+    expect(res.indemnizacionFinal).toBeCloseTo(17458.03, 2);
+    expect(res.topeAplicado).toBe(false);
+    expect(res.diasPorAnio).toBe(33);
+    expect(res.maxMensualidades).toBe(24);
+  });
+
+  test('GOLDEN-B: objetivo 30k ~6,44 años → 10.580,63 € (sin tope)', () => {
+    const res = calcularIndemnizacionDespido({
+      tipoDespido: 'objetivo',
+      salarioBrutoAnual: 30000,
+      fechaInicio: FI_CORTA,
+      fechaExtincion: FE,
+    });
+    expect(res.indemnizacionFinal).toBeCloseTo(10580.63, 2);
+    expect(res.topeAplicado).toBe(false);
+    expect(res.diasPorAnio).toBe(20);
+    expect(res.maxMensualidades).toBe(12);
+  });
+
+  test('GOLDEN-C: improcedente 30k 25 años → tope 60.000 € (24 mensualidades)', () => {
+    const res = calcularIndemnizacionDespido({
+      tipoDespido: 'improcedente',
+      salarioBrutoAnual: 30000,
+      fechaInicio: FI_LARGA,
+      fechaExtincion: FE,
+    });
+    expect(res.topeAplicado).toBe(true);
+    expect(res.indemnizacionFinal).toBeCloseTo(60000, 2);
+    expect(res.topeMáximoEuros).toBeCloseTo(60000, 2);
+    expect(res.indemnizacionSinTope).toBeGreaterThan(60000);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPensionDesempleo
+//
+// Valores calculados internamente desde LGSS arts. 266-279 + IPREM 2025 (600 €/mes).
+// Topes 2025 sin hijos: máx 1.208 €, mín 552 €.
+// PENDIENTES DE VALIDACIÓN CONTRA SEPE — marcados TODO:SEPE.
+// Una vez confirmados por el usuario, eliminar la marca.
+// ────────────────────────────────────────────────────────────────────────────
+
+// Correcciones aplicadas tras verificación SEPE 2026-06-09:
+//   – IPREM diario14 = 8.400/360 (año 360 días), no 8.400/365
+//   – Segundo tramo = 60 % BR (art. 270.1 LGSS reformado), no 50 %
+test.describe('Golden — calcularPensionDesempleo (Capa 1 · SEPE ✓)', () => {
+  test('GOLDEN-D: 900 días, BR 1.800 €, sin hijos → tope máx 1.225 €, 11.670 € total [SEPE ✓]', () => {
+    const res = calcularPensionDesempleo({
+      diasCotizados: 900,
+      baseReguladoraMensual: 1800,
+      numHijos: 0,
+    });
+    expect(res.tieneDerechoPrestacion).toBe(true);
+    expect(res.diasPrestacion).toBe(300);
+    expect(res.mesesPrestacion).toBe(10);
+    // 70 % × 1.800 = 1.260 > tope máx 1.225 → se aplica tope (SEPE confirmó 1.225 €)
+    expect(res.cuantiaEfectivaPrimeros6).toBeCloseTo(1225, 2);
+    expect(res.aplicaTopeMaximo).toBe(true);
+    // 60 % × 1.800 = 1.080, dentro de topes (SEPE confirmó 1.080 €)
+    expect(res.cuantiaEfectivaResto).toBeCloseTo(1080, 2);
+    expect(res.totalPrestacionBruta).toBeCloseTo(11670, 2);  // 1.225×6 + 1.080×4
+  });
+
+  test('GOLDEN-E: 540 días, BR 1.200 €, sin hijos → 840 €/mes, 5.040 € total [SEPE ✓]', () => {
+    const res = calcularPensionDesempleo({
+      diasCotizados: 540,
+      baseReguladoraMensual: 1200,
+      numHijos: 0,
+    });
+    expect(res.tieneDerechoPrestacion).toBe(true);
+    expect(res.diasPrestacion).toBe(180);
+    expect(res.mesesPrestacion).toBe(6);
+    // 70 % × 1.200 = 840, sin tope (SEPE confirmó 840 €)
+    expect(res.cuantiaEfectivaPrimeros6).toBeCloseTo(840, 2);
+    expect(res.aplicaTopeMaximo).toBe(false);
+    expect(res.aplicaTopeMinimo).toBe(false);
+    expect(res.totalPrestacionBruta).toBeCloseTo(5040, 2);
+  });
+
+  test('GOLDEN-F: 540 días, BR 600 €, sin hijos → tope mínimo 560 €, 3.360 € total [SEPE ✓]', () => {
+    const res = calcularPensionDesempleo({
+      diasCotizados: 540,
+      baseReguladoraMensual: 600,
+      numHijos: 0,
+    });
+    expect(res.tieneDerechoPrestacion).toBe(true);
+    expect(res.diasPrestacion).toBe(180);
+    // 70 % × 600 = 420 < tope mínimo 560 → se aplica tope (SEPE confirmó 560 €)
+    expect(res.cuantiaEfectivaPrimeros6).toBeCloseTo(560, 2);
+    expect(res.aplicaTopeMinimo).toBe(true);
+    expect(res.totalPrestacionBruta).toBeCloseTo(3360, 2);  // 560 × 6
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularHipoteca
+//
+// Valores calculados internamente: fórmula francesa estándar (determinista).
+// Verificación: script Node.js con la misma fórmula — pendienteUltimo = 0
+// en los tres casos, confirmando amortización completa sin residuo.
+// No requiere simulador externo (matemática pura; el BdE usa la misma fórmula).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularHipoteca (Capa 1 · fórmula francesa)', () => {
+  test('GOLDEN-G: fija 200k € al 3,5% a 25 años → cuota 1.001,25 €, intereses 100.374,14 €', () => {
+    const res = calcularHipoteca({
+      precioVivienda: 250000,
+      entrada: 50000,
+      tipoHipoteca: 'fijo',
+      interesAnual: 3.5,
+      plazoAnios: 25,
+    });
+    expect(res.capital).toBeCloseTo(200000, 2);
+    expect(res.porcentajeFinanciacion).toBeCloseTo(80, 2);
+    expect(res.tipoEfectivo).toBe(3.5);
+    expect(res.cuotaMensual).toBeCloseTo(1001.25, 2);
+    expect(res.totalIntereses).toBeCloseTo(100374.14, 2);
+    expect(res.totalPagado).toBeCloseTo(300374.14, 2);
+    expect(res.porcentajeInteresesSobreCapital).toBeCloseTo(50.19, 2);
+    // Año 1: el primer año paga más intereses que capital (francés)
+    expect(res.resumenAnual[0].interesesAnio).toBeCloseTo(6918.76, 2);
+    expect(res.resumenAnual[0].capitalAnio).toBeCloseTo(5096.2, 2);
+    expect(res.resumenAnual[0].capitalPendiente).toBeCloseTo(194903.8, 2);
+  });
+
+  test('GOLDEN-H: variable 150k € (Euríbor 3% + 0,8%) a 30 años → cuota 698,94 €, intereses 101.616,97 €', () => {
+    const res = calcularHipoteca({
+      precioVivienda: 200000,
+      entrada: 50000,
+      tipoHipoteca: 'variable',
+      euribor: 3.0,
+      diferencial: 0.8,
+      plazoAnios: 30,
+    });
+    expect(res.capital).toBeCloseTo(150000, 2);
+    expect(res.porcentajeFinanciacion).toBeCloseTo(75, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(3.8, 2);
+    expect(res.cuotaMensual).toBeCloseTo(698.94, 2);
+    expect(res.totalIntereses).toBeCloseTo(101616.97, 2);
+    expect(res.totalPagado).toBeCloseTo(251616.97, 2);
+    expect(res.porcentajeInteresesSobreCapital).toBeCloseTo(67.74, 2);
+  });
+
+  test('GOLDEN-I: fija 300k € al 2,5% a 30 años → cuota 1.185,36 €, intereses 126.730,57 €', () => {
+    const res = calcularHipoteca({
+      precioVivienda: 375000,
+      entrada: 75000,
+      tipoHipoteca: 'fijo',
+      interesAnual: 2.5,
+      plazoAnios: 30,
+    });
+    expect(res.capital).toBeCloseTo(300000, 2);
+    expect(res.porcentajeFinanciacion).toBeCloseTo(80, 2);
+    expect(res.tipoEfectivo).toBe(2.5);
+    expect(res.cuotaMensual).toBeCloseTo(1185.36, 2);
+    expect(res.totalIntereses).toBeCloseTo(126730.57, 2);
+    expect(res.totalPagado).toBeCloseTo(426730.57, 2);
+    expect(res.porcentajeInteresesSobreCapital).toBeCloseTo(42.24, 2);
+  });
+
+  test('GOLDEN-J: ratio de endeudamiento — cuota 1.001 € sobre 3.000 € netos → 33,38 % → alerta activa', () => {
+    const res = calcularHipoteca({
+      precioVivienda: 250000,
+      entrada: 50000,
+      tipoHipoteca: 'fijo',
+      interesAnual: 3.5,
+      plazoAnios: 25,
+      ingresosMensuales: 3000,
+    });
+    // Ratio sobre cuota exacta (1.001,247…), no sobre la redondeada (1.001,25)
+    expect(res.ratioCuotaIngresos).toBeCloseTo(33.37, 2);
+    expect(res.alertaRatio).toBe(true);
+    // Sin ingresos: ratio null y sin alerta
+    const r2 = calcularHipoteca({
+      precioVivienda: 250000, entrada: 50000,
+      tipoHipoteca: 'fijo', interesAnual: 3.5, plazoAnios: 25,
+    });
+    expect(r2.ratioCuotaIngresos).toBeNull();
+    expect(r2.alertaRatio).toBe(false);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularCuotaAutonomo
+//
+// Tabla verificada contra importass.seg-social.es el 2026-06-09.
+// Bug detectado: 9 de 12 tramos de la tabla general tenían bases mínimas
+// de la tabla 2023 (no actualizadas). Corregido en data/fiscal/autonomos.ts.
+// Tipo de cotización: 31,50% (desglose oficial suma a este valor aunque el
+// encabezado del portal diga "31,40%" — texto de 2025 no actualizado).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => {
+  test('GOLDEN-K: rendimiento 1.600 €/mes → tramo 6, base 960,78 €, cuota 302,65 €/mes [SS ✓]', () => {
+    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 1600 });
+    expect(res.tramo).toBe(6);
+    expect(res.baseMinima).toBeCloseTo(960.78, 2);
+    expect(res.baseCotizacion).toBeCloseTo(960.78, 2);   // base mínima por defecto
+    expect(res.cuotaMensualGeneral).toBeCloseTo(302.65, 2);
+    expect(res.cuotaEfectiva).toBeCloseTo(302.65, 2);
+    expect(res.cuotaAnual).toBeCloseTo(3631.80, 2);
+    expect(res.aplicaTarifaPlana).toBe(false);
+    expect(res.tipoCotizacion).toBeCloseTo(31.5, 1);
+  });
+
+  test('GOLDEN-L: rendimiento 2.500 €/mes → tramo 10, base 1.356,21 €, cuota 427,21 €/mes [SS ✓]', () => {
+    // Con la tabla 2023 (incorrecta) este caso daba 350 €/mes (base 1.111,11).
+    // Con la tabla 2026 correcta la base mínima del tramo es 1.356,21.
+    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 2500 });
+    expect(res.tramo).toBe(10);
+    expect(res.baseMinima).toBeCloseTo(1356.21, 2);
+    expect(res.baseCotizacion).toBeCloseTo(1356.21, 2);
+    expect(res.cuotaMensualGeneral).toBeCloseTo(427.21, 2);
+    expect(res.cuotaEfectiva).toBeCloseTo(427.21, 2);
+    expect(res.cuotaAnual).toBeCloseTo(5126.52, 2);
+    expect(res.aplicaTarifaPlana).toBe(false);
+  });
+
+  test('GOLDEN-M: nuevo autónomo → tarifa plana 80 €/mes independiente del rendimiento', () => {
+    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 2500, esNuevoAutonomo: true });
+    expect(res.aplicaTarifaPlana).toBe(true);
+    expect(res.cuotaEfectiva).toBeCloseTo(80, 2);
+    expect(res.cuotaAnual).toBeCloseTo(960, 2);
+    // La cuota general sigue calculada (no se oculta)
+    expect(res.cuotaMensualGeneral).toBeCloseTo(427.21, 2);
+    expect(res.cuotaConTarifaPlana).toBeCloseTo(80, 2);
   });
 });
