@@ -83,32 +83,25 @@ export interface ResultadoRetencionAlquiler {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function calcularCuotaIRPF(base: number, otrosIngresos: number): { cuota: number; tipoMarginal: number } {
-  // Solo el rendimiento del alquiler en el contexto de los otros ingresos
-  let cuotaSobreTotal = 0;
-  let cuotaSobreOtros = 0;
-  let tipoMarginal = 0;
-
-  for (const tramo of TRAMOS_IRPF_2025) {
-    // Cuota sobre (otrosIngresos + base)
-    if (otrosIngresos + base > 0) {
-      const baseEnTramo = Math.min(otrosIngresos + base, tramo.hasta) - Math.min(otrosIngresos, tramo.hasta);
-      if (baseEnTramo > 0) {
-        cuotaSobreTotal += baseEnTramo * (tramo.tipo / 100);
-        tipoMarginal = tramo.tipo;
-      }
-    }
-    // Cuota solo sobre otrosIngresos
-    if (otrosIngresos > 0) {
-      const baseEnTramoOtros = Math.min(otrosIngresos, tramo.hasta) - Math.min(0, tramo.hasta);
-      cuotaSobreOtros += Math.max(0, baseEnTramoOtros) * (tramo.tipo / 100);
-    }
+function tarifaProgresiva(importe: number): number {
+  let cuota = 0;
+  let prev = 0;
+  for (const t of TRAMOS_IRPF_2025) {
+    if (importe <= prev) break;
+    cuota += (Math.min(importe, t.hasta) - prev) * (t.tipo / 100);
+    prev = t.hasta;
   }
+  return cuota;
+}
 
-  return {
-    cuota: Math.round((cuotaSobreTotal - cuotaSobreOtros) * 100) / 100,
-    tipoMarginal,
-  };
+function calcularCuotaIRPF(base: number, otrosIngresos: number): { cuota: number; tipoMarginal: number } {
+  // Impacto marginal: tarifa(total) - tarifa(otros ingresos sin alquiler)
+  const cuota = Math.round((tarifaProgresiva(otrosIngresos + base) - tarifaProgresiva(otrosIngresos)) * 100) / 100;
+  let tipoMarginal = 0;
+  for (const t of TRAMOS_IRPF_2025) {
+    if (otrosIngresos + base <= t.hasta) { tipoMarginal = t.tipo; break; }
+  }
+  return { cuota, tipoMarginal };
 }
 
 // ─── Función principal ─────────────────────────────────────────────────────────

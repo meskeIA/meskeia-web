@@ -39,6 +39,9 @@ import { calcularIVA } from '../lib/calculadoras/iva';
 import { calcularModelo130 } from '../lib/calculadoras/modelo130';
 import { calcularModelo303 } from '../lib/calculadoras/modelo303';
 import { calcularInteresCompuesto } from '../lib/calculadoras/interesCompuesto';
+import { calcularPlusvaliasIRPF } from '../lib/calculadoras/plusvaliasIRPF';
+import { calcularRetencionAlquiler } from '../lib/calculadoras/retencionAlquiler';
+import { calcularRendimientoCapitalInmobiliario } from '../lib/calculadoras/rendimientoCapitalInmobiliario';
 
 /** Redondeo a 2 decimales idéntico al de las calculadoras */
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -848,4 +851,375 @@ test.describe('Golden — calcularInteresCompuesto (Capa 1 · fórmula exponenci
     expect(res.totalIntereses).toBeCloseTo(30063.92, 2);
     expect(res.rentabilidadPct).toBeCloseTo(300.6, 1);
   });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularSucesion (ISD)
+// Tarifa estatal (Ley 29/1987) + tarifa Cataluña.
+// Todos los casos verificados internamente con la misma fórmula que el código.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + autonómica)', () => {
+
+  test('GOLDEN-AC: Madrid, I-descendiente, 200.000 € → 99% bonif → cuotaFinal 177,52 €', () => {
+    // Hijo hereda 200.000 € de padre. Madrid aplica 99% bonificación.
+    // baseLiquidable = 200.000 − 15.956,87 (red. parentesco) = 184.043,13
+    // cuotaIntegra (tramo 4) = 17.751,99; bonif 99% → cuotaFinal = 177,52 €
+    const res = calcularSucesion({ baseImponible: 200000, ccaa: 'madrid', grupo: 'I-descendiente' });
+    expect(res.reduccionParentesco).toBeCloseTo(15956.87, 2);
+    expect(res.baseLiquidable).toBeCloseTo(184043.13, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(17751.99, 2);
+    expect(res.coeficienteMultiplicador).toBe(1.0);
+    expect(res.cuotaTributaria).toBeCloseTo(17751.99, 2);
+    expect(res.bonificacionCcaa).toBeCloseTo(17574.47, 2);
+    expect(res.porcentajeBonificacion).toBeCloseTo(99, 1);
+    expect(res.cuotaFinal).toBeCloseTo(177.52, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.09, 2);
+    expect(res.esForal).toBe(false);
+  });
+
+  test('GOLDEN-AD: Asturias, Grupo IV (extraño), 50.000 € → coef×2 → cuotaFinal 8.671,82 €', () => {
+    // Grupo IV (no pariente): sin reducción parentesco, coeficiente multiplicador 2,0.
+    // baseLiquidable = 50.000; cuotaIntegra (tramo 3) = 4.335,91; ×2 = 8.671,82 €
+    const res = calcularSucesion({ baseImponible: 50000, ccaa: 'asturias', grupo: 'IV' });
+    expect(res.reduccionParentesco).toBe(0);
+    expect(res.baseLiquidable).toBe(50000);
+    expect(res.cuotaIntegra).toBeCloseTo(4335.91, 2);
+    expect(res.coeficienteMultiplicador).toBe(2.0);
+    expect(res.cuotaTributaria).toBeCloseTo(8671.82, 2);
+    expect(res.bonificacionCcaa).toBe(0);
+    expect(res.cuotaFinal).toBeCloseTo(8671.82, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(17.34, 2);
+  });
+
+  test('GOLDEN-AE: Cataluña, Grupo II, 300.000 € → tarifa propia → cuotaFinal 31.500 €', () => {
+    // Cataluña usa tarifa propia (7%–32%) y reducción parentesco propia (50.000 €).
+    // baseLiquidable = 300.000 − 50.000 = 250.000; tramo 17% → cuotaIntegra = 31.500 €
+    const res = calcularSucesion({ baseImponible: 300000, ccaa: 'cataluna', grupo: 'II' });
+    expect(res.reduccionParentesco).toBeCloseTo(50000, 2);
+    expect(res.baseLiquidable).toBe(250000);
+    expect(res.cuotaIntegra).toBeCloseTo(31500, 2);
+    expect(res.cuotaFinal).toBeCloseTo(31500, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(10.5, 2);
+    expect(res.esForal).toBe(true);
+    expect(res.tarifaAplicada).toContain('Cataluña');
+  });
+
+  test('GOLDEN-AF: Madrid, I-descendiente, 200.000 € + vivienda 200.000 € → cuotaFinal 54,05 €', () => {
+    // Reducción vivienda habitual al 95%, pero tope 122.606,47 €.
+    // 200.000 × 95% = 190.000 → se aplica el tope de 122.606,47 €.
+    // baseLiquidable = 200.000 − 15.956,87 − 122.606,47 = 61.436,66
+    const res = calcularSucesion({
+      baseImponible: 200000, ccaa: 'madrid', grupo: 'I-descendiente',
+      viviendaHabitual: 200000,
+    });
+    expect(res.reduccionVivienda).toBeCloseTo(122606.47, 2);
+    expect(res.totalReducciones).toBeCloseTo(138563.34, 2);
+    expect(res.baseLiquidable).toBeCloseTo(61436.66, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(5405.24, 2);
+    expect(res.cuotaTributaria).toBeCloseTo(5405.24, 2);
+    expect(res.bonificacionCcaa).toBeCloseTo(5351.19, 2);
+    expect(res.cuotaFinal).toBeCloseTo(54.05, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.03, 2);
+  });
+
+  test('GOLDEN-AG: Madrid, I-descendiente, 200.000 €, edad 16 → reducción menor-21 → cuotaFinal 157,17 €', () => {
+    // Reducción por edad: (21−16) × 3.990,72 = 19.953,60 €.
+    // baseLiquidable = 200.000 − 15.956,87 − 19.953,60 = 164.089,53
+    const res = calcularSucesion({
+      baseImponible: 200000, ccaa: 'madrid', grupo: 'I-descendiente', edadHeredero: 16,
+    });
+    expect(res.reduccionEdadMenor21).toBeCloseTo(19953.6, 2);
+    expect(res.totalReducciones).toBeCloseTo(35910.47, 2);
+    expect(res.baseLiquidable).toBeCloseTo(164089.53, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(15716.72, 2);
+    expect(res.bonificacionCcaa).toBeCloseTo(15559.55, 2);
+    expect(res.cuotaFinal).toBeCloseTo(157.17, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.08, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularIRPF
+// Tramos estatal + autonómico medio 2025 (Ley 35/2006 + LPGE 2025).
+// Todos los casos verificados internamente. Pipeline:
+//   input → −gastos deducibles (2.000€) → −reducción RNT (art.20) → tarifa progresiva → −mínimo personal/familiar
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularIRPF (Capa 1 · tarifa progresiva 2025)', () => {
+
+  test('GOLDEN-AH: soltero, 30.000 € trabajo → cuota 4.198,14 €, tipo 16,38%', () => {
+    // rntBruto = 28.000 → red. RNT 2.364 (>=16.825) → rtn=25.636
+    // blg = 25.636 − 5.550 = 20.086 → cruza tramos 19% y 24%
+    const res = calcularIRPF({ rendimientosTrabajo: 30000 });
+    expect(res.gastosDeducibles).toBe(2000);
+    expect(res.reduccionRNT).toBe(2364);
+    expect(res.rendimientosTrabajoNetos).toBe(25636);
+    expect(res.baseImponibleGeneral).toBe(25636);
+    expect(res.minimoPersonalFamiliar).toBe(5550);
+    expect(res.baseLiquidableGeneral).toBe(20086);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(4198.14, 2);
+    expect(res.cuotaIntegralAhorro).toBe(0);
+    expect(res.cuotaIntegra).toBeCloseTo(4198.14, 2);
+    expect(res.tipoEfectivoGeneral).toBeCloseTo(16.38, 2);
+  });
+
+  test('GOLDEN-AI: soltero, 60.000 € trabajo → cuota 14.233,32 €, tipo 25,58%', () => {
+    // rntBruto = 58.000 → red. RNT 2.364 → rtn=55.636 → blg=50.086
+    // Activa tramos 19%, 24%, 30% y 37% (parcial)
+    const res = calcularIRPF({ rendimientosTrabajo: 60000 });
+    expect(res.reduccionRNT).toBe(2364);
+    expect(res.rendimientosTrabajoNetos).toBe(55636);
+    expect(res.baseLiquidableGeneral).toBe(50086);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(14233.32, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(14233.32, 2);
+    expect(res.tipoEfectivoGeneral).toBeCloseTo(25.58, 2);
+  });
+
+  test('GOLDEN-AJ: soltero, 13.000 € trabajo → mínimo personal cubre la base → cuota 0 €', () => {
+    // rntBruto=11.000 → red. RNT 6.498 (máxima, ≤13.115) → rtn=4.502
+    // blg = max(0, 4.502 − 5.550) = 0 → el mínimo personal absorbe toda la base
+    const res = calcularIRPF({ rendimientosTrabajo: 13000 });
+    expect(res.reduccionRNT).toBe(6498);
+    expect(res.rendimientosTrabajoNetos).toBeCloseTo(4502, 2);
+    expect(res.baseLiquidableGeneral).toBe(0);
+    expect(res.cuotaIntegra).toBe(0);
+    expect(res.cuotaDiferencial).toBe(0);
+    expect(res.tipoEfectivoGeneral).toBe(0);
+  });
+
+  test('GOLDEN-AK: 40.000 € trabajo + 5.000 € capital, 2 hijos, 4.000 € retenciones → diferencial 2.611,30 €', () => {
+    // Base ahorro 5.000 € al 19% → 950 €. Base general: mínimo 10.650 (personal+2hijos)
+    // cuotaGeneral = 5.661,30 + cuotaAhorro 950 = 6.611,30 − 4.000 ret = 2.611,30 €
+    const res = calcularIRPF({
+      rendimientosTrabajo: 40000,
+      rendimientosCapitalMobiliario: 5000,
+      numHijos: 2,
+      retenciones: 4000,
+    });
+    expect(res.minimoPersonalFamiliar).toBe(10650);   // 5550 + 2400 + 2700
+    expect(res.baseLiquidableGeneral).toBeCloseTo(24986, 2);
+    expect(res.baseImponibleAhorro).toBe(5000);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(5661.3, 2);
+    expect(res.cuotaIntegralAhorro).toBeCloseTo(950, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(6611.3, 2);
+    expect(res.retenciones).toBe(4000);
+    expect(res.cuotaDiferencial).toBeCloseTo(2611.3, 2);
+    expect(res.tipoEfectivoGeneral).toBeCloseTo(15.89, 2);
+  });
+
+  test('GOLDEN-AL: 17.000 € trabajo → zona interpolación reducción RNT → cuota 969,17 €', () => {
+    // rntBruto=15.000, entre 13.115 y 16.825 → reducción interpolada: 6.498 − 1,14×(15.000−13.115)
+    // = 6.498 − 2.148,90 = 4.349,10 → rtn=10.650,90 → blg=5.100,90 → tipo 19%
+    const res = calcularIRPF({ rendimientosTrabajo: 17000 });
+    expect(res.reduccionRNT).toBeCloseTo(4349.1, 2);
+    expect(res.rendimientosTrabajoNetos).toBeCloseTo(10650.9, 2);
+    expect(res.baseLiquidableGeneral).toBeCloseTo(5100.9, 2);
+    expect(res.cuotaIntegraGeneral).toBeCloseTo(969.17, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(969.17, 2);
+    expect(res.tipoEfectivoGeneral).toBeCloseTo(9.1, 1);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPlusvaliasIRPF
+// Tramos base del ahorro 2025 (arts. 33-39 + 66 Ley 35/2006).
+// Verificación interna: aritmética pura sobre tramos conocidos.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularPlusvaliasIRPF (Capa 1 · base del ahorro 2025)', () => {
+
+  test('GOLDEN-AM: ganancia 3.700 € (< 6.000 €) → solo tramo 19% → cuota 703 €', () => {
+    // compra 10.200 € (10k+200 gastos), venta 13.900 € (14k-100 gastos), 730 días → largo plazo
+    const res = calcularPlusvaliasIRPF({
+      precioCompra: 10000, gastosCompra: 200,
+      precioVenta: 14000, gastosVenta: 100,
+      fechaCompra: '2022-01-01', fechaVenta: '2024-01-01',
+    });
+    expect(res.precioAdquisicion).toBe(10200);
+    expect(res.precioTransmision).toBe(13900);
+    expect(res.gananciaNeta).toBe(3700);
+    expect(res.esGanancia).toBe(true);
+    expect(res.esLargoPlazo).toBe(true);
+    expect(res.diasTranscurridos).toBe(730);
+    expect(res.baseLiquidable).toBe(3700);
+    expect(res.cuotaIRPF).toBe(703);
+    expect(res.tipoEfectivo).toBe(19);
+    expect(res.gananciaNeta_DI).toBe(2997);
+    expect(res.rentabilidadNetaImpuestos).toBeCloseTo(29.38, 2);
+  });
+
+  test('GOLDEN-AN: ganancia 25.000 € → cruza tramos 19% + 21% → cuota 5.130 €', () => {
+    // 19%×6.000=1.140 + 21%×19.000=3.990 = 5.130 €; tipo efectivo 20,52%
+    const res = calcularPlusvaliasIRPF({
+      precioCompra: 50000, precioVenta: 75000,
+      fechaCompra: '2020-01-01', fechaVenta: '2025-01-01',
+    });
+    expect(res.gananciaNeta).toBe(25000);
+    expect(res.baseLiquidable).toBe(25000);
+    expect(res.cuotaIRPF).toBe(5130);
+    expect(res.tipoEfectivo).toBeCloseTo(20.52, 2);
+    expect(res.gananciaNeta_DI).toBe(19870);
+    expect(res.rentabilidadNetaImpuestos).toBeCloseTo(39.74, 2);
+    expect(res.desglose).toHaveLength(2);
+    expect(res.desglose[0]).toMatchObject({ tipo: 19, cuota: 1140 });
+    expect(res.desglose[1]).toMatchObject({ tipo: 21, cuota: 3990 });
+  });
+
+  test('GOLDEN-AO: pérdida patrimonial −3.000 € → cuota 0, base liquidable 0', () => {
+    // Venta por debajo del precio de compra → esGanancia=false, sin tributación
+    const res = calcularPlusvaliasIRPF({
+      precioCompra: 10000, precioVenta: 7000,
+      fechaCompra: '2021-01-01', fechaVenta: '2024-01-01',
+    });
+    expect(res.gananciaNeta).toBe(-3000);
+    expect(res.esGanancia).toBe(false);
+    expect(res.baseLiquidable).toBe(0);
+    expect(res.cuotaIRPF).toBe(0);
+    expect(res.tipoEfectivo).toBe(0);
+    expect(res.gananciaNeta_DI).toBe(-3000);
+  });
+
+  test('GOLDEN-AP: ganancia 10.000 € con compensación 3.000 € → base 7.000 € → cuota 1.350 €', () => {
+    // saldoCompensado = 3.000 → baseLiquidable = 7.000
+    // 19%×6.000=1.140 + 21%×1.000=210 = 1.350 €; tipo efectivo 13,5%
+    const res = calcularPlusvaliasIRPF({
+      precioCompra: 10000, precioVenta: 20000,
+      fechaCompra: '2020-01-01', fechaVenta: '2025-01-01',
+      saldoCompensacion: 3000,
+    });
+    expect(res.gananciaNeta).toBe(10000);
+    expect(res.saldoCompensado).toBe(3000);
+    expect(res.baseLiquidable).toBe(7000);
+    expect(res.cuotaIRPF).toBe(1350);
+    expect(res.tipoEfectivo).toBeCloseTo(13.5, 2);
+    expect(res.gananciaNeta_DI).toBe(8650);
+    expect(res.rentabilidadNetaImpuestos).toBeCloseTo(86.5, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularRetencionAlquiler
+// Verificación interna. Bug previo corregido (2026-06-09): calcularCuotaIRPF
+// usaba fórmula no estándar que producía valores ~10× incorrectos. Fix: tarifa
+// progresiva diferencial (tarifa(total) − tarifa(otros)).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularRetencionAlquiler (Capa 1)', () => {
+
+  test('GOLDEN-AQ: 800 €/mes, pc=150.000 € → amort 3.150, rn 6.450, cuota 490,20 €', () => {
+    // Amortización = 150.000 × 70% × 3% = 3.150. Reducción 60% → rnr = 2.580
+    // IRPF sobre 2.580 al 19% = 490,20 € (sin arrendatario empresa → sin retención)
+    const res = calcularRetencionAlquiler({ alquilerMensual: 800, precioCompra: 150000 });
+    expect(res.ingresosIntegros).toBe(9600);
+    expect(res.gastos.amortizacion).toBe(3150);
+    expect(res.gastos.total).toBe(3150);
+    expect(res.rendimientoNeto).toBe(6450);
+    expect(res.reduccionViviendaHabitual).toBe(true);
+    expect(res.reduccion60pct).toBe(3870);
+    expect(res.rendimientoNetoReducido).toBe(2580);
+    expect(res.cuotaIRPFEstimada).toBeCloseTo(490.2, 2);
+    expect(res.tipoMarginal).toBe(19);
+    expect(res.retencionAnual).toBe(0);
+    expect(res.cuotaDiferencial).toBeCloseTo(490.2, 2);
+    expect(res.aDevolver).toBe(false);
+  });
+
+  test('GOLDEN-AR: 1.000 €/mes empresa, gastos+hipoteca → retención 2.280 → a devolver 1.938 €', () => {
+    // Arrendatario empresa: retención 19% × 12.000 = 2.280. Cuota IRPF 342 < 2.280 → devolver
+    const res = calcularRetencionAlquiler({
+      alquilerMensual: 1000, precioCompra: 200000,
+      ibi: 500, comunidad: 600, seguro: 200, interesesHipoteca: 2000,
+      arrendatarioEmpresa: true,
+    });
+    expect(res.ingresosIntegros).toBe(12000);
+    expect(res.gastos.amortizacion).toBe(4200);
+    expect(res.gastos.total).toBe(7500);
+    expect(res.rendimientoNeto).toBe(4500);
+    expect(res.rendimientoNetoReducido).toBe(1800);
+    expect(res.cuotaIRPFEstimada).toBeCloseTo(342, 2);
+    expect(res.retencionAnual).toBe(2280);
+    expect(res.retencionMensual).toBe(190);
+    expect(res.cuotaDiferencial).toBeCloseTo(-1938, 2);
+    expect(res.aDevolver).toBe(true);
+  });
+
+  test('GOLDEN-AS: 500 €/mes, gastos > ingresos → rendimientoNeto −1.220 → cuota 0', () => {
+    // Gastos 7.220 > ingresos 6.000 → rendimiento negativo, sin reducción, sin IRPF
+    const res = calcularRetencionAlquiler({
+      alquilerMensual: 500, precioCompra: 120000,
+      interesesHipoteca: 4000, ibi: 400, comunidad: 300,
+    });
+    expect(res.ingresosIntegros).toBe(6000);
+    expect(res.gastos.amortizacion).toBe(2520);
+    expect(res.gastos.total).toBe(7220);
+    expect(res.rendimientoNeto).toBe(-1220);
+    expect(res.reduccionViviendaHabitual).toBe(false);
+    expect(res.reduccion60pct).toBe(0);
+    expect(res.cuotaIRPFEstimada).toBe(0);
+    expect(res.cuotaDiferencial).toBe(0);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularRendimientoCapitalInmobiliario
+// LIRPF arts. 22-24 + Ley 12/2023. Verificación interna.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularRendimientoCapitalInmobiliario (Capa 1)', () => {
+
+  test('GOLDEN-AT: vivienda habitual 50%, 12.000 € ingresos, valorConst=150.000 → rnr 3.350 €', () => {
+    // Amort = 150.000 × 3% = 4.500. Gastos = 4.500+600+200 = 5.300. rn = 6.700 → 50% → 3.350
+    const res = calcularRendimientoCapitalInmobiliario({
+      tipoInmueble: 'vivienda_habitual_arrendatario',
+      ingresosIntegros: 12000,
+      gastos: { ibiYTributos: 600, seguros: 200, valorConstruccion: 150000 },
+    });
+    expect(res.amortizacionComputada).toBe(4500);
+    expect(res.totalGastosBrutos).toBe(5300);
+    expect(res.totalGastosEfectivos).toBe(5300);
+    expect(res.excesoNoDeducible).toBe(0);
+    expect(res.rendimientoNeto).toBe(6700);
+    expect(res.pctReduccion).toBe(50);
+    expect(res.importeReduccion).toBe(3350);
+    expect(res.rendimientoNetoReducido).toBe(3350);
+  });
+
+  test('GOLDEN-AU: local (no_vivienda), amortización directa → sin reducción → rnr = rn', () => {
+    // Local comercial: sin reducción. rn = 8.000 − 2.400 = 5.600 = rnr
+    const res = calcularRendimientoCapitalInmobiliario({
+      tipoInmueble: 'no_vivienda',
+      ingresosIntegros: 8000,
+      gastos: { ibiYTributos: 400, amortizacionDirecta: 2000 },
+    });
+    expect(res.amortizacionComputada).toBe(2000);
+    expect(res.totalGastosBrutos).toBe(2400);
+    expect(res.rendimientoNeto).toBe(5600);
+    expect(res.pctReduccion).toBe(0);
+    expect(res.importeReduccion).toBe(0);
+    expect(res.rendimientoNetoReducido).toBe(5600);
+  });
+
+  test('GOLDEN-AV: intereses+reparación (8.000) > ingresos (6.000) → exceso 2.000 no deducible, rn −300', () => {
+    // Gastos sujetos a límite = 5.000+3.000 = 8.000 > 6.000 → exceso 2.000 trasladable 4 años
+    // Gastos efectivos = 6.000+300 = 6.300 → rn = −300 → no aplica reducción
+    const res = calcularRendimientoCapitalInmobiliario({
+      tipoInmueble: 'vivienda_habitual_arrendatario',
+      ingresosIntegros: 6000,
+      gastos: { interesesPrestamo: 5000, reparacionConservacion: 3000, ibiYTributos: 300 },
+    });
+    expect(res.gastosSujetosLimite).toBe(8000);
+    expect(res.limiteGastos).toBe(6000);
+    expect(res.excesoNoDeducible).toBe(2000);
+    expect(res.totalGastosBrutos).toBe(8300);
+    expect(res.totalGastosEfectivos).toBe(6300);
+    expect(res.rendimientoNeto).toBe(-300);
+    expect(res.importeReduccion).toBe(0);        // no aplica: rn negativo
+    expect(res.rendimientoNetoReducido).toBe(-300);
+  });
+
 });
