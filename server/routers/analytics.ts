@@ -915,16 +915,13 @@ export const analyticsRouter = router({
       await initializeDatabase();
       const client = getTursoClient();
 
-      let ipExcluida = '';
-      if (input.excluir_mi_ip) {
-        try {
-          const cfg = await client.execute({
-            sql: `SELECT valor FROM analytics_config WHERE clave = 'ip_excluida'`,
-            args: [],
-          });
-          if (cfg.rows.length > 0) ipExcluida = String(cfg.rows[0].valor);
-        } catch { /* ignorar */ }
-      }
+      // Leer siempre (on-demand necesita la IP; el filtro la usa solo si excluir_mi_ip=true)
+      const ipConfigurada = await leerIpExcluida(client);
+      const ipExcluida = input.excluir_mi_ip ? ipConfigurada : '';
+
+      // On-demand defensivo: rellena el día que acaba de salir de la ventana viva
+      // (mismo patrón que getStatsPorRollup, getTendencias y getDistribucionDuraciones)
+      try { await computarRollupPendientes(client, ipConfigurada, 7); } catch { /* no bloquear */ }
 
       // Fecha de hace 29 días (para incluir hoy = 30 días en total), en formato YYYYMMDD
       const hoy = new Date();
