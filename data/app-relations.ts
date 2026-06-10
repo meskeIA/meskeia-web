@@ -3286,6 +3286,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-gastos-deducibles/', icon: '🧾', name: 'Orientador Gastos Deducibles', description: 'Qué puedes deducir' },
     { url: '/comparador-autonomo-vs-sl/', icon: '⚖️', name: 'Comparador Autónomo vs SL', description: '¿Cuándo conviene una SL?' },
   ],
+  'orientador-ayudas-autonomos-pymes': [
+    { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
+    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuánto pagarás con o sin tarifa plana' },
+    { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
+    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+  ],
   // FAMILIA: IRPF Y FISCAL GENERAL
   // ==========================================
   'estimador-irpf': [

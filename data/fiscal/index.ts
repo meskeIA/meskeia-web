@@ -25,3 +25,4 @@ export * from './dependencia';
 export * from './maternidad';
 export * from './smi';
 export * from './patrimonio';
+export * from './ayudas-publicas';
