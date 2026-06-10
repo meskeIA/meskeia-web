@@ -2,8 +2,9 @@
  * API Route: Impuesto sobre Sociedades para ChatGPT Actions
  * Endpoint: POST /api/chatgpt/impuesto-sociedades
  *
- * Calcula la cuota del IS para sociedades españolas con los tipos vigentes 2025:
- * 15% nueva empresa, 20% microempresa, 23% PYME, 25% general.
+ * Calcula la cuota del IS para sociedades españolas con los tipos vigentes 2026:
+ * 15% nueva empresa, 25% general, y escala progresiva 19%/21% (Ley 7/2024)
+ * para microempresa/PYME (cifra de negocio < 1M€).
  * Incluye reserva de capitalización y nivelación.
  *
  * Analytics: registra cada llamada con modo='chatgpt' en Turso.
@@ -17,7 +18,7 @@ import { getTursoClient, initializeDatabase } from '@/lib/turso';
 export const runtime = 'nodejs';
 
 const AVISO_LEGAL =
-  '⚠️ Resultado orientativo basado en LIS (Ley 27/2014) vigente 2025. ' +
+  '⚠️ Resultado orientativo basado en LIS (Ley 27/2014), modificada por Ley 7/2024, vigente 2026. ' +
   'La base imponible real puede diferir del resultado contable por ajustes extracontables. ' +
   'Consulta con tu asesor fiscal. Fuente: meskeia.com/impuesto-sociedades';
 
@@ -60,8 +61,8 @@ export async function POST(request: NextRequest) {
         {
           error:
             'El campo regimenFiscal es obligatorio. Valores válidos: ' +
-            '"general" (25%), "pyme" (23%, CN<1M€), "nueva_empresa" (15%, primeros 2 años), ' +
-            '"microempresa" (20%, CN<1M€ y <10 empleados), "cooperativa" (20%), ' +
+            '"general" (25%), "pyme" o "microempresa" (escala progresiva 19%/21% en 2026, CN<1M€, Ley 7/2024 — ambos valores son equivalentes), ' +
+            '"nueva_empresa" (15%, primeros 2 años), "cooperativa" (20%), ' +
             '"sin_animo_lucro" (10%), "credito_hidrocarburos" (30%).',
         },
         { status: 400, headers: corsHeaders() }

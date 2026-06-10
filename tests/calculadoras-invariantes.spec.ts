@@ -57,6 +57,7 @@ import { calcularPensionViudedad } from '../lib/calculadoras/pensionViudedad';
 import { calcularPrestacionMaternidadPaternidad } from '../lib/calculadoras/prestacionMaternidadPaternidad';
 import { calcularExcedencia } from '../lib/calculadoras/excedencia';
 import { calcularComplementoBrechaGenero } from '../lib/calculadoras/complementoBrechaGenero';
+import { calcularImpuestoSociedades } from '../lib/calculadoras/impuestoSociedades';
 
 /** Redondeo a 2 decimales idéntico al de las calculadoras */
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -308,6 +309,56 @@ test.describe('Golden — compararAutonomoVsSL (Capa 1 · IS micropymes 2026 ✓
     expect(cmp.sl.baseImponible).toBeCloseTo(40000, 2);
     expect(cmp.sl.cuotaImpuesto).toBeCloseTo(10000, 2); // 40.000 × 25%
     expect(cmp.tipoISAplicado).toBeCloseTo(25, 2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularImpuestoSociedades — IS micropymes (escala Ley 7/2024)
+//
+// Verificado 2026-06-10: 'pyme' (23% plano) y 'microempresa' (20% plano,
+// requisito de plantilla nunca incorporado a la ley) eran categorías
+// obsoletas/incorrectas. La Ley 7/2024 unifica ambas bajo la misma escala
+// progresiva para entidades con cifra de negocio < 1M€: 2026 → 19% (hasta
+// 50.000 € BI) / 21% (resto). Ver TRAMOS_IS_MICROPYMES_2026 en data/fiscal/sociedades.ts.
+// La reserva de nivelación (art. 105 LIS, 10% de la BI) se aplica siempre
+// para 'pyme'/'microempresa' antes de calcular la escala.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularImpuestoSociedades (Capa 1 · IS micropymes 2026 ✓)', () => {
+  test('GOLDEN-IS-PYME-A: BI 40.000 € → reserva nivelación 4.000 € → BL 36.000 € (≤ 50.000 €) → IS = 19% = 6.840 €', () => {
+    const r = calcularImpuestoSociedades({ regimenFiscal: 'pyme', baseImponible: 40000 });
+    expect(r.reservaNivelacion).toBeCloseTo(4000, 2);
+    expect(r.baseLiquidable).toBeCloseTo(36000, 2);
+    expect(r.cuotaIntegra).toBeCloseTo(6840, 2);
+    expect(r.tipoGravamen).toBeCloseTo(19, 2);
+    expect(r.cuotaLiquida).toBeCloseTo(6840, 2);
+    expect(r.tipoEfectivo).toBeCloseTo(17.1, 2);
+  });
+
+  test('GOLDEN-IS-MICROEMPRESA-B: BI 100.000 € → reserva nivelación 10.000 € → BL 90.000 € (> 50.000 €) → escala 19%/21% = 17.900 € (tipo medio 19,89%)', () => {
+    const r = calcularImpuestoSociedades({ regimenFiscal: 'microempresa', baseImponible: 100000 });
+    expect(r.reservaNivelacion).toBeCloseTo(10000, 2);
+    expect(r.baseLiquidable).toBeCloseTo(90000, 2);
+    expect(r.cuotaIntegra).toBeCloseTo(17900, 2);
+    expect(r.tipoGravamen).toBeCloseTo(19.89, 2);
+    expect(r.cuotaLiquida).toBeCloseTo(17900, 2);
+    expect(r.tipoEfectivo).toBeCloseTo(17.9, 2);
+  });
+
+  test('EQUIVALENCIA: \'pyme\' y \'microempresa\' producen el mismo resultado (Ley 7/2024 unifica ambas categorías)', () => {
+    const pyme = calcularImpuestoSociedades({ regimenFiscal: 'pyme', baseImponible: 75000 });
+    const micro = calcularImpuestoSociedades({ regimenFiscal: 'microempresa', baseImponible: 75000 });
+    expect(pyme.cuotaIntegra).toBeCloseTo(micro.cuotaIntegra, 2);
+    expect(pyme.tipoGravamen).toBeCloseTo(micro.tipoGravamen, 2);
+  });
+
+  test('REGRESIÓN: regimenFiscal "general" sigue aplicando el 25% plano sin reserva de nivelación', () => {
+    const r = calcularImpuestoSociedades({ regimenFiscal: 'general', baseImponible: 40000 });
+    expect(r.reservaNivelacion).toBe(0);
+    expect(r.baseLiquidable).toBeCloseTo(40000, 2);
+    expect(r.cuotaIntegra).toBeCloseTo(10000, 2); // 40.000 × 25%
+    expect(r.tipoGravamen).toBeCloseTo(25, 2);
+    expect(r.tipoEfectivo).toBeCloseTo(25, 2);
   });
 });
 

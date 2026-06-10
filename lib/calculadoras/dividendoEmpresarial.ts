@@ -11,7 +11,7 @@
  * paga IS sobre el beneficio antes de distribuirlo. El salario reduce el IS
  * pero tributa a tipos de la tarifa general (más altos).
  *
- * Fuente: LIRPF + LIS + LGSS — verificado 2025
+ * Fuente: IRPF 2025 + IS 2026 (Ley 27/2014, escala micropymes Ley 7/2024) + LGSS — verificado 2026-06-10
  *
  * Encadenable con: comparar_autonomo_vs_sl, calcular_irpf, calcular_cuota_autonomo
  */
