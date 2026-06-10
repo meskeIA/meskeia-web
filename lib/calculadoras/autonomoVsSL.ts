@@ -5,7 +5,7 @@
  * Compara la carga fiscal total (SS + IRPF/IS + dividendos) de operar
  * como autónomo persona física frente a constituir una SL.
  *
- * Fuente: IRPF 2025 + RETA 2026 + IS 2025 (Ley 27/2014)
+ * Fuente: IRPF 2025 + RETA 2026 + IS 2026 (Ley 27/2014, escala micropymes Ley 7/2024)
  */
 
 import {
@@ -18,6 +18,7 @@ import {
   AUTONOMO_SOCIETARIO_2025,
   FISCAL_AUTONOMOS_META,
   FISCAL_SOCIEDADES_META,
+  calcularCuotaISMicropyme,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -97,6 +98,14 @@ function calcularCuotaRetaAnual(rendimientoMensual: number): number {
   return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
 }
 
+// Cuota de IS según el tipo de SL: las micropymes tributan por la escala
+// progresiva de la Ley 7/2024 (19%/21% en 2026), no por un tipo plano.
+function calcularCuotaIS(baseImponible: number, tipoIS: TipoIS | undefined): number {
+  if (tipoIS === 'micropyme') return calcularCuotaISMicropyme(baseImponible);
+  if (tipoIS === 'nueva_creacion') return baseImponible * (TIPOS_IS_2025.nuevaCreacion / 100);
+  return baseImponible * (TIPOS_IS_2025.general / 100);
+}
+
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoComparacion {
@@ -106,12 +115,6 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
 
   const gastosDeducibles = p.gastosDeducibles ?? 0;
   const repartirDividendos = p.repartirDividendos !== false; // por defecto sí
-
-  const tipoISPct = p.tipoIS === 'nueva_creacion'
-    ? TIPOS_IS_2025.nuevaCreacion
-    : p.tipoIS === 'micropyme'
-      ? TIPOS_IS_2025.micropymes
-      : TIPOS_IS_2025.general;
 
   // ─── AUTÓNOMO ───────────────────────────────────────────────────────────────
 
@@ -145,8 +148,11 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
   // ─── SOCIEDAD LIMITADA ──────────────────────────────────────────────────────
 
   const beneficioSL = Math.max(0, p.beneficioAnual - gastosDeducibles);
-  const cuotaIS = r(beneficioSL * (tipoISPct / 100));
+  const cuotaIS = r(calcularCuotaIS(beneficioSL, p.tipoIS));
   const beneficioNetoSL = r(beneficioSL - cuotaIS);
+  // Tipo efectivo de IS (informativo): para 'micropyme' es el tipo medio
+  // resultante de aplicar la escala progresiva, no un tipo plano.
+  const tipoISEfectivo = beneficioSL > 0 ? r((cuotaIS / beneficioSL) * 100) : 0;
 
   // Autónomo societario (administrador con participación ≥ 25%)
   const cuotaAutoSocietarioAnual = r(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual * 12);
@@ -190,7 +196,7 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
     const cuotaR = calcularCuotaRetaAnual(rnA / 12);
     const cargaA = cuotaR + calcularCuotaIRPF(Math.max(0, rnA - cuotaR - MINIMOS_IRPF_2025.personal));
     const benefS = Math.max(0, b - gd);
-    const cuotaISU = benefS * (tipoISPct / 100);
+    const cuotaISU = calcularCuotaIS(benefS, p.tipoIS);
     const cuotaAS = AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual * 12;
     const irpfD = repartirDividendos ? calcularCuotaAhorro(benefS - cuotaISU) : 0;
     const cargaS = cuotaISU + cuotaAS + irpfD;
@@ -206,7 +212,7 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
     ahorroCargasSL,
     convieneSL,
     umbralSL,
-    tipoISAplicado: tipoISPct,
+    tipoISAplicado: tipoISEfectivo,
     fuenteDatos: `${FISCAL_AUTONOMOS_META.fuente} | ${FISCAL_SOCIEDADES_META.fuente}`,
   };
 }

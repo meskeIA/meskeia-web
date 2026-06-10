@@ -25,6 +25,7 @@ import {
   RETENCIONES_IS_2025,
   AUTONOMO_SOCIETARIO_2025,
   FISCAL_SOCIEDADES_META,
+  calcularCuotaISMicropyme,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -154,11 +155,19 @@ function cuotaIRPFAhorro(base: number): number {
   return cuota;
 }
 
+// Cuota de IS según el tipo de SL: las micropymes tributan por la escala
+// progresiva de la Ley 7/2024 (19%/21% en 2026), no por un tipo plano.
+function calcularCuotaIS(baseImponible: number, tipoIS: TipoIS_Dividendo): number {
+  if (tipoIS === 'micropyme') return calcularCuotaISMicropyme(baseImponible);
+  if (tipoIS === 'nueva_creacion') return baseImponible * (TIPOS_IS_2025.nuevaCreacion / 100);
+  return baseImponible * (TIPOS_IS_2025.general / 100);
+}
+
 function calcularEscenario(
   nombre: string,
   beneficioAntesIS: number,
   salarioBruto: number,
-  tipoIS: number,
+  tipoIS: TipoIS_Dividendo,
   participacionPct: number,
   tieneControl: boolean,
   otrosRendimientos: number,
@@ -173,7 +182,7 @@ function calcularEscenario(
 
   // Base IS = beneficio - salario (el salario es gasto deducible)
   const baseIS = Math.max(0, beneficioAntesIS - salarioBruto);
-  const isPagado = r(baseIS * tipoIS / 100);
+  const isPagado = r(calcularCuotaIS(baseIS, tipoIS));
   const beneficioNetoSL = r(baseIS - isPagado);
 
   // Dividendo proporcional a la participación
@@ -214,9 +223,9 @@ function calcularEscenario(
 export function calcularDividendoEmpresarial(p: ParametrosDividendoEmpresarial): ResultadoDividendoEmpresarial {
   if (p.beneficioAntesIS <= 0) throw new Error('El beneficio antes de IS debe ser mayor que cero.');
 
+  const r = (n: number) => Math.round(n * 100) / 100;
   const salarioBruto = p.salarioBrutoSocio ?? 0;
   const tipoISKey = p.tipoIS ?? 'general';
-  const tipoISPct = TIPOS_IS_2025[tipoISKey === 'nueva_creacion' ? 'nuevaCreacion' : tipoISKey === 'micropyme' ? 'micropymes' : 'general'];
   const participacion = p.participacionPct ?? 100;
   const tieneControl = p.tieneControl ?? true;
   const otrosRendimientos = p.otrosRendimientosTrabajo ?? 0;
@@ -225,18 +234,25 @@ export function calcularDividendoEmpresarial(p: ParametrosDividendoEmpresarial):
   if (salarioBruto > p.beneficioAntesIS) throw new Error('El salario no puede superar el beneficio antes de IS.');
   if (participacion <= 0 || participacion > 100) throw new Error('La participación debe estar entre 1% y 100%.');
 
-  const escenarioSoloDividendo = calcularEscenario('Solo dividendo (salario 0)', p.beneficioAntesIS, 0, tipoISPct, participacion, tieneControl, otrosRendimientos, hijos);
-  const escenarioSoloSalario   = calcularEscenario('Solo salario', p.beneficioAntesIS, p.beneficioAntesIS, tipoISPct, participacion, tieneControl, otrosRendimientos, hijos);
-  const escenarioCombinado     = calcularEscenario(`Combinado (salario ${salarioBruto.toLocaleString('es-ES')} €)`, p.beneficioAntesIS, salarioBruto, tipoISPct, participacion, tieneControl, otrosRendimientos, hijos);
+  const escenarioSoloDividendo = calcularEscenario('Solo dividendo (salario 0)', p.beneficioAntesIS, 0, tipoISKey, participacion, tieneControl, otrosRendimientos, hijos);
+  const escenarioSoloSalario   = calcularEscenario('Solo salario', p.beneficioAntesIS, p.beneficioAntesIS, tipoISKey, participacion, tieneControl, otrosRendimientos, hijos);
+  const escenarioCombinado     = calcularEscenario(`Combinado (salario ${salarioBruto.toLocaleString('es-ES')} €)`, p.beneficioAntesIS, salarioBruto, tipoISKey, participacion, tieneControl, otrosRendimientos, hijos);
 
   const escenarios = [escenarioSoloDividendo, escenarioSoloSalario, escenarioCombinado];
   const maxNeto = Math.max(...escenarios.map(e => e.netoDisponibleSocio));
   const minNeto = Math.min(...escenarios.map(e => e.netoDisponibleSocio));
   const optimo = escenarios.find(e => e.netoDisponibleSocio === maxNeto)!;
 
+  // Tipo efectivo de IS (informativo) sobre el beneficio total, tomando como
+  // referencia el escenario sin salario (base IS = beneficio antes de IS).
+  // Para 'micropyme' es el tipo medio resultante de la escala progresiva.
+  const tipoISAplicado = p.beneficioAntesIS > 0
+    ? r((escenarioSoloDividendo.isPagado / p.beneficioAntesIS) * 100)
+    : 0;
+
   return {
     beneficioAntesIS: p.beneficioAntesIS,
-    tipoISAplicado: tipoISPct,
+    tipoISAplicado,
     escenarioSoloDividendo,
     escenarioSoloSalario,
     escenarioCombinado,

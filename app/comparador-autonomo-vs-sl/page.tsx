@@ -14,11 +14,17 @@ import {
   TRAMOS_IRPF_2025,
   TRAMOS_RETA_2025,
   TIPO_COTIZACION_RETA,
-  TIPOS_IS_2025,
   RETENCIONES_IS_2025,
   AUTONOMO_SOCIETARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  calcularCuotaISMicropyme,
 } from '@/data/fiscal';
+
+export type TipoISComparador = '25' | 'micropyme' | '15';
+
+function labelTipoIS(tipoIS: TipoISComparador): string {
+  return tipoIS === 'micropyme' ? '19-21' : tipoIS;
+}
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
@@ -100,12 +106,14 @@ function calcularAutonomo(beneficio: number, gastosDeducibles: number): Resultad
   };
 }
 
-function calcularSL(beneficio: number, gastosDeducibles: number, tipoIS: number, repartirDividendos: boolean): ResultadoFiscal {
+function calcularSL(beneficio: number, gastosDeducibles: number, tipoIS: TipoISComparador, repartirDividendos: boolean): ResultadoFiscal {
   // Beneficio contable de la SL = beneficio - gastos deducibles
   const beneficioSL = Math.max(0, beneficio - gastosDeducibles);
 
-  // IS
-  const cuotaIS = beneficioSL * (tipoIS / 100);
+  // IS: las micropymes tributan por la escala progresiva 2026 (Ley 7/2024), no por un tipo plano
+  const cuotaIS = tipoIS === 'micropyme'
+    ? calcularCuotaISMicropyme(beneficioSL)
+    : beneficioSL * (Number(tipoIS) / 100);
   const beneficioNeto = beneficioSL - cuotaIS;
 
   // Autónomo societario obligatorio (cotización administrador)
@@ -138,7 +146,7 @@ function calcularSL(beneficio: number, gastosDeducibles: number, tipoIS: number,
 export default function ComparadorAutonomoVsSLPage() {
   const [beneficio, setBeneficio] = useState('');
   const [gastosDeducibles, setGastosDeducibles] = useState('');
-  const [tipoIS, setTipoIS] = useState<'25' | '23' | '15'>('25');
+  const [tipoIS, setTipoIS] = useState<TipoISComparador>('25');
   const [repartirDividendos, setRepartirDividendos] = useState(true);
 
   const [resultados, setResultados] = useState<{
@@ -154,7 +162,7 @@ export default function ComparadorAutonomoVsSLPage() {
     if (b <= 0) return;
 
     const resAutonomo = calcularAutonomo(b, g);
-    const resSL = calcularSL(b, g, parseInt(tipoIS), repartirDividendos);
+    const resSL = calcularSL(b, g, tipoIS, repartirDividendos);
     const ahorroSL = resAutonomo.totalCargas - resSL.totalCargas;
 
     setResultados({ autonomo: resAutonomo, sl: resSL, ahorroSL, convieneSL: ahorroSL > 0 });
@@ -209,11 +217,11 @@ export default function ComparadorAutonomoVsSLPage() {
             <select
               id="tipoIS"
               value={tipoIS}
-              onChange={e => setTipoIS(e.target.value as '25' | '23' | '15')}
+              onChange={e => setTipoIS(e.target.value as TipoISComparador)}
               className={styles.select}
             >
               <option value="25">25% — Tipo general</option>
-              <option value="23">23% — Micropyme (&lt; 1M € facturación)</option>
+              <option value="micropyme">19% / 21% — Micropyme (&lt; 1M € facturación, escala 2026)</option>
               <option value="15">15% — SL de nueva creación (primeros 2 años)</option>
             </select>
           </div>
@@ -308,7 +316,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <div className={styles.columnaHeader}>
                 <span className={styles.columnaEmoji} aria-hidden="true">🏢</span>
                 <h2 className={styles.columnaTitulo}>Sociedad Limitada</h2>
-                <p className={styles.columnaSubtitulo}>IS {tipoIS}% + dividendos{repartirDividendos ? '' : ' (sin repartir)'}</p>
+                <p className={styles.columnaSubtitulo}>IS {labelTipoIS(tipoIS)}% + dividendos{repartirDividendos ? '' : ' (sin repartir)'}</p>
               </div>
               <div className={styles.columnaBody}>
                 <div className={styles.filaResultado}>
@@ -320,7 +328,7 @@ export default function ComparadorAutonomoVsSLPage() {
                   <span className={styles.filaValor}>- {formatCurrency(resultados.sl.gastosDeducibles)}</span>
                 </div>
                 <div className={styles.filaResultado}>
-                  <span className={styles.filaLabel}>Impuesto de Sociedades ({tipoIS}%)</span>
+                  <span className={styles.filaLabel}>Impuesto de Sociedades ({labelTipoIS(tipoIS)}%)</span>
                   <span className={styles.filaValor}>- {formatCurrency(resultados.sl.cuotaImpuestos)}</span>
                 </div>
                 <div className={styles.filaResultado}>
@@ -463,7 +471,7 @@ export default function ComparadorAutonomoVsSLPage() {
                 <tr>
                   <td>Tipo impositivo principal</td>
                   <td>IRPF progresivo: 19%–47%</td>
-                  <td>IS fijo: 15% (nuevas) / 23% (micropyme) / 25%</td>
+                  <td>IS: 15% (nuevas) / 19%-21% escala 2026 (micropyme) / 25%</td>
                 </tr>
                 <tr>
                   <td>Cotización mínima mensual SS</td>

@@ -2,32 +2,64 @@
  * Datos fiscales: Impuesto de Sociedades (IS)
  *
  * ⚠️ HERRAMIENTA DE ORIENTACIÓN — No constituye asesoramiento fiscal.
- * Datos verificados a la fecha indicada. Pueden haber cambiado en 2026.
+ * Datos verificados a la fecha indicada. Pueden haber cambiado.
  * Verifica siempre en la fuente oficial antes de tomar decisiones.
  *
- * Fuente: Ley 27/2014 del Impuesto sobre Sociedades + LPGE 2025
- * Verificado: 2025-01-15
+ * Fuente: Ley 27/2014 del Impuesto sobre Sociedades, modificada por la
+ * Ley 7/2024, de 20 de diciembre, que introduce una escala progresiva
+ * para microempresas (cifra de negocio < 1M €) en sustitución del
+ * antiguo tipo plano del 23%.
+ * Verificado: 2026-06-10
  * URL oficial: https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html
  */
 
 export const FISCAL_SOCIEDADES_META = {
-  fuente: 'Ley 27/2014, de 27 de noviembre, del Impuesto sobre Sociedades',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  fuente: 'Ley 27/2014, de 27 de noviembre, del Impuesto sobre Sociedades (modificada por Ley 7/2024, de 20 de diciembre)',
+  verificado: '2026-06-10',
+  vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html',
-  nota: 'Tipos generales IS 2025. Las pymes y sociedades de nueva creación pueden aplicar tipos reducidos. Verificar en la Agencia Tributaria para el cálculo exacto.',
+  nota: 'Tipo general 25% sin cambios. Las microempresas (cifra de negocio < 1M €) tributan desde 2025 por la escala progresiva de la Ley 7/2024 — ver TRAMOS_IS_MICROPYMES_2026 y calcularCuotaISMicropyme(). Las sociedades de nueva creación mantienen el 15% en los dos primeros periodos con base imponible positiva. Verificar en la Agencia Tributaria para el cálculo exacto.',
 };
 
-// ─── Tipos IS 2025 ────────────────────────────────────────────────────────────
+// ─── Tipos IS 2025/2026 ────────────────────────────────────────────────────────
 
 export const TIPOS_IS_2025 = {
-  general:              25,    // % — Tipo general
-  nuevaCreacion:        15,    // % — Primeros 2 periodos con base imponible positiva
-  micropymes:           23,    // % — Entidades con cifra de negocios < 1M € (a partir 2023)
+  general:              25,    // % — Tipo general, sin cambios
+  nuevaCreacion:        15,    // % — Primeros 2 periodos con base imponible positiva, sin cambios
+  micropymes:           23,    // % — ⚠️ OBSOLETO: tipo plano vigente solo hasta el ejercicio 2024. Desde 2025 se aplica una escala progresiva (Ley 7/2024) — usar TRAMOS_IS_MICROPYMES_2026 / calcularCuotaISMicropyme(). Se conserva como referencia histórica.
   entidadesExentas:     10,    // % — Entidades sin ánimo de lucro (parcialmente exentas)
   cooperativas:         20,    // % — Resultados cooperativos
   socInversionInmob:    0,     // % — SOCIMI (tributación a nivel del socio)
 };
+
+// ─── Escala progresiva IS micropymes (Ley 7/2024, DT 44ª LIS) ─────────────────
+// Aplica a entidades con cifra de negocio < 1M € en el periodo impositivo
+// anterior. Calendario de implantación gradual:
+//   2025 → 21% (hasta 50.000 €) / 22% (resto)
+//   2026 → 19% (hasta 50.000 €) / 21% (resto)  ← escala vigente recogida abajo
+//   2027 → 17% (hasta 50.000 €) / 20% (resto)
+
+export const TRAMOS_IS_MICROPYMES_2026: { hasta: number; tipo: number }[] = [
+  { hasta: 50000,    tipo: 19 }, // % sobre los primeros 50.000 € de base imponible
+  { hasta: Infinity, tipo: 21 }, // % sobre el resto
+];
+
+/**
+ * Calcula la cuota del Impuesto de Sociedades de una microempresa aplicando
+ * la escala progresiva 2026 de la Ley 7/2024 (por tramos de base imponible).
+ */
+export function calcularCuotaISMicropyme(baseImponible: number): number {
+  if (baseImponible <= 0) return 0;
+  let cuota = 0;
+  let baseAnterior = 0;
+  for (const tramo of TRAMOS_IS_MICROPYMES_2026) {
+    if (baseImponible <= baseAnterior) break;
+    const baseEnTramo = Math.min(baseImponible, tramo.hasta) - baseAnterior;
+    cuota += baseEnTramo * (tramo.tipo / 100);
+    baseAnterior = tramo.hasta;
+  }
+  return cuota;
+}
 
 // ─── Retenciones sobre dividendos y beneficios ───────────────────────────────
 

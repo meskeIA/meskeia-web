@@ -274,6 +274,44 @@ test.describe('Invariantes de composición — consulta_autonomo', () => {
 });
 
 // ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: compararAutonomoVsSL — IS micropymes (escala Ley 7/2024)
+//
+// Verificado 2026-06-10: el tipo plano histórico (23%) quedó OBSOLETO desde el
+// ejercicio 2025. La Ley 7/2024 introduce una escala progresiva para
+// microempresas (cifra de negocio < 1M €): 2026 → 19% (hasta 50.000 € BI) /
+// 21% (resto). Ver TRAMOS_IS_MICROPYMES_2026 en data/fiscal/sociedades.ts.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — compararAutonomoVsSL (Capa 1 · IS micropymes 2026 ✓)', () => {
+  test('GOLDEN-MICROPYME-A: BI 40.000 € (≤ 50.000 €) → IS = 19% plano = 7.600 €', () => {
+    const cmp = compararAutonomoVsSL({ beneficioAnual: 60000, gastosDeducibles: 20000, tipoIS: 'micropyme', repartirDividendos: true });
+    expect(cmp.sl.baseImponible).toBeCloseTo(40000, 2);
+    expect(cmp.sl.cuotaImpuesto).toBeCloseTo(7600, 2);
+    expect(cmp.tipoISAplicado).toBeCloseTo(19, 2);
+    expect(cmp.sl.irpfDividendos).toBeCloseTo(6684, 2);
+    expect(cmp.sl.totalCargas).toBeCloseTo(20463.88, 2);
+    expect(cmp.sl.netoAnual).toBeCloseTo(19536.12, 2);
+  });
+
+  test('GOLDEN-MICROPYME-B: BI 80.000 € (> 50.000 €) → escala 19%/21% = 15.800 € (tipo medio 19,75%)', () => {
+    const cmp = compararAutonomoVsSL({ beneficioAnual: 100000, gastosDeducibles: 20000, tipoIS: 'micropyme', repartirDividendos: true });
+    expect(cmp.sl.baseImponible).toBeCloseTo(80000, 2);
+    expect(cmp.sl.cuotaImpuesto).toBeCloseTo(15800, 2);
+    expect(cmp.tipoISAplicado).toBeCloseTo(19.75, 2);
+    expect(cmp.sl.irpfDividendos).toBeCloseTo(13646, 2);
+    expect(cmp.sl.totalCargas).toBeCloseTo(35625.88, 2);
+    expect(cmp.sl.netoAnual).toBeCloseTo(44374.12, 2);
+  });
+
+  test('REGRESIÓN: tipoIS "general" sigue aplicando el 25% plano (no afectado por la escala micropyme)', () => {
+    const cmp = compararAutonomoVsSL({ beneficioAnual: 60000, gastosDeducibles: 20000, tipoIS: 'general', repartirDividendos: false });
+    expect(cmp.sl.baseImponible).toBeCloseTo(40000, 2);
+    expect(cmp.sl.cuotaImpuesto).toBeCloseTo(10000, 2); // 40.000 × 25%
+    expect(cmp.tipoISAplicado).toBeCloseTo(25, 2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 // COMPOSICIÓN — consulta_compra_vivienda (compraventa + hipoteca)
 // ────────────────────────────────────────────────────────────────────────────
 
