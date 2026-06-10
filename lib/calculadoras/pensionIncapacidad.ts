@@ -13,7 +13,8 @@
  *   - Absoluta (IPA): Imposibilidad de cualquier trabajo
  *     Prestación: 100% de la base reguladora
  *   - Gran Invalidez (GI): IPA + necesita asistencia de tercera persona
- *     Prestación: 100% BR + complemento (45% IPREM + 30% última base cotización)
+ *     Prestación: 100% BR + complemento (45% base mínima de cotización + 30% última
+ *     base de cotización, con un mínimo del 45% de la pensión sin complemento)
  *
  * Base reguladora (art. 197 LGSS — contingencias comunes):
  *   BR = Suma bases cotización últimos 8 años / 112
@@ -21,7 +22,9 @@
  *   Para contingencias profesionales (AT/EP): bases de los últimos 12 meses / 12
  *
  * Pensión mínima 2025: varía según grado y situación familiar.
- * IPREM mensual 2025: 600 €/mes.
+ * Complemento de Gran Invalidez (art. 196.4 LGSS): 45% de la base mínima de
+ * cotización vigente (BASES_SS_2025.minima) + 30% de la última base de cotización
+ * del trabajador, con un mínimo del 45% de la pensión sin complemento.
  *
  * Fuente: LGSS arts. 194-200 + RD pensiones mínimas 2025
  * Verificado: 2025-01-15
@@ -29,9 +32,10 @@
  * Encadenable con: calcular_baja_medica, calcular_pension_publica, calcular_sueldo_neto
  */
 
+import { BASES_SS_2025 } from '@/data/fiscal';
+
 // ─── Constantes 2025 ────────────────────────────────────────────────────────────
 
-const IPREM_MENSUAL_2025 = 600;               // €/mes
 const MESES_BR_COMUNES = 112;                 // 8 años × 12 meses + 4 pagas extra
 const MESES_BR_PROFESIONALES = 12;
 
@@ -46,9 +50,10 @@ const PENSION_MINIMA_GI = 1575.00; // Aproximado (IPT + complemento tercera pers
 // Recargo IPT ≥ 55 años por dificultad de reempleo
 const RECARGO_IPT_55_ANIOS = 20; // % adicional sobre BR
 
-// Complemento GI
-const PCT_COMPLEMENTO_GI_IPREM = 45;   // % del IPREM
-const PCT_COMPLEMENTO_GI_BASE = 30;    // % de la última base de cotización
+// Complemento GI (art. 196.4 LGSS)
+const PCT_COMPLEMENTO_GI_BASE_MINIMA = 45; // % de la base mínima de cotización vigente
+const PCT_COMPLEMENTO_GI_BASE = 30;        // % de la última base de cotización
+const PCT_COMPLEMENTO_GI_MINIMO = 45;      // % mínimo sobre la pensión sin complemento
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -198,10 +203,12 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
 
   if (p.gradoIncapacidad === 'gran_invalidez') {
     const ultimaBase = p.ultimaBaseCotizacion ?? baseReguladora;
-    complementoGranInvalidez = r(
-      (IPREM_MENSUAL_2025 * PCT_COMPLEMENTO_GI_IPREM / 100) +
+    const complementoCalculado = r(
+      (BASES_SS_2025.minima * PCT_COMPLEMENTO_GI_BASE_MINIMA / 100) +
       (ultimaBase * PCT_COMPLEMENTO_GI_BASE / 100)
     );
+    const complementoMinimo = r(cuantiaBrutaMensual * PCT_COMPLEMENTO_GI_MINIMO / 100);
+    complementoGranInvalidez = Math.max(complementoCalculado, complementoMinimo);
     cuantiaBrutaTotalMensual = r(cuantiaBrutaMensual + complementoGranInvalidez);
   }
 
@@ -215,7 +222,7 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     advertencias.push('La IPT puede complementarse con la prestación por desempleo si no se ha agotado. Verificar con el SEPE.');
   }
   if (p.gradoIncapacidad === 'gran_invalidez') {
-    advertencias.push(`Complemento de Gran Invalidez: ${PCT_COMPLEMENTO_GI_IPREM}% IPREM (${r(IPREM_MENSUAL_2025 * PCT_COMPLEMENTO_GI_IPREM / 100).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) + ${PCT_COMPLEMENTO_GI_BASE}% última base cotización (art. 139 LGSS).`);
+    advertencias.push(`Complemento de Gran Invalidez: ${PCT_COMPLEMENTO_GI_BASE_MINIMA}% de la base mínima de cotización 2025 (${BASES_SS_2025.minima.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) + ${PCT_COMPLEMENTO_GI_BASE}% última base de cotización, con un mínimo del ${PCT_COMPLEMENTO_GI_MINIMO}% de la pensión sin complemento (art. 196.4 LGSS).`);
   }
 
   return {
@@ -232,6 +239,6 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     cuantiaAnual14Pagas,
     explicacion,
     advertencias,
-    fuenteDatos: 'LGSS arts. 194-200 + IPREM 2025 (600 €/mes) + pensiones mínimas 2025 — vigente 2025',
+    fuenteDatos: 'LGSS arts. 194-200 + base mínima de cotización 2025 (1.381,20 €/mes, Orden PJC/178/2025) + pensiones mínimas 2025 — vigente 2025',
   };
 }
