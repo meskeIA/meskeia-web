@@ -77,6 +77,7 @@ import {
   calcularPrestacionMaternidadPaternidad,
   type EdadProgenitor,
   type SituacionLaboralMP,
+  type TipoFamiliaMP,
 } from '@/lib/calculadoras/prestacionMaternidadPaternidad';
 import { calcularReduccionJornada, type MotivoReduccionJornada } from '@/lib/calculadoras/reduccionJornada';
 import { calcularBajaMedica, type TipoBaja } from '@/lib/calculadoras/bajaMedica';
@@ -2054,10 +2055,11 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_prestacion_maternidad_paternidad ────────────────────────────
   servidor.tool(
     'calcular_prestacion_maternidad_paternidad',
-    'Calcula la prestación por nacimiento/adopción (maternidad/paternidad) de un progenitor. Desde 2021 ambos ' +
-    'tienen 16 semanas iguales al 100% de la base reguladora. Devuelve la cuantía diaria y mensual, la duración ' +
-    'total (con extras por parto múltiple o discapacidad), las 6 semanas obligatorias y las flexibles, y verifica ' +
-    'el período de carencia según la edad.',
+    'Calcula la prestación por nacimiento/adopción (maternidad/paternidad) de un progenitor. Tras el RDL 9/2025, ' +
+    'la duración es de 19 semanas por progenitor en familias biparentales (32 semanas en familias monoparentales), ' +
+    'al 100% de la base reguladora. Devuelve la cuantía diaria y mensual, la duración total (con extras por parto ' +
+    'múltiple o discapacidad), las 6 semanas obligatorias y el reparto de las semanas flexibles, y verifica el ' +
+    'período de carencia según la edad.',
     {
       base_cotizacion_mensual: z.number().positive().describe('Base de cotización mensual del mes anterior al inicio de la prestación (€)'),
       edad_progenitor: z.enum(['menor_21', 'entre_21_y_26', 'mayor_26']).describe('Tramo de edad del progenitor (determina la carencia exigida)'),
@@ -2065,9 +2067,10 @@ function crearServidorDelegum(): McpServer {
       hijo_con_discapacidad: z.boolean().optional().describe('¿Algún hijo con discapacidad ≥33%? (añade 2 semanas). Por defecto false.'),
       cumple_carencia: z.boolean().optional().describe('¿Cumple el período de carencia exigido? Por defecto true.'),
       situacion_laboral: z.enum(['trabajador_cuenta_ajena', 'autonomo', 'desempleado_sin_derecho']).optional().describe('Situación laboral del progenitor. Por defecto trabajador por cuenta ajena.'),
+      tipo_familia: z.enum(['biparental', 'monoparental']).optional().describe('Tipo de familia: "biparental" (19 semanas, por defecto) o "monoparental" (32 semanas, RDL 9/2025).'),
     },
     { title: 'Calcula la prestación por nacimiento/adopción (maternidad/paternidad)', readOnlyHint: true },
-    async ({ base_cotizacion_mensual, edad_progenitor, numero_hijos, hijo_con_discapacidad, cumple_carencia, situacion_laboral }, extra) => {
+    async ({ base_cotizacion_mensual, edad_progenitor, numero_hijos, hijo_con_discapacidad, cumple_carencia, situacion_laboral, tipo_familia }, extra) => {
       await registrarUsoDelegum('calcular_prestacion_maternidad_paternidad', getCaller(extra));
       try {
         const r = calcularPrestacionMaternidadPaternidad({
@@ -2077,14 +2080,15 @@ function crearServidorDelegum(): McpServer {
           hijoConDiscapacidad: hijo_con_discapacidad,
           cumpleCarencia: cumple_carencia,
           situacionLaboral: situacion_laboral as SituacionLaboralMP | undefined,
+          tipoFamilia: tipo_familia as TipoFamiliaMP | undefined,
         });
         const semanas = r.semanasBase + r.semanasAdicionalMultiple + r.semanasAdicionalDiscapacidad;
         const lineas = [
-          `👶 **Prestación por maternidad/paternidad**`,
+          `👶 **Prestación por maternidad/paternidad** (familia ${r.tipoFamilia})`,
           '',
           `🗓️ Duración total: **${r.duracionTotalDias} días (${semanas} semanas)**`,
           `  • ${r.diasObligatorios} días obligatorios (primeras 6 semanas tras el parto)`,
-          `  • ${r.diasFlexibles} días flexibles (hasta los 12 meses del menor)`,
+          `  • ${r.diasFlexibles} días flexibles (hasta los 12 meses o los 8 años del menor)`,
           '',
           `📦 Base reguladora diaria: ${fmt(r.baseReguladoraDiaria)} €${r.limitadaPorBaseMaxima ? ' (limitada por base máxima)' : ''}`,
           `💰 Cuantía: ${fmt(r.cuantiaDiaria)} €/día · ${fmt(r.cuantiaMensual)} €/mes`,

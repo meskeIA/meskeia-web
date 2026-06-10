@@ -2060,37 +2060,40 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
 
 // ────────────────────────────────────────────────────────────────────────────
 // CAPA 1 — Golden tests: calcularPrestacionMaternidadPaternidad
-// Prestación por nacimiento/cuidado de menor (LGSS arts. 177-182, RDL 6/2019).
+// Prestación por nacimiento/cuidado de menor (LGSS arts. 177-182, RDL 6/2019,
+// ampliada por RDL 9/2025 — 19 semanas biparental / 32 monoparental).
 // [SS pendiente verificación]: valores calculados con la lógica propia de la
 // calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
 // ────────────────────────────────────────────────────────────────────────────
 
-test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS arts. 177-182)', () => {
+test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS arts. 177-182 + RDL 9/2025)', () => {
 
-  test('GOLDEN-CE: BC 2.400 €/mes, 1 hijo, ≥26 años → 16 semanas, prestación 100% BR [SS pendiente verificación]', () => {
+  test('GOLDEN-CE: BC 2.400 €/mes, 1 hijo, ≥26 años, biparental → 19 semanas, prestación 100% BR [SS pendiente verificación]', () => {
     // BR diaria = 2.400/30 = 80 €. No supera la base máxima diaria (163,65 €).
-    // Duración = 16 semanas = 112 días. Obligatorios = 42 días, flexibles = 70 días.
-    // Cuantía mensual = 80 × 30 = 2.400 €. Total prestación = 80 × 112 = 8.960 €.
+    // Duración = 19 semanas (RDL 9/2025) = 133 días. Obligatorios = 42 días, flexibles = 91 días.
+    // Cuantía mensual = 80 × 30 = 2.400 €. Total prestación = 80 × 133 = 10.640 €.
     const mp = calcularPrestacionMaternidadPaternidad({
       baseCotizacionMensual: 2400,
       edadProgenitor: 'mayor_26',
       numerosHijos: 1,
     });
+    expect(mp.tipoFamilia).toBe('biparental');
     expect(mp.baseReguladoraDiaria).toBeCloseTo(80.00, 2);
     expect(mp.limitadaPorBaseMaxima).toBe(false);
     expect(mp.baseReguladoraMensual).toBeCloseTo(2400.00, 2);
-    expect(mp.duracionTotalDias).toBe(112);
+    expect(mp.semanasBase).toBe(19);
+    expect(mp.duracionTotalDias).toBe(133);
     expect(mp.diasObligatorios).toBe(42);
-    expect(mp.diasFlexibles).toBe(70);
+    expect(mp.diasFlexibles).toBe(91);
     expect(mp.cumpleCarencia).toBe(true);
     expect(mp.cuantiaMensual).toBeCloseTo(2400.00, 2);
-    expect(mp.cuotaTotalPrestacion).toBeCloseTo(8960.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(10640.00, 2);
   });
 
-  test('GOLDEN-CF: BC 3.000 €/mes, parto múltiple (2 hijos) + discapacidad → +4 semanas adicionales [SS pendiente verificación]', () => {
-    // BR diaria = 3.000/30 = 100 €. +2 semanas (1 hijo adicional) + 2 semanas (discapacidad) = 20 semanas = 140 días.
-    // Obligatorios = 42 días, flexibles = 98 días.
-    // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 140 = 14.000 €.
+  test('GOLDEN-CF: BC 3.000 €/mes, parto múltiple (2 hijos) + discapacidad → +3 semanas adicionales [SS pendiente verificación]', () => {
+    // BR diaria = 3.000/30 = 100 €. +1 semana (1 hijo adicional, RDL 9/2025) + 2 semanas (discapacidad) = 22 semanas = 154 días.
+    // Obligatorios = 42 días, flexibles = 112 días.
+    // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 154 = 15.400 €.
     const mp = calcularPrestacionMaternidadPaternidad({
       baseCotizacionMensual: 3000,
       edadProgenitor: 'entre_21_y_26',
@@ -2099,11 +2102,13 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     });
     expect(mp.baseReguladoraDiaria).toBeCloseTo(100.00, 2);
     expect(mp.baseReguladoraMensual).toBeCloseTo(3000.00, 2);
-    expect(mp.duracionTotalDias).toBe(140);
+    expect(mp.semanasAdicionalMultiple).toBe(1);
+    expect(mp.semanasAdicionalDiscapacidad).toBe(2);
+    expect(mp.duracionTotalDias).toBe(154);
     expect(mp.diasObligatorios).toBe(42);
-    expect(mp.diasFlexibles).toBe(98);
+    expect(mp.diasFlexibles).toBe(112);
     expect(mp.cuantiaMensual).toBeCloseTo(3000.00, 2);
-    expect(mp.cuotaTotalPrestacion).toBeCloseTo(14000.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(15400.00, 2);
   });
 
   test('GOLDEN-CG: BC 6.000 €/mes (supera base máxima) sin carencia → cuantía 0 [SS pendiente verificación]', () => {
@@ -2121,6 +2126,25 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     expect(mp.cumpleCarencia).toBe(false);
     expect(mp.cuantiaMensual).toBe(0);
     expect(mp.cuotaTotalPrestacion).toBe(0);
+  });
+
+  test('GOLDEN-CH: BC 3.000 €/mes, familia monoparental, 1 hijo → 32 semanas (RDL 9/2025) [SS pendiente verificación]', () => {
+    // BR diaria = 3.000/30 = 100 €. Duración monoparental = 32 semanas = 224 días.
+    // Obligatorios = 42 días, flexibles = 182 días.
+    // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 224 = 22.400 €.
+    const mp = calcularPrestacionMaternidadPaternidad({
+      baseCotizacionMensual: 3000,
+      edadProgenitor: 'mayor_26',
+      numerosHijos: 1,
+      tipoFamilia: 'monoparental',
+    });
+    expect(mp.tipoFamilia).toBe('monoparental');
+    expect(mp.semanasBase).toBe(32);
+    expect(mp.duracionTotalDias).toBe(224);
+    expect(mp.diasObligatorios).toBe(42);
+    expect(mp.diasFlexibles).toBe(182);
+    expect(mp.cuantiaMensual).toBeCloseTo(3000.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(22400.00, 2);
   });
 
 });
