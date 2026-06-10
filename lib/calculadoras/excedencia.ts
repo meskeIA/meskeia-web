@@ -23,11 +23,13 @@
  *    - Cuidado familiar hasta 2.º grado: máximo 2 años si no puede valerse
  *    - Primer año: reserva del puesto exacto
  *    - Período restante: reserva de plaza del mismo grupo/categoría
- *    - Cotización computable durante los primeros 3 años (cuidado hijo) y 18 meses (familiar)
+ *    - Cotización computable durante los tres primeros años, tanto para cuidado de
+ *      hijo como de familiar (art. 237.1 y 237.2 LGSS; el plazo de familiares se
+ *      amplió de 1 a 3 años por el RDL 2/2023, vigente desde el 18-mar-2023)
  *    - Computable a efectos de jubilación, incapacidad permanente y muerte/supervivencia
  *
- * Fuente: ET arts. 45-46 + LGSS art. 237-238 — vigente 2025
- * Verificado: 2025-01-15
+ * Fuente: ET arts. 45-46 + LGSS arts. 237-238 (modificados por RDL 2/2023) — vigente 2025
+ * Verificado: 2026-06-10
  *
  * Encadenable con: calcular_finiquito, calcular_baja_medica, calcular_pension_publica
  */
@@ -163,10 +165,10 @@ export function calcularExcedencia(p: ParametrosExcedencia): ResultadoExcedencia
       reservaGrupoProfesional = true;
       mesesReservaPuestoExacto = Math.min(12, p.duracionMeses); // Primer año
       cotizaDurante = false;
-      // Los primeros 18 meses computan (art. 237 LGSS — familiar)
-      mesesComputablesSSTotal = Math.min(18, p.duracionMeses);
-      detalleCotizacion = `Los primeros ${Math.min(18, p.duracionMeses)} meses computan como cotizados a efectos de jubilación, incapacidad permanente y muerte/supervivencia (art. 237.1 LGSS — cuidado familiar).`;
-      impactoSS = 'Período parcialmente asimilado a cotizado (primeros 18 meses). El resto del período no cuenta.';
+      // Los tres primeros años computan (art. 237.2 LGSS, ampliado de 1 a 3 años por el RDL 2/2023)
+      mesesComputablesSSTotal = Math.min(36, p.duracionMeses);
+      detalleCotizacion = `Los primeros ${Math.min(36, p.duracionMeses)} meses computan como cotizados a efectos de jubilación, incapacidad permanente y muerte/supervivencia (art. 237.2 LGSS — cuidado familiar, ampliado de 1 a 3 años por el RDL 2/2023).`;
+      impactoSS = 'Período asimilado a cotizado: tras la ampliación del RDL 2/2023, toda excedencia por cuidado de familiar (máximo legal 2 años) computa íntegramente para prestaciones contributivas.';
       break;
   }
 
@@ -218,6 +220,6 @@ export function calcularExcedencia(p: ParametrosExcedencia): ResultadoExcedencia
     costeTotalIngresosNoPecibidos,
     plazoNuevaExcedenciaVoluntaria,
     advertencias,
-    fuenteDatos: 'ET arts. 45-46 + LGSS arts. 237-238 — Real Decreto Legislativo 2/2015 y 8/2015, vigente 2025',
+    fuenteDatos: 'ET arts. 45-46 + LGSS arts. 237-238 (cuidado de familiar ampliado de 1 a 3 años por el RDL 2/2023) — Real Decreto Legislativo 2/2015 y 8/2015, vigente 2025',
   };
 }

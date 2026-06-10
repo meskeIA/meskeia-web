@@ -2213,9 +2213,11 @@ test.describe('Golden — calcularExcedencia (Capa 1 · ET arts. 45-46)', () => 
     expect(ex.costeTotalIngresosNoPecibidos).toBeCloseTo(9000.00, 2);
   });
 
-  test('GOLDEN-CK: cuidado de familiar, 2.200 €/mes, 24 meses → reserva 12 meses, computan 18 meses SS [SS pendiente verificación]', () => {
+  test('GOLDEN-CK: cuidado de familiar, 2.200 €/mes, 24 meses → reserva 12 meses, computan los 24 meses SS (RDL 2/2023) [Capa 1 · LGSS art. 237.2]', () => {
     // Duración máxima 24 meses (≤ 24, cumple). Reserva puesto exacto primer año (12 meses).
-    // Computan los primeros 18 meses a efectos SS. Coste = 2.200 × 24 = 52.800 €.
+    // El RDL 2/2023 amplió de 1 a 3 años (36 meses) el período computable a efectos SS para
+    // cuidado de familiar (art. 237.2 LGSS), por lo que los 24 meses solicitados (< 36) computan íntegros.
+    // Coste = 2.200 × 24 = 52.800 €.
     const ex = calcularExcedencia({
       tipo: 'cuidado_familiar',
       antiguedadAnios: 5,
@@ -2225,7 +2227,7 @@ test.describe('Golden — calcularExcedencia (Capa 1 · ET arts. 45-46)', () => 
     expect(ex.cumpleRequisitos).toBe(true);
     expect(ex.duracionMaximaMeses).toBe(24);
     expect(ex.mesesReservaPuestoExacto).toBe(12);
-    expect(ex.mesesComputablesSSTotal).toBe(18);
+    expect(ex.mesesComputablesSSTotal).toBe(24);
     expect(ex.costeTotalIngresosNoPecibidos).toBeCloseTo(52800.00, 2);
   });
 
