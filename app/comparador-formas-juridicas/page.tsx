@@ -96,7 +96,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     responsabilidadTexto: 'Limitada al capital social',
     fiscalidad: 'Impuesto de Sociedades',
     tipoImpuesto: 'IS',
-    tipoGravamen: '25% (23% pymes)',
+    tipoGravamen: '25% (19-21% micropymes <1M€, escala progresiva)',
     cotizacionSS: 'Administrador en RETA obligatorio',
     tramitesAlta: [
       'Certificación negativa de denominación',
@@ -847,7 +847,7 @@ export default function ComparadorFormasJuridicasPage() {
               </p>
               <ul>
                 <li><strong>Autónomo</strong>: IRPF progresivo (19%-47%)</li>
-                <li><strong>SL</strong>: IS fijo (25%, o 23% pymes)</li>
+                <li><strong>SL</strong>: IS al 25% (19-21% para micropymes con facturación &lt;1M€, escala progresiva)</li>
                 <li>Con beneficios altos, la SL suele ser más ventajosa</li>
                 <li>El punto de equilibrio está en torno a 40.000-60.000€</li>
               </ul>
@@ -899,7 +899,7 @@ export default function ComparadorFormasJuridicasPage() {
                 <tr>
                   <td><strong>Tipo impositivo</strong></td>
                   <td>IRPF 19 %–47 %</td>
-                  <td>IS 25 % (23 % pymes)</td>
+                  <td>IS 25 % (19-21 % micropymes &lt;1M€)</td>
                   <td>IS 20 % (coop. protegida)</td>
                   <td>IRPF 19 %–47 % (cada comunero)</td>
                   <td>IS 25 % con exenciones</td>

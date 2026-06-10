@@ -81,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Cuándo conviene constituir una Sociedad Limitada en lugar de ser autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Generalmente conviene plantearse la SL cuando los beneficios netos superan los 40.000-50.000 € anuales, ya que el tipo del Impuesto sobre Sociedades (25 %, o 23 % para pymes con base imponible hasta 300.000 €) puede ser inferior al IRPF marginal. También es recomendable si el proyecto implica varios socios, necesita financiación externa o presenta un riesgo patrimonial elevado, dado que la SL limita la responsabilidad al capital aportado.',
+        text: 'Generalmente conviene plantearse la SL cuando los beneficios netos superan los 40.000-50.000 € anuales, ya que el tipo del Impuesto sobre Sociedades (25 % general, o 19-21 % en escala progresiva para empresas con cifra de negocio inferior a 1 millón de euros) puede ser inferior al IRPF marginal. También es recomendable si el proyecto implica varios socios, necesita financiación externa o presenta un riesgo patrimonial elevado, dado que la SL limita la responsabilidad al capital aportado.',
       },
     },
     {
