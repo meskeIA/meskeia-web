@@ -50,6 +50,13 @@ import { calcularReduccionJornada } from '../lib/calculadoras/reduccionJornada';
 import { calcularCapacidadHipoteca } from '../lib/calculadoras/capacidadHipoteca';
 import { calcularGananciaCriptomonedas } from '../lib/calculadoras/gananciaCriptomonedas';
 import { calcularPlanPensiones } from '../lib/calculadoras/planPensiones';
+import { calcularBajaMedica } from '../lib/calculadoras/bajaMedica';
+import { calcularJubilacionAnticipada } from '../lib/calculadoras/jubilacionAnticipada';
+import { calcularPensionIncapacidad } from '../lib/calculadoras/pensionIncapacidad';
+import { calcularPensionViudedad } from '../lib/calculadoras/pensionViudedad';
+import { calcularPrestacionMaternidadPaternidad } from '../lib/calculadoras/prestacionMaternidadPaternidad';
+import { calcularExcedencia } from '../lib/calculadoras/excedencia';
+import { calcularComplementoBrechaGenero } from '../lib/calculadoras/complementoBrechaGenero';
 
 /** Redondeo a 2 decimales idéntico al de las calculadoras */
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -1780,6 +1787,473 @@ test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () =
     expect(pp.anosAhorro).toBe(27);
     expect(pp.capitalEstimadoJubilacion).toBeCloseTo(70626.32, 2);
     expect(pp.rentaMensualEstimada).toBeCloseTo(235.42, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularBajaMedica
+// Subsidio por Incapacidad Temporal (LGSS arts. 169-176).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularBajaMedica (Capa 1 · LGSS arts. 169-176)', () => {
+
+  test('GOLDEN-BS: contingencia común, 2.000 €/mes, 30 días → subsidio 1.180 € [SS pendiente verificación]', () => {
+    // BC diaria = 2.000/30 = 66,67 €. Días 1-3 sin subsidio (espera).
+    // Días 4-20 (17 días) al 60% = 40,00 €/día → 680,00 €.
+    // Días 21-30 (10 días) al 75% = 50,00 €/día → 500,00 €.
+    // Total = 1.180,00 €. Equivalente mensual = 1.180,00 €. Pérdida = 2.000 − 1.180 = 820 €.
+    const bm = calcularBajaMedica({
+      salarioBrutoMensual: 2000,
+      tipoBaja: 'comun',
+      diasBaja: 30,
+    });
+    expect(bm.baseCotizacionDiaria).toBeCloseTo(66.67, 2);
+    expect(bm.diasEspera).toBe(3);
+    expect(bm.subsidioDiarioFase1).toBeCloseTo(40.00, 2);
+    expect(bm.subsidioDiarioFase2).toBeCloseTo(50.00, 2);
+    expect(bm.totalSubsidio).toBeCloseTo(1180.00, 2);
+    expect(bm.subsidioMensualEquivalente).toBeCloseTo(1180.00, 2);
+    expect(bm.perdidaEstimada).toBeCloseTo(820.00, 2);
+  });
+
+  test('GOLDEN-BT: accidente laboral, 3.000 €/mes, 15 días → subsidio 1.125 € desde día 1 [SS pendiente verificación]', () => {
+    // BC diaria = 3.000/30 = 100 €. Accidente laboral: 75% desde el día 1, sin espera.
+    // Diario = 75 €. Total 15 días = 1.125 €. Equivalente mensual = 75×30 = 2.250 €.
+    // Pérdida = 3.000 − 2.250 = 750 €.
+    const bm = calcularBajaMedica({
+      salarioBrutoMensual: 3000,
+      tipoBaja: 'accidente_laboral',
+      diasBaja: 15,
+    });
+    expect(bm.baseCotizacionDiaria).toBeCloseTo(100.00, 2);
+    expect(bm.diasEspera).toBe(0);
+    expect(bm.subsidioDiarioFase1).toBeCloseTo(75.00, 2);
+    expect(bm.subsidioDiarioFase2).toBeCloseTo(75.00, 2);
+    expect(bm.totalSubsidio).toBeCloseTo(1125.00, 2);
+    expect(bm.subsidioMensualEquivalente).toBeCloseTo(2250.00, 2);
+    expect(bm.perdidaEstimada).toBeCloseTo(750.00, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularJubilacionAnticipada
+// Coeficientes reductores (Ley 21/2021 + LGSS arts. 207-208).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · Ley 21/2021)', () => {
+
+  test('GOLDEN-BU: involuntaria, 35 años cotizados, 12 meses anticipación → reducción 6,24% [SS pendiente verificación]', () => {
+    // 12 meses = 4 trimestres, todos en el tramo 1-4 (1,56%/trimestre) → 4×1,56 = 6,24%.
+    // Pensión con reducción = 1.500 × (1 − 6,24/100) = 1.406,40 €.
+    // Pérdida mensual = 93,60 €. Pérdida anual (14 pagas) = 1.310,40 €.
+    // 35 años × 12 = 420 meses < 459 (38a3m) → edad ordinaria "66 años y 6 meses".
+    const ja = calcularJubilacionAnticipada({
+      anosCotizados: 35,
+      mesesAnticipacion: 12,
+      tipo: 'involuntaria',
+      pensionOrdinaria: 1500,
+    });
+    expect(ja.posible).toBe(true);
+    expect(ja.cumpleCotizacion).toBe(true);
+    expect(ja.trimestreAnticipacion).toBe(4);
+    expect(ja.reduccionTotal).toBeCloseTo(6.24, 2);
+    expect(ja.pensionConReduccion).toBeCloseTo(1406.40, 2);
+    expect(ja.perdidaMensual).toBeCloseTo(93.60, 2);
+    expect(ja.perdidaAnual).toBeCloseTo(1310.40, 2);
+    expect(ja.edadOrdinaria).toBe('66 años y 6 meses');
+  });
+
+  test('GOLDEN-BV: voluntaria, 37 años cotizados, 24 meses anticipación → reducción 15,84% [SS pendiente verificación]', () => {
+    // 24 meses = 8 trimestres: 1-4 al 2,04% (8,16%) + 5-8 al 1,92% (7,68%) = 15,84%.
+    // Pensión con reducción = 1.800 × (1 − 15,84/100) = 1.514,88 €.
+    // Pérdida mensual = 285,12 €. Pérdida anual (14 pagas) = 3.991,68 €.
+    const ja = calcularJubilacionAnticipada({
+      anosCotizados: 37,
+      mesesAnticipacion: 24,
+      tipo: 'voluntaria',
+      pensionOrdinaria: 1800,
+    });
+    expect(ja.posible).toBe(true);
+    expect(ja.cumpleCotizacion).toBe(true);
+    expect(ja.trimestreAnticipacion).toBe(8);
+    expect(ja.reduccionTotal).toBeCloseTo(15.84, 2);
+    expect(ja.pensionConReduccion).toBeCloseTo(1514.88, 2);
+    expect(ja.perdidaMensual).toBeCloseTo(285.12, 2);
+    expect(ja.perdidaAnual).toBeCloseTo(3991.68, 2);
+  });
+
+  test('GOLDEN-BW: involuntaria, 30 años cotizados (no cumple mínimo de 33) → no posible [SS pendiente verificación]', () => {
+    const ja = calcularJubilacionAnticipada({
+      anosCotizados: 30,
+      mesesAnticipacion: 12,
+      tipo: 'involuntaria',
+      pensionOrdinaria: 1500,
+    });
+    expect(ja.posible).toBe(false);
+    expect(ja.cumpleCotizacion).toBe(false);
+    expect(ja.anosMinimosRequeridos).toBe(33);
+    expect(ja.reduccionTotal).toBe(0);
+    expect(ja.pensionConReduccion).toBeCloseTo(1500.00, 2);
+    expect(ja.motivoImpedimento.length).toBeGreaterThan(0);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPensionIncapacidad
+// Pensión de Incapacidad Permanente (LGSS arts. 194-200).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-200)', () => {
+
+  test('GOLDEN-BX: IPT, edad 50 (sin recargo), sin cónyuge → 55% BR = 1.100 €/mes [SS pendiente verificación]', () => {
+    // BR = 224.000 / 112 = 2.000 €. IPT al 55% (sin recargo, edad < 55) = 1.100 €/mes.
+    // Mínimo (sin cónyuge, < 55 años) = 730 € → no se aplica (1.100 > 730).
+    // Anual (14 pagas) = 1.100 × 14 = 15.400 €.
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'total',
+      origenContingencia: 'comun',
+      sumaBasesCotizacion: 224000,
+      edad: 50,
+      tieneConyuge: false,
+    });
+    expect(pi.baseReguladora).toBeCloseTo(2000.00, 2);
+    expect(pi.porcentajeAplicado).toBe(55);
+    expect(pi.recargo55Anios).toBe(false);
+    expect(pi.cuantiaBrutaMensual).toBeCloseTo(1100.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(730.00, 2);
+    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1100.00, 2);
+    expect(pi.cuantiaAnual14Pagas).toBeCloseTo(15400.00, 2);
+  });
+
+  test('GOLDEN-BY: IPA, edad 60, con cónyuge → 100% BR = 1.500 €/mes [SS pendiente verificación]', () => {
+    // BR = 168.000 / 112 = 1.500 €. IPA al 100% = 1.500 €/mes.
+    // Mínimo (IPA con cónyuge) = 1.050 € → no se aplica (1.500 > 1.050).
+    // Anual (14 pagas) = 1.500 × 14 = 21.000 €.
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'absoluta',
+      origenContingencia: 'comun',
+      sumaBasesCotizacion: 168000,
+      edad: 60,
+      tieneConyuge: true,
+    });
+    expect(pi.baseReguladora).toBeCloseTo(1500.00, 2);
+    expect(pi.porcentajeAplicado).toBe(100);
+    expect(pi.cuantiaBrutaMensual).toBeCloseTo(1500.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(1050.00, 2);
+    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1500.00, 2);
+    expect(pi.cuantiaAnual14Pagas).toBeCloseTo(21000.00, 2);
+  });
+
+  test('GOLDEN-BZ: Gran Invalidez → BR + complemento 45% IPREM + 30% última base [SS pendiente verificación]', () => {
+    // BR = 112.000 / 112 = 1.000 €. Cuantía bruta = 100% × 1.000 = 1.000 €.
+    // Complemento GI = 45% × 600 (IPREM) + 30% × 1.200 (última base) = 270 + 360 = 630 €.
+    // Total mensual = 1.000 + 630 = 1.630 €. Mínimo GI = 1.575 € → no se aplica.
+    // Anual (14 pagas) = 1.630 × 14 = 22.820 €.
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'gran_invalidez',
+      origenContingencia: 'comun',
+      sumaBasesCotizacion: 112000,
+      edad: 58,
+      ultimaBaseCotizacion: 1200,
+    });
+    expect(pi.baseReguladora).toBeCloseTo(1000.00, 2);
+    expect(pi.cuantiaBrutaMensual).toBeCloseTo(1000.00, 2);
+    expect(pi.complementoGranInvalidez).toBeCloseTo(630.00, 2);
+    expect(pi.cuantiaBrutaTotalMensual).toBeCloseTo(1630.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(1575.00, 2);
+    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1630.00, 2);
+    expect(pi.cuantiaAnual14Pagas).toBeCloseTo(22820.00, 2);
+  });
+
+  test('GOLDEN-CA: IP Parcial → indemnización única de 24 mensualidades de BR [SS pendiente verificación]', () => {
+    // BR = 56.000 / 112 = 500 €. Indemnización = 24 × 500 = 12.000 € (no genera pensión mensual).
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'parcial',
+      origenContingencia: 'comun',
+      sumaBasesCotizacion: 56000,
+      edad: 45,
+    });
+    expect(pi.baseReguladora).toBeCloseTo(500.00, 2);
+    expect(pi.indemnizacionTotalIPParcial).toBeCloseTo(12000.00, 2);
+    expect(pi.cuantiaEfectivaMensual).toBe(0);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPensionViudedad
+// Pensión de Viudedad (LGSS arts. 219-231, RDL 8/2015).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)', () => {
+
+  test('GOLDEN-CB: causante activo, BC media 2.000 €, 50 años → 52% general = 891,43 €/mes [SS pendiente verificación]', () => {
+    // BR = (24 × 2.000) / 28 = 1.714,29 €. Sin cargas ni condiciones especiales → 52% general.
+    // Pensión bruta = 1.714,29 × 52% = 891,43 €. Mínimo (< 60, sin cargas) = 583 € → no se aplica.
+    // Anual = 891,43 × 14 = 12.480,02 € < 15.000 → sin retención.
+    const pv = calcularPensionViudedad({
+      situacionCausante: 'activo',
+      baseCotizacionMedia: 2000,
+      edadBeneficiario: 50,
+      tieneCargas: false,
+      ingresosMensualesPropios: 0,
+    });
+    expect(pv.baseReguladora).toBeCloseTo(1714.29, 2);
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.pensionBruta).toBeCloseTo(891.43, 2);
+    expect(pv.pensionMinima).toBeCloseTo(583.00, 2);
+    expect(pv.pensionFinal).toBeCloseTo(891.43, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(891.43, 2);
+  });
+
+  test('GOLDEN-CC: causante jubilado, pensión 1.800 €, beneficiario 67 años, ingresos < SMI → 60% [SS pendiente verificación]', () => {
+    // BR = pensión del causante = 1.800 €. Edad ≥ 65 e ingresos (500) < SMI (1.323) → 60%.
+    // Pensión bruta = 1.800 × 60% = 1.080 €. Mínimo (≥ 65) = 853 € → no se aplica.
+    // Anual = 1.080 × 14 = 15.120 € → tramo retención 8% (15.000-22.000).
+    // Neta = 1.080 × (1 − 0,08) = 993,60 €.
+    const pv = calcularPensionViudedad({
+      situacionCausante: 'jubilado',
+      pensionCausante: 1800,
+      edadBeneficiario: 67,
+      tieneCargas: false,
+      ingresosMensualesPropios: 500,
+    });
+    expect(pv.baseReguladora).toBeCloseTo(1800.00, 2);
+    expect(pv.porcentajeAplicable).toBe(60);
+    expect(pv.pensionBruta).toBeCloseTo(1080.00, 2);
+    expect(pv.pensionMinima).toBeCloseTo(853.00, 2);
+    expect(pv.pensionFinal).toBeCloseTo(1080.00, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(993.60, 2);
+  });
+
+  test('GOLDEN-CD: causante activo, BC media 1.200 €, 45 años con cargas → 70% pero se aplica el mínimo [SS pendiente verificación]', () => {
+    // BR = (24 × 1.200) / 28 = 1.028,57 €. Cargas + ingresos (500) < límite 70% (992) → 70%.
+    // Pensión bruta = 1.028,57 × 70% = 720,00 €. Mínimo (< 60 con cargas) = 785 € → SE APLICA (785 > 720).
+    // Anual = 785 × 14 = 10.990 € < 15.000 → sin retención.
+    const pv = calcularPensionViudedad({
+      situacionCausante: 'activo',
+      baseCotizacionMedia: 1200,
+      edadBeneficiario: 45,
+      tieneCargas: true,
+      ingresosMensualesPropios: 500,
+    });
+    expect(pv.baseReguladora).toBeCloseTo(1028.57, 2);
+    expect(pv.porcentajeAplicable).toBe(70);
+    expect(pv.pensionBruta).toBeCloseTo(720.00, 2);
+    expect(pv.pensionMinima).toBeCloseTo(785.00, 2);
+    expect(pv.pensionFinal).toBeCloseTo(785.00, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(785.00, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPrestacionMaternidadPaternidad
+// Prestación por nacimiento/cuidado de menor (LGSS arts. 177-182, RDL 6/2019).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS arts. 177-182)', () => {
+
+  test('GOLDEN-CE: BC 2.400 €/mes, 1 hijo, ≥26 años → 16 semanas, prestación 100% BR [SS pendiente verificación]', () => {
+    // BR diaria = 2.400/30 = 80 €. No supera la base máxima diaria (163,65 €).
+    // Duración = 16 semanas = 112 días. Obligatorios = 42 días, flexibles = 70 días.
+    // Cuantía mensual = 80 × 30 = 2.400 €. Total prestación = 80 × 112 = 8.960 €.
+    const mp = calcularPrestacionMaternidadPaternidad({
+      baseCotizacionMensual: 2400,
+      edadProgenitor: 'mayor_26',
+      numerosHijos: 1,
+    });
+    expect(mp.baseReguladoraDiaria).toBeCloseTo(80.00, 2);
+    expect(mp.limitadaPorBaseMaxima).toBe(false);
+    expect(mp.baseReguladoraMensual).toBeCloseTo(2400.00, 2);
+    expect(mp.duracionTotalDias).toBe(112);
+    expect(mp.diasObligatorios).toBe(42);
+    expect(mp.diasFlexibles).toBe(70);
+    expect(mp.cumpleCarencia).toBe(true);
+    expect(mp.cuantiaMensual).toBeCloseTo(2400.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(8960.00, 2);
+  });
+
+  test('GOLDEN-CF: BC 3.000 €/mes, parto múltiple (2 hijos) + discapacidad → +4 semanas adicionales [SS pendiente verificación]', () => {
+    // BR diaria = 3.000/30 = 100 €. +2 semanas (1 hijo adicional) + 2 semanas (discapacidad) = 20 semanas = 140 días.
+    // Obligatorios = 42 días, flexibles = 98 días.
+    // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 140 = 14.000 €.
+    const mp = calcularPrestacionMaternidadPaternidad({
+      baseCotizacionMensual: 3000,
+      edadProgenitor: 'entre_21_y_26',
+      numerosHijos: 2,
+      hijoConDiscapacidad: true,
+    });
+    expect(mp.baseReguladoraDiaria).toBeCloseTo(100.00, 2);
+    expect(mp.baseReguladoraMensual).toBeCloseTo(3000.00, 2);
+    expect(mp.duracionTotalDias).toBe(140);
+    expect(mp.diasObligatorios).toBe(42);
+    expect(mp.diasFlexibles).toBe(98);
+    expect(mp.cuantiaMensual).toBeCloseTo(3000.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(14000.00, 2);
+  });
+
+  test('GOLDEN-CG: BC 6.000 €/mes (supera base máxima) sin carencia → cuantía 0 [SS pendiente verificación]', () => {
+    // BR diaria sin tope = 6.000/30 = 200 €, limitada a la base máxima diaria 2025 = 4.909,50/30 = 163,65 €.
+    // Sin carencia → cuantía diaria = 0 → cuantía mensual y total = 0.
+    const mp = calcularPrestacionMaternidadPaternidad({
+      baseCotizacionMensual: 6000,
+      edadProgenitor: 'mayor_26',
+      numerosHijos: 1,
+      cumpleCarencia: false,
+    });
+    expect(mp.baseReguladoraDiaria).toBeCloseTo(163.65, 2);
+    expect(mp.limitadaPorBaseMaxima).toBe(true);
+    expect(mp.baseReguladoraMensual).toBeCloseTo(4909.50, 2);
+    expect(mp.cumpleCarencia).toBe(false);
+    expect(mp.cuantiaMensual).toBe(0);
+    expect(mp.cuotaTotalPrestacion).toBe(0);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularExcedencia
+// Excedencias laborales (ET arts. 45-46 + LGSS arts. 237-238).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularExcedencia (Capa 1 · ET arts. 45-46)', () => {
+
+  test('GOLDEN-CH: voluntaria, 3 años de antigüedad, 12 meses → cumple requisitos, sin cotización [SS pendiente verificación]', () => {
+    // Antigüedad ≥ 1 año y duración dentro de [4, 60] meses → cumple requisitos.
+    // No cotiza durante la excedencia voluntaria. Coste = 2.000 × 12 = 24.000 €.
+    const ex = calcularExcedencia({
+      tipo: 'voluntaria',
+      antiguedadAnios: 3,
+      salarioBrutoMensual: 2000,
+      duracionMeses: 12,
+    });
+    expect(ex.cumpleRequisitos).toBe(true);
+    expect(ex.duracionMinimaMeses).toBe(4);
+    expect(ex.duracionMaximaMeses).toBe(60);
+    expect(ex.reservaPuestoExacto).toBe(false);
+    expect(ex.cotizaDurante).toBe(false);
+    expect(ex.mesesComputablesSSTotal).toBe(0);
+    expect(ex.plazoNuevaExcedenciaVoluntaria).toBe(48);
+    expect(ex.salerioMensualPerdido).toBeCloseTo(2000.00, 2);
+    expect(ex.costeTotalIngresosNoPecibidos).toBeCloseTo(24000.00, 2);
+  });
+
+  test('GOLDEN-CI: cuidado de hijo, 1.800 €/mes, 18 meses → reserva 12 meses, computan 18 meses SS [SS pendiente verificación]', () => {
+    // Primer año (12 meses) con reserva de puesto exacto. Los 18 meses computan a efectos SS (≤ 36).
+    // Coste = 1.800 × 18 = 32.400 €.
+    const ex = calcularExcedencia({
+      tipo: 'cuidado_hijo',
+      antiguedadAnios: 2,
+      salarioBrutoMensual: 1800,
+      duracionMeses: 18,
+    });
+    expect(ex.cumpleRequisitos).toBe(true);
+    expect(ex.duracionMaximaMeses).toBe(36);
+    expect(ex.reservaPuestoExacto).toBe(true);
+    expect(ex.mesesReservaPuestoExacto).toBe(12);
+    expect(ex.cotizaDurante).toBe(false);
+    expect(ex.mesesComputablesSSTotal).toBe(18);
+    expect(ex.costeTotalIngresosNoPecibidos).toBeCloseTo(32400.00, 2);
+  });
+
+  test('GOLDEN-CJ: voluntaria con menos de 1 año de antigüedad → no cumple requisitos [SS pendiente verificación]', () => {
+    const ex = calcularExcedencia({
+      tipo: 'voluntaria',
+      antiguedadAnios: 0.5,
+      salarioBrutoMensual: 1500,
+      duracionMeses: 6,
+    });
+    expect(ex.cumpleRequisitos).toBe(false);
+    expect(ex.motivoIncumplimiento).toBeDefined();
+    expect(ex.motivoIncumplimiento?.length ?? 0).toBeGreaterThan(0);
+    expect(ex.costeTotalIngresosNoPecibidos).toBeCloseTo(9000.00, 2);
+  });
+
+  test('GOLDEN-CK: cuidado de familiar, 2.200 €/mes, 24 meses → reserva 12 meses, computan 18 meses SS [SS pendiente verificación]', () => {
+    // Duración máxima 24 meses (≤ 24, cumple). Reserva puesto exacto primer año (12 meses).
+    // Computan los primeros 18 meses a efectos SS. Coste = 2.200 × 24 = 52.800 €.
+    const ex = calcularExcedencia({
+      tipo: 'cuidado_familiar',
+      antiguedadAnios: 5,
+      salarioBrutoMensual: 2200,
+      duracionMeses: 24,
+    });
+    expect(ex.cumpleRequisitos).toBe(true);
+    expect(ex.duracionMaximaMeses).toBe(24);
+    expect(ex.mesesReservaPuestoExacto).toBe(12);
+    expect(ex.mesesComputablesSSTotal).toBe(18);
+    expect(ex.costeTotalIngresosNoPecibidos).toBeCloseTo(52800.00, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularComplementoBrechaGenero
+// Complemento por hijos en pensiones contributivas (art. 60 LGSS, RDL 3/2026).
+// [SS pendiente verificación]: valores calculados con la lógica propia de la
+// calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularComplementoBrechaGenero (Capa 1 · art. 60 LGSS)', () => {
+
+  test('GOLDEN-CL: jubilación, 2 hijos → complemento 73,80 €/mes (2 × 36,90 €) [SS pendiente verificación]', () => {
+    // Complemento mensual = 2 × 36,90 = 73,80 €. Anual (14 pagas) = 1.033,20 €.
+    // Pensión total con complemento = 1.200 + 73,80 = 1.273,80 €.
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 2,
+      tipoPension: 'jubilacion',
+      cuantiaPensionBeneficiario: 1200,
+    });
+    expect(cb.tieneDerechoComplemento).toBe(true);
+    expect(cb.hijosComputables).toBe(2);
+    expect(cb.cuantiaPorHijoMensual).toBeCloseTo(36.90, 2);
+    expect(cb.complementoMensual).toBeCloseTo(73.80, 2);
+    expect(cb.complementoAnual).toBeCloseTo(1033.20, 2);
+    expect(cb.pensionTotalMensual).toBeCloseTo(1273.80, 2);
+  });
+
+  test('GOLDEN-CM: incapacidad permanente, 5 hijos → se computan máximo 4 hijos = 147,60 €/mes [SS pendiente verificación]', () => {
+    // hijosComputables = min(5, 4) = 4. Complemento mensual = 4 × 36,90 = 147,60 €.
+    // Anual (14 pagas) = 2.066,40 €.
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'hombre',
+      numHijos: 5,
+      tipoPension: 'incapacidad_permanente',
+    });
+    expect(cb.tieneDerechoComplemento).toBe(true);
+    expect(cb.hijosComputables).toBe(4);
+    expect(cb.complementoMensual).toBeCloseTo(147.60, 2);
+    expect(cb.complementoAnual).toBeCloseTo(2066.40, 2);
+  });
+
+  test('GOLDEN-CN: hecho causante anterior a 2021 → no procede el complemento [SS pendiente verificación]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 1,
+      tipoPension: 'jubilacion',
+      fechaHechoCausante: 'antes_2021',
+    });
+    expect(cb.tieneDerechoComplemento).toBe(false);
+    expect(cb.hijosComputables).toBe(0);
+    expect(cb.complementoMensual).toBe(0);
+    expect(cb.complementoAnual).toBe(0);
   });
 
 });
