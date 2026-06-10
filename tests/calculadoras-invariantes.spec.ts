@@ -2128,7 +2128,7 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     expect(mp.cuotaTotalPrestacion).toBe(0);
   });
 
-  test('GOLDEN-CH: BC 3.000 €/mes, familia monoparental, 1 hijo → 32 semanas (RDL 9/2025) [SS pendiente verificación]', () => {
+  test('GOLDEN-CO: BC 3.000 €/mes, familia monoparental, 1 hijo → 32 semanas (RDL 9/2025) [SS pendiente verificación]', () => {
     // BR diaria = 3.000/30 = 100 €. Duración monoparental = 32 semanas = 224 días.
     // Obligatorios = 42 días, flexibles = 182 días.
     // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 224 = 22.400 €.

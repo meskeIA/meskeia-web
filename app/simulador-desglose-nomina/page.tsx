@@ -884,7 +884,7 @@ export default function SimuladorDesgloseNominaPage() {
                 <h4>Revisa la base de cotización a la Seguridad Social</h4>
                 <p>
                   La base de cotización suele coincidir con el bruto (excepto si superas
-                  la base máxima de 4.720,50 €/mes en 2025). Sobre ella se calculan los
+                  la base máxima de 4.909,50 €/mes en 2025). Sobre ella se calculan los
                   porcentajes del trabajador: 4,70 % CC + 1,55 % desempleo + 0,10 % FP
                   + 0,12 % MEI = <strong>6,47 % total</strong>.
                 </p>

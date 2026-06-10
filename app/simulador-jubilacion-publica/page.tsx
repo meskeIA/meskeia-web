@@ -478,7 +478,7 @@ export default function SimuladorJubilacionPublicaPage() {
           <NumberInput
             value={baseMensual}
             onChange={setBaseMensual}
-            label={`Base de cotización media mensual (€) — máx. ${formatCurrency(4720.50)}/mes`}
+            label={`Base de cotización media mensual (€) — máx. ${formatCurrency(4909.50)}/mes`}
             placeholder="Ej: 2.500"
             helperText="Aproximación de tu salario bruto mensual medio de los últimos 25 años."
             min={100}

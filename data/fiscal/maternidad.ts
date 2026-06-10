@@ -114,10 +114,10 @@ export const PRESTACION_NACIMIENTO_2025 = {
     duracion: 42, // días naturales (6 semanas)
     nota: 'Si no se cumple el período mínimo de cotización, se cobra el 100% del IPREM durante 42 días',
   },
-  /** Bases de cotización referencia 2025 */
+  /** Bases de cotización referencia 2025 (Orden PJC/178/2025) */
   basesReferencia: {
-    baseMinimaMensual: 1184.40,
-    baseMaximaMensual: 4720.50,
+    baseMinimaMensual: 1381.20,
+    baseMaximaMensual: 4909.50,
   },
   /** Exenta de IRPF */
   exentaIRPF: true,

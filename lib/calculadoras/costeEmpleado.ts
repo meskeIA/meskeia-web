@@ -27,10 +27,10 @@ const SS_EMPRESA_2025 = {
   fuenteDatos: 'Orden PJC/51/2025 de cotización a la Seguridad Social. Tipos vigentes 2025.',
 };
 
-// Bases de cotización 2025
+// Bases de cotización 2025 (mensuales) — Orden PJC/178/2025, vigentes desde el 01-ene-2025
 const BASES_SS_2025 = {
-  minima: 1184.40,
-  maxima: 4720.50,
+  minima: 1381.20,
+  maxima: 4909.50,
 };
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────

@@ -266,7 +266,7 @@ export default function EstimacionPrestacionNacimiento() {
             min={0}
             max={10000}
             suffix="\u20AC"
-            helperText="Aparece en tu nomina o en el informe de vida laboral. En 2025: minima 1.184,40 \u20AC, maxima 4.720,50 \u20AC."
+            helperText="Aparece en tu nomina o en el informe de vida laboral. En 2025: minima 1.381,20 \u20AC, maxima 4.909,50 \u20AC."
             required
           />
         </div>

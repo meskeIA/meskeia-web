@@ -128,8 +128,8 @@ export const COPAGO_DEPENDENCIA_2025 = {
 // El cuidador no profesional puede ser dado de alta en SS por convenio especial.
 
 export const COTIZACION_CUIDADOR_NO_PROFESIONAL_2025 = {
-  /** Base de cotización mensual (base mínima del Régimen General) */
-  baseCotizacionMensual: 1184.40,
+  /** Base de cotización mensual (base mínima del Régimen General) — Orden PJC/178/2025 */
+  baseCotizacionMensual: 1381.20,
   /** Tipo de cotización (%) — jubilación, IT, muerte y supervivencia */
   tipoCotizacion: 28.30,
   /** Cuota mensual resultante aproximada */
