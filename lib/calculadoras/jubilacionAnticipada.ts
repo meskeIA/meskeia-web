@@ -3,7 +3,8 @@
  * Usada por: MCP server (calcular_jubilacion_anticipada)
  *
  * Calcula el coeficiente reductor de la pensión por jubilación anticipada
- * según la LGSS (arts. 207-208) y la Ley 21/2021.
+ * según la LGSS (arts. 207-208) y el RDL 2/2023. El coeficiente por trimestre
+ * depende de los años cotizados (a más años cotizados, menor penalización).
  *
  * Dos modalidades:
  * - Voluntaria: hasta 2 años antes, necesita ≥ 35 años cotizados
@@ -17,6 +18,7 @@ import {
   REQUISITOS_ANTICIPADA_VOLUNTARIA,
   EDAD_JUBILACION_2025,
   FISCAL_PENSIONES_META,
+  getCoeficienteAnticipada,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -98,17 +100,17 @@ export function calcularJubilacionAnticipada(p: ParametrosJubilacionAnticipada):
   const mesesReales = Math.min(p.mesesAnticipacion, requisitos.maxMesesAnticipacion);
   const trimestreAnticipacion = Math.ceil(mesesReales / 3);
 
-  // Calcular reducción trimestre a trimestre
+  // El coeficiente reductor por trimestre depende de los años cotizados (RDL 2/2023)
+  // y se aplica de forma plana a todos los trimestres anticipados.
   const desglosePorTrimestre: Array<{ trimestre: number; reduccion: number }> = [];
   let reduccionTotal = 0;
 
   if (posible) {
+    const coeficientePorTrimestre = getCoeficienteAnticipada(p.anosCotizados, coeficientes);
     for (let t = 1; t <= trimestreAnticipacion; t++) {
-      const tramo = coeficientes.find(c => t >= c.trimestreDesde && t <= c.trimestreHasta);
-      const red = tramo?.reduccionPorTrimestre ?? 0;
-      reduccionTotal += red;
-      desglosePorTrimestre.push({ trimestre: t, reduccion: red });
+      desglosePorTrimestre.push({ trimestre: t, reduccion: coeficientePorTrimestre });
     }
+    reduccionTotal = coeficientePorTrimestre * trimestreAnticipacion;
   }
 
   reduccionTotal = r(reduccionTotal);

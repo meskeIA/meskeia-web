@@ -31,7 +31,7 @@ import {
   REQUISITOS_ANTICIPADA_VOLUNTARIA,
   REQUISITOS_JUBILACION_PARCIAL,
   JUBILACION_PARCIAL_META,
-  CoeficienteReductor,
+  getCoeficienteAnticipada,
 } from '@/data/fiscal';
 import { jsonLd } from './metadata';
 
@@ -217,17 +217,12 @@ function estimarPension(baseMensualMedia: number, anosCotizados: number): Result
 // LÓGICA: JUBILACIÓN ANTICIPADA
 // ──────────────────────────────────────────────────────────────────────────────
 
-function calcularReduccionAnticipada(trimestreAnticipacion: number, tipo: TipoAnticipada): number {
-  const coeficientes: CoeficienteReductor[] = tipo === 'voluntaria'
+function calcularReduccionAnticipada(anosCotizados: number, trimestreAnticipacion: number, tipo: TipoAnticipada): number {
+  const coeficientes = tipo === 'voluntaria'
     ? COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025
     : COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025;
 
-  let reduccionTotal = 0;
-  for (let t = 1; t <= trimestreAnticipacion; t++) {
-    const tramo = coeficientes.find(c => t >= c.trimestreDesde && t <= c.trimestreHasta);
-    if (tramo) reduccionTotal += tramo.reduccionPorTrimestre;
-  }
-  return reduccionTotal;
+  return getCoeficienteAnticipada(anosCotizados, coeficientes) * trimestreAnticipacion;
 }
 
 function orientarAnticipada(
@@ -253,7 +248,7 @@ function orientarAnticipada(
   }
 
   const posible = cumpleCotizacion && mesesAnticipacion <= maxPermitidos;
-  const reduccionTotal = posible ? calcularReduccionAnticipada(trimestreAnticipacion, tipo) : 0;
+  const reduccionTotal = posible ? calcularReduccionAnticipada(anosCotizados, trimestreAnticipacion, tipo) : 0;
   const pensionConReduccion = pensionOrdinaria * (1 - reduccionTotal / 100);
 
   return {

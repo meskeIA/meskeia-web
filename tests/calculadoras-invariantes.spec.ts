@@ -1841,17 +1841,18 @@ test.describe('Golden — calcularBajaMedica (Capa 1 · LGSS arts. 169-176)', ()
 
 // ────────────────────────────────────────────────────────────────────────────
 // CAPA 1 — Golden tests: calcularJubilacionAnticipada
-// Coeficientes reductores (Ley 21/2021 + LGSS arts. 207-208).
+// Coeficientes reductores por años cotizados (RDL 2/2023 + LGSS arts. 207-208).
 // [SS pendiente verificación]: valores calculados con la lógica propia de la
 // calculadora, sin contraste contra el simulador oficial de la Seguridad Social.
 // ────────────────────────────────────────────────────────────────────────────
 
-test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · Ley 21/2021)', () => {
+test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · RDL 2/2023)', () => {
 
-  test('GOLDEN-BU: involuntaria, 35 años cotizados, 12 meses anticipación → reducción 6,24% [SS pendiente verificación]', () => {
-    // 12 meses = 4 trimestres, todos en el tramo 1-4 (1,56%/trimestre) → 4×1,56 = 6,24%.
-    // Pensión con reducción = 1.500 × (1 − 6,24/100) = 1.406,40 €.
-    // Pérdida mensual = 93,60 €. Pérdida anual (14 pagas) = 1.310,40 €.
+  test('GOLDEN-BU: involuntaria, 35 años cotizados, 12 meses anticipación → reducción 7,5% [SS pendiente verificación]', () => {
+    // 35 años cotizados < 38a6m → coeficiente plano 1,875%/trimestre (RDL 2/2023).
+    // 12 meses = 4 trimestres → 4×1,875 = 7,5%.
+    // Pensión con reducción = 1.500 × (1 − 7,5/100) = 1.387,50 €.
+    // Pérdida mensual = 112,50 €. Pérdida anual (14 pagas) = 1.575 €.
     // 35 años × 12 = 420 meses < 459 (38a3m) → edad ordinaria "66 años y 6 meses".
     const ja = calcularJubilacionAnticipada({
       anosCotizados: 35,
@@ -1862,17 +1863,18 @@ test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · Ley 21/2021)',
     expect(ja.posible).toBe(true);
     expect(ja.cumpleCotizacion).toBe(true);
     expect(ja.trimestreAnticipacion).toBe(4);
-    expect(ja.reduccionTotal).toBeCloseTo(6.24, 2);
-    expect(ja.pensionConReduccion).toBeCloseTo(1406.40, 2);
-    expect(ja.perdidaMensual).toBeCloseTo(93.60, 2);
-    expect(ja.perdidaAnual).toBeCloseTo(1310.40, 2);
+    expect(ja.reduccionTotal).toBeCloseTo(7.5, 2);
+    expect(ja.pensionConReduccion).toBeCloseTo(1387.50, 2);
+    expect(ja.perdidaMensual).toBeCloseTo(112.50, 2);
+    expect(ja.perdidaAnual).toBeCloseTo(1575.00, 2);
     expect(ja.edadOrdinaria).toBe('66 años y 6 meses');
   });
 
-  test('GOLDEN-BV: voluntaria, 37 años cotizados, 24 meses anticipación → reducción 15,84% [SS pendiente verificación]', () => {
-    // 24 meses = 8 trimestres: 1-4 al 2,04% (8,16%) + 5-8 al 1,92% (7,68%) = 15,84%.
-    // Pensión con reducción = 1.800 × (1 − 15,84/100) = 1.514,88 €.
-    // Pérdida mensual = 285,12 €. Pérdida anual (14 pagas) = 3.991,68 €.
+  test('GOLDEN-BV: voluntaria, 37 años cotizados, 24 meses anticipación → reducción 16% [SS pendiente verificación]', () => {
+    // 37 años cotizados < 38a6m → coeficiente plano 2,00%/trimestre (RDL 2/2023).
+    // 24 meses = 8 trimestres → 8×2,00 = 16%.
+    // Pensión con reducción = 1.800 × (1 − 16/100) = 1.512 €.
+    // Pérdida mensual = 288 €. Pérdida anual (14 pagas) = 4.032 €.
     const ja = calcularJubilacionAnticipada({
       anosCotizados: 37,
       mesesAnticipacion: 24,
@@ -1882,10 +1884,10 @@ test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · Ley 21/2021)',
     expect(ja.posible).toBe(true);
     expect(ja.cumpleCotizacion).toBe(true);
     expect(ja.trimestreAnticipacion).toBe(8);
-    expect(ja.reduccionTotal).toBeCloseTo(15.84, 2);
-    expect(ja.pensionConReduccion).toBeCloseTo(1514.88, 2);
-    expect(ja.perdidaMensual).toBeCloseTo(285.12, 2);
-    expect(ja.perdidaAnual).toBeCloseTo(3991.68, 2);
+    expect(ja.reduccionTotal).toBeCloseTo(16.00, 2);
+    expect(ja.pensionConReduccion).toBeCloseTo(1512.00, 2);
+    expect(ja.perdidaMensual).toBeCloseTo(288.00, 2);
+    expect(ja.perdidaAnual).toBeCloseTo(4032.00, 2);
   });
 
   test('GOLDEN-BW: involuntaria, 30 años cotizados (no cumple mínimo de 33) → no posible [SS pendiente verificación]', () => {

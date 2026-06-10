@@ -158,25 +158,29 @@ export function getSistemaDualParams(anio: number): SistemaDualParams {
 
 /**
  * Coeficientes reductores por trimestre de anticipación respecto a edad ordinaria.
+ * El coeficiente aplicable depende de los AÑOS COTIZADOS (no del trimestre de
+ * anticipación): a más años cotizados, menor penalización por trimestre.
+ * El mismo coeficiente (plano) se aplica a todos los trimestres anticipados.
  * Distintos según sea voluntaria (a iniciativa del trabajador) o involuntaria
  * (despido colectivo, ERTE, cierre empresa u otras causas ajenas).
  *
- * Fuente: Ley 21/2021 + LGSS art. 207 y 208
+ * Fuente: RDL 2/2023 (DT 33ª y 34ª LGSS) + LGSS art. 207 y 208
  */
 
-export interface CoeficienteReductor {
-  trimestreDesde: number;  // Trimestre inicial del tramo (inclusive)
-  trimestreHasta: number;  // Trimestre final del tramo (inclusive)
-  reduccionPorTrimestre: number; // % de reducción por cada trimestre de antelación
+export interface CoeficienteAnticipadaPorAnios {
+  /** Límite superior (exclusivo) de años cotizados para este tramo. Infinity = sin límite. */
+  aniosCotizadosHasta: number;
+  /** % de reducción fijo por cada trimestre (o fracción) de anticipación */
+  reduccionPorTrimestre: number;
 }
 
 // Jubilación INVOLUNTARIA (causa no imputable al trabajador)
 // Requisito: ≥ 33 años cotizados, hasta 4 años antes de la edad ordinaria
-export const COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025: CoeficienteReductor[] = [
-  { trimestreDesde: 1,  trimestreHasta: 4,  reduccionPorTrimestre: 1.56 },
-  { trimestreDesde: 5,  trimestreHasta: 8,  reduccionPorTrimestre: 1.44 },
-  { trimestreDesde: 9,  trimestreHasta: 12, reduccionPorTrimestre: 1.32 },
-  { trimestreDesde: 13, trimestreHasta: 16, reduccionPorTrimestre: 1.20 },
+export const COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025: CoeficienteAnticipadaPorAnios[] = [
+  { aniosCotizadosHasta: 38.5, reduccionPorTrimestre: 1.875 }, // < 38a 6m
+  { aniosCotizadosHasta: 41.5, reduccionPorTrimestre: 1.750 }, // 38a6m - 41a6m
+  { aniosCotizadosHasta: 44.5, reduccionPorTrimestre: 1.625 }, // 41a6m - 44a6m
+  { aniosCotizadosHasta: Infinity, reduccionPorTrimestre: 1.500 }, // ≥ 44a6m
 ];
 
 export const REQUISITOS_ANTICIPADA_INVOLUNTARIA = {
@@ -187,15 +191,23 @@ export const REQUISITOS_ANTICIPADA_INVOLUNTARIA = {
 
 // Jubilación VOLUNTARIA (a iniciativa del propio trabajador)
 // Requisito: ≥ 35 años cotizados, hasta 2 años antes de la edad ordinaria
-export const COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025: CoeficienteReductor[] = [
-  { trimestreDesde: 1, trimestreHasta: 4, reduccionPorTrimestre: 2.04 },
-  { trimestreDesde: 5, trimestreHasta: 8, reduccionPorTrimestre: 1.92 },
+export const COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025: CoeficienteAnticipadaPorAnios[] = [
+  { aniosCotizadosHasta: 38.5, reduccionPorTrimestre: 2.00 }, // < 38a 6m
+  { aniosCotizadosHasta: 41.5, reduccionPorTrimestre: 1.87 }, // 38a6m - 41a6m
+  { aniosCotizadosHasta: 44.5, reduccionPorTrimestre: 1.75 }, // 41a6m - 44a6m
+  { aniosCotizadosHasta: Infinity, reduccionPorTrimestre: 1.63 }, // ≥ 44a6m
 ];
 
 export const REQUISITOS_ANTICIPADA_VOLUNTARIA = {
   anosMinimoCotizados: 35,
   maxMesesAnticipacion: 24, // hasta 2 años antes
 };
+
+/** Devuelve el coeficiente de reducción por trimestre aplicable según los años cotizados. */
+export function getCoeficienteAnticipada(anosCotizados: number, tabla: CoeficienteAnticipadaPorAnios[]): number {
+  const tramo = tabla.find(t => anosCotizados < t.aniosCotizadosHasta) ?? tabla[tabla.length - 1];
+  return tramo.reduccionPorTrimestre;
+}
 
 // ─── Plan de Pensiones: límites fiscales 2025 ────────────────────────────────
 
