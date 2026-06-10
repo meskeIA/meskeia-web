@@ -42,6 +42,14 @@ import { calcularInteresCompuesto } from '../lib/calculadoras/interesCompuesto';
 import { calcularPlusvaliasIRPF } from '../lib/calculadoras/plusvaliasIRPF';
 import { calcularRetencionAlquiler } from '../lib/calculadoras/retencionAlquiler';
 import { calcularRendimientoCapitalInmobiliario } from '../lib/calculadoras/rendimientoCapitalInmobiliario';
+import { calcularDonacion } from '../lib/calculadoras/donaciones';
+import { calcularAmortizacionAnticipada } from '../lib/calculadoras/amortizacionAnticipada';
+import { calcularTarifaFreelance } from '../lib/calculadoras/tarifaFreelance';
+import { calcularGastosDeduciblesAutonomo } from '../lib/calculadoras/gastosDeduciblesAutonomo';
+import { calcularReduccionJornada } from '../lib/calculadoras/reduccionJornada';
+import { calcularCapacidadHipoteca } from '../lib/calculadoras/capacidadHipoteca';
+import { calcularGananciaCriptomonedas } from '../lib/calculadoras/gananciaCriptomonedas';
+import { calcularPlanPensiones } from '../lib/calculadoras/planPensiones';
 
 /** Redondeo a 2 decimales idéntico al de las calculadoras */
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -1220,6 +1228,558 @@ test.describe('Golden — calcularRendimientoCapitalInmobiliario (Capa 1)', () =
     expect(res.rendimientoNeto).toBe(-300);
     expect(res.importeReduccion).toBe(0);        // no aplica: rn negativo
     expect(res.rendimientoNetoReducido).toBe(-300);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularDonacion (Impuesto de Donaciones ISD)
+// Ley 29/1987 ISD — tarifa estatal 16 tramos + tarifa Cataluña + bonificaciones CCAA.
+// Verificación interna. Deuda técnica: bonificaciones autonómicas verificadas 2025-01-01.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularDonacion (Capa 1 · ISD donaciones)', () => {
+
+  test('GOLDEN-AW: Madrid, I-descendiente, 30.000 € → cuotaFinal 11,26 € (bonif 99%)', () => {
+    // reduccionParentesco = 15.956,87 → baseNetaReducida = 14.043,13
+    // Tarifa estatal tramo 2: 611,50 + (14.043,13 − 7.993,46) × 8,5% = 1.125,72
+    // bonif 99% → cuotaFinal ≈ 11,26 €, tipoEfectivo ≈ 0,04%
+    const res = calcularDonacion({
+      valorDonacion: 30000,
+      ccaa: 'madrid',
+      grupo: 'I-descendiente',
+    });
+    expect(res.baseImponible).toBe(30000);
+    expect(res.baseLiquidable).toBe(30000);
+    expect(res.reduccionParentesco).toBeCloseTo(15956.87, 2);
+    expect(res.baseNetaReducida).toBeCloseTo(14043.13, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(1125.72, 2);
+    expect(res.coeficienteMultiplicador).toBe(1);
+    expect(res.cuotaTributaria).toBeCloseTo(1125.72, 2);
+    expect(res.porcentajeBonificacion).toBe(99);
+    expect(res.cuotaFinal).toBeCloseTo(11.26, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(0.04, 2);
+    expect(res.esForal).toBe(false);
+  });
+
+  test('GOLDEN-AX: Asturias, Grupo IV, 50.000 € → coef 2,0, cuotaFinal 9.897,87 €, tipo 19,8%', () => {
+    // Sin reducción de parentesco (Grupo IV = 0). Tarifa estatal: tramo 7 → 4.948,93.
+    // Coeficiente multiplicador Grupo IV = 2,0 → 9.897,87. Sin bonificación autonómica.
+    const res = calcularDonacion({
+      valorDonacion: 50000,
+      ccaa: 'asturias',
+      grupo: 'IV',
+    });
+    expect(res.reduccionParentesco).toBe(0);
+    expect(res.baseNetaReducida).toBe(50000);
+    expect(res.cuotaIntegra).toBeCloseTo(4948.93, 2);
+    expect(res.coeficienteMultiplicador).toBe(2);
+    expect(res.cuotaTributaria).toBeCloseTo(9897.87, 2);
+    expect(res.bonificacionCcaa).toBe(0);
+    expect(res.cuotaFinal).toBeCloseTo(9897.87, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(19.8, 2);
+    expect(res.esForal).toBe(false);
+  });
+
+  test('GOLDEN-AY: Cataluña, I-descendiente, 100.000 €, escritura → tarifa reducida 5%, cuota 5.000 €', () => {
+    // Régimen foral. Tarifa reducida (Grupos I/II + escritura): 0 + 100.000 × 5% = 5.000.
+    // Sin reducción de parentesco (Cataluña aplica su propia tarifa). Sin bonificación.
+    const res = calcularDonacion({
+      valorDonacion: 100000,
+      ccaa: 'cataluna',
+      grupo: 'I-descendiente',
+      escrituraPublica: true,
+    });
+    expect(res.reduccionParentesco).toBe(0);
+    expect(res.baseNetaReducida).toBe(100000);
+    expect(res.cuotaIntegra).toBeCloseTo(5000, 2);
+    expect(res.coeficienteMultiplicador).toBe(1);
+    expect(res.cuotaTributaria).toBeCloseTo(5000, 2);
+    expect(res.cuotaFinal).toBeCloseTo(5000, 2);
+    expect(res.tipoEfectivo).toBeCloseTo(5, 2);
+    expect(res.esForal).toBe(true);
+    expect(res.tarifaAplicada).toContain('reducida');
+  });
+
+  test('GOLDEN-AZ: Madrid, I-descendiente, 80.000 €, discapacidad ≥65% → baseNetaReducida 0, cuota 0 €', () => {
+    // reduccionParentesco 15.956,87 + reduccionDiscapacidad 150.253,03 > 80.000.
+    // baseNetaReducida = max(0, 80.000 − 15.956,87 − 150.253,03) = 0 → cuota = 0.
+    const res = calcularDonacion({
+      valorDonacion: 80000,
+      ccaa: 'madrid',
+      grupo: 'I-descendiente',
+      discapacidad: '65',
+    });
+    expect(res.reduccionParentesco).toBeCloseTo(15956.87, 2);
+    expect(res.reduccionDiscapacidad).toBeCloseTo(150253.03, 2);
+    expect(res.baseNetaReducida).toBe(0);
+    expect(res.cuotaIntegra).toBe(0);
+    expect(res.cuotaTributaria).toBe(0);
+    expect(res.cuotaFinal).toBe(0);
+    expect(res.tipoEfectivo).toBe(0);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularAmortizacionAnticipada
+// Fórmula francesa (idéntica a calcularHipoteca). Verificación interna.
+// cuotaOriginal coincide con GOLDEN-G (200k @ 3,5% 25a = 1.001,25 €).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularAmortizacionAnticipada (Capa 1 · fórmula francesa)', () => {
+
+  test('GOLDEN-BA: 200k @ 3,5% 25a, amortizar 20k en mes 60 → cuota baja a 885,26 €, ahorro plazo 18.047,40 €', () => {
+    // Saldo mes 60 = 172.640,81 €. Tras amortizar: 152.640,81 €.
+    // Opción cuota: nueva cuota 885,26 € (−115,99), ahorra 7.836,92 € en intereses.
+    // Opción plazo: termina 38 meses antes (202 meses restantes), ahorra 18.047,40 €.
+    // Reducir plazo siempre domina en ahorro total de intereses (francés convexo).
+    const res = calcularAmortizacionAnticipada({
+      capitalInicial: 200000,
+      plazoAnios: 25,
+      tin: 3.5,
+      importeAmortizacion: 20000,
+      mesesTranscurridos: 60,
+    });
+    expect(res.cuotaOriginal).toBeCloseTo(1001.25, 2);   // coincide con GOLDEN-G
+    expect(res.saldoAntes).toBeCloseTo(172640.81, 2);
+    expect(res.saldoDespues).toBeCloseTo(152640.81, 2);
+    expect(res.plazoRestanteMeses).toBe(240);            // 300 - 60
+    expect(res.nuevaCuota).toBeCloseTo(885.26, 2);
+    expect(res.reduccionCuota).toBeCloseTo(115.99, 2);
+    expect(res.ahorroInteresesCuota).toBeCloseTo(7836.92, 2);
+    expect(res.nuevoPlazoMeses).toBe(202);
+    expect(res.reduccionMeses).toBe(38);
+    expect(res.ahorroInteresesPlazo).toBeCloseTo(18047.4, 2);
+    expect(res.totalInteresesSinAmortizar).toBeCloseTo(67658.51, 2);
+    // Reducir plazo ahorra más: invariante de la fórmula francesa
+    expect(res.ahorroInteresesPlazo).toBeGreaterThan(res.ahorroInteresesCuota);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularTarifaFreelance
+// Aritmética pura: días laborables → facturación → tarifa. Verificación interna.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularTarifaFreelance (Capa 1 · aritmética)', () => {
+
+  test('GOLDEN-BB: neto 3.000 €/mes, todo por defecto → tarifa 42,54 €/h (sin IVA), 51,47 €/h (con IVA)', () => {
+    // Días lab: 365−104−22−14−5=220; facturables=154; mes=12,83 días; 102,67 h/mes.
+    // Facturación nec: (3.000/0,79)×1,15 = 4.367,09 €/mes.
+    // IRPF 21% sobre 52.405,08 anual = 11.005,07 €.
+    const res = calcularTarifaFreelance({ ingresoNetoMensual: 3000 });
+    expect(res.diasLaborablesAno).toBe(220);
+    expect(res.diasFacturablesAno).toBeCloseTo(154, 2);
+    expect(res.diasFacturablesMes).toBeCloseTo(12.83, 2);
+    expect(res.horasFacturablesAno).toBeCloseTo(1232, 2);
+    expect(res.horasFacturablesMes).toBeCloseTo(102.67, 2);
+    expect(res.facturacionMensualNecesaria).toBeCloseTo(4367.09, 2);
+    expect(res.tarifaHora).toBeCloseTo(42.54, 2);
+    expect(res.tarifaDia).toBeCloseTo(340.38, 2);
+    expect(res.tarifaSemana).toBeCloseTo(1701.9, 2);
+    expect(res.tarifaHoraConIVA).toBeCloseTo(51.47, 2);
+    expect(res.tarifaDiaConIVA).toBeCloseTo(411.86, 2);
+    expect(res.facturacionAnual).toBeCloseTo(52405.08, 2);
+    expect(res.irpfAnual).toBeCloseTo(11005.07, 2);
+    expect(res.beneficioNetoAnual).toBeCloseTo(41400.01, 2);
+  });
+
+  test('GOLDEN-BC: neto 2.000 €/mes + gastos 400 €/mes → facturación 3.493,67 €, tarifa 34,03 €/h', () => {
+    // Los gastos se añaden a la base antes de grossing-up por IRPF.
+    // Facturación: ((2000+400)/0,79)×1,15 = 3.493,67 €/mes.
+    const res = calcularTarifaFreelance({
+      ingresoNetoMensual: 2000,
+      gastosFijos: [{ concepto: 'Cuota RETA', importe: 310 }, { concepto: 'Seguro', importe: 90 }],
+    });
+    expect(res.totalGastosMensuales).toBeCloseTo(400, 2);
+    expect(res.facturacionMensualNecesaria).toBeCloseTo(3493.67, 2);
+    expect(res.tarifaHora).toBeCloseTo(34.03, 2);
+    expect(res.tarifaDia).toBeCloseTo(272.3, 2);
+    expect(res.facturacionAnual).toBeCloseTo(41924.04, 2);
+    expect(res.gastosAnuales).toBeCloseTo(4800, 2);
+    expect(res.irpfAnual).toBeCloseTo(7796.05, 2);
+    expect(res.beneficioNetoAnual).toBeCloseTo(29327.99, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularGastosDeduciblesAutonomo
+// LIRPF arts. 28-30 + RIRPF art. 22. Reglas aplicadas:
+//   suministros vivienda = %afecta × 30%; vehículo no exclusivo = 50%.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularGastosDeduciblesAutonomo (Capa 1 · LIRPF art. 28-30)', () => {
+
+  test('GOLDEN-BD: local independiente — suministros 100%, cuota 100%, publicidad 100%, vehículo 50% → total 8.700 €', () => {
+    // sub=2.400(100%)=2.400, cuota=3.600, pub=1.200, veh=3.000×50%=1.500. Suma=8.700.
+    const res = calcularGastosDeduciblesAutonomo({
+      modalidad: 'normal',
+      tipoLocal: 'local_independiente',
+      gastosSubministros: 2400,
+      cuotaAutonomo: 3600,
+      gastosPublicidad: 1200,
+      vehiculo: { totalGastosVehiculo: 3000, tipoActividad: 'no_exclusivo' },
+    });
+    expect(res.totalGastosDeducibles).toBeCloseTo(8700, 2);
+    expect(res.provisionGlobalED5pct).toBe(0);
+    expect(res.totalGastosConProvision).toBeCloseTo(8700, 2);
+    // Línea de suministros al 100% (local independiente)
+    const linSub = res.lineas.find(l => l.concepto.includes('Suministros'));
+    expect(linSub?.porcentajeDeducible).toBe(100);
+    expect(linSub?.importeDeducible).toBe(2400);
+    // Línea de vehículo al 50% (actividad no exclusiva)
+    const linVeh = res.lineas.find(l => l.concepto.includes('vehículo'));
+    expect(linVeh?.porcentajeDeducible).toBe(50);
+    expect(linVeh?.importeDeducible).toBeCloseTo(1500, 2);
+  });
+
+  test('GOLDEN-BE: vivienda habitual 20% — suministros al 6% (RIRPF art.22), seguro médico topado → total 5.680 €', () => {
+    // pctSub = 20% vivienda × 30% = 6%. sub=3.000×6%=180.
+    // Seguro: prima=2.000, 2 familiares → límite=500+2×500=1.500 → deducible=1.500.
+    // Total = 180 + 4.000 + 1.500 = 5.680.
+    const res = calcularGastosDeduciblesAutonomo({
+      modalidad: 'simplificada',
+      tipoLocal: 'vivienda_habitual',
+      pctViviendaAfecta: 20,
+      gastosSubministros: 3000,
+      cuotaAutonomo: 4000,
+      segurosPrivadosMedicos: 2000,
+      numFamiliaresSeguroMedico: 2,
+    });
+    expect(res.totalGastosDeducibles).toBeCloseTo(5680, 2);
+    expect(res.provisionGlobalED5pct).toBe(0);   // saldoDeudores no proporcionado
+    const linSub = res.lineas.find(l => l.concepto.includes('Suministros'));
+    expect(linSub?.porcentajeDeducible).toBeCloseTo(6, 2);   // 20% × 30%
+    expect(linSub?.importeDeducible).toBeCloseTo(180, 2);
+    const linSeg = res.lineas.find(l => l.concepto.includes('médico'));
+    expect(linSeg?.importeDeducible).toBeCloseTo(1500, 2);   // limitado a 1.500 €
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularReduccionJornada
+// ET arts. 37.6 + 37.7 + LGSS art. 237. Aritmética proporcional + reglas de límites.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularReduccionJornada (Capa 1 · ET art. 37.6)', () => {
+
+  test('GOLDEN-BF: hijo_menor_12, salario 2.500 €, jornada completa 40h, reducción 25% → merma 625 €/mes', () => {
+    // Jornada reducida: 30h. Salario: 2.500×75%=1.875 €. Merma: 625/mes, 7.500/año.
+    // Primeros 24 meses: baseSSCompleta=true (art. 237 LGSS protege cotización a jornada completa).
+    // Rango legal: 12,5%–50%; 25% ∈ rango → dentroRangoLegal=true.
+    const res = calcularReduccionJornada({
+      motivo: 'hijo_menor_12',
+      salarioBrutoMensualCompleto: 2500,
+      horasSemanalesCompletas: 40,
+      fraccionReduccion: 0.25,
+    });
+    expect(res.pctJornadaReducida).toBeCloseTo(25, 2);
+    expect(res.pctJornadaTrabajada).toBeCloseTo(75, 2);
+    expect(res.horasSemanalesTrasReduccion).toBeCloseTo(30, 2);
+    expect(res.salarioBrutoMensualReducido).toBeCloseTo(1875, 2);
+    expect(res.mermaMensualBruta).toBeCloseTo(625, 2);
+    expect(res.mermaAnualBruta).toBeCloseTo(7500, 2);
+    expect(res.baseSSCompleta).toBe(true);
+    expect(res.baseReguladoraEstimada).toBeCloseTo(2500, 2);   // jornada completa
+    expect(res.reduccionMinimaPermitida).toBeCloseTo(12.5, 2);
+    expect(res.reduccionMaximaPermitida).toBeCloseTo(50, 2);
+    expect(res.dentroRangoLegal).toBe(true);
+  });
+
+  test('GOLDEN-BG: hijo_discapacidad_grave (art.37.7), salario 3.200 €, reducción 50% → merma 1.600 €/mes, rango 50–100%', () => {
+    // Art. 37.7 ET: reducción mínima ≥50%, sin tope máximo. Límite inferior 50% (no 12,5%).
+    // fraccion=0,50 → en el límite inferior del rango especial → dentroRangoLegal=true.
+    const res = calcularReduccionJornada({
+      motivo: 'hijo_discapacidad_grave',
+      salarioBrutoMensualCompleto: 3200,
+      horasSemanalesCompletas: 40,
+      fraccionReduccion: 0.50,
+    });
+    expect(res.pctJornadaReducida).toBeCloseTo(50, 2);
+    expect(res.salarioBrutoMensualReducido).toBeCloseTo(1600, 2);
+    expect(res.mermaMensualBruta).toBeCloseTo(1600, 2);
+    expect(res.mermaAnualBruta).toBeCloseTo(19200, 2);
+    expect(res.reduccionMinimaPermitida).toBeCloseTo(50, 2);
+    expect(res.reduccionMaximaPermitida).toBeCloseTo(100, 2);
+    expect(res.dentroRangoLegal).toBe(true);
+    expect(res.baseSSCompleta).toBe(true);
+    expect(res.baseReguladoraEstimada).toBeCloseTo(3200, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularCapacidadHipoteca
+// Regla de esfuerzo BdE (cuota ≤ 30-35% ingresos netos). Fórmula francesa inversa.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularCapacidadHipoteca (Capa 1 · Banco de España)', () => {
+
+  test('GOLDEN-BH: 3.000 € neto, 40.000 € ahorros, 3,5% 30a → capital 200.425,49 €, precio máx 218.568,63 €', () => {
+    // cuota máx = 3.000×30% = 900 €. Capital = despeje fórmula francesa = 200.425,49 €.
+    // entrada = (40.000 − capital×10%) / 1,10 = 18.143,14 €.
+    // Financiación 91,7% > 80% → alerta. Esfuerzo = 30% → cumple BdE (justo en el límite).
+    const res = calcularCapacidadHipoteca({
+      ingresosMensualesNetos: 3000,
+      ahorrosDisponibles: 40000,
+    });
+    expect(res.cuotaMaximaMensual).toBeCloseTo(900, 2);
+    expect(res.cuotaDisponible).toBeCloseTo(900, 2);
+    expect(res.capitalMaximo).toBeCloseTo(200425.49, 2);
+    expect(res.entradaDisponible).toBeCloseTo(18143.14, 2);
+    expect(res.gastosCompraReservados).toBeCloseTo(21856.86, 2);
+    expect(res.precioMaximoVivienda).toBeCloseTo(218568.63, 2);
+    expect(res.porcentajeFinanciacion).toBeCloseTo(91.7, 2);
+    expect(res.esfuerzoHipotecario).toBeCloseTo(30, 2);
+    expect(res.cumpleRecomendacionBDE).toBe(true);
+    // Alerta: financiación > 80%
+    expect(res.advertencias.some(a => a.includes('80%'))).toBe(true);
+  });
+
+  test('GOLDEN-BI: 4.500 € neto, 70.000 € ahorros, otras=300 €, 4% 25a → capital 198.925,11 €, esfuerzo 23,33%', () => {
+    // cuotaMax = 4.500×30% = 1.350. cuotaDisp = 1.350−300 = 1.050 €.
+    // Capital = 198.925,11 €. Precio máx = 244.477,37 €. Fin. 81,37% (>80% → alerta).
+    const res = calcularCapacidadHipoteca({
+      ingresosMensualesNetos: 4500,
+      ahorrosDisponibles: 70000,
+      otrasDeudasMensuales: 300,
+      tasaInteres: 4,
+      plazo: 25,
+    });
+    expect(res.cuotaMaximaMensual).toBeCloseTo(1350, 2);
+    expect(res.cuotaDisponible).toBeCloseTo(1050, 2);
+    expect(res.capitalMaximo).toBeCloseTo(198925.11, 2);
+    expect(res.entradaDisponible).toBeCloseTo(45552.26, 2);
+    expect(res.gastosCompraReservados).toBeCloseTo(24447.74, 2);
+    expect(res.precioMaximoVivienda).toBeCloseTo(244477.37, 2);
+    expect(res.porcentajeFinanciacion).toBeCloseTo(81.37, 2);
+    expect(res.esfuerzoHipotecario).toBeCloseTo(23.33, 2);
+    expect(res.cumpleRecomendacionBDE).toBe(true);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularFiniquito
+// Cálculo proporcional de vacaciones, pagas extra y salarios pendientes.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularFiniquito (Capa 1 · ET arts. 52-56)', () => {
+
+  test('GOLDEN-BJ: bruto 2.000 €, 6a y 182d antigüedad, 12 días vacaciones pendientes → total 2.705,08 €', () => {
+    // Vacaciones devengadas en 2026 (181 días/365 × 22) = 10,9096 días − 10 disfrutados = 0,9096 días → 60,64 €.
+    // 2 pagas extra, última devengada el 01/06/2026 → 29/30 meses proporcionales (tope 6) → 644,44 €.
+    // Salarios atrasados = salario diario × día del mes (30) = 2.000 €.
+    const f = calcularFiniquito({
+      salarioBrutoMensual: 2000,
+      motivoFiniquito: 'baja_voluntaria',
+      fechaInicio: '2020-01-01',
+      fechaBaja: '2026-06-30',
+      diasVacacionesDisfrutados: 10,
+      ultimaPagaExtraFecha: '2026-06-01',
+    });
+    expect(f.antiguedadAnios).toBe(6);
+    expect(f.antiguedadDias).toBe(182);
+    expect(f.diasVacacionesPendientes).toBeCloseTo(0.91, 2);
+    expect(f.vacacionesPendientes).toBeCloseTo(60.64, 2);
+    expect(f.pagasExtrasProporcionales).toBeCloseTo(644.44, 2);
+    expect(f.salariosAtrasados).toBeCloseTo(2000, 2);
+    expect(f.totalFiniquitoBruto).toBeCloseTo(2705.08, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularSueldoNeto
+// Retenciones IRPF + SS empleado sobre bruto anual (IRPF 2025).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
+
+  test('GOLDEN-BK: soltero, bruto 24.000 €, 14 pagas → cuota SS 1.552,80 €, IRPF 2.385,47 €, neto mensual 1.432,98 €', () => {
+    // baseSS = 2.000 €/mes (dentro de mín-máx). Cuota SS anual = 2.000×6,47%×12 = 1.552,80 €.
+    // Base imponible = 24.000 − 1.552,80 − 2.000 = 20.447,20 € → reducción RNT mínima (2.364 €, RNT > 16.825).
+    // Mínimo personal (soltero, sin hijos) = 5.550 €. Base liquidable = 20.447,20 − 2.364 − 5.550 = 12.533,20 €.
+    // Cuota IRPF = 12.450×19% + 83,20×24% = 2.365,50 + 19,968 = 2.385,47 €.
+    const r = calcularSueldoNeto({ brutoAnual: 24000, situacion: 'soltero', pagas: 14 });
+    expect(r.cuotaSSAnual).toBeCloseTo(1552.80, 2);
+    expect(r.baseImponible).toBeCloseTo(20447.20, 2);
+    expect(r.reduccionRNT).toBeCloseTo(2364, 2);
+    expect(r.minimoPersonalFamiliar).toBeCloseTo(5550, 2);
+    expect(r.baseLiquidable).toBeCloseTo(12533.20, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(2385.47, 2);
+    expect(r.tipoRetencion).toBeCloseTo(9.94, 2);
+    expect(r.netoAnual).toBeCloseTo(20061.73, 2);
+    expect(r.netoMensual).toBeCloseTo(1432.98, 2);
+  });
+
+  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → mínimo familiar 13.450 €, neto mensual 2.481,40 €', () => {
+    // Mínimo personal+familiar = 5.550 (personal) + 2.400 (hijo 1º) + 2.700 (hijo 2º) + 2.800 (hijo <3) = 13.450 €.
+    // Base imponible = 35.000 − 2.264,50 (SS) − 2.000 = 30.735,50 € → reducción RNT mínima (2.364 €).
+    // Base liquidable = 30.735,50 − 2.364 − 13.450 = 14.921,50 €.
+    // Cuota IRPF = 12.450×19% + 2.471,50×24% = 2.365,50 + 593,16 = 2.958,66 €.
+    const r = calcularSueldoNeto({
+      brutoAnual: 35000,
+      situacion: 'casado_con_ingresos',
+      numHijos: 2,
+      hijosMenores3: 1,
+      pagas: 12,
+    });
+    expect(r.cuotaSSAnual).toBeCloseTo(2264.50, 2);
+    expect(r.baseImponible).toBeCloseTo(30735.50, 2);
+    expect(r.reduccionRNT).toBeCloseTo(2364, 2);
+    expect(r.minimoPersonalFamiliar).toBeCloseTo(13450, 2);
+    expect(r.baseLiquidable).toBeCloseTo(14921.50, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(2958.66, 2);
+    expect(r.tipoRetencion).toBeCloseTo(8.45, 2);
+    expect(r.netoAnual).toBeCloseTo(29776.84, 2);
+    expect(r.netoMensual).toBeCloseTo(2481.40, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPensionPublica
+// Porcentaje de base reguladora según años cotizados (LGSS, transitorio 2025).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)', () => {
+
+  test('GOLDEN-BM: base 2.800 €, 30 años cotizados (360 meses) → 86,12%, pensión 2.066,88 €/mes, sin límites', () => {
+    // BR = 2.800 × 300/350 = 2.400 €.
+    // % pensión: tramo 277-9999 → 70,16 + (360-277+1)×0,19 = 70,16 + 84×0,19 = 86,12%.
+    // Pensión sin límites = 2.400 × 86,12% = 2.066,88 € → dentro de [888,70 ; 3.359,60], no se aplican límites.
+    const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, edadActual: 55 });
+    expect(p.baseReguladora).toBeCloseTo(2400, 2);
+    expect(p.porcentajePension).toBeCloseTo(86.12, 2);
+    expect(p.pensionBrutaSinLimites).toBeCloseTo(2066.88, 2);
+    expect(p.pensionBrutaMensual).toBeCloseTo(2066.88, 2);
+    expect(p.pensionBrutaAnual).toBeCloseTo(28936.32, 2);
+    expect(p.aplicaMinimo).toBe(false);
+    expect(p.aplicaMaximo).toBe(false);
+    expect(p.mesesParaCien).toBe(81);
+  });
+
+  test('GOLDEN-BN: base mínima 1.184,40 €, 15 años cotizados (180 meses, mínimo de acceso) → se aplica pensión mínima 888,70 €/mes', () => {
+    // BR = 1.184,40 × 300/350 = 1.015,20 €. % pensión = 50% (180 meses, primer tramo).
+    // Pensión sin límites = 1.015,20 × 50% = 507,60 € < 888,70 € (mínima sin cónyuge) → se aplica el mínimo.
+    const p = calcularPensionPublica({ baseCotizacionMensual: 1184.40, anosCotizados: 15, edadActual: 65 });
+    expect(p.baseReguladora).toBeCloseTo(1015.20, 2);
+    expect(p.porcentajePension).toBeCloseTo(50, 2);
+    expect(p.pensionBrutaSinLimites).toBeCloseTo(507.60, 2);
+    expect(p.aplicaMinimo).toBe(true);
+    expect(p.aplicaMaximo).toBe(false);
+    expect(p.pensionBrutaMensual).toBeCloseTo(888.70, 2);
+    expect(p.pensionBrutaAnual).toBeCloseTo(12441.80, 2);
+    expect(p.mesesParaCien).toBe(261);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularBrechaJubilacion
+// Diferencial sueldo neto actual vs. pensión estimada + ahorro mensual necesario.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularBrechaJubilacion (Capa 1 · cálculo financiero propio)', () => {
+
+  test('GOLDEN-BO: sueldo neto 2.400 €, pensión 1.500 €, 47 años → brecha 900 €/mes, capital 216.000 €, ahorro 588,92 €/mes', () => {
+    // Brecha mensual = 2.400 − 1.500 = 900 €. Brecha anual = 10.800 €. Capital = 10.800 × 20 años = 216.000 €.
+    // % pensión/sueldo = 1.500/2.400 × 100 = 62,5%. Años hasta jubilación (67−47) = 20 → n = 240 meses, r_mes = 4%/12.
+    // PMT = 216.000 × r_mes / ((1+r_mes)^240 − 1) = 588,92 €/mes.
+    const b = calcularBrechaJubilacion({ sueldoNetoMensual: 2400, pensionEstimadaMensual: 1500, edadActual: 47 });
+    expect(b.brechaMensual).toBeCloseTo(900, 2);
+    expect(b.brechaAnual).toBeCloseTo(10800, 2);
+    expect(b.capitalNecesario).toBeCloseTo(216000, 2);
+    expect(b.porcentajePensionSobreSueldo).toBeCloseTo(62.5, 2);
+    expect(b.anosHastaJubilacion).toBe(20);
+    expect(b.ahorroMensualNecesario).toBeCloseTo(588.92, 2);
+    expect(b.tieneBrecha).toBe(true);
+    expect(b.edadJubilacion).toBe(67);
+    expect(b.anosJubilado).toBe(20);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularGananciaCriptomonedas
+// Base del ahorro IRPF (LIRPF art. 37.1.v), FIFO, escala del ahorro 2025.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularGananciaCriptomonedas (Capa 1 · LIRPF art. 37.1.v)', () => {
+
+  test('GOLDEN-BP: ganancia 14.850 € + pérdida 4.000 € → saldo neto 10.850 €, cuota 2.158,50 €', () => {
+    // Op.1: adquisición 1×20.000+50=20.050 €, transmisión 1×35.000−100=34.900 € → ganancia 14.850 €.
+    // Op.2: adquisición 2×3.000=6.000 €, transmisión 2×1.000=2.000 € → pérdida 4.000 €.
+    // Saldo neto = 14.850 − 4.000 = 10.850 € → escala ahorro: 6.000×19% + 4.850×21% = 1.140 + 1.018,50 = 2.158,50 €.
+    const g = calcularGananciaCriptomonedas({
+      operaciones: [
+        { tipoOperacion: 'venta', unidades: 1, precioAdquisicionUnitario: 20000, gastosAdquisicion: 50, precioTransmisionUnitario: 35000, gastosTransmision: 100 },
+        { tipoOperacion: 'venta', unidades: 2, precioAdquisicionUnitario: 3000, precioTransmisionUnitario: 1000 },
+      ],
+    });
+    expect(g.detalleOperaciones[0].valorAdquisicion).toBeCloseTo(20050, 2);
+    expect(g.detalleOperaciones[0].valorTransmision).toBeCloseTo(34900, 2);
+    expect(g.detalleOperaciones[0].gananciaPerdida).toBeCloseTo(14850, 2);
+    expect(g.detalleOperaciones[1].gananciaPerdida).toBeCloseTo(-4000, 2);
+    expect(g.totalGanancias).toBeCloseTo(14850, 2);
+    expect(g.totalPerdidas).toBeCloseTo(4000, 2);
+    expect(g.saldoNeto).toBeCloseTo(10850, 2);
+    expect(g.cuotaTributaria).toBeCloseTo(2158.50, 2);
+    expect(g.compensacionRCMPosible).toBe(0);
+    expect(g.perdidaPendienteCompensacion).toBe(0);
+  });
+
+  test('GOLDEN-BQ: pérdida neta 7.530 € con RCM positivo 10.000 € → compensa 2.500 € (25%), pendiente 5.030 €', () => {
+    // Adquisición = 0,5×40.000+20=20.020 €, transmisión = 0,5×25.000−10=12.490 € → pérdida 7.530 €.
+    // Compensación = min(7.530, 10.000×25%) = min(7.530, 2.500) = 2.500 €. Pendiente = 7.530 − 2.500 = 5.030 €.
+    const g = calcularGananciaCriptomonedas({
+      operaciones: [
+        { tipoOperacion: 'venta', unidades: 0.5, precioAdquisicionUnitario: 40000, gastosAdquisicion: 20, precioTransmisionUnitario: 25000, gastosTransmision: 10 },
+      ],
+      saldoPositivoRCM: 10000,
+    });
+    expect(g.saldoNeto).toBeCloseTo(-7530, 2);
+    expect(g.cuotaTributaria).toBe(0);
+    expect(g.compensacionRCMPosible).toBeCloseTo(2500, 2);
+    expect(g.perdidaPendienteCompensacion).toBeCloseTo(5030, 2);
+    expect(g.advertencias.some(a => a.includes('Pérdida patrimonial'))).toBe(true);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularPlanPensiones
+// Proyección de ahorro privado + deducción IRPF (LIRPF art. 51).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () => {
+
+  test('GOLDEN-BR: rendimientos 40.000 €, aportación 1.500 €, 40→67 años → ahorro fiscal 450 €, capital 70.626,32 €', () => {
+    // Límite deducible = min(1.500, 40.000×30%) = min(1.500, 12.000) = 1.500 € → toda la aportación es deducible.
+    // Tipo marginal: RNT = 40.000 − 40.000×6,47% − 2.000 = 35.412 € → tramo 35.200 (30%).
+    // Ahorro fiscal = 1.500×30% = 450 €. Coste neto = 1.500 − 450 = 1.050 €.
+    // Capital a 27 años (4% anual, sin capital previo) = 1.500 × ((1,04^27 − 1)/0,04) = 70.626,32 €.
+    const pp = calcularPlanPensiones({
+      rendimientosNetos: 40000,
+      aportacionIndividual: 1500,
+      edadActual: 40,
+    });
+    expect(pp.aportacionTotal).toBeCloseTo(1500, 2);
+    expect(pp.limiteDeducible).toBeCloseTo(1500, 2);
+    expect(pp.baseReducible).toBeCloseTo(1500, 2);
+    expect(pp.excesoNoDeducible).toBe(0);
+    expect(pp.superaLimite).toBe(false);
+    expect(pp.tipoMarginal).toBe(30);
+    expect(pp.ahorroFiscalAnual).toBeCloseTo(450, 2);
+    expect(pp.costeNetoAnual).toBeCloseTo(1050, 2);
+    expect(pp.anosAhorro).toBe(27);
+    expect(pp.capitalEstimadoJubilacion).toBeCloseTo(70626.32, 2);
+    expect(pp.rentaMensualEstimada).toBeCloseTo(235.42, 2);
   });
 
 });
