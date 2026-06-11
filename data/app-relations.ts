@@ -3290,7 +3290,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/asistente-alta-autonomo/', icon: '📋', name: 'Asistente Alta Autónomo', description: 'Trámites para darte de alta' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Estimador Cuota Autónomo', description: 'Cuánto pagarás con o sin tarifa plana' },
     { url: '/comparador-formas-juridicas/', icon: '⚖️', name: 'Comparador Formas Jurídicas', description: 'Autónomo, SL, cooperativa...' },
-    { url: '/orientador-tarifa-freelance/', icon: '💼', name: 'Tarifa Freelance', description: 'Calcula tu precio por hora' },
+    { url: '/orientador-ayudas-personas-familias/', icon: '🧭', name: 'Ayudas para Personas y Familias', description: 'IMV, desempleo, bono social, deducciones familiares' },
+  ],
+  'orientador-ayudas-personas-familias': [
+    { url: '/orientador-ayudas-autonomos-pymes/', icon: '🎁', name: 'Ayudas Autónomos y Pymes', description: 'Subvenciones y financiación pública' },
+    { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo?' },
+    { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Orientación BVD y prestaciones SAAD' },
+    { url: '/simulador-bono-joven-alquiler/', icon: '🏠', name: 'Bono Joven Alquiler', description: 'Comprueba si eres elegible' },
   ],
   // FAMILIA: IRPF Y FISCAL GENERAL
   // ==========================================

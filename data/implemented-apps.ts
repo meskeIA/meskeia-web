@@ -1165,6 +1165,7 @@ export const implementedAppsUrls = [
   "/guia-comentario-texto/",             // Metodología 7 pasos, análisis poesía+prosa, vocabulario y plantillas
   "/generador-poemas/",                  // Editor métrico guiado: haiku, redondilla, serventesio, romance, lira y soneto con contador sílabas
   "/orientador-ayudas-autonomos-pymes/", // Wizard de ayudas, subvenciones y financiación pública para autónomos, emprendedores y pymes
+  "/orientador-ayudas-personas-familias/", // Wizard de ayudas y prestaciones sociales para personas y familias: IMV, desempleo, bono social, deducciones familiares
 ];
 
 /**

@@ -26,3 +26,4 @@ export * from './maternidad';
 export * from './smi';
 export * from './patrimonio';
 export * from './ayudas-publicas';
+export * from './ayudas-personas';
