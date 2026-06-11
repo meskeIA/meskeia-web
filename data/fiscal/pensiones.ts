@@ -11,6 +11,8 @@
  * Simulador oficial: https://portal.seg-social.gob.es/wps/portal/importass/importass/Categorias/vidaLaboral-y-pensiones/simuladorPensionJubilacion
  */
 
+import { SMI_2026 } from './smi';
+
 export const FISCAL_PENSIONES_META = {
   fuente: 'LGSS (RDL 8/2015) + Ley 21/2021 de Reforma de Pensiones + RDL 16/2025 (prórroga)',
   verificado: '2026-03-16',
@@ -247,8 +249,8 @@ export const REQUISITOS_JUBILACION_PARCIAL = {
 // ─── Pensión de Viudedad: datos normativos 2026 ───────────────────────────────
 // Fuente: LGSS arts. 219-231 (RDL 8/2015) + Resolución INSS pensiones mínimas 2026
 // Revalorización 2026: +2,8% IPC respecto a 2025
-// Verificado: 2026-03-16
-// SMI 2026: pendiente RDL oficial (se mantiene 1.323 €/mes de 2025)
+// Verificado: 2026-06-11
+// SMI 2026: 1.221 €/mes (RD 126/2026) — ver data/fiscal/smi.ts
 
 export const PENSION_VIUDEDAD_2026 = {
   // Porcentajes aplicables sobre la base reguladora (LGSS art. 231)
@@ -256,9 +258,9 @@ export const PENSION_VIUDEDAD_2026 = {
   porcentaje60:            60,   // % — ≥65 años sin otra pensión pública y rentas < SMI
   porcentaje70:            70,   // % — Cargas familiares + rentas del trabajo < 75% SMI
 
-  // SMI 2026 mensual (14 pagas = €15.876 anuales / 12; sin actualización oficial aún)
-  smiMensual:            1323,
-  limiteIngresos70:       992,   // 75% del SMI mensual (992,25 → redondeado)
+  // SMI 2026 mensual (14 pagas, RD 126/2026 — ver data/fiscal/smi.ts)
+  smiMensual:            SMI_2026.mensual14, // 1.221 €
+  limiteIngresos70:      Math.round(SMI_2026.mensual14 * 0.75), // 916 € = 75% del SMI 2026
 
   // Pensiones mínimas garantizadas 2026 (brutas/mes, 14 pagas)
   // Revalorizadas +2,8% IPC respecto a valores 2025

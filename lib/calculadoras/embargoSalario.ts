@@ -15,24 +15,26 @@
  * El salario mínimo interprofesional (SMI) actúa como cantidad inembargable.
  * Si el salario neto es ≤ SMI, NO es embargable (art. 607.1 LEC).
  *
- * SMI 2025: 1.184 €/mes (14 pagas) = 16.576 €/año
- * SMI mensual (12 pagas): 1.381,33 €/mes
+ * SMI 2026: 1.221 €/mes (14 pagas) = 17.094 €/año (ver data/fiscal/smi.ts)
+ * SMI mensual (12 pagas): 1.424,50 €/mes
  *
  * Reducción por cargas familiares (art. 607.3 LEC):
  * El juez puede reducir los porcentajes en 10-15 puntos si el deudor
  * tiene cargas familiares que lo justifiquen. Esta calculadora aplica
  * el porcentaje estándar y advierte de esta posibilidad.
  *
- * Fuente: LEC art. 607 — vigente 2025
- * Verificado: 2025-01-15
+ * Fuente: LEC art. 607 + SMI 2026 (RD 126/2026) — ver data/fiscal/smi.ts
+ * Verificado: 2026-06-11
  *
  * Encadenable con: calcular_sueldo_neto, calcular_finiquito
  */
 
+import { SMI_2026 } from '@/data/fiscal/smi';
+
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
-const SMI_MENSUAL_14_PAGAS_2025 = 1184;   // €/mes (14 pagas, oficial)
-const SMI_MENSUAL_12_PAGAS_2025 = 1381.33; // €/mes (equivalente 12 pagas)
+const SMI_MENSUAL_14_PAGAS = SMI_2026.mensual14; // 1.221 €/mes (14 pagas, RD 126/2026)
+const SMI_MENSUAL_12_PAGAS = SMI_2026.mensual12; // 1.424,50 €/mes (equivalente 12 pagas)
 
 // Tramos del art. 607.2 LEC: [límite superior en múltiplos de SMI, tipo %]
 const TRAMOS_EMBARGO: Array<{ hastaSMI: number; tipo: number }> = [
@@ -58,7 +60,7 @@ export interface ParametrosEmbargoSalario {
   /** Salario neto mensual del deudor (€). Base para el cálculo del embargo. */
   salarioNetoMensual: number;
   /**
-   * ¿Usar SMI en 12 pagas (1.381,33 €) o 14 pagas (1.184 €)?
+   * ¿Usar SMI en 12 pagas (1.424,50 €) o 14 pagas (1.221 €)?
    * Por defecto 14 pagas (official LEC). Si el salario se cobra en 12 pagas, usar 12.
    */
   pagas?: 12 | 14;
@@ -107,7 +109,7 @@ export function calcularEmbargoSalario(p: ParametrosEmbargoSalario): ResultadoEm
 
   const r = (n: number) => Math.round(n * 100) / 100;
 
-  const smiMensual = p.pagas === 12 ? SMI_MENSUAL_12_PAGAS_2025 : SMI_MENSUAL_14_PAGAS_2025;
+  const smiMensual = p.pagas === 12 ? SMI_MENSUAL_12_PAGAS : SMI_MENSUAL_14_PAGAS;
 
   if (p.salarioNetoMensual <= smiMensual) {
     return {
@@ -126,7 +128,7 @@ export function calcularEmbargoSalario(p: ParametrosEmbargoSalario): ResultadoEm
         `El salario neto (${r(p.salarioNetoMensual).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) es igual o inferior al SMI (${smiMensual.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) y NO es embargable (art. 607.1 LEC).`,
         'Solo son embargables los salarios que superen el SMI. El exceso tributa según la escala del art. 607.2 LEC.',
       ],
-      fuenteDatos: 'LEC art. 607 — vigente 2025',
+      fuenteDatos: 'LEC art. 607 + SMI 2026 (RD 126/2026) — vigente 2026',
     };
   }
 
@@ -196,6 +198,6 @@ export function calcularEmbargoSalario(p: ParametrosEmbargoSalario): ResultadoEm
     pctEfectivoEmbargado,
     esEmbargable: true,
     advertencias,
-    fuenteDatos: 'LEC art. 607 + SMI 2025 (RD 145/2025) — vigente 2025',
+    fuenteDatos: 'LEC art. 607 + SMI 2026 (RD 126/2026) — vigente 2026',
   };
 }

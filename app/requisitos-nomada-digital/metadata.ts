@@ -60,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Cuál es el ingreso mínimo para obtener la visa nómada digital en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El requisito económico mínimo es acreditar ingresos de al menos el 200 % del Salario Mínimo Interprofesional (SMI) vigente en España. En 2025, con un SMI de 1.184 € mensuales, el umbral se sitúa en aproximadamente 2.368 € netos al mes. Por cada miembro de la unidad familiar se añade un 75 % adicional del SMI. Este importe debe acreditarse con documentación oficial como contratos, nóminas o declaraciones fiscales.',
+        text: 'El requisito económico mínimo es acreditar ingresos de al menos el 200 % del Salario Mínimo Interprofesional (SMI) vigente en España. En 2026, con un SMI de 1.221 € mensuales, el umbral se sitúa en aproximadamente 2.442 € netos al mes. Por cada miembro de la unidad familiar se añade un 75 % adicional del SMI. Este importe debe acreditarse con documentación oficial como contratos, nóminas o declaraciones fiscales.',
       },
     },
     {

@@ -7,25 +7,27 @@
  *
  * Fuente: Ley 28/2022 de Fomento del Ecosistema de Empresas Emergentes (Ley de Startups)
  *         + Real Decreto 1008/2023 (Reglamento de desarrollo)
- * Verificado: 2026-03-18
+ * Verificado: 2026-06-11
  * URL oficial: https://www.inclusion.gob.es/web/migraciones/nomadas-digitales
  */
+
+import { SMI_2026 } from './smi';
 
 export const NOMADA_DIGITAL_META = {
   fuente: 'Ley 28/2022 de Startups + RD 1008/2023',
   descripcion: 'Visa Nómada Digital y Autorización de Residencia para Teletrabajo Internacional',
-  verificado: '2026-03-18',
-  vigencia: '2025-2026',
+  verificado: '2026-06-11',
+  vigencia: '2026',
   urlOficial: 'https://www.inclusion.gob.es/web/migraciones/nomadas-digitales',
-  nota: 'SMI de referencia: RD 145/2024 (1.323 €/mes). Pendiente nuevo RD para 2026.',
+  nota: 'SMI de referencia: RD 126/2026 (1.221 €/mes, 14 pagas) — ver data/fiscal/smi.ts',
 };
 
-// SMI mensual de referencia (RD 145/2024 — 14 pagas, 15.876 €/año)
-export const SMI_MENSUAL_NOMADA = 1323; // €/mes
+// SMI mensual de referencia (RD 126/2026 — 14 pagas, 17.094 €/año)
+export const SMI_MENSUAL_NOMADA = SMI_2026.mensual14; // 1.221 €/mes
 
 // Ingresos mínimos requeridos
-export const MINIMO_INGRESOS_TITULAR_NOMADA = SMI_MENSUAL_NOMADA * 2; // 200% SMI = 2.646 €/mes
-export const MINIMO_INGRESOS_DEPENDIENTE_NOMADA = Math.round(SMI_MENSUAL_NOMADA * 0.75); // 75% SMI = 992 €/mes
+export const MINIMO_INGRESOS_TITULAR_NOMADA = SMI_MENSUAL_NOMADA * 2; // 200% SMI = 2.442 €/mes
+export const MINIMO_INGRESOS_DEPENDIENTE_NOMADA = Math.round(SMI_MENSUAL_NOMADA * 0.75); // 75% SMI = 916 €/mes
 
 // Duración de las autorizaciones
 export const DURACION_VISADO_MESES = 12; // Visado nómada: 1 año

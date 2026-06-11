@@ -18,6 +18,7 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   MINIMO_INGRESOS_TITULAR_NOMADA,
   MINIMO_INGRESOS_DEPENDIENTE_NOMADA,
+  SMI_MENSUAL_NOMADA,
   NOMADA_DIGITAL_META,
 } from '@/data/fiscal';
 
@@ -119,13 +120,13 @@ const DOCUMENTOS_EMPLEADO = [
   'Contrato de trabajo con empresa extranjera (traducido y apostillado)',
   'Carta del empleador confirmando modalidad 100% remota y antigüedad ≥ 3 meses',
   'Documentación acreditativa de la empresa (registro mercantil, actividad, sede)',
-  'Últimas 3 nóminas que acrediten ingresos ≥ 200% SMI (2.646 €/mes)',
+  `Últimas 3 nóminas que acrediten ingresos ≥ 200% SMI (${MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes)`,
 ];
 
 const DOCUMENTOS_FREELANCER = [
   'Contratos o acuerdos con clientes extranjeros (últimos 12 meses)',
   'Últimas facturas emitidas a clientes fuera de España',
-  'Declaraciones fiscales que acrediten ingresos ≥ 200% SMI (2.646 €/mes)',
+  `Declaraciones fiscales que acrediten ingresos ≥ 200% SMI (${MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes)`,
   'Documentación que acredite al menos 1 año de experiencia profesional',
   'Relación de clientes con indicación de su país (para demostrar mayoría extranjera)',
 ];
@@ -251,7 +252,7 @@ export default function RequisitosNomadaDigitalPage() {
                 value={ingresos}
                 onChange={setIngresos}
                 label="Ingresos mensuales netos"
-                placeholder="2646"
+                placeholder="2442"
                 helperText={`Mínimo requerido: ${formatCurrency(minimoRequerido)}/mes`}
                 min={0}
               />
@@ -498,7 +499,7 @@ export default function RequisitosNomadaDigitalPage() {
               <h3>Desarrollador de software</h3>
               <p>
                 Trabaja para una startup norteamericana en remoto. Quiere vivir en España disfrutando
-                del clima y la calidad de vida. Si lleva ≥3 meses en la empresa y gana ≥2.646 €/mes,
+                del clima y la calidad de vida. Si lleva ≥3 meses en la empresa y gana ≥{MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes,
                 puede solicitar el visado en el consulado.
               </p>
             </div>
@@ -507,7 +508,7 @@ export default function RequisitosNomadaDigitalPage() {
               <h3>Diseñadora freelancer</h3>
               <p>
                 Diseñadora gráfica con clientes en Reino Unido, Alemania y Estados Unidos. Factura
-                ≥2.646 €/mes. Solicita la Autorización de Residencia estando ya en España con visa
+                ≥{MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes. Solicita la Autorización de Residencia estando ya en España con visa
                 de turista.
               </p>
             </div>
@@ -556,7 +557,7 @@ export default function RequisitosNomadaDigitalPage() {
               <p>
                 Sí. El cónyuge o pareja de hecho y los hijos menores a cargo pueden obtener autorización
                 de residencia vinculada. Por cada familiar dependiente, los ingresos mínimos se incrementan
-                en un 75% del SMI (≈992 €/mes por persona).
+                en un 75% del SMI (≈{MINIMO_INGRESOS_DEPENDIENTE_NOMADA.toLocaleString('es-ES')} €/mes por persona).
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -595,7 +596,7 @@ export default function RequisitosNomadaDigitalPage() {
               <h3>¿Qué es el SMI y por qué se usa como referencia?</h3>
               <p>
                 El Salario Mínimo Interprofesional (SMI) es el salario mínimo legalmente establecido en
-                España. En 2025 es de 1.323 €/mes (14 pagas). La Ley de Startups fija el mínimo de
+                España. En 2026 es de {SMI_MENSUAL_NOMADA.toLocaleString('es-ES')} €/mes (14 pagas). La Ley de Startups fija el mínimo de
                 ingresos en 200% del SMI para garantizar la solvencia económica del nómada digital.
               </p>
             </div>

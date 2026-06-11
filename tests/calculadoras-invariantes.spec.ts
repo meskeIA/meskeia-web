@@ -2111,7 +2111,7 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
   });
 
   test('GOLDEN-CC: causante jubilado, pensión 1.800 €, beneficiario 67 años, ingresos < SMI → 60% [SS pendiente verificación]', () => {
-    // BR = pensión del causante = 1.800 €. Edad ≥ 65 e ingresos (500) < SMI (1.323) → 60%.
+    // BR = pensión del causante = 1.800 €. Edad ≥ 65 e ingresos (500) < SMI (1.221) → 60%.
     // Pensión bruta = 1.800 × 60% = 1.080 €. Mínimo (≥ 65) = 853 € → no se aplica.
     // Anual = 1.080 × 14 = 15.120 € → tramo retención 8% (15.000-22.000).
     // Neta = 1.080 × (1 − 0,08) = 993,60 €.
@@ -2131,7 +2131,7 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
   });
 
   test('GOLDEN-CD: causante activo, BC media 1.200 €, 45 años con cargas → 70% pero se aplica el mínimo [SS pendiente verificación]', () => {
-    // BR = (24 × 1.200) / 28 = 1.028,57 €. Cargas + ingresos (500) < límite 70% (992) → 70%.
+    // BR = (24 × 1.200) / 28 = 1.028,57 €. Cargas + ingresos (500) < límite 70% (916) → 70%.
     // Pensión bruta = 1.028,57 × 70% = 720,00 €. Mínimo (< 60 con cargas) = 785 € → SE APLICA (785 > 720).
     // Anual = 785 × 14 = 10.990 € < 15.000 → sin retención.
     const pv = calcularPensionViudedad({
