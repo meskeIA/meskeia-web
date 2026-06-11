@@ -443,7 +443,10 @@ export default function QuizMitosCiencia() {
         )}
       </section>
 
-      <EducationalSection title="¿Por qué los mitos científicos son tan difíciles de erradicar?">
+      <EducationalSection
+        title="¿Por qué los mitos científicos son tan difíciles de erradicar?"
+        subtitle="Sesgos cognitivos, pensamiento crítico y cómo verificar afirmaciones científicas"
+      >
         <p>
           Los mitos científicos persisten porque suelen contener un grano de verdad distorsionado,
           son fáciles de recordar y se transmiten de generación en generación antes de que la ciencia

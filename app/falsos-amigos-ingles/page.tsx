@@ -428,7 +428,10 @@ export default function FalsosAmigosIngles() {
         )}
       </div>
 
-      <EducationalSection title="Por qué los falsos amigos son la trampa más frecuente del inglés">
+      <EducationalSection
+        title="Por qué los falsos amigos son la trampa más frecuente del inglés"
+        subtitle="Cómo identificarlos, ejemplos habituales y estrategias para no caer en ellos"
+      >
         <p>
           Los falsos amigos (<em>false friends</em> o <em>faux amis</em>) son palabras que se parecen
           en forma pero difieren en significado entre dos lenguas. Para hispanohablantes que aprenden inglés,

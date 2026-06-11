@@ -291,7 +291,10 @@ export default function OrientadorAyudaViviendaRural() {
         </div>
       </section>
 
-      <EducationalSection title="Ayudas a la primera vivienda rural: contexto y claves del Plan 2026-2030">
+      <EducationalSection
+        title="Ayudas a la primera vivienda rural: contexto y claves del Plan 2026-2030"
+        subtitle="Qué cubre el plan, requisitos habituales y cómo solicitarlo"
+      >
         <p>
           El Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026, de 22 de abril) introduce por primera vez
           una línea de ayudas específica para la compra o autoconstrucción de primera vivienda en municipios pequeños.
