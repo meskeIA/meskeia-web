@@ -796,7 +796,7 @@ export default function DashboardAnalyticsPage() {
                   {(() => {
                     const canales = tendenciasQuery.data!.canales;
                     const total = Object.values(canales).reduce((a, b) => a + b, 0);
-                    const items = [
+                    const items: { key: keyof typeof canales; label: string; icon: string }[] = [
                       { key: 'web', label: 'Orgánico / Directo', icon: '🌐' },
                       { key: 'ia', label: 'IAs (ChatGPT, Copilot…)', icon: '🤖' },
                       { key: 'social', label: 'Redes sociales (X, etc.)', icon: '📱' },

@@ -543,6 +543,7 @@ export const analyticsRouter = router({
       }
       paisesSql += ' GROUP BY 1 ORDER BY total DESC LIMIT 20';
       const paisesResult = await client.execute({ sql: paisesSql, args: paisesArgs });
+      const paises = paisesResult.rows.map(r => ({ pais: String(r.pais), total: Number(r.total) }));
 
       let ciudadesSql = `
         SELECT ciudad, COUNT(*) as total
@@ -556,6 +557,7 @@ export const analyticsRouter = router({
       }
       ciudadesSql += ' GROUP BY ciudad ORDER BY total DESC LIMIT 10';
       const ciudadesResult = await client.execute({ sql: ciudadesSql, args: ciudadesArgs });
+      const ciudades = ciudadesResult.rows.map(r => ({ ciudad: String(r.ciudad), total: Number(r.total) }));
 
       // Comparativa temporal
       const formatoEspanol = (fecha: Date): string => {
@@ -711,8 +713,8 @@ export const analyticsRouter = router({
           },
           por_compartir: totalPorCompartir,
           geografia: {
-            paises: paisesResult.rows,
-            ciudades: ciudadesResult.rows,
+            paises,
+            ciudades,
           },
         },
         comparativa,
@@ -1288,7 +1290,7 @@ export const analyticsRouter = router({
       const mesExpr = `substr(fecha_ord,1,4)||'-'||substr(fecha_ord,5,2)`;
       const U2_SQL = `('web','chatgpt','copilot','otras-ia','pwa','redes')`;
       const LATAM = new Set(['MX', 'CO', 'AR', 'BO', 'EC', 'PE', 'CL', 'CR', 'VE', 'UY', 'PY', 'GT', 'HN', 'SV', 'NI', 'DO', 'CU', 'PA', 'PR']);
-      const canalDe = (o: string) => o === 'web' ? 'web' : o === 'redes' ? 'social' : o === 'pwa' ? 'pwa' : 'ia';
+      const canalDe = (o: string): CanalKey => o === 'web' ? 'web' : o === 'redes' ? 'social' : o === 'pwa' ? 'pwa' : 'ia';
 
       const [origenRes, sesRes, paisRes, vivoRes] = await Promise.all([
         client.execute(`SELECT ${mesExpr} mes, origen, SUM(usos) v FROM rollup_dia_origen WHERE substr(fecha_ord,1,4)='${anio}' AND origen IN ${U2_SQL} GROUP BY mes, origen`),
@@ -1298,7 +1300,8 @@ export const analyticsRouter = router({
       ]);
       const vivo = agregarRegistros(vivoRes.rows, ipConfigurada);
 
-      type MesAcc = { visitas: number; sesiones: number; paises: Set<string>; canales: Record<string, number>; latamTotal: number; latamN: number };
+      type CanalKey = 'web' | 'ia' | 'social' | 'pwa';
+      type MesAcc = { visitas: number; sesiones: number; paises: Set<string>; canales: Record<CanalKey, number>; latamTotal: number; latamN: number };
       const meses = new Map<string, MesAcc>();
       const getMes = (m: string): MesAcc => {
         let x = meses.get(m);
