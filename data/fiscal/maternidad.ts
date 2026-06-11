@@ -6,54 +6,70 @@
  * se actualizan anualmente vía LPGE o modificaciones del Estatuto
  * de los Trabajadores / LGSS.
  *
- * Fuente: RDL 6/2019 (permiso nacimiento igualitario) + LGSS (RDL 8/2015)
- *         Ley 35/2006 IRPF art. 81 (deducción maternidad)
- *         LPGE 2025 (bases cotización, IPREM)
- * Verificado: 2026-03-31
+ * Fuente: RDL 6/2019 (equiparación permisos 2021) + RDL 9/2025 (ampliación
+ *         a 19/32 semanas, en vigor 31-jul-2025, BOE-A-2025-15741) + LGSS
+ *         (RDL 8/2015) + Ley 35/2006 IRPF art. 81 (deducción maternidad)
+ *         + LPGE 2025 (bases cotización, IPREM)
+ * Verificado: 2026-06-11
  * URL oficial SS: https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938
  */
 
 // ─── Metadatos del módulo ────────────────────────────────────────────────────
 
 export const FISCAL_MATERNIDAD_META = {
-  fuente: 'RDL 6/2019 + LGSS (RDL 8/2015) + Ley 35/2006 IRPF art. 81 + LPGE 2025',
-  verificado: '2026-03-31',
+  fuente: 'RDL 6/2019 + RDL 9/2025 (BOE-A-2025-15741) + LGSS (RDL 8/2015) + Ley 35/2006 IRPF art. 81 + LPGE 2025',
+  verificado: '2026-06-11',
   vigencia: '2025-2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938',
   nota: 'Las cuantías dependen de la base reguladora individual. Los datos son orientativos y reflejan el marco general. Consultar con la Seguridad Social para el cálculo exacto.',
 };
 
-// ─── Permiso por nacimiento y cuidado del menor (RDL 6/2019) ─────────────────
-// Desde 2021: 16 semanas para AMBOS progenitores (igualitario)
+// ─── Permiso por nacimiento y cuidado del menor (RDL 9/2025) ─────────────────
+// En vigor desde el 31-jul-2025 (BOE-A-2025-15741): 19 semanas por progenitor
+// en familias biparentales, 32 semanas en familias monoparentales
 
 export interface PermisoNacimiento {
-  progenitor: 'biologico' | 'otro';
+  tipoFamilia: 'biparental' | 'monoparental';
+  /** Semanas totales por progenitor (biparental) o para el único progenitor (monoparental) */
   semanasTotal: number;
+  /** Primeras semanas, ininterrumpidas tras el nacimiento */
   semanasObligatorias: number;
+  /** Semanas de disfrute flexible hasta que el menor cumpla 12 meses */
+  semanasFlexiblesHasta12Meses: number;
+  /** Semanas de cuidado prolongado, distribuibles hasta que el menor cumpla 8 años */
+  semanasCuidadoProlongadoHasta8Anios: number;
+  /** Suma de flexibles + cuidado prolongado (semanas no obligatorias) */
   semanasVoluntarias: number;
   obligatoriasIninterrumpidas: boolean;
   voluntariasHasta: number; // meses desde el nacimiento
-  simultaneoObligatorio: number; // semanas que ambos deben estar a la vez
+  cuidadoProlongadoHastaAnios: number; // años del menor
+  simultaneoObligatorio: number; // semanas que ambos progenitores deben coincidir (0 en monoparental)
 }
 
 export const PERMISO_NACIMIENTO_2025: PermisoNacimiento[] = [
   {
-    progenitor: 'biologico',
-    semanasTotal: 16,
+    tipoFamilia: 'biparental',
+    semanasTotal: 19,
     semanasObligatorias: 6,
-    semanasVoluntarias: 10,
+    semanasFlexiblesHasta12Meses: 11,
+    semanasCuidadoProlongadoHasta8Anios: 2,
+    semanasVoluntarias: 13,
     obligatoriasIninterrumpidas: true,
-    voluntariasHasta: 12, // hasta que el menor cumpla 12 meses
+    voluntariasHasta: 12,
+    cuidadoProlongadoHastaAnios: 8,
     simultaneoObligatorio: 6, // las 6 primeras semanas son simultáneas
   },
   {
-    progenitor: 'otro',
-    semanasTotal: 16,
+    tipoFamilia: 'monoparental',
+    semanasTotal: 32,
     semanasObligatorias: 6,
-    semanasVoluntarias: 10,
+    semanasFlexiblesHasta12Meses: 22,
+    semanasCuidadoProlongadoHasta8Anios: 4,
+    semanasVoluntarias: 26,
     obligatoriasIninterrumpidas: true,
     voluntariasHasta: 12,
-    simultaneoObligatorio: 6,
+    cuidadoProlongadoHastaAnios: 8,
+    simultaneoObligatorio: 0,
   },
 ];
 
@@ -69,9 +85,9 @@ export interface AmpliacionPermiso {
 export const AMPLIACIONES_PERMISO: AmpliacionPermiso[] = [
   {
     motivo: 'Parto múltiple',
-    semanasExtra: 2,
+    semanasExtra: 1,
     porProgenitor: true,
-    nota: 'Por cada hijo/a adicional a partir del segundo',
+    nota: 'Por cada hijo/a adicional a partir del segundo (RDL 9/2025)',
   },
   {
     motivo: 'Discapacidad del hijo/a',

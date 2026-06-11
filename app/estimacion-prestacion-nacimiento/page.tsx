@@ -26,6 +26,7 @@ import { jsonLd } from './metadata';
 // ===== TIPOS =====
 type RangoEdad = 'menor21' | '21a25' | 'mayor26';
 type Situacion = 'nacimiento' | 'adopcion' | 'acogimiento';
+type TipoFamilia = 'biparental' | 'monoparental';
 
 interface ResultadoEstimacion {
   baseReguladoraDiaria: number;
@@ -45,6 +46,7 @@ interface ResultadoEstimacion {
 export default function EstimacionPrestacionNacimiento() {
   const [edad, setEdad] = useState<RangoEdad>('mayor26');
   const [baseCotizacion, setBaseCotizacion] = useState<string>('');
+  const [tipoFamilia, setTipoFamilia] = useState<TipoFamilia>('biparental');
   const [situacion, setSituacion] = useState<Situacion>('nacimiento');
   const [partoMultiple, setPartoMultiple] = useState(false);
   const [numHijos, setNumHijos] = useState<number>(2);
@@ -95,7 +97,7 @@ export default function EstimacionPrestacionNacimiento() {
     const brDiaria = baseAplicable / 30;
     const prestacionDiaria = brDiaria; // 100% de la BR
 
-    const permiso = PERMISO_NACIMIENTO_2025[0];
+    const permiso = PERMISO_NACIMIENTO_2025.find((p) => p.tipoFamilia === tipoFamilia) ?? PERMISO_NACIMIENTO_2025[0];
     let semanasExtra = 0;
     const detalleAmpliaciones: string[] = [];
 
@@ -151,7 +153,7 @@ export default function EstimacionPrestacionNacimiento() {
       detalleAmpliaciones,
       esContributiva: true,
     };
-  }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, situacion]);
+  }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, situacion, tipoFamilia]);
 
   // Requisitos de cotizacion por edad
   const requisitoEdad = useMemo(() => {
@@ -220,6 +222,37 @@ export default function EstimacionPrestacionNacimiento() {
         <h2 className={styles.formTitle}>
           <span aria-hidden="true">📋</span> Datos para la estimacion
         </h2>
+
+        {/* Tipo de familia */}
+        <div className={styles.formGroup}>
+          <span className={styles.formLabel} id="label-tipofamilia">Tipo de familia</span>
+          <div className={styles.radioGroup} role="radiogroup" aria-labelledby="label-tipofamilia">
+            {([
+              { value: 'biparental' as TipoFamilia, label: 'Biparental (2 progenitores)' },
+              { value: 'monoparental' as TipoFamilia, label: 'Monoparental (1 progenitor)' },
+            ]).map((opcion) => (
+              <label
+                key={opcion.value}
+                className={`${styles.radioOption} ${tipoFamilia === opcion.value ? styles.radioOptionSelected : ''}`}
+              >
+                <input
+                  type="radio"
+                  name="tipofamilia"
+                  value={opcion.value}
+                  checked={tipoFamilia === opcion.value}
+                  onChange={() => {
+                    setTipoFamilia(opcion.value);
+                    setMostrarResultados(false);
+                  }}
+                />
+                {opcion.label}
+              </label>
+            ))}
+          </div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.4rem 0 0' }}>
+            Desde el RDL 9/2025 (en vigor desde el 31/07/2025): {tipoFamilia === 'monoparental' ? '32 semanas para el unico progenitor' : '19 semanas por progenitor'}.
+          </p>
+        </div>
 
         {/* Edad */}
         <div className={styles.formGroup}>
@@ -420,7 +453,7 @@ export default function EstimacionPrestacionNacimiento() {
               <span className={styles.breakdownValue}>{resultado.semanasObligatorias} semanas</span>
             </div>
             <div className={styles.breakdownItem}>
-              <span className={styles.breakdownLabel}>Semanas voluntarias (hasta los 12 meses del menor)</span>
+              <span className={styles.breakdownLabel}>Semanas flexibles + cuidado prolongado (hasta los 12 meses / 8 anos del menor)</span>
               <span className={styles.breakdownValue}>{resultado.semanasVoluntarias} semanas</span>
             </div>
             {resultado.detalleAmpliaciones.map((detalle, i) => (
@@ -444,7 +477,11 @@ export default function EstimacionPrestacionNacimiento() {
                 (el tope es la base maxima de cotizacion: {formatCurrency(PRESTACION_NACIMIENTO_2025.basesReferencia.baseMaximaMensual)}/mes).
               </li>
               <li>
-                Ambos progenitores tienen derecho a <strong>16 semanas cada uno</strong> (RDL 6/2019, desde 2021).
+                {tipoFamilia === 'monoparental' ? (
+                  <>En familias monoparentales, el progenitor tiene derecho a <strong>{resultado.semanasBase} semanas</strong> (RDL 9/2025, en vigor desde el 31/07/2025).</>
+                ) : (
+                  <>Cada progenitor tiene derecho, de forma individual e intransferible, a <strong>{resultado.semanasBase} semanas</strong> (RDL 9/2025, en vigor desde el 31/07/2025).</>
+                )}
               </li>
               <li>
                 Esta prestacion esta <strong>exenta de IRPF</strong> y no se incluye en la declaracion de la renta.
@@ -469,13 +506,16 @@ export default function EstimacionPrestacionNacimiento() {
         <section className={styles.eduSection}>
           <h2>Como funciona la prestacion por nacimiento</h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Desde enero de 2021, ambos progenitores tienen derecho a <strong>16 semanas de permiso
-            retribuido</strong> por nacimiento, adopcion o acogimiento (RDL 6/2019). La prestacion
-            economica equivale al <strong>100% de la base reguladora</strong>, que se calcula
-            dividiendo la base de cotizacion del mes anterior al inicio del descanso entre 30.
-            Las 6 primeras semanas son obligatorias e ininterrumpidas tras el parto, y las 10
-            restantes pueden disfrutarse de forma continuada o fraccionada hasta que el menor
-            cumpla 12 meses.
+            Desde la entrada en vigor del RDL 9/2025 (31 de julio de 2025), cada progenitor tiene
+            derecho a <strong>19 semanas de permiso retribuido</strong> por nacimiento, adopcion o
+            acogimiento en familias biparentales (<strong>32 semanas</strong> en familias
+            monoparentales). La prestacion economica equivale al <strong>100% de la base
+            reguladora</strong>, que se calcula dividiendo la base de cotizacion del mes anterior
+            al inicio del descanso entre 30. Las 6 primeras semanas son obligatorias e
+            ininterrumpidas tras el parto. De las semanas restantes, 11 (22 en familias
+            monoparentales) se disfrutan de forma flexible hasta que el menor cumpla 12 meses, y
+            2 (4 en monoparentales) son de cuidado prolongado, distribuibles hasta que el menor
+            cumpla 8 anos.
           </p>
         </section>
 
@@ -504,7 +544,7 @@ export default function EstimacionPrestacionNacimiento() {
                 </tr>
                 <tr>
                   <td><strong>Duracion</strong></td>
-                  <td>16 semanas (112 dias)</td>
+                  <td>19 semanas/progenitor (133 dias); 32 semanas (224 dias) si familia monoparental</td>
                   <td>42 dias (6 semanas)</td>
                 </tr>
                 <tr>
@@ -544,10 +584,11 @@ export default function EstimacionPrestacionNacimiento() {
               <p>
                 Laura, 32 anos, base de cotizacion de {formatCurrency(2200)}/mes. Su base reguladora
                 diaria es {formatCurrency(2200 / 30)}. Cobra el 100%: {formatCurrency(2200 / 30)}/dia
-                durante 16 semanas (112 dias). Total estimado: {formatCurrency((2200 / 30) * 112)}.
+                durante 19 semanas (133 dias), su parte individual del permiso biparental.
+                Total estimado: {formatCurrency((2200 / 30) * 133)}.
               </p>
               <div className={styles.escenarioResultado}>
-                16 semanas al 100% de la BR, exentas de IRPF
+                19 semanas al 100% de la BR, exentas de IRPF (32 si familia monoparental)
               </div>
             </div>
             <div className={styles.escenarioCard}>
@@ -557,11 +598,11 @@ export default function EstimacionPrestacionNacimiento() {
               </div>
               <p>
                 Carlos, 28 anos, base de {formatCurrency(1800)}/mes. Al ser parto de gemelos,
-                obtiene +2 semanas adicionales (1 hijo extra). Total: 18 semanas (126 dias).
-                Prestacion diaria: {formatCurrency(1800 / 30)}. Total: {formatCurrency((1800 / 30) * 126)}.
+                obtiene +1 semana adicional (1 hijo extra, RDL 9/2025). Total: 20 semanas (140 dias).
+                Prestacion diaria: {formatCurrency(1800 / 30)}. Total: {formatCurrency((1800 / 30) * 140)}.
               </p>
               <div className={styles.escenarioResultado}>
-                18 semanas = 16 base + 2 por parto multiple
+                20 semanas = 19 base + 1 por parto multiple
               </div>
             </div>
             <div className={styles.escenarioCard}>
@@ -570,12 +611,13 @@ export default function EstimacionPrestacionNacimiento() {
                 <span className={styles.escenarioTag}>Adopcion internacional</span>
               </div>
               <p>
-                Ana y Pedro adoptan en Colombia. Cada uno tiene 16 semanas de permiso.
-                Ademas, pueden solicitar hasta 2 semanas adicionales por desplazamiento
-                al pais de origen. La prestacion se calcula igual: 100% de la base reguladora.
+                Ana y Pedro adoptan en Colombia. Cada uno tiene 19 semanas de permiso (32 si fuera
+                familia monoparental). Ademas, pueden solicitar hasta 2 semanas adicionales por
+                desplazamiento al pais de origen. La prestacion se calcula igual: 100% de la base
+                reguladora.
               </p>
               <div className={styles.escenarioResultado}>
-                Hasta 18 semanas si hay desplazamiento internacional
+                Hasta 21 semanas si hay desplazamiento internacional (34 si monoparental)
               </div>
             </div>
             <div className={styles.escenarioCard}>
@@ -585,11 +627,12 @@ export default function EstimacionPrestacionNacimiento() {
               </div>
               <p>
                 Maria, 35 anos. Su hijo nace prematuro y permanece 45 dias hospitalizado.
-                A las 16 semanas base se anaden hasta 13 semanas mas (segun los dias reales
-                de hospitalizacion tras el parto). La prestacion no se interrumpe.
+                A las 19 semanas base (32 si familia monoparental) se anaden hasta 13 semanas mas
+                (segun los dias reales de hospitalizacion tras el parto). La prestacion no se
+                interrumpe.
               </p>
               <div className={styles.escenarioResultado}>
-                Hasta 29 semanas si hay hospitalizacion neonatal prolongada
+                Hasta 32 semanas si hay hospitalizacion neonatal prolongada (45 si monoparental)
               </div>
             </div>
           </div>
@@ -612,17 +655,21 @@ export default function EstimacionPrestacionNacimiento() {
             <div className={styles.faqItem}>
               <h4>Pueden ambos progenitores cobrar la prestacion a la vez?</h4>
               <p>
-                Si. Desde 2021, cada progenitor tiene derecho <strong>individual e intransferible</strong> a
-                16 semanas. Las 6 primeras semanas son obligatorias y simultaneas (ambos de baja
-                a la vez). Las 10 restantes son voluntarias y pueden disfrutarse en momentos
-                diferentes. Esto permite que la familia tenga cobertura durante mas tiempo.
+                Si. Desde el RDL 9/2025 (en vigor 31-jul-2025), cada progenitor tiene derecho{' '}
+                <strong>individual e intransferible</strong> a 19 semanas (32 si la familia es
+                monoparental). Las 6 primeras semanas son obligatorias y simultaneas (ambos de
+                baja a la vez). De las restantes, 11 semanas (22 en monoparental) son flexibles
+                hasta que el menor cumple 12 meses, y 2 semanas (4 en monoparental) son de cuidado
+                prolongado, distribuibles hasta que el menor cumple 8 anos. Esto permite que la
+                familia tenga cobertura durante mas tiempo.
               </p>
             </div>
             <div className={styles.faqItem}>
               <h4>Que pasa si soy autonomo?</h4>
               <p>
-                Los trabajadores autonomos tienen exactamente el mismo derecho: 16 semanas al
-                100% de la base reguladora. La diferencia es que la base de cotizacion depende
+                Los trabajadores autonomos tienen exactamente el mismo derecho: 19 semanas (32 en
+                familias monoparentales) al 100% de la base reguladora. La diferencia es que la
+                base de cotizacion depende
                 de la cuota que pagues al RETA. Si cotizas por la base minima, tu prestacion
                 sera menor que la de un asalariado con sueldo alto. Se solicita igualmente al INSS.
               </p>
@@ -637,12 +684,15 @@ export default function EstimacionPrestacionNacimiento() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>Puedo fraccionar las semanas voluntarias?</h4>
+              <h4>Puedo fraccionar las semanas flexibles?</h4>
               <p>
-                Si. Las 10 semanas voluntarias pueden disfrutarse de forma continua o en periodos
-                semanales (semanas completas), de forma acumulada o interrumpida, hasta que el
-                menor cumpla 12 meses. Necesitas acuerdo con la empresa y preaviso de 15 dias.
-                Tambien es posible disfrutarlas a jornada completa o parcial (minimo 50%).
+                Si. De las semanas no obligatorias, 11 (22 en familias monoparentales) son
+                flexibles y pueden disfrutarse de forma continua o en periodos semanales (semanas
+                completas), de forma acumulada o interrumpida, hasta que el menor cumpla 12
+                meses. Las 2 restantes (4 en monoparental) son de cuidado prolongado y se pueden
+                distribuir hasta que el menor cumpla 8 anos. Necesitas acuerdo con la empresa y
+                preaviso de 15 dias. Tambien es posible disfrutarlas a jornada completa o parcial
+                (minimo 50%).
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -710,11 +760,13 @@ export default function EstimacionPrestacionNacimiento() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
-                <strong>Gestiona las semanas voluntarias</strong>
+                <strong>Gestiona las semanas flexibles y de cuidado prolongado</strong>
                 <p>
-                  Una vez completadas las 6 semanas obligatorias, puedes distribuir las 10
-                  voluntarias a tu conveniencia (siempre antes de los 12 meses del menor).
-                  Cada periodo requiere solicitud adicional al INSS y preaviso a la empresa.
+                  Una vez completadas las 6 semanas obligatorias, puedes distribuir las 11
+                  semanas flexibles (22 en familias monoparentales) antes de que el menor cumpla
+                  12 meses, y las 2 semanas de cuidado prolongado (4 en monoparental) hasta que
+                  cumpla 8 anos. Cada periodo requiere solicitud adicional al INSS y preaviso a
+                  la empresa.
                 </p>
               </div>
             </li>
@@ -753,8 +805,9 @@ export default function EstimacionPrestacionNacimiento() {
               <span className={styles.tipIcon}>🤝</span>
               <strong>Coordina con tu pareja</strong>
               <p>
-                Las 6 semanas obligatorias son simultaneas. Planificad las 10 voluntarias
-                para maximizar el tiempo con el bebe.
+                Las 6 semanas obligatorias son simultaneas. Planificad el resto (semanas
+                flexibles hasta los 12 meses y de cuidado prolongado hasta los 8 anos) para
+                maximizar el tiempo con el bebe.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -794,9 +847,9 @@ export default function EstimacionPrestacionNacimiento() {
               no desde el parto. Retrasar la solicitud supone perder dias de cobro.
             </li>
             <li>
-              <strong>Creer que el permiso es transferible:</strong> desde 2021, las 16
-              semanas son individuales e intransferibles. Un progenitor no puede ceder
-              sus semanas al otro.
+              <strong>Creer que el permiso es transferible:</strong> desde el RDL 9/2025
+              (31-jul-2025), las 19 semanas (32 en familias monoparentales) son individuales
+              e intransferibles. Un progenitor no puede ceder sus semanas al otro.
             </li>
             <li>
               <strong>No pedir el informe de maternidad:</strong> es un documento que

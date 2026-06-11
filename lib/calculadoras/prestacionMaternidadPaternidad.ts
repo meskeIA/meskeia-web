@@ -54,20 +54,26 @@
  * Encadenable con: calcular_sueldo_neto, calcular_baja_medica, calcular_complemento_it_empresa
  */
 
+import { PERMISO_NACIMIENTO_2025, AMPLIACIONES_PERMISO, PRESTACION_NACIMIENTO_2025 } from '@/data/fiscal';
+
 // ─── Constantes ─────────────────────────────────────────────────────────────
+// Fuente única: data/fiscal/maternidad.ts (RDL 9/2025)
+
+const PERMISO_BIPARENTAL = PERMISO_NACIMIENTO_2025.find((p) => p.tipoFamilia === 'biparental')!;
+const PERMISO_MONOPARENTAL = PERMISO_NACIMIENTO_2025.find((p) => p.tipoFamilia === 'monoparental')!;
 
 const DIAS_SEMANA = 7;
-const SEMANAS_BASE_BIPARENTAL = 19;
-const SEMANAS_BASE_MONOPARENTAL = 32;
-const SEMANAS_OBLIGATORIAS = 6; // primeras 6 semanas, ininterrumpidas
+const SEMANAS_BASE_BIPARENTAL = PERMISO_BIPARENTAL.semanasTotal;
+const SEMANAS_BASE_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasTotal;
+const SEMANAS_OBLIGATORIAS = PERMISO_BIPARENTAL.semanasObligatorias; // primeras 6 semanas, ininterrumpidas
 const DIAS_OBLIGATORIOS = SEMANAS_OBLIGATORIAS * DIAS_SEMANA; // 42 días
-const SEMANAS_FLEXIBLES_HASTA_12_MESES_BIPARENTAL = 11;
-const SEMANAS_FLEXIBLES_HASTA_12_MESES_MONOPARENTAL = 22;
-const SEMANAS_CUIDADO_PROLONGADO_BIPARENTAL = 2; // distribuibles hasta los 8 años
-const SEMANAS_CUIDADO_PROLONGADO_MONOPARENTAL = 4;
-const SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO = 1; // por cada hijo a partir del segundo
-const SEMANAS_ADICIONAL_DISCAPACIDAD = 2; // fijo, para cada progenitor
-const BASE_MAXIMA_MENSUAL_2025 = 4909.50; // €/mes
+const SEMANAS_FLEXIBLES_HASTA_12_MESES_BIPARENTAL = PERMISO_BIPARENTAL.semanasFlexiblesHasta12Meses;
+const SEMANAS_FLEXIBLES_HASTA_12_MESES_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasFlexiblesHasta12Meses;
+const SEMANAS_CUIDADO_PROLONGADO_BIPARENTAL = PERMISO_BIPARENTAL.semanasCuidadoProlongadoHasta8Anios; // distribuibles hasta los 8 años
+const SEMANAS_CUIDADO_PROLONGADO_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasCuidadoProlongadoHasta8Anios;
+const SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Parto múltiple')!.semanasExtra; // por cada hijo a partir del segundo
+const SEMANAS_ADICIONAL_DISCAPACIDAD = AMPLIACIONES_PERMISO.find((a) => a.motivo === 'Discapacidad del hijo/a')!.semanasExtra; // fijo, para cada progenitor
+const BASE_MAXIMA_MENSUAL_2025 = PRESTACION_NACIMIENTO_2025.basesReferencia.baseMaximaMensual; // €/mes
 const BASE_MAXIMA_DIARIA_2025 = BASE_MAXIMA_MENSUAL_2025 / 30;
 
 // ─── Tipos públicos ───────────────────────────────────────────────────────────

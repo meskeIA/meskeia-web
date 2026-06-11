@@ -22,7 +22,7 @@ import { jsonLd } from './metadata';
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
-type TipoProgenitor = 'biologico' | 'otro';
+type TipoFamilia = 'biparental' | 'monoparental';
 type Situacion = 'nacimiento' | 'adopcion' | 'acogimiento';
 
 interface ResultadoBaja {
@@ -67,7 +67,7 @@ function formatFecha(date: Date): string {
 // ── Componente ───────────────────────────────────────────────────────────────
 
 export default function EstimacionBajaMaternalPage() {
-  const [progenitor, setProgenitor] = useState<TipoProgenitor>('biologico');
+  const [tipoFamilia, setTipoFamilia] = useState<TipoFamilia>('biparental');
   const [situacion, setSituacion] = useState<Situacion>('nacimiento');
   const [partoMultiple, setPartoMultiple] = useState(false);
   const [numBebes, setNumBebes] = useState(2);
@@ -78,9 +78,9 @@ export default function EstimacionBajaMaternalPage() {
   const [resultado, setResultado] = useState<ResultadoBaja | null>(null);
 
   const calcular = useCallback(() => {
-    // Buscar datos base del progenitor
+    // Buscar datos base segun el tipo de familia (RDL 9/2025)
     const datosBase = PERMISO_NACIMIENTO_2025.find(
-      (p) => p.progenitor === progenitor
+      (p) => p.tipoFamilia === tipoFamilia
     ) ?? PERMISO_NACIMIENTO_2025[0];
 
     const semanasObligatorias = datosBase.semanasObligatorias;
@@ -118,8 +118,8 @@ export default function EstimacionBajaMaternalPage() {
       );
     }
 
-    // Adopcion internacional: +2 semanas
-    if ((situacion === 'adopcion' || situacion === 'acogimiento') && progenitor === 'otro') {
+    // Adopcion/acogimiento internacional: +2 semanas (beneficio familiar, RDL 9/2025)
+    if (situacion === 'adopcion' || situacion === 'acogimiento') {
       semanasExtras += AMPLIACIONES_PERMISO[3].semanasExtra;
       detalleExtras.push(
         `${situacion === 'adopcion' ? 'Adopcion' : 'Acogimiento'} (desplazamiento): +${AMPLIACIONES_PERMISO[3].semanasExtra} semanas`
@@ -152,10 +152,10 @@ export default function EstimacionBajaMaternalPage() {
       fechaFinTotal,
       fechaLimiteVoluntarias,
     });
-  }, [progenitor, situacion, partoMultiple, numBebes, discapacidad, hospitalizacion, diasHospitalizacion, fechaParto]);
+  }, [tipoFamilia, situacion, partoMultiple, numBebes, discapacidad, hospitalizacion, diasHospitalizacion, fechaParto]);
 
   const limpiar = useCallback(() => {
-    setProgenitor('biologico');
+    setTipoFamilia('biparental');
     setSituacion('nacimiento');
     setPartoMultiple(false);
     setNumBebes(2);
@@ -215,27 +215,32 @@ export default function EstimacionBajaMaternalPage() {
             <span aria-hidden="true">📋</span> Datos del permiso
           </h2>
 
-          {/* Tipo de progenitor */}
+          {/* Tipo de familia */}
           <fieldset className={styles.formGroup}>
-            <legend className={styles.label}>Que progenitor eres?</legend>
+            <legend className={styles.label}>Tipo de familia</legend>
             <div className={styles.radioGroup}>
               {([
-                { value: 'biologico' as const, label: 'Progenitor biologico (madre gestante)' },
-                { value: 'otro' as const, label: 'Otro progenitor (padre, madre no gestante, coadoptante)' },
+                { value: 'biparental' as const, label: 'Biparental (2 progenitores): 19 semanas por progenitor' },
+                { value: 'monoparental' as const, label: 'Monoparental (1 progenitor): 32 semanas' },
               ]).map((opt) => (
                 <label key={opt.value} className={styles.radioLabel}>
                   <input
                     type="radio"
-                    name="progenitor"
+                    name="tipoFamilia"
                     value={opt.value}
-                    checked={progenitor === opt.value}
-                    onChange={() => setProgenitor(opt.value)}
+                    checked={tipoFamilia === opt.value}
+                    onChange={() => setTipoFamilia(opt.value)}
                     className={styles.radioInput}
                   />
                   <span className={styles.radioText}>{opt.label}</span>
                 </label>
               ))}
             </div>
+            <p className={styles.helpText}>
+              Desde el RDL 9/2025 (en vigor 31-jul-2025), el permiso se calcula segun el tipo de
+              familia: 19 semanas por progenitor en familias biparentales, o 32 semanas en
+              familias monoparentales.
+            </p>
           </fieldset>
 
           {/* Situacion */}
@@ -415,7 +420,7 @@ export default function EstimacionBajaMaternalPage() {
                       <td>{resultado.semanasObligatorias}</td>
                     </tr>
                     <tr>
-                      <td>Voluntarias (distribuibles hasta los 12 meses)</td>
+                      <td>Flexibles + cuidado prolongado (hasta los 12 meses / 8 anos)</td>
                       <td>{resultado.semanasVoluntarias}</td>
                     </tr>
                     {resultado.semanasExtras > 0 && (
@@ -443,7 +448,7 @@ export default function EstimacionBajaMaternalPage() {
               <h3 className={styles.timelineTitle}>
                 <span aria-hidden="true">📊</span> Timeline visual
               </h3>
-              <div className={styles.timeline} role="img" aria-label={`Timeline del permiso: ${resultado.semanasObligatorias} semanas obligatorias, ${resultado.semanasVoluntarias} voluntarias${resultado.semanasExtras > 0 ? `, ${resultado.semanasExtras} extras` : ''}`}>
+              <div className={styles.timeline} role="img" aria-label={`Timeline del permiso: ${resultado.semanasObligatorias} semanas obligatorias, ${resultado.semanasVoluntarias} flexibles/cuidado prolongado${resultado.semanasExtras > 0 ? `, ${resultado.semanasExtras} extras` : ''}`}>
                 <div className={styles.timelineBar}>
                   <div
                     className={styles.timelineObligatorias}
@@ -479,7 +484,7 @@ export default function EstimacionBajaMaternalPage() {
                   </span>
                   <span className={styles.legendItem}>
                     <span className={styles.legendDotVol} aria-hidden="true" />
-                    Voluntarias (sem. 7-16)
+                    Flexibles + cuidado prolongado
                   </span>
                   {resultado.semanasExtras > 0 && (
                     <span className={styles.legendItem}>
@@ -525,9 +530,10 @@ export default function EstimacionBajaMaternalPage() {
               <div className={styles.resultNote} role="note">
                 <span aria-hidden="true">💡</span>
                 <p>
-                  Las {resultado.semanasVoluntarias} semanas voluntarias se pueden tomar en periodos semanales
-                  (no necesariamente consecutivos) hasta que el menor cumpla 12 meses.
-                  Requieren preaviso de 15 dias a la empresa.
+                  De las {resultado.semanasVoluntarias} semanas restantes, la mayoria son flexibles
+                  y se pueden tomar en periodos semanales (no necesariamente consecutivos) hasta que
+                  el menor cumpla 12 meses; el resto son de cuidado prolongado, distribuibles hasta
+                  que cumpla 8 anos. Requieren preaviso de 15 dias a la empresa.
                 </p>
               </div>
             </>
@@ -538,33 +544,34 @@ export default function EstimacionBajaMaternalPage() {
       {/* ── Seccion educativa v2.0 ─────────────────────────────────────── */}
       <EducationalSection
         title="Todo sobre el permiso por nacimiento en Espana"
-        subtitle="Guia completa sobre la baja maternal y paternal (RDL 6/2019)"
+        subtitle="Guia completa sobre la baja maternal y paternal (RDL 9/2025)"
       >
         {/* Como funciona */}
-        <h3>Como funciona el permiso desde el RDL 6/2019?</h3>
+        <h3>Como funciona el permiso desde el RDL 9/2025?</h3>
         <p>
-          Desde enero de 2021, el permiso por nacimiento y cuidado del menor es
-          <strong> igualitario e intransferible</strong> para ambos progenitores: 16 semanas
-          cada uno. Este cambio historico (Real Decreto-ley 6/2019) equiparo los derechos de
-          maternidad y paternidad en Espana. Anteriormente, la madre tenia 16 semanas y el padre
-          solo 5 dias + 4 semanas.
+          Desde el 31 de julio de 2025, el permiso por nacimiento y cuidado del menor es
+          <strong> igualitario e intransferible</strong> para ambos progenitores en familias
+          biparentales: <strong>19 semanas cada uno</strong>. En familias monoparentales, el
+          unico progenitor dispone de <strong>32 semanas</strong>. El RDL 9/2025 amplio el
+          modelo igualitario establecido por el RDL 6/2019 (16 semanas desde 2021).
         </p>
         <p>
           Las 6 primeras semanas son obligatorias, ininterrumpidas y simultaneas para ambos
-          progenitores. Es decir, ambos disfrutan juntos esas 6 semanas tras el nacimiento.
-          Las 10 semanas restantes son voluntarias y se pueden distribuir libremente en periodos
-          semanales hasta que el bebe cumpla 12 meses.
+          progenitores (en familias biparentales). De las semanas restantes, 11 (22 en
+          familias monoparentales) son flexibles y se pueden distribuir libremente en periodos
+          semanales hasta que el bebe cumpla 12 meses, y 2 (4 en monoparental) son de cuidado
+          prolongado, distribuibles hasta que el menor cumpla 8 anos.
         </p>
 
         {/* Tabla comparativa obligatorio vs voluntario */}
-        <h3>Obligatorio vs. Voluntario</h3>
+        <h3>Obligatorio vs. Flexible/Cuidado prolongado</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
               <tr>
                 <th>Aspecto</th>
                 <th>Obligatorio (6 sem.)</th>
-                <th>Voluntario (10 sem.)</th>
+                <th>Flexible + cuidado prolongado (13/26 sem.)</th>
               </tr>
             </thead>
             <tbody>
@@ -581,7 +588,7 @@ export default function EstimacionBajaMaternalPage() {
               <tr>
                 <td>Plazo maximo</td>
                 <td>6 semanas desde el parto</td>
-                <td>Hasta que el menor cumpla 12 meses</td>
+                <td>12 meses (flexibles) / 8 anos (cuidado prolongado)</td>
               </tr>
               <tr>
                 <td>Preaviso a la empresa</td>
@@ -611,9 +618,9 @@ export default function EstimacionBajaMaternalPage() {
               <h4>Nacimiento estandar (1 bebe)</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Cada progenitor: 16 semanas.</p>
-              <p>6 semanas obligatorias simultaneas + 10 voluntarias distribuibles.</p>
-              <p><strong>Total familia: hasta 32 semanas de cobertura</strong> si se alternan.</p>
+              <p>Familia biparental: 19 semanas por progenitor (32 si es monoparental).</p>
+              <p>6 semanas obligatorias simultaneas + 11 flexibles (22 en monoparental) + 2 de cuidado prolongado hasta los 8 anos (4 en monoparental).</p>
+              <p><strong>Total familia biparental: hasta 38 semanas de cobertura</strong> si se alternan.</p>
             </div>
             <div className={styles.escenarioTip}>
               Consejo: alternar las semanas voluntarias maximiza el tiempo que al menos un progenitor esta con el bebe.
@@ -626,9 +633,9 @@ export default function EstimacionBajaMaternalPage() {
               <h4>Parto gemelar (2 bebes)</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Cada progenitor: 16 + 2 = 18 semanas.</p>
-              <p>Se anaden 2 semanas por el segundo bebe.</p>
-              <p><strong>Total familia: hasta 36 semanas de cobertura.</strong></p>
+              <p>Cada progenitor (familia biparental): 19 + 1 = 20 semanas.</p>
+              <p>Se anade 1 semana por el segundo bebe (RDL 9/2025).</p>
+              <p><strong>Total familia: hasta 40 semanas de cobertura</strong> si se alternan.</p>
             </div>
             <div className={styles.escenarioTip}>
               Las semanas extra por multiple son para cada progenitor, no se comparten.
@@ -641,9 +648,9 @@ export default function EstimacionBajaMaternalPage() {
               <h4>Parto prematuro con hospitalizacion</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>16 semanas base + hasta 13 semanas adicionales.</p>
+              <p>19 semanas base (32 si familia monoparental) + hasta 13 semanas adicionales.</p>
               <p>Se anade 1 semana por cada 7 dias de hospitalizacion neonatal.</p>
-              <p><strong>Maximo posible: 29 semanas</strong> (solo un progenitor).</p>
+              <p><strong>Maximo posible: 32 semanas</strong> (45 en monoparental), para un solo progenitor.</p>
             </div>
             <div className={styles.escenarioTip}>
               La ampliacion por hospitalizacion corresponde a un solo progenitor, a elegir por la familia.
@@ -656,12 +663,12 @@ export default function EstimacionBajaMaternalPage() {
               <h4>Adopcion internacional</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>16 semanas base + hasta 2 semanas por desplazamiento.</p>
+              <p>19 semanas base (32 si familia monoparental) + hasta 2 semanas por desplazamiento.</p>
               <p>Las semanas de desplazamiento pueden disfrutarse antes de la resolucion judicial/administrativa.</p>
-              <p><strong>Total: hasta 18 semanas.</strong></p>
+              <p><strong>Total: hasta 21 semanas</strong> (34 en monoparental).</p>
             </div>
             <div className={styles.escenarioTip}>
-              En adopcion nacional: mismas 16 semanas, sin semanas de desplazamiento.
+              En adopcion nacional: mismas 19/32 semanas, sin semanas de desplazamiento.
             </div>
           </div>
         </div>
@@ -670,28 +677,32 @@ export default function EstimacionBajaMaternalPage() {
         <h3>Preguntas frecuentes</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
-            <h4>Puedo fraccionar las semanas voluntarias?</h4>
+            <h4>Puedo fraccionar las semanas flexibles?</h4>
             <p>
-              Si. Las 10 semanas voluntarias se pueden tomar en periodos semanales completos,
-              no necesariamente consecutivos, hasta que el menor cumpla 12 meses.
-              Debes preavisar a tu empresa con al menos 15 dias de antelacion para cada periodo.
+              Si. De las semanas no obligatorias, 11 (22 en familias monoparentales) son
+              flexibles y se pueden tomar en periodos semanales completos, no necesariamente
+              consecutivos, hasta que el menor cumpla 12 meses. Las 2 restantes (4 en
+              monoparental) son de cuidado prolongado y se distribuyen hasta que el menor
+              cumpla 8 anos. Debes preavisar a tu empresa con al menos 15 dias de antelacion
+              para cada periodo.
             </p>
           </div>
           <div className={styles.faqItem}>
             <h4>Que pasa si soy autonomo/a?</h4>
             <p>
-              Los autonomos tienen exactamente el mismo derecho: 16 semanas con prestacion
-              del 100% de la base reguladora. La solicitud se tramita directamente con la
-              Seguridad Social (mutua colaboradora si la tienes). Durante la baja no pagas
-              cuota de autonomos.
+              Los autonomos tienen exactamente el mismo derecho: 19 semanas (32 en familias
+              monoparentales) con prestacion del 100% de la base reguladora. La solicitud se
+              tramita directamente con la Seguridad Social (mutua colaboradora si la tienes).
+              Durante la baja no pagas cuota de autonomos.
             </p>
           </div>
           <div className={styles.faqItem}>
             <h4>Pueden ambos progenitores estar de baja a la vez?</h4>
             <p>
-              Si. Las 6 primeras semanas son obligatoriamente simultaneas. Las 10 voluntarias
-              tambien pueden ser simultaneas o alternarse. No hay obligacion de turnarse.
-              Sin embargo, alternarlas maximiza el tiempo total de cuidado.
+              Si. Las 6 primeras semanas son obligatoriamente simultaneas (en familias
+              biparentales). Las semanas flexibles y de cuidado prolongado tambien pueden
+              ser simultaneas o alternarse. No hay obligacion de turnarse, aunque alternarlas
+              maximiza el tiempo total de cuidado.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -750,11 +761,13 @@ export default function EstimacionBajaMaternalPage() {
           </div>
           <div className={styles.stepCard}>
             <span className={styles.stepNumber} aria-hidden="true">4</span>
-            <h4>Planifica las semanas voluntarias</h4>
+            <h4>Planifica las semanas flexibles y de cuidado prolongado</h4>
             <p>
-              Decide con tu pareja como distribuir las 10 semanas restantes.
-              Podeis alternarlas, simultanearlas o combinar jornada parcial.
-              Comunicalo con 15 dias de antelacion a la empresa.
+              Decide con tu pareja como distribuir las semanas restantes: las flexibles
+              (11 en biparental, 22 en monoparental) hasta los 12 meses del menor, y las de
+              cuidado prolongado (2 o 4) hasta que cumpla 8 anos. Podeis alternarlas,
+              simultanearlas o combinar jornada parcial. Comunicalo con 15 dias de antelacion
+              a la empresa.
             </p>
           </div>
         </div>
