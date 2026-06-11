@@ -516,6 +516,14 @@
   margin: 0;
 }
 
+.tablaNota {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 8px 0 0 0;
+  font-style: italic;
+}
+
 .faqList {
   display: flex;
   flex-direction: column;

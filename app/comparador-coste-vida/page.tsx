@@ -20,7 +20,7 @@ interface DatosCosteVida {
   indice: number;          // Índice total (Madrid = 100)
 }
 
-// Fuente: estimación basada en Numbeo y otras fuentes públicas · Datos 2024-2025
+// Fuente: estimación basada en Numbeo y otras fuentes públicas · Datos 2025-2026
 const CIUDADES: DatosCosteVida[] = [
   // EUROPA — Ibérica
   { ciudad: 'Madrid', pais: 'España', continente: 'Europa', alquiler: 1100, cena: 12, supermercado: 280, transporte: 55, internet: 35, indice: 100 },
@@ -61,7 +61,7 @@ const CIUDADES: DatosCosteVida[] = [
   { ciudad: 'Toronto', pais: 'Canadá', continente: 'América', alquiler: 1900, cena: 18, supermercado: 380, transporte: 130, internet: 55, indice: 172 },
   { ciudad: 'Ciudad de México', pais: 'México', continente: 'América', alquiler: 600, cena: 6, supermercado: 200, transporte: 25, internet: 28, indice: 60 },
   // AMÉRICA — Sur
-  { ciudad: 'Buenos Aires', pais: 'Argentina', continente: 'América', alquiler: 400, cena: 5, supermercado: 180, transporte: 10, internet: 15, indice: 40 },
+  { ciudad: 'Buenos Aires', pais: 'Argentina', continente: 'América', alquiler: 600, cena: 9, supermercado: 220, transporte: 20, internet: 20, indice: 60 },
   { ciudad: 'Santiago', pais: 'Chile', continente: 'América', alquiler: 700, cena: 8, supermercado: 260, transporte: 55, internet: 30, indice: 70 },
   { ciudad: 'Bogotá', pais: 'Colombia', continente: 'América', alquiler: 450, cena: 5, supermercado: 200, transporte: 30, internet: 18, indice: 46 },
   { ciudad: 'Lima', pais: 'Perú', continente: 'América', alquiler: 500, cena: 5, supermercado: 200, transporte: 28, internet: 25, indice: 49 },
@@ -148,7 +148,7 @@ export default function ComparadorCosteVida() {
 
       <main className={styles.main}>
         <DisclaimerCard variant="financial" severity="high" collapsible={false}>
-          <strong>Datos de referencia 2024-2025.</strong> Las cifras son estimaciones basadas en Numbeo y otras fuentes públicas. Los precios reales varían según barrio, estilo de vida y momento del año. No usar como base única para decisiones de mudanza sin contrastar con fuentes actualizadas.
+          <strong>Datos de referencia 2025-2026.</strong> Las cifras son estimaciones basadas en Numbeo y otras fuentes públicas. Los precios reales varían según barrio, estilo de vida y momento del año. No usar como base única para decisiones de mudanza sin contrastar con fuentes actualizadas. Los países con alta inflación o devaluación reciente (p. ej. Argentina) pueden cambiar de rango de precio en euros en pocos meses: contrasta siempre con fuentes recientes.
         </DisclaimerCard>
 
         {/* Comparador de dos ciudades */}
@@ -318,7 +318,7 @@ export default function ComparadorCosteVida() {
           </div>
 
           <p className={styles.fuenteTexto}>
-            Índice orientativo (Madrid = 100) · Estimación basada en Numbeo y otras fuentes públicas · Datos 2024-2025
+            Índice orientativo (Madrid = 100) · Estimación basada en Numbeo y otras fuentes públicas · Datos 2025-2026
           </p>
         </section>
 
@@ -337,7 +337,7 @@ export default function ComparadorCosteVida() {
           <ul>
             <li><strong>Vivienda:</strong> suele ser el mayor factor diferencial, especialmente en ciudades globales como Zúrich, Nueva York o Singapur</li>
             <li><strong>Nivel de vida local:</strong> países con salarios más altos tienden a tener precios más altos en servicios</li>
-            <li><strong>Tipo de cambio:</strong> los valores están convertidos a euros a tasas aproximadas de 2024-2025</li>
+            <li><strong>Tipo de cambio:</strong> los valores están convertidos a euros a tasas aproximadas de 2025-2026</li>
             <li><strong>Subsidios:</strong> algunos países subvencionan el transporte o la vivienda, lo que reduce el coste real</li>
           </ul>
 

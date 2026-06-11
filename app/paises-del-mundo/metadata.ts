@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Países del Mundo - Buscador con Capitales, Banderas y Datos | meskeIA',
-  description: 'Explora los 195 países del mundo. Busca por nombre o capital y descubre banderas, población, superficie, moneda, idioma y prefijo telefónico de cada país.',
+  description: 'Explora los 196 países del mundo. Busca por nombre o capital y descubre banderas, población, superficie, moneda, idioma y prefijo telefónico de cada país.',
   keywords: 'países del mundo, capitales, banderas, monedas, idiomas, población, superficie, prefijo telefónico, atlas mundial, geografía',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Países del Mundo - Buscador Completo | meskeIA',
-    description: 'Explora los 195 países del mundo con sus capitales, banderas, monedas, idiomas y más datos interesantes.',
+    description: 'Explora los 196 países del mundo con sus capitales, banderas, monedas, idiomas y más datos interesantes.',
     url: 'https://meskeia.com/paises-del-mundo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Países del Mundo - Buscador Completo | meskeIA',
-    description: 'Explora los 195 países del mundo con sus capitales, banderas, monedas, idiomas y más.',
+    description: 'Explora los 196 países del mundo con sus capitales, banderas, monedas, idiomas y más.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Países del Mundo",
-  description: "Explora los 195 países del mundo. Busca por nombre o capital y descubre banderas, población, superficie, moneda, idioma y prefijo telefónico de cada país.",
+  description: "Explora los 196 países del mundo. Busca por nombre o capital y descubre banderas, población, superficie, moneda, idioma y prefijo telefónico de cada país.",
   url: "https://meskeia.com/paises-del-mundo/",
   category: 'EducationalApplication',
   features: [],
@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Cuántos países hay en el mundo actualmente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Actualmente se reconocen 195 países en el mundo: 193 son estados miembros de las Naciones Unidas y 2 tienen estatus de estado observador (Vaticano y Palestina). Esta cifra puede variar ligeramente según el criterio de reconocimiento internacional que se aplique.',
+        text: 'Esta base de datos incluye 196 países y territorios: 193 son estados miembros de las Naciones Unidas, 2 tienen estatus de estado observador permanente (Ciudad del Vaticano y Palestina) y se añade Taiwán. La cifra varía según la fuente: los organismos internacionales suelen citar 193 (solo miembros ONU) o 195 (+ Vaticano y Palestina); algunos atlas añaden también Taiwán o Kosovo según el criterio de reconocimiento aplicado.',
       },
     },
     {

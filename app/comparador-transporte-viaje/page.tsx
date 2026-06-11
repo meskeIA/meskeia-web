@@ -562,7 +562,7 @@ export default function ComparadorTransporteViaje() {
         <ul className={styles.faqList}>
           <li className={styles.faqItem}>
             <strong>¿Cuándo vale la pena coger el avión sobre el tren?</strong>
-            <p>En España, para distancias superiores a 600-700 km o cuando no hay AVE directo. Madrid–Canarias o viajes internacionales son casos claros. Para rutas como Madrid–Barcelona (621 km), el AVE es competitivo en tiempo total (2h30 puerta a puerta vs. 4-5h en avión) y más cómodo.</p>
+            <p>En España, para distancias superiores a 600-700 km o cuando no hay AVE directo. Madrid–Canarias o viajes internacionales son casos claros. Para rutas como Madrid–Barcelona (621 km), el AVE es competitivo en tiempo total (2h30 puerta a puerta vs. 3-3,5h en avión contando esperas y traslados) y más cómodo.</p>
           </li>
           <li className={styles.faqItem}>
             <strong>¿Cuándo es más barato el coche que el tren?</strong>

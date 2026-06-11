@@ -106,7 +106,7 @@ export default function PaisesDelMundoPage() {
         <span className={styles.heroIcon}>🌍</span>
         <h1 className={styles.title}>Países del Mundo</h1>
         <p className={styles.subtitle}>
-          Explora los 195 países del mundo con sus capitales, banderas, monedas e información clave
+          Explora los 196 países del mundo con sus capitales, banderas, monedas e información clave
         </p>
       </header>
 
@@ -329,7 +329,7 @@ export default function PaisesDelMundoPage() {
 
       <EducationalSection
         title="Geografía Mundial: Datos y Curiosidades"
-        subtitle="Récords mundiales, datos comparativos por continente y curiosidades geopolíticas de los 195 países"
+        subtitle="Récords mundiales, datos comparativos por continente y curiosidades geopolíticas de los 196 países"
         icon="🌍"
       >
         <section>
@@ -350,7 +350,7 @@ export default function PaisesDelMundoPage() {
           <ul>
             <li><strong>Países sin litoral (landlocked)</strong>: 44 países no tienen acceso directo al mar. Bolivia y Paraguay son los únicos en América del Sur. Kazajistán es el país interior más grande del mundo.</li>
             <li><strong>Países dentro de otros países</strong>: San Marino y Ciudad del Vaticano están rodeados completamente por Italia. Lesotho está dentro de Sudáfrica. Se llaman «enclaves».</li>
-            <li><strong>Micronaciones reconocidas</strong>: Los 195 países son los reconocidos por la ONU. Existen además Taiwán, Kosovo y otros territorios con estatus disputado.</li>
+            <li><strong>Reconocimiento parcial</strong>: de los 196 países de esta base de datos, 193 son miembros de pleno derecho de la ONU; Vaticano y Palestina tienen estatus de observador permanente, y Taiwán cuenta con reconocimiento formal de solo 12 países. Existen además Kosovo y otros territorios con estatus disputado no incluidos aquí.</li>
             <li><strong>El país con más países vecinos</strong>: Rusia y China comparten fronteras con 14 países distintos cada uno.</li>
             <li><strong>Países que no existen en mapas tradicionales</strong>: Sudán del Sur (independiente en 2011) es el país más joven reconocido por la ONU.</li>
             <li><strong>Monedas compartidas</strong>: El euro lo usan 20 países de la UE. El dólar estadounidense es moneda oficial en 11 países además de EE.UU.</li>
@@ -361,20 +361,20 @@ export default function PaisesDelMundoPage() {
           <h4>Los 5 continentes en cifras</h4>
           <ul>
             <li><strong>🌍 África</strong>: 54 países, 1.400 millones de habitantes, el continente con mayor crecimiento demográfico. Nigeria será el 3.er país más poblado del mundo en 2050.</li>
-            <li><strong>🌏 Asia</strong>: 49 países, 4.700 millones de habitantes (60% de la humanidad). Incluye las dos civilizaciones más antiguas continuas (China e India) y el país con la economía que más rápido creció en el siglo XXI.</li>
+            <li><strong>🌏 Asia</strong>: 48 países, 4.700 millones de habitantes (60% de la humanidad). Incluye las dos civilizaciones más antiguas continuas (China e India) y el país con la economía que más rápido creció en el siglo XXI.</li>
             <li><strong>🌎 América</strong>: 35 países, 1.000 millones de habitantes. Brasil es el 5.º país más grande del mundo y tiene el mayor número de hablantes de portugués.</li>
-            <li><strong>🌍 Europa</strong>: 44 países en apenas 10,5 millones km². Alta densidad media (~73 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
+            <li><strong>🌍 Europa</strong>: 45 países en apenas 10,5 millones km². Alta densidad media (~73 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
             <li><strong>🌏 Oceanía</strong>: 14 países. Australia ocupa el 92% del área continental. Muchos estados son pequeñas islas del Pacífico con soberanía sobre grandes zonas económicas exclusivas (ZEE).</li>
           </ul>
         </section>
 
         <section>
           <h4>Cómo se cuentan los países</h4>
-          <p>La cifra de «195 países» tiene matices:</p>
+          <p>La cifra de «196 países» de esta base de datos tiene matices:</p>
           <ul>
-            <li><strong>193 miembros de pleno derecho</strong> de la ONU + 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) = 195.</li>
+            <li><strong>193 miembros de pleno derecho</strong> de la ONU + 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) + Taiwán = 196.</li>
             <li><strong>Territorios no autónomos</strong>: Existen ~17 territorios bajo administración de otros países que la ONU considera pendientes de descolonización (Gibraltar, Nueva Caledonia, Sahara Occidental...).</li>
-            <li><strong>Reconocimiento parcial</strong>: Kosovo es reconocido por 100+ países pero no por España, China o Rusia. Taiwán es reconocido formalmente por solo 12 países, aunque mantiene relaciones comerciales con casi todos.</li>
+            <li><strong>Reconocimiento parcial</strong>: Taiwán es reconocido formalmente por solo 12 países, aunque mantiene relaciones comerciales con casi todos. Kosovo, reconocido por 100+ países pero no por España, China o Rusia, no está incluido en esta base de datos.</li>
             <li><strong>Pasaportes más poderosos (2025)</strong>: Los de Singapur, Japón y Francia permiten entrar sin visa a más de 190 destinos. El más restrictivo, Afganistán, da acceso libre a menos de 30.</li>
           </ul>
         </section>
@@ -470,8 +470,8 @@ export default function PaisesDelMundoPage() {
           <h3>❓ Preguntas Frecuentes sobre los Países del Mundo</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqQuestion}>¿Por qué hay exactamente 195 países y no otra cifra?</summary>
-              <p className={styles.eduFaqAnswer}>Los <strong>193 miembros de pleno derecho de la ONU</strong> más los 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) suman 195. El número cambia históricamente: en 1945 había 51 miembros fundadores. Cada descolonización o independencia reconocida añade un nuevo estado. El último en unirse fue Sudán del Sur (2011).</p>
+              <summary className={styles.eduFaqQuestion}>¿Por qué hay exactamente 196 países y no otra cifra?</summary>
+              <p className={styles.eduFaqAnswer}>Los <strong>193 miembros de pleno derecho de la ONU</strong> más los 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) suman 195; esta base de datos añade además Taiwán, totalizando 196. El número cambia históricamente: en 1945 había 51 miembros fundadores. Cada descolonización o independencia reconocida añade un nuevo estado. El último en unirse a la ONU fue Sudán del Sur (2011).</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué pasó cuando se disolvió la URSS?</summary>
@@ -682,7 +682,7 @@ export default function PaisesDelMundoPage() {
                 <h4>Estudiante — Preparando examen de geografía</h4>
               </div>
               <p className={styles.escenarioExample}>
-                <strong>Situación:</strong> Examen de geografía mundial en 2 semanas. Necesita repasar las 195 capitales, identificar banderas y conocer datos básicos por continente.
+                <strong>Situación:</strong> Examen de geografía mundial en 2 semanas. Necesita repasar las 196 capitales, identificar banderas y conocer datos básicos por continente.
               </p>
               <p className={styles.escenarioTip}>
                 <strong>Cómo usarlo:</strong> Filtra por continente, haz clic en cada país para ver capital, prefijo y moneda. Repasa en grupos de 10 países hasta cubrir el mapa completo.
@@ -733,7 +733,7 @@ export default function PaisesDelMundoPage() {
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary>¿Cuántos países hay exactamente en el mundo?</summary>
-              <p>Hay <strong>195 países reconocidos</strong>: 193 miembros de pleno derecho de la ONU más 2 estados observadores permanentes (Ciudad del Vaticano y Palestina). La cifra varía según la fuente: algunos atlas cuentan 196 añadiendo Kosovo, otros solo cuentan 193. Sudán del Sur (2011) es el estado reconocido más recientemente por la ONU.</p>
+              <p>Esta base de datos incluye <strong>196 países y territorios</strong>: 193 miembros de pleno derecho de la ONU, los 2 estados observadores permanentes (Ciudad del Vaticano y Palestina) y Taiwán. La cifra varía según la fuente: los organismos internacionales suelen citar 193 (solo miembros ONU) o 195 (+ Vaticano y Palestina); algunos atlas añaden también Taiwán o Kosovo según el criterio de reconocimiento aplicado. Sudán del Sur (2011) es el estado reconocido más recientemente por la ONU.</p>
               <p className={styles.faqTip}>Dato extra: en 1945, la ONU se fundó con solo 51 estados miembros.</p>
             </details>
             <details className={styles.faqItem}>
@@ -777,7 +777,7 @@ export default function PaisesDelMundoPage() {
         {/* ── SECCIÓN 4: Guía Paso a Paso — 7 pasos (patrón v2.0) ── */}
         <section>
           <h3>📋 Método para Aprender la Geografía Mundial en 4-8 Semanas</h3>
-          <p>Sigue este método sistemático por continente para memorizar los 195 países y sus capitales de forma duradera:</p>
+          <p>Sigue este método sistemático por continente para memorizar los 196 países y sus capitales de forma duradera:</p>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber}>1</span>

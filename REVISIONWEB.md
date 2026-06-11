@@ -240,12 +240,14 @@ Regularizar incidencias por sesiones, empezando por las de severidad 🔴 y 🟠
 > Se ha actualizado `calculadora-propinas` a **SMI 2026 = 1.221 €/mes (14 pagas)** importado desde
 > `data/fiscal/smi.ts`. Ver nuevo hallazgo 17.1 más abajo.
 
-### Tanda 2 — pendiente
+### Tanda 2 — ✅ COMPLETADA (2026-06-11)
 
-5. `comparador-transporte-viaje` — alinear tiempo avión MAD-BCN entre fórmula y FAQ (12.1)
-6. `comparador-coste-vida` — refrescar etiqueta de fechas y datos de Buenos Aires (15.1, 15.2)
-7. `paises-del-mundo` — resolver 195 vs 196 países (16.1)
-8. `lista-equipaje` — añadir fecha de verificación a tablas de aerolíneas (6.1, 6.2)
+5. ✅ `comparador-transporte-viaje` — alinear tiempo avión MAD-BCN entre fórmula y FAQ (12.1)
+6. ✅ `comparador-coste-vida` — refrescar etiqueta de fechas (2025-2026) y datos de Buenos Aires (15.1, 15.2)
+7. ✅ `paises-del-mundo` — resolver 195 vs 196 países (16.1): explicación 193 ONU + Vaticano/Palestina + Taiwán = 196, propagada a `page.tsx`, `metadata.ts`, `data/countries.ts`, `data/applications.ts` y `data/app-relations.ts`
+8. ✅ `lista-equipaje` — nota de verificación (junio 2026) y aviso "consulta siempre la política vigente" junto a la tabla de aerolíneas; dato EasyJet matizado (6.1, 6.2)
+
+Build verificado: 998 apps, 1299 páginas, exit 0.
 
 El resto de hallazgos 🟡 Bajo pueden agruparse en una sesión de "limpieza menor" posterior.
 

@@ -572,8 +572,8 @@ export default function ListaEquipajePage() {
               <tr>
                 <td>EasyJet</td>
                 <td>56 × 45 × 25 cm</td>
-                <td>Sin límite de peso</td>
-                <td>Incluido en todos los billetes</td>
+                <td>Sin límite oficial publicado*</td>
+                <td>Solo bolso pequeño bajo asiento en tarifa básica</td>
               </tr>
               <tr>
                 <td>Wizz Air</td>
@@ -584,6 +584,9 @@ export default function ListaEquipajePage() {
             </tbody>
           </table>
         </div>
+        <p className={styles.tablaNota}>
+          * Datos orientativos verificados en junio de 2026. Las aerolíneas low-cost cambian estas políticas con frecuencia (cada 1-2 años) y aplican condiciones distintas según la tarifa contratada (básica, estándar, plus...). Antes de viajar, consulta siempre la política vigente en la web oficial de tu aerolínea.
+        </p>
 
         <h3 className={styles.eduTitle}>Casos de uso por tipo de viaje</h3>
         <div className={styles.escenariosGrid}>

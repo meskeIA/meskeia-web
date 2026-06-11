@@ -1,5 +1,6 @@
 // Base de datos de países del mundo
-// Datos actualizados 2024 - 195 países reconocidos por la ONU
+// Datos actualizados 2024 - 196 entradas: 193 estados miembros de la ONU +
+// Ciudad del Vaticano y Palestina (estados observadores) + Taiwán
 // Códigos ISO 3166-1 alpha-2 para banderas (flag-icons)
 
 export interface Country {
