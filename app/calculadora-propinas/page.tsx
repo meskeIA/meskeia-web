@@ -7,6 +7,18 @@ import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
 import { getRelatedApps } from '@/data/app-relations';
+import { SMI_2026 } from '@/data/fiscal';
+
+// Porcentaje de propina habitual por país/contexto
+const PORCENTAJE_POR_PAIS: Record<string, number> = {
+  'es-10': 10,
+  'us-18': 18,
+  'mx-12': 12,
+  'uk-10': 10,
+  'fr-8': 8,
+  'de-8': 8,
+  'jp-0': 0,
+};
 
 export default function CalculadoraPropinas() {
   // Estados
@@ -56,8 +68,8 @@ export default function CalculadoraPropinas() {
     const valor = e.target.value;
     setPaisSeleccionado(valor);
 
-    if (valor !== 'custom') {
-      setPorcentaje(parseInt(valor));
+    if (valor in PORCENTAJE_POR_PAIS) {
+      setPorcentaje(PORCENTAJE_POR_PAIS[valor]);
     }
   };
 
@@ -180,13 +192,13 @@ export default function CalculadoraPropinas() {
               value={paisSeleccionado}
               onChange={cambiarPais}
             >
-              <option value="10">🇪🇸 España (10%)</option>
-              <option value="18">🇺🇸 Estados Unidos (18%)</option>
-              <option value="12">🇲🇽 México (12%)</option>
-              <option value="10">🇬🇧 Reino Unido (10%)</option>
-              <option value="8">🇫🇷 Francia (8%)</option>
-              <option value="8">🇩🇪 Alemania (8%)</option>
-              <option value="0">🇯🇵 Japón (0% - No propina)</option>
+              <option value="es-10">🇪🇸 España (10%)</option>
+              <option value="us-18">🇺🇸 Estados Unidos (18%)</option>
+              <option value="mx-12">🇲🇽 México (12%)</option>
+              <option value="uk-10">🇬🇧 Reino Unido (10%)</option>
+              <option value="fr-8">🇫🇷 Francia (8%)</option>
+              <option value="de-8">🇩🇪 Alemania (8%)</option>
+              <option value="jp-0">🇯🇵 Japón (0% - No propina)</option>
               <option value="custom">✏️ Personalizado</option>
             </select>
           </div>
@@ -556,9 +568,10 @@ export default function CalculadoraPropinas() {
                   <p>
                     En EEUU la propina es prácticamente obligatoria (15-20 %) porque el
                     salario mínimo para camareros puede ser tan bajo como 2,13 $/hora (salario
-                    federal con propinas). En España el SMI en 2025 es de 1.184 €/mes y
-                    aplica a todos los trabajadores. Por eso en España la propina es un extra
-                    de reconocimiento, no una necesidad económica estructural.
+                    federal con propinas). En España el SMI en 2026 es de{' '}
+                    {formatCurrency(SMI_2026.mensual14)}/mes (14 pagas) y aplica a todos los
+                    trabajadores. Por eso en España la propina es un extra de reconocimiento,
+                    no una necesidad económica estructural.
                   </p>
                 </details>
               </li>
@@ -752,7 +765,7 @@ export default function CalculadoraPropinas() {
       </main>
 
       {/* Footer meskeIA */}
-      <RelatedApps apps={getRelatedApps('Calculadora de Propinas')} />
+      <RelatedApps apps={getRelatedApps('calculadora-propinas')} />
       <ShareCard appName="Calculadora de Propinas" />
       <Footer appName="Calculadora de Propinas" />
     </>

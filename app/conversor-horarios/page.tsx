@@ -622,7 +622,7 @@ export default function ConversorHorariosPage() {
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo afecta el cambio de horario de verano a las reuniones ya programadas?</h4>
-              <p>En España el cambio es el último domingo de marzo (avanzamos 1h) y octubre (atrasamos 1h). Si tienes una reunión semanal fija con EE.UU. o UK, la diferencia horaria cambia 1h durante esas semanas de transición porque los cambios no son simultáneos. Ejemplo: el último domingo de marzo EE.UU. cambia 2 semanas después que Europa, creando una semana de diferencia anómala de 5h en vez de 6h con NY. 💡 Consejo: Durante las semanas de cambio de horario, confirma siempre la hora de las reuniones con colaboradores internacionales. Es la causa más frecuente de &ldquo;¿dónde estás?&rdquo; en llamadas de trabajo remoto.</p>
+              <p>En España el cambio es el último domingo de marzo (avanzamos 1h) y octubre (atrasamos 1h). Si tienes una reunión semanal fija con EE.UU. o UK, la diferencia horaria cambia 1h durante esas semanas de transición porque los cambios no son simultáneos. Ejemplo: en EE.UU. el cambio de primavera ocurre el segundo domingo de marzo, unas dos semanas antes que en Europa, lo que crea un periodo de diferencia anómala de 5h en vez de 6h con NY hasta que Europa también cambia. 💡 Consejo: Durante las semanas de cambio de horario, confirma siempre la hora de las reuniones con colaboradores internacionales. Es la causa más frecuente de &ldquo;¿dónde estás?&rdquo; en llamadas de trabajo remoto.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Existe algún país a 0 horas UTC todo el año?</h4>

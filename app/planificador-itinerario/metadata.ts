@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Necesito registrarme o crear una cuenta para usar el planificador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. El planificador es completamente gratuito y no requiere registro. Los datos se guardan en el navegador de forma local. Para conservar el itinerario fuera del navegador, usa la función de exportación antes de cerrar o limpiar el caché.',
+        text: 'No. El planificador es completamente gratuito y no requiere registro. Los datos se mantienen solo durante la sesión activa en tu navegador y se pierden si recargas o cierras la página. Usa la función de exportación para guardar tu itinerario antes de salir.',
       },
     },
     {

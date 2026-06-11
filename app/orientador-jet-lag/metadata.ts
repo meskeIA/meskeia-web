@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Cuántos días tarda en recuperarse el jet lag?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Como regla general, el organismo necesita aproximadamente un día de adaptación por cada hora de diferencia horaria cruzada. Un vuelo con 8 horas de desfase puede requerir entre 5 y 8 días para una adaptación completa, aunque varía según la dirección del vuelo y cada persona.',
+        text: 'Como regla general, el organismo necesita aproximadamente un día de adaptación por cada hora de diferencia horaria cruzada. Un vuelo con 8 horas de desfase puede requerir entre 7 y 10 días para una adaptación completa, según la dirección del vuelo (más rápido hacia el oeste, más lento hacia el este) y cada persona.',
       },
     },
     {

@@ -622,7 +622,7 @@ export default function PlanificadorItinerario() {
             </div>
             <p className={styles.escenarioExample}>
               Itinerario en bloques geográficos: Tokio (5 días) → Kioto/Nara (4 días) → Osaka/Hiroshima (3 días) → Hakone (2 días) →
-              vuelta a Tokio (1 día). Japan Rail Pass (21.100 ¥ ≈ 130 €) cubre casi todos los shinkansen.
+              vuelta a Tokio (1 día). Japan Rail Pass de 14 días (unos 80.000 ¥, aprox. 450-500 € según el cambio) cubre casi todos los shinkansen.
               Ritmo intensivo los primeros días, relajado al final para absorber el choque cultural.
             </p>
             <p className={styles.escenarioTip}>Descargar Google Maps offline de cada región antes de salir del hotel; el wifi en zonas rurales es limitado.</p>

@@ -518,15 +518,16 @@ export default function SimuladorJetLagPage() {
               <p>
                 Viajar al este obliga al reloj biológico a adelantarse, lo que va en contra de la
                 tendencia natural del ritmo circadiano humano (ligeramente superior a 24 h).
-                El cuerpo ajusta ~1 huso/día hacia el este frente a ~1,5 husos/día hacia el oeste.
+                Por eso la adaptación requiere más tiempo hacia el este (~1,15 días por huso)
+                que hacia el oeste (~0,85 días por huso).
               </p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cuántos días tarda en desaparecer el jet lag?</strong>
               <p>
-                Depende de los husos cruzados y la dirección. Regla práctica: 1 día por huso
-                cruzado al este y 0,7 días por huso al oeste. Un vuelo Madrid–Tokio (8 h al este)
-                implica unos 8–10 días para adaptación completa.
+                Depende de los husos cruzados y la dirección. Regla práctica: unos 1,15 días por
+                huso cruzado al este y 0,85 días por huso al oeste. Un vuelo Madrid–Tokio (8 h al
+                este) implica unos 10 días para una adaptación completa.
               </p>
             </li>
             <li className={styles.faqItem}>
