@@ -28,3 +28,4 @@ export * from './patrimonio';
 export * from './ayudas-publicas';
 export * from './ayudas-personas';
 export * from './becas-estudio';
+export * from './jubilacion-tramites';

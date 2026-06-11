@@ -3293,7 +3293,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-ayudas-personas-familias/', icon: '🧭', name: 'Ayudas para Personas y Familias', description: 'IMV, desempleo, bono social, deducciones familiares' },
   ],
   'orientador-ayudas-personas-familias': [
-    { url: '/orientador-ayudas-autonomos-pymes/', icon: '🎁', name: 'Ayudas Autónomos y Pymes', description: 'Subvenciones y financiación pública' },
+    { url: '/orientador-tramites-jubilacion/', icon: '🏖️', name: 'Trámites de Jubilación', description: 'Solicitud de pensión, complementos e IRPF pensionista' },
     { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo?' },
     { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Orientación BVD y prestaciones SAAD' },
     { url: '/orientador-becas-ayudas-estudio/', icon: '🎓', name: 'Becas y Ayudas al Estudio', description: 'Beca general MEC, NEAE, comedor, transporte' },
@@ -3303,6 +3303,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo?' },
     { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Deducciones familiares en tu nómina' },
     { url: '/estimacion-baja-maternal/', icon: '📅', name: 'Baja Maternal y Paternal', description: 'Permiso por nacimiento, semanas y prestación' },
+  ],
+  'orientador-tramites-jubilacion': [
+    { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
+    { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
+    { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2026' },
+    { url: '/orientador-ayudas-personas-familias/', icon: '🧭', name: 'Ayudas para Personas y Familias', description: 'IMV, desempleo, bono social, deducciones familiares' },
   ],
   // FAMILIA: IRPF Y FISCAL GENERAL
   // ==========================================

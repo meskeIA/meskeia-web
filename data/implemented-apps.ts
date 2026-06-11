@@ -1167,6 +1167,7 @@ export const implementedAppsUrls = [
   "/orientador-ayudas-autonomos-pymes/", // Wizard de ayudas, subvenciones y financiación pública para autónomos, emprendedores y pymes
   "/orientador-ayudas-personas-familias/", // Wizard de ayudas y prestaciones sociales para personas y familias: IMV, desempleo, bono social, deducciones familiares
   "/orientador-becas-ayudas-estudio/", // Wizard de becas y ayudas al estudio: beca general MEC, NEAE, comedor, transporte, libros y becas autonómicas
+  "/orientador-tramites-jubilacion/", // Wizard de trámites de jubilación: solicitud de pensión, cuantía, complementos, IRPF, viudedad y servicios para mayores
 ];
 
 /**
