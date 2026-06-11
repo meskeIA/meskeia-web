@@ -1166,6 +1166,7 @@ export const implementedAppsUrls = [
   "/generador-poemas/",                  // Editor métrico guiado: haiku, redondilla, serventesio, romance, lira y soneto con contador sílabas
   "/orientador-ayudas-autonomos-pymes/", // Wizard de ayudas, subvenciones y financiación pública para autónomos, emprendedores y pymes
   "/orientador-ayudas-personas-familias/", // Wizard de ayudas y prestaciones sociales para personas y familias: IMV, desempleo, bono social, deducciones familiares
+  "/orientador-becas-ayudas-estudio/", // Wizard de becas y ayudas al estudio: beca general MEC, NEAE, comedor, transporte, libros y becas autonómicas
 ];
 
 /**

@@ -3296,7 +3296,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/orientador-ayudas-autonomos-pymes/', icon: '🎁', name: 'Ayudas Autónomos y Pymes', description: 'Subvenciones y financiación pública' },
     { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo?' },
     { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Orientación BVD y prestaciones SAAD' },
-    { url: '/simulador-bono-joven-alquiler/', icon: '🏠', name: 'Bono Joven Alquiler', description: 'Comprueba si eres elegible' },
+    { url: '/orientador-becas-ayudas-estudio/', icon: '🎓', name: 'Becas y Ayudas al Estudio', description: 'Beca general MEC, NEAE, comedor, transporte' },
+  ],
+  'orientador-becas-ayudas-estudio': [
+    { url: '/orientador-ayudas-personas-familias/', icon: '🧭', name: 'Ayudas para Personas y Familias', description: 'IMV, desempleo, bono social, deducciones familiares' },
+    { url: '/orientador-discapacidad/', icon: '♿', name: 'Grado de Discapacidad', description: '¿Vale la pena solicitarlo?' },
+    { url: '/estimador-sueldo-neto/', icon: '💶', name: 'Estimador Sueldo Neto', description: 'Deducciones familiares en tu nómina' },
+    { url: '/estimacion-baja-maternal/', icon: '📅', name: 'Baja Maternal y Paternal', description: 'Permiso por nacimiento, semanas y prestación' },
   ],
   // FAMILIA: IRPF Y FISCAL GENERAL
   // ==========================================
