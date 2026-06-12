@@ -159,7 +159,28 @@
 
 **Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
 
-**Pendiente Grupo 1**: `comparador-autonomo-vs-sl` (`comparar_autonomo_vs_sl`), `orientador-gastos-deducibles` (`calcular_gastos_deducibles_autonomo`), `orientador-tarifa-freelance`/`calculadora-precio-por-proyecto` (`calcular_tarifa_freelance`), `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador).
+#### 43. `comparador-autonomo-vs-sl` (Comparador Autónomo vs SL) — tool `comparar_autonomo_vs_sl`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 43.1 | 🟠 Medio | `page.tsx` tabla comparativa, fila "Cotización mínima mensual SS" | "~230 €/mes (rendimiento bajo, tramo mínimo 2025)" para autónomo y "~512 €/mes" para SL — mismo patrón que #42: tramo mínimo RETA 2026 es 205,88 €/mes y autónomo societario 2026 es 514,99 €/mes (`AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual`, `data/fiscal/sociedades.ts`). | Actualizado a "~206 €/mes (rendimiento bajo, tramo mínimo 2026)" y "~515 €/mes". |
+| 43.2 | 🔴 Crítico | `page.tsx` "Casos de Uso", Caso 1 (Freelance 30.000€) y Caso 2 (Consultor 60.000€) | Las cifras de IRPF/RETA/IS de los 4 escenarios no coinciden con la fórmula del propio comparador (`calcularAutonomo`/`calcularSL`) aplicada a esos mismos importes con los datos 2026 — desviaciones del 25-45%. En Caso 2, el veredicto "Empieza a compensar... ahorro neto real ~3.400 €/año" es la conclusión opuesta a la real: con datos 2026 el ahorro bruto es de solo ~790 € y los costes fijos de la SL (~5.500 €/año) lo convierten en un **sobrecoste neto de ~4.700 €/año** — la SL NO compensa a ese nivel. Es la "comparativa" central de una herramienta cuyo propósito es orientar la decisión autónomo vs SL, expuesta también como tool `comparar_autonomo_vs_sl` de Delegum. | Recalculado con `calcularAutonomo`/`calcularSL` y datos 2026: Caso 1 autónomo 4.015€ IRPF + 5.126€ RETA = 9.142€ (vs SL 18.285€ repartiendo dividendos, veredicto reforzado "no compensa"); Caso 2 autónomo 13.426€ IRPF + 6.547€ RETA = 19.973€ vs SL con salario 30.000€: 7.500€ IS + 5.500€ IRPF salario + 6.180€ autónomo societario = 19.180€ → ahorro bruto ~790€, sobrecoste neto ~4.700€/año tras costes fijos SL. Veredicto reescrito: "a este nivel la SL todavía no compensa por motivos fiscales". |
+| 43.3 | 🟡 Bajo | `page.tsx` Caso 3 (reinversión 80.000€) | "Como autónomo, tributarías al 43-47% de IRPF" — 43% no es un tipo marginal real de `TRAMOS_IRPF_2025` (19/24/30/37/45/47); para un rendimiento neto de ~80.000€ el marginal real es 45%, no 47%. | "tributarías hasta al 45% de IRPF en el tramo superior". |
+| 43.4 | 🟠 Medio | `page.tsx` tabla comparativa fila "Capital mínimo" vs FAQ JSON-LD (`metadata.ts`) | La tabla decía "3.000 € (o 1 € SRL formación sucesiva)", contradiciendo la propia FAQ de la misma app ("capital mínimo de 1 €, desde la reforma de 2023, antes eran 3.000 €") — la categoría "SRL formación sucesiva" como régimen separado fue eliminada por la Ley 18/2022 (Crea y Crece); el mínimo legal es 1 € para cualquier SL, con reserva legal del 20% y responsabilidad solidaria hasta 3.000 € si el capital es menor. | Tabla actualizada a "1 € (si es < 3.000 €, reserva legal especial hasta alcanzarlos)"; paso 2 de la guía de constitución reescrito sin la terminología "SRL de formación sucesiva". |
+| 43.5 | 🟡 Bajo | `page.tsx` FAQ interna "¿Puedo ser administrador...?" y "¿El autónomo societario tiene las mismas prestaciones?" | "~512 €/mes (2025)" y "~1.634 €/mes en 2025" — mismo dato 2025/2026 que 43.1. | Actualizado a "~515 €/mes (2026)" y "~1.634 €/mes en 2026". |
+
+**RelatedApps/ShareCard/Footer**: correctos. `DisclaimerCard severity="critical"`, `RegionBadge variant="es-only"`, `DataReference` con `FISCAL_AUTONOMOS_META` correctos. La lógica viva del comparador (`calcularAutonomo`/`calcularSL`) ya importa correctamente `TRAMOS_RETA_2025`/`TIPO_COTIZACION_RETA` 2026 (sin hardcodear) — el problema estaba solo en los ejemplos estáticos del bloque educativo, no en el cálculo interactivo.
+
+**Correcciones aplicadas**:
+- 43.1: tramo mínimo RETA y cuota autónomo societario actualizados a 2026 en la tabla comparativa.
+- 43.2: Casos 1 y 2 recalculados con la fórmula real 2026; veredicto del Caso 2 invertido (de "empieza a compensar" a "no compensa a este nivel").
+- 43.3: "43-47%" → "hasta al 45%".
+- 43.4: tabla "Capital mínimo" y paso 2 de la guía alineados con la FAQ (mínimo legal 1€, régimen único desde Ley 18/2022).
+- 43.5: 2 referencias "(2025)" → "(2026)" en FAQ internas.
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Pendiente Grupo 1**: `orientador-gastos-deducibles` (`calcular_gastos_deducibles_autonomo`), `orientador-tarifa-freelance`/`calculadora-precio-por-proyecto` (`calcular_tarifa_freelance`), `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador).
 
 ---
 

@@ -461,7 +461,7 @@ export default function ComparadorAutonomoVsSLPage() {
                 <tr>
                   <td>Capital mínimo</td>
                   <td>0 €</td>
-                  <td>3.000 € (o 1 € SRL formación sucesiva)</td>
+                  <td>1 € (si es &lt; 3.000 €, reserva legal especial hasta alcanzarlos)</td>
                 </tr>
                 <tr>
                   <td>Responsabilidad patrimonial</td>
@@ -475,8 +475,8 @@ export default function ComparadorAutonomoVsSLPage() {
                 </tr>
                 <tr>
                   <td>Cotización mínima mensual SS</td>
-                  <td>~230 €/mes (rendimiento bajo, tramo mínimo 2025)</td>
-                  <td>~512 €/mes (autónomo societario obligatorio)</td>
+                  <td>~206 €/mes (rendimiento bajo, tramo mínimo 2026)</td>
+                  <td>~515 €/mes (autónomo societario obligatorio)</td>
                 </tr>
                 <tr>
                   <td>Costes de constitución</td>
@@ -518,16 +518,17 @@ export default function ComparadorAutonomoVsSLPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Como <strong>autónomo</strong>: ~8.200 € IRPF + ~3.900 € RETA = <strong>12.100 € en cargas</strong>.
+                  Como <strong>autónomo</strong>: ~4.015 € IRPF + ~5.126 € RETA = <strong>9.142 € en cargas</strong>.
                 </p>
                 <p>
-                  Como <strong>SL</strong> (IS 25%): ~5.400 € IS + ~6.144 € autónomo societario = ~11.500 €.
-                  Añade costes fijos SL de ~5.000-6.000 €/año (gestoría, cuentas anuales, etc.).
+                  Como <strong>SL</strong> (IS 25%, repartiendo todo como dividendos): ~7.500 € IS + ~4.605 € IRPF
+                  sobre dividendos + ~6.180 € autónomo societario = <strong>~18.285 € en cargas</strong>, más los
+                  costes fijos de la SL (~5.000-6.000 €/año de gestoría, cuentas anuales, etc.).
                 </p>
               </div>
               <p className={styles.escenarioTip}>
-                Veredicto: La SL no compensa a este nivel. Los costes fijos anuales eliminan el ahorro fiscal.
-                Continúa como autónomo.
+                Veredicto: La SL no compensa a este nivel: ya supone casi el doble de carga que el autónomo
+                (18.285 € vs 9.142 €) antes incluso de sumar los costes fijos de gestoría. Continúa como autónomo.
               </p>
             </div>
 
@@ -538,15 +539,19 @@ export default function ComparadorAutonomoVsSLPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p>
-                  Como <strong>autónomo</strong>: ~22.000 € IRPF + ~5.500 € RETA = <strong>27.500 € en cargas</strong>.
+                  Como <strong>autónomo</strong>: ~13.426 € IRPF + ~6.547 € RETA = <strong>19.973 € en cargas</strong>.
                 </p>
                 <p>
-                  Como <strong>SL</strong> con salario 30.000 €: IS ~7.500 € + IRPF salario ~5.000 € + autónomo societario ~6.144 €
-                  = ~18.600 €. Ahorro bruto ~8.900 €, menos costes SL ~5.500 € → <strong>ahorro neto real ~3.400 €/año</strong>.
+                  Como <strong>SL</strong> con salario 30.000 €: IS ~7.500 € + IRPF salario ~5.500 € + autónomo societario ~6.180 €
+                  = ~19.180 €. El ahorro bruto es de solo ~790 €, que los costes fijos de la SL (~5.500 €/año)
+                  convierten en un <strong>sobrecoste neto de ~4.700 €/año</strong>.
                 </p>
               </div>
               <p className={styles.escenarioTip}>
-                Veredicto: Empieza a compensar. Si reinviertes beneficios y no lo retiras todo, el ahorro real puede superar 6.000 €/año.
+                Veredicto: A este nivel la SL todavía no compensa por motivos fiscales: la diferencia bruta es
+                mínima y los costes fijos la convierten en la opción más cara. La SL empieza a tener sentido en
+                niveles de beneficio más altos, al reinvertir sin repartir salario íntegro, o por motivos no
+                fiscales (responsabilidad, imagen, contratos).
               </p>
             </div>
 
@@ -559,7 +564,7 @@ export default function ComparadorAutonomoVsSLPage() {
                 <p>
                   Si tienes 80.000 € de beneficio y reinviertes 50.000 € en la empresa (equipos, contrataciones,
                   marketing), la SL solo tributa al <strong>23-25% IS</strong> por esos 50.000 € que no retiras.
-                  Como autónomo, tributarías al 43-47% de IRPF por <em>todos</em> los beneficios, reinviertas o no.
+                  Como autónomo, tributarías hasta al 45% de IRPF por <em>todos</em> los beneficios, reinviertas o no.
                 </p>
               </div>
               <p className={styles.escenarioTip}>
@@ -604,7 +609,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <dt>¿Puedo ser administrador de mi SL sin cobrar salario?</dt>
               <dd>
                 Sí, pero debes estar dado de alta como autónomo societario igualmente si controlas más del 25%
-                del capital social y trabajas en la empresa. La cotización mínima es ~512 €/mes (2025)
+                del capital social y trabajas en la empresa. La cotización mínima es ~515 €/mes (2026)
                 independientemente de si te pagas salario. No cobrar salario puede generar problemas con la AEAT
                 por operaciones vinculadas si la SL tiene actividad real.
               </dd>
@@ -653,7 +658,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <dd>
                 Sí, en general. El autónomo societario cotiza en el RETA y tiene acceso a las mismas prestaciones:
                 cese de actividad (paro del autónomo), incapacidad temporal, jubilación, maternidad/paternidad.
-                La diferencia es que la base de cotización suele ser más alta (mínimo ~1.634 €/mes en 2025),
+                La diferencia es que la base de cotización suele ser más alta (mínimo ~1.634 €/mes en 2026),
                 lo que implica mayor cuota pero también mejores prestaciones futuras.
               </dd>
             </div>
@@ -695,9 +700,10 @@ export default function ComparadorAutonomoVsSLPage() {
               <div className={styles.stepContent}>
                 <h4>Apertura de cuenta bancaria y depósito del capital social</h4>
                 <p>
-                  Abre una cuenta a nombre de la sociedad en constitución y deposita el capital mínimo:
-                  <strong> 3.000 € para SRL estándar</strong> o <strong>1 € para SRL de formación sucesiva</strong>
-                  (con restricciones de reparto de dividendos hasta alcanzar 3.000 € en reservas). El banco
+                  Abre una cuenta a nombre de la sociedad en constitución y deposita el capital social que
+                  elijas: el mínimo legal es <strong>1 €</strong>, aunque si optas por menos de 3.000 € se aplican
+                  restricciones (reserva legal del 20% del beneficio hasta alcanzar esa cifra y responsabilidad
+                  solidaria de socios y administradores hasta 3.000 € en caso de liquidación). El banco
                   emitirá un certificado de depósito que necesitarás en el notario. Plazo: 2-5 días hábiles.
                 </p>
               </div>
@@ -764,7 +770,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <h4>Evalúa el umbral real de rentabilidad</h4>
               <p>
                 No crees una SL solo por el ahorro fiscal si los beneficios son inferiores a <strong>50.000 €</strong>.
-                Los costes fijos anuales (gestoría ~3.000 €, cuentas anuales, autónomo societario ~6.144 €)
+                Los costes fijos anuales (gestoría ~3.000 €, cuentas anuales, autónomo societario ~6.180 €)
                 suman fácilmente <strong>5.000-7.000 €/año</strong> en obligaciones que el autónomo no tiene.
                 Haz el cálculo neto real antes de decidir.
               </p>
