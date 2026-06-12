@@ -750,7 +750,7 @@ export default function JuegoSpaceInvadersPage() {
                   <th>Nivel</th>
                   <th>Velocidad invasores</th>
                   <th>Puntos por invasor</th>
-                  <th>Dificultad defensas</th>
+                  <th>Frecuencia de disparo enemigo</th>
                   <th>Estrategia recomendada</th>
                 </tr>
               </thead>
@@ -760,7 +760,7 @@ export default function JuegoSpaceInvadersPage() {
                   <td>Muy pausada</td>
                   <td>10 – 30 pts</td>
                   <td>Baja</td>
-                  <td>Aprender patrones, acumular puntos con el OVNI</td>
+                  <td>Aprender los patrones de movimiento y practicar el ritmo de disparo</td>
                 </tr>
                 <tr>
                   <td>🟡 Nivel 3 (medio)</td>
@@ -884,10 +884,10 @@ export default function JuegoSpaceInvadersPage() {
               <details>
                 <summary>¿Qué invasor da más puntos?</summary>
                 <p>
-                  En el arcade original, los invasores de la fila superior (los más pequeños, tipo
-                  cangrejo) valen 30 puntos, los de las filas intermedias 20 puntos, y los de las
-                  filas inferiores 10 puntos. El OVNI rojo que cruza en la parte superior puede valer
-                  entre 50 y 300 puntos dependiendo del número de disparo realizado.
+                  En esta versión, los invasores de la fila superior (👾) valen 30 puntos, los de la
+                  fila intermedia (👽) valen 20 puntos, y los de la fila inferior (🛸) valen 10 puntos.
+                  Cada vez que destruyes un invasor se genera una pequeña explosión de partículas en
+                  su posición, una referencia visual al feedback de impacto del arcade original.
                 </p>
               </details>
             </li>
@@ -952,23 +952,24 @@ export default function JuegoSpaceInvadersPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">3</span>
               <div className={styles.stepContent}>
-                <strong>Usar las defensas como cobertura táctica</strong>
+                <strong>Mantén siempre una vía de escape lateral</strong>
                 <p>
-                  Los búnkeres (defensas) absorben los disparos enemigos. Posiciona tu cañón detrás
-                  de una defensa intacta para disparar a través del hueco que tú mismo vayas creando.
-                  No te quedes detrás de una defensa ya muy destruida — no ofrece protección real.
+                  Tu nave se mueve en pasos fijos sobre una rejilla, así que evita acorralarte contra
+                  un extremo de la pantalla. Deja margen para desplazarte hacia ambos lados: cuando un
+                  disparo enemigo descienda hacia tu posición, necesitarás espacio para apartarte sin
+                  quedarte contra el borde del campo de juego.
                 </p>
               </div>
             </li>
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">4</span>
               <div className={styles.stepContent}>
-                <strong>El OVNI rojo aparece periódicamente — vale muchos puntos</strong>
+                <strong>Vigila el cambio de dirección de la formación</strong>
                 <p>
-                  El OVNI aparece cada cierto tiempo cruzando la parte superior de la pantalla. En el
-                  arcade original el valor (50, 100, 150 o 300 puntos) depende del número total de
-                  disparos realizados. Cuando lo veas, interrumpe momentáneamente la táctica habitual
-                  e intenta derribarlo antes de que desaparezca.
+                  Cuando un invasor de la fila más adelantada toca un borde de la pantalla, toda la
+                  formación invierte su dirección y desciende una fila hacia ti. Ese momento es el
+                  más peligroso: la formación está más cerca y tu margen de maniobra se reduce, así
+                  que aprovecha los instantes previos para reposicionarte.
                 </p>
               </div>
             </li>
@@ -1009,21 +1010,21 @@ export default function JuegoSpaceInvadersPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
-              <h4>Usar las defensas inteligentemente</h4>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
+              <h4>Usa la pausa para reevaluar la situación</h4>
               <p>
-                No te quedes estático detrás de una defensa ya destruida pensando que te protege.
-                Evalúa constantemente el estado de los búnkeres y reposiciónate en cuanto uno quede
-                inutilizable como cobertura.
+                Si la formación se complica, pulsa P para pausar y observar con calma qué columnas
+                quedan activas y desde dónde llegan los disparos enemigos. Reanuda con un plan claro
+                en lugar de reaccionar de forma improvisada bajo presión.
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon} aria-hidden="true">🛸</span>
-              <h4>El OVNI vale entre 50 y 300 puntos</h4>
+              <span className={styles.tipIcon} aria-hidden="true">👾</span>
+              <h4>Prioriza según la fila cuando puedas elegir</h4>
               <p>
-                El valor del OVNI rojo no es aleatorio en el original: depende del número de disparo.
-                El disparo número 23 (y cada 15 disparos después) garantiza 300 puntos. En versiones
-                modernas el valor puede variar, pero siempre merece intentar derribarlo.
+                Los invasores 👾 de la fila superior valen 30 puntos, los 👽 de la fila media 20, y
+                los 🛸 de la fila inferior 10. Si tienes vía libre hacia varias filas, apunta primero
+                a los de mayor valor sin descuidar la amenaza inmediata de los que están más cerca.
               </p>
             </div>
           </div>
@@ -1053,10 +1054,10 @@ export default function JuegoSpaceInvadersPage() {
                 que eran fácilmente esquivables con un simple paso lateral a tiempo.
               </li>
               <li>
-                <strong>Ignorar el OVNI rojo.</strong> Es la mayor fuente de puntos bonus del juego.
-                Pasar por alto sus apariciones porque &quot;interrumpe la estrategia&quot; es ceder cientos
-                de puntos que pueden marcar la diferencia entre superar o no un nivel de dificultad
-                alta.
+                <strong>Dejar pasar a los invasores de mayor valor.</strong> Los invasores 👾 de la
+                fila superior valen 30 puntos, el triple que los 🛸 de la fila inferior. Centrarte
+                solo en los más cercanos y descuidar las filas superiores cuando tienes línea de
+                tiro libre te hace perder puntuación fácil de conseguir.
               </li>
             </ul>
           </div>

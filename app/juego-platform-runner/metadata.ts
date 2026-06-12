@@ -48,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Qué es Platform Runner y cómo se juega?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Platform Runner es un juego de plataformas en el que controlas un personaje que corre, salta, recolecta monedas y derrota enemigos superando niveles de dificultad progresiva. Se juega con las teclas de flecha (movimiento) y la barra espaciadora o flecha arriba para saltar. El objetivo es llegar al final de cada nivel recolectando el mayor número de monedas posible.',
+        text: 'Platform Runner es un juego de plataformas en el que controlas un personaje que corre, salta, recolecta monedas y derrota enemigos superando niveles de dificultad progresiva. Se juega con las teclas de flecha (movimiento) y la barra espaciadora para saltar. El objetivo es llegar al final de cada nivel recolectando el mayor número de monedas posible.',
       },
     },
     {

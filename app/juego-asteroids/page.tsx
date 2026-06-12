@@ -1146,7 +1146,7 @@ export default function JuegoAsteroidsPage() {
                 <p>
                   Un asteroide grande (20 pts) se divide en 2 medianos (50 pts cada uno).
                   Un mediano se divide en 2 pequeños (100 pts cada uno). Destruir un
-                  grande por completo hasta los pequeños te da 420 puntos totales.
+                  grande por completo hasta los pequeños te da 520 puntos totales.
                   Prioriza eliminar toda la cadena antes de pasar al siguiente grande.
                 </p>
               </div>
@@ -1166,12 +1166,12 @@ export default function JuegoAsteroidsPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">5</span>
               <div className={styles.stepContent}>
-                <strong>Usa el hiperespacio solo como último recurso</strong>
+                <strong>Limita tus disparos: solo 5 balas activas a la vez</strong>
                 <p>
-                  El hiperespacio (botón H en teclado) te teletransporta a una
-                  posición aleatoria del mapa. Puede salvarte de una colisión
-                  inminente, pero también puede teletransportarte encima de un
-                  asteroide. Úsalo únicamente cuando no haya escapatoria posible.
+                  El juego permite un máximo de 5 balas en pantalla simultáneamente.
+                  Si disparas sin control, te quedarás sin munición disponible justo
+                  cuando más la necesites. Dispara con criterio, deja que las balas
+                  antiguas expiren o impacten antes de saturar la pantalla con nuevos disparos.
                 </p>
               </div>
             </li>
@@ -1213,12 +1213,12 @@ export default function JuegoAsteroidsPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚡</span>
-              <h4>El hiperespacio es un riesgo calculado</h4>
+              <h4>Domina la rotación antes que el impulso</h4>
               <p>
-                Aunque tentador en momentos de pánico, el hiperespacio puede
-                teletransportarte encima de un asteroide. Si lo usas, hazlo
-                solo cuando estás rodeado sin escapatoria y acepta que el
-                resultado es incierto. No es un poder, es una apuesta.
+                Practica girar la nave con las flechas izquierda/derecha (o A/D)
+                sin aplicar impulso. Cuanto más preciso sea tu ángulo de disparo
+                antes de acelerar, menos correcciones de inercia necesitarás
+                después y menos riesgo de colisión por movimientos descontrolados.
               </p>
             </div>
           </div>
@@ -1251,10 +1251,10 @@ export default function JuegoAsteroidsPage() {
                 pulsar. La inercia residual mata más que los propios asteroides.
               </li>
               <li>
-                <strong>Usar el hiperespacio impulsivamente.</strong> En momentos
-                de pánico, el instinto es pulsar el hiperespacio. Pero teletransportarte
-                al azar puede ser fatal: puedes aparecer encima de un asteroide o
-                directamente en la trayectoria de un disparo del OVNI.
+                <strong>Vaciar el cargador sin necesidad.</strong> Disparar sin
+                parar hasta agotar las 5 balas disponibles te deja sin capacidad
+                de respuesta justo cuando aparece una amenaza real, como un
+                asteroide cercano o un disparo del OVNI.
               </li>
             </ul>
           </div>

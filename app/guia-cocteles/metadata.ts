@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Qué cócteles clásicos se pueden preparar sin alcohol?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Varios clásicos tienen versiones sin alcohol (mocktails) bien establecidas: el Virgin Mojito sustituye el ron por agua con gas y más lima; el Arnold Palmer mezcla té helado con limonada; el Shirley Temple usa ginger ale y granadina. Más allá de las versiones sin alcohol de clásicos, hay cócteles sin alcohol de identidad propia como el Seedlip Spritz o el Nojito. La clave es mantener el equilibrio ácido-dulce-amargo del original.',
+        text: 'Varios clásicos tienen versiones sin alcohol (mocktails) bien establecidas: el Virgin Mojito sustituye el ron por agua con gas y más lima; el Arnold Palmer mezcla té helado con limonada; el Shirley Temple usa ginger ale y granadina. Más allá de las versiones sin alcohol de clásicos, hay cócteles sin alcohol de identidad propia como el Agua de Valencia sin alcohol o el Cucumber Cooler. La clave es mantener el equilibrio ácido-dulce-amargo del original.',
       },
     },
     {

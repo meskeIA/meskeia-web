@@ -320,20 +320,12 @@ export default function JuegoMemoriaPage() {
                   <td>8-12 años / adultos principiantes</td>
                 </tr>
                 <tr>
-                  <td>🧠 Difícil (5×4)</td>
-                  <td>10 pares</td>
-                  <td>4-7 min</td>
+                  <td>🧠 Difícil (6×4)</td>
+                  <td>12 pares</td>
+                  <td>5-9 min</td>
                   <td>Alto</td>
                   <td>Memoria de trabajo, concentración profunda</td>
                   <td>12+ años / adultos en entrenamiento</td>
-                </tr>
-                <tr>
-                  <td>🔥 Experto (6×5)</td>
-                  <td>15 pares</td>
-                  <td>7-12 min</td>
-                  <td>Muy alto</td>
-                  <td>Memoria visual avanzada, resistencia cognitiva</td>
-                  <td>Adultos / usuarios avanzados</td>
                 </tr>
               </tbody>
             </table>

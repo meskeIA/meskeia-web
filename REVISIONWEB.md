@@ -296,11 +296,11 @@ Build verificado: 999 apps, 1300 páginas, exit 0.
 
 | Severidad | Nº hallazgos |
 |---|---|
-| 🔴 Crítico | 2 |
-| 🟠 Medio | 12 |
+| 🔴 Crítico | 0 (2 corregidos en Tanda 1) |
+| 🟠 Medio | 6 (6 corregidos en Tanda 1) |
 | 🟡 Bajo | 23 |
 
-**Hallazgos críticos**:
+**Hallazgos críticos** (✅ corregidos en Tanda 1, ver sección "Tanda 1 — Fase 2" más abajo):
 - `juego-space-invaders`: el contenido educativo describe búnkeres/defensas y un OVNI bonus como mecánicas centrales del juego, pero ninguna de las dos existe en la implementación real (solo hay nave, balas, filas de invasores y partículas).
 - `juego-asteroids`: el contenido educativo dedica tres secciones a la mecánica de "hiperespacio" (tecla H, teletransporte), inexistente en el código; además un cálculo de puntos de la guía da 420 cuando el resultado correcto con las constantes reales del juego es 520.
 
@@ -523,24 +523,31 @@ Sin hallazgos relevantes. El generador de tiradas (`rollDie`/`rollDice`/`quickRo
 
 ---
 
+## Tanda 1 — Fase 2 Juegos y Ocio — ✅ COMPLETADA (2026-06-12)
+
+Corregidos los 2 hallazgos 🔴 Crítico y 6 de los 12 hallazgos 🟠 Medio mediante 7 ediciones (Opción A: corrección de contenido educativo para que coincida con la implementación real, sin cambios de lógica de juego):
+
+1. `juego-space-invaders` (28.1) — eliminadas todas las referencias a búnkeres/defensas y OVNI del contenido educativo (guía, tips, errores comunes, FAQ y tabla de niveles); sustituidas por mecánicas reales (filas de invasores 30/20/10 pts, partículas de explosión, frecuencia de disparo enemigo, pausa).
+2. `juego-asteroids` (22.1, 22.2) — eliminadas las 3 menciones a "hiperespacio" (tecla H inexistente), sustituidas por consejos sobre `MAX_BULLETS = 5` y gestión de rotación/inercia; corregido el cálculo "420 puntos totales" → "520 puntos totales".
+3. `generador-loteria` (19.1) — eliminadas menciones a Quiniela/El Gordo de Navidad (inexistentes en `LOTTERY_CONFIG`) en `description`, `keywords`, `jsonLd.features` y FAQ; añadida pregunta FAQ real sobre Lototurf.
+4. `guia-cocteles` (20.1) — corregida FAQ de mocktails: "Seedlip Spritz"/"Nojito" (inexistentes) sustituidos por "Agua de Valencia sin alcohol" y "Cucumber Cooler" (sí presentes en el dataset de 45 cócteles).
+5. `juego-memoria` (23.1) — eliminada la fila "🔥 Experto (6×5, 15 pares)" (inexistente) de la tabla de niveles; corregida la fila "Difícil" a "12 pares, 6×4" conforme a `CONFIGURACION`.
+6. `juego-ahorcado` (24.1) — corregido `'CAMBODIA'` → `'CAMBOYA'` en el array de países.
+7. `juego-platform-runner` (26.1) — corregida FAQ de controles: "barra espaciadora o flecha arriba para saltar" → "barra espaciadora para saltar" (ArrowUp no gestiona el salto).
+
+**Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
+
 ## Próximos pasos (Fase 2) — Suite Juegos y Ocio
 
-Pendiente de priorización por el usuario. Candidatos para Tanda 1 (severidad 🔴 y 🟠):
+**Tanda 2** — 6 candidatos 🟠 Medio restantes:
 
-1. `juego-space-invaders` — eliminar referencias a búnkeres/defensas y OVNI del contenido educativo (28.1) o implementarlas
-2. `juego-asteroids` — eliminar/implementar mecánica de hiperespacio (22.1) y corregir cálculo 420→520 puntos (22.2)
-3. `generador-loteria` — resolver discrepancia Quiniela/El Gordo Navidad vs Lototurf (19.1)
-4. `guia-cocteles` — corregir ejemplos de mocktails inexistentes (20.1)
-5. `juego-memoria` — corregir tabla de niveles (Experto inexistente, Difícil incorrecto) (23.1)
-6. `juego-ahorcado` — CAMBODIA → CAMBOYA (24.1)
-7. `juego-platform-runner` — corregir FAQ de tecla de salto (26.1)
-8. `juego-puzzle-matematico` — corregir afirmación de dificultad adaptativa (27.1)
-9. `juego-sudoku` — corregir afirmación de unicidad garantizada o nivel "Experto" inexistente (29.1, 29.2)
-10. `metronomo` — unificar rango "Allegro" en los 4 lugares (32.1)
-11. `radio-meskeia` — corregir emisoras destacadas con URL vacía (34.1)
-12. `ruleta-aleatoria` — corregir FAQ de añadir opciones (35.1)
-13. `test-velocidad-escritura` — corregir afirmación de "PPM netas" (36.1)
+1. `juego-puzzle-matematico` — corregir afirmación de dificultad adaptativa (27.1)
+2. `juego-sudoku` — corregir afirmación de unicidad garantizada o nivel "Experto" inexistente (29.1, 29.2)
+3. `metronomo` — unificar rango "Allegro" en los 4 lugares (32.1)
+4. `radio-meskeia` — corregir emisoras destacadas con URL vacía (34.1)
+5. `ruleta-aleatoria` — corregir FAQ de añadir opciones (35.1)
+6. `test-velocidad-escritura` — corregir afirmación de "PPM netas" (36.1)
 
-El resto de hallazgos 🟡 Bajo (estadísticas sin fuente, términos España-only) pueden agruparse en una sesión de "limpieza menor" posterior, igual que en la Suite Viajes.
+El resto de hallazgos 🟡 Bajo (estadísticas sin fuente, términos España-only) pueden agruparse en una sesión de "limpieza menor" posterior (Tandas 3-5), igual que en la Suite Viajes.
 
 

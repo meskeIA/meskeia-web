@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador Lotería: Primitiva, Euromillones, Bonoloto | meskeIA',
-  description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo y Quiniela. Combinaciones al azar, historial y estadísticas. Gratis y sin registro.',
-  keywords: 'generador loteria, numeros primitiva, euromillones, bonoloto, el gordo, quiniela, numeros aleatorios, combinaciones loteria, numeros suerte',
+  description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf. Combinaciones al azar, historial y estadísticas. Gratis y sin registro.',
+  keywords: 'generador loteria, numeros primitiva, euromillones, bonoloto, el gordo, lototurf, numeros aleatorios, combinaciones loteria, numeros suerte',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,12 +36,12 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Generador de Números de Lotería',
-  description: 'Generador de combinaciones aleatorias para loterías españolas: Primitiva, Euromillones, Bonoloto, El Gordo y Quiniela. Genera números al azar con historial y estadísticas.',
+  description: 'Generador de combinaciones aleatorias para loterías españolas: Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf. Genera números al azar con historial y estadísticas.',
   url: 'https://meskeia.com/generador-loteria/',
   category: 'UtilityApplication',
   features: [
     'Generador de números aleatorios para 5 loterías españolas',
-    'Primitiva, Euromillones, Bonoloto, El Gordo, Quiniela',
+    'Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva, Lototurf',
     'Múltiples combinaciones por sorteo',
     'Historial de combinaciones generadas',
     'Estadísticas básicas de los números generados',
@@ -89,10 +89,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Puedo generar combinaciones para la Quiniela o El Gordo de Navidad?',
+      name: '¿Puedo generar combinaciones para Lototurf con esta herramienta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El generador incluye opciones para la Quiniela de fútbol (15 resultados: 1, X, 2) y para El Gordo de la Primitiva (5 números del 1 al 54 más un número clave del 0 al 9). Puedes cambiar la modalidad en el selector y generar tantas combinaciones como necesites.',
+        text: 'Sí. El generador incluye Lototurf, que consiste en 6 números del 1 al 31 más un caballo ganador del 1 al 12. Selecciona esta modalidad en el listado de loterías y genera tantas combinaciones aleatorias como necesites, igual que con el resto de loterías disponibles.',
       },
     },
   ],
