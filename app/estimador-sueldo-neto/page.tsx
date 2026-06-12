@@ -7,7 +7,7 @@ import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, Relat
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025, calcularDeduccionRentasBajas } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularDeduccionRentasBajas } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -64,6 +64,14 @@ function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: number; me
   };
 }
 
+// Función para calcular la reducción por rendimientos del trabajo (art. 20 LIRPF)
+function calcularReduccionRNT(rnt: number): number {
+  const red = REDUCCION_RENDIMIENTOS_TRABAJO_2025;
+  if (rnt <= red.limite1) return red.reduccion1;
+  if (rnt >= red.limite2) return red.reduccion2;
+  return red.reduccion1 - red.factorInterpolacion * (rnt - red.limite1);
+}
+
 // Función para calcular mínimos personales
 function calcularMinimosPersonales(
   situacion: SituacionFamiliar,
@@ -107,11 +115,15 @@ function calcularBrutoANeto(
   deduccionRentasBajas: number;
 } {
   const ss = calcularSeguridadSocial(brutoAnual);
-  const baseImponible = brutoAnual - ss.anual;
+  // Rendimiento neto del trabajo (RNT): bruto - SS - gastos deducibles generales (art. 19 LIRPF)
+  const rnt = Math.max(0, brutoAnual - ss.anual - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
+  // Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF)
+  const reduccionRNT = calcularReduccionRNT(rnt);
+  const baseImponible = Math.max(0, rnt - reduccionRNT);
   const minimos = calcularMinimosPersonales(situacion, numHijos, hijosMenores3);
   const cuotaIRPF = calcularIRPF(baseImponible, minimos);
   // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
-  const deduccion = calcularDeduccionRentasBajas(baseImponible, 0);
+  const deduccion = calcularDeduccionRentasBajas(rnt, 0);
   const irpfAnual = Math.max(0, cuotaIRPF - deduccion);
   const tipoRetencion = brutoAnual > 0 ? (irpfAnual / brutoAnual) * 100 : 0;
   const netoAnual = brutoAnual - ss.anual - irpfAnual;
@@ -568,14 +580,21 @@ export default function EstimadorSueldoNetoPage() {
           <div className={styles.infoBox}>
             <h4>📌 Ejemplo práctico</h4>
             <p>
-              Si ganas 30.000 € brutos, NO pagas el 30% de todo. Pagas:
+              Si tu <strong>base liquidable</strong> (lo que queda tras restar a tu bruto la Seguridad
+              Social, los gastos deducibles, la reducción por rendimientos del trabajo y el mínimo
+              personal/familiar) es de 30.000 €, NO pagas el 30% de todo. Pagas:
             </p>
             <ul>
               <li>19% de los primeros 12.450 € = 2.365,50 €</li>
               <li>24% de 12.450 € a 20.200 € = 1.860 €</li>
               <li>30% de 20.200 € a 30.000 € = 2.940 €</li>
-              <li><strong>Total IRPF</strong>: 7.165,50 € (23,88% efectivo, no 30%)</li>
+              <li><strong>Total IRPF</strong>: 7.165,50 € (23,88% efectivo sobre la base liquidable, no 30%)</li>
             </ul>
+            <p>
+              Esa base liquidable de 30.000 € corresponde a un salario bruto considerablemente más alto:
+              las deducciones previas suelen reducir el bruto en varios miles de euros antes de llegar
+              a la base sobre la que se aplican estos tramos.
+            </p>
           </div>
         </section>
 
@@ -681,21 +700,21 @@ export default function EstimadorSueldoNetoPage() {
                 </tr>
                 <tr>
                   <td>Neto mensual estimado</td>
-                  <td>~1.985 €</td>
-                  <td>~1.701 € + 2 extras de ~1.701 €</td>
-                  <td>~1.985 €</td>
+                  <td>~2.027 €</td>
+                  <td>~1.738 € + 2 extras de ~1.738 €</td>
+                  <td>~2.027 €</td>
                 </tr>
                 <tr>
                   <td>Retención mensual IRPF</td>
-                  <td>~375 €</td>
-                  <td>~320 € (base menor)</td>
-                  <td>~375 €</td>
+                  <td>~311 €</td>
+                  <td>~267 € (mensualidad menor)</td>
+                  <td>~311 €</td>
                 </tr>
                 <tr>
                   <td>Neto anual total</td>
-                  <td>~23.820 €</td>
-                  <td>~23.814 €</td>
-                  <td>~23.820 €</td>
+                  <td>~24.327 €</td>
+                  <td>~24.327 €</td>
+                  <td>~24.327 €</td>
                 </tr>
                 <tr>
                   <td>Ventaja principal</td>
@@ -737,11 +756,11 @@ export default function EstimadorSueldoNetoPage() {
                 <p><strong>Perfil:</strong> 22.000 € brutos, soltero/a, sin hijos</p>
                 <ul>
                   <li>SS trabajador (6,47%): <strong>1.423 €/año</strong></li>
-                  <li>Base imponible IRPF: <strong>20.577 €</strong></li>
-                  <li>IRPF anual (mínimo 5.550 €): <strong>~2.790 €</strong></li>
-                  <li>Retención efectiva: <strong>~12,7%</strong></li>
-                  <li>Neto anual: <strong>~17.787 €</strong></li>
-                  <li>Neto mensual (12 pagas): <strong>~1.482 €</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>16.213 €</strong></li>
+                  <li>IRPF anual (mínimo personal 5.550 €): <strong>~2.026 €</strong></li>
+                  <li>Retención efectiva: <strong>~9,2%</strong></li>
+                  <li>Neto anual: <strong>~18.551 €</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>~1.546 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -758,15 +777,16 @@ export default function EstimadorSueldoNetoPage() {
                 <p><strong>Perfil:</strong> 35.000 € brutos, casado/a (dos ingresos), 1 hijo</p>
                 <ul>
                   <li>SS trabajador (6,47%): <strong>2.265 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>28.372 €</strong></li>
                   <li>Mínimo personal + hijo 1 (5.550 + 2.400): <strong>7.950 €</strong></li>
-                  <li>IRPF anual: <strong>~5.835 €</strong></li>
-                  <li>Retención efectiva: <strong>~16,7%</strong></li>
-                  <li>Neto anual: <strong>~26.900 €</strong></li>
-                  <li>Impacto del mínimo familiar: ahorra ~456 €/año en IRPF vs soltero</li>
+                  <li>IRPF anual: <strong>~4.292 €</strong></li>
+                  <li>Retención efectiva: <strong>~12,3%</strong></li>
+                  <li>Neto anual: <strong>~28.444 €</strong></li>
+                  <li>Impacto del mínimo familiar: ahorra ~720 €/año en IRPF vs soltero</li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Actualizar el modelo 145 al tener un hijo puede reducir tu retención mensual unos 38 €.
+                Consejo: Actualizar el modelo 145 al tener un hijo puede reducir tu retención mensual unos 60 €.
               </div>
             </div>
 
@@ -778,16 +798,16 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 80.000 € brutos, casado/a (dos ingresos), sin hijos</p>
                 <ul>
-                  <li>SS trabajador (base máx. 4.909 €/mes): <strong>~3.814 €/año</strong></li>
-                  <li>Base imponible IRPF: <strong>~76.186 €</strong></li>
-                  <li>IRPF anual: <strong>~22.750 €</strong></li>
-                  <li>Tipo efectivo real: <strong>~28,4%</strong></li>
-                  <li>Neto anual: <strong>~53.436 €</strong></li>
-                  <li>Neto mensual (12 pagas): <strong>~4.453 €</strong></li>
+                  <li>SS trabajador (base máx. 4.909 €/mes): <strong>~3.812 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~71.824 €</strong></li>
+                  <li>IRPF anual: <strong>~20.725 €</strong></li>
+                  <li>Tipo efectivo real: <strong>~25,9%</strong></li>
+                  <li>Neto anual: <strong>~55.463 €</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>~4.622 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorras ~370 € en IRPF a este nivel de ingresos.
+                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorras ~450 € en IRPF a este nivel de ingresos (tramo marginal 45%).
               </div>
             </div>
 
@@ -799,12 +819,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 14.000 € brutos, reducción por cuidado de hijos (50%)</p>
                 <ul>
-                  <li>SS trabajador (6,47%): <strong>906 €/año</strong></li>
-                  <li>Base imponible IRPF: <strong>13.094 €</strong></li>
+                  <li>SS trabajador (6,47% sobre base mínima 1.381,20 €/mes): <strong>~1.072 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~4.430 €</strong></li>
                   <li>Mínimo personal + familia monoparental: <strong>~7.700 €</strong></li>
-                  <li>IRPF anual: <strong>~1.028 €</strong></li>
-                  <li>Retención efectiva: <strong>~7,3%</strong></li>
-                  <li>Neto anual: <strong>~12.066 €</strong></li>
+                  <li>IRPF anual: <strong>0 € (base liquidable negativa, no tributa)</strong></li>
+                  <li>Retención efectiva: <strong>0%</strong></li>
+                  <li>Neto anual: <strong>~12.928 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -821,16 +841,16 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué es el MEI (Mecanismo de Equidad Intergeneracional) y cuánto me descuentan?</h4>
               <p>
-                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2025, el trabajador paga el <strong>0,12%</strong> y la empresa el <strong>0,58%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~29 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
+                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. El trabajador paga el <strong>0,12%</strong> y la empresa el <strong>0,58%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~36 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
               </p>
             </div>
 
             <div className={styles.faqItemPro}>
               <h4>¿Mi empresa puede pagarme menos del salario mínimo interprofesional?</h4>
               <p>
-                No. El <strong>SMI 2025 es de 1.184 €/mes en 14 pagas</strong> (16.576 € brutos anuales). Ningún convenio colectivo ni contrato puede establecer un salario inferior. Si tu empresa te paga menos, puedes reclamar ante la Inspección de Trabajo. Ojo: el SMI es la retribución bruta, antes de IRPF y SS.
+                No. El <strong>SMI 2026 es de 1.221 €/mes en 14 pagas</strong> (17.094 € brutos anuales). Ningún convenio colectivo ni contrato puede establecer un salario inferior. Si tu empresa te paga menos, puedes reclamar ante la Inspección de Trabajo. Ojo: el SMI es la retribución bruta, antes de IRPF y SS.
               </p>
-              <div className={styles.faqTipPro}>Referencia: RD 145/2025, publicado en el BOE de 11 de febrero de 2025.</div>
+              <div className={styles.faqTipPro}>Referencia: Real Decreto 126/2026, de 18 de febrero, publicado en el BOE.</div>
             </div>
 
             <div className={styles.faqItemPro}>
@@ -848,9 +868,9 @@ export default function EstimadorSueldoNetoPage() {
             </div>
 
             <div className={styles.faqItemPro}>
-              <h4>¿Cuánto es el SMI 2025 y cómo afecta a mi neto?</h4>
+              <h4>¿Cuánto es el SMI 2026 y cómo afecta a mi neto?</h4>
               <p>
-                El SMI 2025 es <strong>1.184 €/mes en 14 pagas = 16.576 € brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.050 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
+                El SMI 2026 es <strong>1.221 €/mes en 14 pagas = 17.094 € brutos anuales</strong>. Aplicando las deducciones estándar (soltero/a, sin hijos), el neto mensual estimado es de <strong>~1.126 €</strong>. Es importante saber que trabajadores con salarios de hasta el SMI que tengan rendimientos del trabajo por debajo de 22.000 € no están obligados a presentar la declaración de la renta (con un único pagador).
               </p>
             </div>
 
@@ -997,7 +1017,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <p>
-                <strong>SMI 2025: 1.184 €/mes en 14 pagas</strong> (16.576 € brutos anuales).
+                <strong>SMI 2026: 1.221 €/mes en 14 pagas</strong> (17.094 € brutos anuales).
                 Ningún contrato puede pactarse por debajo. Los trabajadores con ingresos hasta 22.000 €
                 con un único pagador no están obligados a presentar declaración de la renta, aunque
                 pueden hacerlo si el borrador les sale a devolver.

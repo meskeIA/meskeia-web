@@ -23,6 +23,7 @@ import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
+  calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
 
@@ -109,7 +110,11 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
     prevLimite = tramo.hasta === Infinity ? prevLimite : tramo.hasta;
   }
 
-  const retencionIRPF = desgloseTramosIRPF.reduce((s, t) => s + t.cuota, 0);
+  const cuotaIntegraIRPF = desgloseTramosIRPF.reduce((s, t) => s + t.cuota, 0);
+
+  // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
+  const deduccionRentasBajas = calcularDeduccionRentasBajas(rendimientoNeto, 0);
+  const retencionIRPF = Math.max(0, cuotaIntegraIRPF - deduccionRentasBajas);
   const tipoEfectivoIRPF = brutoAnual > 0 ? (retencionIRPF / brutoAnual) * 100 : 0;
 
   // 4. Neto

@@ -18,9 +18,11 @@ import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2025,
+  BASES_SS_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   FISCAL_IRPF_META,
+  calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
 import styles from './SimuladorDesgloseNomina.module.css';
 
@@ -126,10 +128,15 @@ export default function SimuladorDesgloseNominaPage() {
     const tMEI = COTIZACIONES_SS_2025.mef;
     const totalSSPct = tCC + tDes + tFP + tMEI;
 
-    const cotCC = brutoVal * (tCC / 100);
-    const cotDesempleo = brutoVal * (tDes / 100);
-    const cotFP = brutoVal * (tFP / 100);
-    const cotMEI = brutoVal * (tMEI / 100);
+    // Base de cotización: salario mensual prorrateado (bruto/12), limitada entre la base mínima y máxima
+    const salarioMensualSS = brutoVal / 12;
+    const baseSSAnual =
+      Math.min(Math.max(salarioMensualSS, BASES_SS_2025.minima), BASES_SS_2025.maxima) * 12;
+
+    const cotCC = baseSSAnual * (tCC / 100);
+    const cotDesempleo = baseSSAnual * (tDes / 100);
+    const cotFP = baseSSAnual * (tFP / 100);
+    const cotMEI = baseSSAnual * (tMEI / 100);
     const totalSS = cotCC + cotDesempleo + cotFP + cotMEI;
 
     // 2) Rendimiento Neto del Trabajo
@@ -146,8 +153,12 @@ export default function SimuladorDesgloseNominaPage() {
     const baseLiquidable = Math.max(0, baseImponible - minimoPersonal);
 
     // 5) IRPF
-    const { cuota: cuotaAuto, desglose: desgloseTramos } =
+    const { cuota: cuotaIntegra, desglose: desgloseTramos } =
       calcularCuotaIRPF(baseLiquidable);
+
+    // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
+    const deduccionRentasBajas = calcularDeduccionRentasBajas(rnt, 0);
+    const cuotaAuto = Math.max(0, cuotaIntegra - deduccionRentasBajas);
 
     const irpfRetenido =
       modoIRPF === 'auto' ? cuotaAuto : brutoVal * (retencionManual / 100);
@@ -742,10 +753,10 @@ export default function SimuladorDesgloseNominaPage() {
             <div className={styles.escenarioCard}>
               <h4>👨‍🔧 Mileurista — 14.000 € brutos / 14 pagas</h4>
               <p>
-                <strong>SS trabajador:</strong> ~917 €/año<br />
-                <strong>IRPF retenido:</strong> ~0–200 € (mínimo personal absorbe casi toda la base)<br />
-                <strong>Neto anual:</strong> ~12.880 €<br />
-                <strong>Neto mensual:</strong> ~920 €/paga
+                <strong>SS trabajador:</strong> ~1.072 €/año (sobre la base mínima de cotización, 1.381,20 €/mes)<br />
+                <strong>IRPF retenido:</strong> 0 € (base liquidable negativa, no tributa)<br />
+                <strong>Neto anual:</strong> ~12.930 €<br />
+                <strong>Neto mensual:</strong> ~923 €/paga
               </p>
               <p className={styles.escenarioTip}>
                 Con un solo pagador y &lt;22.000 € no estás obligado a declarar IRPF.
@@ -755,9 +766,9 @@ export default function SimuladorDesgloseNominaPage() {
               <h4>🧑‍💼 Mediano — 30.000 € brutos / 14 pagas</h4>
               <p>
                 <strong>SS trabajador:</strong> ~1.940 €/año<br />
-                <strong>IRPF retenido:</strong> ~3.200–3.600 €<br />
-                <strong>Neto anual:</strong> ~24.500 €<br />
-                <strong>Neto mensual:</strong> ~1.750 €/paga
+                <strong>IRPF retenido:</strong> ~3.600–3.900 €<br />
+                <strong>Neto anual:</strong> ~24.300 €<br />
+                <strong>Neto mensual:</strong> ~1.740 €/paga
               </p>
               <p className={styles.escenarioTip}>
                 Tipo efectivo total ~18 %. Es el rango donde la declaración suele salir
@@ -767,10 +778,10 @@ export default function SimuladorDesgloseNominaPage() {
             <div className={styles.escenarioCard}>
               <h4>👔 Alto — 60.000 € brutos / 14 pagas</h4>
               <p>
-                <strong>SS trabajador:</strong> ~3.880 €/año (con base máxima ~3.555 €)<br />
+                <strong>SS trabajador (base máx.):</strong> ~3.810 €/año<br />
                 <strong>IRPF retenido:</strong> ~12.500–13.500 €<br />
-                <strong>Neto anual:</strong> ~43.000 €<br />
-                <strong>Neto mensual:</strong> ~3.070 €/paga
+                <strong>Neto anual:</strong> ~43.400 €<br />
+                <strong>Neto mensual:</strong> ~3.100 €/paga
               </p>
               <p className={styles.escenarioTip}>
                 Entrarías en el tramo del 37 %. Plan de pensiones (1.500 €) ahorra ~555 €.
@@ -779,10 +790,10 @@ export default function SimuladorDesgloseNominaPage() {
             <div className={styles.escenarioCard}>
               <h4>🏢 Directivo — 120.000 € brutos / 14 pagas</h4>
               <p>
-                <strong>SS trabajador (base máx.):</strong> ~3.555 €/año<br />
+                <strong>SS trabajador (base máx.):</strong> ~4.448 €/año<br />
                 <strong>IRPF retenido:</strong> ~36.000–39.000 €<br />
-                <strong>Neto anual:</strong> ~80.500 €<br />
-                <strong>Neto mensual:</strong> ~5.750 €/paga
+                <strong>Neto anual:</strong> ~77.100 €<br />
+                <strong>Neto mensual:</strong> ~5.510 €/paga
               </p>
               <p className={styles.escenarioTip}>
                 Tramo marginal del 45 %. La SS topa en la base máxima, no sube proporcionalmente.

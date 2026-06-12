@@ -290,7 +290,36 @@ Los estimadores interactivos se verificaron contra las fórmulas de `calcular_mo
 
 **Grupo 2 "Fiscal autónomos" — COMPLETADO** (`calculadora-iva`, `simulador-irpf-tramos`, `calendario-fiscal-emprendedor`; sin apps web dedicadas para `modelo_130`/`modelo_303` aisladas — cubiertas vía `calendario-fiscal-emprendedor`).
 
-**Pendiente — Grupo 3 "Nómina"**: `consulta_nomina`, `calcular_sueldo_neto` (próximo grupo a revisar).
+### Tanda 4 — Cobertura Delegum MCP, Grupo 3: Nómina (`consulta_nomina`, `calcular_sueldo_neto`) — ✅ COMPLETADA (2026-06-12)
+
+#### 50. `estimador-sueldo-neto` (Estimador de Sueldo Neto) — tools `consulta_nomina` + `calcular_sueldo_neto`, + `visualizador-sueldo-neto`, `simulador-desglose-nomina`, `visualizador-anatomia-nomina`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 50.1 | 🔴 Crítico | `lib/calculadoras/sueldoNeto.ts` (compartido con MCP `calcular_sueldo_neto`/`consulta_nomina`) **y** `app/estimador-sueldo-neto/page.tsx` (`calcularBrutoANeto`) | Fórmula IRPF incompleta — y de forma distinta en cada archivo. La fórmula correcta (art. 19/20/80 bis LIRPF) es: RNT = bruto − SS − gastos deducibles generales (2.000€) → reducción RNT (art. 20, interpolación entre 13.115€ y 16.825€) → base imponible = RNT − reducción → base liquidable = base imponible − mínimo personal/familiar → cuota por tramos → cuota final = cuota − deducción rentas bajas (art. 80 bis, hasta 340€). El MCP tenía los pasos 1-6 y 9 pero le faltaba el paso de deducción rentas bajas (art. 80 bis). La web tenía los pasos 1, 5 (parcial), 6, 7, 9 pero le faltaban los gastos deducibles (2.000€) y la reducción RNT (art. 20) — calculaba `baseImponible = bruto − SS` directamente. Verificado con `node` replicando ambas fórmulas: sobreestimación sistemática del IRPF (infraestimación del neto) de ~900-2.000€/año en rentas de 14.000-80.000€ (9-32% del IRPF real). | Corregidas ambas fórmulas para incluir los 7 pasos completos del art. 19/20/80 bis LIRPF. |
+| 50.2 | 🔴 Crítico | `app/visualizador-sueldo-neto/page.tsx` y `app/simulador-desglose-nomina/page.tsx` | Ambos calculaban correctamente RNT + reducción art. 20 + mínimo personal/familiar, pero les faltaba la deducción por rentas bajas del trabajo (art. 80 bis LIRPF), afectando a cualquier RNT ≤ 18.276€/año (deducción de hasta 340€). | Añadida `calcularDeduccionRentasBajas(rnt, 0)` en ambos, igual que en 50.1. |
+| 50.3 | 🔴 Crítico | `app/simulador-desglose-nomina/page.tsx` | La cotización SS se calculaba como `bruto × 6,47 %` sin aplicar el tope de la base de cotización (`BASES_SS_2025`: mín. 1.381,20 €/mes, máx. 4.909,50 €/mes). Para rentas bajas (bruto/12 < 1.381,20€) infraestimaba la SS — y por tanto el RNT, llevando a un IRPF mayor de lo real—; para rentas altas (bruto/12 > 4.909,50€) la sobreestimaba, inflando artificialmente las deducciones totales y reduciendo el neto. | Aplicado el tope mín./máx. sobre la base mensual (bruto/12) antes de calcular las 4 cotizaciones (CC, desempleo, FP, MEI), igual que en `lib/calculadoras/sueldoNeto.ts`. |
+| 50.4 | 🟡 Bajo | `app/estimador-sueldo-neto/page.tsx`, FAQ "¿Cuánto es el SMI 2025...?" + tip "SMI 2025: 1.184€/mes" + FAQ MEI | Usaban `SMI_2025` (1.184€/mes, 16.576€/año, `data/fiscal/smi.ts`) en vez de `SMI_2026` (1.221€/mes, 17.094€/año) vigente — mismo patrón "2025"→"2026" de Grupo 2. Además, la FAQ del MEI decía "el trabajador paga el 0,12%... esto representa ~29€ anuales" para 30.000€ brutos, pero 30.000/12×0,12%×12 = 36€ — inconsistente con el propio 0,12% citado en la misma frase. | Actualizado a SMI 2026 (1.221€/mes, 17.094€/año, RD 126/2026) + recalculado neto mensual SMI (~1.126€, antes ~1.050€) + MEI corregido a ~36€. |
+| 50.5 | 🟡 Bajo | `app/estimador-sueldo-neto/page.tsx`, "Casos de Uso" (4 perfiles) + tabla "12 vs 14 pagas" | Recalculados con la fórmula corregida (50.1). El más afectado: perfil "Trabajadora a tiempo parcial" (14.000€, familia monoparental) pasaba de "IRPF ~1.028€/retención 7,3%/neto ~12.066€" a **IRPF 0€ (base liquidable negativa, no tributa)/retención 0%/neto ~12.928€**; también SS recalculada a ~1.072€/año (sobre la base mínima de cotización, antes 906€). El resto de perfiles (22.000€, 35.000€, 80.000€) variaron entre +0,4 y +5 puntos porcentuales de retención efectiva. | Las 4 fichas, la tabla 12 vs 14 pagas y el bloque "Ejemplo práctico" de tramos IRPF reescritos con las cifras recalculadas. |
+| 50.6 | 🟡 Bajo | `app/simulador-desglose-nomina/page.tsx`, "Casos de Uso Reales" (4 perfiles) | Recalculados tras 50.2/50.3. El más afectado: "Directivo 120.000€" pasaba de "SS ~3.555€/neto ~80.500€" a **SS ~4.448€/neto ~77.100€** (el tope de la base de cotización no se aplicaba, sobreestimando el neto en ~3.400€/año); "Mileurista 14.000€" pasó de "SS ~917€/IRPF ~0-200€/neto ~12.880€" a "SS ~1.072€/IRPF 0€/neto ~12.930€"; "Alto 60.000€" y "Mediano 30.000€" con ajustes menores (<1%). | Las 4 fichas reescritas con las cifras recalculadas. |
+
+**App revisada sin hallazgos**: `visualizador-anatomia-nomina` — es un ejemplo estático ilustrativo de una nómina concreta (no implementa la fórmula bruto→neto general), fuera del alcance de los hallazgos 50.1-50.3.
+
+**RelatedApps/ShareCard/Footer**: correctos en las 4 apps.
+
+**Correcciones aplicadas**:
+- 50.1: `lib/calculadoras/sueldoNeto.ts` — añadida deducción rentas bajas (art. 80 bis). `app/estimador-sueldo-neto/page.tsx` (`calcularBrutoANeto`) — añadidos gastos deducibles generales (2.000€) y reducción RNT (art. 20).
+- 50.2: `app/visualizador-sueldo-neto/page.tsx` y `app/simulador-desglose-nomina/page.tsx` — añadida deducción rentas bajas (art. 80 bis).
+- 50.3: `app/simulador-desglose-nomina/page.tsx` — aplicado tope mín./máx. de la base de cotización SS.
+- 50.4: FAQ + tip SMI "2025" (1.184€/1.050€) → "2026" (1.221€/~1.126€); MEI "~29€" → "~36€".
+- 50.5: 4 perfiles + tabla 12 vs 14 pagas + ejemplo práctico de tramos en `estimador-sueldo-neto` recalculados.
+- 50.6: 4 perfiles en `simulador-desglose-nomina` recalculados.
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Grupo 3 "Nómina" — COMPLETADO** (`estimador-sueldo-neto`, `visualizador-sueldo-neto`, `simulador-desglose-nomina`; `visualizador-anatomia-nomina` revisado sin hallazgos; `lib/calculadoras/sueldoNeto.ts` compartido con MCP corregido).
+
+**Pendiente — Grupo 4 "Vivienda"**: `consulta_compra_vivienda`, `consulta_venta_vivienda`, `calcular_hipoteca`, `calcular_capacidad_hipoteca`, `calcular_amortizacion_anticipada` (parcialmente cubierto en Tanda 2 vía `estimador-hipoteca`; próximo grupo a revisar).
 
 ---
 

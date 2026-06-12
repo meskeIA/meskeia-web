@@ -16,6 +16,7 @@ import {
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   FISCAL_IRPF_META,
+  calcularDeduccionRentasBajas,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -139,7 +140,11 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
   const baseLiquidable = Math.max(0, baseLiquidableGeneral - minimoPersonalFamiliar);
 
   // Cuota íntegra
-  const cuotaIRPF = r(calcularCuotaIRPF(baseLiquidable));
+  const cuotaIntegra = calcularCuotaIRPF(baseLiquidable);
+
+  // Deducción por rentas bajas del trabajo (art. 80 bis LIRPF)
+  const deduccionRentasBajas = calcularDeduccionRentasBajas(baseImponible, 0);
+  const cuotaIRPF = r(Math.max(0, cuotaIntegra - deduccionRentasBajas));
 
   // Tipo de retención
   const tipoRetencion = r((cuotaIRPF / p.brutoAnual) * 100);
