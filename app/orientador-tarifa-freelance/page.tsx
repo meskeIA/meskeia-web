@@ -327,15 +327,15 @@ export default function CalculadoraTarifaFreelancePage() {
 
             <div className={styles.configGrid}>
               <div className={styles.selectGroup}>
-                <label className={styles.selectLabel}>Retención IRPF</label>
+                <label className={styles.selectLabel}>IRPF estimado</label>
                 <select
                   className={styles.select}
                   value={tipoIRPF}
                   onChange={(e) => setTipoIRPF(e.target.value)}
                 >
-                  <option value="7">7% (Nuevos autónomos - 2 primeros años)</option>
-                  <option value="15">15% (Reducido)</option>
-                  <option value="21">21% (General)</option>
+                  <option value="7">7% (Nuevos autónomos - retención reducida)</option>
+                  <option value="15">15% (Retención estándar en factura)</option>
+                  <option value="21">21% (Estimación para rendimientos en tramos altos)</option>
                 </select>
               </div>
               <div className={styles.selectGroup}>
@@ -625,7 +625,7 @@ export default function CalculadoraTarifaFreelancePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuál es la diferencia entre tarifa bruta y neta?</h4>
-              <p>La bruta incluye IRPF (~15-20%) y cotización autónomo (cuota variable según ingresos reales: 204-1.478 €/mes en 2026). La neta es lo que realmente ingresas tras pagar impuestos y cuota de autónomo.</p>
+              <p>La bruta incluye IRPF (~15-20%) y cotización autónomo (cuota variable según ingresos reales: 206-1.607 €/mes en 2026). La neta es lo que realmente ingresas tras pagar impuestos y cuota de autónomo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuándo y cuánto debo subir mi tarifa?</h4>
@@ -645,7 +645,7 @@ export default function CalculadoraTarifaFreelancePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué tarifa cobran otros en mi sector?</h4>
-              <p>Benchmarks 2025: dev junior 25-40 €/h, senior 65-95 €/h, diseñador 35-65 €/h, consultor 55-90 €/h. Consulta LinkedIn, Malt y Workana para tu perfil.</p>
+              <p>Benchmarks 2026: dev junior 25-40 €/h, senior 65-95 €/h, diseñador 35-65 €/h, consultor 55-90 €/h. Consulta LinkedIn, Malt y Workana para tu perfil.</p>
             </div>
           </div>
         </div>
@@ -665,7 +665,7 @@ export default function CalculadoraTarifaFreelancePage() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <strong>Añade costes de autónomo</strong>
-                <p>Cuota de Seguridad Social (mínimo ~204 €/mes en 2026, variable según ingresos reales), IRPF estimado (15-20% los primeros años) y gestoría (~100 €/mes). Son gastos inevitables.</p>
+                <p>Cuota de Seguridad Social (mínimo ~206 €/mes en 2026, variable según ingresos reales), IRPF estimado (15-20% los primeros años) y gestoría (~100 €/mes). Son gastos inevitables.</p>
               </div>
             </div>
             <div className={styles.eduStep}>

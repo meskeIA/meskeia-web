@@ -201,7 +201,26 @@
 
 **Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
 
-**Pendiente Grupo 1**: `orientador-tarifa-freelance`/`calculadora-precio-por-proyecto` (`calcular_tarifa_freelance`), `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador).
+#### 45. `orientador-tarifa-freelance` (Orientador de Tarifa Freelance) + `calculadora-precio-por-proyecto` (Calculadora de Precio por Proyecto) — tool `calcular_tarifa_freelance`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 45.1 | 🟠 Medio | `orientador-tarifa-freelance/page.tsx`, select "Retención IRPF" | Etiquetaba "21% (General)" como tipo estándar y "15% (Reducido)", mientras que la FAQ JSON-LD de la propia app (`metadata.ts`) afirma correctamente que la retención estándar en factura es del 15% (RD 439/2007 art. 95) — en IRPF no existe una retención del 21% (ese es el tipo general de IVA, no de IRPF). Contradicción interna entre el selector y la FAQ. | Select renombrado a "IRPF estimado" con opciones reetiquetadas: 7% (nuevos autónomos - retención reducida), 15% (retención estándar en factura), 21% (estimación para rendimientos en tramos altos). Valores numéricos y opción por defecto (21) sin cambios. |
+| 45.2 | 🟡 Bajo | `orientador-tarifa-freelance/page.tsx`, paso 2 de "7 pasos" y FAQ "tarifa bruta vs neta" | Cuota RETA mínima citada como "~204 €/mes en 2026" y rango "204-1.478 €/mes en 2026" — desactualizado frente a `TRAMOS_RETA_2025` (Tramo1 cuotaMinima=205,88€ → ~206€, Tramo15 cuotaMaxima=1.606,88€ → ~1.607€). | Actualizado a "~206 €/mes" y "206-1.607 €/mes en 2026". |
+| 45.3 | 🟡 Bajo | `orientador-tarifa-freelance/page.tsx`, FAQ "¿Qué tarifa cobran otros en mi sector?" | "Benchmarks 2025: dev junior 25-40 €/h..." | Actualizado a "Benchmarks 2026". |
+
+**`calculadora-precio-por-proyecto`**: revisado sin hallazgos. Los 4 "Casos de uso" (diseñador, desarrollador, traductor, consultor) se verificaron ejecutando la fórmula real del componente (`costoHorasBase → ×complejidad → ×urgencia → +imprevistos → +gastos`) con los inputs declarados: desviaciones <1% en todos los casos (dentro del margen de "ronda"/"en torno a/alrededor de" usado en el texto). `metadata.ts` sin referencias a años ni datos normativos caducables.
+
+**RelatedApps/ShareCard/Footer**: correctos en ambas apps. `orientador-tarifa-freelance` tiene `DisclaimerCard severity="high"`; `calculadora-precio-por-proyecto` también. Ambas independientes de `lib/calculadoras/tarifaFreelance.ts` en sus cálculos interactivos (mismo patrón de fórmula, sin desincronía detectada).
+
+**Correcciones aplicadas**:
+- 45.1: select "Retención IRPF" → "IRPF estimado", opciones reetiquetadas para alinear con la FAQ (15% = retención estándar, 21% = tramos altos).
+- 45.2: "~204 €/mes en 2026" → "~206 €/mes en 2026"; "204-1.478 €/mes en 2026" → "206-1.607 €/mes en 2026".
+- 45.3: "Benchmarks 2025" → "Benchmarks 2026".
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Pendiente Grupo 1**: `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador) — último ítem del grupo.
 
 ---
 
