@@ -847,26 +847,26 @@
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Cara o Cruz | `/cara-o-cruz/` | juegos |
-| [ ] | Generador de Lotería | `/generador-loteria/` | juegos |
-| [ ] | Guía de Cócteles Clásicos | `/guia-cocteles/` | juegos, cultura |
-| [ ] | Juego 2048 | `/juego-2048/` | juegos |
-| [ ] | Juego Asteroids | `/juego-asteroids/` | juegos |
-| [ ] | Juego de Memoria | `/juego-memoria/` | juegos |
-| [ ] | Juego del Ahorcado | `/juego-ahorcado/` | juegos, estudiantes |
-| [ ] | Juego Piedra Papel Tijera | `/juego-piedra-papel-tijera/` | juegos |
-| [ ] | Juego Platform Runner | `/juego-platform-runner/` | juegos |
-| [ ] | Juego Puzzle Matemático | `/juego-puzzle-matematico/` | juegos, estudiantes |
-| [ ] | Juego Space Invaders | `/juego-space-invaders/` | juegos |
-| [ ] | Juego Sudoku | `/juego-sudoku/` | juegos |
-| [ ] | Juego Tres en Raya | `/juego-tres-en-raya/` | juegos |
-| [ ] | Juego Wordle | `/juego-wordle/` | juegos |
-| [ ] | Metrónomo Online | `/metronomo/` | juegos, cultura |
-| [ ] | Quiz Verbos Irregulares Inglés | `/quiz-verbos-irregulares/` | juegos, estudiantes |
-| [ ] | Radio meskeIA | `/radio-meskeia/` | juegos |
-| [ ] | Ruleta Aleatoria | `/ruleta-aleatoria/` | juegos |
-| [ ] | Test de Velocidad de Escritura | `/test-velocidad-escritura/` | juegos, productividad |
-| [ ] | Tirador de Dados | `/tirador-dados/` | juegos |
+| [x] | Cara o Cruz | `/cara-o-cruz/` | juegos |
+| [x] | Generador de Lotería | `/generador-loteria/` | juegos |
+| [x] | Guía de Cócteles Clásicos | `/guia-cocteles/` | juegos, cultura |
+| [x] | Juego 2048 | `/juego-2048/` | juegos |
+| [x] | Juego Asteroids | `/juego-asteroids/` | juegos |
+| [x] | Juego de Memoria | `/juego-memoria/` | juegos |
+| [x] | Juego del Ahorcado | `/juego-ahorcado/` | juegos, estudiantes |
+| [x] | Juego Piedra Papel Tijera | `/juego-piedra-papel-tijera/` | juegos |
+| [x] | Juego Platform Runner | `/juego-platform-runner/` | juegos |
+| [x] | Juego Puzzle Matemático | `/juego-puzzle-matematico/` | juegos, estudiantes |
+| [x] | Juego Space Invaders | `/juego-space-invaders/` | juegos |
+| [x] | Juego Sudoku | `/juego-sudoku/` | juegos |
+| [x] | Juego Tres en Raya | `/juego-tres-en-raya/` | juegos |
+| [x] | Juego Wordle | `/juego-wordle/` | juegos |
+| [x] | Metrónomo Online | `/metronomo/` | juegos, cultura |
+| [x] | Quiz Verbos Irregulares Inglés | `/quiz-verbos-irregulares/` | juegos, estudiantes |
+| [x] | Radio meskeIA | `/radio-meskeia/` | juegos |
+| [x] | Ruleta Aleatoria | `/ruleta-aleatoria/` | juegos |
+| [x] | Test de Velocidad de Escritura | `/test-velocidad-escritura/` | juegos, productividad |
+| [x] | Tirador de Dados | `/tirador-dados/` | juegos |
 
 ## Legal, Fiscal y Patrimonio (`legal-fiscal`) — 44 apps
 
