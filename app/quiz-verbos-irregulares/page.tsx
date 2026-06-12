@@ -387,7 +387,7 @@ export default function QuizVerbosIrregularesPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
-                <strong>Estudiante de ESO/Bachillerato</strong>
+                <strong>Estudiante de secundaria/preparatoria (ESO/Bachillerato en España)</strong>
               </div>
               <p className={styles.escenarioExample}>
                 Preparas el examen de inglés del trimestre y el profesor va a poner Past Simple y Past Participle.
@@ -447,9 +447,9 @@ export default function QuizVerbosIrregularesPage() {
             <li className={styles.faqItem}>
               <strong>¿Cuántos verbos irregulares hay en inglés?</strong>
               <p>
-                En inglés existen aproximadamente 200 verbos irregulares, pero los lingüistas estiman que
-                con los 75 más frecuentes se cubre más del 90 % de los textos cotidianos y profesionales.
-                Este quiz te entrena precisamente sobre esos 75.
+                Se estima que existen unos 200 verbos irregulares en inglés, aunque la mayoría de uso
+                cotidiano se concentra en unos 75-100. Los 75 verbos de este quiz cubren la gran mayoría
+                de los casos que aparecerán en textos y conversaciones habituales.
               </p>
             </li>
 
@@ -466,8 +466,8 @@ export default function QuizVerbosIrregularesPage() {
               <strong>¿Hay algún patrón para aprenderlos más fácil?</strong>
               <p>
                 Sí. La clave está en agruparlos por patrón de cambio: A-A-A (sin cambio), A-B-B (past = participle),
-                A-B-A (infinitive = participle) y A-B-C (tres formas distintas). Aprenderlos en grupos reduce
-                el esfuerzo de memorización hasta en un 40 %.
+                A-B-A (infinitive = participle) y A-B-C (tres formas distintas). Agruparlos por patrones
+                similares (ablaut, mismo sufijo, etc.) puede facilitar su memorización.
               </p>
             </li>
 

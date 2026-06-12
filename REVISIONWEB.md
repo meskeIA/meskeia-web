@@ -298,7 +298,7 @@ Build verificado: 999 apps, 1300 páginas, exit 0.
 |---|---|
 | 🔴 Crítico | 0 (2 corregidos en Tanda 1) |
 | 🟠 Medio | 0 (6 corregidos en Tanda 1, 6 corregidos en Tanda 2) |
-| 🟡 Bajo | 13 (13 corregidos en Tanda 3, de 26 totales) |
+| 🟡 Bajo | 0 (13 corregidos en Tanda 3, 13 corregidos en Tanda 4, de 26 totales) |
 
 **Hallazgos críticos** (✅ corregidos en Tanda 1, ver sección "Tanda 1 — Fase 2" más abajo):
 - `juego-space-invaders`: el contenido educativo describe búnkeres/defensas y un OVNI bonus como mecánicas centrales del juego, pero ninguna de las dos existe en la implementación real (solo hay nave, balas, filas de invasores y partículas).
@@ -564,17 +564,28 @@ Corregidos 13 de los 26 hallazgos 🟡 Bajo restantes mediante 6 ediciones (suav
 
 **Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
 
-## Próximos pasos (Fase 2) — Suite Juegos y Ocio
+## Tanda 4 — Fase 2 Juegos y Ocio (limpieza menor, parte final) — ✅ COMPLETADA (2026-06-12)
 
-Tandas 1-3 completadas (8 hallazgos 🔴/🟠 + 13 hallazgos 🟡 Bajo resueltos). Queda la **Tanda 4** con los 13 hallazgos 🟡 Bajo restantes, en 6 apps:
+Corregidos los 13 hallazgos 🟡 Bajo restantes mediante 6 ediciones (terminología Latam-friendly, eliminación de mecánicas/cifras inexistentes, suavizado de afirmaciones sin fuente):
 
-1. `juego-puzzle-matematico` — 27.2 (terminología España-only: Secundaria/Bachillerato), 27.3 (neurociencia sin cita)
-2. `juego-wordle` — 31.1 ("modo difícil" inexistente), 31.2 (ejemplos de vocales incorrectos: AUDIO/REINA/EUROS), 31.3 (cifras de diccionario RAE sin fuente, no coinciden con datos reales de la app)
-3. `quiz-verbos-irregulares` — 33.1 (terminología España-only: ESO/Bachillerato), 33.2 (200 verbos/90% sin fuente), 33.3 (40% memorización sin fuente)
-4. `radio-meskeia` — 34.2 ("efecto Mozart" sin referencia), 34.3 (cálculo de consumo de datos, aclarar que es teórico)
-5. `ruleta-aleatoria` — 35.2 (Ley 13/2011 y umbrales sin fuente verificable)
-6. `test-velocidad-escritura` — 36.2 (terminología España-only: CCAA/Cuerpo General Administrativo), 36.3 (velocidad media España sin fuente/año)
+1. `juego-puzzle-matematico` (27.2, 27.3) — "Secundaria/Bachillerato (14+)" → "Secundaria/preparatoria (14+)" y "Bachillerato/Adultos (16+)" → "Educación media/adultos (16+)"; afirmación de neurociencia reformulada de "estudios... señalan" a "la neurociencia cognitiva sugiere... se asocia con".
+2. `juego-wordle` (31.1, 31.2, 31.3) — eliminado el "modo difícil" inexistente (fila de tabla, tip y FAQ reformulados aclarando que esta versión usa modo estándar); corregidos los ejemplos de cobertura vocálica (AUDIO/REINA/EUROS/CAIRE: "3-4 vocales distintas" en vez de "las cinco vocales"); cifras de diccionario sustituidas por las reales del proyecto (`diccionario-es.txt` = 86.972 palabras, `palabras-wordle.txt` = 528 palabras del día).
+3. `quiz-verbos-irregulares` (33.1, 33.2, 33.3) — "Estudiante de ESO/Bachillerato" → "Estudiante de secundaria/preparatoria (ESO/Bachillerato en España)"; "más del 90% de los textos" eliminado y reformulado cualitativamente; "reduce el esfuerzo de memorización hasta en un 40%" → recomendación cualitativa de agrupar por patrones (ablaut, sufijo).
+4. `radio-meskeia` (34.2, 34.3) — eliminado el "efecto Mozart" como referencia establecida, reformulado hacia el efecto general (y variable según persona) de la música instrumental en la concentración; cálculo de consumo de datos (58/144 MB por hora) aclarado como estimación teórica basada en el bitrate nominal, no una medición real.
+5. `ruleta-aleatoria` (35.2) — eliminados los umbrales sin fuente ("200 €", "50 participantes") y la referencia específica a la Ley 13/2011; FAQ reformulada hacia una recomendación genérica (uso informal vs. consultar normativa/Dirección General de Ordenación del Juego para sorteos con premios significativos).
+6. `test-velocidad-escritura` (36.2, 36.3) — "Cuerpo General Administrativo del Estado, CCAA" → "exámenes de acceso a la administración pública" (genérico, varía según país); pregunta y respuesta de "velocidad media en España" generalizadas a "velocidad media de un adulto al escribir", atribuyendo las cifras a "datos agregados de Keybr/TypeRacer (sin desglose oficial por país)".
 
-Tras Tanda 4 quedará cerrada toda la Fase 2 de la Suite Juegos y Ocio.
+**Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
+
+## Cierre Fase 2 — Suite Juegos y Ocio (2026-06-12)
+
+**Fase 2 completada en su totalidad**: las 39 incidencias detectadas en la auditoría (2 🔴 Crítico + 12 🟠 Medio + 26 🟡 Bajo, sobre 20 apps revisadas) han sido resueltas en 4 tandas:
+
+- **Tanda 1** (commit `397dee12`): 2 🔴 + 6 de 12 🟠.
+- **Tanda 2** (commit `5f834b12`): 6 🟠 restantes.
+- **Tanda 3** (commit `ac12c38a`): 13 de 26 🟡 Bajo (incluye 19.2 documentado como "sin acción" por evitar abstracción prematura).
+- **Tanda 4** (este commit): 13 🟡 Bajo restantes.
+
+4 builds verificados (uno por tanda), todos exit 0 con 999 apps / 1300 páginas. No quedan hallazgos pendientes en la Suite Juegos y Ocio.
 
 

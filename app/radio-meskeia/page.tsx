@@ -741,8 +741,9 @@ export default function RadioMeskeiaPage() {
                   para el trabajo cognitivo.
                 </p>
                 <p className={styles.faqTip}>
-                  Referencia: efecto Mozart y estudios de productividad con música instrumental
-                  sin letra en entornos laborales.
+                  La música instrumental o sin letra (lo-fi, clásica, ambiental) suele
+                  ayudar a concentrarse al reducir distracciones, aunque el efecto varía
+                  mucho según la persona y el tipo de tarea.
                 </p>
               </details>
             </li>
@@ -764,9 +765,11 @@ export default function RadioMeskeiaPage() {
                 <p>
                   El consumo depende de la calidad del stream. Una emisora estándar a
                   128 kbps consume aproximadamente 58 MB por hora. A 320 kbps (alta
-                  calidad) sube a unos 144 MB por hora. En conexión WiFi esto es
-                  inapreciable; en datos móviles conviene elegir emisoras de menor bitrate
-                  si tienes una tarifa limitada.
+                  calidad) sube a unos 144 MB por hora. Estas cifras son un cálculo
+                  teórico basado en el bitrate nominal del stream; el consumo real puede
+                  variar ligeramente por el overhead del streaming y el buffering. En
+                  conexión WiFi esto es inapreciable; en datos móviles conviene elegir
+                  emisoras de menor bitrate si tienes una tarifa limitada.
                 </p>
                 <p className={styles.faqTip}>
                   Dato: cada emisora muestra su bitrate en kbps en la lista de Radio meskeIA.

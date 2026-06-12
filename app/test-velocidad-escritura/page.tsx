@@ -392,7 +392,7 @@ export default function TestVelocidadEscrituraPage() {
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🎓</span>
               <h4>Oposiciones y Exámenes</h4>
-              <p>Varias oposiciones en España incluyen prueba de mecanografía (Cuerpo General Administrativo del Estado, auxiliares administrativos de CCAA, etc.) con velocidad mínima de 180-200 pulsaciones por minuto. En exámenes universitarios con entrega digital, una mayor velocidad permite dedicar más tiempo a pensar y menos a teclear.</p>
+              <p>Muchos exámenes de acceso a la administración pública incluyen una prueba de mecanografía con un mínimo de pulsaciones por minuto exigido, que varía según el país y el tipo de plaza. En exámenes universitarios con entrega digital, una mayor velocidad permite dedicar más tiempo a pensar y menos a teclear.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>💻</span>
@@ -415,8 +415,8 @@ export default function TestVelocidadEscrituraPage() {
               <p className={styles.eduFaqRespuesta}><strong>PPM (palabras por minuto)</strong>: se calcula dividiendo los caracteres escritos entre 5 (longitud media de palabra en inglés) y entre los minutos. Es la medida más usada internacionalmente. <strong>CPM (caracteres por minuto)</strong>: cuenta directamente cada carácter, incluyendo espacios. En español, las palabras son más largas que en inglés (media ~5,5 caracteres vs ~4,5), por lo que un test en español con 40 PPM equivale a más CPM que el mismo test en inglés. Algunas herramientas también calculan las llamadas <strong>PPM netas</strong> (PPM brutas menos una penalización por errores); esta herramienta muestra por separado las <strong>PPM brutas</strong> y la <strong>precisión (%)</strong>, lo que te da la misma información y te permite calcular tú mismo las PPM netas si lo necesitas.</p>
             </details>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqPregunta}>¿Cuál es la velocidad media de un adulto en España?</summary>
-              <p className={styles.eduFaqRespuesta}>Según estudios de plataformas de mecanografía como Keybr y TypeRacer, la media global es de 40-50 PPM. En España, con teclado QWERTY español, los estudios de productividad laboral estiman una media de 35-45 PPM para trabajadores de oficina. Los jóvenes que han crecido con smartphones tienden a ser más rápidos en móvil pero más variables en teclado físico. Los &quot;nativos digitales&quot; con formación en mecanografía táctil suelen superar los 60 PPM con facilidad.</p>
+              <summary className={styles.eduFaqPregunta}>¿Cuál es la velocidad media de un adulto al escribir?</summary>
+              <p className={styles.eduFaqRespuesta}>Según datos agregados de plataformas de práctica de mecanografía como Keybr y TypeRacer (sin desglose oficial por país), la media global se sitúa en torno a 40-50 PPM. Los trabajadores de oficina sin formación específica suelen rondar 35-45 PPM. Los jóvenes que han crecido con smartphones tienden a ser más rápidos en móvil pero más variables en teclado físico. Los &quot;nativos digitales&quot; con formación en mecanografía táctil suelen superar los 60 PPM con facilidad.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué es la mecanografía táctil y por qué es importante?</summary>

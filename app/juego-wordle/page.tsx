@@ -395,14 +395,6 @@ export default function JuegoWordlePage() {
                   <td>Palabra con 4-5 vocales distintas (AUDIO, REINA)</td>
                 </tr>
                 <tr>
-                  <td>Wordle difícil</td>
-                  <td>5</td>
-                  <td>6</td>
-                  <td>Igual, pero obliga a usar pistas</td>
-                  <td>Alta</td>
-                  <td>Máxima cobertura consonántica desde el turno 2</td>
-                </tr>
-                <tr>
                   <td>Wordle doble</td>
                   <td>5</td>
                   <td>7</td>
@@ -486,10 +478,10 @@ export default function JuegoWordlePage() {
                 <summary>¿Cuál es la mejor primera palabra en español?</summary>
                 <p>
                   Las mejores palabras iniciales cubren la mayor cantidad de letras
-                  frecuentes del español. Palabras como <strong>AUDIO</strong>,{' '}
-                  <strong>REINA</strong> o <strong>CAIRE</strong> incluyen 4-5 vocales
-                  distintas (A, E, I, O, U) y consonantes habituales. Así, en el primer
-                  intento ya sabrás qué vocales contiene la palabra objetivo.
+                  frecuentes del español. Palabras como <strong>AUDIO</strong> (A, U,
+                  I, O), <strong>REINA</strong> (E, I, A) o <strong>CAIRE</strong> (A,
+                  I, E) cubren 3-4 vocales distintas y consonantes habituales. Así, en
+                  el primer intento ya sabrás qué vocales contiene la palabra objetivo.
                 </p>
                 <p className={styles.faqTip}>
                   Dato: las letras más frecuentes en palabras de 5 letras del español
@@ -516,10 +508,12 @@ export default function JuegoWordlePage() {
               <details>
                 <summary>¿Cuántas palabras de 5 letras hay en español?</summary>
                 <p>
-                  El diccionario de la RAE contiene aproximadamente 8.000-10.000 palabras
-                  de 5 letras. Sin embargo, los juegos de Wordle en español suelen
-                  trabajar con un subconjunto de 2.000-3.000 palabras de uso común para
-                  que las soluciones sean reconocibles por la mayoría de jugadores.
+                  Esta herramienta valida cada intento contra un diccionario de unas
+                  87.000 palabras del español (Lemario General del Español de Ismael
+                  Olea, de las cuales varios miles tienen exactamente 5 letras), y
+                  selecciona la palabra del día de un conjunto curado de 528 palabras
+                  de uso común, para que las soluciones sean reconocibles por la mayoría
+                  de jugadores.
                 </p>
               </details>
             </li>
@@ -541,13 +535,13 @@ export default function JuegoWordlePage() {
             </li>
             <li className={styles.faqItem}>
               <details>
-                <summary>¿Qué es el modo difícil?</summary>
+                <summary>¿Existe un &quot;modo difícil&quot; en este Wordle?</summary>
                 <p>
-                  En el modo difícil, estás obligado a usar en cada intento todas las
-                  letras que ya has confirmado (verdes y amarillas). No puedes probar
-                  una palabra que ignore una letra verde ya confirmada. Esto elimina la
-                  estrategia de usar &quot;palabras de descarte&quot; y obliga a jugar
-                  con información incompleta desde el principio.
+                  No. En otras versiones de Wordle existe un &quot;modo difícil&quot; que
+                  obliga a reutilizar en cada intento todas las pistas ya confirmadas
+                  (letras verdes y amarillas). Esta herramienta usa el modo estándar, sin
+                  esa restricción: puedes escribir cualquier palabra válida del
+                  diccionario en cada intento, aunque no reutilice las pistas anteriores.
                 </p>
               </details>
             </li>
@@ -563,9 +557,9 @@ export default function JuegoWordlePage() {
               <div className={styles.stepContent}>
                 <strong>Empieza con una palabra rica en vocales</strong>
                 <p>
-                  Usa AUDIO, REINA o EUROS como primera palabra. Estas palabras cubren
-                  las cinco vocales del español (A, E, I, O, U) o muy cerca de eso,
-                  revelando de inmediato cuáles vocales contiene la solución.
+                  Usa AUDIO (A, U, I, O), REINA (E, I, A) o EUROS (E, U, O) como primera
+                  palabra. Estas palabras cubren 3-4 vocales distintas del español,
+                  revelando de inmediato cuáles de ellas contiene la solución.
                 </p>
               </div>
             </li>
@@ -641,11 +635,12 @@ export default function JuegoWordlePage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📍</span>
-              <h4>En modo difícil, usa verdes en su posición</h4>
+              <h4>Mantén las letras verdes en su posición</h4>
               <p>
-                En modo difícil, las letras verdes deben mantenerse en su posición
-                en todos los intentos siguientes. Planifica ya desde el turno 1 qué
-                posiciones quieres confirmar para no quedarte sin opciones.
+                Aunque esta versión no lo exige, conviene mantener las letras verdes
+                confirmadas en su posición en los siguientes intentos: moverlas o
+                sustituirlas descarta una certeza y amplía sin necesidad el espacio
+                de búsqueda.
               </p>
             </div>
             <div className={styles.tipCard}>

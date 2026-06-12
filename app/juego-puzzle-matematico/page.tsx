@@ -488,14 +488,14 @@ export default function JuegoPuzzleMatematicoPage() {
                   <td>Visualización espacial, razonamiento deductivo</td>
                   <td>Media–Alta</td>
                   <td>1–5 minutos</td>
-                  <td>Secundaria/Bachillerato (14+)</td>
+                  <td>Secundaria/preparatoria (14+)</td>
                 </tr>
                 <tr>
                   <td>🔣 Lógica numérica</td>
                   <td>Razonamiento abstracto, álgebra básica</td>
                   <td>Alta</td>
                   <td>2–10 minutos</td>
-                  <td>Bachillerato/Adultos (16+)</td>
+                  <td>Educación media/adultos (16+)</td>
                 </tr>
               </tbody>
             </table>
@@ -559,7 +559,7 @@ export default function JuegoPuzzleMatematicoPage() {
                   Los puzzles matemáticos no elevan el cociente intelectual de forma directa, pero sí mejoran habilidades concretas: velocidad de cálculo, memoria de trabajo, capacidad de concentración y resolución de problemas. Estas habilidades tienen un impacto práctico medible en el rendimiento académico y laboral.
                 </p>
                 <p className={styles.faqTip}>
-                  Referencia: estudios de neurociencia cognitiva señalan que la práctica de aritmética mental activa las regiones prefrontal y parietal del cerebro, asociadas a la función ejecutiva.
+                  Referencia: la neurociencia cognitiva sugiere que la práctica de aritmética mental se asocia con la activación de regiones cerebrales implicadas en el razonamiento numérico y la atención, como la corteza prefrontal y parietal.
                 </p>
               </details>
             </li>

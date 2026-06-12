@@ -607,14 +607,18 @@ export default function RuletaAleatoriaPage() {
               <details>
                 <summary>¿Puedo usar la ruleta para sorteos legales en España?</summary>
                 <p>
-                  Depende del tipo de sorteo. Para sorteos internos sin premios económicos
-                  (elegir turno, asignar tareas) es perfectamente válida. Para concursos con premios,
-                  la Ley 13/2011 de regulación del juego y la normativa de consumo pueden exigir
-                  sistemas certificados, notario o plataforma de gestión acreditada.
+                  Depende del tipo de sorteo. Para usos informales o lúdicos (elegir turno,
+                  asignar tareas, dinámicas entre amigos, en clase o en redes sociales) esta
+                  herramienta es perfectamente válida. Para concursos o sorteos con premios de
+                  valor económico significativo o un número elevado de participantes, la
+                  normativa de juegos y sorteos puede exigir requisitos adicionales según el
+                  país o región.
                 </p>
                 <p className={styles.faqTip}>
-                  Consulta con un asesor legal si el sorteo tiene premios superiores a 200 € o
-                  involucra a más de 50 participantes.
+                  Si tu sorteo implica premios de valor relevante o muchos participantes,
+                  consulta la normativa de juegos y sorteos aplicable en tu país y, si es
+                  necesario, a un profesional o a la autoridad competente (en España, la
+                  Dirección General de Ordenación del Juego).
                 </p>
               </details>
             </li>
