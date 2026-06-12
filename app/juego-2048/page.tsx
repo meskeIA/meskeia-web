@@ -488,8 +488,8 @@ export default function Juego2048Page() {
                   dirección que saca la ficha mayor de su esquina.
                 </p>
                 <p className={styles.faqTip}>
-                  Dato: los jugadores que aplican esta estrategia tienen tasas de victoria
-                  superiores al 90 % en la variante 4×4 clásica.
+                  Dato: dentro de la comunidad de jugadores se considera la estrategia
+                  más fiable para alcanzar 2048 en la variante 4×4 clásica.
                 </p>
               </details>
             </li>
@@ -618,9 +618,9 @@ export default function Juego2048Page() {
               <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <h4>Estrategia &quot;esquina&quot;: la más efectiva</h4>
               <p>
-                Más del 90 % de las victorias documentadas usan esta técnica.
-                Elige siempre la misma esquina en cada partida para automatizar
-                el hábito y reducir errores por indecisión.
+                Es la técnica más recomendada por jugadores experimentados para
+                mantener el control del tablero. Elige siempre la misma esquina
+                en cada partida para automatizar el hábito y reducir errores por indecisión.
               </p>
             </div>
             <div className={styles.tipCard}>

@@ -451,10 +451,10 @@ export default function JuegoPiedraPapelTijeraPage() {
               <details>
                 <summary>¿Cuál es la jugada más elegida por los humanos?</summary>
                 <p>
-                  Según investigaciones en teoría de juegos, la Piedra es la jugada más
-                  frecuente entre jugadores humanos, especialmente en la primera ronda.
-                  Los hombres eligen Piedra con mayor frecuencia que las mujeres. El Papel
-                  suele ser la jugada menos elegida espontáneamente.
+                  Algunas investigaciones en teoría de juegos apuntan a la Piedra como
+                  una de las jugadas más frecuentes entre jugadores humanos al inicio de
+                  una partida. El Papel, en cambio, suele ser la jugada menos elegida
+                  espontáneamente.
                 </p>
                 <p className={styles.faqTip}>
                   Implicación práctica: si no sabes nada de tu rival, elegir Papel en la
@@ -478,11 +478,11 @@ export default function JuegoPiedraPapelTijeraPage() {
               <details>
                 <summary>¿Cómo funciona el Campeonato Mundial de RPS?</summary>
                 <p>
-                  La World RPS Society organiza competiciones donde los jugadores compiten
-                  en formato torneo. Se juega al mejor de tres rondas por partida. Los
-                  competidores avanzados estudian el lenguaje corporal del rival, sus
+                  Existen campeonatos organizados de Piedra, Papel o Tijera (como los de
+                  la World RPS Society), que han tenido cierta popularidad en distintos
+                  países. En estos torneos se juega al mejor de tres rondas por partida y
+                  los competidores avanzados estudian el lenguaje corporal del rival, sus
                   tendencias previas y emplean técnicas de bluff para ser impredecibles.
-                  El campeonato fue muy popular en Canadá durante los años 2000.
                 </p>
               </details>
             </li>
@@ -601,9 +601,10 @@ export default function JuegoPiedraPapelTijeraPage() {
               <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Conoce las estadísticas de frecuencia</h4>
               <p>
-                La Piedra es elegida ~35 % de las veces, Papel ~33 % y Tijera ~32 % en
-                jugadores sin entrenamiento. Conocer estos datos te da una ligera ventaja
-                inicial al elegir Papel en rondas de apertura contra rivales desconocidos.
+                Algunos estudios sugieren una ligera preferencia por la Piedra entre
+                jugadores sin entrenamiento previo, especialmente en la primera ronda.
+                Conocer esta tendencia te da una pequeña ventaja al elegir Papel en
+                rondas de apertura contra rivales desconocidos.
               </p>
             </div>
           </div>

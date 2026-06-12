@@ -616,7 +616,7 @@ const COCTELES: Coctel[] = [
     origen: 'Derivado del Mojito cubano',
     decada: 'Años 1990',
     descripcion: 'El Virgin Mojito es probablemente el mocktail más pedido del mundo. Sin ron pero con toda la frescura de la menta, la lima y la soda, es una bebida elegante y satisfactoria para quienes no consumen alcohol. La clave es usar menta fresca de buena calidad y no machacarla en exceso.',
-    curiosidad: 'El término "mocktail" (mezcla de "mock" -imitación- y "cocktail") se popularizó en los años 80 pero las bebidas sin alcohol en bar existen desde el siglo XIX. El mercado de los mocktails creció un 42% entre 2019 y 2023 en Europa, impulsado por la tendencia "sober curious" entre los menores de 35 años.',
+    curiosidad: 'El término "mocktail" (mezcla de "mock" -imitación- y "cocktail") se popularizó en los años 80 pero las bebidas sin alcohol en bar existen desde el siglo XIX. El mercado de los mocktails ha crecido notablemente en los últimos años en Europa, impulsado por la tendencia "sober curious" (curiosidad por reducir el consumo de alcohol).',
   },
   {
     nombre: 'Shirley Temple',

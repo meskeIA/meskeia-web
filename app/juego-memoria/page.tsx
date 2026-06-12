@@ -534,8 +534,8 @@ export default function JuegoMemoriaPage() {
               <h4>Divide el tablero en zonas mentales</h4>
               <p>
                 Antes de empezar, visualiza el tablero dividido en 4 cuadrantes. Cuando
-                descubras una carta, asígnala a su zona. Esta agrupación espacial reduce
-                la carga de la memoria de trabajo hasta en un 30 %.
+                descubras una carta, asígnala a su zona. Esta agrupación espacial puede
+                ayudar a reducir la carga de la memoria de trabajo durante la partida.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -598,9 +598,10 @@ export default function JuegoMemoriaPage() {
               </li>
               <li>
                 <strong>Esperar resultados inmediatos.</strong> La mejora cognitiva es
-                gradual y no siempre perceptible a corto plazo. Se necesitan al menos 3-4
-                semanas de práctica regular para notar diferencias medibles en la memoria
-                cotidiana. La constancia, no la velocidad, es lo que produce resultados.
+                gradual y no siempre perceptible a corto plazo. Los estudios sobre
+                entrenamiento cognitivo sugieren que la práctica regular durante varias
+                semanas puede producir mejoras perceptibles en la memoria cotidiana. La
+                constancia, no la velocidad, es lo que produce resultados.
               </li>
             </ul>
           </div>

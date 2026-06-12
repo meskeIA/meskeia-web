@@ -980,11 +980,11 @@ export default function JuegoPlatformRunnerPage() {
               <details>
                 <summary>¿Los juegos de plataformas mejoran los reflejos?</summary>
                 <p>
-                  Sí. Varios estudios de psicología cognitiva han demostrado que los juegos
-                  de acción y plataformas mejoran el tiempo de reacción visual, la atención
-                  dividida y la coordinación ojo-mano. El efecto es más pronunciado con
-                  práctica regular de 20 – 30 minutos diarios. No sustituyen el ejercicio
-                  físico, pero son un entrenamiento cognitivo real.
+                  Algunos estudios de psicología cognitiva sugieren que los juegos
+                  de acción y plataformas podrían mejorar el tiempo de reacción visual, la atención
+                  dividida y la coordinación ojo-mano, aunque los resultados varían según el estudio. El efecto, cuando se observa, parece más pronunciado con
+                  práctica regular de 20 – 30 minutos diarios. En cualquier caso, no sustituyen el ejercicio
+                  físico.
                 </p>
               </details>
             </li>

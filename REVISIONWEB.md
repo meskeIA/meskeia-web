@@ -298,7 +298,7 @@ Build verificado: 999 apps, 1300 páginas, exit 0.
 |---|---|
 | 🔴 Crítico | 0 (2 corregidos en Tanda 1) |
 | 🟠 Medio | 0 (6 corregidos en Tanda 1, 6 corregidos en Tanda 2) |
-| 🟡 Bajo | 23 |
+| 🟡 Bajo | 13 (13 corregidos en Tanda 3, de 26 totales) |
 
 **Hallazgos críticos** (✅ corregidos en Tanda 1, ver sección "Tanda 1 — Fase 2" más abajo):
 - `juego-space-invaders`: el contenido educativo describe búnkeres/defensas y un OVNI bonus como mecánicas centrales del juego, pero ninguna de las dos existe en la implementación real (solo hay nave, balas, filas de invasores y partículas).
@@ -550,15 +550,31 @@ Corregidos los 6 hallazgos 🟠 Medio restantes mediante 6 ediciones (mayormente
 
 **Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
 
+## Tanda 3 — Fase 2 Juegos y Ocio (limpieza menor) — ✅ COMPLETADA (2026-06-12)
+
+Corregidos 13 de los 26 hallazgos 🟡 Bajo restantes mediante 6 ediciones (suavizado de cifras sin fuente, atribución a corpus lingüísticos, matización de "han demostrado", relleno de `jsonLd.features` vacío):
+
+1. `generador-loteria` (19.2) — revisado: el umbral de 40.000 € / tipo 20% (art. 13 Ley 16/2012) es correcto y verificable; se decide **sin acción** (no centralizar en `data/fiscal/` por ser uso único — evitar abstracción prematura).
+2. `guia-cocteles` (20.2) — eliminada la cifra "42% entre 2019-2023" sobre el mercado de mocktails; reformulado como "ha crecido notablemente en los últimos años".
+3. `juego-2048` (21.1, 21.2) — eliminado el ">90% de victorias" (duplicado en FAQ y curiosidad) sobre la estrategia de esquina fija; reformulado de forma cualitativa y con redacción distinta en cada sección.
+4. `juego-memoria` (23.2, 23.3) — eliminado "hasta en un 30%" (memoria de trabajo) y "3-4 semanas" (práctica); reformulados como tendencias generales sin cifras exactas.
+5. `juego-ahorcado` (24.2, 24.3) — `jsonLd.features` (vacío) rellenado con 6 características reales (categorías, teclado virtual, estadísticas/racha, dibujo progresivo, accesibilidad ARIA, 100% local); FAQ de frecuencia de letras ahora atribuye las cifras a "corpus lingüísticos como el CREA de la RAE".
+6. `juego-piedra-papel-tijera` (25.1, 25.2, 25.3) — eliminados los porcentajes exactos de frecuencia de jugadas y la afirmación de diferencia de género sin fuente; generalizada la referencia geográfica/temporal del campeonato RPS (antipatrón #5).
+7. `juego-platform-runner` (26.2, 26.3) — FAQ de "niveles progresivos" matizado a "3 niveles con dificultad creciente"; "han demostrado" → "sugieren... aunque los resultados varían según el estudio" (antipatrón #3).
+
+**Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
+
 ## Próximos pasos (Fase 2) — Suite Juegos y Ocio
 
-Tandas 1 y 2 completadas (8 hallazgos 🔴/🟠 resueltos de 14). Quedan los **23 hallazgos 🟡 Bajo** para una sesión de "limpieza menor" posterior (Tandas 3-5), agrupables por tipo igual que en la Suite Viajes:
+Tandas 1-3 completadas (8 hallazgos 🔴/🟠 + 13 hallazgos 🟡 Bajo resueltos). Queda la **Tanda 4** con los 13 hallazgos 🟡 Bajo restantes, en 6 apps:
 
-- **Estadísticas/porcentajes sin fuente**: 27.3, 33.2, 33.3, 34.2, 34.3, 35.2, 36.3 (y otros pendientes de listar al detalle).
-- **Terminología España-only (regla 1.bis)**: 27.2 (`juego-puzzle-matematico`), 33.1 (`quiz-verbos-irregulares`), 36.2 (`test-velocidad-escritura`).
-- **Wordle**: 31.1 ("modo difícil" inexistente), 31.2 (ejemplos de vocales incorrectos), 31.3 (cifras de diccionario sin fuente / no coinciden con datos reales de la app).
-- Resto de hallazgos 🟡 Bajo de apps no listadas arriba: revisar tabla de "Hallazgos detallados" completa para inventario exacto antes de planificar Tanda 3.
+1. `juego-puzzle-matematico` — 27.2 (terminología España-only: Secundaria/Bachillerato), 27.3 (neurociencia sin cita)
+2. `juego-wordle` — 31.1 ("modo difícil" inexistente), 31.2 (ejemplos de vocales incorrectos: AUDIO/REINA/EUROS), 31.3 (cifras de diccionario RAE sin fuente, no coinciden con datos reales de la app)
+3. `quiz-verbos-irregulares` — 33.1 (terminología España-only: ESO/Bachillerato), 33.2 (200 verbos/90% sin fuente), 33.3 (40% memorización sin fuente)
+4. `radio-meskeia` — 34.2 ("efecto Mozart" sin referencia), 34.3 (cálculo de consumo de datos, aclarar que es teórico)
+5. `ruleta-aleatoria` — 35.2 (Ley 13/2011 y umbrales sin fuente verificable)
+6. `test-velocidad-escritura` — 36.2 (terminología España-only: CCAA/Cuerpo General Administrativo), 36.3 (velocidad media España sin fuente/año)
 
-El resto de hallazgos 🟡 Bajo (estadísticas sin fuente, términos España-only) pueden agruparse en una sesión de "limpieza menor" posterior (Tandas 3-5), igual que en la Suite Viajes.
+Tras Tanda 4 quedará cerrada toda la Fase 2 de la Suite Juegos y Ocio.
 
 

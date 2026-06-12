@@ -485,10 +485,12 @@ export default function JuegoAhorcadoPage() {
               <details>
                 <summary>¿Cuál es la letra más frecuente del español?</summary>
                 <p>
-                  La letra más frecuente del español es la E, que aparece en aproximadamente
-                  el 13,7 % de todos los textos escritos. Le siguen la A (12,5 %), la O (8,7 %),
-                  la S (8 %), la R (6,9 %) y la N (6,7 %). Esta frecuencia hace que empezar
-                  siempre por las vocales sea la estrategia óptima en el ahorcado.
+                  La letra más frecuente del español es la E, que según estudios de frecuencia
+                  léxica del español (basados en corpus lingüísticos como el CREA de la RAE)
+                  aparece en aproximadamente el 13,7 % de todos los textos escritos. Le siguen
+                  la A (12,5 %), la O (8,7 %), la S (8 %), la R (6,9 %) y la N (6,7 %). Esta
+                  frecuencia hace que empezar siempre por las vocales sea la estrategia óptima
+                  en el ahorcado.
                 </p>
                 <p className={styles.faqTip}>
                   Dato: la frecuencia de letras en español difiere del inglés, donde la E

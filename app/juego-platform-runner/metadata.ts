@@ -48,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Qué es Platform Runner y cómo se juega?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Platform Runner es un juego de plataformas en el que controlas un personaje que corre, salta, recolecta monedas y derrota enemigos superando niveles de dificultad progresiva. Se juega con las teclas de flecha (movimiento) y la barra espaciadora para saltar. El objetivo es llegar al final de cada nivel recolectando el mayor número de monedas posible.',
+        text: 'Platform Runner es un juego de plataformas en el que controlas un personaje que corre, salta, recolecta monedas y derrota enemigos superando 3 niveles con dificultad creciente (fácil, medio y avanzado). Se juega con las teclas de flecha (movimiento) y la barra espaciadora para saltar. El objetivo es llegar al final de cada nivel recolectando el mayor número de monedas posible.',
       },
     },
     {
@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Para qué edades es adecuado Platform Runner?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Platform Runner es apto para todas las edades. Sus mecánicas sencillas lo hacen accesible desde los 6-7 años, mientras que la dificultad progresiva lo mantiene entretenido para jugadores adultos. No contiene contenido violento ni temáticas para adultos.',
+        text: 'Platform Runner es apto para todas las edades. Sus mecánicas sencillas lo hacen accesible desde los 6-7 años, mientras que sus 3 niveles de dificultad creciente lo mantienen entretenido para jugadores adultos. No contiene contenido violento ni temáticas para adultos.',
       },
     },
     {

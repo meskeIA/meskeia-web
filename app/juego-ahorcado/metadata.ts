@@ -39,7 +39,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Juega al clásico juego del ahorcado en español. 4 categorías: animales, países, profesiones y vocabulario. Sin registro, sin publicidad, 100% local.",
   url: "https://meskeia.com/juego-ahorcado/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    '4 categorías temáticas: animales, países, profesiones y vocabulario',
+    'Teclado virtual interactivo con marcado de letras correctas e incorrectas',
+    'Estadísticas de partidas, victorias, racha actual y mejor racha',
+    'Dibujo del ahorcado progresivo según los errores (hasta 6 fallos)',
+    'Accesibilidad con etiquetas ARIA y anuncios en tiempo real (aria-live)',
+    '100% local en el navegador, sin registro, sin publicidad y sin conexión necesaria',
+  ],
 });
 
 export const faqJsonLd = {
