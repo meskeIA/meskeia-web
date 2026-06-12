@@ -921,4 +921,27 @@ Corregidos los 13 hallazgos 🟡 Bajo restantes mediante 6 ediciones (terminolog
 
 4 builds verificados (uno por tanda), todos exit 0 con 999 apps / 1300 páginas. No quedan hallazgos pendientes en la Suite Juegos y Ocio.
 
+---
+
+## Divergencia tablas ITP por CCAA — fix tipos generales Cantabria/Galicia (2026-06-12)
+
+> Hilo nuevo, distinto de los anteriores: existen **dos tablas independientes de ITP por comunidad autónoma** que llevan tiempo divergiendo:
+> - `TIPOS_ITP_CCAA_2025` (`data/fiscal/inmuebles.ts`, 17 CCAA, tipo general + 1 reducido simplificado) → usada por `lib/calculadoras/compraventa.ts` (`getTipoITP`) → tools MCP `consulta_compra_vivienda`/`consulta_venta_vivienda`.
+> - `ITP_CCAA` (`data/itp-ccaa.ts`, 19 territorios incl. Ceuta/Melilla, tramos progresivos + lista completa de `tiposReducidos`) → usada por `estimador-compraventa-inmueble`, `simulador-gastos-compraventa-garaje`, `simulador-gastos-compraventa-nave-industrial`, `simulador-gastos-compraventa-trastero`.
+
+### 🔴 Crítico — corregido en esta sesión
+
+Divergencias en el **tipo general** (el que se aplica por defecto cuando no hay perfil reducido):
+
+- **Cantabria**: `TIPOS_ITP_CCAA_2025` decía 10%, real es **9%** (confirmado: tipo general 9% sobre el valor; tramo reducido 7% hasta 300.000€ vivienda habitual). Diferencia de 1 punto = ~2.000€ en una compra de 200.000€.
+- **Galicia**: `TIPOS_ITP_CCAA_2025` decía 10%, real es **8%** (confirmado vía ATRIGA, Axencia Tributaria de Galicia: tipo general TPO 8% sobre inmuebles). Diferencia de 2 puntos = ~4.000€ en una compra de 200.000€.
+
+**Corrección aplicada** en `data/fiscal/inmuebles.ts`: Cantabria `tipo: 10`→`9` (+ `reducido: 7`, "Vivienda habitual valor < 200.000 €; jóvenes <36 años hasta 4%"); Galicia `tipo: 10`→`8` (+ `notaReducido` corregido de "Familias numerosas, zonas despobladas" a "Jóvenes <36 años, familias numerosas, discapacidad ≥65% (vivienda habitual ≤150.000 €)", alineado con `ITP_CCAA.galicia.tiposReducidos`). `FISCAL_INMUEBLES_META.verificado` actualizado a `2026-06-12`.
+
+### 🟠 Pendiente — reconciliación completa de las 17-19 CCAA (proyecto nuevo, fuera de alcance hoy)
+
+Además de los tipos generales, los **tipos reducidos** divergen entre ambas tablas en al menos 9 territorios (Aragón, Asturias, Canarias, Castilla-La Mancha, Cataluña, La Rioja, Madrid, Navarra, País Vasco), y `TIPOS_ITP_CCAA_2025` no incluye Ceuta/Melilla. Verificar cada CCAA contra su fuente oficial es un trabajo del tamaño de la verificación RETA del Grupo 1, multiplicado por ~19 territorios — se documenta como proyecto independiente para abordar en lotes (ver memoria `project_reconciliacion_itp_ccaa.md`).
+
+**Build verificado**: `npm run build` exit 0, sin errores (999 apps, 1300 páginas).
+
 

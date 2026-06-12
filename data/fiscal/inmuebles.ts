@@ -18,7 +18,7 @@
 
 export const FISCAL_INMUEBLES_META = {
   fuente: 'Ley 1/1993 ITP-AJD + Ley 35/2006 IRPF + Ley 37/1992 IVA + RDL 26/2021',
-  verificado: '2025-01-15',
+  verificado: '2026-06-12',
   vigencia: '2025',
   urlOficialITP: 'https://sede.agenciatributaria.gob.es/Sede/itp-ajd.html',
   urlOficialIRPF: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
@@ -45,12 +45,12 @@ export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Asturias',           tipo: 8,    reducido: 3,    notaReducido: 'Zonas despobladas, jóvenes' },
   { ccaa: 'Baleares',           tipo: 8,    reducido: 4,    notaReducido: 'Primera vivienda habitual precio < 270.151 €' },
   { ccaa: 'Canarias',           tipo: 6.5 },
-  { ccaa: 'Cantabria',          tipo: 10 },
+  { ccaa: 'Cantabria',          tipo: 9,    reducido: 7,    notaReducido: 'Vivienda habitual valor < 200.000 €; jóvenes <36 años hasta 4%' },
   { ccaa: 'Castilla-La Mancha', tipo: 9,    reducido: 6,    notaReducido: 'Zonas despobladas' },
   { ccaa: 'Castilla y León',    tipo: 8,    reducido: 4,    notaReducido: 'Jóvenes <36 años vivienda habitual' },
   { ccaa: 'Cataluña',           tipo: 10,   reducido: 5,    notaReducido: 'Precio < 190.000 € y comprador <33 años u otras circunstancias' },
   { ccaa: 'Extremadura',        tipo: 8,    reducido: 7 },
-  { ccaa: 'Galicia',            tipo: 10,   reducido: 3,    notaReducido: 'Familias numerosas, zonas despobladas' },
+  { ccaa: 'Galicia',            tipo: 8,    reducido: 3,    notaReducido: 'Jóvenes <36 años, familias numerosas, discapacidad ≥65% (vivienda habitual ≤150.000 €)' },
   { ccaa: 'La Rioja',           tipo: 7 },
   { ccaa: 'Madrid',             tipo: 6 },
   { ccaa: 'Murcia',             tipo: 8,    reducido: 3,    notaReducido: 'Familias numerosas, discapacidad' },
