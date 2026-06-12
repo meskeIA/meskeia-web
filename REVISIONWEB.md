@@ -23,6 +23,73 @@
 
 ---
 
+## Auditoría de Alto Tráfico
+
+> Hilo complementario al ciclo por suites. En lugar de seguir el orden de suites, prioriza las apps con mayor uso real según el ranking de `/dashboard-analytics` ("Ranking de Aplicaciones"). Objetivo: detectar y corregir cuanto antes cualquier error en las apps que más usuarios reciben a diario, sin esperar a que les llegue el turno por suite.
+
+### Metodología específica
+
+1. Fuente del ranking: `/dashboard-analytics` → pestaña "Ranking de Aplicaciones" (columna "Usos").
+2. Tandas de **1-2 apps** (más pequeñas que el ciclo por suites, para no agotar el cupo de tokens por sesión — lección aprendida en Viajes y Juegos y Ocio).
+3. Misma clasificación de severidad y mismo checklist que el ciclo por suites (ver "Metodología" al inicio del documento).
+4. Una app ya marcada ✅ en el ciclo por suites no se repite aquí salvo cambios relevantes — se anota "ya auditada (suite X, fecha)".
+5. Tras cada tanda: si hay cambios de código, build de verificación + commit + push.
+
+### Ranking de referencia (2026-06-12, dashboard-analytics)
+
+| # | App | Usos | Tiempo medio | Estado auditoría |
+|---|---|---|---|---|
+| 1 | `tabla-periodica` | 417 | 1m 7s | ✅ Tanda 1 |
+| 2 | `test-perfil-inversor` | 415 | 6m 3s | ✅ Tanda 1 |
+| 3 | `simulador-equilibrio-quimico` | 401 | 1m 8s | ⏳ Pendiente |
+| 4 | `simulador-puertas-logicas` | 323 | 59s | ⏳ Pendiente |
+| 5 | `simulador-genetica` | 310 | 5m 18s | ⏳ Pendiente |
+| 6 | `conversor-braille` | 261 | 1m 20s | ⏳ Pendiente |
+| 7 | `generador-anagramas` | 244 | 1m 27s | ⏳ Pendiente |
+| 8 | `calculadora-notas` | 186 | 42s | ⏳ Pendiente |
+| 9 | `generador-tonos` | 157 | 2m 33s | ⏳ Pendiente |
+| 10 | `simulador-movimiento-circular` | 149 | 2m 51s | ⏳ Pendiente |
+| 11 | `simulador-campo-electrico` | 123 | 9m 50s | ⏳ Pendiente |
+| 12 | `estimador-compraventa-inmueble` | 104 | 1m 25s | ⏳ Pendiente |
+| 13 | `simulador-ecosistema-trofico` | 79 | 3m 37s | ⏳ Pendiente |
+| 14 | `calculadora-cocina` | — | 4m 11s | ⏳ Pendiente |
+
+*(`meskeIA` = homepage, 163 usos — no aplica el checklist de auditoría de apps individuales; se excluye del ranking).*
+
+---
+
+### Tanda 1 — Auditoría de Alto Tráfico (`tabla-periodica`, `test-perfil-inversor`) — ✅ COMPLETADA (2026-06-12)
+
+#### 38. `tabla-periodica` (Tabla Periódica Interactiva) — 417 usos, #1 del ranking
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 38.1 | 🟡 Bajo | `page.tsx:409` | La tabla comparativa escribe "Metales alcalinoterreos (Gp2)" sin tilde, mientras `elementos-data.ts` (`FAMILIAS`) usa correctamente "Metales Alcalinotérreos". | Corregir a "Metales alcalinotérreos (Gp2)". |
+| 38.2 | 🟡 Bajo | `page.tsx:212` | La celda de cada elemento en la tabla muestra la masa atómica con `elemento.masa.toFixed(...)` (formato US, punto decimal), mientras el modal de detalle usa `formatNumber(..., 3)` (formato español, coma decimal) para el mismo dato — regla #4 (formato español) y consistencia visual. | Sustituir `toFixed()` por `formatNumber(elemento.masa, elemento.masa % 1 === 0 ? 0 : 2)`. |
+
+**RelatedApps**: correcto (`getRelatedApps('tabla-periodica')` resuelve 4 apps existentes: quiz-tabla-periodica, simulador-estequiometria, simulador-equilibrio-quimico, glosario-fisica-quimica). FAQ JSON-LD (118 elementos, masa molar, grupos/períodos, número atómico) coherente con la implementación. Resto del contenido educativo (escenarios, FAQ de química, guía de 7 pasos, tips, warning box) revisado sin errores factuales relevantes.
+
+#### 39. `test-perfil-inversor` (Test de Perfil Inversor) — 415 usos, #2 del ranking
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 39.1 | 🔴 Crítico | `page.tsx:1093` | El botón "📊 Simular esta Cartera" de la pantalla de resultado enlaza a `/simulador-cartera-inversion/?perfil=${profileType}`, una ruta **que no existe** (404). La app `estimador-cartera-inversion` está específicamente diseñada para recibir este parámetro (`PERFILES_PREDEFINIDOS` con las mismas 5 claves `conservador/moderado/equilibrado/dinamico/agresivo` y las mismas asignaciones rv/rf/liq/alt que `PROFILES` de este test). | Cambiar a `/estimador-cartera-inversion/?perfil=${profileType}`. |
+| 39.2 | 🔴 Crítico | `page.tsx:1098` | El botón "💼 Calculadora de Inversiones" enlaza a `/calculadora-inversiones/`, ruta **que no existe** (404). | Cambiar a `/estimador-inversiones/` (Estimador de Inversiones — Asignación de Activos), el app existente más afín; ajustar el texto del botón si procede (p.ej. "Estimador de Inversiones"). |
+| 39.3 | 🟠 Medio | `metadata.ts:43-47` (FAQ JSON-LD) | La pregunta "¿Qué tipos de perfil inversor existen?" responde "Existen tres perfiles principales: conservador, moderado y agresivo... Algunos sistemas añaden subperfiles como moderado-conservador o moderado-agresivo". La app real tiene **5 perfiles** (`conservador`, `moderado`, `equilibrado`, `dinámico`, `agresivo`), sin esos subperfiles — inconsistencia entre el FAQ usado para grounding de IAs y el resultado real del test. | Reescribir la respuesta para reflejar los 5 perfiles reales de esta herramienta. |
+
+**RelatedApps**: correcto (`getRelatedApps('test-perfil-inversor')` resuelve 4 apps existentes, incluyendo `estimador-cartera-inversion` — coherente con 39.1). Lógica de puntuación (`getProfile`, rangos 10-40 en 5 tramos de 6-7 puntos, `getBarPosition`) verificada correcta. Resto del contenido educativo (tabla comparativa de 5 perfiles, escenarios, FAQ avanzado, guía de 7 pasos, 6 reglas de oro, errores comunes) revisado sin errores factuales relevantes.
+
+**Correcciones aplicadas**:
+- 39.1: `/simulador-cartera-inversion/?perfil=...` → `/estimador-cartera-inversion/?perfil=...`
+- 39.2: `/calculadora-inversiones/` → `/estimador-inversiones/` (texto del botón actualizado a "Estimador de Inversiones")
+- 39.3: FAQ reescrita para reflejar los 5 perfiles reales (conservador/moderado/equilibrado/dinámico/agresivo)
+- 38.1: "Metales alcalinoterreos" → "Metales alcalinotérreos"
+- 38.2: `toFixed()` → `formatNumber()` para la masa atómica en la tabla principal
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+---
+
 ## Resumen ejecutivo — Suite Viajes
 
 | Severidad | Nº hallazgos |

@@ -209,7 +209,7 @@ export default function TablaPerodicaPage() {
                 <span className={styles.numeroAtomico}>{elemento.numero}</span>
                 <span className={styles.simbolo}>{elemento.simbolo}</span>
                 <span className={styles.nombre}>{elemento.nombre}</span>
-                <span className={styles.masa}>{elemento.masa.toFixed(elemento.masa % 1 === 0 ? 0 : 2)}</span>
+                <span className={styles.masa}>{formatNumber(elemento.masa, elemento.masa % 1 === 0 ? 0 : 2)}</span>
               </div>
             );
           })}
@@ -406,7 +406,7 @@ export default function TablaPerodicaPage() {
                   <td>Sodio (Na, Z=11)</td>
                 </tr>
                 <tr>
-                  <td><strong>Metales alcalinoterreos (Gp2)</strong></td>
+                  <td><strong>Metales alcalinotérreos (Gp2)</strong></td>
                   <td>Más duros que Gp1, 2 e⁻ de valencia</td>
                   <td>0,9–1,3 (baja)</td>
                   <td>Sólido</td>

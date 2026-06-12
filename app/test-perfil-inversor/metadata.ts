@@ -43,7 +43,7 @@ export const faqJsonLd = {
       name: '¿Qué tipos de perfil inversor existen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Existen tres perfiles principales: conservador (prioriza seguridad y acepta menor rentabilidad), moderado (equilibra rentabilidad y riesgo) y agresivo (acepta alta volatilidad buscando mayor rentabilidad a largo plazo). Algunos sistemas añaden subperfiles como moderado-conservador o moderado-agresivo.',
+        text: 'Este test distingue cinco perfiles según la puntuación obtenida: conservador (prioriza la seguridad y acepta menor rentabilidad), moderado, equilibrado (reparto similar entre renta fija y variable), dinámico y agresivo (acepta alta volatilidad buscando mayor rentabilidad a largo plazo). Cada perfil tiene asociada una distribución orientativa de activos (renta variable, renta fija, liquidez y alternativos).',
       },
     },
     {

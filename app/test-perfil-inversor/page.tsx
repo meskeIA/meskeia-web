@@ -1090,13 +1090,13 @@ export default function TestPerfilInversorPage() {
         {/* Acciones */}
         <div className={styles.resultActions}>
           <Link
-            href={`/simulador-cartera-inversion/?perfil=${profileType}`}
+            href={`/estimador-cartera-inversion/?perfil=${profileType}`}
             className={`${styles.actionButton} ${styles.primary}`}
           >
             📊 Simular esta Cartera
           </Link>
-          <Link href="/calculadora-inversiones/" className={`${styles.actionButton} ${styles.secondary}`}>
-            💼 Calculadora de Inversiones
+          <Link href="/estimador-inversiones/" className={`${styles.actionButton} ${styles.secondary}`}>
+            💼 Estimador de Inversiones
           </Link>
           <button type="button" onClick={handleRestart} className={`${styles.actionButton} ${styles.secondary}`}>
             🔄 Repetir Test
