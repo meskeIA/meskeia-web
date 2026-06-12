@@ -246,7 +246,7 @@ export default function ConversionDivisas() {
                 </thead>
                 <tbody>
                   <tr><td>Wise (Transferwise)</td><td>0,3–0,6%</td><td>Fija mínima</td><td>0,5–1% total</td><td>Transferencias internacionales, vivir en el extranjero</td></tr>
-                  <tr><td>Revolut (plan gratuito)</td><td>0% en horario laboral</td><td>0% hasta límite mensual</td><td>0–1,5% (fin de semana +1%)</td><td>Gastos de viaje, compras online internacionales</td></tr>
+                  <tr><td>Revolut (plan gratuito)</td><td>0% en horario laboral</td><td>0% hasta límite mensual</td><td>0–1,5% (recargo en fin de semana según plan y divisa)</td><td>Gastos de viaje, compras online internacionales</td></tr>
                   <tr><td>Banco tradicional</td><td>2–4%</td><td>€3–15 por operación</td><td>3–6% total</td><td>Si no tienes alternativa digital</td></tr>
                   <tr><td>Cajero automático en destino</td><td>1,5–3%</td><td>€2–5 por retirada</td><td>3–5% + comisión fija</td><td>Efectivo de emergencia (no recomendado como norma)</td></tr>
                   <tr><td>Casa de cambio en aeropuerto</td><td>5–10%</td><td>Sin comisión aparente</td><td>5–15% total</td><td>Nunca — solo emergencia absoluta</td></tr>

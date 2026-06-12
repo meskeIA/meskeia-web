@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import React, { useState, useMemo } from 'react';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
@@ -8,6 +7,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import DisclaimerCard from '@/components/DisclaimerCard';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './ComparadorTransporte.module.css';
@@ -88,7 +88,7 @@ function calcularResultados(
   const autobusCO2PP = Math.round(distanciaKm * 0.068);
 
   // COCHE
-  const cocheCostePorKm = 0.085; // combustible + amortización
+  const cocheCostePorKm = 0.085; // combustible (estimación; no incluye amortización ni seguro)
   const cochePeajes = distanciaKm > 100 ? distanciaKm * 0.011 : 0;
   const cocheCosteTotal = distanciaKm * cocheCostePorKm + cochePeajes;
   const cocheCostePP = cocheCosteTotal / n;
@@ -257,6 +257,13 @@ export default function ComparadorTransporteViaje() {
       </header>
 
       <LegalNotice />
+
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="comparador-transporte-viaje-disclaimer"
+      />
 
       <main className={styles.main}>
         {/* ── Configuración ── */}

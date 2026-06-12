@@ -22,7 +22,7 @@ interface DatosPais {
 /**
  * Base de datos de enchufes por país
  * Fuente: IEC 60083, World Standards, Wikipedia
- * Tipos A-M según IEC
+ * Tipos A-N según IEC
  */
 const BASE_PAISES: DatosPais[] = [
   // EUROPA
@@ -247,7 +247,7 @@ export default function EnchufesPais() {
           <h3>¿Por qué hay tantos tipos de enchufe en el mundo?</h3>
           <p>
             Los sistemas eléctricos se desarrollaron de forma independiente en cada país durante el siglo XX,
-            antes de que existieran estándares internacionales. Hoy existen 15 tipos de enchufe (A-M según IEC),
+            antes de que existieran estándares internacionales. Hoy existen 14 tipos de enchufe (A-N según IEC),
             aunque los más comunes son los tipos A/B (Norteamérica y Japón), C/E/F (Europa continental) y G (Reino Unido).
           </p>
 

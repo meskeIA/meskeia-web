@@ -449,7 +449,8 @@ export default function GuiaSeguroViaje() {
             </ul>
             <p>
               Solicítala gratuitamente en el INSS, en tu mutua de trabajo, o a través de la app
-              <em> Carpeta Ciudadana</em>. Tiene validez de 1-2 años.
+              <em> Carpeta Ciudadana</em>. La fecha de caducidad viene impresa en la propia tarjeta;
+              compruébala antes de viajar.
             </p>
           </section>
 
@@ -655,7 +656,8 @@ export default function GuiaSeguroViaje() {
               <div className={styles.faqItem}>
                 <dt><strong>¿Qué seguro necesito para viajar a EE.UU.?</strong></dt>
                 <dd>
-                  Una cobertura médica mínima de 500.000 € por persona (recomendable superar esa cifra),
+                  Una cobertura médica mínima recomendada de 250.000 USD por persona (o equivalente en euros),
+                  aunque muchos expertos aconsejan 500.000 USD o cobertura ilimitada, además de
                   repatriación en avión medicalizado y asistencia 24h. Los costes hospitalarios en EE.UU.
                   pueden ser devastadores sin seguro: una noche en UCI puede superar los 50.000 $.
                   <span className={styles.faqTip}>Algunas visas de EE.UU. exigen demostrar seguro médico suficiente.</span>

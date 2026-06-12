@@ -19,7 +19,7 @@ export interface Country {
 }
 
 export const countries: Country[] = [
-  // EUROPA (44 países)
+  // EUROPA (45 países)
   { name: "Alemania", code: "de", capital: "Berlín", continent: "Europa", population: 83.2, area: 357386, currency: "Euro", currencySymbol: "€", language: "Alemán", phoneCode: "+49", timezone: "UTC+1", tld: ".de" },
   { name: "Albania", code: "al", capital: "Tirana", continent: "Europa", population: 2.8, area: 28748, currency: "Lek", currencySymbol: "L", language: "Albanés", phoneCode: "+355", timezone: "UTC+1", tld: ".al" },
   { name: "Andorra", code: "ad", capital: "Andorra la Vella", continent: "Europa", population: 0.08, area: 468, currency: "Euro", currencySymbol: "€", language: "Catalán", phoneCode: "+376", timezone: "UTC+1", tld: ".ad" },
@@ -66,7 +66,7 @@ export const countries: Country[] = [
   { name: "Ucrania", code: "ua", capital: "Kiev", continent: "Europa", population: 43.5, area: 603550, currency: "Grivna", currencySymbol: "₴", language: "Ucraniano", phoneCode: "+380", timezone: "UTC+2", tld: ".ua" },
   { name: "Vaticano", code: "va", capital: "Ciudad del Vaticano", continent: "Europa", population: 0.0008, area: 0.44, currency: "Euro", currencySymbol: "€", language: "Latín/Italiano", phoneCode: "+379", timezone: "UTC+1", tld: ".va" },
 
-  // ASIA (49 países)
+  // ASIA (48 países)
   { name: "Afganistán", code: "af", capital: "Kabul", continent: "Asia", population: 40.1, area: 652230, currency: "Afgani", currencySymbol: "؋", language: "Pastún/Dari", phoneCode: "+93", timezone: "UTC+4:30", tld: ".af" },
   { name: "Arabia Saudita", code: "sa", capital: "Riad", continent: "Asia", population: 35.0, area: 2149690, currency: "Rial saudí", currencySymbol: "﷼", language: "Árabe", phoneCode: "+966", timezone: "UTC+3", tld: ".sa" },
   { name: "Armenia", code: "am", capital: "Ereván", continent: "Asia", population: 3.0, area: 29743, currency: "Dram", currencySymbol: "֏", language: "Armenio", phoneCode: "+374", timezone: "UTC+4", tld: ".am" },
@@ -83,7 +83,7 @@ export const countries: Country[] = [
   { name: "Emiratos Árabes Unidos", code: "ae", capital: "Abu Dabi", continent: "Asia", population: 9.9, area: 83600, currency: "Dírham", currencySymbol: "د.إ", language: "Árabe", phoneCode: "+971", timezone: "UTC+4", tld: ".ae" },
   { name: "Filipinas", code: "ph", capital: "Manila", continent: "Asia", population: 111.0, area: 300000, currency: "Peso filipino", currencySymbol: "₱", language: "Filipino/Inglés", phoneCode: "+63", timezone: "UTC+8", tld: ".ph" },
   { name: "Georgia", code: "ge", capital: "Tiflis", continent: "Asia", population: 3.7, area: 69700, currency: "Lari", currencySymbol: "₾", language: "Georgiano", phoneCode: "+995", timezone: "UTC+4", tld: ".ge" },
-  { name: "India", code: "in", capital: "Nueva Delhi", continent: "Asia", population: 1417.2, area: 3287263, currency: "Rupia india", currencySymbol: "₹", language: "Hindi/Inglés", phoneCode: "+91", timezone: "UTC+5:30", tld: ".in" },
+  { name: "India", code: "in", capital: "Nueva Delhi", continent: "Asia", population: 1450.0, area: 3287263, currency: "Rupia india", currencySymbol: "₹", language: "Hindi/Inglés", phoneCode: "+91", timezone: "UTC+5:30", tld: ".in" },
   { name: "Indonesia", code: "id", capital: "Yakarta", continent: "Asia", population: 273.8, area: 1904569, currency: "Rupia indonesia", currencySymbol: "Rp", language: "Indonesio", phoneCode: "+62", timezone: "UTC+7", tld: ".id" },
   { name: "Irak", code: "iq", capital: "Bagdad", continent: "Asia", population: 41.2, area: 438317, currency: "Dinar iraquí", currencySymbol: "ع.د", language: "Árabe/Kurdo", phoneCode: "+964", timezone: "UTC+3", tld: ".iq" },
   { name: "Irán", code: "ir", capital: "Teherán", continent: "Asia", population: 86.8, area: 1648195, currency: "Rial iraní", currencySymbol: "﷼", language: "Persa", phoneCode: "+98", timezone: "UTC+3:30", tld: ".ir" },

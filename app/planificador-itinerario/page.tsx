@@ -610,7 +610,7 @@ export default function PlanificadorItinerario() {
             <p className={styles.escenarioExample}>
               Ritmo relajado (3 actividades/día). El Louvre necesita mínimo 3h y agota a los niños pequeños; mejor dedicarle una mañana
               entera y terminar en el jardín. Incluir Disneyland París (1 día completo) + Torre Eiffel (reservar turno de subida).
-              Metro París: billete suelto 2,15 €/viaje vs. día completo 8,65 € — con familia, el bono día sale rentable.
+              Metro París: el billete único &quot;t+&quot; cuesta unos 2,50 €/viaje — con varios trayectos al día, un pase turístico o de día suele salir más rentable para la familia.
             </p>
             <p className={styles.escenarioTip}>Evitar lunes en el Louvre (cerrado) y martes en el Museo d&apos;Orsay (cerrado).</p>
           </div>

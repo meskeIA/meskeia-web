@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la ciudad más barata para vivir en Europa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Entre las ciudades europeas más asequibles destacan Bucarest (Rumanía), Belgrado (Serbia), Sofía (Bulgaria) y Budapest (Hungría), donde el coste mensual de vida para una persona puede situarse entre 800 y 1.200 €, incluyendo alquiler en zona céntrica. En contraste, Zúrich, Ginebra o Londres superan fácilmente los 3.000 € al mes.',
+        text: 'Entre las ciudades europeas más asequibles destacan Bucarest (Rumanía), Budapest (Hungría) y Estambul (Turquía), donde el coste mensual de vida para una persona puede situarse entre 800 y 1.200 €, incluyendo alquiler en zona céntrica. En contraste, Zúrich, Ginebra o Londres superan fácilmente los 3.000 € al mes.',
       },
     },
     {

@@ -442,7 +442,7 @@ export default function SimuladorJetLagPage() {
                   <td>Protocolo completo: pre-ajuste 3 días, melatonina 1–3 mg, exposición solar activa</td>
                 </tr>
                 <tr>
-                  <td><strong>9+ h</strong></td>
+                  <td><strong>10+ h</strong></td>
                   <td>Desfase total del ritmo circadiano, síntomas gastrointestinales, irritabilidad</td>
                   <td>Impacto significativo aunque menor que al este</td>
                   <td>10–14 días</td>
@@ -451,6 +451,10 @@ export default function SimuladorJetLagPage() {
                 </tr>
               </tbody>
             </table>
+            <p className={styles.tableNote}>
+              Los desfases UTC indicados son horario estándar; algunas ciudades aplican horario de
+              verano y pueden variar ±1 h según la época del año.
+            </p>
           </div>
         </div>
 

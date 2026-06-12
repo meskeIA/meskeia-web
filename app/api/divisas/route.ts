@@ -92,7 +92,6 @@ export async function GET() {
   } catch (error) {
     console.error('Error al obtener divisas:', error);
 
-    // Fallback: tasas aproximadas del BCE (enero 2025) si la API falla
     return NextResponse.json(
       { error: 'No se pudieron obtener las tasas de cambio. Inténtalo más tarde.' },
       { status: 503 }

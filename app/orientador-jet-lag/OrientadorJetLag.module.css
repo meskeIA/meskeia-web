@@ -541,6 +541,12 @@
   background: var(--hover);
 }
 
+.tableNote {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 10px 16px 0;
+}
+
 [data-theme='dark'] .comparativaTable th {
   background: linear-gradient(135deg, #1e6a8a 0%, #2d7d7a 100%);
 }

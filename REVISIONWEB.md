@@ -29,7 +29,7 @@
 |---|---|
 | 🔴 Crítico | 1 |
 | 🟠 Medio | 12 |
-| 🟡 Bajo | 27 (11 resueltos en Tanda 3, 16 pendientes en Tanda 4) |
+| 🟡 Bajo | 27 (25 resueltos en Tanda 3+4, 2 notas de revisión anual sin acción) |
 
 **Hallazgo crítico único**: `calculadora-propinas` no muestra su sección de apps relacionadas (RelatedApps vacío) por un bug de slug — afecta al cross-linking SEO obligatorio.
 
@@ -263,7 +263,24 @@ Build verificado: 998 apps, 1299 páginas, exit 0.
 
 Build verificado: 999 apps, 1300 páginas, exit 0.
 
-**Pendiente (Tanda 4 — parte 2/2)**: `orientador-jet-lag` (8.3, 8.4), `guia-seguro-viaje` (9.1, 9.2), `planificador-itinerario` (10.3), `conversor-divisas` (11.1, 11.2), `comparador-transporte-viaje` (12.2, 12.4 — 12.3 nota anual sin acción), `enchufes-por-pais` (14.1), `comparador-coste-vida` (15.3), `paises-del-mundo` (16.2, 16.3, 16.4 — 16.5 nota anual sin acción).
+---
+
+### Tanda 4 — Limpieza menor 🟡 Bajo (parte 2/2) — ✅ COMPLETADA (2026-06-12)
+
+14 hallazgos resueltos en 8 apps (sin cambios de lógica salvo el comentario de `comparador-transporte-viaje`):
+
+1. ✅ `orientador-jet-lag` — tabla husos: última fila "9+ h" → "10+ h" para coherencia con el código `<=9`/`>9` (8.3) + nota indicando que los UTC son horario estándar y pueden variar ±1h con DST (8.4)
+2. ✅ `guia-seguro-viaje` — validez de la TSJE: "Tiene validez de 1-2 años" → "La fecha de caducidad viene impresa en la propia tarjeta; compruébala antes de viajar" (9.1) + unificar cobertura mínima EE.UU. a "250.000 USD (recomendable 500.000 USD o ilimitada)" en `page.tsx`, alineado con `metadata.ts` (9.2)
+3. ✅ `planificador-itinerario` — Metro París: "billete suelto 2,15 €/viaje vs. día completo 8,65 €" → tarifa única "t+" ~2,50 €/viaje + recomendación de pase turístico/día (10.3)
+4. ✅ `conversor-divisas` — eliminado comentario obsoleto sobre "fallback BCE (enero 2025)" en `app/api/divisas/route.ts` (código muerto) (11.1) + matizado "Revolut fin de semana +1%" a "según plan y divisa" (11.2)
+5. ✅ `comparador-transporte-viaje` — comentario `0,085 €/km` "combustible + amortización" → "combustible (estimación; no incluye amortización ni seguro)" (12.2) + migrado de `// @disclaimer: exempt` a `<DisclaimerCard variant="general" severity="medium" collapsible>`, alineado con `conversor-divisas` (12.4). Nota: 12.3 es revisión anual, sin acción.
+6. ✅ `enchufes-por-pais` — unificado "tipos A-M (15 tipos)" → "tipos A-N (14 tipos)" en comentario del dataset y texto educativo (14.1)
+7. ✅ `comparador-coste-vida` — FAQ JSON-LD: "Bucarest, Belgrado, Sofía y Budapest" → "Bucarest, Budapest y Estambul" (ciudades presentes en el dataset `CIUDADES`) (15.3)
+8. ✅ `paises-del-mundo` y `data/countries.ts` — comentarios "EUROPA (44 países)"/"ASIA (49 países)" → "(45 países)"/"(48 países)", y tabla comparativa de continentes actualizada igual (16.2); población de India unificada a 1.450 M (ONU/Banco Mundial 2024-2025) en `countries.ts` y en las dos menciones del texto educativo (16.3); densidad de Europa unificada a "~71 hab/km²" (745M/10,5M km²) (16.4). Nota: 16.5 es revisión anual, sin acción.
+
+Build verificado: 999 apps, 1300 páginas, exit 0.
+
+**Cierre Viajes 🟡 Bajo**: 25/27 hallazgos resueltos (11 en Tanda 3 + 14 en Tanda 4) + 2 notas de revisión anual sin acción de código (12.3, 16.5 — pendientes de la revisión anual de enero).
 
 ---
 

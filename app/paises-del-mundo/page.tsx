@@ -337,7 +337,7 @@ export default function PaisesDelMundoPage() {
           <ul>
             <li><strong>🏆 País más grande</strong>: Rusia (17,1 millones km²) — equivale a casi dos veces EE.UU. o 34 veces España.</li>
             <li><strong>🔬 País más pequeño</strong>: Ciudad del Vaticano (0,44 km²) — cabe 11 veces en el Parque del Retiro de Madrid.</li>
-            <li><strong>👥 Más poblado</strong>: India (1.428 millones, superó a China en 2023).</li>
+            <li><strong>👥 Más poblado</strong>: India (1.450 millones, superó a China en 2023).</li>
             <li><strong>🏜️ Menos poblado (continente)</strong>: Nauru en Oceanía (unos 10.000 habitantes) es el estado independiente menos poblado.</li>
             <li><strong>🏔️ País más alto</strong>: Lesotho — su punto más bajo está a 1.400 m sobre el nivel del mar, completamente rodeado por Sudáfrica.</li>
             <li><strong>📐 Mayor densidad de población</strong>: Mónaco (~26.000 hab/km²), seguido de Singapur y Bahréin.</li>
@@ -363,7 +363,7 @@ export default function PaisesDelMundoPage() {
             <li><strong>🌍 África</strong>: 54 países, 1.400 millones de habitantes, el continente con mayor crecimiento demográfico. Nigeria será el 3.er país más poblado del mundo en 2050.</li>
             <li><strong>🌏 Asia</strong>: 48 países, 4.700 millones de habitantes (60% de la humanidad). Incluye las dos civilizaciones más antiguas continuas (China e India) y el país con la economía que más rápido creció en el siglo XXI.</li>
             <li><strong>🌎 América</strong>: 35 países, 1.000 millones de habitantes. Brasil es el 5.º país más grande del mundo y tiene el mayor número de hablantes de portugués.</li>
-            <li><strong>🌍 Europa</strong>: 45 países en apenas 10,5 millones km². Alta densidad media (~73 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
+            <li><strong>🌍 Europa</strong>: 45 países en apenas 10,5 millones km². Alta densidad media (~71 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
             <li><strong>🌏 Oceanía</strong>: 14 países. Australia ocupa el 92% del área continental. Muchos estados son pequeñas islas del Pacífico con soberanía sobre grandes zonas económicas exclusivas (ZEE).</li>
           </ul>
         </section>
@@ -405,11 +405,11 @@ export default function PaisesDelMundoPage() {
                 </tr>
                 <tr>
                   <td><strong>🌏 Asia</strong></td>
-                  <td>49</td>
+                  <td>48</td>
                   <td>4.750 millones</td>
                   <td>44,6 M km²</td>
                   <td>~107 hab/km²</td>
-                  <td>India (1.428 M)</td>
+                  <td>India (1.450 M)</td>
                 </tr>
                 <tr>
                   <td><strong>🌎 América</strong></td>
@@ -421,7 +421,7 @@ export default function PaisesDelMundoPage() {
                 </tr>
                 <tr>
                   <td><strong>🌍 Europa</strong></td>
-                  <td>44</td>
+                  <td>45</td>
                   <td>745 millones</td>
                   <td>10,5 M km²</td>
                   <td>~71 hab/km²</td>
