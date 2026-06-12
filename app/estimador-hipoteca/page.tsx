@@ -314,9 +314,6 @@ export default function SimuladorHipotecaPage() {
         </p>
       </DisclaimerCard>
 
-      {/* Última actualización */}
-      
-
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}
         <div className={styles.configPanel}>
@@ -398,7 +395,7 @@ export default function SimuladorHipotecaPage() {
             <div className={styles.sliderGroup}>
               <div className={styles.sliderHeader}>
                 <label className={styles.label}>Interés fijo anual (TIN)</label>
-                <span className={styles.sliderValue}>{interesAnual.toFixed(2)}%</span>
+                <span className={styles.sliderValue}>{formatNumber(interesAnual, 2)}%</span>
               </div>
               <input
                 type="range"
@@ -417,7 +414,7 @@ export default function SimuladorHipotecaPage() {
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
                   <label className={styles.label}>Euríbor actual</label>
-                  <span className={styles.sliderValue}>{euribor.toFixed(2)}%</span>
+                  <span className={styles.sliderValue}>{formatNumber(euribor, 2)}%</span>
                 </div>
                 <input
                   type="range"
@@ -432,7 +429,7 @@ export default function SimuladorHipotecaPage() {
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
                   <label className={styles.label}>Diferencial</label>
-                  <span className={styles.sliderValue}>+{diferencial.toFixed(2)}%</span>
+                  <span className={styles.sliderValue}>+{formatNumber(diferencial, 2)}%</span>
                 </div>
                 <input
                   type="range"
@@ -467,7 +464,7 @@ export default function SimuladorHipotecaPage() {
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
                   <label className={styles.label}>Tipo fijo inicial (TIN)</label>
-                  <span className={styles.sliderValue}>{interesAnual.toFixed(2)}%</span>
+                  <span className={styles.sliderValue}>{formatNumber(interesAnual, 2)}%</span>
                 </div>
                 <input
                   type="range"
@@ -482,7 +479,7 @@ export default function SimuladorHipotecaPage() {
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
                   <label className={styles.label}>Euríbor (tramo variable)</label>
-                  <span className={styles.sliderValue}>{euribor.toFixed(2)}%</span>
+                  <span className={styles.sliderValue}>{formatNumber(euribor, 2)}%</span>
                 </div>
                 <input
                   type="range"
@@ -497,7 +494,7 @@ export default function SimuladorHipotecaPage() {
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
                   <label className={styles.label}>Diferencial (tramo variable)</label>
-                  <span className={styles.sliderValue}>+{diferencial.toFixed(2)}%</span>
+                  <span className={styles.sliderValue}>+{formatNumber(diferencial, 2)}%</span>
                 </div>
                 <input
                   type="range"
@@ -902,7 +899,7 @@ export default function SimuladorHipotecaPage() {
               </div>
             </div>
             <div className={styles.escenarioResultado}>
-              Cuota: <strong>~1.165 €/mes</strong>
+              Cuota: <strong>~1.262 €/mes</strong>
             </div>
             <p className={styles.escenarioConsejo}>
               Entrada mayor (más ahorro). Variable para aprovechar tipos bajos con colchón económico.
@@ -927,10 +924,10 @@ export default function SimuladorHipotecaPage() {
               </div>
             </div>
             <div className={styles.escenarioResultado}>
-              Cuota: <strong>~735 €/mes</strong>
+              Cuota: <strong>~787 €/mes</strong>
             </div>
             <p className={styles.escenarioConsejo}>
-              Plazo corto para amortizar rápido. El alquiler debe cubrir la cuota + gastos (~900 €/mes).
+              Plazo corto para amortizar rápido. El alquiler debe cubrir la cuota + gastos (~950 €/mes).
             </p>
           </div>
 
@@ -1002,7 +999,7 @@ export default function SimuladorHipotecaPage() {
               </div>
             </div>
             <div className={styles.escenarioResultado}>
-              Cuota: <strong>~855 €/mes</strong>
+              Cuota: <strong>~802 €/mes</strong>
             </div>
             <p className={styles.escenarioConsejo}>
               Los no residentes necesitan mayor entrada (30-40%) y obtienen tipos algo más altos. Algunos bancos especializados (Sabadell, CaixaBank) tienen productos específicos para emigrantes.

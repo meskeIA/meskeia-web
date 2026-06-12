@@ -90,6 +90,48 @@
 
 ---
 
+### Tanda 2 — Spot-check apps Delegum MCP (`estimador-hipoteca`, `verificador-complemento-brecha-genero`) — ✅ COMPLETADA (2026-06-12)
+
+> Fuera del orden del ranking: spot-check solicitado para verificar que las apps web cuya lógica también expone Delegum MCP (`calcular_hipoteca`, `calcular_complemento_brecha_genero`) están bien configuradas y son coherentes con el lib compartido (`lib/calculadoras/`).
+
+#### 40. `estimador-hipoteca` (Estimador de Hipoteca)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 40.1 | 🟡 Bajo | `page.tsx:401,420,435,470,485,500` | 6 sliders (TIN fijo, Euríbor, diferencial, tramo fijo/variable de la mixta) muestran el valor con `.toFixed(2)` (formato US, "3.50%") en lugar de `formatNumber()` (formato español, "3,50%") — Regla #4. El resto de la página usa `formatNumber` correctamente. | Sustituir los 6 `.toFixed(2)` por `formatNumber(valor, 2)`. |
+| 40.2 | 🟠 Medio | `page.tsx` Escenarios "Segunda residencia" y "Inversión (alquiler)" | Las cuotas de ejemplo (~1.165 €/mes y ~735 €/mes) para "Euríbor + 0.9%" y "Euríbor + 1.2%" no corresponden a la fórmula francesa del propio simulador con el Euríbor por defecto actual (3.0%): dan 1.261,52 € y 787,24 € respectivamente (desviación 7-8%). Los importes coinciden casi exactamente si se asume un Euríbor de referencia de ~2.0% — probablemente escritos cuando ese era el valor por defecto. | Actualizar a ~1.262 €/mes y ~787 €/mes (recalculado con Euríbor 3.0% actual). |
+| 40.3 | 🟠 Medio | `page.tsx` Escenario "No residente (español en el extranjero)" | Cuota de ejemplo ~855 €/mes para 200.000 €/70.000 € entrada (35%)/20 años/4,2% fijo. La fórmula francesa (y `calcular_hipoteca` de Delegum MCP, verificado) dan **801,54 €/mes** para esos mismos datos — desviación de 53 € (6,6%). | Actualizar a ~802 €/mes. |
+| 40.4 | 🟡 Bajo | `metadata.ts` FAQ "¿Cuánto se paga en total de intereses en una hipoteca a 30 años?" | El ejemplo "200.000 € al 3% a 30 años → ~103.000 € de intereses" es correcto (103.555 €, OK), pero "reducir a 20 años bajaría los intereses a unos 63.000 €" se queda corto: el cálculo real da 66.207 € (desviación ~5%). | Actualizar a "unos 66.000 €". |
+| 40.5 | 🟡 Bajo | `page.tsx:317-318` | Comentario vacío `{/* Última actualización */}` sin contenido — resto de placeholder/código muerto. | Eliminar el comentario huérfano. |
+| 40.6 | 🟡 Bajo | `metadata.ts:94` (jsonLd) | `generateWebAppSchema({ ..., features: [] })` con el array de características vacío — Schema.org WebApplication incompleto para grounding de IAs. | Rellenar con 6-8 características reales (amortización francesa, fija/variable/mixta, tabla de amortización, comparador, ratio cuota/ingresos, gratuito, sin registro, en español). |
+
+**RelatedApps/ShareCard/Footer**: correctos. Lógica de cálculo (`useMemo resultado`, sistema francés) verificada correcta y coincide con `lib/calculadoras/hipoteca.ts` (usado por Delegum `calcular_hipoteca`, contrastado numéricamente para 40.3). `DisclaimerCard severity="critical"` correcto. Resto del contenido educativo (comparador 3 vías, tabla de amortización, FAQ ampliado de amortizaciones/comisiones/hipoteca mixta/seguros/Euríbor, buenas prácticas, errores comunes) revisado sin más errores factuales.
+
+#### 41. `verificador-complemento-brecha-genero` (Verificador Complemento Brecha de Género)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 41.1 | 🔴 Crítico | `metadata.ts` FAQ "¿Pueden los hombres cobrar el complemento por brecha de género?" | La respuesta afirmaba que un hombre puede percibirlo "si... tuvo una carrera de cotización más larga que la de su pareja" — un requisito que **no existe** en la normativa, contradice la doctrina post-STJUE C-623/23 / STS 09-07-2025 (requisitos idénticos para ambos sexos, documentada en `lib/calculadoras/complementoBrechaGenero.ts`) y contradice la propia lógica `evaluar()` de esta página (no implementa tal comprobación). Es contenido FAQPage usado para grounding de IAs (Regla 1.ter) — un asistente que lo cite daría información legal incorrecta. | Reescribir explicando que los requisitos son idénticos para ambos sexos (pensión contributiva + hecho causante desde 04/02/2021 + ≥1 hijo + que el otro progenitor no lo perciba ya), y que las denegaciones a hombres anteriores a 2025 por requisitos adicionales hoy eliminados pueden reclamarse. |
+| 41.2 | 🟡 Bajo | `metadata.ts` FAQ "¿Cómo saber si tengo derecho...?" | La respuesta añadía como requisito "acreditar que la maternidad o paternidad interrumpió o redujo la carrera de cotización" — esa condición no forma parte de los requisitos reales (ni de `evaluar()` ni del art. 60 LGSS); el complemento se reconoce automáticamente si se cumplen pensión contributiva + hecho causante + hijos + no percepción por el otro progenitor. | Reescribir eliminando la condición de "acreditar interrupción de carrera". |
+| 41.3 | 🟡 Bajo | `lib/calculadoras/complementoBrechaGenero.ts:193` (usado por Delegum `calcular_complemento_brecha_genero`) | `esReclamacion = otroProgenitor === 'denegado'` sin comprobar el sexo. Para `sexo: 'mujer'` + `otroProgenitor: 'denegado'`, el resultado marcaba `esReclamacion: true` con un motivo redactado en clave masculina ("denegaciones previas a **hombres**..."), un mensaje incoherente para una mujer. La página web (`page.tsx:138`) ya restringía este caso a `genero === 'hombre'`, por lo que había una divergencia entre el lib (fuente de Delegum) y la app web para este caso límite. | `esReclamacion = otroProgenitor === 'denegado' && p.sexo === 'hombre'` — alinea el lib con la app web y con el comportamiento observado en Delegum MCP (verificado con llamada real: mujer+denegado devuelve el motivo genérico, no el de reclamación). |
+
+**RelatedApps/ShareCard/Footer**: correctos. `DisclaimerCard severity="critical"`, `DataReference` con `COMPLEMENTO_BRECHA_GENERO_META`, `RegionBadge variant="es-only"` correctos. Cifras 36,90 €/mes × 4 hijos = 147,60 €/mes verificadas contra `data/fiscal/pensiones.ts`. Contenido educativo (tabla comparativa maternidad/brecha género, 4 escenarios, 8 FAQ internas, guía de 6 pasos, 6 tips, 6 errores frecuentes) revisado sin más errores factuales.
+
+**Correcciones aplicadas**:
+- 40.1: 6× `.toFixed(2)` → `formatNumber(valor, 2)` en los sliders de tipo de interés/Euríbor/diferencial.
+- 40.2: Escenarios "Segunda residencia" (~1.165 → ~1.262 €/mes) e "Inversión" (~735 → ~787 €/mes, ajustado también el colchón de alquiler ~900 → ~950 €/mes).
+- 40.3: Escenario "No residente" (~855 → ~802 €/mes).
+- 40.4: FAQ intereses a 20 años (~63.000 → ~66.000 €).
+- 40.5: eliminado el comentario huérfano `{/* Última actualización */}`.
+- 40.6: `features: []` → 8 características reales en el jsonLd.
+- 41.1: FAQ "¿Pueden los hombres cobrar...?" reescrita con los requisitos reales y la doctrina 2025.
+- 41.2: FAQ "¿Cómo saber si tengo derecho...?" reescrita sin la condición inexistente de "interrupción de carrera".
+- 41.3: `complementoBrechaGenero.ts` — `esReclamacion` ahora exige también `sexo === 'hombre'`.
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+---
+
 ## Resumen ejecutivo — Suite Viajes
 
 | Severidad | Nº hallazgos |

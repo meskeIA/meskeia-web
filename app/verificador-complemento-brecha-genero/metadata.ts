@@ -74,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Tras la sentencia del Tribunal de Justicia de la Unión Europea de 2025, España igualó el acceso al complemento para hombres y mujeres. Un hombre puede percibirlo si tiene al menos un hijo o hija y en el año del nacimiento o adopción tuvo una carrera de cotización más larga que la de su pareja. Las solicitudes denegadas antes de este cambio normativo pueden reclamarse de forma retroactiva ante el Instituto Nacional de la Seguridad Social.',
+        text: 'Sí. Tras la STJUE C-623/23 (15-mayo-2025) y la doctrina del Tribunal Supremo (9-julio-2025), los requisitos son idénticos para hombres y mujeres: pensión contributiva de jubilación, incapacidad permanente o viudedad con hecho causante desde el 4 de febrero de 2021, al menos un hijo o hija, y que el otro progenitor no perciba ya el complemento por los mismos hijos. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.',
       },
     },
     {
@@ -82,7 +82,7 @@ export const faqJsonLd = {
       name: '¿Cómo saber si tengo derecho al complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los requisitos principales son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente; haber tenido al menos un hijo o hija biológico o adoptado; y acreditar que la maternidad o paternidad interrumpió o redujo la carrera de cotización. El verificador comprueba estas condiciones en 5 preguntas y calcula el importe estimado que correspondería según el número de hijos.',
+        text: 'Los requisitos son: ser titular de una pensión contributiva de jubilación, viudedad o incapacidad permanente con hecho causante desde el 4 de febrero de 2021; tener al menos un hijo o hija biológico o adoptado; y que el otro progenitor no perciba ya el complemento por los mismos hijos. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador comprueba estas condiciones en 5 preguntas y calcula el importe estimado según el número de hijos.',
       },
     },
     {

@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga en total de intereses en una hipoteca a 30 años?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende del capital, el tipo de interés y el plazo. Una hipoteca de 200.000 € al 3% a 30 años genera unos 103.000 € de intereses totales. Reducir el plazo a 20 años con el mismo tipo bajaría los intereses a unos 63.000 €, aunque con una cuota mensual más alta. El simulador calcula el coste total exacto para cada combinación de capital, tipo y plazo.',
+        text: 'Depende del capital, el tipo de interés y el plazo. Una hipoteca de 200.000 € al 3% a 30 años genera unos 103.500 € de intereses totales. Reducir el plazo a 20 años con el mismo tipo bajaría los intereses a unos 66.000 €, aunque con una cuota mensual más alta. El simulador calcula el coste total exacto para cada combinación de capital, tipo y plazo.',
       },
     },
   ],
@@ -91,5 +91,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Calcula la cuota mensual de tu hipoteca. Simulador con sistema francés, tabla de amortización completa, comparador de ofertas y análisis de gastos.",
   url: "https://meskeia.com/estimador-hipoteca/",
   category: 'FinanceApplication',
-  features: [],
+  features: [
+    'Cálculo de cuota mensual con sistema de amortización francés',
+    'Hipoteca fija, variable o mixta',
+    'Tabla de amortización mensual y anual completa',
+    'Comparador de los tres tipos de hipoteca con los mismos datos',
+    'Cálculo del ratio cuota/ingresos y alerta de sobreendeudamiento',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y sin publicidad',
+    'En español',
+  ],
 });

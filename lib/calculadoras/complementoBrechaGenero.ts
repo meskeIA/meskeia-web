@@ -189,8 +189,9 @@ export function calcularComplementoBrechaGenero(
     );
   }
 
-  // Caso 5: denegación previa (típicamente a un hombre antes de la doctrina 2025) → reclamación
-  const esReclamacion = otroProgenitor === 'denegado';
+  // Caso 5: denegación previa a un hombre antes de la doctrina 2025 → posible reclamación
+  // (la denegación por requisitos adicionales solo se aplicaba históricamente a hombres)
+  const esReclamacion = otroProgenitor === 'denegado' && p.sexo === 'hombre';
 
   const pensionTotalMensual = p.cuantiaPensionBeneficiario !== undefined
     ? r2(p.cuantiaPensionBeneficiario + complementoMensual)
