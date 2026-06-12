@@ -582,50 +582,6 @@ export default function EstimadorCuotaAutonomoPage() {
         </section>
 
         {/* ============================================ */}
-        {/* SECCIÓN 1: TABLA COMPARATIVA 15 TRAMOS RETA */}
-        {/* ============================================ */}
-        <section className={styles.guideSection}>
-          <h2>Tabla Comparativa: 15 Tramos RETA 2025</h2>
-          <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-lg)', fontSize: '0.95rem' }}>
-            Sistema vigente desde 2023 — cotización por ingresos reales. Cuotas calculadas al tipo del 31,30% sobre la base mínima.
-          </p>
-          <div className={styles.tableWrapper}>
-            <table className={styles.comparativaTable}>
-              <thead>
-                <tr>
-                  <th>Tramo</th>
-                  <th>Rendimiento neto mensual</th>
-                  <th>Base mín. cotización</th>
-                  <th>Base máx. cotización</th>
-                  <th>Cuota mín. mensual</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>1</td><td>≤ 670 €</td><td>735,29 €</td><td>1.166,70 €</td><td>~244 €</td></tr>
-                <tr><td>2</td><td>670 – 900 €</td><td>816,98 €</td><td>1.166,70 €</td><td>~272 €</td></tr>
-                <tr><td>3</td><td>900 – 1.166,70 €</td><td>872,55 €</td><td>1.166,70 €</td><td>~290 €</td></tr>
-                <tr><td>4</td><td>1.166,70 – 1.300 €</td><td>950,98 €</td><td>1.300 €</td><td>~316 €</td></tr>
-                <tr><td>5</td><td>1.300 – 1.500 €</td><td>960,78 €</td><td>1.500 €</td><td>~319 €</td></tr>
-                <tr><td>6</td><td>1.500 – 1.700 €</td><td>960,78 €</td><td>1.700 €</td><td>~319 €</td></tr>
-                <tr><td>7</td><td>1.700 – 1.850 €</td><td>1.013,07 €</td><td>1.850 €</td><td>~337 €</td></tr>
-                <tr><td>8</td><td>1.850 – 2.030 €</td><td>1.013,07 €</td><td>2.030 €</td><td>~337 €</td></tr>
-                <tr><td>9</td><td>2.030 – 2.330 €</td><td>1.029,41 €</td><td>2.330 €</td><td>~342 €</td></tr>
-                <tr><td>10</td><td>2.330 – 2.760 €</td><td>1.045,75 €</td><td>2.760 €</td><td>~348 €</td></tr>
-                <tr><td>11</td><td>2.760 – 3.190 €</td><td>1.078,43 €</td><td>3.190 €</td><td>~358 €</td></tr>
-                <tr><td>12</td><td>3.190 – 3.620 €</td><td>1.111,11 €</td><td>3.620 €</td><td>~369 €</td></tr>
-                <tr><td>13</td><td>3.620 – 4.050 €</td><td>1.176,47 €</td><td>4.050 €</td><td>~391 €</td></tr>
-                <tr><td>14</td><td>4.050 – 6.000 €</td><td>1.176,47 €</td><td>6.000 €</td><td>~391 €</td></tr>
-                <tr><td>15</td><td>&gt; 6.000 €</td><td>1.225,90 €</td><td>4.139,40 €</td><td>~407 €</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 'var(--spacing-sm)' }}>
-            * Tramos 1–3: tabla reducida (rendimientos inferiores al SMI mensual). Tramos 4–15: tabla general.
-            Cuota incluye el MEI (0,70%) desde enero 2023. Fuente: TGSS / Real Decreto-ley 13/2022.
-          </p>
-        </section>
-
-        {/* ============================================ */}
         {/* SECCIÓN 2: CASOS DE USO — 4 PERFILES REALES  */}
         {/* ============================================ */}
         <section className={styles.guideSection}>
@@ -644,10 +600,10 @@ export default function EstimadorCuotaAutonomoPage() {
                 <p><strong>Rendimiento mensual:</strong> 1.500 €/mes</p>
                 <p><strong>Tramo aplicable:</strong> Tramo 6 (1.500 – 1.700 €)</p>
                 <p><strong>Base mínima:</strong> 960,78 €</p>
-                <p><strong>Cuota mensual:</strong> ~319 €/mes · ~3.828 €/año</p>
+                <p><strong>Cuota mensual:</strong> 302,65 €/mes · 3.631,80 €/año</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Si anticipa que sus ingresos bajarán en verano, puede reducir la base al tramo 5 hasta septiembre y ajustarla después — ahorrando hasta 240 € en esos meses.
+                💡 Los tramos 5 y 6 comparten la misma base mínima (960,78 €), así que cotizar por la base mínima no encarece la cuota al subir de tramo. Solo conviene elegir una base superior si interesa mejorar prestaciones futuras (jubilación, incapacidad).
               </p>
             </div>
 
@@ -661,12 +617,12 @@ export default function EstimadorCuotaAutonomoPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Rendimiento mensual:</strong> 4.000 €/mes</p>
-                <p><strong>Tramo aplicable:</strong> Tramo 14 (4.050 – 6.000 €)</p>
-                <p><strong>Base mínima:</strong> 1.176,47 €</p>
-                <p><strong>Cuota mensual:</strong> ~391 €/mes · ~4.692 €/año</p>
+                <p><strong>Tramo aplicable:</strong> Tramo 13 (3.620 – 4.050 €)</p>
+                <p><strong>Base mínima:</strong> 1.601,31 €</p>
+                <p><strong>Cuota mensual:</strong> 504,41 €/mes · 6.052,92 €/año</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Con ingresos altos y estables puede valorar subir la base hacia 2.000 €/mes: la cuota sube a ~626 €, pero la prestación por IT o maternidad se multiplica.
+                💡 Con ingresos altos y estables puede valorar subir la base hacia 2.000 €/mes: la cuota sube a 630 €, pero la prestación por IT o maternidad se multiplica.
               </p>
             </div>
 
@@ -681,8 +637,8 @@ export default function EstimadorCuotaAutonomoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Rendimiento mensual:</strong> &gt; 6.000 €</p>
                 <p><strong>Tramo aplicable:</strong> Tramo 15 (máximo)</p>
-                <p><strong>Base mínima:</strong> 1.225,90 €</p>
-                <p><strong>Cuota mínima:</strong> ~407 €/mes · ~4.884 €/año</p>
+                <p><strong>Base mínima:</strong> 1.928,10 €</p>
+                <p><strong>Cuota mínima:</strong> 607,35 €/mes · 7.288,20 €/año</p>
               </div>
               <p className={styles.escenarioTip}>
                 💡 Los autónomos societarios tributan por los rendimientos del trabajo percibidos de la sociedad, no por los beneficios de la empresa. El tramo se calcula sobre el salario declarado.
@@ -699,12 +655,12 @@ export default function EstimadorCuotaAutonomoPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Cuota durante 12 meses:</strong> 80 €/mes</p>
-                <p><strong>Ahorro vs. tramo 6:</strong> 239 €/mes · 2.868 €/año</p>
-                <p><strong>Prórroga 12 meses adicionales:</strong> si ingresos anuales ≤ SMI (~15.876 €)</p>
+                <p><strong>Ahorro vs. tramo 6:</strong> 222,65 €/mes · 2.671,80 €/año</p>
+                <p><strong>Prórroga 12 meses adicionales:</strong> si los rendimientos anuales no superan el SMI (~17.094 € en 2026)</p>
                 <p><strong>Requisito:</strong> sin alta en RETA en los últimos 2 años</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Si cumples los requisitos, la tarifa plana es la medida de mayor impacto en los primeros 2 años. Ahorro total potencial si se extiende: hasta 5.736 € en 24 meses.
+                💡 Si cumples los requisitos, la tarifa plana es la medida de mayor impacto en los primeros 2 años. Ahorro total potencial si se extiende: hasta 5.343,60 € en 24 meses.
               </p>
             </div>
 
@@ -756,7 +712,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 (3 años si ya disfrutaste de tarifa plana anteriormente), y (2) ser el primer alta o haber transcurrido
                 el periodo de carencia. Los autónomos colaboradores (familiares contratados) tienen condiciones distintas.
                 La tarifa es de <strong>80 €/mes durante 12 meses</strong>, prorrogable otros 12 meses si los rendimientos
-                netos anuales no superan el SMI (~15.876 € en 2025).
+                netos anuales no superan el SMI (~17.094 € en 2026).
               </p>
             </div>
 
@@ -801,7 +757,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 de larga duración prevista —misma regla—; (3) <strong>autónomos mayores de 50 años</strong> que quieran
                 mejorar la pensión en los últimos tramos de su carrera; (4) <strong>ingresos variables con picos altos</strong>
                 en los que la regularización podría ser elevada de todas formas. El coste adicional por subir 200 €
-                la base es de aproximadamente <strong>62,60 €/mes</strong> adicionales (31,30%).
+                la base es de aproximadamente <strong>63 €/mes</strong> adicionales (31,50%).
               </p>
             </div>
 
@@ -997,8 +953,8 @@ export default function EstimadorCuotaAutonomoPage() {
               </li>
               <li>
                 <strong>Confundir base de cotización con cuota.</strong> La base es la cantidad sobre la que
-                se aplica el tipo (31,30%). La cuota es el resultado: base × 31,30%. Por ejemplo, base 1.000 € →
-                cuota ~313 €. Base 2.000 € → cuota ~626 €. El MEI (0,70%) ya está incluido en el tipo desde 2023.
+                se aplica el tipo (31,50%). La cuota es el resultado: base × 31,50%. Por ejemplo, base 1.000 € →
+                cuota 315 €. Base 2.000 € → cuota 630 €. El MEI (0,90% en 2026) ya está incluido en el tipo desde 2023.
               </li>
               <li>
                 <strong>No solicitar el cese de actividad al cerrar.</strong> Si te das de baja en Hacienda
@@ -1007,10 +963,10 @@ export default function EstimadorCuotaAutonomoPage() {
                 siguientes al cese real de la actividad.
               </li>
               <li>
-                <strong>Ignorar el MEI (0,70%) en el cálculo.</strong> Desde enero de 2023, el tipo de cotización
-                incluye la Aportación al Mecanismo de Equidad Intergeneracional (MEI): 0,70% sobre la base de
-                cotización. No es separado —viene integrado en el recibo— pero sí afecta al cálculo real de la cuota.
-                Para una base de 1.000 €, representa <strong>7 €/mes adicionales</strong> que algunos autónomos
+                <strong>Ignorar el MEI en el cálculo.</strong> Desde enero de 2023, el tipo de cotización
+                incluye la Aportación al Mecanismo de Equidad Intergeneracional (MEI), que sube cada año y en 2026
+                es del 0,90% sobre la base de cotización. No es separado —viene integrado en el recibo— pero sí afecta
+                al cálculo real de la cuota. Para una base de 1.000 €, representa <strong>9 €/mes adicionales</strong> que algunos autónomos
                 no contabilizan.
               </li>
             </ul>

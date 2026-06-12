@@ -132,6 +132,37 @@
 
 ---
 
+### Tanda 3 — Cobertura Delegum MCP, Grupo 1: Autónomos (`calcular_cuota_autonomo`) — 🔄 EN CURSO (2026-06-12)
+
+> Tras Tanda 2, el usuario pidió priorizar la cobertura completa de las 39 tools de Delegum MCP (37 pendientes tras `calcular_hipoteca` y `calcular_complemento_brecha_genero`). Revisión por grupos de tools relacionadas (lib/calculadoras compartido). Grupo 1 "Autónomos": `consulta_autonomo`, `calcular_cuota_autonomo`, `comparar_autonomo_vs_sl`, `calcular_gastos_deducibles_autonomo`, `calcular_tarifa_freelance`.
+
+#### 42. `estimador-cuota-autonomo` (Estimador Cuota de Autónomo) — tool `calcular_cuota_autonomo`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 42.1 | 🔴 Crítico | `page.tsx` sección "Tabla Comparativa: 15 Tramos RETA 2025" (antiguas líneas 588-625) | Tabla **hardcodeada y duplicada** de la tabla real del simulador (que importa `TRAMOS_RETA_2025` de `data/fiscal/autonomos.ts`, verificada 2026-06-09 contra importass.seg-social.es). Bases y cuotas distintas para los mismos tramos (ej. Tramo 1: hardcoded 735,29€/~244€ vs real 653,59€/205,88€) — contradicción visible en la misma página, calculada al tipo antiguo 31,30% + MEI 0,70% (≈2024) en vez del 31,50% + MEI 0,90% vigente en 2026. | Eliminar la tabla duplicada (la tabla real ya está mostrada arriba en la misma página). |
+| 42.2 | 🟠 Medio | `page.tsx` "Casos de Uso: 4 Perfiles Reales" (4 tarjetas) | Las 4 cuotas de ejemplo usaban el tipo antiguo 31,30%/MEI 0,70%, y el Caso 2 (4.000 €/mes) asignaba el **Tramo 14 (4.050-6.000€)**, que no incluye 4.000€ — debería ser el Tramo 13 (3.620-4.050€). | Recalculadas con `TRAMOS_RETA_2025` + tipo 31,50%: Caso 1 (1.500€/mes, Tramo 6) 302,65€/mes·3.631,80€/año; Caso 2 (4.000€/mes, **Tramo 13**) 504,41€/mes·6.052,92€/año; Caso 3 (>6.000€, Tramo 15) 607,35€/mes·7.288,20€/año; Caso 4 (tarifa plana) ahorro 222,65€/mes·2.671,80€/año. |
+| 42.3 | 🟠 Medio | `page.tsx` (3 menciones) y `asistente-alta-autonomo/page.tsx` (1 mención) | SMI anual citado como "~15.876€ en 2025" para los umbrales de prórroga de tarifa plana y presunción de habitualidad — esa cifra es el SMI **anual 2024** (1.134€×14 pagas), no 2025. SMI 2026 = 17.094€ (`data/fiscal/smi.ts`, verificado 2026-04-01 contra BOE-A-2026-3815). | Actualizado a "~17.094€ en 2026" en las 4 ubicaciones. |
+| 42.4 | 🟡 Bajo | `page.tsx` (3 menciones, bloque "errores comunes" y nota tabla) | Tipo de cotización citado como "31,30%" y MEI como "0,70%" en ejemplos sueltos (coste de subir base, base×tipo→cuota, MEI sobre base 1.000€) — vigente en 2026: tipo 31,50%, MEI 0,90%. | Recalculados: 200€ de base extra → 63€/mes (antes 62,60€); base 1.000€→cuota 315€, 2.000€→630€ (antes 313€/626€); MEI sobre base 1.000€ → 9€/mes (antes 7€). |
+| 42.5 | 🟠 Medio | `metadata.ts` FAQ "¿Cuánto se paga de cuota de autónomo en 2025 según los ingresos?" | Cifras de cuota mínima/máxima/tramo intermedio (200€/590€/291€) no coinciden con `TRAMOS_RETA_2025` 2026 (205,88€/607,35€/360,29€ para tramos 1/15/7) — mismo origen que 42.1 (tabla antigua ~2024). | Actualizadas a 205,88€/607,35€/360,29€. |
+| 42.6 | 🟡 Bajo | `metadata.ts` FAQ "¿Cuál es la tarifa plana...?" | "SMI (1.134€ en 2025)" — mismo problema que 42.3, es el SMI mensual (14 pagas) de 2024. | Actualizado a "1.221€ en 2026" (SMI mensual 14 pagas 2026). |
+
+**Verificación de la tabla 2026**: confirmada vía búsqueda web (cuentica.com) — los 15 tramos de `TRAMOS_RETA_2025` (bases y cuotas) coinciden exactamente con la tabla RETA 2026 publicada por una fuente externa; MEI 2026 = 0,90% (subió desde 0,80% en 2025) confirmado independientemente. La tabla hardcodeada eliminada (42.1) y las cifras "200€/590€/291€" (42.5) corresponden a una tabla de ~2024 que circula también en algunas webs SEO desactualizadas — no son válidas para 2026.
+
+**Correcciones aplicadas**:
+- 42.1: eliminada la sección "Tabla Comparativa: 15 Tramos RETA 2025" duplicada y hardcodeada.
+- 42.2: 4 tarjetas de "Casos de Uso" recalculadas con datos 2026 (tramo, base, cuota); Caso 2 reasignado a Tramo 13; tips de los Casos 1 y 4 ajustados a las nuevas cifras.
+- 42.3: 4 menciones de SMI "~15.876€ en 2025" → "~17.094€ en 2026" (`estimador-cuota-autonomo` ×3, `asistente-alta-autonomo` ×1).
+- 42.4: 3 menciones de tipo/MEI antiguos actualizadas a 31,50%/0,90% con cifras recalculadas.
+- 42.5: FAQ JSON-LD con cuotas mínima/máxima/tramo intermedio actualizadas.
+- 42.6: FAQ JSON-LD tarifa plana, SMI mensual actualizado a 1.221€ (2026).
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Pendiente Grupo 1**: `comparador-autonomo-vs-sl` (`comparar_autonomo_vs_sl`), `orientador-gastos-deducibles` (`calcular_gastos_deducibles_autonomo`), `orientador-tarifa-freelance`/`calculadora-precio-por-proyecto` (`calcular_tarifa_freelance`), `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador).
+
+---
+
 ## Resumen ejecutivo — Suite Viajes
 
 | Severidad | Nº hallazgos |

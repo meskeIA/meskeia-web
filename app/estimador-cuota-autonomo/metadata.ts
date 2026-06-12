@@ -43,7 +43,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de cuota de autónomo en 2025 según los ingresos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2025 la cuota de autónomo depende de los ingresos netos reales. El sistema tiene 15 tramos: la cuota mínima (ingresos hasta 670 €/mes) es de 200 € al mes, y la máxima (ingresos superiores a 6.000 €/mes) es de 590 € mensuales. Para ingresos entre 1.700 y 1.850 €/mes, la cuota es de 291 € al mes. Los autónomos societarios tienen cuotas distintas.',
+        text: 'En 2026 la cuota de autónomo depende de los ingresos netos reales. El sistema tiene 15 tramos: la cuota mínima (ingresos hasta 670 €/mes) es de 205,88 € al mes, y la máxima (ingresos superiores a 6.000 €/mes) es de 607,35 € mensuales. Para ingresos entre 1.700 y 1.850 €/mes, la cuota es de 360,29 € al mes. Los autónomos societarios tienen cuotas distintas.',
       },
     },
     {
@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la tarifa plana para nuevos autónomos en 2025?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los autónomos que se dan de alta por primera vez (o reincorporados tras más de 2 años de baja) pueden acogerse a la cuota reducida de 80 € al mes durante los primeros 12 meses, independientemente de sus ingresos. Este período puede prorrogarse otros 12 meses adicionales si los ingresos no superan el SMI (1.134 € en 2025). El sistema anterior de tarifa plana de 60 € se eliminó con la reforma del RETA.',
+        text: 'Los autónomos que se dan de alta por primera vez (o reincorporados tras más de 2 años de baja) pueden acogerse a la cuota reducida de 80 € al mes durante los primeros 12 meses, independientemente de sus ingresos. Este período puede prorrogarse otros 12 meses adicionales si los rendimientos netos mensuales no superan el SMI (1.221 € en 2026). El sistema anterior de tarifa plana de 60 € se eliminó con la reforma del RETA.',
       },
     },
     {

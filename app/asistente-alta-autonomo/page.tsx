@@ -1284,7 +1284,7 @@ export default function AsistenteAltaAutonomoPage() {
               <p>
                 El alta es obligatoria cuando existe <strong>habitualidad</strong> en la actividad económica.
                 La jurisprudencia del Tribunal Supremo indica que se presume habitualidad cuando los ingresos
-                suponen el <strong>Salario Mínimo Interprofesional (SMI)</strong> en cómputo anual (~15.876 € en 2025).
+                suponen el <strong>Salario Mínimo Interprofesional (SMI)</strong> en cómputo anual (~17.094 € en 2026).
                 Por debajo de ese umbral puede discutirse, pero Hacienda puede igualmente exigir el alta si detecta
                 facturación recurrente. Ante la duda, consúltalo con un asesor.
               </p>
