@@ -386,6 +386,40 @@
   color: #EF4444;
 }
 
+/* Emisora placeholder sin URL todavía (mientras carga la API) */
+.emisoraNoDisponible {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.emisoraNoDisponible:hover {
+  background: transparent;
+}
+
+.emisoraNoDisponible .emisoraItemFav {
+  cursor: not-allowed;
+}
+
+.cargandoEmisoraTexto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinnerPequeno {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border);
+  border-top-color: #2E86AB;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+[data-theme='dark'] .spinnerPequeno {
+  border-top-color: #7FB3D3;
+}
+
 /* Sin resultados */
 .sinResultados {
   padding: 40px 20px;

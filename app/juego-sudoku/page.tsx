@@ -577,16 +577,9 @@ export default function JuegoSudokuPage() {
                 <tr>
                   <td>🔴 Difícil</td>
                   <td>26 – 35</td>
-                  <td>Pares desnudos, apuntamiento</td>
+                  <td>Pares desnudos, apuntamiento, bifurcación</td>
                   <td>30 – 60 min</td>
                   <td>Eliminar candidatos por intersección</td>
-                </tr>
-                <tr>
-                  <td>⚫ Experto</td>
-                  <td>17 – 25</td>
-                  <td>X-wing, swordfish, bifurcación</td>
-                  <td>60 – 120 min</td>
-                  <td>Bifurcación controlada con retroceso</td>
                 </tr>
               </tbody>
             </table>
@@ -672,9 +665,11 @@ export default function JuegoSudokuPage() {
                 <summary>¿Cuántas soluciones puede tener un sudoku válido?</summary>
                 <p>
                   Un sudoku bien formado tiene exactamente una solución única. Si un puzzle
-                  tiene más de una solución, se considera inválido o mal diseñado. Los
-                  generadores de puzzles verifican esta unicidad antes de presentar el juego.
-                  El número mínimo de pistas para garantizar unicidad es 17.
+                  tiene más de una solución, se considera inválido o mal diseñado según los
+                  estándares clásicos del pasatiempo. Matemáticamente, se ha demostrado que
+                  17 pistas es el número mínimo necesario para que un sudoku pueda tener
+                  solución única; por debajo de esa cifra, siempre existe más de una
+                  combinación válida.
                 </p>
               </details>
             </li>
@@ -842,8 +837,8 @@ export default function JuegoSudokuPage() {
                 incorrecto, los errores en cascada pueden hacer el tablero irresolvable.
               </li>
               <li>
-                <strong>No usar notas en niveles avanzados.</strong> En dificultad difícil
-                o experto intentar resolver de memoria sin anotar candidatos lleva
+                <strong>No usar notas en el nivel difícil.</strong> En dificultad difícil
+                intentar resolver de memoria sin anotar candidatos lleva
                 inevitablemente a errores. Las notas son una herramienta, no una trampa.
               </li>
               <li>
@@ -853,10 +848,10 @@ export default function JuegoSudokuPage() {
                 que bloquean el avance.
               </li>
               <li>
-                <strong>Intentar el nivel experto sin dominar antes el difícil.</strong>{' '}
-                El salto entre difícil y experto es grande: aparecen técnicas como X-wing
-                o swordfish que requieren experiencia previa. Domina el nivel difícil
-                consistentemente antes de subir.
+                <strong>Saltarse niveles intermedios.</strong> Pasar directamente de fácil
+                a difícil sin dominar primero la eliminación por filas y columnas y los
+                pares desnudos del nivel medio hace que el salto de dificultad resulte
+                frustrante en lugar de progresivo.
               </li>
             </ul>
           </div>

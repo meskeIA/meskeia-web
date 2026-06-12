@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Puzzle Matemático - Juego de Operaciones | meskeIA',
-  description: 'Resuelve puzzles matemáticos contrarreloj. Suma, resta, multiplicación y división con niveles progresivos. Entrena tu agilidad mental.',
+  description: 'Resuelve puzzles matemáticos contrarreloj. Elige entre suma, resta, multiplicación, división o modo mixto. Entrena tu agilidad mental.',
   keywords: 'puzzle, matemático, juego, operaciones, suma, resta, multiplicación, división, mental, matemáticas',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Juego Puzzle Matemático",
-  description: "Resuelve puzzles matemáticos contrarreloj. Suma, resta, multiplicación y división con niveles progresivos. Entrena tu agilidad mental.",
+  description: "Resuelve puzzles matemáticos contrarreloj. Elige entre suma, resta, multiplicación, división o modo mixto. Entrena tu agilidad mental.",
   url: "https://meskeia.com/juego-puzzle-matematico/",
   category: 'EducationalApplication',
   features: [],
@@ -46,7 +46,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Qué es un puzzle matemático y cómo funciona este juego?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Un puzzle matemático es un desafío numérico que combina operaciones aritméticas (suma, resta, multiplicación y división) para entrenar la agilidad mental. En este juego aparecen operaciones contrarreloj con niveles de dificultad progresivos: cuantas más respuestas correctas encadenes, más exigentes se vuelven los cálculos.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Un puzzle matemático es un desafío numérico que combina operaciones aritméticas (suma, resta, multiplicación y división) para entrenar la agilidad mental. En este juego eliges el modo (suma, resta, multiplicación, división o mixto) y resuelves operaciones contrarreloj: cada respuesta correcta seguida aumenta tu racha y la puntuación que obtienes.' },
     },
     {
       '@type': 'Question',
@@ -66,7 +66,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿En qué se diferencia este juego de otras apps de matemáticas?',
-      acceptedAnswer: { '@type': 'Answer', text: 'A diferencia de apps con registro obligatorio o compras dentro del juego, este juego funciona directamente en el navegador sin instalación ni cuenta. Los niveles se adaptan automáticamente al rendimiento del jugador, y la mecánica contrarreloj añade un elemento de dinamismo que hace el entrenamiento más estimulante que los ejercicios estáticos en papel.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'A diferencia de apps con registro obligatorio o compras dentro del juego, este juego funciona directamente en el navegador sin instalación ni cuenta. El jugador elige el modo (suma, resta, multiplicación, división o mixto) según el reto que busque, y la mecánica contrarreloj con racha de aciertos añade un elemento de dinamismo que hace el entrenamiento más estimulante que los ejercicios estáticos en papel.' },
     },
   ],
 };

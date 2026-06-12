@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cómo añado mis propias opciones a la ruleta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Solo tienes que escribir o pegar tus opciones en el campo de texto, una por línea o separadas por comas. La ruleta se actualiza automáticamente con los segmentos correspondientes. Puedes añadir tantas opciones como necesites, desde 2 hasta varias decenas.',
+        text: 'Escribe una opción en el campo de texto y pulsa "+ Añadir" (o la tecla Enter) para incorporarla a la ruleta. Repite el proceso para cada opción adicional: la ruleta se actualiza automáticamente con un nuevo segmento por cada una. Si prefieres algo más rápido, puedes cargar una plantilla predefinida (Sí/No, Números, Días de la semana, Comida o Colores) con un clic y luego editarla a tu gusto.',
       },
     },
     {

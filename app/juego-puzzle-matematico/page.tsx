@@ -641,9 +641,9 @@ export default function JuegoPuzzleMatematicoPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">5</span>
               <div className={styles.stepContent}>
-                <strong>Aumenta la dificultad progresivamente</strong>
+                <strong>Cambia de modo cuando domines el actual</strong>
                 <p>
-                  Una vez que domines un modo con más de un 85 % de aciertos, sube al siguiente nivel o activa el modo Mixto. La sobrecarga progresiva es el principio que garantiza la mejora continua.
+                  Una vez que superes un modo con más de un 85 % de aciertos, prueba el siguiente (por ejemplo, de Suma a Multiplicación) o activa el modo Mixto. Cada modo tiene un rango numérico fijo, así que el reto adicional viene de combinar operaciones distintas, no de números más grandes.
                 </p>
               </div>
             </li>

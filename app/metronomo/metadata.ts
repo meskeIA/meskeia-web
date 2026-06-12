@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Qué rango de BPM cubre este metrónomo y qué significan los tempos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Este metrónomo cubre de 40 a 220 BPM. Como referencia: Largo (40-60 BPM) es muy lento y solemne; Andante (76-108) es un paso moderado; Allegro (120-168) es rápido y animado; Presto (168-200) es muy rápido. La mayoría de estilos populares se sitúan entre 80 y 140 BPM.',
+        text: 'Este metrónomo cubre de 40 a 220 BPM. Como referencia: Largo (40-60 BPM) es muy lento y solemne; Andante (76-108) es un paso moderado; Allegro (120-156) es rápido y animado; Presto (168-200) es muy rápido. La mayoría de estilos populares se sitúan entre 80 y 140 BPM.',
       },
     },
     {

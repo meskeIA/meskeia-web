@@ -251,6 +251,9 @@ export default function RadioMeskeiaPage() {
   const reproducirEmisora = useCallback(async (emisora: Emisora) => {
     if (!audioRef.current) return;
 
+    // Emisora placeholder sin URL real todavía (mientras carga la API o si falló)
+    if (!emisora.url) return;
+
     // Si es la misma emisora, toggle play/pause
     if (emisoraActual?.id === emisora.id) {
       if (reproduciendo) {
@@ -552,27 +555,40 @@ export default function RadioMeskeiaPage() {
         ) : (
           <div className={styles.emisorasGrid}>
             {emisorasFiltradas.length > 0 ? (
-              emisorasFiltradas.map((emisora) => (
-                <div
-                  key={emisora.id}
-                  className={`${styles.emisoraItem} ${emisoraActual?.id === emisora.id ? styles.activa : ''}`}
-                  onClick={() => reproducirEmisora(emisora)}
-                >
-                  <div className={styles.emisoraItemLogo}>{emisora.logo}</div>
-                  <div className={styles.emisoraItemInfo}>
-                    <div className={styles.emisoraItemNombre}>{emisora.nombre}</div>
-                    <div className={styles.emisoraItemCategoria}>
-                      {emisora.pais} • {emisora.bitrate}kbps
-                    </div>
-                  </div>
-                  <button
-                    className={`${styles.emisoraItemFav} ${favoritos.includes(emisora.id) ? styles.esFavorito : ''}`}
-                    onClick={(e) => toggleFavorito(emisora.id, e)}
+              emisorasFiltradas.map((emisora) => {
+                const sinUrl = !emisora.url;
+                return (
+                  <div
+                    key={emisora.id}
+                    className={`${styles.emisoraItem} ${emisoraActual?.id === emisora.id ? styles.activa : ''} ${sinUrl ? styles.emisoraNoDisponible : ''}`}
+                    onClick={sinUrl ? undefined : () => reproducirEmisora(emisora)}
+                    role={sinUrl ? undefined : 'button'}
+                    aria-disabled={sinUrl || undefined}
                   >
-                    {favoritos.includes(emisora.id) ? '❤️' : '🤍'}
-                  </button>
-                </div>
-              ))
+                    <div className={styles.emisoraItemLogo}>{emisora.logo}</div>
+                    <div className={styles.emisoraItemInfo}>
+                      <div className={styles.emisoraItemNombre}>{emisora.nombre}</div>
+                      <div className={styles.emisoraItemCategoria}>
+                        {sinUrl ? (
+                          <span className={styles.cargandoEmisoraTexto}>
+                            <span className={styles.spinnerPequeno} aria-hidden="true"></span>
+                            Cargando...
+                          </span>
+                        ) : (
+                          <>{emisora.pais} • {emisora.bitrate}kbps</>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      className={`${styles.emisoraItemFav} ${favoritos.includes(emisora.id) ? styles.esFavorito : ''}`}
+                      onClick={(e) => toggleFavorito(emisora.id, e)}
+                      disabled={sinUrl}
+                    >
+                      {favoritos.includes(emisora.id) ? '❤️' : '🤍'}
+                    </button>
+                  </div>
+                );
+              })
             ) : (
               <div className={styles.sinResultados}>
                 {categoria === 'favoritos'

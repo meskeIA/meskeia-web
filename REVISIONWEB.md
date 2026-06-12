@@ -297,7 +297,7 @@ Build verificado: 999 apps, 1300 páginas, exit 0.
 | Severidad | Nº hallazgos |
 |---|---|
 | 🔴 Crítico | 0 (2 corregidos en Tanda 1) |
-| 🟠 Medio | 6 (6 corregidos en Tanda 1) |
+| 🟠 Medio | 0 (6 corregidos en Tanda 1, 6 corregidos en Tanda 2) |
 | 🟡 Bajo | 23 |
 
 **Hallazgos críticos** (✅ corregidos en Tanda 1, ver sección "Tanda 1 — Fase 2" más abajo):
@@ -537,16 +537,27 @@ Corregidos los 2 hallazgos 🔴 Crítico y 6 de los 12 hallazgos 🟠 Medio medi
 
 **Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
 
+## Tanda 2 — Fase 2 Juegos y Ocio — ✅ COMPLETADA (2026-06-12)
+
+Corregidos los 6 hallazgos 🟠 Medio restantes mediante 6 ediciones (mayormente Opción A; metrónomo y radio incluyen ajustes de lógica/UI menores):
+
+1. `juego-puzzle-matematico` (27.1) — eliminadas las afirmaciones de "dificultad adaptativa" (guía, FAQ, `description`); reformuladas para describir el comportamiento real: modos con rango fijo elegidos por el jugador + racha que solo afecta a la puntuación.
+2. `juego-sudoku` (29.1, 29.2) — reformulado el FAQ de unicidad como información matemática general (sin afirmar que el generador de esta app verifique unicidad); eliminada la fila/tabla y menciones al nivel "⚫ Experto" inexistente (X-wing/swordfish reasignado al nivel Difícil).
+3. `metronomo` (32.1) — unificado el rango Allegro a 120-156 BPM en `getTempoName`, tabla visible y FAQ; añadida fila "Vivace: 156-168 BPM" a la tabla, eliminando el hueco y el solape con Presto.
+4. `radio-meskeia` (34.1) — añadido guard en `reproducirEmisora` (`if (!emisora.url) return`) y estado visual "Cargando..." (spinner, `cursor: not-allowed`, no clicable) para las emisoras destacadas placeholder (`los40-default`, `cadena-ser-default`) mientras no tienen `url`.
+5. `ruleta-aleatoria` (35.1) — reescrita la FAQ "¿Cómo añado mis propias opciones?" para describir el flujo real (input + botón "+ Añadir" o Enter, una opción a la vez, o cargar una plantilla predefinida).
+6. `test-velocidad-escritura` (36.1) — corregido el FAQ y el bloque educativo: ya no afirman que la app calcule "PPM netas"; se mantiene como concepto explicativo general, aclarando que la app muestra PPM brutas y precisión (%) por separado.
+
+**Build verificado**: `npm run build` exit 0, 999 apps, 1300 páginas generadas sin errores.
+
 ## Próximos pasos (Fase 2) — Suite Juegos y Ocio
 
-**Tanda 2** — 6 candidatos 🟠 Medio restantes:
+Tandas 1 y 2 completadas (8 hallazgos 🔴/🟠 resueltos de 14). Quedan los **23 hallazgos 🟡 Bajo** para una sesión de "limpieza menor" posterior (Tandas 3-5), agrupables por tipo igual que en la Suite Viajes:
 
-1. `juego-puzzle-matematico` — corregir afirmación de dificultad adaptativa (27.1)
-2. `juego-sudoku` — corregir afirmación de unicidad garantizada o nivel "Experto" inexistente (29.1, 29.2)
-3. `metronomo` — unificar rango "Allegro" en los 4 lugares (32.1)
-4. `radio-meskeia` — corregir emisoras destacadas con URL vacía (34.1)
-5. `ruleta-aleatoria` — corregir FAQ de añadir opciones (35.1)
-6. `test-velocidad-escritura` — corregir afirmación de "PPM netas" (36.1)
+- **Estadísticas/porcentajes sin fuente**: 27.3, 33.2, 33.3, 34.2, 34.3, 35.2, 36.3 (y otros pendientes de listar al detalle).
+- **Terminología España-only (regla 1.bis)**: 27.2 (`juego-puzzle-matematico`), 33.1 (`quiz-verbos-irregulares`), 36.2 (`test-velocidad-escritura`).
+- **Wordle**: 31.1 ("modo difícil" inexistente), 31.2 (ejemplos de vocales incorrectos), 31.3 (cifras de diccionario sin fuente / no coinciden con datos reales de la app).
+- Resto de hallazgos 🟡 Bajo de apps no listadas arriba: revisar tabla de "Hallazgos detallados" completa para inventario exacto antes de planificar Tanda 3.
 
 El resto de hallazgos 🟡 Bajo (estadísticas sin fuente, términos España-only) pueden agruparse en una sesión de "limpieza menor" posterior (Tandas 3-5), igual que en la Suite Viajes.
 

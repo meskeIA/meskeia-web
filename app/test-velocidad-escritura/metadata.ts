@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cómo se mide la velocidad de escritura en un test de mecanografía?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El test cronometra cuántas palabras correctas escribes en un minuto (PPM brutos) y descuenta los errores para obtener las PPM netas. La precisión se calcula como el porcentaje de pulsaciones correctas sobre el total. Cuanto más alta sea la precisión, más útil resulta la velocidad bruta.',
+        text: 'El test cronometra cuántas palabras escribes en un minuto (PPM brutas) y, por separado, calcula la precisión como el porcentaje de pulsaciones correctas sobre el total. Estas dos métricas, PPM brutas y precisión (%), se muestran juntas al finalizar el test. Cuanto más alta sea la precisión, más útil resulta la velocidad bruta.',
       },
     },
     {
@@ -69,10 +69,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuál es la diferencia entre PPM brutos y PPM netos?',
+      name: '¿Cuál es la diferencia entre PPM brutas y PPM netas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las PPM brutas cuentan todas las palabras escritas, independientemente de si son correctas. Las PPM netas descuentan las palabras con errores. Los empleadores y concursos de mecanografía suelen usar PPM netos como medida real de rendimiento.',
+        text: 'Las PPM brutas cuentan todas las palabras escritas, independientemente de si son correctas. Las PPM netas descuentan las palabras con errores y algunas plataformas las usan como medida de rendimiento. Este test muestra las PPM brutas junto con la precisión (%) de forma separada, lo que te permite ver ambos datos y calcular tú mismo las PPM netas si lo necesitas.',
       },
     },
     {

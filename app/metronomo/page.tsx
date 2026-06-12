@@ -181,8 +181,8 @@ export default function MetronomoPage() {
     if (bpm < 80) return 'Adagio';
     if (bpm < 100) return 'Andante';
     if (bpm < 120) return 'Moderato';
-    if (bpm < 140) return 'Allegro';
-    if (bpm < 170) return 'Vivace';
+    if (bpm < 156) return 'Allegro';
+    if (bpm < 168) return 'Vivace';
     return 'Presto';
   };
 
@@ -347,6 +347,7 @@ export default function MetronomoPage() {
               <tr><td>Andante</td><td>76–108 BPM</td><td>Paso de marcha</td><td>Pop lento, bolero</td><td>Natural, caminando</td></tr>
               <tr><td>Moderato</td><td>108–120 BPM</td><td>Moderado</td><td>Pop, rock moderado</td><td>Equilibrado</td></tr>
               <tr><td>Allegro</td><td>120–156 BPM</td><td>Vivo y rápido</td><td>Rock, pop, salsa</td><td>Energético, animado</td></tr>
+              <tr><td>Vivace</td><td>156–168 BPM</td><td>Muy vivo</td><td>Punk, drum&amp;bass moderado</td><td>Apremiante, vibrante</td></tr>
               <tr><td>Presto</td><td>168–200 BPM</td><td>Muy rápido</td><td>Thrash metal, drum&amp;bass</td><td>Frenético, virtuoso</td></tr>
             </tbody>
           </table>
