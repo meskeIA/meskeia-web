@@ -1210,30 +1210,33 @@ test.describe('Golden — calcularPlusvaliasIRPF (Capa 1 · base del ahorro 2025
 // Verificación interna. Bug previo corregido (2026-06-09): calcularCuotaIRPF
 // usaba fórmula no estándar que producía valores ~10× incorrectos. Fix: tarifa
 // progresiva diferencial (tarifa(total) − tarifa(otros)).
+// Bug previo corregido (2026-06-12): reducción por vivienda habitual usaba
+// 60% (vigente hasta 2023); desde Ley 12/2023 (01/01/2024) es 50%.
 // ────────────────────────────────────────────────────────────────────────────
 
 test.describe('Golden — calcularRetencionAlquiler (Capa 1)', () => {
 
-  test('GOLDEN-AQ: 800 €/mes, pc=150.000 € → amort 3.150, rn 6.450, cuota 490,20 €', () => {
-    // Amortización = 150.000 × 70% × 3% = 3.150. Reducción 60% → rnr = 2.580
-    // IRPF sobre 2.580 al 19% = 490,20 € (sin arrendatario empresa → sin retención)
+  test('GOLDEN-AQ: 800 €/mes, pc=150.000 € → amort 3.150, rn 6.450, cuota 612,75 €', () => {
+    // Amortización = 150.000 × 70% × 3% = 3.150. Reducción 50% → rnr = 3.225
+    // IRPF sobre 3.225 al 19% = 612,75 € (sin arrendatario empresa → sin retención)
     const res = calcularRetencionAlquiler({ alquilerMensual: 800, precioCompra: 150000 });
     expect(res.ingresosIntegros).toBe(9600);
     expect(res.gastos.amortizacion).toBe(3150);
     expect(res.gastos.total).toBe(3150);
     expect(res.rendimientoNeto).toBe(6450);
     expect(res.reduccionViviendaHabitual).toBe(true);
-    expect(res.reduccion60pct).toBe(3870);
-    expect(res.rendimientoNetoReducido).toBe(2580);
-    expect(res.cuotaIRPFEstimada).toBeCloseTo(490.2, 2);
+    expect(res.reduccionVivienda).toBe(3225);
+    expect(res.rendimientoNetoReducido).toBe(3225);
+    expect(res.cuotaIRPFEstimada).toBeCloseTo(612.75, 2);
     expect(res.tipoMarginal).toBe(19);
     expect(res.retencionAnual).toBe(0);
-    expect(res.cuotaDiferencial).toBeCloseTo(490.2, 2);
+    expect(res.cuotaDiferencial).toBeCloseTo(612.75, 2);
     expect(res.aDevolver).toBe(false);
   });
 
-  test('GOLDEN-AR: 1.000 €/mes empresa, gastos+hipoteca → retención 2.280 → a devolver 1.938 €', () => {
-    // Arrendatario empresa: retención 19% × 12.000 = 2.280. Cuota IRPF 342 < 2.280 → devolver
+  test('GOLDEN-AR: 1.000 €/mes empresa, gastos+hipoteca → retención 2.280 → a devolver 1.852,50 €', () => {
+    // Arrendatario empresa: retención 19% × 12.000 = 2.280. Reducción 50% → rnr = 2.250
+    // Cuota IRPF 427,50 < 2.280 → devolver
     const res = calcularRetencionAlquiler({
       alquilerMensual: 1000, precioCompra: 200000,
       ibi: 500, comunidad: 600, seguro: 200, interesesHipoteca: 2000,
@@ -1243,11 +1246,12 @@ test.describe('Golden — calcularRetencionAlquiler (Capa 1)', () => {
     expect(res.gastos.amortizacion).toBe(4200);
     expect(res.gastos.total).toBe(7500);
     expect(res.rendimientoNeto).toBe(4500);
-    expect(res.rendimientoNetoReducido).toBe(1800);
-    expect(res.cuotaIRPFEstimada).toBeCloseTo(342, 2);
+    expect(res.reduccionVivienda).toBe(2250);
+    expect(res.rendimientoNetoReducido).toBe(2250);
+    expect(res.cuotaIRPFEstimada).toBeCloseTo(427.5, 2);
     expect(res.retencionAnual).toBe(2280);
     expect(res.retencionMensual).toBe(190);
-    expect(res.cuotaDiferencial).toBeCloseTo(-1938, 2);
+    expect(res.cuotaDiferencial).toBeCloseTo(-1852.5, 2);
     expect(res.aDevolver).toBe(true);
   });
 
@@ -1262,7 +1266,7 @@ test.describe('Golden — calcularRetencionAlquiler (Capa 1)', () => {
     expect(res.gastos.total).toBe(7220);
     expect(res.rendimientoNeto).toBe(-1220);
     expect(res.reduccionViviendaHabitual).toBe(false);
-    expect(res.reduccion60pct).toBe(0);
+    expect(res.reduccionVivienda).toBe(0);
     expect(res.cuotaIRPFEstimada).toBe(0);
     expect(res.cuotaDiferencial).toBe(0);
   });

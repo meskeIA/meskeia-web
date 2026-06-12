@@ -5,6 +5,7 @@ import styles from './EstimadorCompraventa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, ShareCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -24,6 +25,9 @@ type PerfilComprador = 'general' | 'joven' | 'familia-numerosa' | 'discapacidad'
 
 // Inmuebles que pueden optar a tipos reducidos de ITP (solo residenciales)
 const INMUEBLES_RESIDENCIALES: TipoInmueble[] = ['vivienda', 'garaje', 'trastero'];
+
+// Normaliza tildes para comparar nombres de tipos reducidos (ej: "Jóvenes" → "jovenes")
+const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 interface ResultadosComprador {
   precioInmueble: number;
@@ -94,15 +98,6 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'vpo', label: 'Vivienda de Protección Oficial' },
 ];
 
-// Tramos IRPF para ganancias patrimoniales 2025 (base del ahorro)
-const TRAMOS_IRPF_AHORRO = [
-  { hasta: 6000, tipo: 19 },
-  { hasta: 50000, tipo: 21 },
-  { hasta: 200000, tipo: 23 },
-  { hasta: 300000, tipo: 27 },
-  { hasta: Infinity, tipo: 30 }, // 2025: tipo máximo 30% (era 28% en 2024)
-];
-
 export default function SimuladorCompraventaPage() {
   // Estado del formulario
   const [precioVenta, setPrecioVenta] = useState('');
@@ -151,10 +146,11 @@ export default function SimuladorCompraventaPage() {
       let tipoAplicable = datosCcaa.tipoGeneral;
       if (esResidencial && perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
         const reducido = datosCcaa.tiposReducidos.find(r => {
-          if (perfilComprador === 'joven' && r.nombre.toLowerCase().includes('joven')) return true;
-          if (perfilComprador === 'familia-numerosa' && r.nombre.toLowerCase().includes('familia')) return true;
-          if (perfilComprador === 'discapacidad' && r.nombre.toLowerCase().includes('discapacidad')) return true;
-          if (perfilComprador === 'vpo' && r.nombre.toLowerCase().includes('vpo')) return true;
+          const nombre = normalizarTexto(r.nombre);
+          if (perfilComprador === 'joven' && nombre.includes('joven')) return true;
+          if (perfilComprador === 'familia-numerosa' && nombre.includes('familia')) return true;
+          if (perfilComprador === 'discapacidad' && nombre.includes('discapacidad')) return true;
+          if (perfilComprador === 'vpo' && nombre.includes('vpo')) return true;
           return false;
         });
         if (reducido) {
@@ -239,7 +235,7 @@ export default function SimuladorCompraventaPage() {
     if (ganancia > 0 && !exentoIRPF) {
       let gananciaRestante = ganancia;
       let limiteAnterior = 0;
-      for (const tramo of TRAMOS_IRPF_AHORRO) {
+      for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
         const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
         if (baseTramo <= 0) break;
         irpf += baseTramo * (tramo.tipo / 100);
@@ -893,10 +889,11 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji}>🏠</span>
                 <span className={styles.casoTag}>Comprador primera vivienda</span>
               </div>
-              <p>Marta, 29 años, compra su primera vivienda de segunda mano en Madrid por 200.000 €.
-              Al ser menor de 36 años en la Comunidad de Madrid, se aplica un ITP reducido del 6%.
-              El simulador le calcula 12.000 € de ITP más unos 1.800 € en notaría, registro y gestoría.</p>
-              <div className={styles.casoResultado}>Ahorra ~4.000 € frente al tipo general del 8%</div>
+              <p>Marta, 29 años, compra su primera vivienda habitual de segunda mano en Andalucía por
+              140.000 €. Al ser menor de 35 años y no superar los 150.000 €, se aplica el tipo
+              reducido de ITP del 3,5% (4.900 €) en lugar del tipo general del 7%. Además paga
+              unos 790 € en notaría, registro y gestoría.</p>
+              <div className={styles.casoResultado}>Ahorra 4.900 € frente al tipo general del 7%</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -913,9 +910,10 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji}>💸</span>
                 <span className={styles.casoTag}>Vendedor con ganancia</span>
               </div>
-              <p>Ana vende su piso por 250.000 €. Lo compró hace 8 años por 180.000 €. La ganancia
-              patrimonial de 70.000 € tributa al 19% los primeros 6.000 €, al 21% el siguiente tramo
-              y al 23% el resto. Además paga la plusvalía municipal por el método más favorable.</p>
+              <p>Ana vende su piso por 250.000 €. Lo compró hace 8 años por 180.000 €. Tras restar
+              la comisión inmobiliaria (3%) y la gestoría, su ganancia patrimonial es de 62.200 €,
+              que tributa al 19% los primeros 6.000 €, al 21% hasta 50.000 € y al 23% el resto.
+              Además paga la plusvalía municipal por el método más favorable.</p>
               <div className={styles.casoResultado}>Ganancia patrimonial sujeta a IRPF del ahorro</div>
             </div>
             <div className={styles.casoCard}>

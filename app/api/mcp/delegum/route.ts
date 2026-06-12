@@ -1866,8 +1866,9 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_retencion_alquiler ──────────────────────────────────────────
   servidor.tool(
     'calcular_retencion_alquiler',
-    'Estima de forma rápida el IRPF del propietario por alquilar un inmueble: rendimiento neto, reducción del 60% ' +
-    'por vivienda habitual y la retención del 19% que practica el arrendatario cuando es empresa o profesional. ' +
+    'Estima de forma rápida el IRPF del propietario por alquilar un inmueble: rendimiento neto, reducción del 50% ' +
+    'por vivienda habitual (Ley 12/2023, vigente desde 2024) y la retención del 19% que practica el arrendatario ' +
+    'cuando es empresa o profesional. ' +
     'Para el cálculo detallado con todas las reducciones de la Ley de Vivienda usa "calcular_rendimiento_capital_inmobiliario".',
     {
       alquiler_mensual: z.number().positive().describe('Alquiler mensual bruto en euros'),
@@ -1907,8 +1908,8 @@ function crearServidorDelegum(): McpServer {
           '',
           `📊 Rendimiento neto: ${fmt(r.rendimientoNeto)} €`,
           r.reduccionViviendaHabitual
-            ? `➖ Reducción 60% (vivienda habitual): −${fmt(r.reduccion60pct)} €`
-            : `  (sin reducción 60%: solo aplica si es vivienda habitual del inquilino)`,
+            ? `➖ Reducción 50% (vivienda habitual, Ley 12/2023): −${fmt(r.reduccionVivienda)} €`
+            : `  (sin reducción del 50%: solo aplica si es vivienda habitual del inquilino)`,
           `💰 **Rendimiento neto reducido (base IRPF): ${fmt(r.rendimientoNetoReducido)} €**`,
           `🧾 Cuota IRPF estimada: ${fmt(r.cuotaIRPFEstimada)} € (tipo marginal ${pct(r.tipoMarginal)}%)`,
           '',

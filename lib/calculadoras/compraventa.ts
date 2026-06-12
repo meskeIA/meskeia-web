@@ -178,9 +178,11 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     notaITP = nota;
   }
 
-  // AJD: en hipotecas lo paga el banco (Ley 5/2019); en compraventa sin hipoteca, el comprador
-  // Para el MCP calculamos solo el AJD de la escritura de compraventa (no de la hipoteca)
-  const ajd = r(p.precioInmueble * TIPOS_AJD_2025.general / 100);
+  // AJD y ITP son incompatibles sobre el mismo acto (art. 31.2 TRLITP): en segunda mano
+  // (sujeta a ITP) no se devenga AJD gradual. Solo aplica en obra nueva y VPO (sujetas a IVA).
+  const ajd = p.tipoTransmision === 'segunda_mano'
+    ? 0
+    : r(p.precioInmueble * TIPOS_AJD_2025.general / 100);
 
   // Notaría: arancel regulado, estimación porcentual con límites
   const notariaBase = p.precioInmueble * COSTES_COMPRAVENTA_2025.notaria.estimacion / 100;

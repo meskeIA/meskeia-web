@@ -338,7 +338,7 @@ export default function AmortizacionHipotecaPage() {
           <strong>ANTES de amortizar, consulta con tu banco:</strong>
         </p>
         <ul>
-          <li><strong>Comisiones por amortización anticipada</strong> (hasta 0,25% en hipotecas variables, 0,15% en fijas según tiempo restante)</li>
+          <li><strong>Comisiones por amortización anticipada</strong> (hasta 0,25% en hipotecas a tipo variable, hasta 2% en hipotecas a tipo fijo, según tiempo restante)</li>
           <li><strong>Penalizaciones específicas</strong> según tu contrato de hipoteca</li>
           <li><strong>Procedimiento y plazos</strong> para realizar la amortización</li>
           <li><strong>Alternativas de inversión</strong> con tu asesor financiero (¿es mejor invertir ese dinero en otro sitio?)</li>
@@ -906,7 +906,11 @@ export default function AmortizacionHipotecaPage() {
                 </tr>
                 <tr>
                   <td>Comisión por amortización</td>
-                  <td colSpan={2}>Igual en ambos casos (máx. 0,25-0,5% según ley)</td>
+                  <td colSpan={2}>
+                    Igual en ambos casos. Para préstamos desde jun-2019 (Ley 5/2019), el máximo legal es:
+                    tipo variable 0,25% (≤3 años) / 0,15% (3-5 años) / 0% (&gt;5 años);
+                    tipo fijo 2% (≤10 años) / 1,5% (&gt;10 años). Revisa tu contrato: muchos bancos no la aplican.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -943,7 +947,7 @@ export default function AmortizacionHipotecaPage() {
                 <span className={styles.casoNivel}>Comparar escenarios</span>
               </div>
               <p className={styles.casoTip}>
-                Contrasta hasta 3 importes de amortización simultáneamente. Ve de un vistazo
+                Contrasta hasta 4 importes de amortización simultáneamente. Ve de un vistazo
                 cuál es la mejor estrategia según tus objetivos.
               </p>
             </div>
@@ -976,9 +980,9 @@ export default function AmortizacionHipotecaPage() {
               <dt className={styles.faqPregunta}>¿Qué comisión me pueden cobrar por amortizar?</dt>
               <dd className={styles.faqRespuesta}>
                 La Ley Hipotecaria (Ley 5/2019) limita las comisiones de amortización anticipada:
-                máx. 0,25% los primeros 3 años o 0,15% entre el 3.º y 5.º año para tipo variable;
-                0,25% los primeros 5 años o 0,5% los primeros 3 para tipo fijo. Muchos bancos
-                las han eliminado en sus hipotecas variables.
+                máx. 0,25% los primeros 3 años o 0,15% entre el 3.º y 5.º año para tipo variable
+                (0% a partir del 5.º año); máx. 2% los primeros 10 años o 1,5% después para tipo fijo.
+                Muchos bancos las han eliminado en sus hipotecas variables.
               </dd>
             </div>
             <div className={styles.faqItem}>

@@ -9,6 +9,8 @@
 
 // ===== TIPOS =====
 
+import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
+
 export type ComunidadAutonoma =
   | 'andalucia'
   | 'aragon'
@@ -821,7 +823,7 @@ export interface DatosPlusvalia {
   aniosPropiedad: number;
   precioCompra: number;
   precioVenta: number;
-  tipoMaximo?: number; // Por defecto 30%
+  tipoMaximo?: number; // Por defecto el tipo orientativo (25%); el máximo legal es 30%
 }
 
 export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
@@ -830,35 +832,11 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   recomendado: number;
   exento: boolean;
 } {
-  const { valorCatastralSuelo, aniosPropiedad, precioCompra, precioVenta, tipoMaximo = 30 } = datos;
+  const { valorCatastralSuelo, aniosPropiedad, precioCompra, precioVenta, tipoMaximo = PLUSVALIA_MUNICIPAL_META.tipoOrientativo } = datos;
 
-  // Coeficientes orientativos (varían por municipio)
-  // Según Ley de Haciendas Locales reformada en 2021
-  const coeficientes: Record<number, number> = {
-    1: 0.14,
-    2: 0.13,
-    3: 0.15,
-    4: 0.17,
-    5: 0.17,
-    6: 0.16,
-    7: 0.12,
-    8: 0.10,
-    9: 0.09,
-    10: 0.08,
-    11: 0.08,
-    12: 0.08,
-    13: 0.08,
-    14: 0.10,
-    15: 0.12,
-    16: 0.16,
-    17: 0.20,
-    18: 0.26,
-    19: 0.36,
-    20: 0.45,
-  };
-
+  // Coeficientes oficiales (RDL 26/2021 + actualización anual), centralizados en data/fiscal/inmuebles.ts
   const aniosCapped = Math.min(Math.max(aniosPropiedad, 1), 20);
-  const coeficiente = coeficientes[aniosCapped] || 0.45;
+  const coeficiente = COEFICIENTES_IIVTNU_2025.find(c => c.anios === aniosCapped)?.coeficiente ?? 0.45;
 
   // Método objetivo (tradicional)
   const baseObjetivo = valorCatastralSuelo * coeficiente;

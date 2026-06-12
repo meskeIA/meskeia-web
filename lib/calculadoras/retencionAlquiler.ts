@@ -7,6 +7,8 @@
  *
  * Fuente: Ley 35/2006 IRPF art. 22-24 — Rendimientos del capital inmobiliario
  * Retención 19%: art. 101.4 LIRPF (solo si el arrendatario es empresa/profesional)
+ * Reducción 50% por arrendamiento de vivienda habitual: art. 23.2 LIRPF tras
+ * Ley 12/2023 (Ley de Vivienda), vigente desde 01/01/2024 (antes era 60%).
  */
 
 import {
@@ -59,10 +61,10 @@ export interface ResultadoRetencionAlquiler {
   };
   /** Rendimiento neto (ingresos - gastos) (€) */
   rendimientoNeto: number;
-  /** ¿Se aplica reducción del 60% por arrendamiento vivienda habitual? */
+  /** ¿Se aplica reducción del 50% por arrendamiento vivienda habitual? */
   reduccionViviendaHabitual: boolean;
-  /** Importe de la reducción del 60% (€) */
-  reduccion60pct: number;
+  /** Importe de la reducción del 50% (€) */
+  reduccionVivienda: number;
   /** Rendimiento neto reducido (base IRPF) (€) */
   rendimientoNetoReducido: number;
   /** Cuota IRPF estimada sobre el rendimiento del alquiler (€) */
@@ -140,11 +142,12 @@ export function calcularRetencionAlquiler(p: ParametrosRetencionAlquiler): Resul
   // Rendimiento neto
   const rendimientoNeto = r(ingresosIntegros - totalGastos);
 
-  // Reducción del 60% por arrendamiento de vivienda habitual (art. 23.2 LIRPF)
+  // Reducción del 50% por arrendamiento de vivienda habitual (art. 23.2 LIRPF,
+  // tras Ley 12/2023 vigente desde 2024 — antes era 60%)
   // Solo aplicable si el rendimiento es positivo
   const reduccionViviendaHabitual = rendimientoNeto > 0;
-  const reduccion60pct = reduccionViviendaHabitual ? r(rendimientoNeto * 0.6) : 0;
-  const rendimientoNetoReducido = r(Math.max(0, rendimientoNeto - reduccion60pct));
+  const reduccionVivienda = reduccionViviendaHabitual ? r(rendimientoNeto * 0.5) : 0;
+  const rendimientoNetoReducido = r(Math.max(0, rendimientoNeto - reduccionVivienda));
 
   // IRPF estimado sobre el rendimiento reducido
   const { cuota: cuotaIRPFEstimada, tipoMarginal } = calcularCuotaIRPF(
@@ -173,7 +176,7 @@ export function calcularRetencionAlquiler(p: ParametrosRetencionAlquiler): Resul
     },
     rendimientoNeto,
     reduccionViviendaHabitual,
-    reduccion60pct,
+    reduccionVivienda,
     rendimientoNetoReducido,
     cuotaIRPFEstimada,
     tipoMarginal,

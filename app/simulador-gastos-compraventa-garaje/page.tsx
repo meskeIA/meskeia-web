@@ -17,6 +17,7 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -88,14 +89,8 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'discapacidad', label: 'Persona con discapacidad' },
 ];
 
-// Tramos IRPF para ganancias patrimoniales 2025 (base del ahorro)
-const TRAMOS_IRPF_AHORRO = [
-  { hasta: 6000, tipo: 19 },
-  { hasta: 50000, tipo: 21 },
-  { hasta: 200000, tipo: 23 },
-  { hasta: 300000, tipo: 27 },
-  { hasta: Infinity, tipo: 30 },
-];
+// Normaliza tildes para comparar nombres de tipos reducidos (ej: "Jóvenes" → "jovenes")
+const normalizarTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 // ===== COMPONENTE PRINCIPAL =====
 export default function SimuladorGarajeCompraventaPage() {
@@ -138,9 +133,10 @@ export default function SimuladorGarajeCompraventaPage() {
       let tipoAplicable = datosCcaa.tipoGeneral;
       if (perfilComprador !== 'general' && datosCcaa.tiposReducidos.length > 0) {
         const reducido = datosCcaa.tiposReducidos.find(r => {
-          if (perfilComprador === 'joven' && r.nombre.toLowerCase().includes('joven')) return true;
-          if (perfilComprador === 'familia-numerosa' && r.nombre.toLowerCase().includes('familia')) return true;
-          if (perfilComprador === 'discapacidad' && r.nombre.toLowerCase().includes('discapacidad')) return true;
+          const nombre = normalizarTexto(r.nombre);
+          if (perfilComprador === 'joven' && nombre.includes('joven')) return true;
+          if (perfilComprador === 'familia-numerosa' && nombre.includes('familia')) return true;
+          if (perfilComprador === 'discapacidad' && nombre.includes('discapacidad')) return true;
           return false;
         });
         if (reducido && (!reducido.valorMaximo || precio <= reducido.valorMaximo)) {
@@ -213,7 +209,7 @@ export default function SimuladorGarajeCompraventaPage() {
     if (ganancia > 0) {
       let gananciaRestante = ganancia;
       let limiteAnterior = 0;
-      for (const tramo of TRAMOS_IRPF_AHORRO) {
+      for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
         const baseTramo = Math.min(gananciaRestante, tramo.hasta - limiteAnterior);
         if (baseTramo <= 0) break;
         irpf += baseTramo * (tramo.tipo / 100);
