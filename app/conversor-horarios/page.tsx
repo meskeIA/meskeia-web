@@ -626,7 +626,7 @@ export default function ConversorHorariosPage() {
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Existe algún país a 0 horas UTC todo el año?</h4>
-              <p>Ghana, Islandia y algunos países del África Occidental están en UTC+0 permanentemente (sin horario de verano). Reino Unido, Portugal e Irlanda están en UTC+0 en invierno y UTC+1 en verano (BST/WEST). Curiosidad: España geográficamente debería estar en UTC+0 (misma longitud que UK/Portugal) pero políticamente está en CET (UTC+1) desde la época franquista. 💡 Consejo: Cuando conviertas horarios con Portugal, recuerda que en invierno tienen 1h menos que España, pero en verano tienen la misma hora (ambos en UTC+1).</p>
+              <p>Ghana, Islandia y algunos países del África Occidental están en UTC+0 permanentemente (sin horario de verano). Reino Unido, Portugal e Irlanda están en UTC+0 en invierno y UTC+1 en verano (BST/WEST). Curiosidad: España geográficamente debería estar en UTC+0 (misma longitud que UK/Portugal) pero políticamente está en CET (UTC+1) desde una decisión de 1940 que nunca se revirtió. 💡 Consejo: Cuando conviertas horarios con Portugal, recuerda que en invierno tienen 1h menos que España, pero en verano tienen la misma hora (ambos en UTC+1).</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo funciona la herramienta para fechas pasadas o futuras?</h4>

@@ -485,8 +485,10 @@ export default function CalculadoraPropinas() {
                     digno. Dejar propina es un gesto de reconocimiento, no una obligación.
                   </p>
                   <p className={styles.faqTip}>
-                    Dato: según el INE, el salario medio en hostelería en España ronda
-                    los 1.200-1.400 € brutos/mes sin propinas.
+                    Dato: según estimaciones del sector (Encuesta de Estructura Salarial
+                    del INE), el salario medio en hostelería en España suele rondar los
+                    1.200-1.400 € brutos/mes sin propinas, aunque varía según convenio
+                    provincial y categoría profesional.
                   </p>
                 </details>
               </li>

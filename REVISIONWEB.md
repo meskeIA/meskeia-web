@@ -19,6 +19,7 @@
 | Suite | Apps | Estado | Fecha |
 |---|---|---|---|
 | Viajes | 16/16 | ✅ Revisado (piloto) | 2026-06-11 |
+| Juegos y Ocio | 20/20 | ✅ Revisado | 2026-06-11 |
 
 ---
 
@@ -28,7 +29,7 @@
 |---|---|
 | 🔴 Crítico | 1 |
 | 🟠 Medio | 12 |
-| 🟡 Bajo | 17 |
+| 🟡 Bajo | 27 (11 resueltos en Tanda 3, 16 pendientes en Tanda 4) |
 
 **Hallazgo crítico único**: `calculadora-propinas` no muestra su sección de apps relacionadas (RelatedApps vacío) por un bug de slug — afecta al cross-linking SEO obligatorio.
 
@@ -249,7 +250,20 @@ Regularizar incidencias por sesiones, empezando por las de severidad 🔴 y 🟠
 
 Build verificado: 998 apps, 1299 páginas, exit 0.
 
-El resto de hallazgos 🟡 Bajo pueden agruparse en una sesión de "limpieza menor" posterior.
+### Tanda 3 — Limpieza menor 🟡 Bajo (parte 1/2) — ✅ COMPLETADA (2026-06-12)
+
+11 ediciones de texto en 6 apps (sin cambios de lógica salvo 2.1):
+
+1. ✅ `calculadora-propinas` — matizar fuente del dato de salario en hostelería (1.4)
+2. ✅ `calculadora-combustible` — `parseNum` ahora usa `Math.max(0, ...)` (2.1) + nota de precios orientativos 2025-2026 (2.2)
+3. ✅ `conversor-horarios` — "desde la época franquista" → "una decisión de 1940 que nunca se revirtió" (3.2)
+4. ✅ `informacion-tiempo` — matizar que la actualización cada ~10 min es del proveedor, no de la app (4.1) + atribuir cifra de estaciones AEMET a aemet.es sin cifra exacta (4.2)
+5. ✅ `conversor-unidades` — distinguir GiB (binario) de GB (SI) (5.1) + suavizar "solo 3 países sin SI" con matiz de transición (5.2)
+6. ✅ `checklist-documentos-viaje` — tasa pasaporte 30 €→30,90 € (7.1), unificar cobertura seguro EEUU a 150.000 € en `page.tsx` (dos menciones) y `metadata.ts` (7.2), generalizar "México/Costa Rica/Brasil" a "países latinoamericanos" + recomendar consultar embajada (7.3)
+
+Build verificado: 999 apps, 1300 páginas, exit 0.
+
+**Pendiente (Tanda 4 — parte 2/2)**: `orientador-jet-lag` (8.3, 8.4), `guia-seguro-viaje` (9.1, 9.2), `planificador-itinerario` (10.3), `conversor-divisas` (11.1, 11.2), `comparador-transporte-viaje` (12.2, 12.4 — 12.3 nota anual sin acción), `enchufes-por-pais` (14.1), `comparador-coste-vida` (15.3), `paises-del-mundo` (16.2, 16.3, 16.4 — 16.5 nota anual sin acción).
 
 ---
 
@@ -258,5 +272,258 @@ El resto de hallazgos 🟡 Bajo pueden agruparse en una sesión de "limpieza men
 | # | Severidad | Ubicación | Problema | Propuesta |
 |---|---|---|---|---|
 | 17.1 | ✅ Resuelto (2026-06-11) | `data/fiscal/pensiones.ts:260` (`smiMensual: 1323`) y `data/fiscal/nomada-digital.ts:24` (`SMI_MENSUAL_NOMADA = 1323`) | Ambos módulos usaban **1.323 €/mes** como "SMI 2025/2026" (en realidad el SMI **2024**, 15.876 €/año ÷ 12 pagas), mientras `data/fiscal/smi.ts` (verificado 2026-04-01, BOE oficial) fija SMI 2025 = 1.184 €/mes y SMI 2026 = 1.221 €/mes (14 pagas). Afectaba a `app/requisitos-nomada-digital`, `app/estimador-pension-viudedad`, `lib/calculadoras/pensionViudedad.ts` (y por tanto al tool MCP Delegum `calcular_pension_viudedad`) y `lib/calculadoras/embargoSalario.ts`. | **Corregido**: `pensiones.ts` y `nomada-digital.ts` ahora importan `SMI_2026` desde `data/fiscal/smi.ts` (`smiMensual`/`SMI_MENSUAL_NOMADA` = 1.221 €, `limiteIngresos70`/`MINIMO_INGRESOS_DEPENDIENTE_NOMADA` = 916 €). Textos hardcoded en `app/requisitos-nomada-digital` (page.tsx + metadata.ts FAQ) actualizados a 2.442 €/916 €/1.221 € (2026). `embargoSalario.ts` migrado a `SMI_2026` (1.221 €/1.424,50 €), eliminando constantes locales duplicadas y la cita errónea "RD 145/2025". Comentarios de `tests/calculadoras-invariantes.spec.ts` actualizados. `npx tsc --noEmit` sin nuevos errores y `npm run test:calc` (136/136) en verde. |
+
+---
+
+## Resumen ejecutivo — Suite Juegos y Ocio
+
+| Severidad | Nº hallazgos |
+|---|---|
+| 🔴 Crítico | 2 |
+| 🟠 Medio | 12 |
+| 🟡 Bajo | 23 |
+
+**Hallazgos críticos**:
+- `juego-space-invaders`: el contenido educativo describe búnkeres/defensas y un OVNI bonus como mecánicas centrales del juego, pero ninguna de las dos existe en la implementación real (solo hay nave, balas, filas de invasores y partículas).
+- `juego-asteroids`: el contenido educativo dedica tres secciones a la mecánica de "hiperespacio" (tecla H, teletransporte), inexistente en el código; además un cálculo de puntos de la guía da 420 cuando el resultado correcto con las constantes reales del juego es 520.
+
+**Patrones repetidos a vigilar en próximas suites**:
+- Contenido educativo que describe niveles, modos o controles que no existen en la implementación real: nivel "Experto" en Memoria y Sudoku, "modo difícil" en Wordle, dificultad adaptativa en Puzzle Matemático, tecla flecha-arriba para saltar en Platform Runner, modalidad "Quiniela" en Generador de Lotería, recetas "Seedlip Spritz"/"Nojito" en Guía de Cócteles, emisoras destacadas con URL vacía en Radio meskeIA. 9 casos en 20 apps — el patrón más repetido de esta suite.
+- Estadísticas y porcentajes concretos sin fuente verificable (antipatrón #1 de neutralidad editorial): presente en prácticamente todas las apps con bloque educativo.
+- Terminología España-only (ESO/Bachillerato, CCAA, "Ley 13/2011") en apps con suite `estudiantes`/`productividad` que deberían ser neutras para Latam (regla 1.bis): Quiz Verbos Irregulares, Puzzle Matemático, Test de Velocidad de Escritura.
+
+`RelatedApps`/`getRelatedApps` correctos en las 20 apps. `guia-cocteles` mantiene correctamente su `DisclaimerCard severity="high" collapsible={false}` por contenido sobre alcohol.
+
+---
+
+## Hallazgos detallados — Suite Juegos y Ocio
+
+### 18. `cara-o-cruz` (Cara o Cruz)
+
+Sin hallazgos relevantes. `getRelatedApps('cara-o-cruz')` resuelve correctamente. El contenido educativo (Ley de los Grandes Números, falacia del jugador, sesgo de Diaconis) es coherente con la mecánica real (`Math.random() < 0.5`, cálculo de rachas y porcentajes verificado). FAQ JSON-LD alineado con la implementación. `// @disclaimer: exempt` correcto.
+
+---
+
+### 19. `generador-loteria` (Generador de Lotería)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 19.1 | 🟠 Medio | `metadata.ts:6, 39, 44, 92, 95` | El `description`, `jsonLd.features` y dos preguntas de `faqJsonLd` afirman que el generador soporta la **Quiniela** (15 resultados 1/X/2) y "El Gordo de Navidad". `LOTTERY_CONFIG` en `page.tsx` solo define `primitiva`, `euromillones`, `bonoloto`, `gordo` (El Gordo de la Primitiva, no el de Navidad) y `lototurf` — no existe ningún modo Quiniela ni generación 1/X/2. Además, Lototurf sí está implementado pero no se menciona en `description`/FAQ. | Eliminar las menciones a "Quiniela" y "El Gordo de Navidad" de `description`, `keywords`, `jsonLd.features` y la pregunta FAQ correspondiente (sustituir por una pregunta sobre Lototurf, que sí existe), o implementar el modo Quiniela. |
+| 19.2 | 🟡 Bajo | `page.tsx:556-566` | FAQ afirma "Los premios de loterías del Estado superiores a 40.000 € tributan al 20% sobre el exceso... art. 13 Ley 16/2012". La cifra y el tipo son correctos, pero el dato fiscal no está centralizado en `data/fiscal/` pese a tener fecha de verificación. | Evaluar mover el umbral (40.000 €) y el tipo (20%) a `data/fiscal/` si se reutiliza en más apps. |
+
+Probabilidades de la tabla comparativa (1/13.983.816 para 6/49, 1/139.838.160 Euromillones, 1/31.625.100 El Gordo) correctas. `RelatedApps`/`DisclaimerCard severity="low" collapsible` correctos.
+
+---
+
+### 20. `guia-cocteles` (Guía de Cócteles Clásicos)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 20.1 | 🟠 Medio | `metadata.ts:87` (FAQ "¿Qué cócteles clásicos se pueden preparar sin alcohol?") | La respuesta menciona "cócteles sin alcohol de identidad propia como el **Seedlip Spritz** o el **Nojito**". El array de 45 cócteles en `page.tsx` solo contiene 7 entradas `familia: 'Sin alcohol'` (Virgin Mojito, Shirley Temple, Arnold Palmer, Virgin Mary, Limonada de frambuesa, Agua de Valencia sin alcohol, Cucumber Cooler); ni "Seedlip Spritz" ni "Nojito" existen en el dataset. | Sustituir los ejemplos por cócteles que sí existen (p. ej. "Agua de Valencia sin alcohol" o "Cucumber Cooler"), o añadirlos al array de 45. |
+| 20.2 | 🟡 Bajo | `page.tsx:619` (curiosidad de Virgin Mojito) | "El mercado de los mocktails creció un 42% entre 2019 y 2023 en Europa, impulsado por la tendencia 'sober curious'" sin fuente verificable. | Añadir fuente concreta o suavizar a "según informes del sector...". |
+
+`DisclaimerCard variant="alcohol" severity="high" collapsible={false}` verificado correcto. Recuento "45 cócteles"/"7 sin alcohol" del `jsonLd` coincide con el dataset. `RelatedApps` correcto.
+
+---
+
+### 21. `juego-2048` (Juego 2048)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 21.1 | 🟡 Bajo | `page.tsx:490-493` (FAQ) | "Los jugadores que aplican esta estrategia [esquina fija] tienen tasas de victoria superiores al 90% en la variante 4×4 clásica" sin fuente ni estudio citado. | Suavizar a "se considera la estrategia más fiable según la comunidad de jugadores" o citar fuente. |
+| 21.2 | 🟡 Bajo | `page.tsx:621` | Repite "Más del 90% de las victorias documentadas usan esta técnica" — mismo problema que 21.1, duplicado en dos secciones. | Misma corrección que 21.1; unificar el mensaje en un único lugar. |
+
+Mecánica del juego (tablero 4×4, fusión de potencias de 2, generación 90/10 de fichas 2/4, detección de victoria/derrota) correcta y coherente con el FAQ. Ficha máxima teórica 131.072 (2¹⁷) y puntuación máxima ~3,9M consistentes. `RelatedApps`/`// @disclaimer: exempt` correctos.
+
+---
+
+### 22. `juego-asteroids` (Juego Asteroids)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 22.1 | 🔴 Crítico | `page.tsx:1169-1174, 1216-1223, 1254-1258` | El contenido educativo describe extensamente una mecánica de "hiperespacio" (botón H, teletransporte aleatorio, riesgo de aparecer encima de un asteroide) en tres secciones (guía, mejores prácticas, errores comunes). El manejador de teclado real (`handleKeyDown`) solo gestiona `ArrowUp`/`W` (impulso), `Space` (disparo), `P` (pausa) y `R` (reinicio) — no existe tecla `H` ni teletransporte en el código. El contenido describe una función inexistente. | Opción A (recomendada): eliminar las menciones al hiperespacio en las tres secciones y sustituirlas por consejos sobre mecánicas reales (gestión de inercia, límite de 5 balas, rotación). Opción B: implementar la mecánica (tecla H → reposición aleatoria con riesgo de colisión). |
+| 22.2 | 🟠 Medio | `page.tsx:1147-1149` | El texto afirma que destruir un asteroide grande (20 pts) hasta fragmentos pequeños (2 medianos de 50 pts, 4 pequeños de 100 pts) "te da 420 puntos totales". El cálculo correcto con esas constantes es 20 + 2×50 + 4×100 = **520**, no 420. | Corregir "420 puntos totales" a "520 puntos totales" en `page.tsx:1149`. |
+
+Rotación, impulso con inercia, límite de 5 balas (`MAX_BULLETS = 5`), división grande→mediano→pequeño y teletransporte en bordes del canvas correctos. `RelatedApps`/`// @disclaimer: exempt` correctos.
+
+---
+
+### 23. `juego-memoria` (Juego de Memoria)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 23.1 | 🟠 Medio | `page.tsx:34-38` (`CONFIGURACION`) vs tabla educativa (~líneas 306-337) | El juego solo tiene 3 niveles seleccionables: Fácil (6 pares, 4×3), Medio (8 pares, 4×4), Difícil (12 pares, 6×4). La tabla "Niveles de dificultad comparados" describe 4 niveles, incluyendo "🔥 Experto (6×5, 15 pares)", que no existe ni es seleccionable; y "🧠 Difícil (5×4, 10 pares)" tampoco coincide con el difícil real (12 pares, 6×4). | Eliminar la fila "Experto" (o implementar un 4º nivel real en `CONFIGURACION`) y corregir la fila "Difícil" a 12 pares / 6×4. |
+| 23.2 | 🟡 Bajo | `page.tsx:546` | "Esta agrupación espacial reduce la carga de la memoria de trabajo hasta en un 30%" — cifra sin fuente ni estudio. | Suavizar a "puede reducir la carga de memoria de trabajo" sin porcentaje, o citar fuente. |
+| 23.3 | 🟡 Bajo | `page.tsx:608-611` | "Se necesitan al menos 3-4 semanas de práctica regular para notar diferencias medibles" — cifra plausible pero sin fuente. | Matizar como estimación general ("estudios de entrenamiento cognitivo sugieren..."). |
+
+`getRelatedApps('juego-memoria')` correcto. Lógica del juego (mezcla Fisher-Yates, detección de parejas, temporizador, mejores tiempos en `localStorage`) correcta.
+
+---
+
+### 24. `juego-ahorcado` (Juego del Ahorcado)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 24.1 | 🟠 Medio | `page.tsx:41` (array `paises`) | La categoría "🌍 Países" incluye `'CAMBODIA'` (nombre en inglés; en español es "CAMBOYA") junto a `'CROACIA'`, `'TANZANIA'`, `'JORDANIA'`, `'ARMENIA'`, `'URUGUAY'`. El `metadata.ts` afirma "100% local, vocabulario en español" — un anglicismo en una app educativa de vocabulario es inconsistente con esa promesa. | Cambiar `'CAMBODIA'` por `'CAMBOYA'`. |
+| 24.2 | 🟡 Bajo | `metadata.ts:39-43` | `jsonLd.features` está vacío (`[]`), mientras otras apps de la suite incluyen 5-7 características reales. Reduce la calidad de los datos estructurados para SEO/IA. | Rellenar `features` con 4-8 características reales (4 categorías, teclado virtual, estadísticas con racha, accesibilidad ARIA, 100% local). |
+| 24.3 | 🟡 Bajo | `page.tsx:489-490` | FAQ afirma que la letra E aparece en "aproximadamente el 13,7%" de los textos en español, con cifras exactas para A, O, S, R, N, sin citar fuente del estudio de frecuencia léxica. | Citar fuente (RAE/corpus CREA) o suavizar a "según estudios de frecuencia léxica". |
+
+`getRelatedApps('juego-ahorcado')` correcto. Lógica del juego (selección aleatoria, conteo de errores, estadísticas con racha) correcta. Resto de categorías (animales, profesiones, vocabulario) sin anglicismos.
+
+---
+
+### 25. `juego-piedra-papel-tijera` (Juego Piedra Papel Tijera)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 25.1 | 🟡 Bajo | `page.tsx:604-606` | "La Piedra es elegida ~35% de las veces, Papel ~33% y Tijera ~32% en jugadores sin entrenamiento" — cifras concretas sin fuente. | Suavizar a "estudios sugieren una ligera preferencia por Piedra" sin porcentajes exactos, o citar fuente. |
+| 25.2 | 🟡 Bajo | `page.tsx:454-457` | "Según investigaciones en teoría de juegos, la Piedra es la jugada más frecuente... Los hombres eligen Piedra con mayor frecuencia que las mujeres" — afirmación sociológica sin fuente ni año. | Citar el estudio o eliminar la afirmación sobre diferencias de género. |
+| 25.3 | 🟡 Bajo | `page.tsx:484-486` | "El campeonato fue muy popular en Canadá durante los años 2000" (World RPS Society) — afirmación histórica sin fuente, con sesgo geográfico anglosajón (antipatrón #5). | Suavizar/generalizar sin anclar a un país/década concretos. |
+
+Sin hallazgos de severidad Medio o superior. Lógica del juego (`determinarGanador`, elección aleatoria, estadísticas con racha) correcta y coherente con el FAQ (33% por jugada). `getRelatedApps('juego-piedra-papel-tijera')` correcto.
+
+---
+
+### 26. `juego-platform-runner` (Juego Platform Runner)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 26.1 | 🟠 Medio | `metadata.ts:51` (FAQ) vs `page.tsx:597-613` (`handleKeyDown`) y `page.tsx:802-805` (panel de controles) | El FAQ afirma "Se juega con las teclas de flecha (movimiento) y la barra espaciadora **o flecha arriba** para saltar". `handleKeyDown` solo activa el salto con `e.key === ' '`; `ArrowUp` no está manejado. El panel de controles en pantalla solo muestra "ESPACIO → Saltar". | Corregir el FAQ a "barra espaciadora para saltar" (eliminar la mención a flecha arriba), o añadir el manejo de `ArrowUp` en `handleKeyDown`. |
+| 26.2 | 🟡 Bajo | `page.tsx:170-196` | Todos los niveles ≥3 comparten el mismo diseño "Nivel 3+ - Avanzado" (mismas plataformas/monedas/enemigos). El FAQ promete "niveles progresivos", cierto entre 1→2→3 pero no a partir del 3. | Matizar a "3 niveles con dificultad creciente" o generar variación para niveles 4+. |
+| 26.3 | 🟡 Bajo | `page.tsx:983-988` | "Varios estudios de psicología cognitiva han demostrado que los juegos de acción y plataformas mejoran el tiempo de reacción visual..." — usa "han demostrado" para un campo con resultados discutidos, sin citar estudios (antipatrón #3). | Cambiar "han demostrado" por "sugieren" o "han explorado", y citar referencia opcional. |
+
+`getRelatedApps('juego-platform-runner')` correcto. Física (gravedad, colisiones AABB, salto, eliminación de enemigos saltando encima) correcta.
+
+---
+
+### 27. `juego-puzzle-matematico` (Juego Puzzle Matemático)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 27.1 | 🟠 Medio | `page.tsx:644-648` y `metadata.ts:49,69` | El contenido afirma repetidamente que "los niveles se adaptan automáticamente al rendimiento del jugador". `generarProblema` (`page.tsx:76-128`) genera operaciones con rangos numéricos fijos por modo, sin relación con `racha`/`correctas`/`incorrectas`. `racha` solo afecta a la puntuación (`10 + Math.floor(racha/3)*5`), no a la dificultad. No hay dificultad adaptativa real. | Eliminar las afirmaciones de "dificultad adaptativa" del FAQ y de la guía, sustituyéndolas por una descripción precisa, o implementar escalado real de rangos numéricos según `racha`. |
+| 27.2 | 🟡 Bajo | `page.tsx:487-491` | La tabla "Tipos de puzzle matemático" usa "Secundaria/Bachillerato (14+)" y "Bachillerato/Adultos (16+)" — terminología España-only en una app de la suite `estudiantes` (regla 1.bis). | Sustituir por "secundaria/preparatoria (14+)" y "educación media/adultos (16+)". |
+| 27.3 | 🟡 Bajo | `page.tsx:562-563` | "Estudios de neurociencia cognitiva señalan que la práctica de aritmética mental activa las regiones prefrontal y parietal del cerebro" — afirmación sin cita ni año. | Suavizar a "se asocia comúnmente con..." o citar fuente. |
+
+`getRelatedApps('juego-puzzle-matematico')` correcto. Generación de problemas por modo (suma, resta sin negativos, multiplicación 1-12, división exacta), temporizador de 60s y bonus por racha correctos dentro de su alcance (no adaptativo).
+
+---
+
+### 28. `juego-space-invaders` (Juego Space Invaders)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 28.1 | 🔴 Crítico | `page.tsx:753,763,955-961,966-973,1013-1018,1022-1027,1056-1059` | El contenido educativo describe extensamente "los búnkeres (defensas)" como cobertura táctica clave y un "OVNI rojo" que cruza la pantalla y vale 50-300 puntos según el nº de disparo (incluida una columna "Dificultad defensas" en la tabla de niveles). El juego implementado no tiene ninguna entidad de búnker/defensa ni de OVNI: solo existen `Player`, `Bullet`, `Enemy` (filas de invasores con 30/20/10 pts) y `Particle`. | Eliminar todas las referencias a búnkeres/defensas y al OVNI rojo del contenido educativo (pasos de la guía, tips, columna "Dificultad defensas" y la celda "acumular puntos con el OVNI"), o implementar realmente ambas mecánicas en el game loop. |
+
+Sistema de puntos por fila de invasores (30/20/10) coherente con el FAQ histórico. `RelatedApps` correcto.
+
+---
+
+### 29. `juego-sudoku` (Juego Sudoku)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 29.1 | 🟠 Medio | `page.tsx:674-678` vs `page.tsx:75-142` (`generarSolucion`/`crearPuzzle`) | El FAQ afirma "Un sudoku bien formado tiene exactamente una solución única [...] Los generadores de puzzles verifican esta unicidad antes de presentar el juego." El generador real elimina 35/45/55 celdas (fácil/medio/difícil) en posiciones aleatorias sin ningún solver que cuente soluciones ni verificación de unicidad. En difícil quedan 26 pistas, por debajo del umbral de 17 que el propio texto cita como mínimo para garantizar unicidad. | Implementar un contador de soluciones (solver que se detiene al encontrar 2) tras cada eliminación y revertirla si deja de ser único; o suavizar el texto para no afirmar que este generador verifica unicidad. |
+| 29.2 | 🟡 Bajo | `page.tsx:585-589,846,856-857` vs tipo `Dificultad` y selector | El contenido describe un cuarto nivel "⚫ Experto (17-25 pistas)" con técnicas X-wing/swordfish, pero el selector solo ofrece `facil` (46 pistas), `medio` (36) y `dificil` (26) — no existe nivel "Experto" jugable. | Eliminar las referencias al nivel "Experto" inexistente, o añadir un cuarto nivel `experto` (≈56-64 celdas a quitar) con su botón. |
+
+Algoritmo de generación por backtracking (`esValido`/`resolver`) correcto para tableros completos válidos. `RelatedApps` correcto.
+
+---
+
+### 30. `juego-tres-en-raya` (Juego Tres en Raya)
+
+Sin hallazgos relevantes. Implementación de minimax completa y correcta. Cifras de la FAQ (255.168 partidas posibles, 131.184/77.904/46.080 victorias/derrotas/empates del primer jugador, 26.830 posiciones únicas tras simetrías) consistentes con los valores publicados habitualmente para Tic-Tac-Toe. `RelatedApps` correcto.
+
+---
+
+### 31. `juego-wordle` (Juego Wordle)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 31.1 | 🟡 Bajo | `page.tsx:398-404,544-553,644-649` | El contenido educativo dedica una fila de la tabla, una pregunta de la FAQ y un tip a explicar el "modo difícil" de Wordle (reutilizar letras confirmadas). El juego implementado solo tiene un modo — no existe selector de dificultad ni validación de reutilización de pistas en `enviarIntento`. | Eliminar las menciones al "modo difícil" como característica de esta app (o reformular como "en otras versiones de Wordle existe..."), o implementar la validación. |
+| 31.2 | 🟡 Bajo | `page.tsx:566-569` | El paso 1 de la guía afirma que "AUDIO, REINA o EUROS... cubren las cinco vocales del español o muy cerca de eso". Ninguna cubre las 5: AUDIO tiene 4 distintas (falta E), REINA tiene 3, EUROS tiene 3. | Reformular a "cubren 3-4 vocales distintas" o usar ejemplos que reflejen correctamente su cobertura vocálica. |
+| 31.3 | 🟡 Bajo | `page.tsx:519-523` vs `public/data/palabras-wordle.txt`/`diccionario-es.txt` | La FAQ afirma que "el diccionario de la RAE contiene aproximadamente 8.000-10.000 palabras de 5 letras" y que "los Wordle en español suelen trabajar con 2.000-3.000 palabras", sin fuente, y no coincide con los datos reales de esta app: `diccionario-es.txt` tiene 4.402 palabras de 5 letras y `palabras-wordle.txt` (pool diario) tiene 528. | Citar la fuente real de las cifras de la RAE si se mantienen como dato general, o sustituir por las cifras reales de esta app (4.402 válidas, 528 en el pool diario). |
+
+Evaluación de intentos (`evaluarIntento`) y cálculo de la palabra del día por offset desde 2024-01-01 correctos y deterministas. `RelatedApps` correcto.
+
+---
+
+### 32. `metronomo` (Metrónomo Online)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 32.1 | 🟠 Medio | `page.tsx:15` (preset), `page.tsx:184` (`getTempoName`), `page.tsx:349` (tabla visible), `metadata.ts:67` (FAQ) | El término "Allegro" tiene cuatro valores/rangos distintos en la misma app: preset fijado en 130 BPM; `getTempoName` clasifica como Allegro `< 140` (rango 120-139); la tabla visible dice "Allegro: 120–156 BPM"; el FAQ dice "Allegro (120-168)". Además la tabla visible no incluye "Vivace" (preset 160 BPM, sí existe en `getTempoName` para 140-169), dejando un hueco 156-168 sin clasificación, y el límite superior del FAQ (168) se solapa con el inicio de Presto en la tabla (168-200). | Unificar Allegro a un único rango en los 4 lugares (120-156 BPM, el más citado). Ajustar `getTempoName`: `<120` Moderato, `<156` Allegro, `<168` Vivace, resto Presto. Añadir fila "Vivace (156-168 BPM)" a la tabla y corregir el FAQ a "Allegro (120-156)". |
+
+Resto de presets/clasificaciones (Largo 50/Adagio 70/Andante 90/Moderato 110/Vivace 160/Presto 180) coherentes entre preset y tabla. `RelatedApps` correcto.
+
+---
+
+### 33. `quiz-verbos-irregulares` (Quiz Verbos Irregulares Inglés)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 33.1 | 🟡 Bajo | `page.tsx:390` | El bloque "¿Para quién es útil este quiz?" describe el primer perfil como "Estudiante de ESO/Bachillerato" — terminología España-only en una app de la suite `estudiantes` (regla 1.bis). | Sustituir por "secundaria/preparatoria" o "educación media", o añadir equivalencia entre paréntesis. |
+| 33.2 | 🟡 Bajo | `metadata.ts:54` y `page.tsx:450` | La FAQ afirma "el inglés tiene alrededor de 200 verbos irregulares de uso frecuente... unos 75-100"; el bloque educativo dice "con los 75 más frecuentes se cubre más del 90% de los textos". Ambas cifras (200, 90%) sin fuente. | Atribuir fuente concreta o suavizar a "se estima" sin porcentaje exacto. |
+| 33.3 | 🟡 Bajo | `page.tsx:470` | "Aprenderlos en grupos reduce el esfuerzo de memorización hasta en un 40%" — cifra sin fuente ni estudio. | Eliminar el porcentaje o sustituir por una afirmación cualitativa. |
+
+Generación de preguntas (`generarPreguntas`/`generarOpciones`) coherente con los 75 verbos de `data/verbos-irregulares.ts` (15 A1 + 20 A2 + 20 B1 + 20 B2). `RelatedApps` correcto.
+
+---
+
+### 34. `radio-meskeia` (Radio meskeIA)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 34.1 | 🟠 Medio | `page.tsx:43-46` | Las dos "emisoras destacadas por defecto" (`los40-default`, `cadena-ser-default`) tienen `url: ''`. El comentario indica que "se muestran mientras carga la API", pero si el usuario hace clic antes de que termine la carga (o si la API falla y se mantiene la lista por defecto), `reproducirEmisora` asigna `audioRef.current.src = ''` y `play()` lanza una excepción capturada que muestra "No se pudo conectar con la emisora" — una emisora "destacada" que nunca puede reproducirse. | Deshabilitar el clic/reproducción en las emisoras placeholder mientras `cargandoEmisoras === true` (mostrar estado "cargando"), o eliminar `EMISORAS_DESTACADAS` y mostrar directamente el spinner sin tarjetas falsas. |
+| 34.2 | 🟡 Bajo | `page.tsx:728-730` | La FAQ "¿La música mejora la productividad al trabajar?" cita el "efecto Mozart" sin referencia concreta — concepto popularmente sobreinterpretado y parcialmente refutado. | Citar fuente concreta o eliminar la mención al "efecto Mozart". |
+| 34.3 | 🟡 Bajo | `page.tsx:749-753` | "Una emisora estándar a 128 kbps consume aproximadamente 58 MB por hora... a 320 kbps unos 144 MB por hora" — cálculo correcto (128×3600/8≈57,6MB; 320×3600/8≈144MB) pero sin aclarar que es teórico, no medido. | Aclarar que es un cálculo teórico basado en bitrate nominal (opcional). |
+
+---
+
+### 35. `ruleta-aleatoria` (Ruleta Aleatoria)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 35.1 | 🟠 Medio | `metadata.ts:59` | La FAQ "¿Cómo añado mis propias opciones a la ruleta?" afirma "Solo tienes que escribir o pegar tus opciones en el campo de texto, una por línea o separadas por comas. La ruleta se actualiza automáticamente...". La UI real (`page.tsx:334-347`, función `addItem`) es un único `<input type="text">` + botón "+ Añadir" que agrega una opción a la vez; no existe parsing de texto multilínea ni separado por comas. | Reescribir la FAQ describiendo el flujo real (escribir una opción y pulsar "+ Añadir" o Enter, repetir por cada opción; o usar las plantillas de `PRESETS`), o implementar el parsing multilínea/comas descrito. |
+| 35.2 | 🟡 Bajo | `page.tsx:608-617` | La FAQ "¿Puedo usar la ruleta para sorteos legales en España?" cita la "Ley 13/2011 de regulación del juego" y umbrales concretos ("premios superiores a 200 € o más de 50 participantes") sin fuente verificable para esas cifras. | Eliminar los umbrales numéricos no respaldados por la normativa citada, o sustituir por una recomendación genérica de consultar a un profesional. |
+
+Algoritmo de giro (`spinWheel`/`drawWheel`) coherente. `RelatedApps` correcto.
+
+---
+
+### 36. `test-velocidad-escritura` (Test de Velocidad de Escritura)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 36.1 | 🟠 Medio | `metadata.ts:59,75`, `page.tsx:415` | La FAQ y el bloque educativo afirman que la herramienta calcula "PPM netas" (PPM brutas menos penalización por errores) además de "PPM brutas", y que "los empleadores... suelen usar PPM netos como medida real de rendimiento". `calcularEstadisticas()` (`page.tsx:60-87`) solo calcula `ppm` (sin descontar errores) y `precision` (%); el panel de resultados muestra "PPM" y "Precisión %" por separado — no existe ninguna métrica "PPM netas" en la UI. | Opción A: reescribir FAQ y bloque educativo para reflejar que la app muestra PPM (brutas) y precisión por separado, sin mencionar "PPM netas". Opción B: calcular y mostrar PPM netas (`ppm * precision/100` o restando errores) como métrica adicional. |
+| 36.2 | 🟡 Bajo | `page.tsx:395` | El bloque "Oposiciones y Exámenes" cita "Cuerpo General Administrativo del Estado, auxiliares administrativos de CCAA" y "180-200 pulsaciones por minuto" — terminología y normativa España-only en app con suite `productividad` (regla 1.bis). | Generalizar a "exámenes de acceso a la administración pública" sin nombrar cuerpos específicos de España, o añadir contexto equivalente para otros países. |
+| 36.3 | 🟡 Bajo | `page.tsx:419` | La FAQ "¿Cuál es la velocidad media de un adulto en España?" cita "Keybr y TypeRacer" y "estudios de productividad laboral" con cifras (35-45 PPM, 60+ PPM) sin enlace ni año. | Atribuir año/fuente concreta o suavizar a estimaciones aproximadas. |
+
+---
+
+### 37. `tirador-dados` (Tirador de Dados)
+
+Sin hallazgos relevantes. El generador de tiradas (`rollDie`/`rollDice`/`quickRoll`) es matemáticamente correcto; las probabilidades de la tabla comparativa y la distribución de 2D6 (7 más probable, 6/36≈16,7%; 2 y 12, 1/36≈2,8%) son correctas. `RelatedApps` correcto.
+
+---
+
+## Próximos pasos (Fase 2) — Suite Juegos y Ocio
+
+Pendiente de priorización por el usuario. Candidatos para Tanda 1 (severidad 🔴 y 🟠):
+
+1. `juego-space-invaders` — eliminar referencias a búnkeres/defensas y OVNI del contenido educativo (28.1) o implementarlas
+2. `juego-asteroids` — eliminar/implementar mecánica de hiperespacio (22.1) y corregir cálculo 420→520 puntos (22.2)
+3. `generador-loteria` — resolver discrepancia Quiniela/El Gordo Navidad vs Lototurf (19.1)
+4. `guia-cocteles` — corregir ejemplos de mocktails inexistentes (20.1)
+5. `juego-memoria` — corregir tabla de niveles (Experto inexistente, Difícil incorrecto) (23.1)
+6. `juego-ahorcado` — CAMBODIA → CAMBOYA (24.1)
+7. `juego-platform-runner` — corregir FAQ de tecla de salto (26.1)
+8. `juego-puzzle-matematico` — corregir afirmación de dificultad adaptativa (27.1)
+9. `juego-sudoku` — corregir afirmación de unicidad garantizada o nivel "Experto" inexistente (29.1, 29.2)
+10. `metronomo` — unificar rango "Allegro" en los 4 lugares (32.1)
+11. `radio-meskeia` — corregir emisoras destacadas con URL vacía (34.1)
+12. `ruleta-aleatoria` — corregir FAQ de añadir opciones (35.1)
+13. `test-velocidad-escritura` — corregir afirmación de "PPM netas" (36.1)
+
+El resto de hallazgos 🟡 Bajo (estadísticas sin fuente, términos España-only) pueden agruparse en una sesión de "limpieza menor" posterior, igual que en la Suite Viajes.
 
 

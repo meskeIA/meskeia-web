@@ -626,7 +626,7 @@ export default function ConversorUnidadesPage() {
                   <td><strong>Datos Digitales</strong></td>
                   <td>Byte (B), Kilobyte (KB), Megabyte (MB)</td>
                   <td>-</td>
-                  <td>1 GB = 1.024 MB | Velocidad internet: 100 Mbps ≈ 12,5 MB/s</td>
+                  <td>1 GiB = 1.024 MiB (binario) | 1 GB = 1.000 MB (SI) | Velocidad internet: 100 Mbps ≈ 12,5 MB/s</td>
                 </tr>
               </tbody>
             </table>
@@ -742,7 +742,9 @@ Cinta USA marca millas
               </p>
               <p>
                 En 1960, la comunidad científica adoptó el <strong>Sistema Internacional (SI)</strong> para
-                estandarizar medidas. Hoy, solo 3 países no usan SI oficialmente: Estados Unidos, Myanmar y Liberia.
+                estandarizar medidas. Históricamente se ha citado que Estados Unidos, Myanmar y Liberia son los
+                únicos países sin adopción oficial completa del SI, aunque Myanmar y Liberia llevan años en proceso
+                de transición hacia el sistema métrico.
               </p>
               <div className={styles.faqTip}>
                 💡 Aunque USA usa Imperial cotidianamente, la ciencia, medicina y ejército estadounidenses usan SI.

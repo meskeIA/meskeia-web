@@ -474,13 +474,13 @@ export default function ChecklistDocumentosViajePage() {
             <div className={styles.faqItem}>
               <dt>¿Cómo tramitar el pasaporte con urgencia?</dt>
               <dd>
-                Puedes solicitar cita urgente en cualquier Comisaría de Policía Nacional con servicio de expedición de pasaportes. En casos de emergencia acreditada (vuelo en menos de 48-72 horas), muchas comisarías atienden sin cita previa. Necesitarás DNI en vigor, fotografía reciente en fondo blanco (32x26 mm) y el pago de la tasa (30 €). El pasaporte urgente se tramita en el mismo día o en 24 horas.
+                Puedes solicitar cita urgente en cualquier Comisaría de Policía Nacional con servicio de expedición de pasaportes. En casos de emergencia acreditada (vuelo en menos de 48-72 horas), muchas comisarías atienden sin cita previa. Necesitarás DNI en vigor, fotografía reciente en fondo blanco (32x26 mm) y el pago de la tasa (30,90 €). El pasaporte urgente se tramita en el mismo día o en 24 horas.
               </dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué documentación necesita un menor que viaja sin ambos progenitores?</dt>
               <dd>
-                Si el menor viaja solo con uno de los progenitores o con terceros (abuelos, tíos, etc.), es muy recomendable llevar una <strong>autorización notarial</strong> firmada por el progenitor ausente, con apostilla si se viaja fuera de la UE. Algunos países (México, Costa Rica, Brasil) la exigen expresamente en aduana. También se recomienda llevar el libro de familia o certificado de nacimiento. Si los padres tienen la guardia exclusiva, sentencia judicial incluida.
+                Si el menor viaja solo con uno de los progenitores o con terceros (abuelos, tíos, etc.), es muy recomendable llevar una <strong>autorización notarial</strong> firmada por el progenitor ausente, con apostilla si se viaja fuera de la UE. Algunos países latinoamericanos la exigen expresamente en aduana, aunque los requisitos cambian con frecuencia: consulta siempre la embajada o consulado del país de destino antes de viajar. También se recomienda llevar el libro de familia o certificado de nacimiento. Si los padres tienen la guardia exclusiva, sentencia judicial incluida.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -520,7 +520,7 @@ export default function ChecklistDocumentosViajePage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>6 semanas antes: Contrata el seguro de viaje</strong>
-                <p>Elige un seguro con cobertura médica mínima de 30.000 € para Europa y 100.000 € para EEUU. Verifica que incluya repatriación, asistencia 24h y cobertura de equipaje. Guarda el número de asistencia en el móvil. Si tienes condiciones médicas preexistentes, asegúrate de que estén cubiertas explícitamente.</p>
+                <p>Elige un seguro con cobertura médica mínima de 30.000 € para Europa y 150.000 € para EEUU. Verifica que incluya repatriación, asistencia 24h y cobertura de equipaje. Guarda el número de asistencia en el móvil. Si tienes condiciones médicas preexistentes, asegúrate de que estén cubiertas explícitamente.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -624,7 +624,7 @@ export default function ChecklistDocumentosViajePage() {
                 <strong>Menor que viaja sin autorización notarial.</strong> En muchos países latinoamericanos (México, Costa Rica, Brasil, Colombia) es obligatorio presentar autorización notarial del progenitor ausente. Sin ella, el menor puede ser retenido en aduana e impedirle la entrada. La autorización debe estar apostillada si viaja fuera de la UE.
               </li>
               <li>
-                <strong>Seguro de viaje sin cobertura médica suficiente para el visado Schengen.</strong> Si tramitas visado Schengen, el seguro debe cubrir mínimo 30.000 € y ser válido en todo el espacio Schengen. Un seguro insuficiente puede suponer la denegación del visado directamente. Para EEUU, donde un día de hospitalización puede superar los 3.000 $, se recomienda cobertura de al menos 100.000 €.
+                <strong>Seguro de viaje sin cobertura médica suficiente para el visado Schengen.</strong> Si tramitas visado Schengen, el seguro debe cubrir mínimo 30.000 € y ser válido en todo el espacio Schengen. Un seguro insuficiente puede suponer la denegación del visado directamente. Para EEUU, donde un día de hospitalización puede superar los 3.000 $, se recomienda cobertura de al menos 150.000 €.
               </li>
               <li>
                 <strong>No tramitar la ESTA con suficiente antelación antes de volar a EEUU.</strong> Aunque la ESTA suele aprobarse en minutos, puede retrasarse o denegarse. Tramitarla el mismo día del vuelo es un riesgo innecesario. Hazla con mínimo 72 horas de antelación. Si se deniega, necesitarás solicitar un visado B-2 en el consulado americano, proceso que tarda semanas.

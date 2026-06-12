@@ -32,7 +32,7 @@ export default function CalculadoraCombustiblePage() {
   } | null>(null);
 
   const parseNum = (val: string): number => {
-    return parseFloat(val.replace(',', '.')) || 0;
+    return Math.max(0, parseFloat(val.replace(',', '.')) || 0);
   };
 
   const calcularConsumo = () => {
@@ -410,6 +410,10 @@ export default function CalculadoraCombustiblePage() {
               </tr>
             </tbody>
           </table>
+          <p className={styles.tableNote}>
+            Precios de combustible orientativos (referencia 2025-2026); consulta el
+            precio actual en tu gasolinera o factura eléctrica para cálculos precisos.
+          </p>
         </div>
 
         {/* Casos de uso */}

@@ -489,7 +489,7 @@ export default function InformacionTiempoPage() {
             <span className={styles.infoIcon}>🔄</span>
             <div>
               <strong>Datos actualizados</strong>
-              <p>Información meteorológica actualizada cada 10 minutos</p>
+              <p>OpenWeatherMap actualiza sus datos cada ~10 minutos; vuelve a buscar para ver la información más reciente</p>
             </div>
           </div>
           <div className={styles.infoItem}>
@@ -766,10 +766,11 @@ export default function InformacionTiempoPage() {
                 <summary>¿Cómo funciona AEMET?</summary>
                 <p>
                   AEMET (Agencia Estatal de Meteorología) es el organismo oficial español
-                  encargado de la vigilancia, predicción y climatología atmosférica. Utiliza
-                  modelos numéricos de predicción, datos de una red de más de 900 estaciones
-                  automáticas, radares, radiosondeos y satélites. Sus predicciones y avisos
-                  son la referencia oficial para Protección Civil y usuarios profesionales.
+                  encargado de la vigilancia, predicción y climatología atmosférica. Según
+                  datos publicados en aemet.es, utiliza modelos numéricos de predicción y
+                  una amplia red de estaciones automáticas, radares, radiosondeos y
+                  satélites. Sus predicciones y avisos son la referencia oficial para
+                  Protección Civil y usuarios profesionales.
                 </p>
               </details>
             </li>
