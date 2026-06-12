@@ -180,7 +180,28 @@
 
 **Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
 
-**Pendiente Grupo 1**: `orientador-gastos-deducibles` (`calcular_gastos_deducibles_autonomo`), `orientador-tarifa-freelance`/`calculadora-precio-por-proyecto` (`calcular_tarifa_freelance`), `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador).
+#### 44. `orientador-gastos-deducibles` (Orientador de Gastos Deducibles) — tool `calcular_gastos_deducibles_autonomo`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 44.1 | 🔴 Crítico | `page.tsx` "Casos de uso", Escenario 1 (Diseñador freelance) | "Ahorro fiscal estimado: ~2.800 €/año con IRPF al 30%" — recalculando con la fórmula real del propio orientador (`baseDeducible*irpf + ivaRecuperable` por línea) para los 5 gastos listados (30% suministros 540€, 100% Adobe 660€, 50% móvil 240€, 100% hosting 180€, 100% cursos 400€) con IVA 21%, el ahorro real es **~721 €/año** — el texto sobreestima el ahorro en ~3,9x. | Corregido a "~720 €/año". |
+| 44.2 | 🟠 Medio | `page.tsx` "Casos de uso", Escenario 2 (Consultor con desplazamientos) | "Ahorro fiscal estimado: ~4.200 €/año con IRPF al 37%" — recalculando con IRPF 37% sobre los 7.280€ deducibles (kilometraje + dietas sin IVA recuperable, hoteles+transporte y asesoría+coworking con IVA 21% recuperable al 100%), el ahorro real es **~3.318 €/año** — sobreestimado en ~27%. | Corregido a "~3.300 €/año". |
+| 44.3 | 🟠 Medio | `page.tsx` FAQ "¿La cuota de autónomos es deducible en IRPF e IVA?" | "Importe medio: 230-500 €/mes según tramo. Ahorro IRPF al 30%: ~828-1.800 €/año" — mismo patrón que #42/#43: usa el rango de cuotas RETA ~2024 (230-500€/mes). Con `TRAMOS_RETA_2025` 2026 (Tramo1 cuotaMinima=205,88€, Tramo15 cuotaMinima=607,35€), el ahorro IRPF al 30% real es ~741-2.186 €/año. | Actualizado a "Importe medio: ~206-607 €/mes según tramo (2026). Ahorro IRPF al 30%: ~740-2.190 €/año". |
+| 44.4 | 🟡 Bajo | `page.tsx` disclaimer fijo y `metadata.ts` (description + jsonLd description) | "Datos orientativos para 2025" / "Actualizado 2025" — resto de datos normativos de la app (IRPF, IVA, dietas, interés de demora 4,0625% verificado vigente 2026) son válidos para 2026. | Actualizado a "2026" en las 3 ubicaciones. |
+
+**Observación sin cambio (requiere revisión doctrinal aparte)**: el `gastosDB` interactivo incluye "Mantenimiento vehículo (uso mixto)" y "Gasolina vehículo mixto" en la categoría 50% deducible, aplicando ese 50% tanto a IRPF como a IVA. Sin embargo, la sección "Errores comunes" de esta misma app afirma que un turismo de uso mixto **no es deducible en IRPF** (solo en IVA aplica la presunción del 50% del art. 95 LIVA) — posible contradicción interna entre el cálculo interactivo y el contenido educativo, y el mismo patrón existe en `lib/calculadoras/gastosDeduciblesAutonomo.ts` (usado por el tool MCP). No se modifica en esta pasada por ser una cuestión doctrinal de mayor calado (afecta a `lib/calculadoras/`, no solo a contenido estático); queda anotado para revisión específica.
+
+**RelatedApps/ShareCard/Footer**: correctos. `DisclaimerCard severity="critical"`, `RegionBadge variant="es-only"` correctos. El calculador interactivo de esta app es independiente (`gastosDB` propio, no importa `lib/calculadoras/gastosDeduciblesAutonomo.ts`); el problema estaba en los "Casos de uso" estáticos y la FAQ, no en el cálculo interactivo en sí.
+
+**Correcciones aplicadas**:
+- 44.1: Escenario 1 "~2.800 €/año" → "~720 €/año".
+- 44.2: Escenario 2 "~4.200 €/año" → "~3.300 €/año".
+- 44.3: FAQ cuota autónomos actualizada a rango RETA 2026 y ahorro IRPF correspondiente.
+- 44.4: 3 referencias "2025" → "2026" (disclaimer + metadata.ts ×2).
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Pendiente Grupo 1**: `orientador-tarifa-freelance`/`calculadora-precio-por-proyecto` (`calcular_tarifa_freelance`), `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador).
 
 ---
 

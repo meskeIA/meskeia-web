@@ -425,7 +425,7 @@ export default function OrientadorGastosDeduciblesPage() {
         <p>
           Este orientador es <strong>únicamente orientativo y educativo</strong>. Los cálculos se basan en la normativa general
           del IRPF e IVA para autónomos en régimen de estimación directa y <strong>NO sustituyen el asesoramiento profesional</strong>.
-          Datos orientativos para 2025. Verifica la normativa vigente en la{' '}
+          Datos orientativos para 2026. Verifica la normativa vigente en la{' '}
           <a href="https://sede.agenciatributaria.gob.es" target="_blank" rel="noopener noreferrer">
             Sede Electrónica de la AEAT
           </a>.
@@ -577,7 +577,7 @@ export default function OrientadorGastosDeduciblesPage() {
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Ahorro fiscal estimado: <strong>~2.800 €/año</strong> con IRPF al 30%
+                Ahorro fiscal estimado: <strong>~720 €/año</strong> con IRPF al 30%
               </div>
             </div>
 
@@ -596,7 +596,7 @@ export default function OrientadorGastosDeduciblesPage() {
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Ahorro fiscal estimado: <strong>~4.200 €/año</strong> con IRPF al 37%
+                Ahorro fiscal estimado: <strong>~3.300 €/año</strong> con IRPF al 37%
               </div>
             </div>
 
@@ -664,7 +664,7 @@ export default function OrientadorGastosDeduciblesPage() {
                 la actividad económica. Sin embargo, <strong>no tiene IVA</strong>, así que no se puede recuperar
                 IVA de ella. Es uno de los gastos más importantes y que más autónomos olvidan incluir.
               </dd>
-              <div className={styles.faqTip}>Importe medio: 230-500 €/mes según tramo. Ahorro IRPF al 30%: ~828-1.800 €/año.</div>
+              <div className={styles.faqTip}>Importe medio: ~206-607 €/mes según tramo (2026). Ahorro IRPF al 30%: ~740-2.190 €/año.</div>
             </div>
 
             <div className={styles.faqItem}>
