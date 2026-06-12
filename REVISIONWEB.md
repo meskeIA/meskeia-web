@@ -220,7 +220,32 @@
 
 **Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
 
-**Pendiente Grupo 1**: `selector-regimen-fiscal-autonomo`/`asistente-alta-autonomo` (`consulta_autonomo`, orquestador) — último ítem del grupo.
+#### 46. `asistente-alta-autonomo` (Asistente Alta Autónomo) + `selector-regimen-fiscal-autonomo` (Selector de Régimen Fiscal Autónomo) — tool `consulta_autonomo` (orquestador)
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 46.1 | 🟠 Medio | `asistente-alta-autonomo/page.tsx`, tabla "Comparativa autónomo vs SL", fila "Cuota Seg. Social" | Columna SL decía "~300 €/mes (administrador)" — desactualizado frente a `AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual=514,99€` (`data/fiscal/sociedades.ts`, 31,5% de la base mínima 1.634,88€ desde 2026 por subida MEI), ~42% por debajo del valor real. | Corregido a "~515 €/mes (autónomo societario obligatorio)". |
+| 46.2 | 🟠 Medio | `asistente-alta-autonomo/page.tsx`, tabla "Comparativa de regímenes", fila "Cuota mínima mensual" | Columna autónomo societario decía "Desde 310 €/mes (base mínima RETA admin.)" — mismo problema que 46.1, ~40% por debajo de los 514,99€ reales; columna régimen general decía "Desde 200 €/mes" (RETA 2025). | Corregido a "~515 €/mes (base mínima RETA admin., obligatoria)" y "Desde ~206 €/mes (rendimientos bajos)" (RETA 2026). |
+| 46.3 | 🟠 Medio | `asistente-alta-autonomo/page.tsx`, "Casos de uso" Escenario 1 (Pedro) | "Ahorra ~1.800 € en cuotas SS durante el primer año" — recalculando con la fórmula real de `calcularCuotaAutonomo()` ((cuotaNormal − cuotaTarifaPlana) × 12 = (205,88 − 80) × 12 = 1.510,56€), el ahorro real es **~1.510 €**, sobreestimado ~19%. | Corregido a "~1.510 € (cuota mínima ~206 €/mes − tarifa plana 80 €/mes, ×12)". |
+| 46.4 | 🟡 Bajo | `asistente-alta-autonomo/page.tsx`, disclaimer fijo | "Datos orientativos para 2025" — mismo patrón que #44.4/#45.2. | Actualizado a "2026". |
+| 46.5 | 🔴 Crítico | `asistente-alta-autonomo/metadata.ts`, FAQ JSON-LD "¿Cuánto se paga de cuota de autónomo en 2025?" | "En 2025 hay 15 tramos: el mínimo es de 200 € al mes... y el máximo supera los 590 € para ingresos por encima de 6.000 €/mes" — tabla RETA pre-2026 (31,30%/MEI 0,70%), mismo patrón que #28d25605. El máximo real 2026 (`TRAMOS_RETA_2025` Tramo15 cuotaMaxima=1.606,88€) es ~1.607€, ~2,7x el valor citado. | Pregunta renombrada a "...en 2026?" y respuesta actualizada: "el mínimo es de ~206 € al mes... y el máximo es de ~1.607 € para ingresos por encima de 6.000 €/mes". |
+
+**`selector-regimen-fiscal-autonomo`**: revisado sin hallazgos. Es un quiz de puntuación ponderada (10 preguntas → recomienda `modulos`/`directa_simplificada`/`directa_normal`/`sociedad_limitada`) sin fórmulas numéricas atadas a `consulta_autonomo`. La referencia "47% en los tramos más altos" se verificó correcta contra `TRAMOS_IRPF_2025` (tramo `{hasta: Infinity, tipo: 47}`). `metadata.ts` sin hallazgos (umbrales FAQ 250.000€/150.000€ módulos, 40.000-50.000€ SL, 600.000€ directa normal estables).
+
+**RelatedApps/ShareCard/Footer**: correctos en ambas apps.
+
+**Correcciones aplicadas**:
+- 46.1: "~300 €/mes (administrador)" → "~515 €/mes (autónomo societario obligatorio)".
+- 46.2: "Desde 310 €/mes" → "~515 €/mes"; "Desde 200 €/mes" → "Desde ~206 €/mes".
+- 46.3: "Ahorra ~1.800 €" → "Ahorra ~1.510 €" (recalculado con la fórmula real).
+- 46.4: "Datos orientativos para 2025" → "2026".
+- 46.5: FAQ "¿...en 2025?" + "200€/590€" → "¿...en 2026?" + "~206€/~1.607€".
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Grupo 1 "Autónomos" — COMPLETADO** (commits `28d25605`, `03d01dd4`, `3bd79ffc`, `61400354`, y este lote pendiente de commit).
+
+**Pendiente — Grupo 2 "Fiscal autónomos"**: `modelo_130`, `modelo_303`, `calcular_iva`, `calcular_irpf` (próximo grupo a revisar).
 
 ---
 

@@ -1028,7 +1028,7 @@ export default function AsistenteAltaAutonomoPage() {
                     <tr>
                       <td>Cuota Seg. Social</td>
                       <td>Desde 80€/mes (tarifa plana)</td>
-                      <td>~300€/mes (administrador)</td>
+                      <td>~515€/mes (autónomo societario obligatorio)</td>
                     </tr>
                     <tr>
                       <td>Trámites</td>
@@ -1069,7 +1069,7 @@ export default function AsistenteAltaAutonomoPage() {
         <p>
           Esta herramienta proporciona información <strong>orientativa y educativa</strong> sobre el proceso de alta como autónomo en España.
           <strong> No constituye asesoramiento legal ni fiscal</strong>. Los requisitos, cuotas y procedimientos pueden variar
-          según tu situación personal y cambios normativos. Datos orientativos para 2025, verificados en base al{' '}
+          según tu situación personal y cambios normativos. Datos orientativos para 2026, verificados en base al{' '}
           <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/Afiliacion/10817" target="_blank" rel="noopener noreferrer">
             sistema RETA de la Seguridad Social
           </a>.
@@ -1161,8 +1161,8 @@ export default function AsistenteAltaAutonomoPage() {
               <tbody>
                 <tr>
                   <td>Cuota mínima mensual</td>
-                  <td>Desde 200 €/mes (rendimientos bajos)</td>
-                  <td>Desde 310 €/mes (base mínima RETA admin.)</td>
+                  <td>Desde ~206 €/mes (rendimientos bajos)</td>
+                  <td>~515 €/mes (base mínima RETA admin., obligatoria)</td>
                   <td>Posible reducción del 50 % el 1.º año</td>
                 </tr>
                 <tr>
@@ -1217,7 +1217,7 @@ export default function AsistenteAltaAutonomoPage() {
                 Declara el domicilio fiscal en su vivienda habitual y emite facturas con IVA 21 %.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Al no tener empleados ni local arrendado, el modelo 037 es suficiente. Ahorra ~1.800 € en cuotas SS durante el primer año.
+                💡 Al no tener empleados ni local arrendado, el modelo 037 es suficiente. Ahorra ~1.510 € en cuotas SS durante el primer año (cuota mínima ~206 €/mes − tarifa plana 80 €/mes, ×12).
               </p>
             </div>
 

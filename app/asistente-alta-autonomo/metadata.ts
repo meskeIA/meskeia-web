@@ -56,10 +56,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuánto se paga de cuota de autónomo en 2025?',
+      name: '¿Cuánto se paga de cuota de autónomo en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Desde 2023 la cuota de autónomos depende de los ingresos reales netos. En 2025 hay 15 tramos: el mínimo es de 200 € al mes para ingresos netos inferiores a 670 €/mes, y el máximo supera los 590 € para ingresos por encima de 6.000 €/mes. La cuota base elegida determina también la prestación por incapacidad y la futura pensión.',
+        text: 'Desde 2023 la cuota de autónomos depende de los ingresos reales netos. En 2026 hay 15 tramos: el mínimo es de ~206 € al mes para ingresos netos inferiores a 670 €/mes, y el máximo es de ~1.607 € para ingresos por encima de 6.000 €/mes. La cuota base elegida determina también la prestación por incapacidad y la futura pensión.',
       },
     },
     {
