@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calendario Fiscal del Emprendedor - Fechas y Modelos Tributarios | meskeIA',
-  description: 'Calendario fiscal 2025 para autónomos y sociedades en España. Fechas límite de declaraciones, modelos tributarios (303, 130, 111, 200), recordatorios y estimador de pagos.',
+  description: 'Calendario fiscal 2026 para autónomos y sociedades en España. Fechas límite de declaraciones, modelos tributarios (303, 130, 111, 200), recordatorios y estimador de pagos.',
   keywords: 'calendario fiscal, fechas declaraciones, modelo 303, modelo 130, modelo 111, modelo 200, IVA trimestral, IRPF, impuesto sociedades, autónomo, pyme, obligaciones fiscales, hacienda, AEAT, plazos tributarios',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -48,7 +48,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuándo hay que presentar el IVA trimestral en 2025?',
+      name: '¿Cuándo hay que presentar el IVA trimestral en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'El modelo 303 de IVA trimestral se presenta cuatro veces al año: del 1 al 20 de abril (1T), del 1 al 20 de julio (2T), del 1 al 20 de octubre (3T) y del 1 al 30 de enero del año siguiente (4T y resumen anual modelo 390). Si el día 20 cae en festivo o fin de semana, el plazo se amplía al siguiente día hábil.',

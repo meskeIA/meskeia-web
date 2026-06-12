@@ -627,13 +627,13 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.escenarioCard}>
             <h4>Asalariado tipo (30.000 € base liquidable)</h4>
             <p>
-              Reparto: 12.450 al 19% + 7.750 al 24% + 9.800 al 30% = 7.156,50 € de cuota. Tipo medio ~23,9%, marginal 30%. Si su empresa le sube 1.000 €, 300 € se van al IRPF.
+              Reparto: 12.450 al 19% + 7.750 al 24% + 9.800 al 30% = 7.165,50 € de cuota. Tipo medio ~23,9%, marginal 30%. Si su empresa le sube 1.000 €, 300 € se van al IRPF.
             </p>
           </div>
           <div className={styles.escenarioCard}>
             <h4>Autónomo en RETA (45.000 € base liquidable)</h4>
             <p>
-              Tres tramos llenos + parte del 4º. Cuota ~10.787 €. Tipo medio ~24%, marginal 37%. Importante: el autónomo factura IVA aparte; el IRPF aplica solo sobre el rendimiento neto tras gastos deducibles.
+              Tres tramos llenos + parte del 4º. Cuota ~12.352 €. Tipo medio ~27,4%, marginal 37%. Importante: el autónomo factura IVA aparte; el IRPF aplica solo sobre el rendimiento neto tras gastos deducibles.
             </p>
           </div>
           <div className={styles.escenarioCard}>

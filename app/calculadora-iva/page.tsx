@@ -219,7 +219,7 @@ export default function CalculadoraIvaPage() {
       </div>
 
       <section className={styles.infoSection}>
-        <h2>Tipos de IVA en España (2025)</h2>
+        <h2>Tipos de IVA en España (2026)</h2>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
             <h3>21% - General</h3>

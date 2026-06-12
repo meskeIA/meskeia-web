@@ -49,7 +49,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuáles son los tipos de IVA en España en 2025?',
+      name: '¿Cuáles son los tipos de IVA en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'España tiene tres tipos de IVA: el general del 21%, que aplica a la mayoría de bienes y servicios; el reducido del 10%, para alimentos sin elaborar, hostelería, transporte de viajeros y vivienda nueva; y el superreducido del 4%, para alimentos básicos como pan, leche, huevos, frutas, verduras y legumbres, así como medicamentos y libros. Existen también exenciones para servicios como educación reglada, sanidad y operaciones financieras.',

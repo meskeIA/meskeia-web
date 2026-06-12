@@ -243,9 +243,54 @@
 
 **Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
 
-**Grupo 1 "Autónomos" — COMPLETADO** (commits `28d25605`, `03d01dd4`, `3bd79ffc`, `61400354`, y este lote pendiente de commit).
+**Grupo 1 "Autónomos" — COMPLETADO** (commits `28d25605`, `03d01dd4`, `3bd79ffc`, `61400354`, `0ff4b6dd`).
 
-**Pendiente — Grupo 2 "Fiscal autónomos"**: `modelo_130`, `modelo_303`, `calcular_iva`, `calcular_irpf` (próximo grupo a revisar).
+#### 47. `calculadora-iva` (Calculadora de IVA) — tool `calcular_iva`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 47.1 | 🟡 Bajo | `page.tsx` sección educativa "Tipos de IVA en España (2025)" y `metadata.ts` FAQ "¿Cuáles son los tipos de IVA en España en 2025?" | Año desactualizado — los tipos (21/10/4/0%) no han cambiado para 2026, mismo patrón de etiqueta "2025"→"2026" que #44.4/#45.3/#46.4. | Actualizado a "2026" en ambas ubicaciones. |
+
+El calculador interactivo (añadir/quitar IVA al 21/10/4/0%) coincide exactamente con la fórmula de `calcular_iva` (base×tipo / total÷(1+tipo)). Escenarios, FAQ y guía paso a paso revisados sin más hallazgos (plazos modelo 303, recargo equivalencia, reglas OSS/UE correctas y estables).
+
+**RelatedApps/ShareCard/Footer**: correctos. `DisclaimerCard severity="critical"` correcto (componente fiscal).
+
+**Correcciones aplicadas**:
+- 47.1: "Tipos de IVA en España (2025)" → "(2026)"; FAQ "...en España en 2025?" → "...en 2026?".
+
+#### 48. `simulador-irpf-tramos` (Simulador Visual de Tramos IRPF) — tool `calcular_irpf`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 48.1 | 🟡 Bajo | `page.tsx`, "Casos de Uso Reales", Asalariado tipo (30.000€ base liquidable) | "12.450 al 19% + 7.750 al 24% + 9.800 al 30% = 7.156,50 € de cuota" — recalculando con `TRAMOS_IRPF_2025` y la fórmula real `calcularCuotaTramos(30000)`, el resultado es **7.165,50 €** (transposición de cifras 56↔65, diferencia de 9€). Tipo medio ~23,9% y marginal 30% sí son correctos. | Corregido a "7.165,50 €". |
+| 48.2 | 🟠 Medio | `page.tsx`, "Casos de Uso Reales", Autónomo en RETA (45.000€ base liquidable) | "Cuota ~10.787 €. Tipo medio ~24%, marginal 37%" — recalculando con la misma fórmula (`calcularCuotaTramos(45000)`), el resultado real es **cuota 12.351,50€, tipo medio 27,4%** (marginal 37% sí correcto). La cuota citada está ~12,6% por debajo del valor real, y el tipo medio está desviado ~3,4 puntos porcentuales (24% vs 27,4%). | Corregido a "Cuota ~12.352 €. Tipo medio ~27,4%, marginal 37%". |
+
+**Observación sin cambio**: el caso "Jubilado con pensión (24.000€)" cita cuota ~3.866€/tipo medio 16,1%, mientras que `calcularCuotaTramos(24000)` da 5.365,5€/22,4% si 24.000€ fuera base liquidable directa. A diferencia de los casos 1 y 2 (que dicen explícitamente "base liquidable"), este caso no lo especifica — es plausible que 24.000€ sea ingreso bruto antes de aplicar el mínimo personal (5.550€), lo que se acerca mucho más a la cifra citada (cuota≈3.805€, tipo medio≈15,9% sobre 24.000€). No se modifica por ambigüedad de la base de cálculo.
+
+**RelatedApps/ShareCard/Footer**: correctos. `RegionBadge variant="es-only"`, `DisclaimerCard severity="critical"`, `DataReference` correctos. `TRAMOS_IRPF_2025` (`data/fiscal/irpf.ts`, `vigencia: '2025'`) usado como referencia canónica vigente, sin re-evaluar en esta pasada (cuestión de vigencia anual, fuera del alcance de "Capa Contenido").
+
+**Correcciones aplicadas**:
+- 48.1: "7.156,50 €" → "7.165,50 €" (corrección aritmética).
+- 48.2: "Cuota ~10.787 €. Tipo medio ~24%" → "Cuota ~12.352 €. Tipo medio ~27,4%" (recalculado con la fórmula real).
+
+#### 49. `calendario-fiscal-emprendedor` (Calendario Fiscal del Emprendedor) — tools `calcular_modelo_130` + `calcular_modelo_303`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 49.1 | 🟡 Bajo | `page.tsx` disclaimer fijo y `metadata.ts` (description ×2 + FAQ "¿Cuándo hay que presentar el IVA trimestral en 2025?") | "Plazos generales de la AEAT para 2025" / "Calendario fiscal 2025" — los plazos trimestrales (303/130: 1-20 abr/jul/oct, 1-30 ene) son fijos por ley y no han cambiado, mismo patrón de etiqueta "2025"→"2026". | Actualizado a "2026" en las 4 ubicaciones. |
+
+Los estimadores interactivos se verificaron contra las fórmulas de `calcular_modelo_303` (`ivaRepercutido − ivaSoportado`) y `calcular_modelo_130` (`max(0, beneficio×20% − retenciones)`): coinciden con la lógica de los tools MCP en su versión simplificada por trimestre individual (sin acumulado anual ni pagos fraccionados previos), comportamiento explícitamente etiquetado como "estimación aproximada" en la UI — no es un error, es una simplificación declarada.
+
+**RelatedApps/ShareCard/Footer**: correctos.
+
+**Correcciones aplicadas**:
+- 49.1: 4 referencias "2025" → "2026" (disclaimer `page.tsx` + `metadata.ts` description ×2 + FAQ).
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-12).
+
+**Grupo 2 "Fiscal autónomos" — COMPLETADO** (`calculadora-iva`, `simulador-irpf-tramos`, `calendario-fiscal-emprendedor`; sin apps web dedicadas para `modelo_130`/`modelo_303` aisladas — cubiertas vía `calendario-fiscal-emprendedor`).
+
+**Pendiente — Grupo 3 "Nómina"**: `consulta_nomina`, `calcular_sueldo_neto` (próximo grupo a revisar).
 
 ---
 

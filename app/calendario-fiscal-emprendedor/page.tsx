@@ -1011,7 +1011,7 @@ export default function CalendarioFiscalPage() {
       <div className={styles.disclaimer}>
         <h3>⚠️ Herramienta de Orientación — No es asesoramiento profesional</h3>
         <p>
-          Este calendario es una <strong>guía orientativa</strong> basada en los plazos generales de la AEAT para 2025.
+          Este calendario es una <strong>guía orientativa</strong> basada en los plazos generales de la AEAT para 2026.
           Las fechas pueden variar por festivos locales o cambios normativos posteriores a la elaboración de esta herramienta.
           Para información oficial y actualizada, consulta siempre la{' '}
           <a href="https://sede.agenciatributaria.gob.es" target="_blank" rel="noopener noreferrer">
