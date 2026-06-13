@@ -2938,9 +2938,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-equilibrio-quimico': [
     { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'Aplicación práctica del equilibrio: curva de pH y punto de equivalencia' },
-    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Estequiometría y reactivo limitante' },
-    { url: '/visualizador-cinetica-quimica/', icon: '📈', name: 'Cinética Química', description: 'Velocidades de reacción y energía de activación' },
-    { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala y reacciones de equilibrio iónico' },
+    { url: '/visualizador-termodinamica-quimica/', icon: '🌡️', name: 'Termodinámica Química', description: 'ΔG, espontaneidad y la base teórica de Le Chatelier' },
+    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'La cinética dice a qué velocidad se alcanza el equilibrio' },
+    { url: '/simulador-estequiometria/', icon: '🧪', name: 'Estequiometría', description: 'Reactivo limitante y masas molares de las mismas reacciones' },
   ],
   'simulador-lotka-volterra': [
     { url: '/simulador-genetica/', icon: '🧬', name: 'Genética Mendeliana', description: 'Cruces, Punnett y poblaciones' },
