@@ -1035,3 +1035,49 @@ Decisión conjunta con el usuario sobre los 3 casos especiales pendientes (Arag�
 
 **Ciclo de reconciliación ITP/CCAA cerrado** (Tandas 1-3 + cierre de casos especiales). Pendiente de menor prioridad sin programar: Andalucía, Baleares, Castilla y León, Extremadura, Murcia, Valencia (tipos reducidos "razonablemente coincidentes" entre ambas tablas, pendientes de verificación oficial puntual).
 
+---
+
+## Tanda 7 — Cobertura Delegum MCP, Grupo 6: Pensiones/jubilación/laboral — 🔍 REVISIÓN PRELIMINAR, SIN FIXES (2026-06-13)
+
+> **Estado**: solo revisión/catalogación de hallazgos. Por restricción de presupuesto de tokens de la sesión, **NO se ha aplicado ningún fix de código** en esta tanda (a diferencia de los Grupos 1-5, que seguían el patrón "fix as you find"). Esta tabla es el punto de partida para una sesión futura que aplique las correcciones, siguiendo la misma metodología (verificar fuente externa si el dato parece desactualizado, aplicar fix, `npx tsc --noEmit`, build, tests, commit+push).
+
+**Tools MCP del Grupo 6**: `consulta_jubilacion`, `consulta_despido`, `calcular_indemnizacion_despido`, `calcular_finiquito`, `calcular_pension_desempleo`, `calcular_pension_publica`, `calcular_brecha_jubilacion`, `calcular_plan_pensiones`, `calcular_prestacion_maternidad_paternidad`, `calcular_reduccion_jornada`, `calcular_baja_medica`, `calcular_excedencia`, `calcular_pension_viudedad`, `calcular_jubilacion_anticipada`, `calcular_pension_incapacidad`.
+
+### Subcluster Jubilación/Pensiones
+
+| # | Severidad | Archivo:línea | Hallazgo | Fix sugerido |
+|---|---|---|---|---|
+| 53.1 | 🔴 Crítico | `lib/calculadoras/pensionPublica.ts:121-123`, `lib/calculadoras/jubilacionAnticipada.ts:90` | Edad ordinaria sin cotización suficiente hardcodeada como "66 años y 6 meses" (debería ser 66a8m en 2025 / 66a10m en 2026, según `data/fiscal/pensiones.ts` `TABLA_EDAD_JUBILACION`). También "≥37 años y 3 meses cotizados" cuando la constante real `mesesCotizadosParaJubilacion65=459 meses = 38a3m`. | Usar `getEdadJubilacion(anioActual)` para generar el string dinámicamente y corregir "37a3m"→"38a3m" en ambos archivos. |
+| 53.2 | 🟠 Medio | `lib/calculadoras/pensionPublica.ts` (todo el archivo) | No usa el "Sistema Dual" (`SISTEMA_DUAL_TRANSICION`/`getSistemaDualParams`) ya modelado en `data/fiscal/pensiones.ts` y usado por `app/simulador-jubilacion-publica/page.tsx` (que calcula clásica vs dual y devuelve la más favorable). El tool MCP `calcular_pension_publica` solo aplica la fórmula clásica (300/350), divergiendo del resultado de la app web desde 2026. | Replicar el cálculo dual en la calculadora canónica, o documentar la limitación explícitamente en el campo `nota` de la respuesta. |
+| 53.3 | 🟠 Medio | `lib/calculadoras/pensionIncapacidad.ts:35,43-48,207` | Usa `BASES_SS_2025.minima` (1.381,20€) y pensiones mínimas "2025" hardcodeadas (940,50/860/730/1050/850/1575€) en vez de `PENSIONES_MINIMAS_2026` (ya revalorizadas +2,8% en `data/fiscal/pensiones.ts`, p.ej. incapacidad total≥65 = 1.256,60€ vs 1.050€ actual). Mismo patrón "módulo nuevo no migra datos a módulo dedicado posterior" (SMI/pensiones). | Sustituir constantes locales por lookups a `PENSIONES_MINIMAS_2026` (filtro `tipo: 'incapacidad'`); verificar si existe `BASES_SS_2026` (ver hallazgo 53.7) y usarla. |
+| 53.4 | 🟡 Bajo | `lib/calculadoras/planPensiones.ts:24-26` | Constantes `LIMITE_INDIVIDUAL_2025`/`LIMITE_EMPRESARIAL_2025`/`LIMITE_PORCENTUAL_2025` duplicadas localmente en vez de importar `LIMITES_PLAN_PENSIONES_2025` de `data/fiscal/pensiones.ts` (valores coinciden hoy: 1.500/8.500/10.000€, pero riesgo de desincronización futura). | Importar y usar `LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual`/`.limiteEmpresaAnual`. |
+| 53.5 | 🟡 Bajo | `app/estimador-pension-viudedad/page.tsx:14,~391` | Alias local `const PENSION_VIUDEDAD_2025 = PENSION_VIUDEDAD_2026` (datos correctos, 2026) y texto visible "pensión máxima SS 2025" — etiqueta engañosa para el usuario. | Renombrar la constante local (p.ej. `PV`) y corregir el literal "SS 2025"→"SS 2026" en el JSX. |
+| 53.6 | 🟡 Bajo | `app/planificador-ahorro-jubilacion/page.tsx:129-134,142` | Reimplementa `tipoMarginalIRPF()` aplicando `TRAMOS_IRPF_2025` directamente sobre la "base imponible" del input, sin pasar por `tipoMarginalDesdeRendimientosBrutos` (que descuenta SS + gastos art.19 + reducción art.20 antes de ubicar el tramo). Puede sobreestimar el ahorro fiscal, divergiendo de `calcularPlanPensiones` canónico y de `simulador-renta-plan-pensiones`. | Sustituir por `tipoMarginalDesdeRendimientosBrutos` (de `@/data/fiscal`), o documentar que el input esperado ya es base liquidable. |
+| 53.7 | — | `lib/calculadoras/bajaMedica.ts:15,75` (compartido con subcluster Laboral, ver 53.10) | `BASES_SS_2025` en `data/fiscal/irpf.ts` (mínima 1.381,20€/máxima 4.909,50€, "Orden PJC/178/2025") podría estar desactualizada a 2026 — afecta también a `pensionIncapacidad.ts` (53.3) vía `aplicarBonificacionIS`... | Ver detalle en hallazgo 53.10. |
+
+**Sin hallazgos**: `lib/calculadoras/brechaJubilacion.ts` (fórmula PMT correcta, sin datos hardcodeados desactualizados). `lib/calculadoras/pensionViudedad.ts` (revisado tras fix SMI 2026-06-11, sin nuevos problemas). `app/simulador-jubilacion-publica/page.tsx` (usa imports canónicos correctamente — más completo que la calculadora MCP, ver 53.2). `app/selector-plan-pensiones/page.tsx` (hub de navegación sin lógica propia). `app/visualizador-sistema-pensiones/page.tsx`, `app/orientador-tramites-jubilacion/page.tsx` (sin cálculo propio). `app/estimador-irpf-pensionista/page.tsx` (usa imports de `data/fiscal/irpf.ts` correctamente).
+
+### Subcluster Laboral
+
+**Ninguna de las 6 calculadoras de este subcluster tiene app web dedicada** (MCP-only, mismo patrón que `calcular_capacidad_hipoteca` en Grupo 4). `app/visualizador-desempleo-tipos/` es contenido educativo puro (tipos de desempleo NAIRU/Beveridge) sin relación con `pensionDesempleo.ts`.
+
+| # | Severidad | Archivo:línea | Hallazgo | Fix sugerido |
+|---|---|---|---|---|
+| 53.8 | 🟠 Medio | `lib/calculadoras/pensionDesempleo.ts:13-21` | `IPREM_2025` hardcodeado localmente (mensual 600€); no existe módulo central `data/fiscal/iprem.ts`. `dependencia.ts` y `maternidad.ts` también hardcodean "600€/mes IPREM 2025" en comentarios sueltos por separado — riesgo de desincronización si cambia el IPREM 2026. | Crear `data/fiscal/iprem.ts` con `IPREM_2026` verificado (BOE) y migrar las 3 referencias. |
+| 53.9 | 🟡 Bajo | `lib/calculadoras/pensionDesempleo.ts:8,14,131,195` | Todo el archivo etiquetado "IPREM 2025"/"LPGE 2025" (`TOPES_2025`), mientras el resto del proyecto ya migró a vigencia 2026 (SMI, pensiones). Verificar si el IPREM 2026 ya se publicó y actualizar topes. | Buscar RD/BOE IPREM 2026, actualizar constantes y renombrar `IPREM_2026`/`TOPES_2026`. |
+| 53.10 | 🟠 Medio | `lib/calculadoras/bajaMedica.ts:15,75` → `data/fiscal/irpf.ts` (`BASES_SS_2025`) | Importa `BASES_SS_2025` (mínima 1.381,20€/máxima 4.909,50€, "Orden PJC/178/2025") para el clamp de la base de cotización diaria en `calcular_baja_medica`. `data/fiscal/autonomos.ts:63` ya menciona "Bases de referencia 2026" con valores distintos para RETA — sugiere que las bases generales SS 2026 también cambiaron y `BASES_SS_2025` podría estar obsoleta (afecta también a 53.3). | Verificar Orden de cotización 2026 (BOE), actualizar `BASES_SS_2025`→`BASES_SS_2026` en `irpf.ts`, propagar rename en `bajaMedica.ts` y `pensionIncapacidad.ts`. |
+| 53.11 | 🟡 Bajo | `lib/calculadoras/indemnizacionDespido.ts:172-265` vs `finiquito.ts:150` | Inconsistencia de documentación: `finiquito.ts` menciona el límite de exención IRPF de la indemnización (180.000€, art. 7.e LIRPF), pero `indemnizacionDespido.ts` solo dice "exenta hasta el importe legal máximo" sin la cifra. No afecta al cálculo. | Añadir la cifra 180.000€ también en `indemnizacionDespido.ts` para consistencia. |
+| 53.12 | 🟡 Bajo | `lib/calculadoras/excedencia.ts:131,195` | Dos cifras distintas para la cuota de convenio especial SS dentro del mismo archivo: "aprox. 160€/mes" (línea 131) vs "aprox. 155-165€/mes" (línea 195). Ambas son estimaciones que podrían estar desactualizadas a 2026. | Unificar ambas menciones a un mismo rango, o remitir a la web de la Seguridad Social sin cifra concreta. |
+
+**Sin hallazgos**: `lib/calculadoras/finiquito.ts` (días/año fijos del ET, sin constantes anuales caducables; heurística de pagas extra documentada como simplificación). `lib/calculadoras/excedencia.ts` (límites legales fijos, ya verificados 2026-06-10, salvo 53.12). `lib/calculadoras/reduccionJornada.ts` (porcentajes y plazos son límites legales fijos del ET/LGSS, no anuales).
+
+### Prioridad sugerida para la sesión de fixes
+
+1. **53.1** (🔴, edad de jubilación hardcodeada en 2 archivos — afecta a `consulta_jubilacion`/`calcular_jubilacion_anticipada`/`calcular_pension_publica`, contenido visible al usuario con dato incorrecto).
+2. **53.3 + 53.10** (🟠, posible cascada `BASES_SS_2025`→2026 en `irpf.ts` que afecta a `bajaMedica.ts` y `pensionIncapacidad.ts` — verificar primero si existe una Orden 2026 publicada antes de tocar nada).
+3. **53.2** (🟠, sistema dual ausente en `pensionPublica.ts` — alcance mayor, posible rediseño de la función).
+4. **53.8/53.9** (🟠/🟡, IPREM sin módulo central — crear `data/fiscal/iprem.ts`).
+5. Resto (53.4-53.7, 53.11-53.12): 🟡 cosméticos, agrupables en el mismo commit que los anteriores.
+
+**Grupo 6: revisión preliminar completada, fixes pendientes para sesión futura.**
+
