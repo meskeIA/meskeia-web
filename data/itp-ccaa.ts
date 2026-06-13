@@ -122,7 +122,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Escala progresiva desde 2024. Bonificaciones en zonas rurales.',
+    notas: 'Escala progresiva desde 2024. Bonificaciones en zonas rurales. ⚠️ Dato orientativo: existen bonificaciones adicionales sobre la cuota (jóvenes, discapacidad, familia numerosa) que varían según colectivo y municipio — verifica la tarifa vigente en aragon.es',
   },
 
   'asturias': {
@@ -640,7 +640,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1,
-    notas: 'ITP moderado (7%). Buenos tipos reducidos para jóvenes y familias.',
+    notas: 'ITP moderado (7%). Buenos tipos reducidos para jóvenes y familias. ⚠️ Dato orientativo: existen varios escalones adicionales según colectivo y municipio — verifica la tarifa vigente en larioja.org',
   },
 
   'ceuta': {

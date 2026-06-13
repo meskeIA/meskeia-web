@@ -41,7 +41,7 @@ export interface TipoITPCCAA {
  */
 export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Andalucía',          tipo: 7,    reducido: 3.5,  notaReducido: 'Familias numerosas, discapacidad ≥33%, jóvenes <35 años en zonas rurales' },
-  { ccaa: 'Aragón',             tipo: 8,    reducido: 5,    notaReducido: 'Jóvenes <36 años, primera vivienda habitual' },
+  { ccaa: 'Aragón',             tipo: 8,    reducido: 5,    notaReducido: 'Jóvenes <36 años, primera vivienda habitual. ⚠️ Dato orientativo: Aragón aplica bonificaciones sobre la cuota que varían según colectivo y municipio — verifica la tarifa vigente en aragon.es' },
   { ccaa: 'Asturias',           tipo: 8,    reducido: 4,    notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% (vivienda habitual ≤150.000 €)' },
   { ccaa: 'Baleares',           tipo: 8,    reducido: 4,    notaReducido: 'Primera vivienda habitual precio < 270.151 €' },
   { ccaa: 'Canarias',           tipo: 6.5,  reducido: 5,    notaReducido: 'Vivienda habitual, valor ≤150.000 € (sin ser titular de otra vivienda)' },
@@ -51,7 +51,7 @@ export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Cataluña',           tipo: 10,   reducido: 5,    notaReducido: 'Jóvenes ≤32 años (≤35 desde 27/06/2026) con renta ≤36.000 €, familia numerosa/monoparental o discapacidad ≥65% (vivienda habitual). VPO: 7%' },
   { ccaa: 'Extremadura',        tipo: 8,    reducido: 7 },
   { ccaa: 'Galicia',            tipo: 8,    reducido: 3,    notaReducido: 'Jóvenes <36 años, familias numerosas, discapacidad ≥65% (vivienda habitual ≤150.000 €)' },
-  { ccaa: 'La Rioja',           tipo: 7,    reducido: 4,    notaReducido: 'Jóvenes <40 años, primera vivienda habitual (novedad 2025); familia numerosa o discapacidad ≥33%: 5%' },
+  { ccaa: 'La Rioja',           tipo: 7,    reducido: 4,    notaReducido: 'Jóvenes <40 años, primera vivienda habitual (novedad 2025); familia numerosa o discapacidad ≥33%: 5%. ⚠️ Dato orientativo: existen varios escalones adicionales según colectivo y municipio — verifica la tarifa vigente en larioja.org' },
   { ccaa: 'Madrid',             tipo: 6,    reducido: 5.4,  notaReducido: 'Bonificación 10% sobre cuota, vivienda habitual ≤250.000 € (6% → 5,4% efectivo); familia numerosa: 4%; jóvenes <35 en municipios <2.500 hab.: exento 100%' },
   { ccaa: 'Murcia',             tipo: 8,    reducido: 3,    notaReducido: 'Familias numerosas, discapacidad' },
   { ccaa: 'Navarra',            tipo: 6,    reducido: 5,    notaReducido: 'Jóvenes <35 años, familias con 2+ hijos, discapacidad o VPO (vivienda habitual ≤180.304 €)' },

@@ -990,3 +990,17 @@ Tercera tanda. Cambio en `TIPOS_ITP_CCAA_2025` (`data/fiscal/inmuebles.ts`); `IT
 
 **Pendiente de verificación** (sin caso especial, menor prioridad): Andalucía, Baleares, Castilla y León, Extremadura, Murcia, Valencia.
 
+---
+
+## Reconciliación ITP/CCAA — cierre de casos especiales (2026-06-13)
+
+Decisión conjunta con el usuario sobre los 3 casos especiales pendientes (Aragón, La Rioja `ITP_CCAA`, Ceuta/Melilla): dado su peso poblacional reducido (Aragón ~2,7%, La Rioja ~0,7%, Ceuta+Melilla ~0,36% del total nacional), no se justifica el esfuerzo de reescritura estructural (campo `bonificacionCuota`, 4 escalones de La Rioja, extensión de `ENUM_CCAA` + ~9 calculadoras). Se opta por una solución ligera:
+
+- 🟢 **Aragón**: añadido aviso "⚠️ Dato orientativo: Aragón aplica bonificaciones sobre la cuota que varían según colectivo y municipio — verifica la tarifa vigente en aragon.es" en `notaReducido` (`TIPOS_ITP_CCAA_2025`) y en `notas` (`ITP_CCAA.aragon`). No se modifica el valor `reducido: 5` ni `tiposReducidos`/`tramosProgresivos`.
+- 🟢 **La Rioja**: añadido aviso equivalente "⚠️ Dato orientativo: existen varios escalones adicionales según colectivo y municipio — verifica la tarifa vigente en larioja.org" en `notaReducido` (`TIPOS_ITP_CCAA_2025`) y en `notas` (`ITP_CCAA.rioja`). No se reescriben los 4 escalones detectados en Tanda 2.
+- ⏸️ **Ceuta/Melilla**: cerrado SIN cambios. No soportadas en Delegum (`ENUM_CCAA` no las incluye) — no es una regresión, nunca lo estuvieron. Las 4 apps web ya las soportan correctamente vía `ITP_CCAA.ceuta`/`ITP_CCAA.melilla` (verificado en Tanda 3). No se extiende `ENUM_CCAA` ni se tocan las ~9 calculadoras.
+
+**Build verificado**: `npx tsc --noEmit` limpio + `npm run build` exit 0 (999 apps, 1300 páginas).
+
+**Ciclo de reconciliación ITP/CCAA cerrado** (Tandas 1-3 + cierre de casos especiales). Pendiente de menor prioridad sin programar: Andalucía, Baleares, Castilla y León, Extremadura, Murcia, Valencia (tipos reducidos "razonablemente coincidentes" entre ambas tablas, pendientes de verificación oficial puntual).
+
