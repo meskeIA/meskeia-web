@@ -301,7 +301,7 @@ export default function CalculadoraNotasPage() {
     const credRestantes = parseFloat(creditosRestantes.replace(',', '.'));
 
     if (isNaN(actual) || isNaN(credActuales) || isNaN(objetivo) || isNaN(credRestantes) || credRestantes <= 0) {
-      return { notaNecesaria: 0, valido: false, estado: '' };
+      return { notaNecesaria: 0, valido: false, estado: '', yaSuperado: false };
     }
 
     // (actual * credActuales + X * credRestantes) / (credActuales + credRestantes) = objetivo
@@ -311,13 +311,13 @@ export default function CalculadoraNotasPage() {
     let estado: string;
     if (notaNecesaria > 10) estado = 'imposible';
     else if (notaNecesaria > 8) estado = 'dificil';
-    else if (notaNecesaria >= 0) estado = 'alcanzable';
-    else estado = 'alcanzable'; // Si es negativa, cualquier nota sirve
+    else estado = 'alcanzable'; // incluye negativos: el objetivo ya está superado
 
     return {
       notaNecesaria: Math.max(0, notaNecesaria),
       valido: true,
-      estado
+      estado,
+      yaSuperado: notaNecesaria < 0,
     };
   }, [notaActual, creditosActuales, notaObjetivo, creditosRestantes]);
 
@@ -445,6 +445,7 @@ export default function CalculadoraNotasPage() {
                   />
                   <input
                     type="text"
+                    inputMode="decimal"
                     className={styles.inputSmall}
                     value={asig.nota}
                     onChange={(e) => actualizarAsignatura(asig.id, 'nota', e.target.value)}
@@ -452,6 +453,7 @@ export default function CalculadoraNotasPage() {
                   />
                   <input
                     type="text"
+                    inputMode="decimal"
                     className={styles.inputSmall}
                     value={asig.creditos}
                     onChange={(e) => actualizarAsignatura(asig.id, 'creditos', e.target.value)}
@@ -462,6 +464,7 @@ export default function CalculadoraNotasPage() {
                     onClick={() => eliminarAsignatura(asig.id)}
                     disabled={asignaturas.length <= 1}
                     title="Eliminar asignatura"
+                    aria-label={`Eliminar ${asig.nombre || 'asignatura'}`}
                   >
                     ×
                   </button>
@@ -484,6 +487,7 @@ export default function CalculadoraNotasPage() {
                   <label className={styles.simuladorLabel}>Media actual</label>
                   <input
                     type="text"
+                    inputMode="decimal"
                     className={styles.input}
                     value={notaActual}
                     onChange={(e) => setNotaActual(e.target.value)}
@@ -494,6 +498,7 @@ export default function CalculadoraNotasPage() {
                   <label className={styles.simuladorLabel}>Créditos cursados</label>
                   <input
                     type="text"
+                    inputMode="decimal"
                     className={styles.input}
                     value={creditosActuales}
                     onChange={(e) => setCreditosActuales(e.target.value)}
@@ -504,6 +509,7 @@ export default function CalculadoraNotasPage() {
                   <label className={styles.simuladorLabel}>Media objetivo</label>
                   <input
                     type="text"
+                    inputMode="decimal"
                     className={styles.input}
                     value={notaObjetivo}
                     onChange={(e) => setNotaObjetivo(e.target.value)}
@@ -516,6 +522,7 @@ export default function CalculadoraNotasPage() {
                 <label className={styles.simuladorLabel}>Créditos restantes</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   className={styles.input}
                   value={creditosRestantes}
                   onChange={(e) => setCreditosRestantes(e.target.value)}
@@ -524,10 +531,10 @@ export default function CalculadoraNotasPage() {
               </div>
 
               {resultadoSimulador.valido && (
-                <div className={styles.simuladorResultado}>
+                <div className={styles.simuladorResultado} role="status" aria-live="polite">
                   <p className={styles.simuladorLabel}>Necesitas una media de:</p>
                   <p className={`${styles.simuladorResultadoValor} ${styles[resultadoSimulador.estado]}`}>
-                    {resultadoSimulador.notaNecesaria > 10
+                    {resultadoSimulador.estado === 'imposible'
                       ? 'Imposible'
                       : formatNumber(resultadoSimulador.notaNecesaria, 2)}
                   </p>
@@ -537,7 +544,10 @@ export default function CalculadoraNotasPage() {
                   {resultadoSimulador.estado === 'dificil' && (
                     <p className={styles.simuladorLabel}>Difícil pero posible</p>
                   )}
-                  {resultadoSimulador.estado === 'alcanzable' && resultadoSimulador.notaNecesaria <= 10 && (
+                  {resultadoSimulador.estado === 'alcanzable' && resultadoSimulador.yaSuperado && (
+                    <p className={styles.simuladorLabel}>Ya has superado tu objetivo: con cualquier nota a partir de ahora mantienes la media por encima</p>
+                  )}
+                  {resultadoSimulador.estado === 'alcanzable' && !resultadoSimulador.yaSuperado && (
                     <p className={styles.simuladorLabel}>Objetivo alcanzable</p>
                   )}
                 </div>
@@ -547,7 +557,7 @@ export default function CalculadoraNotasPage() {
 
           {/* Panel de resultados */}
           <div className={styles.resultadoPanel}>
-            <div className={styles.resultadoPrincipal}>
+            <div className={styles.resultadoPrincipal} role="status" aria-live="polite">
               <span className={styles.resultadoLabel}>Tu Media Ponderada</span>
               <span className={styles.resultadoValor}>
                 {resultadoMedia.asignaturasContadas > 0
@@ -616,6 +626,7 @@ export default function CalculadoraNotasPage() {
               </h3>
               <input
                 type="text"
+                inputMode="decimal"
                 className={styles.input}
                 value={notaBachillerato}
                 onChange={(e) => setNotaBachillerato(e.target.value)}
@@ -655,6 +666,7 @@ export default function CalculadoraNotasPage() {
                     />
                     <input
                       type="text"
+                      inputMode="decimal"
                       className={styles.inputSmall}
                       value={asig.nota}
                       onChange={(e) => actualizarAsignaturaEvau(asig.id, 'nota', e.target.value)}
@@ -688,6 +700,7 @@ export default function CalculadoraNotasPage() {
                     />
                     <input
                       type="text"
+                      inputMode="decimal"
                       className={styles.inputSmall}
                       value={asig.nota}
                       onChange={(e) => actualizarEspecifica(asig.id, 'nota', e.target.value)}
@@ -698,6 +711,7 @@ export default function CalculadoraNotasPage() {
                       className={styles.btnEliminar}
                       onClick={() => eliminarEspecifica(asig.id)}
                       title="Eliminar materia"
+                      aria-label={`Eliminar ${asig.nombre || 'materia'}`}
                     >
                       ×
                     </button>
@@ -715,7 +729,7 @@ export default function CalculadoraNotasPage() {
 
           {/* Panel de resultados EvAU */}
           <div className={styles.resultadoPanel}>
-            <div className={styles.resultadoPrincipal}>
+            <div className={styles.resultadoPrincipal} role="status" aria-live="polite">
               <span className={styles.resultadoLabel}>Nota de Admisión</span>
               <span className={styles.resultadoValor}>
                 {resultadoEvau.valido
@@ -805,6 +819,7 @@ export default function CalculadoraNotasPage() {
                 </label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   className={styles.conversorInput}
                   value={notaConversor}
                   onChange={(e) => setNotaConversor(e.target.value)}
@@ -821,7 +836,7 @@ export default function CalculadoraNotasPage() {
             </div>
 
             {resultadoConversor && (
-              <div className={styles.conversorResultados}>
+              <div className={styles.conversorResultados} role="status" aria-live="polite">
                 <div className={styles.conversorResultado}>
                   <span className={styles.conversorEscala}>🇪🇸 España (0-10)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.espana, 2)}</span>
@@ -1062,7 +1077,7 @@ export default function CalculadoraNotasPage() {
             </div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Qué es la Matrícula de Honor y cuándo se concede?</div>
-              <div className={styles.faqRespuesta}>Es la máxima calificación universitaria española, reservada a notas de 9,0 o superior. Tiene un límite cuantitativo: no puede concederse a más del 5% de los alumnos matriculados en la asignatura. Si el 5% da menos de 1 alumno, puede concederse a 1 como máximo.</div>
+              <div className={styles.faqRespuesta}>Es la máxima calificación universitaria española, reservada a notas de 9,0 o superior. Tiene un límite cuantitativo: no puede concederse a más del 5% de los alumnos matriculados en la asignatura. Si el 5% da menos de 1 alumno, puede concederse a 1 como máximo. Distinciones equivalentes en otros países son el &quot;Summa Cum Laude&quot; (EEUU) o la &quot;Mención de Honor&quot; (varios países de Latinoamérica), aunque los requisitos exactos varían según la institución.</div>
             </div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Cómo se convierte una nota española al sistema GPA americano?</div>

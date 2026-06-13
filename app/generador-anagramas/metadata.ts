@@ -76,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué palabras se pueden formar con las letras A, E, R, M, O?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con las letras A, E, R, M, O se pueden formar palabras como: AMORE, RAMO, MORA, AMOR, ROMA, MARE, REMA, ARMO, ORME, MARO, OREA, entre otras. El número de combinaciones posibles depende del diccionario usado. El generador de anagramas de meskeIA comprueba automáticamente todas las permutaciones contra el diccionario español y muestra solo las palabras válidas.',
+        text: 'Con las letras A, E, R, M, O se pueden formar palabras como: MAREO (anagrama perfecto de las 5 letras), AMOR, ROMA, MORA, RAMO, MARO, OREA, MERO, REMO, entre otras. El número de combinaciones posibles depende del diccionario usado. El generador de anagramas de meskeIA comprueba automáticamente todas las permutaciones contra el diccionario español y muestra solo las palabras válidas.',
       },
     },
     {

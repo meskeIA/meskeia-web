@@ -276,7 +276,7 @@ export default function GeneradorAnagramasPage() {
 
         {results.length > 0 && (
           <div className={styles.resultsSection}>
-            <div className={styles.resultsHeader}>
+            <div className={styles.resultsHeader} role="status" aria-live="polite">
               <h3>Palabras encontradas: {results.length}</h3>
             </div>
 
@@ -400,7 +400,7 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué letras son más valiosas en Scrabble español?</summary>
-              <p className={styles.eduFaqAnswer}>En Scrabble español, las letras de mayor valor son: <strong>CH (5 pts), LL (8 pts), RR (8 pts), Ñ (8 pts)</strong> como fichas especiales, y entre las individuales: <strong>Q (8), X (8), Y (4), Z (10), J (8), K (8)</strong>. Las vocales solo valen 1 punto. La estrategia consiste en usar letras de alto valor en casillas premium (doble/triple letra o palabra).</p>
+              <p className={styles.eduFaqAnswer}>En la edición clásica de Scrabble en español, las letras de mayor valor son: <strong>CH (5 pts), LL (8 pts), RR (8 pts), Ñ (8 pts)</strong> como fichas especiales, y entre las individuales: <strong>Q (8), X (8), Y (4), Z (10), J (8), K (8)</strong>. Las vocales solo valen 1 punto. Otras variantes (como Apalabrados) pueden usar puntuaciones distintas. La estrategia consiste en usar letras de alto valor en casillas premium (doble/triple letra o palabra).</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cómo funciona el algoritmo de búsqueda de anagramas?</summary>
@@ -420,7 +420,7 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cuál es la mejor estrategia inicial en Wordle?</summary>
-              <p className={styles.eduFaqAnswer}>Los análisis matemáticos (teoría de la información, entropía de Shannon) señalan palabras como <strong>CRANE, SLATE, AUDIO</strong> (en inglés) o <strong>RATIO, CRANE</strong> como primeras palabras óptimas por cubrir las letras más frecuentes. En español, palabras como <strong>ORATE, AIREL, MARES</strong> cubren bien el espacio de letras frecuentes (A, E, R, S, T, O, N). El objetivo es maximizar la información obtenida en cada intento.</p>
+              <p className={styles.eduFaqAnswer}>Los análisis matemáticos (teoría de la información, entropía de Shannon) señalan palabras como <strong>CRANE, SLATE, AUDIO</strong> como primeras palabras óptimas en inglés por cubrir las letras más frecuentes. En español, palabras como <strong>ORATE, NORTE, ANTES</strong> cubren bien el espacio de letras frecuentes (A, E, R, S, T, O, N). El objetivo es maximizar la información obtenida en cada intento.</p>
             </details>
           </div>
         </section>

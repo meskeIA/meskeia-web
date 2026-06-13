@@ -11,15 +11,12 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 import styles from './SimuladorMovimientoCircular.module.css';
 
 type Modo = 'mcu' | 'mcnu';
 
 const ALPHA_MCNU = 0.5; // rad/s² constante en modo MCNU
-
-function fmtNum(val: number, dec: number = 2): string {
-  return val.toLocaleString('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-}
 
 function drawArrow(
   ctx: CanvasRenderingContext2D,
@@ -319,7 +316,7 @@ export default function SimuladorMovimientoCircularPage() {
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel}>
             Radio (r){' '}
-            <span className={styles.sliderValue}>{fmtNum(radio, 1)} m</span>
+            <span className={styles.sliderValue}>{formatNumber(radio, 1)} m</span>
           </label>
           <input
             type="range"
@@ -337,7 +334,7 @@ export default function SimuladorMovimientoCircularPage() {
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel}>
             Velocidad angular (ω){' '}
-            <span className={styles.sliderValue}>{fmtNum(omega, 1)} rad/s</span>
+            <span className={styles.sliderValue}>{formatNumber(omega, 1)} rad/s</span>
           </label>
           <input
             type="range"
@@ -355,7 +352,7 @@ export default function SimuladorMovimientoCircularPage() {
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel}>
             Masa (m){' '}
-            <span className={styles.sliderValue}>{fmtNum(masa, 1)} kg</span>
+            <span className={styles.sliderValue}>{formatNumber(masa, 1)} kg</span>
           </label>
           <input
             type="range"
@@ -384,32 +381,32 @@ export default function SimuladorMovimientoCircularPage() {
       <div className={styles.valuesPanel}>
         <div className={styles.valueCard}>
           <span className={styles.valueName}>ω</span>
-          <span className={styles.valueNum}>{fmtNum(omegaVal, 2)}</span>
+          <span className={styles.valueNum}>{formatNumber(omegaVal, 2)}</span>
           <span className={styles.valueUnit}>rad/s</span>
         </div>
         <div className={styles.valueCard}>
           <span className={styles.valueName}>v tangencial</span>
-          <span className={styles.valueNum}>{fmtNum(v, 2)}</span>
+          <span className={styles.valueNum}>{formatNumber(v, 2)}</span>
           <span className={styles.valueUnit}>m/s</span>
         </div>
         <div className={styles.valueCard}>
           <span className={styles.valueName}>Aceleración centrípeta</span>
-          <span className={styles.valueNum}>{fmtNum(ac, 2)}</span>
+          <span className={styles.valueNum}>{formatNumber(ac, 2)}</span>
           <span className={styles.valueUnit}>m/s²</span>
         </div>
         <div className={styles.valueCard}>
           <span className={styles.valueName}>Fuerza centrípeta</span>
-          <span className={styles.valueNum}>{fmtNum(fc, 2)}</span>
+          <span className={styles.valueNum}>{formatNumber(fc, 2)}</span>
           <span className={styles.valueUnit}>N</span>
         </div>
         <div className={styles.valueCard}>
           <span className={styles.valueName}>Período (T)</span>
-          <span className={styles.valueNum}>{omegaVal > 0 ? fmtNum(T, 2) : '∞'}</span>
+          <span className={styles.valueNum}>{omegaVal > 0 ? formatNumber(T, 2) : '∞'}</span>
           <span className={styles.valueUnit}>s</span>
         </div>
         <div className={styles.valueCard}>
           <span className={styles.valueName}>Frecuencia (f)</span>
-          <span className={styles.valueNum}>{fmtNum(freq, 3)}</span>
+          <span className={styles.valueNum}>{formatNumber(freq, 3)}</span>
           <span className={styles.valueUnit}>Hz</span>
         </div>
       </div>
