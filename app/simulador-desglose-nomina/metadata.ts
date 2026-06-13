@@ -66,10 +66,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuánto se descuenta por Seguridad Social en la nómina en 2025?',
+      name: '¿Cuánto se descuenta por Seguridad Social en la nómina en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2025, el trabajador cotiza: 4,7% por contingencias comunes, 1,55% por desempleo, 0,1% por formación profesional y 0,12% por el MEI (Mecanismo de Equidad Intergeneracional). El total aproximado es el 6,47% del salario bruto, aunque varía según el tipo de contrato. El empleador paga además alrededor del 30% adicional que no aparece en la nómina del trabajador.',
+        text: 'En 2026, el trabajador cotiza: 4,7% por contingencias comunes, 1,55% por desempleo, 0,1% por formación profesional y 0,15% por el MEI (Mecanismo de Equidad Intergeneracional). El total aproximado es el 6,50% del salario bruto, aunque varía según el tipo de contrato. El empleador paga además alrededor del 30% adicional que no aparece en la nómina del trabajador.',
       },
     },
     {
@@ -85,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre salario bruto y salario neto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El salario bruto es el coste laboral antes de descuentos. El neto es lo que realmente ingresas en cuenta: bruto menos cotizaciones a la Seguridad Social (aprox. 6,47%) menos retención del IRPF (variable según tu situación, desde 0% hasta más del 35%). Con un salario bruto de 30.000 €, el neto habitual ronda los 23.000-24.500 € anuales, entre 1.900 y 2.000 € mensuales con 12 pagas.',
+        text: 'El salario bruto es el coste laboral antes de descuentos. El neto es lo que realmente ingresas en cuenta: bruto menos cotizaciones a la Seguridad Social (aprox. 6,50%) menos retención del IRPF (variable según tu situación, desde 0% hasta más del 35%). Con un salario bruto de 30.000 €, el neto habitual ronda los 23.000-24.500 € anuales, entre 1.900 y 2.000 € mensuales con 12 pagas.',
       },
     },
     {

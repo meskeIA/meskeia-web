@@ -1700,28 +1700,28 @@ test.describe('Golden — calcularFiniquito (Capa 1 · ET arts. 52-56)', () => {
 
 test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
 
-  test('GOLDEN-BK: soltero, bruto 24.000 €, 14 pagas → cuota SS 1.552,80 €, IRPF 2.385,47 €, neto mensual 1.432,98 €', () => {
-    // baseSS = 2.000 €/mes (dentro de mín-máx). Cuota SS anual = 2.000×6,47%×12 = 1.552,80 €.
-    // Base imponible = 24.000 − 1.552,80 − 2.000 = 20.447,20 € → reducción RNT mínima (2.364 €, RNT > 16.825).
-    // Mínimo personal (soltero, sin hijos) = 5.550 €. Base liquidable = 20.447,20 − 2.364 − 5.550 = 12.533,20 €.
-    // Cuota IRPF = 12.450×19% + 83,20×24% = 2.365,50 + 19,968 = 2.385,47 €.
+  test('GOLDEN-BK: soltero, bruto 24.000 €, 14 pagas → cuota SS 1.560,00 €, IRPF 2.383,74 €, neto mensual 1.432,59 €', () => {
+    // baseSS = 2.000 €/mes (dentro de mín-máx). Cuota SS anual = 2.000×6,50%×12 = 1.560,00 €.
+    // Base imponible = 24.000 − 1.560,00 − 2.000 = 20.440,00 € → reducción RNT mínima (2.364 €, RNT > 16.825).
+    // Mínimo personal (soltero, sin hijos) = 5.550 €. Base liquidable = 20.440,00 − 2.364 − 5.550 = 12.526,00 €.
+    // Cuota IRPF = 12.450×19% + 76,00×24% = 2.365,50 + 18,24 = 2.383,74 €.
     const r = calcularSueldoNeto({ brutoAnual: 24000, situacion: 'soltero', pagas: 14 });
-    expect(r.cuotaSSAnual).toBeCloseTo(1552.80, 2);
-    expect(r.baseImponible).toBeCloseTo(20447.20, 2);
+    expect(r.cuotaSSAnual).toBeCloseTo(1560.00, 2);
+    expect(r.baseImponible).toBeCloseTo(20440.00, 2);
     expect(r.reduccionRNT).toBeCloseTo(2364, 2);
     expect(r.minimoPersonalFamiliar).toBeCloseTo(5550, 2);
-    expect(r.baseLiquidable).toBeCloseTo(12533.20, 2);
-    expect(r.cuotaIRPF).toBeCloseTo(2385.47, 2);
-    expect(r.tipoRetencion).toBeCloseTo(9.94, 2);
-    expect(r.netoAnual).toBeCloseTo(20061.73, 2);
-    expect(r.netoMensual).toBeCloseTo(1432.98, 2);
+    expect(r.baseLiquidable).toBeCloseTo(12526.00, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(2383.74, 2);
+    expect(r.tipoRetencion).toBeCloseTo(9.93, 2);
+    expect(r.netoAnual).toBeCloseTo(20056.26, 2);
+    expect(r.netoMensual).toBeCloseTo(1432.59, 2);
   });
 
-  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → mínimo familiar 13.450 €, neto mensual 2.481,40 €', () => {
+  test('GOLDEN-BL: casado con ingresos, bruto 35.000 €, 2 hijos (1 menor de 3), 12 pagas → mínimo familiar 13.450 €, neto mensual 2.480,74 €', () => {
     // Mínimo personal+familiar = 5.550 (personal) + 2.400 (hijo 1º) + 2.700 (hijo 2º) + 2.800 (hijo <3) = 13.450 €.
-    // Base imponible = 35.000 − 2.264,50 (SS) − 2.000 = 30.735,50 € → reducción RNT mínima (2.364 €).
-    // Base liquidable = 30.735,50 − 2.364 − 13.450 = 14.921,50 €.
-    // Cuota IRPF = 12.450×19% + 2.471,50×24% = 2.365,50 + 593,16 = 2.958,66 €.
+    // Base imponible = 35.000 − 2.275,00 (SS) − 2.000 = 30.725,00 € → reducción RNT mínima (2.364 €).
+    // Base liquidable = 30.725,00 − 2.364 − 13.450 = 14.911,00 €.
+    // Cuota IRPF = 12.450×19% + 2.461,00×24% = 2.365,50 + 590,64 = 2.956,14 €.
     const r = calcularSueldoNeto({
       brutoAnual: 35000,
       situacion: 'casado_con_ingresos',
@@ -1729,15 +1729,15 @@ test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
       hijosMenores3: 1,
       pagas: 12,
     });
-    expect(r.cuotaSSAnual).toBeCloseTo(2264.50, 2);
-    expect(r.baseImponible).toBeCloseTo(30735.50, 2);
+    expect(r.cuotaSSAnual).toBeCloseTo(2275.00, 2);
+    expect(r.baseImponible).toBeCloseTo(30725.00, 2);
     expect(r.reduccionRNT).toBeCloseTo(2364, 2);
     expect(r.minimoPersonalFamiliar).toBeCloseTo(13450, 2);
-    expect(r.baseLiquidable).toBeCloseTo(14921.50, 2);
-    expect(r.cuotaIRPF).toBeCloseTo(2958.66, 2);
+    expect(r.baseLiquidable).toBeCloseTo(14911.00, 2);
+    expect(r.cuotaIRPF).toBeCloseTo(2956.14, 2);
     expect(r.tipoRetencion).toBeCloseTo(8.45, 2);
-    expect(r.netoAnual).toBeCloseTo(29776.84, 2);
-    expect(r.netoMensual).toBeCloseTo(2481.40, 2);
+    expect(r.netoAnual).toBeCloseTo(29768.86, 2);
+    expect(r.netoMensual).toBeCloseTo(2480.74, 2);
   });
 
 });
@@ -1868,7 +1868,7 @@ test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () =
 
   test('GOLDEN-BR: rendimientos 40.000 €, aportación 1.500 €, 40→67 años → ahorro fiscal 450 €, capital 70.626,32 €', () => {
     // Límite deducible = min(1.500, 40.000×30%) = min(1.500, 12.000) = 1.500 € → toda la aportación es deducible.
-    // Tipo marginal: RNT = 40.000 − 40.000×6,47% − 2.000 = 35.412 € → tramo 35.200 (30%).
+    // Tipo marginal: RNT = 40.000 − 40.000×6,50% − 2.000 = 35.400 € → tras reducción RNT (2.364 €) = 33.036 € ≤ 35.200 → tramo 30%.
     // Ahorro fiscal = 1.500×30% = 450 €. Coste neto = 1.500 − 450 = 1.050 €.
     // Capital a 27 años (4% anual, sin capital previo) = 1.500 × ((1,04^27 − 1)/0,04) = 70.626,32 €.
     const pp = calcularPlanPensiones({

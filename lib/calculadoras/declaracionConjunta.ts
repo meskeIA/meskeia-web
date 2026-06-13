@@ -14,8 +14,8 @@
 import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
-  COTIZACIONES_SS_2025,
-  BASES_SS_2025,
+  COTIZACIONES_SS_2026,
+  BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   FISCAL_IRPF_META,
@@ -103,12 +103,12 @@ export interface ResultadoDeclaracionConjunta {
 function calcularCuotaSS(salarioBruto: number, cotizaSS: boolean): number {
   if (!cotizaSS) return 0;
   const salarioMensual = salarioBruto / 12;
-  const baseSS = Math.min(Math.max(salarioMensual, BASES_SS_2025.minima), BASES_SS_2025.maxima);
+  const baseSS = Math.min(Math.max(salarioMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
   const tipoSS = (
-    COTIZACIONES_SS_2025.contingenciasComunes +
-    COTIZACIONES_SS_2025.desempleo +
-    COTIZACIONES_SS_2025.formacionProfesional +
-    COTIZACIONES_SS_2025.mef
+    COTIZACIONES_SS_2026.contingenciasComunes +
+    COTIZACIONES_SS_2026.desempleo +
+    COTIZACIONES_SS_2026.formacionProfesional +
+    COTIZACIONES_SS_2026.mef
   ) / 100;
   return Math.round(baseSS * tipoSS * 12 * 100) / 100;
 }

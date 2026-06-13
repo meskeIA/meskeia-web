@@ -9,6 +9,8 @@
  * Fuente: Orden PJC/51/2025 de cotización SS + Estatuto de los Trabajadores
  */
 
+import { BASES_SS_2026 } from '@/data/fiscal';
+
 // ─── Constantes SS empresa 2025 ────────────────────────────────────────────────
 
 // Tipos de cotización a cargo de la empresa (porción patronal)
@@ -25,12 +27,6 @@ const SS_EMPRESA_2025 = {
     industrial:            2.80,  // % — industria media
   },
   fuenteDatos: 'Orden PJC/51/2025 de cotización a la Seguridad Social. Tipos vigentes 2025.',
-};
-
-// Bases de cotización 2025 (mensuales) — Orden PJC/178/2025, vigentes desde el 01-ene-2025
-const BASES_SS_2025 = {
-  minima: 1381.20,
-  maxima: 4909.50,
 };
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -104,8 +100,8 @@ export function calcularCosteEmpleado(p: ParametrosCosteEmpleado): ResultadoCost
 
   // Base de cotización (clampada)
   const baseCotizacion = Math.min(
-    Math.max(salarioBrutoMensual, BASES_SS_2025.minima),
-    BASES_SS_2025.maxima
+    Math.max(salarioBrutoMensual, BASES_SS_2026.minima),
+    BASES_SS_2026.maxima
   );
 
   // Tipos aplicados

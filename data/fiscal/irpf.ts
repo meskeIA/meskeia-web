@@ -53,9 +53,9 @@ export const MINIMOS_IRPF_2025 = {
 // ─── Seguridad Social cuenta ajena ──────────────────────────────────────────
 
 export const FISCAL_SS_CUENTA_AJENA_META = {
-  fuente: 'Orden PJC/51/2025 de cotización a la Seguridad Social',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  fuente: 'Orden PJC/297/2026 de cotización a la Seguridad Social',
+  verificado: '2026-06-13',
+  vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/CotizacionRecaudacionTrabajadores',
   nota: 'Tipos trabajador (cuota a cargo del empleado). El empleador paga tipos adicionales no incluidos aquí.',
 };
@@ -66,6 +66,14 @@ export const COTIZACIONES_SS_2025 = {
   desempleo:               1.55,
   formacionProfesional:    0.10,
   mef:                     0.12, // Mecanismo Equidad Intergeneracional
+};
+
+// Tipos de cotización 2026 (porción trabajador) — DT 38ª LGSS / Orden PJC/297/2026
+export const COTIZACIONES_SS_2026 = {
+  contingenciasComunes:    4.70,
+  desempleo:               1.55,
+  formacionProfesional:    0.10,
+  mef:                     0.15, // Mecanismo Equidad Intergeneracional (0,9% total; 0,15% trabajador en 2026)
 };
 
 // Bases de cotización 2025 (mensuales) — Orden PJC/178/2025, vigentes desde el 01-ene-2025
@@ -158,10 +166,10 @@ export function calcularDeduccionRentasBajas(rnt: number, otrasRentas: number = 
  */
 export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
   const totalSS =
-    COTIZACIONES_SS_2025.contingenciasComunes +
-    COTIZACIONES_SS_2025.desempleo +
-    COTIZACIONES_SS_2025.formacionProfesional +
-    COTIZACIONES_SS_2025.mef;
+    COTIZACIONES_SS_2026.contingenciasComunes +
+    COTIZACIONES_SS_2026.desempleo +
+    COTIZACIONES_SS_2026.formacionProfesional +
+    COTIZACIONES_SS_2026.mef;
   const gastosSS = brutos * (totalSS / 100);
   const rnt = Math.max(0, brutos - gastosSS - GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral);
   return tipoMarginalDesdeRNT(rnt);

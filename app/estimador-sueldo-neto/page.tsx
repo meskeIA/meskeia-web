@@ -7,7 +7,7 @@ import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, Relat
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularDeduccionRentasBajas } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, GASTOS_DEDUCIBLES_TRABAJO_2025, REDUCCION_RENDIMIENTOS_TRABAJO_2025, calcularDeduccionRentasBajas } from '@/data/fiscal';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
@@ -16,7 +16,7 @@ type TipoCalculo = 'brutoANeto' | 'netoABruto';
 type SituacionFamiliar = 'soltero' | 'casado_un_ingreso' | 'casado_dos_ingresos' | 'familia_monoparental';
 
 // Datos fiscales centralizados en data/fiscal/irpf.ts
-// FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2025, BASES_SS_2025, MINIMOS_IRPF_2025 importados al inicio
+// FISCAL_IRPF_META, TRAMOS_IRPF_2025, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025 importados al inicio
 
 // Función para calcular el IRPF
 function calcularIRPF(baseImponible: number, minimos: number): number {
@@ -42,18 +42,18 @@ function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: number; me
 
   // Aplicar bases de cotización
   const baseCotizacion = Math.max(
-    BASES_SS_2025.minima,
-    Math.min(salarioMensual, BASES_SS_2025.maxima)
+    BASES_SS_2026.minima,
+    Math.min(salarioMensual, BASES_SS_2026.maxima)
   );
 
   const desglose: Record<string, number> = {};
   let totalMensual = 0;
 
   // Calcular cada concepto
-  desglose.contingenciasComunes = baseCotizacion * (COTIZACIONES_SS_2025.contingenciasComunes / 100);
-  desglose.desempleo = baseCotizacion * (COTIZACIONES_SS_2025.desempleo / 100);
-  desglose.formacionProfesional = baseCotizacion * (COTIZACIONES_SS_2025.formacionProfesional / 100);
-  desglose.mef = baseCotizacion * (COTIZACIONES_SS_2025.mef / 100);
+  desglose.contingenciasComunes = baseCotizacion * (COTIZACIONES_SS_2026.contingenciasComunes / 100);
+  desglose.desempleo = baseCotizacion * (COTIZACIONES_SS_2026.desempleo / 100);
+  desglose.formacionProfesional = baseCotizacion * (COTIZACIONES_SS_2026.formacionProfesional / 100);
+  desglose.mef = baseCotizacion * (COTIZACIONES_SS_2026.mef / 100);
 
   totalMensual = Object.values(desglose).reduce((a, b) => a + b, 0);
 
@@ -452,7 +452,7 @@ export default function EstimadorSueldoNetoPage() {
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.formacionProfesional * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>MEF - Equidad Intergeneracional (0,12%)</span>
+                    <span>MEF - Equidad Intergeneracional (0,15%)</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.mef * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow + ' ' + styles.desgloseTotal}>
@@ -541,7 +541,7 @@ export default function EstimadorSueldoNetoPage() {
               <h4>💰 Salario Neto</h4>
               <p>
                 Es el resultado de restar al bruto las cotizaciones a la Seguridad Social
-                (aproximadamente 6,47%) y la retención del IRPF (variable según tu situación).
+                (aproximadamente 6,50%) y la retención del IRPF (variable según tu situación).
                 Es lo que ingresas realmente.
               </p>
             </div>
@@ -612,8 +612,8 @@ export default function EstimadorSueldoNetoPage() {
                 <li>Contingencias comunes: 4,70%</li>
                 <li>Desempleo: 1,55%</li>
                 <li>Formación profesional: 0,10%</li>
-                <li>MEF: 0,12%</li>
-                <li><strong>Total: 6,47%</strong></li>
+                <li>MEF: 0,15%</li>
+                <li><strong>Total: 6,50%</strong></li>
               </ul>
             </div>
             <div className={styles.contentCard}>
@@ -755,12 +755,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 22.000 € brutos, soltero/a, sin hijos</p>
                 <ul>
-                  <li>SS trabajador (6,47%): <strong>1.423 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>16.213 €</strong></li>
-                  <li>IRPF anual (mínimo personal 5.550 €): <strong>~2.026 €</strong></li>
+                  <li>SS trabajador (6,50%): <strong>1.430 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>16.206 €</strong></li>
+                  <li>IRPF anual (mínimo personal 5.550 €): <strong>~2.025 €</strong></li>
                   <li>Retención efectiva: <strong>~9,2%</strong></li>
-                  <li>Neto anual: <strong>~18.551 €</strong></li>
-                  <li>Neto mensual (12 pagas): <strong>~1.546 €</strong></li>
+                  <li>Neto anual: <strong>~18.545 €</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>~1.545 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -776,12 +776,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 35.000 € brutos, casado/a (dos ingresos), 1 hijo</p>
                 <ul>
-                  <li>SS trabajador (6,47%): <strong>2.265 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>28.372 €</strong></li>
+                  <li>SS trabajador (6,50%): <strong>2.275 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>28.362 €</strong></li>
                   <li>Mínimo personal + hijo 1 (5.550 + 2.400): <strong>7.950 €</strong></li>
-                  <li>IRPF anual: <strong>~4.292 €</strong></li>
+                  <li>IRPF anual: <strong>~4.289 €</strong></li>
                   <li>Retención efectiva: <strong>~12,3%</strong></li>
-                  <li>Neto anual: <strong>~28.444 €</strong></li>
+                  <li>Neto anual: <strong>~28.436 €</strong></li>
                   <li>Impacto del mínimo familiar: ahorra ~720 €/año en IRPF vs soltero</li>
                 </ul>
               </div>
@@ -798,12 +798,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 80.000 € brutos, casado/a (dos ingresos), sin hijos</p>
                 <ul>
-                  <li>SS trabajador (base máx. 4.909 €/mes): <strong>~3.812 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~71.824 €</strong></li>
-                  <li>IRPF anual: <strong>~20.725 €</strong></li>
-                  <li>Tipo efectivo real: <strong>~25,9%</strong></li>
-                  <li>Neto anual: <strong>~55.463 €</strong></li>
-                  <li>Neto mensual (12 pagas): <strong>~4.622 €</strong></li>
+                  <li>SS trabajador (base máx. 5.101 €/mes): <strong>~3.979 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~71.657 €</strong></li>
+                  <li>IRPF anual: <strong>~20.650 €</strong></li>
+                  <li>Tipo efectivo real: <strong>~25,8%</strong></li>
+                  <li>Neto anual: <strong>~55.371 €</strong></li>
+                  <li>Neto mensual (12 pagas): <strong>~4.614 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -819,12 +819,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> 14.000 € brutos, reducción por cuidado de hijos (50%)</p>
                 <ul>
-                  <li>SS trabajador (6,47% sobre base mínima 1.381,20 €/mes): <strong>~1.072 €/año</strong></li>
-                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~4.430 €</strong></li>
+                  <li>SS trabajador (6,50% sobre base mínima 1.424,40 €/mes): <strong>~1.111 €/año</strong></li>
+                  <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>~4.391 €</strong></li>
                   <li>Mínimo personal + familia monoparental: <strong>~7.700 €</strong></li>
                   <li>IRPF anual: <strong>0 € (base liquidable negativa, no tributa)</strong></li>
                   <li>Retención efectiva: <strong>0%</strong></li>
-                  <li>Neto anual: <strong>~12.928 €</strong></li>
+                  <li>Neto anual: <strong>~12.889 €</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
@@ -841,7 +841,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué es el MEI (Mecanismo de Equidad Intergeneracional) y cuánto me descuentan?</h4>
               <p>
-                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. El trabajador paga el <strong>0,12%</strong> y la empresa el <strong>0,58%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~36 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
+                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2026, el trabajador paga el <strong>0,15%</strong> y la empresa el <strong>0,75%</strong> sobre la base de cotización. Para un sueldo de 30.000 € brutos esto representa <strong>~45 € anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
               </p>
             </div>
 
@@ -884,7 +884,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Cuánto cotizo si tengo dos empleos simultáneos?</h4>
               <p>
-                Si tienes dos contratos simultáneos, cotizas a la SS en ambos por separado, pero existe una <strong>base de cotización máxima conjunta</strong> de <strong>4.909,50 €/mes en 2025</strong>. Si la suma de tus bases supera ese límite, puedes solicitar la <strong>devolución del exceso cotizado</strong> a la Tesorería General de la SS tras finalizar el año. En IRPF, ambos empleadores retienen de forma independiente, lo que suele generar una retención insuficiente y una deuda en la renta.
+                Si tienes dos contratos simultáneos, cotizas a la SS en ambos por separado, pero existe una <strong>base de cotización máxima conjunta</strong> de <strong>5.101,20 €/mes en 2026</strong>. Si la suma de tus bases supera ese límite, puedes solicitar la <strong>devolución del exceso cotizado</strong> a la Tesorería General de la SS tras finalizar el año. En IRPF, ambos empleadores retienen de forma independiente, lo que suele generar una retención insuficiente y una deuda en la renta.
               </p>
             </div>
 

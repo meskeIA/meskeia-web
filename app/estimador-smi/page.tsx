@@ -21,8 +21,8 @@ import {
   SMI_2025,
   SALARIOS_PROVINCIA_2023,
   SALARIO_MEDIO_NACIONAL_2023,
-  COTIZACIONES_SS_2025,
-  BASES_SS_2025,
+  COTIZACIONES_SS_2026,
+  BASES_SS_2026,
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
   calcularDeduccionRentasBajas,
@@ -45,11 +45,11 @@ type SortDir = 'asc' | 'desc';
 // ──────────────────────────────────────────
 
 function calcularSSMensual(brutoMensual: number): number {
-  const base = Math.max(BASES_SS_2025.minima, Math.min(brutoMensual, BASES_SS_2025.maxima));
-  const tipo = COTIZACIONES_SS_2025.contingenciasComunes
-    + COTIZACIONES_SS_2025.desempleo
-    + COTIZACIONES_SS_2025.formacionProfesional
-    + COTIZACIONES_SS_2025.mef;
+  const base = Math.max(BASES_SS_2026.minima, Math.min(brutoMensual, BASES_SS_2026.maxima));
+  const tipo = COTIZACIONES_SS_2026.contingenciasComunes
+    + COTIZACIONES_SS_2026.desempleo
+    + COTIZACIONES_SS_2026.formacionProfesional
+    + COTIZACIONES_SS_2026.mef;
   return base * (tipo / 100);
 }
 

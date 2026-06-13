@@ -19,7 +19,7 @@ import {
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  COTIZACIONES_SS_2025,
+  COTIZACIONES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
 } from '@/data/fiscal';
 import styles from './SimuladorRentaPlanPensiones.module.css';
@@ -69,10 +69,10 @@ function tipoMarginal(baseLiquidable: number): number {
 function calcularBaseLiquidable(salarioBruto: number): number {
   // Cotizaciones SS trabajador
   const totalSSPct =
-    COTIZACIONES_SS_2025.contingenciasComunes +
-    COTIZACIONES_SS_2025.desempleo +
-    COTIZACIONES_SS_2025.formacionProfesional +
-    COTIZACIONES_SS_2025.mef;
+    COTIZACIONES_SS_2026.contingenciasComunes +
+    COTIZACIONES_SS_2026.desempleo +
+    COTIZACIONES_SS_2026.formacionProfesional +
+    COTIZACIONES_SS_2026.mef;
   const ss = salarioBruto * (totalSSPct / 100);
 
   // Gastos deducibles art. 19 (2.000 €)

@@ -17,8 +17,8 @@ import { formatNumber, formatCurrency } from '@/lib';
 import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
-  COTIZACIONES_SS_2025,
-  BASES_SS_2025,
+  COTIZACIONES_SS_2026,
+  BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   FISCAL_IRPF_META,
@@ -122,16 +122,16 @@ export default function SimuladorDesgloseNominaPage() {
     const brutoVal = Math.max(0, bruto);
 
     // 1) Cotizaciones SS (porción trabajador)
-    const tCC = COTIZACIONES_SS_2025.contingenciasComunes;
-    const tDes = COTIZACIONES_SS_2025.desempleo;
-    const tFP = COTIZACIONES_SS_2025.formacionProfesional;
-    const tMEI = COTIZACIONES_SS_2025.mef;
+    const tCC = COTIZACIONES_SS_2026.contingenciasComunes;
+    const tDes = COTIZACIONES_SS_2026.desempleo;
+    const tFP = COTIZACIONES_SS_2026.formacionProfesional;
+    const tMEI = COTIZACIONES_SS_2026.mef;
     const totalSSPct = tCC + tDes + tFP + tMEI;
 
     // Base de cotización: salario mensual prorrateado (bruto/12), limitada entre la base mínima y máxima
     const salarioMensualSS = brutoVal / 12;
     const baseSSAnual =
-      Math.min(Math.max(salarioMensualSS, BASES_SS_2025.minima), BASES_SS_2025.maxima) * 12;
+      Math.min(Math.max(salarioMensualSS, BASES_SS_2026.minima), BASES_SS_2026.maxima) * 12;
 
     const cotCC = baseSSAnual * (tCC / 100);
     const cotDesempleo = baseSSAnual * (tDes / 100);
@@ -810,7 +810,7 @@ export default function SimuladorDesgloseNominaPage() {
               <h4>¿Por qué tu neto es menor de lo que esperabas?</h4>
               <p>
                 Porque del bruto se descuentan tres cosas: cotizaciones a la Seguridad
-                Social del trabajador (~6,47 %), retención de IRPF (variable según tu
+                Social del trabajador (~6,50 %), retención de IRPF (variable según tu
                 base liquidable, entre 0 y 47 %) y, si las hay, deducciones por convenio
                 (cuota sindical, embargos). En España, una persona con 30.000 € brutos
                 recibe en mano alrededor de 24.000–25.000 € netos al año.
@@ -895,9 +895,9 @@ export default function SimuladorDesgloseNominaPage() {
                 <h4>Revisa la base de cotización a la Seguridad Social</h4>
                 <p>
                   La base de cotización suele coincidir con el bruto (excepto si superas
-                  la base máxima de 4.909,50 €/mes en 2025). Sobre ella se calculan los
+                  la base máxima de 5.101,20 €/mes en 2026). Sobre ella se calculan los
                   porcentajes del trabajador: 4,70 % CC + 1,55 % desempleo + 0,10 % FP
-                  + 0,12 % MEI = <strong>6,47 % total</strong>.
+                  + 0,15 % MEI = <strong>6,50 % total</strong>.
                 </p>
               </div>
             </div>

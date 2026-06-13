@@ -5,14 +5,14 @@
  * Calcula la retención IRPF estimada y el sueldo neto mensual/anual
  * a partir del salario bruto anual (o a la inversa).
  *
- * Fuente: IRPF 2025 + SS cuenta ajena 2025
+ * Fuente: IRPF 2025 + SS cuenta ajena 2026
  */
 
 import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
-  COTIZACIONES_SS_2025,
-  BASES_SS_2025,
+  COTIZACIONES_SS_2026,
+  BASES_SS_2026,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   FISCAL_IRPF_META,
@@ -118,12 +118,12 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
 
   // Cotización SS: base = clamp(salario mensual, mínima, máxima)
   const salarioMensual = p.brutoAnual / 12;
-  const baseSS = Math.min(Math.max(salarioMensual, BASES_SS_2025.minima), BASES_SS_2025.maxima);
+  const baseSS = Math.min(Math.max(salarioMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
   const tipoSS = (
-    COTIZACIONES_SS_2025.contingenciasComunes +
-    COTIZACIONES_SS_2025.desempleo +
-    COTIZACIONES_SS_2025.formacionProfesional +
-    COTIZACIONES_SS_2025.mef
+    COTIZACIONES_SS_2026.contingenciasComunes +
+    COTIZACIONES_SS_2026.desempleo +
+    COTIZACIONES_SS_2026.formacionProfesional +
+    COTIZACIONES_SS_2026.mef
   ) / 100;
   const cuotaSSMensual = baseSS * tipoSS;
   const cuotaSSAnual = r(cuotaSSMensual * 12);

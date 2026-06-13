@@ -58,7 +58,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre sueldo bruto y sueldo neto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El sueldo bruto es la cantidad total acordada con la empresa antes de cualquier descuento. El sueldo neto es lo que realmente recibes en tu cuenta bancaria, tras descontar las cotizaciones a la Seguridad Social (entre un 6,35% y 6,47% del bruto) y la retención de IRPF, que varía según tu salario anual y situación personal.',
+        text: 'El sueldo bruto es la cantidad total acordada con la empresa antes de cualquier descuento. El sueldo neto es lo que realmente recibes en tu cuenta bancaria, tras descontar las cotizaciones a la Seguridad Social (entre un 6,35% y 6,50% del bruto) y la retención de IRPF, que varía según tu salario anual y situación personal.',
       },
     },
     {
@@ -66,7 +66,7 @@ export const faqJsonLd = {
       name: '¿Qué porcentaje se descuenta del sueldo para la Seguridad Social en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2025, el trabajador cotiza a la Seguridad Social aproximadamente un 6,35% del salario bruto, distribuido en: contingencias comunes (4,70%), desempleo (1,55%), formación profesional (0,10%) y la cuota MEI del Mecanismo de Equidad Intergeneracional. El empleador paga adicionalmente alrededor de un 30% por el mismo trabajador.',
+        text: 'En 2026, el trabajador cotiza a la Seguridad Social aproximadamente un 6,50% del salario bruto, distribuido en: contingencias comunes (4,70%), desempleo (1,55%), formación profesional (0,10%) y la cuota MEI del Mecanismo de Equidad Intergeneracional (0,15%). El empleador paga adicionalmente alrededor de un 30% por el mismo trabajador.',
       },
     },
     {

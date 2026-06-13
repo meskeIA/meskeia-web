@@ -11,8 +11,8 @@ import {
   FISCAL_IRPF_META,
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
-  COTIZACIONES_SS_2025,
-  BASES_SS_2025,
+  COTIZACIONES_SS_2026,
+  BASES_SS_2026,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   calcularDeduccionRentasBajas,
@@ -76,9 +76,9 @@ function calcularMinimos(situacion: SituacionFamiliar, numHijos: number, hijosMe
 }
 
 function calcularSSLaboralAnual(brutoAnual: number): number {
-  const baseMensual = Math.max(BASES_SS_2025.minima, Math.min(brutoAnual / 12, BASES_SS_2025.maxima));
-  const tipoTotal = COTIZACIONES_SS_2025.contingenciasComunes + COTIZACIONES_SS_2025.desempleo
-    + COTIZACIONES_SS_2025.formacionProfesional + COTIZACIONES_SS_2025.mef;
+  const baseMensual = Math.max(BASES_SS_2026.minima, Math.min(brutoAnual / 12, BASES_SS_2026.maxima));
+  const tipoTotal = COTIZACIONES_SS_2026.contingenciasComunes + COTIZACIONES_SS_2026.desempleo
+    + COTIZACIONES_SS_2026.formacionProfesional + COTIZACIONES_SS_2026.mef;
   return baseMensual * (tipoTotal / 100) * 12;
 }
 

@@ -18,8 +18,8 @@ import { jsonLd } from './metadata';
 import {
   FISCAL_IRPF_META,
   TRAMOS_IRPF_2025,
-  COTIZACIONES_SS_2025,
-  BASES_SS_2025,
+  COTIZACIONES_SS_2026,
+  BASES_SS_2026,
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
@@ -59,11 +59,11 @@ function calcularSueldo(brutoAnual: number): DesgloseSueldo {
   const brutoMensual = brutoAnual / pagas;
 
   // 1. Cotizaciones SS (sobre base mensual, limitada a topes)
-  const baseSS = Math.min(Math.max(brutoMensual, BASES_SS_2025.minima), BASES_SS_2025.maxima);
-  const ssContingencias = baseSS * (COTIZACIONES_SS_2025.contingenciasComunes / 100) * pagas;
-  const ssDesempleo = baseSS * (COTIZACIONES_SS_2025.desempleo / 100) * pagas;
-  const ssFormacion = baseSS * (COTIZACIONES_SS_2025.formacionProfesional / 100) * pagas;
-  const ssMEI = baseSS * (COTIZACIONES_SS_2025.mef / 100) * pagas;
+  const baseSS = Math.min(Math.max(brutoMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
+  const ssContingencias = baseSS * (COTIZACIONES_SS_2026.contingenciasComunes / 100) * pagas;
+  const ssDesempleo = baseSS * (COTIZACIONES_SS_2026.desempleo / 100) * pagas;
+  const ssFormacion = baseSS * (COTIZACIONES_SS_2026.formacionProfesional / 100) * pagas;
+  const ssMEI = baseSS * (COTIZACIONES_SS_2026.mef / 100) * pagas;
   const totalSS = ssContingencias + ssDesempleo + ssFormacion + ssMEI;
 
   // 2. Base imponible IRPF
@@ -287,19 +287,19 @@ export default function VisualizadorSueldoNetoPage() {
           {/* Desglose SS */}
           <div className={styles.desgloseSS}>
             <div className={styles.desgloseItem}>
-              <span>Contingencias comunes ({formatNumber(COTIZACIONES_SS_2025.contingenciasComunes, 2)}%)</span>
+              <span>Contingencias comunes ({formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%)</span>
               <span>− {formatCurrency(datos.ssContingencias)}</span>
             </div>
             <div className={styles.desgloseItem}>
-              <span>Desempleo ({formatNumber(COTIZACIONES_SS_2025.desempleo, 2)}%)</span>
+              <span>Desempleo ({formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%)</span>
               <span>− {formatCurrency(datos.ssDesempleo)}</span>
             </div>
             <div className={styles.desgloseItem}>
-              <span>Formación profesional ({formatNumber(COTIZACIONES_SS_2025.formacionProfesional, 2)}%)</span>
+              <span>Formación profesional ({formatNumber(COTIZACIONES_SS_2026.formacionProfesional, 2)}%)</span>
               <span>− {formatCurrency(datos.ssFormacion)}</span>
             </div>
             <div className={styles.desgloseItem}>
-              <span>MEI ({formatNumber(COTIZACIONES_SS_2025.mef, 2)}%)</span>
+              <span>MEI ({formatNumber(COTIZACIONES_SS_2026.mef, 2)}%)</span>
               <span>− {formatCurrency(datos.ssMEI)}</span>
             </div>
           </div>
@@ -384,7 +384,7 @@ export default function VisualizadorSueldoNetoPage() {
             <p>A partir de {formatCurrency(brutoAnual)}, <strong>el IRPF ya pesa significativamente más que la SS</strong>. Tu tipo marginal es del {formatNumber(datos.desgloseTramosIRPF[datos.desgloseTramosIRPF.length - 1]?.tipo ?? 0, 0)}% — cada euro extra de subida solo te llega parcialmente.</p>
           )}
           {brutoAnual > 80000 && (
-            <p>Con {formatCurrency(brutoAnual)} de bruto, <strong>te llevas menos del {formatNumber(datos.pctNeto, 0)}% a casa</strong>. La SS está topada (base máxima {formatCurrency(BASES_SS_2025.maxima * 14)}), pero el IRPF sigue creciendo con cada tramo.</p>
+            <p>Con {formatCurrency(brutoAnual)} de bruto, <strong>te llevas menos del {formatNumber(datos.pctNeto, 0)}% a casa</strong>. La SS está topada (base máxima {formatCurrency(BASES_SS_2026.maxima * 14)}), pero el IRPF sigue creciendo con cada tramo.</p>
           )}
         </div>
 
@@ -422,7 +422,7 @@ export default function VisualizadorSueldoNetoPage() {
 
           <h3>¿Por qué la SS pesa tanto en sueldos bajos?</h3>
           <p>
-            Las cotizaciones a la Seguridad Social son un <strong>porcentaje fijo</strong> (6,47% del trabajador),
+            Las cotizaciones a la Seguridad Social son un <strong>porcentaje fijo</strong> (6,50% del trabajador),
             sin tramos ni mínimos exentos. Por eso, en sueldos bajos, la SS puede superar al IRPF. Además,
             tu empresa paga otro ~30% adicional que no aparece en tu nómina.
           </p>
