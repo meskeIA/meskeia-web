@@ -26,12 +26,16 @@ const textToBraille: { [key: string]: string } = {
   // Puntuación
   ' ': '⠀', '.': '⠲', ',': '⠂', ';': '⠆', ':': '⠒',
   '?': '⠦', '!': '⠖', '"': '⠶', "'": '⠄', '-': '⠤',
-  '(': '⠣', ')': '⠜', '/': '⠌', '@': '⠈⠁',
+  '(': '⠣', ')': '⠜',
 };
 
 // Invertir para Braille a texto
 const brailleToText: { [key: string]: string } = {};
 Object.entries(textToBraille).forEach(([text, braille]) => {
+  // Los dígitos 0-9 comparten celda con las letras a-j (indicador numérico ⠼
+  // aparte); en Braille → Texto priorizamos la letra y convertBrailleToText
+  // la transforma a dígito si el indicador numérico está activo.
+  if (/[0-9]/.test(text)) return;
   if (!brailleToText[braille] || text.length === 1) {
     brailleToText[braille] = text;
   }
@@ -45,11 +49,11 @@ const brailleDots: { [key: string]: number[] } = {
   '⠕': [1,3,5], '⠏': [1,2,3,4], '⠟': [1,2,3,4,5], '⠗': [1,2,3,5], '⠎': [2,3,4],
   '⠞': [2,3,4,5], '⠥': [1,3,6], '⠧': [1,2,3,6], '⠺': [2,4,5,6], '⠭': [1,3,4,6],
   '⠽': [1,3,4,5,6], '⠵': [1,3,5,6],
-  '⠷': [1,2,3,5,6], '⠮': [2,3,4,6], '⠌': [3,4], '⠬': [3,4,6], '⠾': [1,2,3,5,6],
+  '⠷': [1,2,3,5,6], '⠮': [2,3,4,6], '⠌': [3,4], '⠬': [3,4,6], '⠾': [2,3,4,5,6],
   '⠳': [1,2,5,6],
   '⠀': [], '⠲': [2,5,6], '⠂': [2], '⠆': [2,3], '⠒': [2,5],
   '⠦': [2,3,6], '⠖': [2,3,5], '⠶': [2,3,5,6], '⠄': [3], '⠤': [3,6],
-  '⠣': [1,2,6], '⠜': [3,4,5], '⠼': [3,4,5,6], '⠈': [4],
+  '⠣': [1,2,6], '⠜': [3,4,5], '⠼': [3,4,5,6],
 };
 
 const NUMBER_INDICATOR = '⠼';
@@ -163,7 +167,7 @@ export default function ConversorBraillePage() {
     const dots = brailleDots[char] || [];
     return (
       <div className={styles.brailleCell}>
-        <div className={styles.brailleGrid}>
+        <div className={styles.brailleGrid} aria-hidden="true">
           {[1, 4, 2, 5, 3, 6].map((dot) => (
             <div
               key={dot}
@@ -282,8 +286,8 @@ export default function ConversorBraillePage() {
           <button onClick={handleConvert} className={styles.btnPrimary}>
             Convertir
           </button>
-          <button onClick={handleSwap} className={styles.btnSwap} title="Intercambiar">
-            ⇄
+          <button onClick={handleSwap} className={styles.btnSwap} title="Intercambiar" aria-label="Intercambiar dirección de conversión">
+            <span aria-hidden="true">⇄</span>
           </button>
           <button onClick={handleClear} className={styles.btnSecondary}>
             Limpiar
@@ -293,7 +297,7 @@ export default function ConversorBraillePage() {
         {result && (
           <div className={styles.resultSection}>
             <label className={styles.label}>Resultado:</label>
-            <div className={styles.resultBox}>
+            <div className={styles.resultBox} role="status" aria-live="polite">
               {result}
             </div>
 
@@ -368,7 +372,7 @@ export default function ConversorBraillePage() {
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
               <h3>Historia</h3>
-              <p>Louis Braille inventó este sistema en 1824, siendo él mismo ciego. Se basa en celdas de 6 puntos que permiten 64 combinaciones.</p>
+              <p>Louis Braille, ciego desde niño, ideó un primer borrador de este sistema en 1824 (con solo 15 años) y lo publicó oficialmente en 1829. Se basa en celdas de 6 puntos que permiten 64 combinaciones.</p>
             </div>
             <div className={styles.infoCard}>
               <h3>Braille Español</h3>

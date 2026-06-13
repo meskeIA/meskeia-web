@@ -60,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué es el código Braille y cómo funciona?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Braille es un sistema de escritura táctil creado por Louis Braille en 1824 para personas con discapacidad visual. Cada carácter se representa mediante una celda de 6 puntos en relieve (2 columnas × 3 filas), lo que permite hasta 64 combinaciones distintas. En este conversor las celdas se muestran como símbolos Unicode del bloque Braille (U+2800–U+28FF).',
+        text: 'El Braille es un sistema de escritura táctil que Louis Braille, ciego desde niño, esbozó en 1824 (con 15 años) y publicó oficialmente en 1829 para personas con discapacidad visual. Cada carácter se representa mediante una celda de 6 puntos en relieve (2 columnas × 3 filas), lo que permite hasta 64 combinaciones distintas. En este conversor las celdas se muestran como símbolos Unicode del bloque Braille (U+2800–U+28FF).',
       },
     },
     {
