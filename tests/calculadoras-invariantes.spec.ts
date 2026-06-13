@@ -1749,16 +1749,23 @@ test.describe('Golden — calcularSueldoNeto (Capa 1 · IRPF 2025)', () => {
 
 test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)', () => {
 
-  test('GOLDEN-BM: base 2.800 €, 30 años cotizados (360 meses) → 86,12%, pensión 2.066,88 €/mes, sin límites', () => {
-    // BR = 2.800 × 300/350 = 2.400 €.
+  test('GOLDEN-BM: base 2.800 €, 30 años cotizados (360 meses) → 86,12%, pensión 2.066,90 €/mes (sistema dual), sin límites', () => {
+    // BR clásica = 2.800 × 300/350 = 2.400 €. BR dual (2026) = 2.800 × 302/352,33 ≈ 2.400,02 €.
     // % pensión: tramo 277-9999 → 70,16 + (360-277+1)×0,19 = 70,16 + 84×0,19 = 86,12%.
-    // Pensión sin límites = 2.400 × 86,12% = 2.066,88 € → dentro de [888,70 ; 3.359,60], no se aplican límites.
+    // Pensión clásica = 2.400 × 86,12% = 2.066,88 €. Pensión dual = 2.400,02 × 86,12% ≈ 2.066,90 €.
+    // El sistema dual (DT 40.a LGSS, vigente desde 2026) es marginalmente más favorable → se aplica de oficio.
+    // Ambas dentro de [888,70 ; 3.359,60], no se aplican límites.
     const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, edadActual: 55 });
-    expect(p.baseReguladora).toBeCloseTo(2400, 2);
+    expect(p.baseReguladoraClasica).toBeCloseTo(2400, 2);
+    expect(p.baseReguladoraDual).toBeCloseTo(2400.02, 2);
+    expect(p.formulaAplicada).toBe('dual');
+    expect(p.baseReguladora).toBeCloseTo(2400.02, 2);
     expect(p.porcentajePension).toBeCloseTo(86.12, 2);
-    expect(p.pensionBrutaSinLimites).toBeCloseTo(2066.88, 2);
-    expect(p.pensionBrutaMensual).toBeCloseTo(2066.88, 2);
-    expect(p.pensionBrutaAnual).toBeCloseTo(28936.32, 2);
+    expect(p.pensionClasicaMensual).toBeCloseTo(2066.88, 2);
+    expect(p.pensionDualMensual).toBeCloseTo(2066.90, 2);
+    expect(p.pensionBrutaSinLimites).toBeCloseTo(2066.90, 2);
+    expect(p.pensionBrutaMensual).toBeCloseTo(2066.90, 2);
+    expect(p.pensionBrutaAnual).toBeCloseTo(28936.60, 2);
     expect(p.aplicaMinimo).toBe(false);
     expect(p.aplicaMaximo).toBe(false);
     expect(p.mesesParaCien).toBe(81);
@@ -1946,7 +1953,8 @@ test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · RDL 2/2023)', 
     // 12 meses = 4 trimestres → 4×1,875 = 7,5%.
     // Pensión con reducción = 1.500 × (1 − 7,5/100) = 1.387,50 €.
     // Pérdida mensual = 112,50 €. Pérdida anual (14 pagas) = 1.575 €.
-    // 35 años × 12 = 420 meses < 459 (38a3m) → edad ordinaria "66 años y 6 meses".
+    // 35 años × 12 = 420 meses < 459 (38a3m) → edad ordinaria según TABLA_EDAD_JUBILACION
+    // del año en curso (2026: 66 años y 10 meses). Revisar anualmente al actualizar la tabla.
     const ja = calcularJubilacionAnticipada({
       anosCotizados: 35,
       mesesAnticipacion: 12,
@@ -1960,7 +1968,7 @@ test.describe('Golden — calcularJubilacionAnticipada (Capa 1 · RDL 2/2023)', 
     expect(ja.pensionConReduccion).toBeCloseTo(1387.50, 2);
     expect(ja.perdidaMensual).toBeCloseTo(112.50, 2);
     expect(ja.perdidaAnual).toBeCloseTo(1575.00, 2);
-    expect(ja.edadOrdinaria).toBe('66 años y 6 meses');
+    expect(ja.edadOrdinaria).toBe('66 años y 10 meses');
   });
 
   test('GOLDEN-BV: voluntaria, 37 años cotizados, 24 meses anticipación → reducción 16% [SS pendiente verificación]', () => {
@@ -2011,7 +2019,7 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
 
   test('GOLDEN-BX: IPT, edad 50 (sin recargo), sin cónyuge → 55% BR = 1.100 €/mes [SS pendiente verificación]', () => {
     // BR = 224.000 / 112 = 2.000 €. IPT al 55% (sin recargo, edad < 55) = 1.100 €/mes.
-    // Mínimo (sin cónyuge, < 55 años) = 730 € → no se aplica (1.100 > 730).
+    // Mínimo (IPT < 60 años, unipersonal, 2026) = 671 € → no se aplica (1.100 > 671).
     // Anual (14 pagas) = 1.100 × 14 = 15.400 €.
     const pi = calcularPensionIncapacidad({
       gradoIncapacidad: 'total',
@@ -2024,14 +2032,14 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     expect(pi.porcentajeAplicado).toBe(55);
     expect(pi.recargo55Anios).toBe(false);
     expect(pi.cuantiaBrutaMensual).toBeCloseTo(1100.00, 2);
-    expect(pi.pensionMinimaGarantizada).toBeCloseTo(730.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(671.00, 2);
     expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1100.00, 2);
     expect(pi.cuantiaAnual14Pagas).toBeCloseTo(15400.00, 2);
   });
 
   test('GOLDEN-BY: IPA, edad 60, con cónyuge → 100% BR = 1.500 €/mes [SS pendiente verificación]', () => {
     // BR = 168.000 / 112 = 1.500 €. IPA al 100% = 1.500 €/mes.
-    // Mínimo (IPA con cónyuge) = 1.050 € → no se aplica (1.500 > 1.050).
+    // Mínimo (IPA con cónyuge a cargo, 2026) = 1.256,60 € → no se aplica (1.500 > 1.256,60).
     // Anual (14 pagas) = 1.500 × 14 = 21.000 €.
     const pi = calcularPensionIncapacidad({
       gradoIncapacidad: 'absoluta',
@@ -2043,7 +2051,7 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     expect(pi.baseReguladora).toBeCloseTo(1500.00, 2);
     expect(pi.porcentajeAplicado).toBe(100);
     expect(pi.cuantiaBrutaMensual).toBeCloseTo(1500.00, 2);
-    expect(pi.pensionMinimaGarantizada).toBeCloseTo(1050.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(1256.60, 2);
     expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1500.00, 2);
     expect(pi.cuantiaAnual14Pagas).toBeCloseTo(21000.00, 2);
   });
@@ -2053,7 +2061,7 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     // Complemento GI = 45% × 1.381,20 (base mínima cotización 2025) + 30% × 1.200 (última base)
     //                = 621,54 + 360 = 981,54 €.
     // Mínimo del complemento = 45% × 1.000 (pensión sin complemento) = 450 € → no se aplica (981,54 > 450).
-    // Total mensual = 1.000 + 981,54 = 1.981,54 €. Mínimo GI = 1.575 € → no se aplica.
+    // Total mensual = 1.000 + 981,54 = 1.981,54 €. Mínimo GI (unipersonal, 2026) = 1.404,30 € → no se aplica.
     // Anual (14 pagas) = 1.981,54 × 14 = 27.741,56 €.
     const pi = calcularPensionIncapacidad({
       gradoIncapacidad: 'gran_invalidez',
@@ -2066,7 +2074,7 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     expect(pi.cuantiaBrutaMensual).toBeCloseTo(1000.00, 2);
     expect(pi.complementoGranInvalidez).toBeCloseTo(981.54, 2);
     expect(pi.cuantiaBrutaTotalMensual).toBeCloseTo(1981.54, 2);
-    expect(pi.pensionMinimaGarantizada).toBeCloseTo(1575.00, 2);
+    expect(pi.pensionMinimaGarantizada).toBeCloseTo(1404.30, 2);
     expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1981.54, 2);
     expect(pi.cuantiaAnual14Pagas).toBeCloseTo(27741.56, 2);
   });

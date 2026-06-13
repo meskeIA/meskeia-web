@@ -14,7 +14,8 @@ import {
   BASE_REGULADORA,
   COTIZACION_MINIMA,
   LIMITES_PENSION_2025,
-  EDAD_JUBILACION_2025,
+  getEdadJubilacion,
+  getSistemaDualParams,
   FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
 
@@ -33,16 +34,26 @@ export interface ParametrosPensionPublica {
 }
 
 export interface ResultadoPensionPublica {
-  /** Base reguladora estimada (media de últimas 300 bases / 350) */
+  /** Base reguladora de la fórmula aplicada (clásica o ampliada/dual) */
   baseReguladora: number;
+  /** Base reguladora con la fórmula clásica (media de últimas 300 bases / 350) */
+  baseReguladoraClasica: number;
+  /** Base reguladora con el sistema dual/ampliado (DT 40.a LGSS, vigente desde 2026) */
+  baseReguladoraDual: number;
   /** Porcentaje de pensión aplicado según años cotizados (0–100%) */
   porcentajePension: number;
-  /** Pensión bruta estimada antes de aplicar límites */
+  /** Pensión bruta estimada antes de aplicar límites (fórmula aplicada) */
   pensionBrutaSinLimites: number;
-  /** Pensión bruta mensual real (aplicando mínimos y máximo SS) */
+  /** Pensión bruta mensual real (aplicando mínimos y máximo SS, fórmula aplicada) */
   pensionBrutaMensual: number;
-  /** Pensión bruta anual (× 14 pagas) */
+  /** Pensión bruta anual (× 14 pagas, fórmula aplicada) */
   pensionBrutaAnual: number;
+  /** Pensión mensual con la fórmula clásica (25 años / 350), con límites aplicados */
+  pensionClasicaMensual: number;
+  /** Pensión mensual con el sistema dual/ampliado, con límites aplicados */
+  pensionDualMensual: number;
+  /** Fórmula que resulta más favorable y que aplicaría de oficio la SS */
+  formulaAplicada: 'clasica' | 'dual';
   /** Años cotizados introducidos */
   anosCotizados: number;
   /** Indica si se aplica pensión mínima (base calculada inferior al mínimo) */
@@ -94,43 +105,66 @@ export function calcularPensionPublica(p: ParametrosPensionPublica): ResultadoPe
   const r = (n: number) => Math.round(n * 100) / 100;
   const mesesCotizados = Math.round(p.anosCotizados * 12);
 
-  // 1. Base reguladora: promedio de las 300 últimas bases / 350
+  // 1. Base reguladora clásica: promedio de las 300 últimas bases / 350
   //    Simplificación: BR = baseMensual × (300/350)
-  const baseReguladora = r(p.baseCotizacionMensual * BASE_REGULADORA.factor);
+  const baseReguladoraClasica = r(p.baseCotizacionMensual * BASE_REGULADORA.factor);
 
-  // 2. Porcentaje por años cotizados
+  // 1b. Base reguladora con el sistema dual/ampliado (DT 40.a LGSS, vigente desde 2026).
+  //     La SS calcula ambas fórmulas y aplica de oficio la más favorable.
+  const dualParams = getSistemaDualParams(new Date().getFullYear());
+  const baseReguladoraDual = r(p.baseCotizacionMensual * (dualParams.basesSeleccionadas / dualParams.divisor));
+
+  // 2. Porcentaje por años cotizados (igual para ambas fórmulas)
   const porcentajePension = calcularPorcentajePension(mesesCotizados);
 
-  // 3. Pensión bruta sin límites
-  const pensionBrutaSinLimites = r(baseReguladora * (porcentajePension / 100));
+  // 3. Pensión bruta sin límites de cada fórmula
+  const pensionClasicaSinLimites = r(baseReguladoraClasica * (porcentajePension / 100));
+  const pensionDualSinLimites = r(baseReguladoraDual * (porcentajePension / 100));
 
-  // 4. Aplicar mínimos y máximo
+  // 4. Aplicar mínimos y máximo a cada fórmula
   const pensionMinima = LIMITES_PENSION_2025.minimaSinConyuge; // referencia sin cónyuge a cargo
   const pensionMaxima = LIMITES_PENSION_2025.maximaMensual;
 
-  let pensionBrutaMensual = pensionBrutaSinLimites;
+  const aplicarLimites = (bruta: number): number => {
+    if (mesesCotizados < COTIZACION_MINIMA.mesesMinimosAcceso) return bruta;
+    return Math.min(pensionMaxima, Math.max(pensionMinima, bruta));
+  };
+
+  const pensionClasicaMensual = r(aplicarLimites(pensionClasicaSinLimites));
+  const pensionDualMensual = r(aplicarLimites(pensionDualSinLimites));
+
+  // 5. La SS aplica de oficio la fórmula más favorable
+  const formulaAplicada: 'clasica' | 'dual' = pensionDualMensual > pensionClasicaMensual ? 'dual' : 'clasica';
+  const baseReguladora = formulaAplicada === 'dual' ? baseReguladoraDual : baseReguladoraClasica;
+  const pensionBrutaSinLimites = formulaAplicada === 'dual' ? pensionDualSinLimites : pensionClasicaSinLimites;
+  const pensionBrutaMensual = formulaAplicada === 'dual' ? pensionDualMensual : pensionClasicaMensual;
   const aplicaMinimo = mesesCotizados >= COTIZACION_MINIMA.mesesMinimosAcceso && pensionBrutaSinLimites < pensionMinima;
   const aplicaMaximo = pensionBrutaSinLimites > pensionMaxima;
 
-  if (aplicaMinimo) pensionBrutaMensual = pensionMinima;
-  if (aplicaMaximo) pensionBrutaMensual = pensionMaxima;
-  pensionBrutaMensual = r(pensionBrutaMensual);
-
-  // 5. Edad de jubilación ordinaria
-  const mesesParaJubilacion65 = EDAD_JUBILACION_2025.mesesCotizadosParaJubilacion65;
+  // 6. Edad de jubilación ordinaria (tabla progresiva del año en curso)
+  const edadJub = getEdadJubilacion(new Date().getFullYear());
+  const cotizacionPara65 = edadJub.cotizacionPara65;
+  const mesesParaJubilacion65 = cotizacionPara65.anios * 12 + cotizacionPara65.meses;
+  const formatEdad = (e: { anios: number; meses: number }) =>
+    e.meses > 0 ? `${e.anios} años y ${e.meses} meses` : `${e.anios} años`;
   const edadJubilacionOrdinaria = mesesCotizados >= mesesParaJubilacion65
-    ? '65 años (tienes ≥ 37 años y 3 meses cotizados)'
-    : '66 años y 6 meses (necesitas ≥ 37 años y 3 meses cotizados para jubilarte a los 65)';
+    ? `65 años (tienes ≥ ${formatEdad(cotizacionPara65)} cotizados)`
+    : `${formatEdad(edadJub.edadSinCotizacion)} (necesitas ≥ ${formatEdad(cotizacionPara65)} cotizados para jubilarte a los 65)`;
 
-  // 6. Meses adicionales para alcanzar el 100%
+  // 7. Meses adicionales para alcanzar el 100%
   const mesesParaCien = Math.max(0, COTIZACION_MINIMA.mesesParaCien - mesesCotizados);
 
   return {
     baseReguladora,
+    baseReguladoraClasica,
+    baseReguladoraDual,
     porcentajePension,
     pensionBrutaSinLimites,
     pensionBrutaMensual,
     pensionBrutaAnual:    r(pensionBrutaMensual * 14),
+    pensionClasicaMensual,
+    pensionDualMensual,
+    formulaAplicada,
     anosCotizados:        p.anosCotizados,
     aplicaMinimo,
     aplicaMaximo,

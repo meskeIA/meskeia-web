@@ -523,9 +523,10 @@ function crearServidorDelegum(): McpServer {
           `🌅 **Delegum — Tu jubilación**`,
           '',
           `📊 Años cotizados: **${anos_cotizados}** · Porcentaje de pensión: **${pct(pension.porcentajePension)}%**`,
-          `📦 Base reguladora estimada: ${fmt(pension.baseReguladora)} €`,
+          `📦 Base reguladora estimada: ${fmt(pension.baseReguladora)} € (fórmula ${pension.formulaAplicada === 'dual' ? 'ampliada/dual' : 'clásica'} 25 años, la más favorable)`,
           '',
           `💰 **Pensión mensual bruta estimada: ${fmt(pension.pensionBrutaMensual)} €** (× 14 pagas = ${fmt(pension.pensionBrutaAnual)} €/año)`,
+          `   ↳ Fórmula clásica (25 años / 350): ${fmt(pension.pensionClasicaMensual)} €/mes · Sistema dual ampliado (desde 2026): ${fmt(pension.pensionDualMensual)} €/mes`,
           `🗓️ Edad ordinaria de jubilación: ${pension.edadJubilacionOrdinaria}`,
         ];
         if (pension.mesesParaCien > 0) {
@@ -1095,6 +1096,7 @@ function crearServidorDelegum(): McpServer {
           `🌅 **Pensión Pública de Jubilación**`,
           `📊 Años cotizados: ${anos_cotizados} · Porcentaje: ${pct(r.porcentajePension)}%`,
           `💰 **Pensión bruta: ${fmt(r.pensionBrutaMensual)} €/mes** (${fmt(r.pensionBrutaAnual)} €/año)`,
+          `   ↳ Fórmula aplicada: ${r.formulaAplicada === 'dual' ? 'sistema dual ampliado (desde 2026)' : 'clásica (25 años / 350)'} — clásica: ${fmt(r.pensionClasicaMensual)} €/mes · dual: ${fmt(r.pensionDualMensual)} €/mes`,
           `🗓️ Edad ordinaria de jubilación: ${r.edadJubilacionOrdinaria}`,
           `📚 ${r.fuenteDatos}`,
         ].join('\n');

@@ -55,10 +55,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿A qué edad se jubila normalmente en España en 2025?',
+      name: '¿A qué edad se jubila normalmente en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2025, la edad ordinaria de jubilación en España es de 66 años y 6 meses si se tienen menos de 38 años y 3 meses cotizados. Para quienes acrediten 38 años y 3 meses o más de cotización, la edad de jubilación ordinaria se mantiene en 65 años. La edad de jubilación ordinaria seguirá aumentando hasta alcanzar los 67 años en 2027.',
+        text: 'En 2026, la edad ordinaria de jubilación en España es de 66 años y 10 meses si se tienen menos de 38 años y 3 meses cotizados. Para quienes acrediten 38 años y 3 meses o más de cotización, la edad de jubilación ordinaria se mantiene en 65 años. La edad de jubilación ordinaria seguirá aumentando hasta alcanzar los 67 años en 2027.',
       },
     },
     {

@@ -10,8 +10,8 @@ import { getRelatedApps } from '@/data/app-relations';
 import { PENSION_VIUDEDAD_2026 } from '@/data/fiscal/pensiones';
 import { FISCAL_PENSIONES_META } from '@/data/fiscal';
 
-// Alias para compatibilidad interna
-const PENSION_VIUDEDAD_2025 = PENSION_VIUDEDAD_2026;
+// Alias corto para legibilidad interna
+const PV = PENSION_VIUDEDAD_2026;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -59,31 +59,31 @@ function calcularPension(form: FormData): Resultado | null {
   if (form.situacionCausante === 'activo') {
     const baseMensual = parseFloat(form.baseCotizacionMedia.replace(/\./g, '').replace(',', '.')) || 0;
     // BR = (24 × base mensual) / 28
-    baseReguladora = (24 * baseMensual) / PENSION_VIUDEDAD_2025.divisorBaseReguladora;
+    baseReguladora = (24 * baseMensual) / PV.divisorBaseReguladora;
   } else if (form.situacionCausante === 'jubilado') {
     const pensionCausante = parseFloat(form.pensionCausante.replace(/\./g, '').replace(',', '.')) || 0;
     baseReguladora = pensionCausante; // La BR = la pensión que cobraba
   } else {
     // No en alta: estimación con la misma fórmula pero requiere cotizaciones
     const baseMensual = parseFloat(form.baseCotizacionMedia.replace(/\./g, '').replace(',', '.')) || 0;
-    baseReguladora = (24 * baseMensual) / PENSION_VIUDEDAD_2025.divisorBaseReguladora;
+    baseReguladora = (24 * baseMensual) / PV.divisorBaseReguladora;
   }
 
   if (baseReguladora <= 0) return null;
 
   // Porcentaje aplicable
-  let porcentajeAplicable = PENSION_VIUDEDAD_2025.porcentajeGeneral;
+  let porcentajeAplicable = PV.porcentajeGeneral;
   let razonPorcentaje = 'Porcentaje general (52%)';
 
-  const tieneIngresosLimitados70 = ingresosMes < PENSION_VIUDEDAD_2025.limiteIngresos70;
-  const tieneIngresosLimitados60 = ingresosMes < PENSION_VIUDEDAD_2025.smiMensual;
+  const tieneIngresosLimitados70 = ingresosMes < PV.limiteIngresos70;
+  const tieneIngresosLimitados60 = ingresosMes < PV.smiMensual;
 
   if (form.tieneCargas && tieneIngresosLimitados70) {
-    porcentajeAplicable = PENSION_VIUDEDAD_2025.porcentaje70;
-    razonPorcentaje = `70%: tiene cargas familiares e ingresos del trabajo inferiores al 75% del SMI (${formatCurrency(PENSION_VIUDEDAD_2025.limiteIngresos70)}/mes)`;
+    porcentajeAplicable = PV.porcentaje70;
+    razonPorcentaje = `70%: tiene cargas familiares e ingresos del trabajo inferiores al 75% del SMI (${formatCurrency(PV.limiteIngresos70)}/mes)`;
   } else if (edad >= 65 && tieneIngresosLimitados60) {
-    porcentajeAplicable = PENSION_VIUDEDAD_2025.porcentaje60;
-    razonPorcentaje = `60%: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${formatCurrency(PENSION_VIUDEDAD_2025.smiMensual)}/mes)`;
+    porcentajeAplicable = PV.porcentaje60;
+    razonPorcentaje = `60%: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${formatCurrency(PV.smiMensual)}/mes)`;
   }
 
   const pensionBruta = (baseReguladora * porcentajeAplicable) / 100;
@@ -91,18 +91,18 @@ function calcularPension(form: FormData): Resultado | null {
   // Pensión mínima según edad y cargas
   let pensionMinima: number;
   if (edad >= 65) {
-    pensionMinima = PENSION_VIUDEDAD_2025.minimo65SinDiscap;
+    pensionMinima = PV.minimo65SinDiscap;
   } else if (edad >= 60) {
-    pensionMinima = PENSION_VIUDEDAD_2025.minimo60a64;
+    pensionMinima = PV.minimo60a64;
   } else if (form.tieneCargas) {
-    pensionMinima = PENSION_VIUDEDAD_2025.minimoMenor60ConCargas;
+    pensionMinima = PV.minimoMenor60ConCargas;
   } else {
-    pensionMinima = PENSION_VIUDEDAD_2025.minimoMenor60SinCargas;
+    pensionMinima = PV.minimoMenor60SinCargas;
   }
 
   const pensionFinal = Math.min(
     Math.max(pensionBruta, pensionMinima),
-    PENSION_VIUDEDAD_2025.pensionMaxima
+    PV.pensionMaxima
   );
 
   // IRPF estimado: pensiones de viudedad < 22.000€ anuales → tipo ~10-12%
@@ -190,7 +190,7 @@ export default function EstimadorPensionViudedad() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">💍</span>
         <h1 className={styles.title}>Estimador Pensión de Viudedad</h1>
-        <p className={styles.subtitle}>Seguridad Social · Cuantía orientativa 2025 · Porcentajes 52% / 60% / 70%</p>
+        <p className={styles.subtitle}>Seguridad Social · Cuantía orientativa 2026 · Porcentajes 52% / 60% / 70%</p>
       </header>
 
       <RegionBadge variant="es-only" />
@@ -386,9 +386,9 @@ export default function EstimadorPensionViudedad() {
                     ⬆️ Se aplica el mínimo garantizado por ser superior al porcentaje calculado
                   </div>
                 )}
-                {resultado.pensionFinal >= PENSION_VIUDEDAD_2025.pensionMaxima && (
+                {resultado.pensionFinal >= PV.pensionMaxima && (
                   <div className={styles.maximoAplicado}>
-                    ⬇️ Se aplica la pensión máxima SS 2025 ({formatCurrency(PENSION_VIUDEDAD_2025.pensionMaxima)}/mes)
+                    ⬇️ Se aplica la pensión máxima SS 2026 ({formatCurrency(PV.pensionMaxima)}/mes)
                   </div>
                 )}
               </div>
@@ -549,8 +549,8 @@ export default function EstimadorPensionViudedad() {
             <p className={styles.faqTip}>💡 Los autónomos societarios (en régimen general por ser administradores) cotizan como trabajadores por cuenta ajena.</p>
           </details>
           <details className={styles.faqItem}>
-            <summary>¿Cuánto es la pensión mínima de viudedad en 2025?</summary>
-            <p>La pensión mínima de viudedad varía según la edad y las cargas familiares. En 2025, para beneficiarios menores de 60 años sin cargas familiares ronda los 630 €/mes; para mayores de 60 años sin cargas, unos 730 €/mes; y con cargas familiares, supera los 900 €/mes (14 pagas en todos los casos).</p>
+            <summary>¿Cuánto es la pensión mínima de viudedad en 2026?</summary>
+            <p>La pensión mínima de viudedad varía según la edad y las cargas familiares. En 2026, para beneficiarios menores de 60 años sin cargas familiares es de 583 €/mes; para mayores de 60 años sin cargas, 769 €/mes; con cargas familiares (menores de 60), 785 €/mes; y para mayores de 65 años, 853 €/mes (14 pagas en todos los casos).</p>
             <p className={styles.faqTip}>💡 Estos mínimos se actualizan anualmente con el IPC igual que el resto de pensiones.</p>
           </details>
           <details className={styles.faqItem}>

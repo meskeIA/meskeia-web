@@ -19,8 +19,8 @@ import {
   FISCAL_PENSIONES_META,
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
+  tipoMarginalDesdeRendimientosBrutos,
 } from '@/data/fiscal';
-import { TRAMOS_IRPF_2025 } from '@/data/fiscal';
 import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -126,20 +126,13 @@ function calcularProyecciones(
   });
 }
 
-function tipoMarginalIRPF(baseImponible: number): number {
-  for (const tramo of TRAMOS_IRPF_2025) {
-    if (baseImponible <= tramo.hasta) return tramo.tipo;
-  }
-  return 47;
-}
-
 function calcularPlanPensiones(
   baseImponible: number,
   aportacionMensual: number
 ): ResultadoPlanPensiones {
   const aportacionAnual = aportacionMensual * 12;
   const deducibleAnual = Math.min(aportacionAnual, LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual);
-  const tipoMarginal = tipoMarginalIRPF(baseImponible);
+  const tipoMarginal = tipoMarginalDesdeRendimientosBrutos(baseImponible);
   const ahorroFiscalAnual = deducibleAnual * tipoMarginal / 100;
   const costeNetoAnual = aportacionAnual - ahorroFiscalAnual;
 

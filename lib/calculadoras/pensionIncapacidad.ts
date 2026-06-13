@@ -21,31 +21,24 @@
  *   (8 años × 12 meses + 4 pagas = 96 + 16 = 112)
  *   Para contingencias profesionales (AT/EP): bases de los últimos 12 meses / 12
  *
- * Pensión mínima 2025: varía según grado y situación familiar.
+ * Pensión mínima 2026: varía según grado, tramo de edad y situación familiar
+ * (ver `PENSIONES_MINIMAS_2026` en `data/fiscal/pensiones.ts`, revalorizadas +2,8%).
  * Complemento de Gran Invalidez (art. 196.4 LGSS): 45% de la base mínima de
  * cotización vigente (BASES_SS_2025.minima) + 30% de la última base de cotización
  * del trabajador, con un mínimo del 45% de la pensión sin complemento.
  *
- * Fuente: LGSS arts. 194-200 + RD pensiones mínimas 2025
- * Verificado: 2025-01-15
+ * Fuente: LGSS arts. 194-200 + pensiones mínimas 2026 (data/fiscal/pensiones.ts)
+ * Verificado: 2026-06-13
  *
  * Encadenable con: calcular_baja_medica, calcular_pension_publica, calcular_sueldo_neto
  */
 
-import { BASES_SS_2025 } from '@/data/fiscal';
+import { BASES_SS_2025, PENSIONES_MINIMAS_2026 } from '@/data/fiscal';
 
-// ─── Constantes 2025 ────────────────────────────────────────────────────────────
+// ─── Constantes ─────────────────────────────────────────────────────────────────
 
 const MESES_BR_COMUNES = 112;                 // 8 años × 12 meses + 4 pagas extra
 const MESES_BR_PROFESIONALES = 12;
-
-// Pensiones mínimas mensuales 2025 (14 pagas — RD pensiones mínimas)
-const PENSION_MINIMA_IPT_CON_CONYUGE = 940.50;
-const PENSION_MINIMA_IPT_SIN_CONYUGE_MAYOR55 = 860.00;
-const PENSION_MINIMA_IPT_SIN_CONYUGE_MENOR55 = 730.00;
-const PENSION_MINIMA_IPA_CON_CONYUGE = 1050.00;
-const PENSION_MINIMA_IPA_SIN_CONYUGE = 850.00;
-const PENSION_MINIMA_GI = 1575.00; // Aproximado (IPT + complemento tercera persona)
 
 // Recargo IPT ≥ 55 años por dificultad de reempleo
 const RECARGO_IPT_55_ANIOS = 20; // % adicional sobre BR
@@ -122,6 +115,13 @@ export interface ResultadoPensionIncapacidad {
   fuenteDatos: string;
 }
 
+/** Busca el importe de pensión mínima 2026 (con/sin cónyuge a cargo) para un subtipo de incapacidad. */
+function pensionMinimaIncapacidad(subtipo: string, tieneConyuge: boolean): number {
+  const entrada = PENSIONES_MINIMAS_2026.find(e => e.tipo === 'incapacidad' && e.subtipo === subtipo);
+  if (!entrada) throw new Error(`No se encontró la pensión mínima 2026 para incapacidad/${subtipo}.`);
+  return tieneConyuge ? entrada.conConyuge : entrada.unipersonal;
+}
+
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): ResultadoPensionIncapacidad {
@@ -158,7 +158,7 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
       cuantiaAnual14Pagas: 0,
       explicacion: `IP Parcial: indemnización única de ${indemnizacionTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € (24 × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR). No genera pensión mensual.`,
       advertencias,
-      fuenteDatos: 'LGSS art. 196.1 — vigente 2025',
+      fuenteDatos: 'LGSS art. 196.1 — vigente 2026',
     };
   }
 
@@ -168,27 +168,28 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
   let explicacion: string;
 
   switch (p.gradoIncapacidad) {
-    case 'total':
+    case 'total': {
       porcentajeAplicado = 55;
       if (p.edad >= 55) {
         porcentajeAplicado += RECARGO_IPT_55_ANIOS;
         recargo55Anios = true;
       }
-      pensionMinimaGarantizada = tieneConyuge
-        ? PENSION_MINIMA_IPT_CON_CONYUGE
-        : (p.edad >= 55 ? PENSION_MINIMA_IPT_SIN_CONYUGE_MAYOR55 : PENSION_MINIMA_IPT_SIN_CONYUGE_MENOR55);
+      // La pensión mínima de IPT depende del tramo de edad (≥65, 60-64, <60), no del recargo a partir de 55 años.
+      const subtipoIPT = p.edad >= 65 ? 'total_65_o_mas' : (p.edad >= 60 ? 'total_60_64' : 'total_menos_60');
+      pensionMinimaGarantizada = pensionMinimaIncapacidad(subtipoIPT, tieneConyuge);
       explicacion = `IPT: ${p.edad >= 55 ? '55% + 20% recargo edad ≥ 55 = 75%' : '55%'} × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR`;
       break;
+    }
 
     case 'absoluta':
       porcentajeAplicado = 100;
-      pensionMinimaGarantizada = tieneConyuge ? PENSION_MINIMA_IPA_CON_CONYUGE : PENSION_MINIMA_IPA_SIN_CONYUGE;
+      pensionMinimaGarantizada = pensionMinimaIncapacidad('absoluta', tieneConyuge);
       explicacion = `IPA: 100% × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR`;
       break;
 
     case 'gran_invalidez':
       porcentajeAplicado = 100;
-      pensionMinimaGarantizada = PENSION_MINIMA_GI;
+      pensionMinimaGarantizada = pensionMinimaIncapacidad('gran_invalidez', tieneConyuge);
       explicacion = `Gran Invalidez: 100% × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR + complemento tercera persona`;
       break;
 
@@ -239,6 +240,6 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     cuantiaAnual14Pagas,
     explicacion,
     advertencias,
-    fuenteDatos: 'LGSS arts. 194-200 + base mínima de cotización 2025 (1.381,20 €/mes, Orden PJC/178/2025) + pensiones mínimas 2025 — vigente 2025',
+    fuenteDatos: 'LGSS arts. 194-200 + base mínima de cotización 2025 (1.381,20 €/mes, Orden PJC/178/2025, pendiente de actualizar a Orden 2026) + pensiones mínimas 2026 (+2,8% revalorización) — vigente 2026',
   };
 }

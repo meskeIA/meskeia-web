@@ -16,14 +16,13 @@
 
 import {
   FISCAL_IRPF_META,
+  LIMITES_PLAN_PENSIONES_2025,
   tipoMarginalDesdeRendimientosBrutos,
 } from '@/data/fiscal';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
-const LIMITE_INDIVIDUAL_2025 = 1500;   // € — aportación individual deducible
-const LIMITE_EMPRESARIAL_2025 = 8500;  // € — aportaciones empresa al PP del trabajador
-const LIMITE_PORCENTUAL_2025 = 0.30;   // 30% rendimientos trabajo + actividades
+const LIMITE_PORCENTUAL_2025 = 0.30;   // 30% rendimientos trabajo + actividades (límite legal fijo, no revalorizable)
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -93,7 +92,7 @@ export function calcularPlanPensiones(p: ParametrosPlanPensiones): ResultadoPlan
   const aportacionTotal = r(p.aportacionIndividual + aportacionEmpresarial);
 
   // Límite deducible = min(individual_max + empresa_max, 30% rendimientos)
-  const limiteAbsoluto = r(Math.min(p.aportacionIndividual, LIMITE_INDIVIDUAL_2025) + Math.min(aportacionEmpresarial, LIMITE_EMPRESARIAL_2025));
+  const limiteAbsoluto = r(Math.min(p.aportacionIndividual, LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual) + Math.min(aportacionEmpresarial, LIMITES_PLAN_PENSIONES_2025.limiteEmpresaAnual));
   const limitePorcentual = r(p.rendimientosNetos * LIMITE_PORCENTUAL_2025);
   const limiteDeducible = r(Math.min(limiteAbsoluto, limitePorcentual));
 

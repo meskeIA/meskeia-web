@@ -1037,9 +1037,23 @@ Decisión conjunta con el usuario sobre los 3 casos especiales pendientes (Arag�
 
 ---
 
-## Tanda 7 — Cobertura Delegum MCP, Grupo 6: Pensiones/jubilación/laboral — 🔍 REVISIÓN PRELIMINAR, SIN FIXES (2026-06-13)
+## Tanda 7 — Cobertura Delegum MCP, Grupo 6: Pensiones/jubilación/laboral (2026-06-13)
 
-> **Estado**: solo revisión/catalogación de hallazgos. Por restricción de presupuesto de tokens de la sesión, **NO se ha aplicado ningún fix de código** en esta tanda (a diferencia de los Grupos 1-5, que seguían el patrón "fix as you find"). Esta tabla es el punto de partida para una sesión futura que aplique las correcciones, siguiendo la misma metodología (verificar fuente externa si el dato parece desactualizado, aplicar fix, `npx tsc --noEmit`, build, tests, commit+push).
+> **Estado**: catalogación completa + fixes del subcluster Jubilación/Pensiones (53.1-53.7) aplicados en Batch 1. Subcluster Laboral (53.8-53.12) pendiente para Batch 2.
+
+### ✅ Batch 1 — Subcluster Jubilación/Pensiones (53.1-53.7) — FIXES APLICADOS (2026-06-13)
+
+- **53.1**: `pensionPublica.ts` y `jubilacionAnticipada.ts` ahora derivan la edad ordinaria de jubilación dinámicamente con `getEdadJubilacion(new Date().getFullYear())` (helper `formatEdad`), en vez de strings hardcodeados "66 años y 6 meses"/"37 años y 3 meses". También corregido `app/planificador-ahorro-jubilacion/metadata.ts` (FAQ con el mismo dato stale, encontrado por grep).
+- **53.2**: `pensionPublica.ts` ahora calcula AMBAS fórmulas (clásica 300/350 y sistema dual `getSistemaDualParams`) y aplica de oficio la más favorable, exponiendo `baseReguladoraClasica`, `baseReguladoraDual`, `pensionClasicaMensual`, `pensionDualMensual`, `formulaAplicada`. MCP route (`consulta_jubilacion` y `calcular_pension_publica`) actualizado para mostrar el desglose clásica/dual. Golden test GOLDEN-BM actualizado: para base 2.800€/30 años, el sistema dual (2026) resulta marginalmente más favorable (2.066,90€ vs 2.066,88€ clásica).
+- **53.3**: `pensionIncapacidad.ts` sustituye las pensiones mínimas "2025" hardcodeadas por lookups a `PENSIONES_MINIMAS_2026` (filtro `tipo: 'incapacidad'`, subtipos por tramo de edad para IPT). `BASES_SS_2025.minima` (complemento GI) se deja para el hallazgo 53.10 (Batch 2). Golden tests GOLDEN-BX/BY/BZ actualizados con los nuevos mínimos (671€/1.256,60€/1.404,30€).
+- **53.4**: `planPensiones.ts` importa `LIMITES_PLAN_PENSIONES_2025` en vez de duplicar `LIMITE_INDIVIDUAL_2025`/`LIMITE_EMPRESARIAL_2025`. El límite porcentual (30%) se mantiene local (no está en el módulo, es un % legal fijo).
+- **53.5**: `app/estimador-pension-viudedad/page.tsx` — alias renombrado `PENSION_VIUDEDAD_2025`→`PV`, texto "pensión máxima SS 2025"→"SS 2026", y FAQ/subtítulo con cifras de pensión mínima de viudedad actualizadas a 2026 (583/769/785/853€).
+- **53.6**: `app/planificador-ahorro-jubilacion/page.tsx` — eliminada función local `tipoMarginalIRPF()` (lookup directo de tramos sin reducción art. 20); ahora usa `tipoMarginalDesdeRendimientosBrutos` de `data/fiscal/irpf.ts`.
+- **53.7**: cross-ref a 53.10 — sin acción en Batch 1.
+
+**Verificación**: `npx tsc --noEmit` limpio, `npm run build` exit 0, `npx playwright test tests/calculadoras-invariantes.spec.ts` 136/136 OK.
+
+### Batch 2 — Subcluster Laboral (53.8-53.12) — PENDIENTE
 
 **Tools MCP del Grupo 6**: `consulta_jubilacion`, `consulta_despido`, `calcular_indemnizacion_despido`, `calcular_finiquito`, `calcular_pension_desempleo`, `calcular_pension_publica`, `calcular_brecha_jubilacion`, `calcular_plan_pensiones`, `calcular_prestacion_maternidad_paternidad`, `calcular_reduccion_jornada`, `calcular_baja_medica`, `calcular_excedencia`, `calcular_pension_viudedad`, `calcular_jubilacion_anticipada`, `calcular_pension_incapacidad`.
 

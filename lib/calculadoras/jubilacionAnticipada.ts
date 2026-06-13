@@ -16,7 +16,7 @@ import {
   COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025,
   REQUISITOS_ANTICIPADA_INVOLUNTARIA,
   REQUISITOS_ANTICIPADA_VOLUNTARIA,
-  EDAD_JUBILACION_2025,
+  getEdadJubilacion,
   FISCAL_PENSIONES_META,
   getCoeficienteAnticipada,
 } from '@/data/fiscal';
@@ -85,9 +85,12 @@ export function calcularJubilacionAnticipada(p: ParametrosJubilacionAnticipada):
   const cumpleCotizacion = p.anosCotizados >= requisitos.anosMinimoCotizados;
   const superaMaximo = p.mesesAnticipacion > requisitos.maxMesesAnticipacion;
 
-  // Edad ordinaria según cotización
-  const tieneDerechoA65 = p.anosCotizados * 12 >= EDAD_JUBILACION_2025.mesesCotizadosParaJubilacion65;
-  const edadOrdinaria = tieneDerechoA65 ? '65 años' : '66 años y 6 meses';
+  // Edad ordinaria según cotización (tabla progresiva del año en curso)
+  const edadJub = getEdadJubilacion(new Date().getFullYear());
+  const mesesParaJubilacion65 = edadJub.cotizacionPara65.anios * 12 + edadJub.cotizacionPara65.meses;
+  const tieneDerechoA65 = p.anosCotizados * 12 >= mesesParaJubilacion65;
+  const e = edadJub.edadSinCotizacion;
+  const edadOrdinaria = tieneDerechoA65 ? '65 años' : (e.meses > 0 ? `${e.anios} años y ${e.meses} meses` : `${e.anios} años`);
 
   let motivoImpedimento = '';
   if (!cumpleCotizacion) {
