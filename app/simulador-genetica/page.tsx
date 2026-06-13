@@ -152,12 +152,7 @@ export default function SimuladorGeneticaPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="educational"
-        severity="medium"
-        collapsible={true}
-        context="simulador-genetica-disclaimer"
-      />
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
       {/* Selector de Organismo */}
       <div className={styles.organismSelector}>
@@ -581,7 +576,9 @@ export default function SimuladorGeneticaPage() {
         <div className={styles.comparativaSection}>
           <h2>⚖️ Comparativa: Tipos de Herencia Genética</h2>
           <p className={styles.comparativaSubtitle}>
-            Los cuatro modos de herencia que incluye el simulador y sus diferencias clave
+            Cuatro modos de herencia clave en genética mendeliana y sus diferencias.
+            El simulador permite practicar dominancia completa, incompleta y herencia
+            ligada al sexo; la codominancia se incluye aquí como referencia conceptual.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -815,8 +812,9 @@ Hija portadora × marido sano:
                 El gen del daltonismo está en el cromosoma X. Los hombres (XY) solo
                 tienen un cromosoma X, por lo que un único alelo recesivo (X^r Y) es
                 suficiente para ser daltónico (prevalencia: ~8% de hombres). Las mujeres
-                (XX) necesitan dos alelos recesivos (X^r X^r) para ser daltónicas, lo
-                que ocurre solo en el ~0,4% de los casos. Las mujeres con un solo alelo
+                (XX) necesitan dos alelos recesivos (X^r X^r) para ser daltónicas, algo
+                mucho menos frecuente (en torno al 0,5% de los casos, aunque la cifra
+                exacta varía según la población). Las mujeres con un solo alelo
                 recesivo (X^R X^r) son portadoras sanas.
               </p>
             </div>
@@ -956,9 +954,9 @@ Hija portadora × marido sano:
               <span className={styles.tipIcon}>📐</span>
               <h4>Dibuja el Punnett aunque parezca obvio</h4>
               <p>
-                El 70% de errores en exámenes de genética ocurren por calcular
-                mentalmente sin cuadro. Con el Punnett visible, los errores de
-                gametos y combinaciones se eliminan.
+                Calcular mentalmente sin cuadro es una de las causas más
+                frecuentes de error en estos problemas. Con el Punnett visible,
+                los errores de gametos y combinaciones se reducen notablemente.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -975,8 +973,9 @@ Hija portadora × marido sano:
               <h4>En ligada al sexo, sigue el cromosoma X</h4>
               <p>
                 El padre pasa su X solo a las hijas y su Y solo a los hijos.
-                Nunca hay transmisión padre-hijo de rasgos ligados al X. Esta
-                regla elimina el 90% de los errores en estos problemas.
+                Nunca hay transmisión padre-hijo de rasgos ligados al X. Tener
+                esta regla presente evita gran parte de los errores en estos
+                problemas.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -1015,7 +1014,7 @@ Hija portadora × marido sano:
             <li>
               <strong>❌ Olvidar que &quot;portador&quot; significa heterocigoto asintomático:</strong>{' '}
               Un portador (Aa) tiene fenotipo dominante. Si el enunciado dice &quot;portador&quot;,
-              el genotipo es Aa, no aa. Este error se comete en el 40% de los exámenes preuniversitarios.
+              el genotipo es Aa, no aa. Es uno de los errores más comunes en exámenes preuniversitarios.
             </li>
             <li>
               <strong>❌ Aplicar la 3ª Ley a genes ligados:</strong> Si dos características

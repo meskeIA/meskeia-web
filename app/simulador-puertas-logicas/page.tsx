@@ -192,7 +192,10 @@ const parseExpression = (expr: string, variables: Record<string, boolean>): bool
 };
 
 const extractVariables = (expr: string): string[] => {
-  const matches = expr.toUpperCase().match(/[A-Z]/g);
+  // Eliminar los operadores en palabra (AND/OR/NOT/XOR) antes de extraer
+  // letras sueltas, para no confundir sus letras con variables (A-D).
+  const sinOperadores = expr.toUpperCase().replace(/\b(AND|OR|NOT|XOR)\b/g, '');
+  const matches = sinOperadores.match(/[A-Z]/g);
   if (!matches) return [];
   return [...new Set(matches)].sort();
 };
