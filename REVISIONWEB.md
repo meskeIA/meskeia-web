@@ -974,4 +974,19 @@ Segunda tanda (4 CCAA), verificada contra fuentes oficiales (ATC Cataluña, lari
 
 **Siguiente tanda**: País Vasco, Ceuta/Melilla (ausentes de `TIPOS_ITP_CCAA_2025`) + revisión dedicada de La Rioja en `ITP_CCAA` (estructura de 4 escalones) y Aragón (bonificación sobre cuota, pendiente desde Tanda 1).
 
+---
+
+## Reconciliación ITP/CCAA — tipos reducidos, Tanda 3 (2026-06-13)
+
+Tercera tanda. Cambio en `TIPOS_ITP_CCAA_2025` (`data/fiscal/inmuebles.ts`); `ITP_CCAA` (`data/itp-ccaa.ts`) no se ha tocado en esta tanda.
+
+- 🟢 **País Vasco**: no tenía `reducido` (solo `notaReducido: 'Tipo general. Verificar normativa foral'`). Añadido **2,5%** (jóvenes <35 años, familia numerosa, discapacidad ≥65% o VPO, vivienda habitual) — verificado en 2 fuentes (guiafiscal.es + normativa foral agregada de Álava/Bizkaia/Gipuzkoa). El tipo general `4%` ya era correcto (es el tipo para vivienda habitual; el 7% para "otros inmuebles" no aplica a este campo orientado a vivienda). Nota: `ITP_CCAA.pais-vasco.tiposReducidos` describe la condición de superficie como "vivienda habitual ≤120m²", mientras las fuentes consultadas en esta tanda hablan de "vivienda actual <60m²" como condición adicional para otro colectivo — no son necesariamente contradictorias (podrían ser dos requisitos distintos: tamaño de la vivienda que se adquiere vs. tamaño de la vivienda que se deja), pero no se ha resuelto la discrepancia; `ITP_CCAA` no modificado.
+
+- ⏸️ **Ceuta/Melilla — pendiente, sin cambios, propuesto como tercer caso especial**: el dato en sí está bien verificado (BOE, RDL 1/1993 arts. 11.a y 57 bis: tipo general 6% + bonificación automática 50% → 3% efectivo para inmuebles en Ceuta o Melilla), y `ITP_CCAA.ceuta`/`ITP_CCAA.melilla` ya lo modelan correctamente (usado por las 4 apps web del estimador). Sin embargo, añadir Ceuta/Melilla a `TIPOS_ITP_CCAA_2025` sería **dato muerto** para el MCP Delegum: `ENUM_CCAA` (`app/api/mcp/delegum/route.ts`, líneas 179-182) es un enum compartido de 17 territorios usado por ~5 tools (ITP/compraventa, sucesiones ×2, donaciones, capital inmobiliario) y no incluye `'ceuta'`/`'melilla'`. Soportarlas de verdad requeriría extender ese enum + `normalizarCCAA` y aportar datos normativos de ISD/donaciones/AJD/deducciones para Ceuta y Melilla en ~9 calculadoras (`compraventa.ts`, `sucesiones.ts`, `legitimas.ts`, `deduccionViviendaCCAA.ts`, `ajdCCAA.ts`, `comparacionDonacionHerencia.ts`, `herenciaConjunta.ts`, `empresaFamiliarISD.ts`, `itpCCAA.ts`) — alcance comparable o mayor al de Aragón/La Rioja. Se propone tratarlo como **tercer caso especial** a discutir junto a Aragón y La Rioja.
+
+**Build verificado**: `npx tsc --noEmit` limpio + `npm run build` exit 0 (999 apps, 1300 páginas).
+
+**Casos especiales pendientes de discusión conjunta**: Aragón (bonificación sobre cuota vs tipo fijo, Tanda 1), La Rioja `ITP_CCAA` (estructura real de 4 escalones, Tanda 2), Ceuta/Melilla (extensión de `ENUM_CCAA` + ~9 calculadoras para Delegum, Tanda 3).
+
+**Pendiente de verificación** (sin caso especial, menor prioridad): Andalucía, Baleares, Castilla y León, Extremadura, Murcia, Valencia.
 

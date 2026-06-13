@@ -55,7 +55,7 @@ export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Madrid',             tipo: 6,    reducido: 5.4,  notaReducido: 'Bonificación 10% sobre cuota, vivienda habitual ≤250.000 € (6% → 5,4% efectivo); familia numerosa: 4%; jóvenes <35 en municipios <2.500 hab.: exento 100%' },
   { ccaa: 'Murcia',             tipo: 8,    reducido: 3,    notaReducido: 'Familias numerosas, discapacidad' },
   { ccaa: 'Navarra',            tipo: 6,    reducido: 5,    notaReducido: 'Jóvenes <35 años, familias con 2+ hijos, discapacidad o VPO (vivienda habitual ≤180.304 €)' },
-  { ccaa: 'País Vasco',         tipo: 4,    notaReducido:   'Tipo general. Verificar normativa foral' },
+  { ccaa: 'País Vasco',         tipo: 4,    reducido: 2.5,  notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% o VPO (vivienda habitual). Normativa foral: puede variar ligeramente entre Álava/Bizkaia/Gipuzkoa' },
   { ccaa: 'Valencia',           tipo: 10,   reducido: 8,    notaReducido: 'Primera vivienda habitual precio < 1M €' },
   { ccaa: 'Media orientativa',  tipo: 8 },
 ];
