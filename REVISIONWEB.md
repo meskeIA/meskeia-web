@@ -356,6 +356,37 @@ Los estimadores interactivos se verificaron contra las fórmulas de `calcular_mo
 
 ---
 
+### Tanda 6 — Cobertura Delegum MCP, Grupo 5: Herencias/donaciones (`calcular_sucesiones`, `calcular_donaciones`, `consulta_herencia`, `comparar_donacion_vs_herencia`) — ✅ COMPLETADA (2026-06-13)
+
+#### 52. `estimador-impuesto-sucesiones`, `estimador-impuesto-donaciones`, `simulador-heredar-vivienda`, `estimador-legitimas`, `orientacion-tramitacion-herencias` + `lib/calculadoras/sucesiones.ts`, `lib/calculadoras/donaciones.ts`
+
+| # | Severidad | Ubicación | Problema | Propuesta |
+|---|---|---|---|---|
+| 52.1 | 🔴 Crítico | `lib/calculadoras/sucesiones.ts` (`aplicarBonificacionIS`, tools MCP `calcular_sucesiones`/`consulta_herencia`/`comparar_donacion_vs_herencia`) | La bonificación de Aragón (Grupos I/II, exención 100% hasta 3.000.000€ de base liquidable) seguía devolviendo `porcentaje: 100` incluso para bases liquidables SUPERIORES al límite de 3M€ (rama `const bonif = cuotaTributaria * 1; return {..., porcentaje: 100, ...}` sin condición). El resultado: herencias de gran patrimonio en Aragón (Grupos I/II) quedaban totalmente exentas del ISD, cuando la normativa solo exime hasta el límite. | Por encima del límite: `{ bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación (base liquidable supera el límite de 3.000.000 €) (Aragón)' }`. |
+| 52.2 | 🔴 Crítico | `lib/calculadoras/sucesiones.ts` (`reduccionEdadMenor21`) | La reducción adicional por edad <21 años (art. 20.2.a LISD) se aplicaba a cualquier heredero de Grupo I o II (cónyuge, descendientes, ascendientes, colaterales del Grupo II) menor de 21 años. La ley la reserva EXCLUSIVAMENTE a "descendientes y adoptados menores de veintiún años": un cónyuge o ascendiente <21 años (caso extremo pero posible) no tiene derecho a esta reducción y el cálculo la concedía igualmente. | Condición restringida a `p.grupo === 'I-descendiente'` (antes: `grupoBase === 'I' || grupoBase === 'II'`). |
+| 52.3 | 🔴 Crítico | `lib/calculadoras/sucesiones.ts` (`reduccionVivienda`) | La reducción del 95% por vivienda habitual (art. 20.2.c LISD, máx. 122.606,47€) se aplicaba a CUALQUIER heredero con `viviendaHabitual` informado, sin restricción de grupo de parentesco ni exclusión de Cataluña. La ley reserva esta reducción a cónyuge, descendientes/adoptados, ascendientes/adoptantes y colaterales del Grupo III (>65 años, 2 años de convivencia) — el Grupo IV NO tiene derecho, y Cataluña tiene su propio régimen (no modelado en este archivo). El cálculo infraestimaba sistemáticamente el ISD para herederos del Grupo IV y para Cataluña con vivienda habitual. | Restringida a `['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III']` y excluida si `esCataluna` (constante `gruposConReduccionVivienda`). |
+| 52.4 | 🟡 Bajo | `lib/calculadoras/sucesiones.ts` (`aplicarBonificacionIS`, exención Andalucía/Galicia) | El límite de exención total por importe (Andalucía/Galicia, base liquidable ≤ 1.000.000€) usaba `<=`; corregido junto con 52.1 para mantener la coherencia del límite frente a la nueva rama "sin bonificación" de Aragón (ambas ramas comparten el mismo `bGrupo.limite`/`bGrupo.exencion` por debajo y por encima del umbral). | Cambiado a `<` (`base liquidable < 1.000.000 €`). |
+| 52.5 | 🟡 Bajo | `app/simulador-heredar-vivienda/page.tsx` (`calcularISD`, lógica local — NO usa la canónica `lib/calculadoras/sucesiones.ts`) | La reducción de vivienda habitual (líneas 224-230) ya excluye correctamente el Grupo IV (`grupo !== 'IV'`), igual que el fix 52.3, pero le falta la exclusión de Cataluña (`!esCataluna`) recién añadida a la canónica. Uno de los 4 `CASOS` preconfigurados (`cataluna-conyuge`) tiene `viviendaHabitual: true` y se ve afectado. | No corregido en esta tanda: la dirección del error es SOBREESTIMACIÓN del ISD en Cataluña (se aplica el tope de 122.606,47€ del régimen común en vez del régimen catalán propio, potencialmente más generoso) — mismo patrón conservador ya usado en el resto del proyecto para Cataluña no modelada. Documentado para revisión futura. |
+
+**Apps revisadas sin hallazgos**: `estimador-impuesto-donaciones` + `lib/calculadoras/donaciones.ts` — comparación completa línea a línea, sin divergencias (mismas fórmulas, mismo límite `<=` de exención Andalucía consistente entre app y canónica, `esForal` correcto). `estimador-legitimas` — calculadora civil de legítimas por régimen territorial (7 regímenes), sin tool MCP asociado; contenido (FAQ, tabla comparativa, casos de uso) revisado y legalmente correcto. `orientacion-tramitacion-herencias` — checklist/timeline/plazos/FAQ de tramitación, sin tool MCP asociado; contenido revisado y correcto (orden de sucesión abintestato, plazos IS/plusvalía municipal, usufructo viudal, costes notariales).
+
+**RelatedApps/ShareCard/Footer**: correctos en todas las apps revisadas.
+
+**Correcciones aplicadas**:
+- 52.1: `lib/calculadoras/sucesiones.ts` — bonificación Aragón por encima de 3M€ → 0% (antes 100% sin límite).
+- 52.2: `lib/calculadoras/sucesiones.ts` — reducción edad <21 restringida a `I-descendiente` (art. 20.2.a LISD).
+- 52.3: `lib/calculadoras/sucesiones.ts` — reducción vivienda habitual restringida a grupos con derecho + excluida Cataluña (art. 20.2.c LISD).
+- 52.4: `lib/calculadoras/sucesiones.ts` — límite exención Andalucía/Galicia `<=`→`<`.
+- 52.5: documentado (sin fix) divergencia menor en `simulador-heredar-vivienda` — sobreestimación en Cataluña, no crítica.
+
+**Verificación**: `npx tsc --noEmit` limpio. `npx playwright test --config playwright.calc.config.ts -g "sucesion"` → 5/5 (GOLDEN-AC a GOLDEN-AG). Suite completa `playwright.calc.config.ts` → 136/136.
+
+**Build**: ✅ exit 0, 999 apps, 1300 páginas (2026-06-13).
+
+**Grupo 5 "Herencias/donaciones" — COMPLETADO** (`estimador-impuesto-sucesiones`, `estimador-impuesto-donaciones`, `simulador-heredar-vivienda`, `estimador-legitimas`, `orientacion-tramitacion-herencias`; `lib/calculadoras/sucesiones.ts` corregido — 3 fixes críticos + 1 menor —, `lib/calculadoras/donaciones.ts` verificado sin cambios). Grupo 6 "Pensiones/jubilación/laboral" queda pendiente para una futura tanda.
+
+---
+
 ## Resumen ejecutivo — Suite Viajes
 
 | Severidad | Nº hallazgos |

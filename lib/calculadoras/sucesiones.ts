@@ -146,9 +146,9 @@ function aplicarBonificacionIS(
     return { bonificacion: bonif, porcentaje: pct * 100, detalle: `Bonificación escalonada ${(pct * 100).toFixed(0)}% (${config.nombre})` };
   }
 
-  // Exención total por importe (Andalucía, Galicia: base ≤ 1.000.000 €)
-  if (bGrupo.exencion !== undefined && baseLiquidable <= bGrupo.exencion) {
-    return { bonificacion: cuotaTributaria, porcentaje: 100, detalle: `Exención total (base liquidable ≤ ${bGrupo.exencion.toLocaleString('es-ES')} €)` };
+  // Exención total por importe (Andalucía, Galicia: base < 1.000.000 €)
+  if (bGrupo.exencion !== undefined && baseLiquidable < bGrupo.exencion) {
+    return { bonificacion: cuotaTributaria, porcentaje: 100, detalle: `Exención total (base liquidable < ${bGrupo.exencion.toLocaleString('es-ES')} €)` };
   }
 
   // Exención con límite máximo (Aragón: hasta 3M€)
@@ -156,8 +156,7 @@ function aplicarBonificacionIS(
     if (baseLiquidable <= bGrupo.limite) {
       return { bonificacion: cuotaTributaria, porcentaje: 100, detalle: `Exención total hasta ${bGrupo.limite.toLocaleString('es-ES')} € (${config.nombre})` };
     }
-    const bonif = cuotaTributaria * 1;
-    return { bonificacion: bonif, porcentaje: 100, detalle: `Exención total (${config.nombre})` };
+    return { bonificacion: 0, porcentaje: 0, detalle: `Sin bonificación (base liquidable supera el límite de ${bGrupo.limite.toLocaleString('es-ES')} €) (${config.nombre})` };
   }
 
   // Bonificación con tope de base (La Rioja)
@@ -202,9 +201,9 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     ? (REDUCCIONES_PARENTESCO_CATALUNA_IS[p.grupo] ?? 0)
     : (REDUCCIONES_PARENTESCO_IS[p.grupo] ?? 0);
 
-  // 3. Reducción por edad (menor de 21, solo régimen común)
+  // 3. Reducción por edad (menor de 21 años: solo descendientes/adoptados, art. 20.2.a LISD)
   let reduccionEdadMenor21 = 0;
-  if (!esCataluna && edad !== undefined && edad < 21 && (grupoBase === 'I' || grupoBase === 'II')) {
+  if (!esCataluna && edad !== undefined && edad < 21 && p.grupo === 'I-descendiente') {
     const aniosDevida = 21 - edad;
     reduccionEdadMenor21 = Math.min(
       reduccionParentesco + aniosDevida * REDUCCION_EDAD_MENOR_21_IS,
@@ -219,7 +218,10 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   else if (discapacidad === '65') reduccionDiscapacidad = REDUCCION_DISCAPACIDAD_65_IS;
 
   // 5. Reducción vivienda habitual (95%, máx 122.606,47 € por heredero)
-  const reduccionVivienda = p.viviendaHabitual
+  // Art. 20.2.c LISD: cónyuge, descendientes/adoptados, ascendientes/adoptantes y colaterales
+  // (Grupo III simplificado). No aplica al Grupo IV ni en Cataluña (régimen propio no modelado).
+  const gruposConReduccionVivienda: GrupoParentescoIS[] = ['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III'];
+  const reduccionVivienda = (p.viviendaHabitual && !esCataluna && gruposConReduccionVivienda.includes(p.grupo))
     ? r(Math.min(p.viviendaHabitual * REDUCCION_VIVIENDA_PORC_IS, REDUCCION_VIVIENDA_MAX_IS))
     : 0;
 
