@@ -3,22 +3,14 @@
  * Usada por: MCP server (calcular_pension_desempleo)
  *
  * Calcula la cuantía y duración de la prestación contributiva por desempleo
- * según la LGSS (arts. 266-279) y la LPGE 2025.
+ * según la LGSS (arts. 266-279) y el IPREM 2026.
  *
- * Fuente: Ley General de la Seguridad Social (LGSS) + IPREM 2025
+ * Fuente: Ley General de la Seguridad Social (LGSS) + IPREM 2026 (data/fiscal/iprem.ts)
  */
 
-// ─── Constantes 2025 ───────────────────────────────────────────────────────────
+import { IPREM_2026 } from '@/data/fiscal';
 
-// IPREM 2025 (Real Decreto 145/2024 o RDL equivalente)
-const IPREM_2025 = {
-  diario: 20,          // €/día (7.200€/año ÷ 360 días)
-  mensual: 600,        // €/mes (12 pagas)
-  anual14: 8400,       // €/año (con 14 pagas = referencia para cálculo de topes)
-  // La SS usa año de 360 días (30 días × 12 meses) para el cálculo de topes:
-  // 8.400 / 360 = 23,33 €/día. Verificado contra simulador SEPE 2026-06-09.
-  diario14: 8400 / 360,
-};
+// ─── Constantes ───────────────────────────────────────────────────────────
 
 // Tabla días cotizados → días de prestación (LGSS art. 269)
 const TABLA_DURACION = [
@@ -34,16 +26,16 @@ const TABLA_DURACION = [
 
 // Topes mensuales (30 días × IPREM diario 14 pagas × porcentaje)
 // = 30 × 23,33 × factor. Verificado contra simulador SEPE 2026-06-09.
-const TOPES_2025 = {
+const TOPES_2026 = {
   maximo: {
-    sinHijos: Math.round(30 * IPREM_2025.diario14 * 1.75),   // 175% = 1.225 €
-    con1Hijo: Math.round(30 * IPREM_2025.diario14 * 2.00),   // 200% = 1.400 €
-    con2Hijos: Math.round(30 * IPREM_2025.diario14 * 2.25),  // 225% = 1.575 €
+    sinHijos: Math.round(30 * IPREM_2026.diario14 * 1.75),   // 175% = 1.225 €
+    con1Hijo: Math.round(30 * IPREM_2026.diario14 * 2.00),   // 200% = 1.400 €
+    con2Hijos: Math.round(30 * IPREM_2026.diario14 * 2.25),  // 225% = 1.575 €
   },
   minimo: {
-    sinHijos: Math.round(30 * IPREM_2025.diario14 * 0.80),   // 80%  = 560 €
-    con1Hijo: Math.round(30 * IPREM_2025.diario14 * 1.07),   // 107% = 749 €
-    con2Hijos: Math.round(30 * IPREM_2025.diario14 * 1.20),  // 120% = 840 €
+    sinHijos: Math.round(30 * IPREM_2026.diario14 * 0.80),   // 80%  = 560 €
+    con1Hijo: Math.round(30 * IPREM_2026.diario14 * 1.07),   // 107% = 749 €
+    con2Hijos: Math.round(30 * IPREM_2026.diario14 * 1.20),  // 120% = 840 €
   },
 };
 
@@ -128,7 +120,7 @@ export function calcularPensionDesempleo(p: ParametrosPensionDesempleo): Resulta
       totalPrestacionBruta: 0,
       aplicaTopeMaximo: false,
       aplicaTopeMinimo: false,
-      fuenteDatos: 'LGSS arts. 266-279 + IPREM 2025',
+      fuenteDatos: 'LGSS arts. 266-279 + IPREM 2026',
     };
   }
 
@@ -151,14 +143,14 @@ export function calcularPensionDesempleo(p: ParametrosPensionDesempleo): Resulta
   let topeMaximo: number;
   let topeMinimo: number;
   if (numHijos === 0) {
-    topeMaximo = TOPES_2025.maximo.sinHijos;
-    topeMinimo = TOPES_2025.minimo.sinHijos;
+    topeMaximo = TOPES_2026.maximo.sinHijos;
+    topeMinimo = TOPES_2026.minimo.sinHijos;
   } else if (numHijos === 1) {
-    topeMaximo = TOPES_2025.maximo.con1Hijo;
-    topeMinimo = TOPES_2025.minimo.con1Hijo;
+    topeMaximo = TOPES_2026.maximo.con1Hijo;
+    topeMinimo = TOPES_2026.minimo.con1Hijo;
   } else {
-    topeMaximo = TOPES_2025.maximo.con2Hijos;
-    topeMinimo = TOPES_2025.minimo.con2Hijos;
+    topeMaximo = TOPES_2026.maximo.con2Hijos;
+    topeMinimo = TOPES_2026.minimo.con2Hijos;
   }
 
   const aplicaTopeMaximo = cuantiaPrimeros6 > topeMaximo || cuantiaResto > topeMaximo;
@@ -192,6 +184,6 @@ export function calcularPensionDesempleo(p: ParametrosPensionDesempleo): Resulta
     totalPrestacionBruta,
     aplicaTopeMaximo,
     aplicaTopeMinimo,
-    fuenteDatos: 'LGSS arts. 266-279 + IPREM 2025 (600€/mes). Cuantías orientativas — el SEPE calcula la prestación exacta.',
+    fuenteDatos: 'LGSS arts. 266-279 + IPREM 2026 (600€/mes). Cuantías orientativas — el SEPE calcula la prestación exacta.',
   };
 }

@@ -74,6 +74,13 @@ export const BASES_SS_2025 = {
   maxima: 4909.50,
 };
 
+// Bases de cotización 2026 (mensuales) — Orden PJC/297/2026, vigentes desde el 01-ene-2026
+// Mínima: grupos 4-7 (SMI 2026 + 1/6). Máxima: tope único Régimen General.
+export const BASES_SS_2026 = {
+  minima: 1424.40,
+  maxima: 5101.20,
+};
+
 // ─── Rendimientos del trabajo: gastos deducibles y reducción 2025 ─────────────
 
 /**

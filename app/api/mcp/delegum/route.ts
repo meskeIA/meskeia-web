@@ -1048,7 +1048,7 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'calcular_pension_desempleo',
     'Calcula la prestación contributiva por desempleo (paro): duración según días cotizados y cuantía ' +
-    'mensual (70% los primeros 6 meses, 50% el resto), con topes IPREM según hijos.',
+    'mensual (70% los primeros 6 meses, 60% el resto), con topes IPREM según hijos.',
     {
       dias_cotizados: z.number().int().min(0).describe('Días cotizados al desempleo en los últimos 6 años (mínimo 360)'),
       base_reguladora_mensual: z.number().positive().describe('Base reguladora mensual (≈ salario bruto mensual) en euros'),

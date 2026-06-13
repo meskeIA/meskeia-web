@@ -177,7 +177,7 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
       maxMensualidades = MAX_MENSUALIDADES_IMPROCEDENTE;
       pravisoDias = 0;
       exentaIRPF = true;
-      detalleFiscal = 'La indemnización por despido improcedente está exenta de IRPF hasta el importe legal máximo (33 días/año, máx 24 mensualidades). El exceso pactado en convenio o acuerdo tributa en IRPF.';
+      detalleFiscal = 'La indemnización por despido improcedente está exenta de IRPF hasta el importe legal máximo (33 días/año, máx 24 mensualidades), con un límite absoluto de 180.000 € (art. 7.e LIRPF). El exceso pactado en convenio o acuerdo tributa en IRPF.';
 
       if (p.tieneAntiguedadPreReforma2012 && fechaInicio < FECHA_REFORMA_2012) {
         // Cálculo dual
@@ -223,7 +223,7 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
       maxMensualidades = MAX_MENSUALIDADES_OBJETIVO;
       pravisoDias = p.tipoDespido === 'objetivo' ? 15 : 15;
       exentaIRPF = true;
-      detalleFiscal = 'La indemnización por despido objetivo/colectivo está exenta de IRPF hasta el importe legal mínimo (20 días/año, máx 12 mensualidades).';
+      detalleFiscal = 'La indemnización por despido objetivo/colectivo está exenta de IRPF hasta el importe legal mínimo (20 días/año, máx 12 mensualidades), con un límite absoluto de 180.000 € (art. 7.e LIRPF).';
 
       topeMáximoEuros = r(salarioMensual * MAX_MENSUALIDADES_OBJETIVO);
       indemnizacionSinTope = r(salarioDiario * DIAS_OBJETIVO * antiguedadAnios);

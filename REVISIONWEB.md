@@ -1039,7 +1039,7 @@ Decisión conjunta con el usuario sobre los 3 casos especiales pendientes (Arag�
 
 ## Tanda 7 — Cobertura Delegum MCP, Grupo 6: Pensiones/jubilación/laboral (2026-06-13)
 
-> **Estado**: catalogación completa + fixes del subcluster Jubilación/Pensiones (53.1-53.7) aplicados en Batch 1. Subcluster Laboral (53.8-53.12) pendiente para Batch 2.
+> **Estado**: catalogación completa + fixes de ambos subclusters aplicados (53.1-53.7 en Batch 1, 53.8-53.12 en Batch 2). Grupo 6 CERRADO.
 
 ### ✅ Batch 1 — Subcluster Jubilación/Pensiones (53.1-53.7) — FIXES APLICADOS (2026-06-13)
 
@@ -1053,7 +1053,16 @@ Decisión conjunta con el usuario sobre los 3 casos especiales pendientes (Arag�
 
 **Verificación**: `npx tsc --noEmit` limpio, `npm run build` exit 0, `npx playwright test tests/calculadoras-invariantes.spec.ts` 136/136 OK.
 
-### Batch 2 — Subcluster Laboral (53.8-53.12) — PENDIENTE
+### ✅ Batch 2 — Subcluster Laboral (53.8-53.12) — FIXES APLICADOS (2026-06-13)
+
+- **53.8/53.9**: creado `data/fiscal/iprem.ts` (`IPREM_2026`, `FISCAL_IPREM_META`) y registrado en `data/fiscal/index.ts`. Verificado por búsqueda web: el IPREM 2026 NO varía respecto a 2025 (600€/mes, 8.400€/año 14 pagas — congelado desde 2022 por prórroga PGE 2023). `pensionDesempleo.ts` migrado a importar `IPREM_2026` (eliminado `IPREM_2025`/`TOPES_2025` locales → `TOPES_2026`), labels "IPREM 2025"/"LPGE 2025" → "IPREM 2026" en doc header y `fuenteDatos` (líneas 6, 8, 131, 195). De paso, corregido el porcentaje "50% el resto" → "60% el resto" en la descripción de la tool MCP `calcular_pension_desempleo` (`app/api/mcp/delegum/route.ts:1051`), desincronizado del cálculo real (Art. 270.1 LGSS reformado, ya aplicado correctamente en `pensionDesempleo.ts:148`).
+- **53.10**: verificada Orden PJC/297/2026 (BOE 31/03/2026) — bases SS 2026 = mínima 1.424,40€/máxima 5.101,20€ (Régimen General). Creado `BASES_SS_2026` en `data/fiscal/irpf.ts` (junto a `BASES_SS_2025`, sin eliminarla). Migrados `bajaMedica.ts` (clamp base de cotización diaria) y `pensionIncapacidad.ts` (complemento Gran Invalidez art. 196.4 LGSS) a `BASES_SS_2026`. Golden test GOLDEN-BZ actualizado (complemento GI 981,54€→1.000,98€, total 1.981,54€→2.000,98€, anual 27.741,56€→28.013,72€).
+- **53.11**: añadida la cifra del límite de exención IRPF (180.000€, art. 7.e LIRPF) a `detalleFiscal` en `indemnizacionDespido.ts` para los casos `improcedente` y `objetivo`/`colectivo_ere`, en línea con `finiquito.ts:150`.
+- **53.12**: unificadas ambas menciones de cuota de convenio especial SS en `excedencia.ts` (líneas 131 y 195) — eliminadas las cifras "160€" y "155-165€/mes en 2025" (no verificables y desactualizadas), sustituidas por texto que remite al simulador oficial de la Seguridad Social, ya que el coste real depende de la base de cotización elegida (~28,3% de la base mínima 2026 ≈ 403€/mes en el caso general, muy distinto de las cifras previas).
+
+**Hallazgo nuevo, NO catalogado, fuera de alcance de esta sesión**: `BASES_SS_2025` y `COTIZACIONES_SS_2025` (MEI trabajador 0,12%) siguen vigentes en `sueldoNeto.ts`, `subidaSalarial.ts`, `declaracionConjunta.ts`, `lib/calculadoras/irpf.ts` y `costeEmpleado.ts` (copia local duplicada). Verificado por búsqueda web: Orden PJC/297/2026 mantiene los tipos trabajador iguales (contingencias comunes 4,70%, desempleo 1,55%, FP 0,10%) salvo el MEI, que sube de 0,12% a 0,15% (DT 38ª LGSS). Esto es un gap de "Cotizaciones SS 2026" que afecta a las calculadoras de nómina core (suite freelance/legal-fiscal), de mayor alcance que el Grupo 6 — candidato a Tanda futura dedicada.
+
+**Verificación Batch 2**: `npx tsc --noEmit` limpio, `npm run build` exit 0, `npx playwright test tests/calculadoras-invariantes.spec.ts` 136/136 OK.
 
 **Tools MCP del Grupo 6**: `consulta_jubilacion`, `consulta_despido`, `calcular_indemnizacion_despido`, `calcular_finiquito`, `calcular_pension_desempleo`, `calcular_pension_publica`, `calcular_brecha_jubilacion`, `calcular_plan_pensiones`, `calcular_prestacion_maternidad_paternidad`, `calcular_reduccion_jornada`, `calcular_baja_medica`, `calcular_excedencia`, `calcular_pension_viudedad`, `calcular_jubilacion_anticipada`, `calcular_pension_incapacidad`.
 

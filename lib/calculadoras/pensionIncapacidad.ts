@@ -24,16 +24,17 @@
  * Pensión mínima 2026: varía según grado, tramo de edad y situación familiar
  * (ver `PENSIONES_MINIMAS_2026` en `data/fiscal/pensiones.ts`, revalorizadas +2,8%).
  * Complemento de Gran Invalidez (art. 196.4 LGSS): 45% de la base mínima de
- * cotización vigente (BASES_SS_2025.minima) + 30% de la última base de cotización
+ * cotización vigente (BASES_SS_2026.minima) + 30% de la última base de cotización
  * del trabajador, con un mínimo del 45% de la pensión sin complemento.
  *
- * Fuente: LGSS arts. 194-200 + pensiones mínimas 2026 (data/fiscal/pensiones.ts)
+ * Fuente: LGSS arts. 194-200 + pensiones mínimas 2026 + bases de cotización 2026
+ *         (Orden PJC/297/2026) — data/fiscal/pensiones.ts, data/fiscal/irpf.ts
  * Verificado: 2026-06-13
  *
  * Encadenable con: calcular_baja_medica, calcular_pension_publica, calcular_sueldo_neto
  */
 
-import { BASES_SS_2025, PENSIONES_MINIMAS_2026 } from '@/data/fiscal';
+import { BASES_SS_2026, PENSIONES_MINIMAS_2026 } from '@/data/fiscal';
 
 // ─── Constantes ─────────────────────────────────────────────────────────────────
 
@@ -205,7 +206,7 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
   if (p.gradoIncapacidad === 'gran_invalidez') {
     const ultimaBase = p.ultimaBaseCotizacion ?? baseReguladora;
     const complementoCalculado = r(
-      (BASES_SS_2025.minima * PCT_COMPLEMENTO_GI_BASE_MINIMA / 100) +
+      (BASES_SS_2026.minima * PCT_COMPLEMENTO_GI_BASE_MINIMA / 100) +
       (ultimaBase * PCT_COMPLEMENTO_GI_BASE / 100)
     );
     const complementoMinimo = r(cuantiaBrutaMensual * PCT_COMPLEMENTO_GI_MINIMO / 100);
@@ -223,7 +224,7 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     advertencias.push('La IPT puede complementarse con la prestación por desempleo si no se ha agotado. Verificar con el SEPE.');
   }
   if (p.gradoIncapacidad === 'gran_invalidez') {
-    advertencias.push(`Complemento de Gran Invalidez: ${PCT_COMPLEMENTO_GI_BASE_MINIMA}% de la base mínima de cotización 2025 (${BASES_SS_2025.minima.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) + ${PCT_COMPLEMENTO_GI_BASE}% última base de cotización, con un mínimo del ${PCT_COMPLEMENTO_GI_MINIMO}% de la pensión sin complemento (art. 196.4 LGSS).`);
+    advertencias.push(`Complemento de Gran Invalidez: ${PCT_COMPLEMENTO_GI_BASE_MINIMA}% de la base mínima de cotización 2026 (${BASES_SS_2026.minima.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) + ${PCT_COMPLEMENTO_GI_BASE}% última base de cotización, con un mínimo del ${PCT_COMPLEMENTO_GI_MINIMO}% de la pensión sin complemento (art. 196.4 LGSS).`);
   }
 
   return {
@@ -240,6 +241,6 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     cuantiaAnual14Pagas,
     explicacion,
     advertencias,
-    fuenteDatos: 'LGSS arts. 194-200 + base mínima de cotización 2025 (1.381,20 €/mes, Orden PJC/178/2025, pendiente de actualizar a Orden 2026) + pensiones mínimas 2026 (+2,8% revalorización) — vigente 2026',
+    fuenteDatos: 'LGSS arts. 194-200 + base mínima de cotización 2026 (1.424,40 €/mes, Orden PJC/297/2026) + pensiones mínimas 2026 (+2,8% revalorización) — vigente 2026',
   };
 }

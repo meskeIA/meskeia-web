@@ -9,10 +9,10 @@
  * - Enfermedad común / accidente no laboral: 60% BC días 4-20, 75% BC día 21+
  * - Accidente de trabajo / enfermedad profesional: 75% BC desde día 1
  *
- * Fuente: LGSS arts. 169-176 + Real Decreto 1430/2009
+ * Fuente: LGSS arts. 169-176 + Real Decreto 1430/2009 + bases de cotización 2026 (Orden PJC/297/2026)
  */
 
-import { BASES_SS_2025 } from '@/data/fiscal';
+import { BASES_SS_2026 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -72,7 +72,7 @@ export function calcularBajaMedica(p: ParametrosBajaMedica): ResultadoBajaMedica
   // Base de cotización diaria: salario bruto mensual / 30
   // Clamped entre mínimo y máximo SS
   const salerioMensual = p.salarioBrutoMensual;
-  const baseMensualClamp = Math.min(Math.max(salerioMensual, BASES_SS_2025.minima), BASES_SS_2025.maxima);
+  const baseMensualClamp = Math.min(Math.max(salerioMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
   const baseCotizacionDiaria = r(baseMensualClamp / 30);
 
   const desglose: { periodo: string; dias: number; pct: number; importeDiario: number; total: number }[] = [];

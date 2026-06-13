@@ -128,7 +128,7 @@ export function calcularExcedencia(p: ParametrosExcedencia): ResultadoExcedencia
       cotizaDurante = false;
       mesesComputablesSSTotal = 0;
       detalleCotizacion = 'Sin cotización durante la excedencia voluntaria. El período no computa para ninguna prestación de la Seguridad Social.';
-      impactoSS = 'Período sin cotización: no cuenta para jubilación, incapacidad permanente ni otras prestaciones. Puede suscribir convenio especial con la SS para mantener cotización (coste aprox. 160 €/mes).';
+      impactoSS = 'Período sin cotización: no cuenta para jubilación, incapacidad permanente ni otras prestaciones. Puede suscribir un convenio especial con la SS para mantener cotización; la cuota depende de la base de cotización elegida (consultar simulador oficial de la Seguridad Social).';
       plazoNuevaExcedenciaVoluntaria = 48; // 4 años
       break;
 
@@ -192,7 +192,7 @@ export function calcularExcedencia(p: ParametrosExcedencia): ResultadoExcedencia
   if (p.tipo === 'voluntaria') {
     advertencias.push('El derecho al reingreso es preferente pero no garantizado: solo se tiene derecho si existe vacante de igual o similar categoría cuando se solicita la reincorporación.');
     advertencias.push(`No podrá solicitar una nueva excedencia voluntaria hasta que pasen ${plazoNuevaExcedenciaVoluntaria} meses (4 años) desde la finalización de la actual.`);
-    advertencias.push('Para no perder cotización SS puede suscribir un convenio especial con la Seguridad Social (aprox. 155-165 €/mes en 2025).');
+    advertencias.push('Para no perder cotización SS puede suscribir un convenio especial con la Seguridad Social; la cuota depende de la base de cotización elegida (consultar simulador oficial de la Seguridad Social).');
   }
   if (p.tipo === 'cuidado_hijo' || p.tipo === 'cuidado_familiar') {
     advertencias.push('Durante la excedencia por cuidado se puede realizar otra actividad laboral, incluso para otra empresa, salvo pacto de no competencia o dedicación exclusiva.');

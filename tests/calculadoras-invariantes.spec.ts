@@ -2058,11 +2058,11 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
 
   test('GOLDEN-BZ: Gran Invalidez → BR + complemento 45% base mínima cotización + 30% última base (art. 196.4 LGSS)', () => {
     // BR = 112.000 / 112 = 1.000 €. Cuantía bruta = 100% × 1.000 = 1.000 €.
-    // Complemento GI = 45% × 1.381,20 (base mínima cotización 2025) + 30% × 1.200 (última base)
-    //                = 621,54 + 360 = 981,54 €.
-    // Mínimo del complemento = 45% × 1.000 (pensión sin complemento) = 450 € → no se aplica (981,54 > 450).
-    // Total mensual = 1.000 + 981,54 = 1.981,54 €. Mínimo GI (unipersonal, 2026) = 1.404,30 € → no se aplica.
-    // Anual (14 pagas) = 1.981,54 × 14 = 27.741,56 €.
+    // Complemento GI = 45% × 1.424,40 (base mínima cotización 2026) + 30% × 1.200 (última base)
+    //                = 640,98 + 360 = 1.000,98 €.
+    // Mínimo del complemento = 45% × 1.000 (pensión sin complemento) = 450 € → no se aplica (1.000,98 > 450).
+    // Total mensual = 1.000 + 1.000,98 = 2.000,98 €. Mínimo GI (unipersonal, 2026) = 1.404,30 € → no se aplica.
+    // Anual (14 pagas) = 2.000,98 × 14 = 28.013,72 €.
     const pi = calcularPensionIncapacidad({
       gradoIncapacidad: 'gran_invalidez',
       origenContingencia: 'comun',
@@ -2072,11 +2072,11 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     });
     expect(pi.baseReguladora).toBeCloseTo(1000.00, 2);
     expect(pi.cuantiaBrutaMensual).toBeCloseTo(1000.00, 2);
-    expect(pi.complementoGranInvalidez).toBeCloseTo(981.54, 2);
-    expect(pi.cuantiaBrutaTotalMensual).toBeCloseTo(1981.54, 2);
+    expect(pi.complementoGranInvalidez).toBeCloseTo(1000.98, 2);
+    expect(pi.cuantiaBrutaTotalMensual).toBeCloseTo(2000.98, 2);
     expect(pi.pensionMinimaGarantizada).toBeCloseTo(1404.30, 2);
-    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1981.54, 2);
-    expect(pi.cuantiaAnual14Pagas).toBeCloseTo(27741.56, 2);
+    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(2000.98, 2);
+    expect(pi.cuantiaAnual14Pagas).toBeCloseTo(28013.72, 2);
   });
 
   test('GOLDEN-CA: IP Parcial → indemnización única de 24 mensualidades de BR [SS pendiente verificación]', () => {
