@@ -959,4 +959,19 @@ Primera tanda de verificación de los "tipos reducidos" (4 CCAA) contra fuentes 
 
 **Siguiente tanda**: Cataluña, La Rioja, Madrid, Navarra (+ revisar Aragón con fuente primaria si se encuentra).
 
+---
+
+## Reconciliación ITP/CCAA — tipos reducidos, Tanda 2 (2026-06-13)
+
+Segunda tanda (4 CCAA), verificada contra fuentes oficiales (ATC Cataluña, larioja.org, comunidad.madrid, Hacienda Foral Navarra vía guiafiscal.es) + agregadores. Cambios en `TIPOS_ITP_CCAA_2025` (`data/fiscal/inmuebles.ts`) y una corrección en `ITP_CCAA` (`data/itp-ccaa.ts`).
+
+- 🟡 **Cataluña**: `notaReducido` ("Precio < 190.000 € y comprador <33 años u otras circunstancias" — condición inexistente, ni precio ni edad 33 aparecen en ninguna fuente) corregido a "Jóvenes ≤32 años (≤35 desde 27/06/2026) con renta ≤36.000 €, familia numerosa/monoparental o discapacidad ≥65% (vivienda habitual). VPO: 7%" — verificado en ATC oficial. El valor `reducido: 5` ya era correcto. Además, `ITP_CCAA.cataluna.tramosProgresivos` tenía solo 2 tramos (10%/11%) cuando la escala oficial real tiene 4 (10%/11%/12%/13% en 600k/900k/1,5M€) — corregido (campo solo informativo en las apps, no afecta al cálculo).
+- 🟢 **La Rioja**: no tenía `reducido`. Añadido **4%** (jóvenes <40 años, primera vivienda habitual, novedad 2025; familia numerosa o discapacidad ≥33%: 5%). Nota: `ITP_CCAA.rioja.tiposReducidos` describe "jóvenes <36 → 5%" y "jóvenes municipios especiales → 3%", que según fuente oficial (larioja.org) están desactualizados/incompletos — la estructura real tiene 4 escalones (7% general / 5% discapacidad+familia numerosa+VPO / 4% jóvenes <40 / 3% familia numerosa con condiciones extra o jóvenes en municipios designados). No reescrito en esta tanda — requiere revisión dedicada similar a Aragón.
+- 🟢 **Madrid**: no tenía `reducido`. Añadido **5,4%** (bonificación general 10% sobre cuota para vivienda habitual ≤250.000€, vigente desde 2019: 6%→5,4% efectivo; familia numerosa: 4%; jóvenes <35 en municipios <2.500 hab.: exento 100%). Coincide con `ITP_CCAA.madrid.tiposReducidos`, sin cambios en esa tabla.
+- 🟢 **Navarra**: no tenía `reducido`. Añadido **5%** (jóvenes <35 años, familias con 2+ hijos, discapacidad o VPO; vivienda habitual ≤180.304€). Coincide razonablemente con `ITP_CCAA.navarra.tiposReducidos` ("vivienda habitual → 5%"), sin cambios en esa tabla.
+
+**Build verificado**: `npx tsc --noEmit` limpio + `npm run build` exit 0 (999 apps, 1300 páginas).
+
+**Siguiente tanda**: País Vasco, Ceuta/Melilla (ausentes de `TIPOS_ITP_CCAA_2025`) + revisión dedicada de La Rioja en `ITP_CCAA` (estructura de 4 escalones) y Aragón (bonificación sobre cuota, pendiente desde Tanda 1).
+
 

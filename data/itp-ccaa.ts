@@ -349,8 +349,10 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     nombre: 'Cataluña',
     tipoGeneral: 10,
     tramosProgresivos: [
-      { hasta: 1000000, tipo: 10 },
-      { hasta: Infinity, tipo: 11 },
+      { hasta: 600000, tipo: 10 },
+      { hasta: 900000, tipo: 11 },
+      { hasta: 1500000, tipo: 12 },
+      { hasta: Infinity, tipo: 13 },
     ],
     tiposReducidos: [
       {
