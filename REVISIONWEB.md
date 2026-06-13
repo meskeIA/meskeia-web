@@ -944,4 +944,19 @@ Además de los tipos generales, los **tipos reducidos** divergen entre ambas tab
 
 **Build verificado**: `npm run build` exit 0, sin errores (999 apps, 1300 páginas).
 
+---
+
+## Reconciliación ITP/CCAA — tipos reducidos, Tanda 1 (2026-06-13)
+
+Primera tanda de verificación de los "tipos reducidos" (4 CCAA) contra fuentes externas (guiafiscal.es, hipotecas.me, aragon.es, búsquedas agregadas). Cambios solo en `TIPOS_ITP_CCAA_2025` (`data/fiscal/inmuebles.ts`); `ITP_CCAA` (`data/itp-ccaa.ts`) no se ha tocado en esta tanda.
+
+- 🔴 **Asturias**: `reducido: 3` no tenía respaldo en ninguna fuente. Corregido a **4%** (jóvenes <35 años, familia numerosa, discapacidad ≥65%, vivienda habitual ≤150.000 €) — coincide con `ITP_CCAA.asturias.tiposReducidos` y con 2 fuentes externas independientes. Tramos generales (8%/9%/10% según 300k/500k) verificados correctos en `ITP_CCAA`, sin cambios.
+- 🟡 **Canarias**: `TIPOS_ITP_CCAA_2025` no tenía ningún `reducido`. Añadido **5%** (vivienda habitual ≤150.000€, sin ser titular de otra vivienda) — coincide con `ITP_CCAA.canarias.tiposReducidos` y 2 fuentes externas. Nota: las fuentes externas discrepan entre sí sobre el tipo para familia numerosa/monoparental (1% según una fuente, 4% según otra) y sobre jóvenes <35/<40 — no se ha tocado `ITP_CCAA` por esta discrepancia, pendiente de fuente primaria.
+- 🟡 **Castilla-La Mancha**: `notaReducido: 'Zonas despobladas'` etiquetaba incorrectamente el 6%. Corregido a "Jóvenes <36 años, familia numerosa o discapacidad, vivienda habitual ≤180.000 €" (2 fuentes coinciden en este perfil para el 6%). El valor 6% no cambia. Las zonas de despoblación tienen su propio tratamiento (ITP_CCAA: tiers 5/4/3%; una fuente externa dice "bonificación 100%") — discrepancia no resuelta, fuera del campo `reducido` de tabla 1.
+- ⏸️ **Aragón — pendiente, sin cambios**: las fuentes externas se contradicen entre sí sobre si los beneficios para jóvenes/discapacidad/familia numerosa son un "tipo reducido fijo" (4-6%) o una "bonificación % sobre la cuota resultante" (12,5%/50%/60%), con distintos límites de edad (35 vs 36) y valor (100.000€ vs 180.000€ vs 200.000€) según la fuente. Además la escala general progresiva real tiene 5 tramos (8/8,5/9/9,5/10%) vs los 2 tramos actuales en `ITP_CCAA` (8/10%). Requiere consultar el BOA (texto legal primario) o un asesor fiscal — no modificado en ninguna tabla.
+
+**Build verificado**: `npx tsc --noEmit` limpio + `npm run build` exit 0 (999 apps, 1300 páginas).
+
+**Siguiente tanda**: Cataluña, La Rioja, Madrid, Navarra (+ revisar Aragón con fuente primaria si se encuentra).
+
 

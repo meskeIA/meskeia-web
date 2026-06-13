@@ -18,7 +18,7 @@
 
 export const FISCAL_INMUEBLES_META = {
   fuente: 'Ley 1/1993 ITP-AJD + Ley 35/2006 IRPF + Ley 37/1992 IVA + RDL 26/2021',
-  verificado: '2026-06-12',
+  verificado: '2026-06-13',
   vigencia: '2025',
   urlOficialITP: 'https://sede.agenciatributaria.gob.es/Sede/itp-ajd.html',
   urlOficialIRPF: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
@@ -42,11 +42,11 @@ export interface TipoITPCCAA {
 export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Andalucía',          tipo: 7,    reducido: 3.5,  notaReducido: 'Familias numerosas, discapacidad ≥33%, jóvenes <35 años en zonas rurales' },
   { ccaa: 'Aragón',             tipo: 8,    reducido: 5,    notaReducido: 'Jóvenes <36 años, primera vivienda habitual' },
-  { ccaa: 'Asturias',           tipo: 8,    reducido: 3,    notaReducido: 'Zonas despobladas, jóvenes' },
+  { ccaa: 'Asturias',           tipo: 8,    reducido: 4,    notaReducido: 'Jóvenes <35 años, familia numerosa, discapacidad ≥65% (vivienda habitual ≤150.000 €)' },
   { ccaa: 'Baleares',           tipo: 8,    reducido: 4,    notaReducido: 'Primera vivienda habitual precio < 270.151 €' },
-  { ccaa: 'Canarias',           tipo: 6.5 },
+  { ccaa: 'Canarias',           tipo: 6.5,  reducido: 5,    notaReducido: 'Vivienda habitual, valor ≤150.000 € (sin ser titular de otra vivienda)' },
   { ccaa: 'Cantabria',          tipo: 9,    reducido: 7,    notaReducido: 'Vivienda habitual valor < 200.000 €; jóvenes <36 años hasta 4%' },
-  { ccaa: 'Castilla-La Mancha', tipo: 9,    reducido: 6,    notaReducido: 'Zonas despobladas' },
+  { ccaa: 'Castilla-La Mancha', tipo: 9,    reducido: 6,    notaReducido: 'Jóvenes <36 años, familia numerosa o discapacidad, vivienda habitual ≤180.000 €' },
   { ccaa: 'Castilla y León',    tipo: 8,    reducido: 4,    notaReducido: 'Jóvenes <36 años vivienda habitual' },
   { ccaa: 'Cataluña',           tipo: 10,   reducido: 5,    notaReducido: 'Precio < 190.000 € y comprador <33 años u otras circunstancias' },
   { ccaa: 'Extremadura',        tipo: 8,    reducido: 7 },
