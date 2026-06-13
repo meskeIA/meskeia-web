@@ -125,18 +125,26 @@
   margin-bottom: 25px;
 }
 
-.escalaVisual span {
+.escalaVisual button {
+  font-family: inherit;
   font-size: 0.75rem;
   color: var(--text-muted);
+  background: none;
+  border: none;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.2s;
 }
 
-.escalaVisual span:hover {
+.escalaVisual button:hover {
   background: var(--bg-primary);
   color: #2E86AB;
+}
+
+.escalaVisual button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Controles */

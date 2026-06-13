@@ -50,10 +50,16 @@ export default function GeneradorTonosPage() {
   useEffect(() => {
     return () => {
       if (oscillatorRef.current) {
-        oscillatorRef.current.stop();
+        try {
+          oscillatorRef.current.stop();
+        } catch {
+          // El oscilador ya estaba detenido
+        }
       }
       if (audioContextRef.current) {
-        audioContextRef.current.close();
+        audioContextRef.current.close().catch(() => {
+          // El contexto ya estaba cerrado
+        });
       }
       if (sweepIntervalRef.current) {
         clearInterval(sweepIntervalRef.current);
@@ -62,28 +68,36 @@ export default function GeneradorTonosPage() {
   }, []);
 
   const iniciarAudio = useCallback(() => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      }
+
+      const ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.type = tipoOnda;
+      oscillator.frequency.setValueAtTime(frecuencia, ctx.currentTime);
+
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(volumen, ctx.currentTime + 0.05);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.start();
+
+      oscillatorRef.current = oscillator;
+      gainNodeRef.current = gainNode;
+      setReproduciendo(true);
+    } catch (error) {
+      console.error('No se pudo iniciar el generador de tonos:', error);
     }
-
-    const ctx = audioContextRef.current;
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.type = tipoOnda;
-    oscillator.frequency.setValueAtTime(frecuencia, ctx.currentTime);
-
-    gainNode.gain.setValueAtTime(0, ctx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(volumen, ctx.currentTime + 0.05);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    oscillator.start();
-
-    oscillatorRef.current = oscillator;
-    gainNodeRef.current = gainNode;
-    setReproduciendo(true);
   }, [frecuencia, volumen, tipoOnda]);
 
   const detenerAudio = useCallback(() => {
@@ -93,16 +107,26 @@ export default function GeneradorTonosPage() {
     }
     setSweep(false);
 
-    if (gainNodeRef.current && audioContextRef.current) {
-      gainNodeRef.current.gain.linearRampToValueAtTime(0, audioContextRef.current.currentTime + 0.05);
+    const oscillator = oscillatorRef.current;
+    const ctx = audioContextRef.current;
+
+    if (gainNodeRef.current && ctx) {
+      gainNodeRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
     }
 
     setTimeout(() => {
-      if (oscillatorRef.current) {
-        oscillatorRef.current.stop();
-        oscillatorRef.current = null;
+      if (oscillator) {
+        try {
+          oscillator.stop();
+        } catch {
+          // El oscilador ya estaba detenido
+        }
       }
-      setReproduciendo(false);
+      // Solo limpiar el estado si nadie ha iniciado un nuevo oscilador mientras tanto
+      if (oscillatorRef.current === oscillator) {
+        oscillatorRef.current = null;
+        setReproduciendo(false);
+      }
     }, 50);
   }, []);
 
@@ -224,13 +248,13 @@ export default function GeneradorTonosPage() {
 
         {/* Slider logarítmico visual */}
         <div className={styles.escalaVisual}>
-          <span onClick={() => setFrecuencia(20)}>20</span>
-          <span onClick={() => setFrecuencia(100)}>100</span>
-          <span onClick={() => setFrecuencia(500)}>500</span>
-          <span onClick={() => setFrecuencia(1000)}>1k</span>
-          <span onClick={() => setFrecuencia(5000)}>5k</span>
-          <span onClick={() => setFrecuencia(10000)}>10k</span>
-          <span onClick={() => setFrecuencia(20000)}>20k</span>
+          <button type="button" onClick={() => setFrecuencia(20)} aria-label="Ir a 20 Hz">20</button>
+          <button type="button" onClick={() => setFrecuencia(100)} aria-label="Ir a 100 Hz">100</button>
+          <button type="button" onClick={() => setFrecuencia(500)} aria-label="Ir a 500 Hz">500</button>
+          <button type="button" onClick={() => setFrecuencia(1000)} aria-label="Ir a 1.000 Hz">1k</button>
+          <button type="button" onClick={() => setFrecuencia(5000)} aria-label="Ir a 5.000 Hz">5k</button>
+          <button type="button" onClick={() => setFrecuencia(10000)} aria-label="Ir a 10.000 Hz">10k</button>
+          <button type="button" onClick={() => setFrecuencia(20000)} aria-label="Ir a 20.000 Hz">20k</button>
         </div>
 
         {/* Botones de control */}
@@ -239,6 +263,7 @@ export default function GeneradorTonosPage() {
             type="button"
             className={`${styles.btnPlay} ${reproduciendo ? styles.activo : ''}`}
             onClick={toggleAudio}
+            aria-pressed={reproduciendo}
           >
             {reproduciendo ? '⏹️ Detener' : '▶️ Reproducir'}
           </button>
@@ -336,6 +361,7 @@ export default function GeneradorTonosPage() {
             type="button"
             className={`${styles.btnSweep} ${sweep ? styles.sweepActivo : ''}`}
             onClick={sweep ? detenerSweep : iniciarSweep}
+            aria-pressed={sweep}
           >
             {sweep ? '⏹️ Detener barrido' : '🔄 Iniciar barrido'}
           </button>
