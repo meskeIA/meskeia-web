@@ -40,7 +40,16 @@ export const jsonLd = generateWebAppSchema({
   description: "Analiza circuitos eléctricos en serie y paralelo. Calcula resistencia equivalente, caídas de tensión, corrientes de rama y potencia disipada. Hasta 6 resistencias.",
   url: "https://meskeia.com/simulador-circuitos-electricos/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Ley de Ohm: calcula tensión, corriente o resistencia dado cualquier par de valores',
+    'Circuito en serie: resistencia equivalente, caídas de tensión y potencia por componente',
+    'Circuito en paralelo: resistencia equivalente, corrientes de rama y potencia por componente',
+    'Potencia y coste energético: P = V×I, consumo en kWh y coste estimado según tarifa',
+    'Hasta 6 resistencias en serie o paralelo',
+    'Diagramas ASCII de circuito para cada configuración',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y en español',
+  ],
 });
 
 export const faqJsonLd = {

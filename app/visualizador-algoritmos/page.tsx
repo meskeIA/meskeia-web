@@ -97,15 +97,16 @@ export default function VisualizadorAlgoritmosPage() {
       <LegalNotice />
 
       {/* Selector de Algoritmos */}
-      <div className={styles.algorithmSelector}>
+      <div className={styles.algorithmSelector} role="group" aria-label="Selección de algoritmo">
         {algorithms.map((algo) => (
           <button
             key={algo}
             className={`${styles.algorithmBtn} ${algorithm === algo ? styles.active : ''}`}
+            aria-pressed={algorithm === algo}
             onClick={() => handleAlgorithmChange(algo)}
             disabled={animationState === 'running'}
           >
-            <span className={styles.algorithmIcon}>{ALGORITHMS_INFO[algo].icon}</span>
+            <span className={styles.algorithmIcon} aria-hidden="true">{ALGORITHMS_INFO[algo].icon}</span>
             <span className={styles.algorithmName}>{ALGORITHMS_INFO[algo].name}</span>
           </button>
         ))}
@@ -150,16 +151,18 @@ export default function VisualizadorAlgoritmosPage() {
             </div>
 
             <div className={styles.speedControl}>
-              <span className={styles.speedLabel}>Velocidad:</span>
+              <label htmlFor="speed-slider" className={styles.speedLabel}>Velocidad:</label>
               <input
+                id="speed-slider"
                 type="range"
                 min="1"
                 max="100"
                 value={speed}
+                aria-label={`Velocidad de animación: ${speed}%`}
                 onChange={(e) => handleSpeedChange(parseInt(e.target.value))}
                 className={styles.speedSlider}
               />
-              <span className={styles.speedValue}>{speed}%</span>
+              <span className={styles.speedValue} aria-hidden="true">{speed}%</span>
             </div>
           </div>
 
@@ -196,11 +199,9 @@ export default function VisualizadorAlgoritmosPage() {
           <MetricsPanel metrics={metrics} />
 
           {/* Progreso */}
-          {totalSteps > 0 && (
-            <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)' }}>
-              Paso {currentStep} de {totalSteps}
-            </div>
-          )}
+          <div role="status" aria-live="polite" style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)' }}>
+            {totalSteps > 0 && `Paso ${currentStep} de ${totalSteps}`}
+          </div>
         </div>
 
         {/* Panel Lateral */}

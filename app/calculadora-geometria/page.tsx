@@ -369,12 +369,14 @@ export default function CalculadoraGeometriaPage() {
           <div className={styles.dimensionTabs}>
             <button
               className={`${styles.dimTab} ${dimension === '2D' ? styles.dimActivo : ''}`}
+              aria-pressed={dimension === '2D'}
               onClick={() => { setDimension('2D'); limpiar(); }}
             >
               2D - Planas
             </button>
             <button
               className={`${styles.dimTab} ${dimension === '3D' ? styles.dimActivo : ''}`}
+              aria-pressed={dimension === '3D'}
               onClick={() => { setDimension('3D'); limpiar(); }}
             >
               3D - Sólidos
@@ -391,9 +393,10 @@ export default function CalculadoraGeometriaPage() {
                   <button
                     key={f.id}
                     className={`${styles.figuraBtn} ${figura2D === f.id ? styles.figuraActiva : ''}`}
+                    aria-pressed={figura2D === f.id}
                     onClick={() => { setFigura2D(f.id); limpiar(); }}
                   >
-                    <span className={styles.figuraIcono}>{f.icono}</span>
+                    <span className={styles.figuraIcono} aria-hidden="true">{f.icono}</span>
                     <span className={styles.figuraNombre}>{f.nombre}</span>
                   </button>
                 ))
@@ -401,9 +404,10 @@ export default function CalculadoraGeometriaPage() {
                   <button
                     key={f.id}
                     className={`${styles.figuraBtn} ${figura3D === f.id ? styles.figuraActiva : ''}`}
+                    aria-pressed={figura3D === f.id}
                     onClick={() => { setFigura3D(f.id); limpiar(); }}
                   >
-                    <span className={styles.figuraIcono}>{f.icono}</span>
+                    <span className={styles.figuraIcono} aria-hidden="true">{f.icono}</span>
                     <span className={styles.figuraNombre}>{f.nombre}</span>
                   </button>
                 ))
@@ -419,7 +423,7 @@ export default function CalculadoraGeometriaPage() {
           </button>
         </div>
 
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="false">
           <h2 className={styles.sectionTitle}>Resultados</h2>
 
           {!resultados ? (

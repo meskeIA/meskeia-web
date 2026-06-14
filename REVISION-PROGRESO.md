@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 92 / 999
-- ⬜ Pendientes: 907 / 999
+- ✅ Revisadas: 96 / 999
+- ⬜ Pendientes: 903 / 999
 
 ## Resumen por suite primaria
 
@@ -373,7 +373,7 @@
 | [x] | Simulador de Puertas Lógicas | `/simulador-puertas-logicas/` | diseno, estudiantes |
 | [ ] | Validador JSON | `/validador-json/` | diseno, tecnicas |
 | [ ] | Validador RegEx | `/validador-regex/` | diseno, tecnicas |
-| [ ] | Visualizador de Algoritmos | `/visualizador-algoritmos/` | diseno, estudiantes |
+| [x] | Visualizador de Algoritmos | `/visualizador-algoritmos/` | diseno, estudiantes |
 
 ## Estudiantes (`estudiantes`) — 244 apps
 
@@ -395,13 +395,13 @@
 | [ ] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
 | [ ] | Calculadora de Ecuaciones | `/algebra-ecuaciones/` | estudiantes |
 | [ ] | Calculadora de Electricidad | `/calculadora-electricidad/` | estudiantes |
-| [ ] | Calculadora de Geometría | `/calculadora-geometria/` | estudiantes |
+| [x] | Calculadora de Geometría | `/calculadora-geometria/` | estudiantes |
 | [ ] | Calculadora de Movimiento | `/calculadora-movimiento/` | estudiantes |
 | [x] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
 | [ ] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
 | [ ] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
 | [ ] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
-| [ ] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
+| [x] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
 | [ ] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
 | [ ] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
 | [ ] | Calculadora Teoría de Colas | `/calculadora-teoria-colas/` | estudiantes |
@@ -544,7 +544,7 @@
 | [ ] | Selector de Idioma | `/selector-idioma/` | estudiantes, cultura |
 | [ ] | Selector de Método de Estudio | `/selector-metodo-estudio/` | estudiantes, productividad |
 | [ ] | Series y Convergencia: Taylor, Criterios y π | `/visualizador-series-convergencia/` | estudiantes, tecnicas |
-| [ ] | Simulador Circuitos Eléctricos | `/simulador-circuitos-electricos/` | estudiantes, tecnicas |
+| [x] | Simulador Circuitos Eléctricos | `/simulador-circuitos-electricos/` | estudiantes, tecnicas |
 | [x] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
 | [ ] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |

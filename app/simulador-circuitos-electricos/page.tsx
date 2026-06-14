@@ -246,9 +246,10 @@ export default function SimuladorCircuitosElectricos() {
                   />
                 </div>
               </div>
-              {errorOhm && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorOhm}</p>}
+              {errorOhm && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorOhm}</p>}
               <button className={styles.calcBtn} onClick={calcOhm}>Calcular</button>
 
+              <div role="status" aria-live="polite">
               {resOhm && (
                 <div className={styles.resultBlock}>
                   <p className={styles.resultTitle}>Resultado</p>
@@ -276,6 +277,7 @@ export default function SimuladorCircuitosElectricos() {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           </div>
         )}
@@ -322,9 +324,10 @@ export default function SimuladorCircuitosElectricos() {
                   placeholder="voltios"
                 />
               </div>
-              {errorSerie && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorSerie}</p>}
+              {errorSerie && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorSerie}</p>}
               <button className={styles.calcBtn} onClick={calcSerie}>Calcular circuito</button>
 
+              <div role="status" aria-live="polite">
               {resSerie && (
                 <>
                   <div className={styles.resultBlock} style={{ marginBottom: '1rem' }}>
@@ -367,6 +370,7 @@ export default function SimuladorCircuitosElectricos() {
                   <div className={styles.diagrama}>{diagramaSerie(numSerie)}</div>
                 </>
               )}
+              </div>
             </div>
           </div>
         )}
@@ -413,9 +417,10 @@ export default function SimuladorCircuitosElectricos() {
                   placeholder="voltios"
                 />
               </div>
-              {errorPar && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPar}</p>}
+              {errorPar && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPar}</p>}
               <button className={styles.calcBtn} onClick={calcParalelo}>Calcular circuito</button>
 
+              <div role="status" aria-live="polite">
               {resPar && (
                 <>
                   <div className={styles.resultBlock} style={{ marginBottom: '1rem' }}>
@@ -458,6 +463,7 @@ export default function SimuladorCircuitosElectricos() {
                   <div className={styles.diagrama}>{diagramaParalelo(numPar)}</div>
                 </>
               )}
+              </div>
             </div>
           </div>
         )}
@@ -498,9 +504,10 @@ export default function SimuladorCircuitosElectricos() {
                   <input type="number" inputMode="decimal" min="0" value={potTarifa} onChange={e => setPotTarifa(e.target.value)} />
                 </div>
               </div>
-              {errorPot && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPot}</p>}
+              {errorPot && <p role="alert" style={{ color: '#dc2626', fontSize: '0.875rem' }}>{errorPot}</p>}
               <button className={styles.calcBtn} onClick={calcPotencia}>Calcular</button>
 
+              <div role="status" aria-live="polite">
               {resPot && (
                 <div className={styles.resultBlock}>
                   <p className={styles.resultTitle}>Resultado energético</p>
@@ -530,6 +537,7 @@ export default function SimuladorCircuitosElectricos() {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           </div>
         )}

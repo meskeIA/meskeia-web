@@ -384,7 +384,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>x̄ = Σx / n</td>
                   <td>Datos simétricos sin valores extremos</td>
                   <td><span className={styles.sensibilidadAlta}>Alta</span></td>
-                  <td>2.260 € (distorsionada por 8.000 €)</td>
+                  <td>2.360 € (distorsionada por 8.000 €)</td>
                 </tr>
                 <tr>
                   <td><strong>Mediana</strong></td>
@@ -408,7 +408,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>Σ(x−x̄)² / (n−1)</td>
                   <td>Base para otros cálculos estadísticos</td>
                   <td><span className={styles.sensibilidadAlta}>Alta</span></td>
-                  <td>3.440.044 €² (unidades al cuadrado, difícil de interpretar)</td>
+                  <td>4.067.111 €² (unidades al cuadrado, difícil de interpretar)</td>
                 </tr>
                 <tr>
                   <td><strong>Desv. Estándar (s)</strong></td>
@@ -416,7 +416,7 @@ Ejemplo: 5, 7, 8, 6, 9, 7, 8"
                   <td>√[Σ(x−x̄)² / (n−1)]</td>
                   <td>Cuantificar variabilidad; reportar junto a la media</td>
                   <td><span className={styles.sensibilidadAlta}>Alta</span></td>
-                  <td>1.854,74 € — indica dispersión muy elevada</td>
+                  <td>2.016,71 € — indica dispersión muy elevada</td>
                 </tr>
                 <tr>
                   <td><strong>Rango</strong></td>
