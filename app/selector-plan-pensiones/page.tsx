@@ -7,9 +7,11 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
+import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import RegionBadge from '@/components/RegionBadge';
 import { getRelatedApps } from '@/data/app-relations';
+import { FISCAL_PLAN_PENSIONES_META } from '@/data/fiscal';
 import styles from './SelectorPlanPensiones.module.css';
 
 // ============================================================
@@ -615,6 +617,13 @@ export default function SelectorPlanPensiones() {
       {/* ---- DISCLAIMER (Nivel 2 ALTO — financiero general, visible siempre) ---- */}
       <div className={styles.disclaimerWrapper}>
         <DisclaimerCard variant="financial" severity="critical" />
+        <DataReference
+          normativa={`Plan de Pensiones ${FISCAL_PLAN_PENSIONES_META.vigencia}`}
+          fuente={FISCAL_PLAN_PENSIONES_META.fuente}
+          verificado={FISCAL_PLAN_PENSIONES_META.verificado}
+          urlOficial={FISCAL_PLAN_PENSIONES_META.urlOficial}
+          nota={FISCAL_PLAN_PENSIONES_META.nota}
+        />
       </div>
 
       {/* ---- SECCIÓN EDUCATIVA (Patrón v2.0) ---- */}
@@ -623,7 +632,7 @@ export default function SelectorPlanPensiones() {
           title="¿Qué debes saber antes de contratar un plan de pensiones?"
           subtitle="Ventajas fiscales, desventajas, diferencias entre planes y cuándo no conviene contratar ninguno"
         >
-          <h3>Ventajas fiscales reales en 2025</h3>
+          <h3>Ventajas fiscales reales en 2026</h3>
           <p>
             Los planes de pensiones individuales permiten reducir la base imponible del
             IRPF hasta <strong>1.500 € anuales</strong>. El ahorro real depende de tu

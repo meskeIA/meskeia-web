@@ -243,10 +243,11 @@ export default function PlanificadorAhorroJubilacionPage() {
         </DisclaimerCard>
 
         <DataReference
-          normativa={FISCAL_PLAN_PENSIONES_META.fuente}
+          normativa={`Plan de Pensiones ${FISCAL_PLAN_PENSIONES_META.vigencia}`}
           fuente={FISCAL_PLAN_PENSIONES_META.fuente}
           verificado={FISCAL_PLAN_PENSIONES_META.verificado}
           urlOficial={FISCAL_PLAN_PENSIONES_META.urlOficial}
+          nota={FISCAL_PLAN_PENSIONES_META.nota}
         />
 
         {/* ═══════ FORMULARIO PRINCIPAL ═══════ */}
@@ -430,7 +431,7 @@ export default function PlanificadorAhorroJubilacionPage() {
               <span className={styles.toggleIcon} aria-hidden="true">💼</span>
               <span className={styles.toggleInfo}>
                 <span className={styles.toggleTitle}>¿Cuánto me ahorro con un plan de pensiones?</span>
-                <span className={styles.toggleSubtitle}>Ventaja fiscal IRPF, coste real y límites de deducción 2025</span>
+                <span className={styles.toggleSubtitle}>Ventaja fiscal IRPF, coste real y límites de deducción 2026</span>
               </span>
               <span className={`${styles.toggleArrow} ${showPlan ? styles.toggleArrowOpen : ''}`} aria-hidden="true">▼</span>
             </button>

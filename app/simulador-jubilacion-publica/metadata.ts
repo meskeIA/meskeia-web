@@ -59,7 +59,7 @@ export const faqJsonLd = {
       name: '¿A qué edad me puedo jubilar en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2026, la edad ordinaria de jubilación en España es de 66 años y 8 meses si tienes menos de 38 años y 3 meses cotizados, o de 65 años si superas esa cotización. La edad se incrementa progresivamente hasta alcanzar los 67 años en 2027 para quienes tengan menos de 38 años y 6 meses cotizados. El año de nacimiento y los años cotizados son los dos factores determinantes.',
+        text: 'En 2026, la edad ordinaria de jubilación en España es de 66 años y 10 meses si tienes menos de 38 años y 3 meses cotizados, o de 65 años si superas esa cotización. La edad se incrementa progresivamente hasta alcanzar los 67 años en 2027 para quienes tengan menos de 38 años y 6 meses cotizados. El año de nacimiento y los años cotizados son los dos factores determinantes.',
       },
     },
     {
@@ -91,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la pensión máxima de jubilación en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pensión máxima de jubilación de la Seguridad Social en 2026 es de 3.267,60 € al mes (en 14 pagas), que se revisa anualmente según el IPC. Esta cifra actúa como techo independientemente de la base reguladora calculada. La pensión mínima garantizada para un pensionista con cónyuge a cargo supera los 900 € mensuales en 2026.',
+        text: 'La pensión máxima de jubilación de la Seguridad Social en 2026 es de 3.359,60 € al mes (en 14 pagas), que se revisa anualmente según el IPC. Esta cifra actúa como techo independientemente de la base reguladora calculada. La pensión mínima garantizada para un pensionista con cónyuge a cargo es de 1.256,60 € mensuales en 2026.',
       },
     },
   ],

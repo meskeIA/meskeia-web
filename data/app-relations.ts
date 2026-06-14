@@ -45,7 +45,7 @@ const estudiantesApps: RelatedApp[] = [
 // ==========================================
 const jubilacionApps: RelatedApp[] = [
   { url: '/simulador-jubilacion-publica/', icon: '🏤', name: 'Simulador Jubilación Pública', description: 'Edad, pensión, anticipada y parcial' },
-  { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2025' },
+  { url: '/estimador-pension-viudedad/', icon: '💍', name: 'Pensión de Viudedad', description: 'Cuantía y requisitos 2026' },
   { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro y plan de pensiones' },
   { url: '/estimador-irpf-pensionista/', icon: '📊', name: 'IRPF Pensionista', description: 'Cuánto pagas de renta al jubilarte' },
   { url: '/verificador-complemento-brecha-genero/', icon: '⚖️', name: 'Complemento Brecha de Género', description: '36,90 €/mes por hijo en tu pensión' },

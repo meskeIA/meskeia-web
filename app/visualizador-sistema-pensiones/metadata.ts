@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Comparativa reparto vs capitalización con visualización SVG',
     'Slider interactivo del ratio trabajadores/pensionistas (1975-2050)',
-    'Datos clave del gasto en pensiones 2024',
+    'Datos clave del gasto en pensiones 2024–2026',
     'Timeline de reformas del sistema (1995-2027)',
     'Proyecciones de gasto AIREF hasta 2050',
     'Evolución del Fondo de Reserva (hucha de las pensiones)',

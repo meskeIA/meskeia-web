@@ -146,7 +146,7 @@ export default function EstimadorIrpfPensionista() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Estimador IRPF Pensionista</h1>
-        <p className={styles.subtitle}>Cuánto pagas de renta siendo jubilado y cuál es tu pensión neta real · 2025</p>
+        <p className={styles.subtitle}>Cuánto pagas de renta siendo jubilado y cuál es tu pensión neta real · 2026</p>
       </header>
 
       <RegionBadge variant="es-only" />
@@ -164,10 +164,11 @@ export default function EstimadorIrpfPensionista() {
       </DisclaimerCard>
 
       <DataReference
-        normativa={FISCAL_IRPF_META.fuente}
+        normativa={`IRPF ${FISCAL_IRPF_META.vigencia}`}
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
+        nota={FISCAL_IRPF_META.nota}
       />
 
       <div className={styles.mainContent}>
@@ -293,7 +294,7 @@ export default function EstimadorIrpfPensionista() {
         </div>
       </div>
 
-      <EducationalSection title="¿Cómo tributa la pensión en el IRPF?" subtitle="Rendimientos del trabajo, reducciones y mínimos para jubilados · 2025">
+      <EducationalSection title="¿Cómo tributa la pensión en el IRPF?" subtitle="Rendimientos del trabajo, reducciones y mínimos para jubilados · 2026">
         <p>La pensión pública de jubilación tributa como <strong>rendimiento del trabajo</strong>, igual que un salario. Sin embargo, los pensionistas tienen ventajas fiscales específicas que reducen su factura.</p>
         <h3>Reducción por rendimientos del trabajo</h3>
         <p>Si tus únicos ingresos son la pensión, aplica una reducción en función de tu renta neta:</p>
@@ -318,7 +319,7 @@ export default function EstimadorIrpfPensionista() {
 
       {/* 1. Tabla Comparativa */}
       <div className={styles.tableWrapper}>
-        <h3>Reducciones y mínimos aplicables a pensionistas (2025)</h3>
+        <h3>Reducciones y mínimos aplicables a pensionistas (2026)</h3>
         <table className={styles.comparativaTable}>
           <thead>
             <tr>
@@ -330,7 +331,7 @@ export default function EstimadorIrpfPensionista() {
           <tbody>
             <tr>
               <td>Reducción rendimientos trabajo (general)</td>
-              <td>5.565 € (renta ≤13.115 €)</td>
+              <td>6.498 € (renta ≤13.115 €)</td>
               <td>Todos los trabajadores/pensionistas</td>
             </tr>
             <tr>
@@ -340,12 +341,12 @@ export default function EstimadorIrpfPensionista() {
             </tr>
             <tr>
               <td>Mínimo por edad ≥65 años</td>
-              <td>918 € adicionales (total 6.468 €)</td>
+              <td>1.150 € adicionales (total 6.700 €)</td>
               <td>65 años o más a 31/12</td>
             </tr>
             <tr>
               <td>Mínimo por edad ≥75 años</td>
-              <td>1.122 € adicionales (total 7.590 €)</td>
+              <td>2.550 € adicionales (total 8.100 €)</td>
               <td>75 años o más a 31/12</td>
             </tr>
             <tr>
@@ -423,7 +424,7 @@ export default function EstimadorIrpfPensionista() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Qué es el mínimo personal por edad?</strong>
-          <p>Es una cantidad que no tributa para proteger la subsistencia del contribuyente mayor. A los 65 años: 6.468 €; a los 75 años: 7.590 €. Se aplica al calcular la cuota íntegra.</p>
+          <p>Es una cantidad que no tributa para proteger la subsistencia del contribuyente mayor. A los 65 años: 6.700 €; a los 75 años: 8.100 €. Se aplica al calcular la cuota íntegra.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Conviene declarar aunque no esté obligado?</strong>

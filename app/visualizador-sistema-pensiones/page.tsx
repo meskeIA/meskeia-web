@@ -413,7 +413,7 @@ export default function VisualizadorSistemaPensiones() {
 
       {/* SECCIÓN 3: Gasto en pensiones */}
       <section className={styles.seccion}>
-        <h2 className={styles.seccionTitulo}>El gasto en pensiones hoy (2024)</h2>
+        <h2 className={styles.seccionTitulo}>El gasto en pensiones hoy (datos 2024–2026)</h2>
         <div className={styles.kpiGrid}>
           <div className={styles.kpiCard}>
             <span className={styles.kpiIcono} aria-hidden="true">💶</span>
@@ -435,15 +435,15 @@ export default function VisualizadorSistemaPensiones() {
           </div>
           <div className={styles.kpiCard}>
             <span className={styles.kpiIcono} aria-hidden="true">⬆️</span>
-            <span className={styles.kpiValor}>3.175 €/mes</span>
+            <span className={styles.kpiValor}>3.359,60 €/mes</span>
             <span className={styles.kpiLabel}>Pensión máxima</span>
-            <span className={styles.kpiSub}>Tope 2024</span>
+            <span className={styles.kpiSub}>Tope 2026</span>
           </div>
           <div className={styles.kpiCard}>
             <span className={styles.kpiIcono} aria-hidden="true">⬇️</span>
-            <span className={styles.kpiValor}>~950 €/mes</span>
+            <span className={styles.kpiValor}>1.256,60 €/mes</span>
             <span className={styles.kpiLabel}>Pensión mínima</span>
-            <span className={styles.kpiSub}>Con cónyuge a cargo</span>
+            <span className={styles.kpiSub}>Con cónyuge a cargo (2026)</span>
           </div>
         </div>
       </section>
@@ -573,15 +573,15 @@ export default function VisualizadorSistemaPensiones() {
             </li>
             <li>
               <strong>Porcentaje aplicable</strong>: mínimo 15 años cotizados para acceder (50%).
-              Se necesitan 37 años cotizados para cobrar el 100%.
+              Se necesitan 36 años y 9 meses cotizados para cobrar el 100% (en 2026; alcanzará los 37 años en 2027).
             </li>
             <li>
-              <strong>Edad de jubilación</strong>: con 67 años (o 65 si se acreditan 38 años y 3
-              meses) se accede a la jubilación ordinaria.
+              <strong>Edad de jubilación</strong>: en 2026, con 66 años y 10 meses (o 65 si se acreditan 38 años y 3 meses).
+              La edad ordinaria alcanzará los 67 años en 2027 (o 65 con 38 años y 6 meses).
             </li>
           </ol>
           <p>
-            La pensión resultante no puede superar el tope máximo (3.175 €/mes en 2024) ni quedar
+            La pensión resultante no puede superar el tope máximo (3.359,60 €/mes en 2026) ni quedar
             por debajo de las pensiones mínimas garantizadas.
           </p>
         </section>

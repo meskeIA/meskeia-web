@@ -214,11 +214,11 @@ export function getCoeficienteAnticipada(anosCotizados: number, tabla: Coeficien
 // ─── Plan de Pensiones: límites fiscales 2025 ────────────────────────────────
 
 export const FISCAL_PLAN_PENSIONES_META = {
-  fuente: 'Ley 35/2006 IRPF art. 51 + LPGE 2025',
-  verificado: '2025-01-15',
-  vigencia: '2025',
+  fuente: 'Ley 35/2006 IRPF art. 51 + LPGE 2025 (prórroga 2026)',
+  verificado: '2026-06-14',
+  vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es',
-  nota: 'Límites orientativos 2025. Consulta con tu entidad gestora o asesor fiscal.',
+  nota: 'Límites orientativos 2026. Consulta con tu entidad gestora o asesor fiscal.',
 };
 
 export const LIMITES_PLAN_PENSIONES_2025 = {

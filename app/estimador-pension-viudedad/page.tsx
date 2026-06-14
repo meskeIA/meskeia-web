@@ -206,10 +206,11 @@ export default function EstimadorPensionViudedad() {
       </DisclaimerCard>
 
       <DataReference
-        normativa={FISCAL_PENSIONES_META.fuente}
+        normativa={`Pensión de Viudedad ${FISCAL_PENSIONES_META.vigencia}`}
         fuente={FISCAL_PENSIONES_META.fuente}
         verificado={FISCAL_PENSIONES_META.verificado}
         urlOficial={FISCAL_PENSIONES_META.urlOficial}
+        nota={FISCAL_PENSIONES_META.nota}
       />
 
       <div className={styles.mainContent}>
@@ -588,7 +589,7 @@ export default function EstimadorPensionViudedad() {
             <span className={styles.stepNumber}>4</span>
             <div className={styles.stepContent}>
               <strong>Declara tus ingresos con exactitud</strong>
-              <p>Si quieres optar al 70%, debes declarar que tus ingresos anuales propios no superan el límite legal (aproximadamente 8.614 €/año en 2025). El INSS verificará esta información con la AEAT.</p>
+              <p>Si quieres optar al 70%, debes declarar que tus ingresos propios del trabajo no superan el límite legal (aproximadamente {formatCurrency(PV.limiteIngresos70)}/mes, el 75% del SMI 2026). El INSS verificará esta información con la AEAT.</p>
             </div>
           </div>
           <div className={styles.step}>

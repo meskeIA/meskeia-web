@@ -2,16 +2,16 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Estimador Pensión de Viudedad 2025 — Cuantía y requisitos SS | meskeIA',
-  description: 'Calcula la pensión de viudedad estimada según la Seguridad Social española 2025. Porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y requisitos de acceso.',
-  keywords: 'pension viudedad 2025, cuantia pension viudedad, como calcular pension viudedad, requisitos pension viudedad, pension viudedad 52 60 70 por ciento, base reguladora viudedad, pension minima viudedad',
+  title: 'Estimador Pensión de Viudedad 2026 — Cuantía y requisitos SS | meskeIA',
+  description: 'Calcula la pensión de viudedad estimada según la Seguridad Social española 2026. Porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y requisitos de acceso.',
+  keywords: 'pension viudedad 2026, cuantia pension viudedad, como calcular pension viudedad, requisitos pension viudedad, pension viudedad 52 60 70 por ciento, base reguladora viudedad, pension minima viudedad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador Pensión de Viudedad 2025 | meskeIA',
+    title: 'Estimador Pensión de Viudedad 2026 | meskeIA',
     description: 'Estima la cuantía de la pensión de viudedad: porcentaje (52/60/70%), mínimos garantizados y requisitos de la Seguridad Social.',
     url: 'https://meskeia.com/estimador-pension-viudedad/',
     siteName: 'meskeIA',
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Pensión de Viudedad 2025 | meskeIA',
-    description: 'Calcula la pensión de viudedad 2025: base reguladora, porcentaje y mínimos garantizados',
+    title: 'Estimador Pensión de Viudedad 2026 | meskeIA',
+    description: 'Calcula la pensión de viudedad 2026: base reguladora, porcentaje y mínimos garantizados',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Estimador Pensión de Viudedad",
-  description: "Calcula la pensión de viudedad estimada según la Seguridad Social española 2025. Porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y requisitos de acceso.",
+  description: "Calcula la pensión de viudedad estimada según la Seguridad Social española 2026. Porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y requisitos de acceso.",
   url: "https://meskeia.com/estimador-pension-viudedad/",
   category: 'FinanceApplication',
   features: [],
@@ -48,10 +48,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuánto es la pensión de viudedad en España en 2025?',
+      name: '¿Cuánto es la pensión de viudedad en España en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cuantía de la pensión de viudedad depende del porcentaje aplicable sobre la base reguladora del fallecido. En 2025 se aplica el 52% con carácter general, el 60% para beneficiarios con 65 o más años sin otras rentas relevantes, y el 70% en casos de cargas familiares (hijos menores a cargo) con bajos ingresos. La pensión mínima garantizada para mayores de 65 años asciende a unos 9.600 € anuales (14 pagas).',
+        text: 'La cuantía de la pensión de viudedad depende del porcentaje aplicable sobre la base reguladora del fallecido. En 2026 se aplica el 52% con carácter general, el 60% para beneficiarios con 65 o más años sin otras rentas relevantes, y el 70% en casos de cargas familiares (hijos menores a cargo) con bajos ingresos. La pensión mínima garantizada para mayores de 65 años asciende a unos 11.940 € anuales (14 pagas).',
       },
     },
     {

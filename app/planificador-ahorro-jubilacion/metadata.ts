@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Cálculo de brecha entre sueldo y pensión',
     'Ahorro mensual necesario para cubrir la diferencia',
-    'Ventaja fiscal del plan de pensiones (IRPF 2025)',
+    'Ventaja fiscal del plan de pensiones (IRPF 2026)',
     'Proyección de capital por 3 escenarios de rentabilidad',
     'Pensión complementaria estimada',
     'Funciona 100% en el navegador, sin registro ni instalación',
@@ -66,7 +66,7 @@ export const faqJsonLd = {
       name: '¿Cuántos años hay que cotizar para recibir el 100% de la pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para percibir el 100% de la base reguladora en 2025 se necesitan 37 años cotizados (el cómputo aumenta progresivamente hasta los 38,5 años en 2027). Con menos años cotizados se aplican porcentajes reductores: entre 15 y 36 años, la pensión oscila entre el 50% y el 99,2%. El mínimo para acceder a la jubilación ordinaria es 15 años cotizados, de los cuales 2 deben estar en los últimos 15 años.',
+        text: 'Para percibir el 100% de la base reguladora se necesitan actualmente 36 años y 9 meses cotizados (36,75 años), un periodo transitorio fijado por la Ley 21/2021 que aumenta progresivamente cada año. Con menos años cotizados se aplican porcentajes reductores: entre 15 y 36 años, la pensión oscila entre el 50% y el 99,2%. El mínimo para acceder a la jubilación ordinaria es 15 años cotizados, de los cuales 2 deben estar en los últimos 15 años.',
       },
     },
     {

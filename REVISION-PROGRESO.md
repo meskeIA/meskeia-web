@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 85 / 999
-- ⬜ Pendientes: 914 / 999
+- ✅ Revisadas: 92 / 999
+- ⬜ Pendientes: 907 / 999
 
 ## Resumen por suite primaria
 
@@ -599,7 +599,7 @@
 | [ ] | Simulador Depredador-Presa (Lotka-Volterra) | `/simulador-lotka-volterra/` | estudiantes |
 | [ ] | Simulador Masa-Resorte (MAS) | `/simulador-mas-resorte/` | estudiantes |
 | [ ] | Simulador VSEPR de Geometría Molecular | `/simulador-vsepr/` | estudiantes |
-| [ ] | Sistema de Pensiones: Reparto, Demografía y Reformas | `/visualizador-sistema-pensiones/` | estudiantes, cultura, finanzas |
+| [x] | Sistema de Pensiones: Reparto, Demografía y Reformas | `/visualizador-sistema-pensiones/` | estudiantes, cultura, finanzas |
 | [ ] | Sistemas Circulatorios - Del Corazón de 2 al de 4 Cámaras | `/visualizador-sistemas-circulatorios/` | estudiantes, cultura |
 | [ ] | Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros | `/visualizador-sistemas-operativos/` | estudiantes, tecnicas |
 | [ ] | Sonido y Ondas - Frecuencia, Amplitud y Decibelios | `/visualizador-sonido-ondas/` | estudiantes, cultura |
@@ -671,7 +671,7 @@
 | [ ] | Seguros y Riesgo: Prima Actuarial, Pool de Riesgo y Mutualización | `/visualizador-seguros-riesgo/` | finanzas, cultura |
 | [ ] | Selector de Coche Nuevo o Usado | `/selector-coche-nuevo-usado/` | finanzas, inmobiliaria |
 | [ ] | Selector de Cuenta Bancaria | `/selector-cuenta-bancaria/` | finanzas |
-| [ ] | Selector de Plan de Pensiones | `/selector-plan-pensiones/` | finanzas, freelance |
+| [x] | Selector de Plan de Pensiones | `/selector-plan-pensiones/` | finanzas, freelance |
 | [ ] | Selector de Seguro de Coche | `/selector-seguro-coche/` | finanzas, tecnicas |
 | [ ] | Selector de Seguro de Vida | `/selector-seguro-vida/` | finanzas, salud |
 | [ ] | Selector de Tipo de Ahorro | `/selector-tipo-ahorro/` | finanzas, productividad |
@@ -889,8 +889,8 @@
 | [x] | Estimador Impuesto de Donaciones | `/estimador-impuesto-donaciones/` | legal-fiscal |
 | [x] | Estimador Impuesto de Sucesiones | `/estimador-impuesto-sucesiones/` | legal-fiscal |
 | [ ] | Estimador IRPF | `/estimador-irpf/` | legal-fiscal |
-| [ ] | Estimador IRPF Pensionista | `/estimador-irpf-pensionista/` | legal-fiscal, finanzas |
-| [ ] | Estimador Pensión de Viudedad | `/estimador-pension-viudedad/` | legal-fiscal, finanzas |
+| [x] | Estimador IRPF Pensionista | `/estimador-irpf-pensionista/` | legal-fiscal, finanzas |
+| [x] | Estimador Pensión de Viudedad | `/estimador-pension-viudedad/` | legal-fiscal, finanzas |
 | [ ] | Estimador Plusvalía Municipal (IIVTNU) | `/estimador-plusvalia-municipal/` | legal-fiscal, inmobiliaria |
 | [ ] | Estimador Plusvalías IRPF | `/estimador-plusvalias-irpf/` | legal-fiscal, finanzas |
 | [ ] | Estimador SMI 2026 | `/estimador-smi/` | legal-fiscal, finanzas |
@@ -904,11 +904,11 @@
 | [x] | Orientador de Gastos Deducibles | `/orientador-gastos-deducibles/` | legal-fiscal, freelance |
 | [ ] | Orientador de Intereses de Demora | `/orientador-intereses-demora/` | legal-fiscal, freelance |
 | [ ] | Orientador de Justicia Gratuita | `/orientador-justicia-gratuita/` | legal-fiscal |
-| [ ] | Orientador de Trámites de Jubilación | `/orientador-tramites-jubilacion/` | legal-fiscal, finanzas |
+| [x] | Orientador de Trámites de Jubilación | `/orientador-tramites-jubilacion/` | legal-fiscal, finanzas |
 | [ ] | Orientador Límite Conjunto IRPF-Patrimonio | `/orientador-limite-conjunto-patrimonio/` | legal-fiscal, finanzas |
 | [ ] | Orientador Visa Nómada Digital | `/requisitos-nomada-digital/` | legal-fiscal, freelance |
-| [ ] | Planificador de Ahorro para la Jubilación | `/planificador-ahorro-jubilacion/` | legal-fiscal, finanzas |
-| [ ] | Simulador de Jubilación Pública | `/simulador-jubilacion-publica/` | legal-fiscal, finanzas |
+| [x] | Planificador de Ahorro para la Jubilación | `/planificador-ahorro-jubilacion/` | legal-fiscal, finanzas |
+| [x] | Simulador de Jubilación Pública | `/simulador-jubilacion-publica/` | legal-fiscal, finanzas |
 | [ ] | Simulador del Mito del Tramo Superior IRPF | `/simulador-mito-tramo-superior/` | legal-fiscal, finanzas |
 | [x] | Simulador Desglose de Nómina (Bruto a Neto) | `/simulador-desglose-nomina/` | legal-fiscal, finanzas |
 | [x] | Simulador Heredar Vivienda (ISD + Plusvalía + IRPF) | `/simulador-heredar-vivienda/` | legal-fiscal, inmobiliaria |

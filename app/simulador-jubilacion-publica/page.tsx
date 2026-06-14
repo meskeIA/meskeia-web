@@ -23,7 +23,7 @@ import {
   TRAMOS_PORCENTAJE_PENSION_2025,
   LIMITES_PENSION_2025,
   BASE_REGULADORA,
-  EDAD_JUBILACION_2025,
+  BASES_SS_2026,
   getSistemaDualParams,
   COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025,
   COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025,
@@ -433,10 +433,11 @@ export default function SimuladorJubilacionPublicaPage() {
         </DisclaimerCard>
 
         <DataReference
-          normativa={FISCAL_PENSIONES_META.fuente}
+          normativa={`Jubilación y Pensiones ${FISCAL_PENSIONES_META.vigencia}`}
           fuente={FISCAL_PENSIONES_META.fuente}
           verificado={FISCAL_PENSIONES_META.verificado}
           urlOficial={FISCAL_PENSIONES_META.urlOficial}
+          nota={FISCAL_PENSIONES_META.nota}
         />
 
         {/* ═══════ FORMULARIO PRINCIPAL ═══════ */}
@@ -473,7 +474,7 @@ export default function SimuladorJubilacionPublicaPage() {
           <NumberInput
             value={baseMensual}
             onChange={setBaseMensual}
-            label={`Base de cotización media mensual (€) — máx. ${formatCurrency(4909.50)}/mes`}
+            label={`Base de cotización media mensual (€) — máx. ${formatCurrency(BASES_SS_2026.maxima)}/mes`}
             placeholder="Ej: 2.500"
             helperText="Aproximación de tu salario bruto mensual medio de los últimos 25 años."
             min={100}
@@ -906,7 +907,7 @@ export default function SimuladorJubilacionPublicaPage() {
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿Cuántos años hay que cotizar para cobrar el 100%?</strong>
-              <p>En 2025 se necesitan 36 años y 6 meses cotizados. Este requisito aumenta gradualmente hasta los 37 años en 2027.</p>
+              <p>En 2026 se necesitan 36 años y 9 meses cotizados para alcanzar el 100% de la base reguladora. Este requisito ha aumentado progresivamente en los últimos años según la Ley 27/2011 y la Ley 21/2021.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es el sistema dual de pensiones 2026?</strong>

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     'EPSV País Vasco',
     'ahorro jubilación España',
     'ventajas fiscales plan pensiones',
-    'plan pensiones 2025',
+    'plan pensiones 2026',
     'alternativas al plan de pensiones',
     'fondo pensiones o indexado',
     'deducción IRPF plan pensiones',
@@ -78,7 +78,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Merece la pena contratar un plan de pensiones en 2025?',
+      name: '¿Merece la pena contratar un plan de pensiones en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Depende de tu tipo marginal de IRPF y de tu horizonte hasta la jubilación. Si tributas al 30 % o más, la deducción fiscal puede ser significativa a corto plazo. Sin embargo, en 2022 el límite de aportación individual se redujo a 1.500 € anuales, lo que limita el beneficio para rentas medias. Para la mayoría de ahorradores con tipo marginal bajo o con necesidad de liquidez en menos de 10 años, un fondo indexado suele ser más flexible y puede ofrecer mejor rentabilidad neta.',
