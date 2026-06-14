@@ -52,3 +52,50 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['curso negociación', 'BATNA', 'ZOPA', 'persuasión', 'Cialdini', 'mediación', 'conflictos'],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el BATNA en una negociación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'BATNA (Best Alternative To a Negotiated Agreement) es la mejor alternativa que tienes si la negociación fracasa. Conocer tu BATNA te da poder de negociación: si la otra parte no ofrece algo mejor que tu alternativa, puedes retirarte con confianza. Antes de negociar conviene identificar y fortalecer tu BATNA tanto como sea posible.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es la ZOPA y cómo afecta al resultado de una negociación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'ZOPA (Zone Of Possible Agreement) es el rango entre el mínimo aceptable de cada parte donde existe posibilidad de acuerdo. Si los rangos se solapan, hay ZOPA y el acuerdo es posible; si no se solapan, la negociación no puede cerrarse sin que alguna parte cambie su posición. Identificar la ZOPA ayuda a enfocar los esfuerzos en opciones realistas.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre negociación distributiva e integrativa?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'La negociación distributiva (suma cero) asume que lo que gana una parte lo pierde la otra, como ocurre al regatear el precio de un producto. La negociación integrativa busca crear valor para ambas partes identificando intereses distintos que se pueden satisfacer simultáneamente. La mayoría de negociaciones profesionales tienen elementos de ambos tipos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién es útil este curso de negociación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para cualquier persona que negocie en su vida laboral o personal: profesionales que cierran contratos o acuerdos comerciales, responsables de compras, emprendedores, abogados, mediadores y personas que quieran mejorar sus habilidades de comunicación y persuasión en el día a día.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cuánto tiempo lleva completar el curso de negociación?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El curso consta de 12 capítulos organizados en 4 módulos: preparación estratégica, psicología de la negociación, cierre de acuerdos y resolución de conflictos. A un ritmo de un capítulo por día, se puede completar en menos de dos semanas. El progreso se guarda automáticamente en el navegador para retomarlo cuando quieras.',
+      },
+    },
+  ],
+};

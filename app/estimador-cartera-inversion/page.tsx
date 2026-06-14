@@ -465,35 +465,39 @@ export default function SimuladorCarteraPage() {
         {/* Panel de Configuración */}
         <div className={styles.configPanel}>
           <h2 className={styles.sectionTitle}>
-            <span>⚙️</span> Configuración
+            <span aria-hidden="true">⚙️</span> Configuración
           </h2>
 
           {/* Capital y Aportaciones */}
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>Capital inicial</label>
+            <label htmlFor="capitalInicial" className={styles.inputLabel}>Capital inicial</label>
             <div className={styles.inputWithUnit}>
               <input
+                id="capitalInicial"
                 type="number"
                 className={styles.input}
                 value={capitalInicial}
                 onChange={e => setCapitalInicial(Math.max(0, parseInt(e.target.value) || 0))}
                 min={0}
                 step={1000}
+                inputMode="numeric"
               />
               <span className={styles.inputUnit}>€</span>
             </div>
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>Aportación mensual</label>
+            <label htmlFor="aportacionMensual" className={styles.inputLabel}>Aportación mensual</label>
             <div className={styles.inputWithUnit}>
               <input
+                id="aportacionMensual"
                 type="number"
                 className={styles.input}
                 value={aportacionMensual}
                 onChange={e => setAportacionMensual(Math.max(0, parseInt(e.target.value) || 0))}
                 min={0}
                 step={50}
+                inputMode="numeric"
               />
               <span className={styles.inputUnit}>€/mes</span>
             </div>
@@ -501,24 +505,27 @@ export default function SimuladorCarteraPage() {
 
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Horizonte</label>
+              <label htmlFor="horizonte" className={styles.inputLabel}>Horizonte</label>
               <div className={styles.inputWithUnit}>
                 <input
+                  id="horizonte"
                   type="number"
                   className={styles.input}
                   value={años}
                   onChange={e => setAños(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
                   min={1}
                   max={50}
+                  inputMode="numeric"
                 />
                 <span className={styles.inputUnit}>años</span>
               </div>
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Inflación</label>
+              <label htmlFor="inflacion" className={styles.inputLabel}>Inflación</label>
               <div className={styles.inputWithUnit}>
                 <input
+                  id="inflacion"
                   type="number"
                   className={styles.input}
                   value={inflacion}
@@ -526,6 +533,7 @@ export default function SimuladorCarteraPage() {
                   min={0}
                   max={10}
                   step={0.5}
+                  inputMode="decimal"
                 />
                 <span className={styles.inputUnit}>%</span>
               </div>
@@ -533,15 +541,17 @@ export default function SimuladorCarteraPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>Objetivo de patrimonio</label>
+            <label htmlFor="objetivo" className={styles.inputLabel}>Objetivo de patrimonio</label>
             <div className={styles.inputWithUnit}>
               <input
+                id="objetivo"
                 type="number"
                 className={styles.input}
                 value={objetivo}
                 onChange={e => setObjetivo(Math.max(0, parseInt(e.target.value) || 0))}
                 min={0}
                 step={10000}
+                inputMode="numeric"
               />
               <span className={styles.inputUnit}>€</span>
             </div>
@@ -550,7 +560,7 @@ export default function SimuladorCarteraPage() {
           {/* Distribución de Cartera */}
           <div className={styles.carteraSection}>
             <h3 className={styles.subsectionTitle}>
-              <span>📊</span> Distribución de Cartera
+              <span aria-hidden="true">📊</span> Distribución de Cartera
             </h3>
 
             {/* Selector de perfil predefinido */}
@@ -560,6 +570,7 @@ export default function SimuladorCarteraPage() {
                   key={key}
                   className={`${styles.perfilBtn} ${perfilSeleccionado === key ? styles.perfilBtnActive : ''}`}
                   onClick={() => handlePerfilChange(key)}
+                  aria-pressed={perfilSeleccionado === key}
                 >
                   {nombre}
                 </button>
@@ -590,6 +601,11 @@ export default function SimuladorCarteraPage() {
                       asset.id as keyof CarteraConfig,
                       parseInt(e.target.value)
                     )}
+                    aria-label={`Peso de ${asset.nombre}`}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={cartera[asset.id as keyof CarteraConfig]}
+                    aria-valuetext={`${cartera[asset.id as keyof CarteraConfig]}%`}
                     style={{
                       background: `linear-gradient(to right, ${asset.color} 0%, ${asset.color} ${cartera[asset.id as keyof CarteraConfig]}%, #E5E5E5 ${cartera[asset.id as keyof CarteraConfig]}%, #E5E5E5 100%)`
                     }}
@@ -630,7 +646,7 @@ export default function SimuladorCarteraPage() {
               </>
             ) : (
               <>
-                <span>🎲</span> Simular Cartera
+                <span aria-hidden="true">🎲</span> Simular Cartera
               </>
             )}
           </button>
@@ -647,13 +663,13 @@ export default function SimuladorCarteraPage() {
         </div>
 
         {/* Panel de Resultados */}
-        <div className={styles.resultadosPanel}>
+        <div className={styles.resultadosPanel} role="status" aria-live="polite" aria-atomic="false">
           {resultado && metricas ? (
             <>
               {/* Gráfico */}
               <div className={styles.chartContainer}>
-                <h3 className={styles.chartTitle}>📈 Evolución del Patrimonio</h3>
-                <div className={styles.chartWrapper}>
+                <h3 className={styles.chartTitle}><span aria-hidden="true">📈</span> Evolución del Patrimonio</h3>
+                <div className={styles.chartWrapper} role="img" aria-label="Gráfico de evolución del patrimonio con percentiles 10, 25, 50, 75 y 90">
                   {chartData && (
                     <Line
                       ref={chartRef}
@@ -667,7 +683,7 @@ export default function SimuladorCarteraPage() {
               {/* Métricas principales */}
               <div className={styles.metricasGrid}>
                 <div className={`${styles.metricaCard} ${styles.destacada}`}>
-                  <div className={styles.metricaIcono}>💰</div>
+                  <div className={styles.metricaIcono} aria-hidden="true">💰</div>
                   <div className={styles.metricaValor}>
                     {formatCurrency(metricas.capitalFinalMediano)}
                   </div>
@@ -675,7 +691,7 @@ export default function SimuladorCarteraPage() {
                 </div>
 
                 <div className={styles.metricaCard}>
-                  <div className={styles.metricaIcono}>🎯</div>
+                  <div className={styles.metricaIcono} aria-hidden="true">🎯</div>
                   <div className={styles.metricaValor}>
                     {formatNumber(metricas.probabilidadObjetivo, 1)}%
                   </div>
@@ -685,7 +701,7 @@ export default function SimuladorCarteraPage() {
                 </div>
 
                 <div className={styles.metricaCard}>
-                  <div className={styles.metricaIcono}>📊</div>
+                  <div className={styles.metricaIcono} aria-hidden="true">📊</div>
                   <div className={styles.metricaValor}>
                     {formatNumber(metricas.sharpeRatio, 2)}
                   </div>
@@ -693,7 +709,7 @@ export default function SimuladorCarteraPage() {
                 </div>
 
                 <div className={styles.metricaCard}>
-                  <div className={styles.metricaIcono}>📉</div>
+                  <div className={styles.metricaIcono} aria-hidden="true">📉</div>
                   <div className={styles.metricaValor}>
                     -{formatNumber(metricas.maxDrawdownEsperado, 1)}%
                   </div>
@@ -704,7 +720,7 @@ export default function SimuladorCarteraPage() {
               {/* Detalles adicionales */}
               <div className={styles.detallesSection}>
                 <h3 className={styles.subsectionTitle}>
-                  <span>📋</span> Detalles de la Simulación
+                  <span aria-hidden="true">📋</span> Detalles de la Simulación
                 </h3>
 
                 <div className={styles.detallesGrid}>
@@ -749,7 +765,7 @@ export default function SimuladorCarteraPage() {
 
               {/* Interpretación */}
               <div className={styles.interpretacion}>
-                <h4>💡 Interpretación</h4>
+                <h4><span aria-hidden="true">💡</span> Interpretación</h4>
                 <ul>
                   <li>
                     <strong>Mediana:</strong> En el 50% de los escenarios, tu patrimonio superará {formatCurrency(metricas.capitalFinalMediano)}

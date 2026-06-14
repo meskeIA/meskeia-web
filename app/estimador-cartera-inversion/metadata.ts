@@ -37,9 +37,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/estimador-cartera-inversion/',
   category: 'FinanceApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "Simulación Monte Carlo con 1000 escenarios de evolución del patrimonio",
+      "Distribución entre 4 clases de activo: renta variable, renta fija, liquidez y alternativos",
+      "5 perfiles predefinidos: conservador, moderado-conservador, moderado, crecimiento y agresivo",
+      "Cálculo de ratio de Sharpe, volatilidad y máximo drawdown esperado",
+      "Visualización de percentiles P10-P90 en gráfico interactivo",
+      "Probabilidad de alcanzar un objetivo de patrimonio personalizado",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 

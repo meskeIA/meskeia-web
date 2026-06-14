@@ -38,7 +38,7 @@ export default function CursoNegociacionPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🤝</span>
+        <span className={styles.heroIcon} aria-hidden="true">🤝</span>
         <h1 className={styles.title}>Curso de Negociación Exitosa</h1>
         <p className={styles.subtitle}>
           Domina el arte de negociar: desde la preparación estratégica hasta el cierre de acuerdos.
@@ -50,7 +50,7 @@ export default function CursoNegociacionPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -60,22 +60,22 @@ export default function CursoNegociacionPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}/{totalChapters}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -85,22 +85,22 @@ export default function CursoNegociacionPage() {
       <section className={styles.overviewSection}>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📋</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📋</span>
             <h3>Preparación</h3>
             <p>BATNA, ZOPA y análisis estratégico antes de negociar</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🧠</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🧠</span>
             <h3>Psicología</h3>
             <p>Sesgos cognitivos, persuasión y tácticas de influencia</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🤝</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🤝</span>
             <h3>Cierre</h3>
             <p>Técnicas de cierre, contratos y negociación internacional</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>⚖️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">⚖️</span>
             <h3>Conflictos</h3>
             <p>Mediación, arbitraje y ética en la negociación</p>
           </div>
@@ -109,7 +109,7 @@ export default function CursoNegociacionPage() {
 
       {/* Modules Section */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido del Curso</h2>
 
         {modules.map((module) => {
           const completedInModule = module.chapters.filter(ch => isCompleted(ch.id)).length;
@@ -146,7 +146,7 @@ export default function CursoNegociacionPage() {
                         <span className={styles.chapterNumber}>{globalChapterIndex}</span>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>{chapter.title}</h4>
-                          <span className={styles.chapterDuration}>⏱️ {chapter.duration} min</span>
+                          <span className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</span>
                         </div>
                       </div>
                       <div className={styles.chapterTopics}>
@@ -168,15 +168,15 @@ export default function CursoNegociacionPage() {
 
       {/* Resources Section */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>📚 Recursos Adicionales</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📚</span> Recursos Adicionales</h2>
         <div className={styles.resourcesGrid}>
           <Link href="/curso-negociacion/recursos/glosario" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>📖</span>
+            <span className={styles.resourceIcon} aria-hidden="true">📖</span>
             <div className={styles.resourceName}>Glosario de Términos</div>
             <div className={styles.resourceDesc}>BATNA, ZOPA, anclaje y más conceptos clave</div>
           </Link>
           <Link href="/curso-negociacion/recursos/ejercicios" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>✏️</span>
+            <span className={styles.resourceIcon} aria-hidden="true">✏️</span>
             <div className={styles.resourceName}>Ejercicios Prácticos</div>
             <div className={styles.resourceDesc}>Practica con escenarios de negociación reales</div>
           </Link>
@@ -187,7 +187,7 @@ export default function CursoNegociacionPage() {
       <section className={styles.ctaSection}>
         {progress === 0 ? (
           <>
-            <h2 className={styles.ctaTitle}>🚀 ¡Comienza tu Formación en Negociación!</h2>
+            <h2 className={styles.ctaTitle}><span aria-hidden="true">🚀</span> ¡Comienza tu Formación en Negociación!</h2>
             <p className={styles.ctaText}>
               Aprende a preparar, conducir y cerrar negociaciones exitosas.
               Domina las técnicas que usan los mejores negociadores del mundo.
@@ -201,7 +201,7 @@ export default function CursoNegociacionPage() {
           </>
         ) : progress === 100 ? (
           <>
-            <h2 className={styles.ctaTitle}>🎉 ¡Felicidades, has completado el curso!</h2>
+            <h2 className={styles.ctaTitle}><span aria-hidden="true">🎉</span> ¡Felicidades, has completado el curso!</h2>
             <p className={styles.ctaText}>
               Has adquirido conocimientos fundamentales sobre negociación exitosa.
               Ahora puedes aplicarlos en tu vida profesional y personal.
@@ -215,7 +215,7 @@ export default function CursoNegociacionPage() {
           </>
         ) : (
           <>
-            <h2 className={styles.ctaTitle}>📈 ¡Sigue avanzando!</h2>
+            <h2 className={styles.ctaTitle}><span aria-hidden="true">📈</span> ¡Sigue avanzando!</h2>
             <p className={styles.ctaText}>
               Llevas {completedCount} de {totalChapters} capítulos completados.
               ¡Continúa desarrollando tus habilidades de negociación!

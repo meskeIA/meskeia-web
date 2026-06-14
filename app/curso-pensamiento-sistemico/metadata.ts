@@ -40,8 +40,58 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/curso-pensamiento-sistemico/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
+      "Curso completo en 4 módulos: fundamentos, conceptos clave, sistemas en acción y aplicación práctica",
+      "Conceptos de Donella Meadows, Peter Senge y Nassim Taleb explicados en español",
+      "Bucles de retroalimentación, emergencia, antifragilidad y puntos de apalancamiento",
+      "Ejercicios de reflexión y casos reales en organizaciones, economía y tecnología",
+      "Progreso guardado localmente entre sesiones sin registro ni instalación",
       "Gratuito y sin publicidad",
-      "En español"
   ],
 });
+
+export const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '¿Qué es el pensamiento sistémico y por qué es importante?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'El pensamiento sistémico es un enfoque para entender la realidad como conjuntos de elementos interconectados cuyas relaciones generan comportamientos que no se pueden deducir estudiando las partes por separado. Es importante porque muchos problemas complejos (organizacionales, sociales, medioambientales) tienen causas sistémicas que no se resuelven con soluciones lineales. Donella Meadows y Peter Senge lo popularizaron en gestión empresarial durante las décadas de 1980-90.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué es un bucle de retroalimentación en un sistema?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un bucle de retroalimentación ocurre cuando el resultado de un proceso vuelve a influir en el propio proceso. Los bucles de refuerzo amplifican cambios (como el crecimiento exponencial o la espiral de deuda). Los bucles de equilibrio tienden a estabilizar el sistema hacia un objetivo. Comprender qué tipo de bucles dominan un sistema es clave para predecir su comportamiento.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué diferencia hay entre un sistema complejo y uno complicado?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Un sistema complicado (como un avión) tiene muchas piezas pero su comportamiento es predecible si se conocen las partes. Un sistema complejo (como una economía o un ecosistema) tiene componentes que interactúan de forma no lineal y produce comportamientos emergentes imposibles de predecir solo desde las partes individuales. La distinción es clave para elegir el tipo de análisis adecuado.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué son los puntos de apalancamiento en un sistema según Donella Meadows?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Los puntos de apalancamiento son lugares del sistema donde un pequeño cambio produce un gran efecto. Meadows identificó una jerarquía de 12 puntos de apalancamiento, siendo los más poderosos cambiar los objetivos del sistema o sus paradigmas subyacentes, no los más obvios como los flujos o los parámetros numéricos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Para quién está pensado este curso de pensamiento sistémico?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Es útil para directivos y líderes que toman decisiones en entornos complejos, analistas y consultores que modelan organizaciones o políticas, educadores que quieran enseñar a pensar en términos de causas y efectos interconectados, y cualquier persona interesada en entender por qué los sistemas (económicos, sociales, tecnológicos) se comportan de formas inesperadas.',
+      },
+    },
+  ],
+};

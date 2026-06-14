@@ -31,9 +31,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/generador-gradientes/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "Editor visual de gradientes lineales, radiales y cónicos",
+      "Hasta 10 color stops con selector visual y valor hexadecimal",
+      "10 presets de gradientes profesionales incluidos",
+      "Ángulo personalizable 0°–360° con presets rápidos",
+      "Código CSS generado en tiempo real, listo para copiar",
+      "Compatible con todos los navegadores modernos sin prefijos vendor",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 

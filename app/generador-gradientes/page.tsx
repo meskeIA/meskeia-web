@@ -135,7 +135,7 @@ export default function GeneradorGradientesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎨 Generador de Gradientes CSS</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎨</span> Generador de Gradientes CSS</h1>
         <p className={styles.subtitle}>
           Crea degradados profesionales con editor visual
         </p>
@@ -151,6 +151,8 @@ export default function GeneradorGradientesPage() {
           <div
             className={styles.previewBox}
             style={{ background: gradientCSS }}
+            role="img"
+            aria-label={`Vista previa del gradiente: ${gradientCSS}`}
           />
 
           <div className={styles.codeSection}>
@@ -159,8 +161,9 @@ export default function GeneradorGradientesPage() {
               <button
                 onClick={copyToClipboard}
                 className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
+                aria-label="Copiar código CSS al portapapeles"
               >
-                {copied ? '✓ Copiado' : '📋 Copiar'}
+                <span role="status" aria-live="polite">{copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}</span>
               </button>
             </div>
             <pre className={styles.codeBlock}>
@@ -200,20 +203,23 @@ export default function GeneradorGradientesPage() {
               <button
                 className={`${styles.typeBtn} ${gradientType === 'linear' ? styles.typeActive : ''}`}
                 onClick={() => setGradientType('linear')}
+                aria-pressed={gradientType === 'linear'}
               >
-                ↗️ Lineal
+                <span aria-hidden="true">↗️</span> Lineal
               </button>
               <button
                 className={`${styles.typeBtn} ${gradientType === 'radial' ? styles.typeActive : ''}`}
                 onClick={() => setGradientType('radial')}
+                aria-pressed={gradientType === 'radial'}
               >
-                ⭕ Radial
+                <span aria-hidden="true">⭕</span> Radial
               </button>
               <button
                 className={`${styles.typeBtn} ${gradientType === 'conic' ? styles.typeActive : ''}`}
                 onClick={() => setGradientType('conic')}
+                aria-pressed={gradientType === 'conic'}
               >
-                🔄 Cónico
+                <span aria-hidden="true">🔄</span> Cónico
               </button>
             </div>
           </div>
@@ -239,6 +245,7 @@ export default function GeneradorGradientesPage() {
                       key={a}
                       className={`${styles.angleBtn} ${angle === a ? styles.angleActive : ''}`}
                       onClick={() => setAngle(a)}
+                      aria-pressed={angle === a}
                     >
                       {a}°
                     </button>
@@ -259,8 +266,9 @@ export default function GeneradorGradientesPage() {
                       key={shape}
                       className={`${styles.shapeBtn} ${radialShape === shape ? styles.shapeActive : ''}`}
                       onClick={() => setRadialShape(shape)}
+                      aria-pressed={radialShape === shape}
                     >
-                      {shape === 'circle' ? '⚫ Círculo' : '🥚 Elipse'}
+                      <span aria-hidden="true">{shape === 'circle' ? '⚫' : '🥚'}</span> {shape === 'circle' ? 'Círculo' : 'Elipse'}
                     </button>
                   ))}
                 </div>
@@ -278,15 +286,19 @@ export default function GeneradorGradientesPage() {
                     key={pos}
                     className={`${styles.positionBtn} ${radialPosition === pos ? styles.positionActive : ''}`}
                     onClick={() => setRadialPosition(pos)}
+                    aria-pressed={radialPosition === pos}
+                    aria-label={pos}
                   >
-                    {pos === 'center' ? '⊙' :
-                     pos === 'top' ? '↑' :
-                     pos === 'bottom' ? '↓' :
-                     pos === 'left' ? '←' :
-                     pos === 'right' ? '→' :
-                     pos === 'top left' ? '↖' :
-                     pos === 'top right' ? '↗' :
-                     pos === 'bottom left' ? '↙' : '↘'}
+                    <span aria-hidden="true">
+                      {pos === 'center' ? '⊙' :
+                       pos === 'top' ? '↑' :
+                       pos === 'bottom' ? '↓' :
+                       pos === 'left' ? '←' :
+                       pos === 'right' ? '→' :
+                       pos === 'top left' ? '↖' :
+                       pos === 'top right' ? '↗' :
+                       pos === 'bottom left' ? '↙' : '↘'}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -301,17 +313,17 @@ export default function GeneradorGradientesPage() {
                 <button
                   onClick={reverseGradient}
                   className={styles.actionBtn}
-                  title="Invertir gradiente"
+                  aria-label="Invertir gradiente"
                 >
-                  ⇄
+                  <span aria-hidden="true">⇄</span>
                 </button>
                 <button
                   onClick={addColorStop}
                   className={styles.actionBtn}
                   disabled={colorStops.length >= 10}
-                  title="Añadir color"
+                  aria-label="Añadir color"
                 >
-                  +
+                  <span aria-hidden="true">+</span>
                 </button>
               </div>
             </div>
@@ -324,12 +336,14 @@ export default function GeneradorGradientesPage() {
                     value={stop.color}
                     onChange={(e) => updateColorStop(stop.id, 'color', e.target.value)}
                     className={styles.colorInput}
+                    aria-label={`Color ${index + 1} (selector visual)`}
                   />
                   <input
                     type="text"
                     value={stop.color}
                     onChange={(e) => updateColorStop(stop.id, 'color', e.target.value)}
                     className={styles.hexInput}
+                    aria-label={`Color ${index + 1} (valor hexadecimal)`}
                   />
                   <input
                     type="number"
@@ -338,15 +352,17 @@ export default function GeneradorGradientesPage() {
                     min="0"
                     max="100"
                     className={styles.positionInput}
+                    inputMode="numeric"
+                    aria-label={`Posición del color ${index + 1} en porcentaje`}
                   />
                   <span className={styles.percentSign}>%</span>
                   <button
                     onClick={() => removeColorStop(stop.id)}
                     className={styles.removeBtn}
                     disabled={colorStops.length <= 2}
-                    title="Eliminar"
+                    aria-label={`Eliminar color ${index + 1}`}
                   >
-                    ×
+                    <span aria-hidden="true">×</span>
                   </button>
                 </div>
               ))}
@@ -360,17 +376,17 @@ export default function GeneradorGradientesPage() {
         <h3>Tipos de Gradientes CSS</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>↗️</span>
+            <span className={styles.infoIcon} aria-hidden="true">↗️</span>
             <h4>Linear Gradient</h4>
             <p>Transición suave en línea recta. Perfecto para fondos, botones y headers</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>⭕</span>
+            <span className={styles.infoIcon} aria-hidden="true">⭕</span>
             <h4>Radial Gradient</h4>
             <p>Se expande desde un punto central. Ideal para efectos de luz y profundidad</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🔄</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔄</span>
             <h4>Conic Gradient</h4>
             <p>Rotación alrededor de un punto. Útil para gráficos circulares y efectos modernos</p>
           </div>

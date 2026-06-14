@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 115 / 999
-- ⬜ Pendientes: 884 / 999
+- ✅ Revisadas: 119 / 999
+- ⬜ Pendientes: 880 / 999
 
 ## Resumen por suite primaria
 
@@ -348,7 +348,7 @@
 | [ ] | Curso de Empresa Familiar | `/curso-empresa-familiar/` | diseno, cultura |
 | [ ] | Curso de Estrategia Empresarial | `/curso-estrategia-empresarial/` | diseno, cultura |
 | [ ] | Curso de Marketing Digital 2025 | `/curso-marketing-digital/` | diseno, cultura |
-| [ ] | Curso de Negociación Exitosa | `/curso-negociacion/` | diseno, cultura |
+| [x] | Curso de Negociación Exitosa | `/curso-negociacion/` | diseno, cultura |
 | [x] | Curso de Optimización para IAs (GEO/AEO) | `/curso-optimizacion-ia/` | diseno, cultura |
 | [ ] | Editor EXIF | `/editor-exif/` | diseno, tecnicas |
 | [ ] | Generador de Avatares | `/generador-avatares/` | diseno |
@@ -356,7 +356,7 @@
 | [ ] | Generador de Códigos de Barras | `/generador-codigos-barras/` | diseno, productividad |
 | [ ] | Generador de Códigos QR | `/generador-qr/` | diseno, productividad |
 | [ ] | Generador de Enlaces UTM | `/generador-utm/` | diseno |
-| [ ] | Generador de Gradientes | `/generador-gradientes/` | diseno |
+| [x] | Generador de Gradientes | `/generador-gradientes/` | diseno |
 | [ ] | Generador de Hashtags | `/generador-hashtags/` | diseno |
 | [ ] | Generador de Iconos PWA | `/generador-iconos/` | diseno |
 | [ ] | Generador de Meta Descripciones | `/generador-meta-descripciones/` | diseno |
@@ -428,7 +428,7 @@
 | [ ] | Cuadro de Punnett: Genética Mendeliana | `/simulador-punnett/` | estudiantes |
 | [ ] | Curso de Introducción a la Teoría Política | `/curso-teoria-politica/` | estudiantes, cultura |
 | [ ] | Curso de Pensamiento Científico | `/curso-pensamiento-cientifico/` | estudiantes |
-| [ ] | Curso de Pensamiento Sistémico | `/curso-pensamiento-sistemico/` | estudiantes, cultura |
+| [x] | Curso de Pensamiento Sistémico | `/curso-pensamiento-sistemico/` | estudiantes, cultura |
 | [ ] | Curso de Redacción Académica | `/curso-redaccion-academica/` | estudiantes |
 | [ ] | De dónde Viene tu Camiseta | `/visualizador-origen-camiseta/` | estudiantes, cultura |
 | [ ] | Diabetes: Mecanismo Biológico de Insulina y Glucagón | `/visualizador-diabetes-mecanismo/` | estudiantes, cultura, salud |
@@ -650,7 +650,7 @@
 | [ ] | El Viaje de tus Impuestos | `/visualizador-viaje-impuestos/` | finanzas, cultura, freelance |
 | [ ] | Estimación de Deducción por Maternidad IRPF | `/estimacion-deduccion-maternidad/` | finanzas, legal-fiscal |
 | [ ] | Estimador Coste Real a Plazos | `/estimador-coste-plazos/` | finanzas |
-| [ ] | Estimador de Cartera de Inversión | `/estimador-cartera-inversion/` | finanzas |
+| [x] | Estimador de Cartera de Inversión | `/estimador-cartera-inversion/` | finanzas |
 | [ ] | Estimador de Deuda | `/estimador-deuda/` | finanzas |
 | [ ] | Estimador de Inflación | `/estimador-inflacion/` | finanzas |
 | [ ] | Estimador de Infraseguro | `/estimador-infraseguro/` | finanzas, inmobiliaria |

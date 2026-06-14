@@ -38,7 +38,7 @@ export default function CursoPensamientoSistemicoPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔄</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔄</span>
         <h1 className={styles.title}>Curso de Pensamiento Sistémico</h1>
         <p className={styles.subtitle}>
           Aprende a entender el mundo como sistemas interconectados.
@@ -50,7 +50,7 @@ export default function CursoPensamientoSistemicoPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -58,24 +58,24 @@ export default function CursoPensamientoSistemicoPage() {
       <LegalNotice />
 
       {/* Stats Grid */}
-      <div className={styles.statsGrid}>
+      <div className={styles.statsGrid} role="status" aria-live="polite">
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}/{totalChapters}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -85,22 +85,22 @@ export default function CursoPensamientoSistemicoPage() {
       <section className={styles.overviewSection}>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📚</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📚</span>
             <h3>Fundamentos</h3>
             <p>Historia y bases del pensamiento sistémico</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🔧</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🔧</span>
             <h3>Conceptos Clave</h3>
             <p>Redes, retroalimentación, emergencia, antifragilidad</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🌐</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🌐</span>
             <h3>Sistemas en Acción</h3>
             <p>Organizaciones, economía, tecnología, clima</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🎯</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🎯</span>
             <h3>Aplicación Práctica</h3>
             <p>Herramientas, decisiones y liderazgo sistémico</p>
           </div>
@@ -109,7 +109,7 @@ export default function CursoPensamientoSistemicoPage() {
 
       {/* Modules Section */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido del Curso</h2>
 
         {modules.map((module) => {
           const completedInModule = module.chapters.filter(ch => isCompleted(ch.id)).length;
@@ -122,7 +122,7 @@ export default function CursoPensamientoSistemicoPage() {
                   className={styles.moduleIcon}
                   style={{ background: MODULE_COLORS[module.id] || MODULE_COLORS['fundamentos'] }}
                 >
-                  {MODULE_ICONS[module.id] || '📖'}
+                  <span aria-hidden="true">{MODULE_ICONS[module.id] || '📖'}</span>
                 </div>
                 <div className={styles.moduleInfo}>
                   <h3 className={styles.moduleTitle}>{module.title}</h3>
@@ -146,7 +146,7 @@ export default function CursoPensamientoSistemicoPage() {
                         <span className={styles.chapterNumber}>{globalChapterIndex}</span>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>{chapter.title}</h4>
-                          <span className={styles.chapterDuration}>⏱️ {chapter.duration} min</span>
+                          <span className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</span>
                         </div>
                       </div>
                       <div className={styles.chapterTopics}>
@@ -182,15 +182,15 @@ export default function CursoPensamientoSistemicoPage() {
 
       {/* Recursos adicionales */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>📖 Cursos Relacionados</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Cursos Relacionados</h2>
         <div className={styles.resourcesGrid}>
           <Link href="/curso-pensamiento-cientifico" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>🔬</span>
+            <span className={styles.resourceIcon} aria-hidden="true">🔬</span>
             <div className={styles.resourceName}>Pensamiento Científico</div>
             <div className={styles.resourceDesc}>Aprende a usar el método científico</div>
           </Link>
           <Link href="/curso-decisiones-inversion" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>📈</span>
+            <span className={styles.resourceIcon} aria-hidden="true">📈</span>
             <div className={styles.resourceName}>Decisiones de Inversión</div>
             <div className={styles.resourceDesc}>Aplica el pensamiento sistémico a finanzas</div>
           </Link>
