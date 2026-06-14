@@ -95,7 +95,7 @@ const faqData = [
   },
   {
     question: '¿Qué impuestos pago al comprar vivienda?',
-    answer: 'Si es vivienda nueva: IVA (10%) + AJD (0.5-1.5% según comunidad). Si es de segunda mano: ITP (4-10% según comunidad). Además, siempre pagas notaría, registro y gestoría.',
+    answer: 'Si es vivienda nueva: IVA (10%) + AJD (0.5-1.5% según comunidad). Si es de segunda mano: ITP (6-11% según comunidad). Además, siempre pagas notaría, registro y gestoría.',
   },
   {
     question: '¿Puedo deducirme la hipoteca en la declaración?',

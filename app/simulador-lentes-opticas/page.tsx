@@ -486,7 +486,7 @@ export default function SimuladorLentesOpticasPage() {
 
         {/* CANVAS */}
         <div className={styles.canvasWrapper}>
-          <canvas ref={canvasRef} className={styles.canvas} aria-label="Trazado de rayos a través de la lente" />
+          <canvas ref={canvasRef} className={styles.canvas} role="img" aria-label="Trazado de rayos a través de la lente" />
           <div className={styles.legendRow}>
             <span className={styles.legendItem}>
               <span className={styles.legendDot} style={{ background: '#48A9A6' }} />
@@ -512,7 +512,7 @@ export default function SimuladorLentesOpticasPage() {
         </div>
 
         {/* CLASIFICACIÓN */}
-        <div className={`${styles.imageClassification} ${clasifClass}`}>
+        <div className={`${styles.imageClassification} ${clasifClass}`} role="status" aria-live="polite">
           <span className={styles.imageClassTitle}>{clasificacion.etiqueta}</span>
           <div className={styles.imageClassChips}>
             {clasificacion.chips.map((c, i) => (
@@ -522,7 +522,7 @@ export default function SimuladorLentesOpticasPage() {
         </div>
 
         {/* RESULTADOS */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} aria-live="polite">
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Distancia objeto (s)</span>
             <span className={styles.resultValue}>{fmt(sObj, 2)} cm</span>
@@ -669,7 +669,7 @@ export default function SimuladorLentesOpticasPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon}>🔬</span>
               <strong>Microscopio óptico</strong>
-              <p>Combina dos lentes: el objetivo (corta f, forma imagen real aumentada) y el ocular (lupa, forma imagen virtual aumentada). Aumento total ≈ M_obj × M_oc, hasta ×1500.</p>
+              <p>Combina dos lentes: el objetivo (corta f, forma imagen real aumentada) y el ocular (lupa, forma imagen virtual aumentada). Aumento total ≈ M_obj × M_oc; los microscopios ópticos de laboratorio suelen alcanzar hasta ×1000-1500 con objetivos de inmersión.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon}>🔭</span>

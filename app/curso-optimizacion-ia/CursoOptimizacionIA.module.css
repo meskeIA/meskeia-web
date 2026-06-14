@@ -100,6 +100,11 @@
   transform: translateY(-2px);
 }
 
+.videoButton:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
 .videoIcon {
   font-size: 1.2rem;
 }
@@ -278,6 +283,11 @@
   box-shadow: var(--shadow-md);
 }
 
+.chapterCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .chapterHeader {
   display: flex;
   align-items: flex-start;
@@ -390,6 +400,11 @@
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: var(--secondary);
+}
+
+.resourceCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .resourceIcon {
@@ -556,6 +571,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.ctaButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* ============================================
    CHAPTER PAGE STYLES
    ============================================ */
@@ -629,6 +649,11 @@
 .navButton:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.navButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .navCenter {
@@ -973,6 +998,11 @@
   transform: translateY(-2px);
 }
 
+.completeButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .completeButton.completed {
   background: var(--text-muted);
   cursor: default;
@@ -1004,6 +1034,11 @@
 .bottomNavLink:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.bottomNavLink:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .bottomNavLink.next {
@@ -1256,5 +1291,18 @@
 
   .faqItem h4 {
     font-size: 0.95rem;
+  }
+}
+
+/* Movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .videoButton,
+  .chapterCard,
+  .resourceCard,
+  .ctaButton,
+  .navButton,
+  .completeButton,
+  .bottomNavLink {
+    transition: none;
   }
 }

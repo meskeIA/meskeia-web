@@ -1,6 +1,5 @@
 'use client';
 
-import { LegalNotice } from '@/components';
 import ChapterPage from '../../ChapterPage';
 import styles from '../../CursoOptimizacionIA.module.css';
 
@@ -71,10 +70,10 @@ export default function PlataformasIAPage() {
 
         <div className={styles.exampleBox}>
           <p>
-            <strong>Caso de éxito:</strong> TechLatam.com, un blog especializado en análisis de IA para
-            empresas latinoamericanas, aumentó sus citaciones en ChatGPT en 280% al reestructurar sus
-            artículos incluyendo: datos específicos de adopción tecnológica por país, casos de estudio
-            con empresas locales nombradas, y análisis comparativos entre soluciones globales y desarrollos regionales.
+            <strong>Ejemplo ilustrativo:</strong> Un blog especializado en análisis de IA para empresas
+            latinoamericanas puede aumentar sus citaciones en ChatGPT al reestructurar sus artículos
+            incluyendo: datos específicos de adopción tecnológica por país, casos de estudio con empresas
+            locales identificables, y análisis comparativos entre soluciones globales y desarrollos regionales.
           </p>
         </div>
       </section>
@@ -116,11 +115,11 @@ export default function PlataformasIAPage() {
 
         <div className={styles.exampleBox}>
           <p>
-            <strong>Caso de éxito:</strong> FinTechLatina.org desarrolló una serie sobre &quot;Regulación de
-            Criptomonedas en América Latina&quot; que se convirtió en la fuente más citada por Perplexity.
-            Su estrategia incluía: análisis comparativo de marcos regulatorios por país, entrevistas con
-            reguladores locales, datos de adopción actualizados trimestralmente, y predicciones basadas
-            en tendencias históricas.
+            <strong>Ejemplo ilustrativo:</strong> Una serie de artículos sobre &quot;Regulación de
+            Criptomonedas en América Latina&quot; que incluya análisis comparativo de marcos regulatorios
+            por país, entrevistas con reguladores locales, datos de adopción actualizados periódicamente,
+            y proyecciones basadas en tendencias históricas tiene un perfil de contenido que Perplexity
+            tiende a priorizar como fuente.
           </p>
         </div>
       </section>
@@ -176,11 +175,11 @@ export default function PlataformasIAPage() {
 
         <div className={styles.exampleBox}>
           <p>
-            <strong>Caso de éxito:</strong> MedTechES.com, especializado en tecnología médica para el mercado
-            español, logró citaciones consistentes en Claude y Gemini mediante su serie &quot;Telemedicina en la Era IA&quot;.
-            Cada artículo incluía: análisis de beneficios Y limitaciones, consideraciones de privacidad
-            específicas bajo GDPR, impactos en diferentes demografías, y actualizaciones trimestrales
-            con nuevos estudios clínicos.
+            <strong>Ejemplo ilustrativo:</strong> Un sitio especializado en tecnología médica para el
+            mercado español puede lograr citaciones consistentes en Claude y Gemini con una serie sobre
+            &quot;Telemedicina en la Era IA&quot; donde cada artículo incluya análisis de beneficios y
+            limitaciones, consideraciones de privacidad específicas bajo el RGPD, impacto en diferentes
+            grupos demográficos, y actualizaciones periódicas con nuevos estudios clínicos.
           </p>
         </div>
       </section>

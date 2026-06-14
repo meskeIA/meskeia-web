@@ -1,6 +1,5 @@
 'use client';
 
-import { LegalNotice } from '@/components';
 import ChapterPage from '../../ChapterPage';
 import styles from '../../CursoOptimizacionIA.module.css';
 
@@ -62,11 +61,11 @@ export default function MedirCitacionesPage() {
 
         <div className={styles.exampleBox}>
           <p>
-            <strong>Caso de éxito:</strong> El medio digital argentino &quot;TecnoSur&quot; logró aumentar su citación
-            por IAs en un 78% en tan solo un año tras implementar una estrategia integral:
-            reestructuraron sus artículos para responder preguntas completas con subtítulos en formato de
-            consulta, incluyeron análisis de expertos regionales con credenciales LinkedIn verificables, y
-            añadieron secciones de &quot;contexto latinoamericano&quot; que diferenciaban sus publicaciones.
+            <strong>Ejemplo ilustrativo:</strong> Un medio digital que reestructura sus artículos para
+            responder preguntas completas con subtítulos en formato de consulta, incorpora análisis de
+            expertos regionales con credenciales verificables, y añade secciones de &quot;contexto
+            latinoamericano&quot; diferenciadas, aumenta sus probabilidades de ser citado por sistemas de IA
+            frente a contenido genérico sin esa estructura.
           </p>
         </div>
       </section>
@@ -106,10 +105,11 @@ export default function MedirCitacionesPage() {
 
         <div className={styles.exampleBox}>
           <p>
-            <strong>Caso de éxito:</strong> La agencia colombiana &quot;DigitalAndes&quot; descubrió utilizando BrightEdge
-            Intelligence que su contenido sobre fintech latinoamericana aparecía en un 67% más de respuestas
-            generativas que sus competidores globales, pero solo cuando incluían terminología financiera
-            específica de la región como &quot;corresponsalía bancaria&quot; y &quot;billeteras digitales&quot;.
+            <strong>Ejemplo ilustrativo:</strong> El contenido sobre fintech latinoamericana que incorpora
+            terminología financiera específica de la región —como &quot;corresponsalía bancaria&quot; o
+            &quot;billeteras digitales&quot;— tiende a aparecer con mayor frecuencia en respuestas generativas
+            que el contenido genérico traducido del inglés, al resultar más relevante para consultas
+            formuladas en español regional.
           </p>
         </div>
       </section>
@@ -157,10 +157,11 @@ export default function MedirCitacionesPage() {
 
         <div className={styles.exampleBox}>
           <p>
-            <strong>Caso de éxito:</strong> El blog tecnológico español &quot;InnovaTech Madrid&quot; implementó un
-            dashboard personalizado combinando métricas de SearchGPT Analytics y Semrush, descubriendo que
-            sus artículos sobre inteligencia artificial aparecían con un CQI de 8.1, pero solo en consultas
-            técnicas avanzadas, lo que les permitió enfocar su estrategia hacia temas de mayor complejidad técnica.
+            <strong>Ejemplo ilustrativo:</strong> Un blog tecnológico que combina varias herramientas de
+            monitorización de citación puede descubrir que sus artículos sobre inteligencia artificial
+            obtienen mejores resultados en consultas técnicas avanzadas que en consultas generalistas, lo
+            que permite enfocar la estrategia editorial hacia los temas donde el contenido tiene mayor
+            ventaja competitiva.
           </p>
         </div>
       </section>

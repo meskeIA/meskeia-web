@@ -1,6 +1,5 @@
 'use client';
 
-import { LegalNotice } from '@/components';
 import ChapterPage from '../../ChapterPage';
 import styles from '../../CursoOptimizacionIA.module.css';
 

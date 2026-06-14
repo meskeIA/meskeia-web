@@ -137,6 +137,7 @@ export default function SimuladorFisicaPage() {
                   className={styles.controlBtn}
                   onClick={handlePlay}
                   title="Iniciar"
+                  aria-label="Iniciar simulación"
                 >
                   ▶️
                 </button>
@@ -145,6 +146,7 @@ export default function SimuladorFisicaPage() {
                   className={`${styles.controlBtn} ${styles.active}`}
                   onClick={handlePause}
                   title="Pausar"
+                  aria-label="Pausar simulación"
                 >
                   ⏸️
                 </button>
@@ -153,6 +155,7 @@ export default function SimuladorFisicaPage() {
                 className={styles.controlBtn}
                 onClick={handleReset}
                 title="Reiniciar"
+                aria-label="Reiniciar simulación"
               >
                 🔄
               </button>

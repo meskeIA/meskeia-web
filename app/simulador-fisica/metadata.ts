@@ -63,7 +63,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona la simulación de caída libre?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La caída libre aplica la ecuación y = ½·g·t², donde g = 9,8 m/s². El simulador anima el objeto cayendo y muestra en tiempo real la altura, la velocidad instantánea y el tiempo transcurrido. Puedes ajustar la altura inicial y observar cómo varía la velocidad al impactar con el suelo.',
+        text: 'La caída libre aplica la ecuación y = ½·g·t², donde g = 9,81 m/s². El simulador anima el objeto cayendo y muestra en tiempo real la altura, la velocidad instantánea y el tiempo transcurrido. Puedes ajustar la altura inicial y observar cómo varía la velocidad al impactar con el suelo.',
       },
     },
     {

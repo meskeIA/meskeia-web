@@ -101,6 +101,11 @@
   background: var(--hover);
 }
 
+.simBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .simBtn.active {
   border-color: var(--primary);
   background: var(--primary);
@@ -174,6 +179,11 @@
 .controlBtn:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.controlBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .controlBtn.active {
@@ -302,6 +312,11 @@
   border: none;
 }
 
+.slider:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Checkbox para opciones */
 .checkboxGroup {
   display: flex;
@@ -360,6 +375,11 @@
   border-color: var(--primary);
   color: var(--primary);
   background: var(--hover);
+}
+
+.presetBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Fórmulas */
