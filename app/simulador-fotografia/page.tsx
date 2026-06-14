@@ -171,7 +171,7 @@ export default function SimuladorFotografiaPage() {
 
   const motionBlur = useMemo(() => {
     if (escena.id !== 'deporte') return 0;
-    const stopsLento = shutterStops(10) - shutterStops(shIdx); // referencia 1/1000
+    const stopsLento = shutterStops(shIdx) - shutterStops(10); // positivo cuando más lento que 1/1000
     if (stopsLento <= 0) return 0;
     return Math.min(stopsLento * 4, 30);
   }, [shIdx, escena.id]);
@@ -356,10 +356,12 @@ export default function SimuladorFotografiaPage() {
                   style={{ left: `${50 + (clamp(deltaEV, -3, 3) / 3) * 50}%` }}
                 />
               </div>
-              <p className={`${styles.exposureLabel} ${exposureClass}`} aria-live="polite">
-                {exposureLabel} ({deltaEV >= 0 ? '+' : ''}
-                {formatNumber(deltaEV, 1)} EV)
-              </p>
+              <div role="status" aria-live="polite">
+                <p className={`${styles.exposureLabel} ${exposureClass}`}>
+                  {exposureLabel} ({deltaEV >= 0 ? '+' : ''}
+                  {formatNumber(deltaEV, 1)} EV)
+                </p>
+              </div>
             </div>
 
             <div className={styles.resultBlock}>
@@ -415,7 +417,7 @@ export default function SimuladorFotografiaPage() {
             </div>
 
             <div className={styles.formulaBox}>
-              <p className={styles.formulaTex}>EV = log₂(N² / t) − log₂(ISO / 100)</p>
+              <p className={styles.formulaTex}>EV = log₂(N² / t) + log₂(ISO / 100)</p>
               <p className={styles.formulaCaption}>
                 Cada paso (stop) duplica o divide a la mitad la luz que llega al sensor
               </p>

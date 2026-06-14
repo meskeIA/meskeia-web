@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 96 / 999
-- ⬜ Pendientes: 903 / 999
+- ✅ Revisadas: 100 / 999
+- ⬜ Pendientes: 899 / 999
 
 ## Resumen por suite primaria
 
@@ -314,7 +314,7 @@
 | [ ] | Revoluciones Industriales: Cronología de la Máquina de Vapor a la Industria 5.0 | `/visualizador-revoluciones-industriales/` | cultura, tecnicas |
 | [ ] | Selector de Tipo de Alojamiento | `/selector-tipo-alojamiento/` | cultura, productividad |
 | [ ] | Simulador de Balance de Blancos (2500K-10000K) | `/simulador-balance-blancos/` | cultura, tecnicas |
-| [ ] | Simulador de Fotografía: Triángulo de Exposición | `/simulador-fotografia/` | cultura, tecnicas |
+| [x] | Simulador de Fotografía: Triángulo de Exposición | `/simulador-fotografia/` | cultura, tecnicas |
 | [ ] | Termodinámica Química: ΔG, Equilibrio y Le Chatelier | `/visualizador-termodinamica-quimica/` | cultura, estudiantes, tecnicas |
 | [ ] | Test de Dependencia Tecnológica | `/test-dependencia-tecnologica/` | cultura, productividad |
 | [ ] | Test de Pensamiento de Grupo | `/test-pensamiento-grupo/` | cultura, productividad |
@@ -390,7 +390,7 @@
 | [ ] | Biomoléculas - Los 4 Ingredientes de la Vida | `/visualizador-biomoleculas/` | estudiantes, cultura |
 | [ ] | Cadenas de Suministro Globales: JIT, Disrupciones y Reshoring | `/visualizador-cadenas-suministro/` | estudiantes, cultura, productividad |
 | [ ] | Calculadora Álgebra Abstracta | `/calculadora-algebra-abstracta/` | estudiantes |
-| [ ] | Calculadora de Álgebra Booleana | `/calculadora-algebra-booleana/` | estudiantes, tecnicas |
+| [x] | Calculadora de Álgebra Booleana | `/calculadora-algebra-booleana/` | estudiantes, tecnicas |
 | [ ] | Calculadora de Cálculo | `/calculadora-calculo/` | estudiantes |
 | [ ] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
 | [ ] | Calculadora de Ecuaciones | `/algebra-ecuaciones/` | estudiantes |
@@ -589,7 +589,7 @@
 | [x] | Simulador de Titulación Ácido-Base | `/simulador-titulacion/` | estudiantes |
 | [ ] | Simulador de Transformaciones de Funciones | `/simulador-funciones-transformaciones/` | estudiantes |
 | [ ] | Simulador del Ciclo de Carnot | `/simulador-termodinamica-carnot/` | estudiantes |
-| [ ] | Simulador del Círculo Trigonométrico | `/simulador-trigonometria-circulo-unitario/` | estudiantes |
+| [x] | Simulador del Círculo Trigonométrico | `/simulador-trigonometria-circulo-unitario/` | estudiantes |
 | [ ] | Simulador del Handshake TCP | `/simulador-tcp-handshake/` | estudiantes |
 | [ ] | Simulador del Multiplicador del Gasto | `/simulador-multiplicador-gasto/` | estudiantes |
 | [ ] | Simulador del Potencial de Acción Neuronal | `/simulador-potencial-accion/` | estudiantes |
@@ -736,7 +736,7 @@
 |---|---|---|---|
 | [ ] | Afinador de Instrumentos | `/afinador-instrumentos/` | tecnicas, cultura |
 | [ ] | Algoritmos de Ordenación: Visualizador Paso a Paso | `/visualizador-algoritmos-ordenacion/` | tecnicas, estudiantes |
-| [ ] | Analizador de Espectro | `/analizador-espectro/` | tecnicas |
+| [x] | Analizador de Espectro | `/analizador-espectro/` | tecnicas |
 | [ ] | Árbol de Decisión Interactivo | `/arbol-decision-ia/` | tecnicas, estudiantes, cultura |
 | [ ] | Asistentes de Código IA 2026: Claude Code vs Copilot vs Gemini | `/comparador-asistentes-codigo/` | tecnicas, productividad |
 | [ ] | Base de Datos Relacional: Tablas, JOIN e Índices | `/visualizador-base-datos-relacional/` | tecnicas, estudiantes |

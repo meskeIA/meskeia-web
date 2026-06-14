@@ -1,8 +1,8 @@
 'use client';
-
+// @disclaimer: exempt
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AnalizadorEspectro.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
@@ -406,6 +406,7 @@ export default function AnalizadorEspectroPage() {
           </div>
 
           {/* Información de frecuencia dominante */}
+          <div role="status" aria-live="polite" aria-atomic="true">
           {isActive && (
             <div className={styles.dominantFreq}>
               <div className={styles.freqInfo}>
@@ -422,6 +423,7 @@ export default function AnalizadorEspectroPage() {
               </div>
             </div>
           )}
+          </div>
 
           {/* Controles */}
           <div className={styles.controls}>
@@ -444,12 +446,14 @@ export default function AnalizadorEspectroPage() {
                 <button
                   className={`${styles.toggleBtn} ${viewMode === 'bars' ? styles.active : ''}`}
                   onClick={() => setViewMode('bars')}
+                  aria-pressed={viewMode === 'bars'}
                 >
                   📊 Barras
                 </button>
                 <button
                   className={`${styles.toggleBtn} ${viewMode === 'line' ? styles.active : ''}`}
                   onClick={() => setViewMode('line')}
+                  aria-pressed={viewMode === 'line'}
                 >
                   📈 Línea
                 </button>
@@ -457,8 +461,9 @@ export default function AnalizadorEspectroPage() {
             </div>
 
             <div className={styles.optionGroup}>
-              <label className={styles.optionLabel}>Sensibilidad:</label>
+              <label className={styles.optionLabel} htmlFor="sensitivity-slider">Sensibilidad:</label>
               <input
+                id="sensitivity-slider"
                 type="range"
                 min="0.5"
                 max="2"
@@ -466,6 +471,7 @@ export default function AnalizadorEspectroPage() {
                 value={sensitivity}
                 onChange={(e) => setSensitivity(parseFloat(e.target.value))}
                 className={styles.slider}
+                aria-label={`Sensibilidad: ${formatNumber(sensitivity, 1)}x`}
               />
               <span className={styles.sliderValue}>{formatNumber(sensitivity, 1)}x</span>
             </div>
@@ -485,7 +491,7 @@ export default function AnalizadorEspectroPage() {
 
           {/* Error */}
           {error && (
-            <div className={styles.errorMessage}>
+            <div className={styles.errorMessage} role="alert">
               ⚠️ {error}
             </div>
           )}
@@ -535,13 +541,6 @@ export default function AnalizadorEspectroPage() {
         </div>
       </main>
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
-      <DisclaimerCard
-        variant="technical"
-        severity="low"
-        context="analizador-espectro"
-        collapsible={true}
-      />
 
 
       {/* Contenido educativo */}

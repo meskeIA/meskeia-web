@@ -476,7 +476,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔢</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔢</span>
         <h1 className={styles.title}>Calculadora de Álgebra Booleana</h1>
         <p className={styles.subtitle}>
           Simplifica expresiones booleanas con mapas de Karnaugh
@@ -498,6 +498,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
                   key={num}
                   className={`${styles.variableBtn} ${numVariables === num ? styles.variableBtnActive : ''}`}
                   onClick={() => handleNumVariablesChange(num)}
+                  aria-pressed={numVariables === num}
                 >
                   {num} vars
                   <span className={styles.variableNames}>
@@ -514,6 +515,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
               <button
                 className={`${styles.modeBtn} ${outputMode === 'sop' ? styles.modeBtnActive : ''}`}
                 onClick={() => setOutputMode('sop')}
+                aria-pressed={outputMode === 'sop'}
               >
                 SOP
                 <span className={styles.modeDesc}>Suma de Productos</span>
@@ -521,6 +523,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
               <button
                 className={`${styles.modeBtn} ${outputMode === 'pos' ? styles.modeBtnActive : ''}`}
                 onClick={() => setOutputMode('pos')}
+                aria-pressed={outputMode === 'pos'}
               >
                 POS
                 <span className={styles.modeDesc}>Producto de Sumas</span>
@@ -614,7 +617,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
       </div>
 
       {/* Resultado */}
-      <section className={styles.resultSection}>
+      <section className={styles.resultSection} role="status" aria-live="polite" aria-atomic="false">
         <h2 className={styles.sectionTitle}>Expresión Simplificada</h2>
 
         <div className={styles.resultBox}>
@@ -635,6 +638,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
           <button
             className={styles.stepsToggle}
             onClick={() => setShowSteps(!showSteps)}
+            aria-expanded={showSteps}
           >
             {showSteps ? '▼' : '▶'} Ver proceso de simplificación
           </button>
@@ -1012,7 +1016,7 @@ export default function CalculadoraAlgebraBooleanaPage() {
           <ul className={styles.warningList}>
             <li><strong>Orden incorrecto en el mapa de Karnaugh</strong>: Las columnas deben ir en código Gray (00,01,11,10), NO en orden binario (00,01,10,11). Con orden incorrecto, los grupos adyacentes son incorrectos.</li>
             <li><strong>Grupos que no son potencias de 2</strong>: Solo son válidos grupos de 1, 2, 4, 8, 16 celdas. Un grupo de 3 o 5 celdas es incorrecto.</li>
-            <li><strong>Olvidar la torodalidad del mapa</strong>: Las esquinas y bordes son adyacentes. La columna izquierda es adyacente a la derecha, la fila superior a la inferior.</li>
+            <li><strong>Olvidar la toroidalidad del mapa</strong>: Las esquinas y bordes son adyacentes. La columna izquierda es adyacente a la derecha, la fila superior a la inferior.</li>
             <li><strong>Confundir NAND y NOR universales</strong>: Ambas son universales pero las conversiones son distintas. NOT(A) = NAND(A,A) pero NOT(A) = NOR(A,A).</li>
             <li><strong>Ignorar los hazards</strong>: Un diseño minimizado puede tener glitches. Añade términos de consenso para eliminarlos en circuitos síncronos sensibles.</li>
             <li><strong>Don&apos;t care en entradas posibles</strong>: Marcar como X una combinación que puede ocurrir → comportamiento impredecible. Solo usa X en combinaciones garantizadas como imposibles.</li>

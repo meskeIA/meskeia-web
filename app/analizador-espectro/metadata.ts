@@ -37,9 +37,14 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/analizador-espectro/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Análisis FFT en tiempo real con fftSize 8192 para alta resolución frecuencial',
+    'Visualización en modo barras o modo línea sobre escala logarítmica 20 Hz–20 kHz',
+    'Detección de frecuencia dominante y nota musical más cercana (temperamento igual)',
+    'Ocho bandas de frecuencia con color diferenciado: sub-graves, graves, medios, agudos y presencia',
+    'Control de sensibilidad ajustable y marcadores de picos con decay automático',
+    'Tabla de referencia de frecuencias de notas musicales (A4=440 Hz)',
+    'Bloque educativo sobre FFT, EQ, respuesta frecuencial y usos profesionales',
+    'Funciona 100% en el navegador con el micrófono del dispositivo, sin instalación',
   ],
 });
 

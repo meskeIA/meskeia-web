@@ -307,8 +307,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     const incremento = incrementos[velocidad - 1] ?? 0.8;
 
     const loop = () => {
-      anguloRef.current = (anguloRef.current + incremento) % 361;
-      if (anguloRef.current > 360) anguloRef.current = 0;
+      anguloRef.current = (anguloRef.current + incremento) % 360;
       setAngulo(Math.round(anguloRef.current * 10) / 10);
       animRef.current = requestAnimationFrame(loop);
     };
@@ -344,7 +343,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📐 Simulador del Círculo Trigonométrico</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📐</span> Simulador del Círculo Trigonométrico</h1>
         <p className={styles.subtitle}>
           Mueve el ángulo θ y observa seno, coseno y tangente sobre el círculo unitario en tiempo real.
           Activa la animación para ver cómo evolucionan las razones trigonométricas.
@@ -444,7 +443,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
         </div>
 
         {/* Panel de valores */}
-        <aside className={styles.valuesPanel}>
+        <aside className={styles.valuesPanel} role="status" aria-live="polite" aria-atomic="false">
           <h2 className={styles.valuesPanelTitle}>Valores actuales</h2>
 
           <div className={styles.valueRow}>

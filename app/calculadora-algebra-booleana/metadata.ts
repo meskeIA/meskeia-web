@@ -40,9 +40,14 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-algebra-booleana/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Mapas de Karnaugh de 2, 3 y 4 variables con visualización de grupos en colores',
+    'Simplificación automática a forma mínima SOP (suma de productos) y POS (producto de sumas)',
+    'Tabla de verdad completa e interactiva: activa/desactiva celdas con un clic',
+    'Soporte de celdas don\'t care (X) para simplificaciones con condiciones de indiferencia',
+    'Ejemplos predefinidos: XOR, votación por mayoría, paridad y BCD inválido',
+    'Proceso de simplificación paso a paso con agrupaciones explicadas',
+    'Equivalencias con puertas NAND, NOR y XOR',
+    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 
@@ -79,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Cómo se introducen los mintérminos en la calculadora?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Puedes seleccionar directamente las celdas del mapa haciendo clic sobre ellas, o introducir la lista de mintérminos (números decimales separados por coma) en el campo de texto. La calculadora actualiza automáticamente la tabla de verdad, identifica las agrupaciones óptimas y muestra la expresión mínima resultante en formato SOP y POS.',
+        text: 'Puedes introducir los mintérminos haciendo clic directamente en las celdas de la tabla de verdad o del mapa de Karnaugh. La calculadora actualiza automáticamente las agrupaciones y muestra la expresión mínima resultante en formato SOP y POS junto con el proceso de simplificación paso a paso.',
       },
     },
     {
