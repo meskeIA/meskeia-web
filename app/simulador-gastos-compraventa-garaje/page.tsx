@@ -12,12 +12,13 @@ import {
   ResultCard,
   LegalNotice,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025, IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -31,6 +32,7 @@ import {
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
+type TipoGaraje = 'vinculado' | 'independiente';
 type PerfilComprador = 'general' | 'joven' | 'familia-numerosa' | 'discapacidad';
 
 interface ResultadosComprador {
@@ -98,6 +100,7 @@ export default function SimuladorGarajeCompraventaPage() {
   const [precioGaraje, setPrecioGaraje] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
+  const [tipoGaraje, setTipoGaraje] = useState<TipoGaraje>('vinculado');
   const [perfilComprador, setPerfilComprador] = useState<PerfilComprador>('general');
   const [gastosGestoria, setGastosGestoria] = useState('300');
 
@@ -123,10 +126,11 @@ export default function SimuladorGarajeCompraventaPage() {
     let porcentaje = 0;
 
     if (tipoTransmision === 'primera-mano') {
-      // Garaje nuevo: IVA 10% (es inmueble residencial)
+      // Garaje nuevo: IVA reducido (10%) si va vinculado a la vivienda (máx. 2 plazas);
+      // IVA general (21%) si es independiente o está en un edificio no residencial
       tipoImpuesto = 'IVA';
-      porcentaje = 10;
-      impuesto = precio * 0.1;
+      porcentaje = tipoGaraje === 'vinculado' ? IVA_INMUEBLES_2025.garageCon : IVA_INMUEBLES_2025.garaje;
+      impuesto = precio * (porcentaje / 100);
     } else {
       // Garaje segunda mano: ITP
       // El garaje es inmueble residencial → puede optar a tipos reducidos
@@ -166,7 +170,7 @@ export default function SimuladorGarajeCompraventaPage() {
       totalGastos,
       totalOperacion: precio + totalGastos,
     };
-  }, [precioGaraje, ccaa, tipoTransmision, perfilComprador, gastosGestoria]);
+  }, [precioGaraje, ccaa, tipoTransmision, tipoGaraje, perfilComprador, gastosGestoria]);
 
   // ===== CÁLCULOS VENDEDOR =====
   const resultadosVendedor = useMemo((): ResultadosVendedor | null => {
@@ -252,7 +256,7 @@ export default function SimuladorGarajeCompraventaPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2024-12-20" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal - CRÍTICO (app fiscal España) */}
       <DisclaimerCard
@@ -260,6 +264,13 @@ export default function SimuladorGarajeCompraventaPage() {
         severity="critical"
         context="simulador-gastos-compraventa-garaje"
         collapsible={false}
+      />
+      <DataReference
+        normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Formulario principal */}
@@ -288,10 +299,40 @@ export default function SimuladorGarajeCompraventaPage() {
               >
                 <span aria-hidden="true" className={styles.transmisionIcon}>🆕</span>
                 <span>Primera mano (obra nueva)</span>
-                <span className={styles.transmisionSub}>Paga IVA 10%</span>
+                <span className={styles.transmisionSub}>Paga IVA</span>
               </button>
             </div>
           </div>
+
+          {/* Tipo de garaje (solo primera mano: determina el tipo de IVA) */}
+          {tipoTransmision === 'primera-mano' && (
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>Tipo de garaje</label>
+              <div className={styles.transmisionGrid}>
+                <button
+                  className={`${styles.transmisionBtn} ${tipoGaraje === 'vinculado' ? styles.active : ''}`}
+                  onClick={() => setTipoGaraje('vinculado')}
+                  aria-pressed={tipoGaraje === 'vinculado'}
+                >
+                  <span aria-hidden="true" className={styles.transmisionIcon}>🏠</span>
+                  <span>Vinculado a vivienda</span>
+                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.garageCon}%</span>
+                </button>
+                <button
+                  className={`${styles.transmisionBtn} ${tipoGaraje === 'independiente' ? styles.active : ''}`}
+                  onClick={() => setTipoGaraje('independiente')}
+                  aria-pressed={tipoGaraje === 'independiente'}
+                >
+                  <span aria-hidden="true" className={styles.transmisionIcon}>🅿️</span>
+                  <span>Independiente</span>
+                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.garaje}%</span>
+                </button>
+              </div>
+              <p className={styles.infoCcaaNote}>
+                Un garaje vinculado a la vivienda (máx. 2 plazas, mismo edificio y promotor) tributa al {IVA_INMUEBLES_2025.garageCon}% de IVA. Un garaje independiente, comprado por separado o en un edificio de uso no residencial, tributa al {IVA_INMUEBLES_2025.garaje}%.
+              </p>
+            </div>
+          )}
 
           {/* Precio del garaje */}
           <NumberInput
@@ -683,8 +724,8 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🏗️</span>
                 <span className={styles.casoTag}>Garaje de obra nueva con vivienda</span>
               </div>
-              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al 10% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €), el IVA del garaje es también el 10% siempre que no supere dos plazas por vivienda.</p>
-              <div className={styles.casoResultado}>IVA 10% en garaje de obra nueva (residencial)</div>
+              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al 10% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el 10%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al 21%.</p>
+              <div className={styles.casoResultado}>IVA 10% (vinculado) o 21% (independiente) en garaje de obra nueva</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -719,7 +760,7 @@ export default function SimuladorGarajeCompraventaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Garaje nuevo o de segunda mano: qué impuesto se paga?</h4>
-              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA al 10% más AJD (entre 0,5% y 1,5% según la comunidad). Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
+              <p>Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (entre 0,5% y 1,5% según la comunidad). El IVA es del 10% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del 21% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿El vendedor de un garaje paga plusvalía municipal?</h4>
@@ -768,8 +809,7 @@ export default function SimuladorGarajeCompraventaPage() {
           <ul className={styles.warningList}>
             <li><strong>Estimaciones orientativas:</strong> Los importes reales pueden diferir según el valor de referencia catastral del inmueble, los coeficientes de plusvalía de cada municipio y los aranceles notariales concretos aplicados.</li>
             <li><strong>Sin exención IRPF por vivienda habitual:</strong> Esta calculadora no aplica la exención por reinversión en vivienda habitual ni la exención para mayores de 65 años, ya que estas exenciones aplican a vivienda, no a garajes independientes.</li>
-            <li><strong>Tipos fiscales pueden cambiar:</strong> Los tipos de ITP, AJD y tarifas notariales corresponden a la normativa de diciembre 2024. Verifica con tu comunidad autónoma antes de tomar decisiones.</li>
-            <li><strong>Garajes en sótanos comerciales:</strong> Si el garaje está vinculado a un local o edificio de uso no residencial, el tipo de IVA puede ser del 21% en lugar del 10%. Consulta con un profesional.</li>
+            <li><strong>Tipos fiscales pueden cambiar:</strong> Los tipos de ITP, AJD e IVA corresponden a la normativa vigente indicada en el aviso de fuentes al inicio de la página. Verifica con tu comunidad autónoma antes de tomar decisiones.</li>
           </ul>
         </div>
       </EducationalSection>

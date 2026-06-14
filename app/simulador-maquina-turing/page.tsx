@@ -104,20 +104,26 @@ const PROGRAMAS: ProgramaPredefinido[] = [
     estadoInicial: 'q0',
     estadosFinales: ['qf'],
     reglas: [
-      // q0: marca un 1 como X y busca el final
+      // q0: marca un 1 sin procesar como X y va a duplicarlo al final
       { estado: 'q0', lee: '1', escribe: 'X', mueve: 'R', nuevoEstado: 'q1' },
-      { estado: 'q0', lee: '_', escribe: '_', mueve: 'R', nuevoEstado: 'q4' },
-      // q1: avanzar hasta el blanco
+      // q0: ya no quedan 1 sin marcar (solo copias Z) → ir a limpieza final
+      { estado: 'q0', lee: 'Z', escribe: 'Z', mueve: 'L', nuevoEstado: 'q5' },
+      // q0: cinta vacía desde el inicio (0 copias de 0)
+      { estado: 'q0', lee: '_', escribe: '_', mueve: 'S', nuevoEstado: 'qf' },
+      // q1: avanzar hasta el final de la cinta (saltando 1 y Z)
       { estado: 'q1', lee: '1', escribe: '1', mueve: 'R', nuevoEstado: 'q1' },
-      { estado: 'q1', lee: 'Y', escribe: 'Y', mueve: 'R', nuevoEstado: 'q1' },
-      { estado: 'q1', lee: '_', escribe: '1', mueve: 'L', nuevoEstado: 'q2' },
-      // q2: volver a la izquierda hasta la X
+      { estado: 'q1', lee: 'Z', escribe: 'Z', mueve: 'R', nuevoEstado: 'q1' },
+      { estado: 'q1', lee: '_', escribe: 'Z', mueve: 'L', nuevoEstado: 'q2' },
+      // q2: volver a la izquierda hasta la X marcada
       { estado: 'q2', lee: '1', escribe: '1', mueve: 'L', nuevoEstado: 'q2' },
-      { estado: 'q2', lee: 'Y', escribe: 'Y', mueve: 'L', nuevoEstado: 'q2' },
-      { estado: 'q2', lee: 'X', escribe: 'Y', mueve: 'R', nuevoEstado: 'q0' },
-      // q4: convertir todas las Y de vuelta a 1
-      { estado: 'q4', lee: 'Y', escribe: '1', mueve: 'R', nuevoEstado: 'q4' },
-      { estado: 'q4', lee: '1', escribe: '1', mueve: 'R', nuevoEstado: 'q4' },
+      { estado: 'q2', lee: 'Z', escribe: 'Z', mueve: 'L', nuevoEstado: 'q2' },
+      { estado: 'q2', lee: 'X', escribe: 'X', mueve: 'R', nuevoEstado: 'q0' },
+      // q5: volver al principio de la cinta
+      { estado: 'q5', lee: 'X', escribe: 'X', mueve: 'L', nuevoEstado: 'q5' },
+      { estado: 'q5', lee: '_', escribe: '_', mueve: 'R', nuevoEstado: 'q4' },
+      // q4: convertir todas las X y Z en 1 (resultado final duplicado)
+      { estado: 'q4', lee: 'X', escribe: '1', mueve: 'R', nuevoEstado: 'q4' },
+      { estado: 'q4', lee: 'Z', escribe: '1', mueve: 'R', nuevoEstado: 'q4' },
       { estado: 'q4', lee: '_', escribe: '_', mueve: 'S', nuevoEstado: 'qf' },
     ],
   },
@@ -698,7 +704,7 @@ export default function SimuladorMaquinaTuring() {
                         type="button"
                         className={styles.deleteBtn}
                         onClick={() => eliminarRegla(idx)}
-                        aria-label="Eliminar regla"
+                        aria-label={`Eliminar regla: si el estado es ${r.estado} y se lee ${r.lee}, escribir ${r.escribe}, mover ${r.mueve} e ir al estado ${r.nuevoEstado}`}
                       >
                         Eliminar
                       </button>
@@ -887,7 +893,11 @@ export default function SimuladorMaquinaTuring() {
         </div>
 
         {/* Resultado */}
-        <div className={`${styles.resultadoBox} ${resultadoTexto.clase}`}>
+        <div
+          className={`${styles.resultadoBox} ${resultadoTexto.clase}`}
+          role="status"
+          aria-live="polite"
+        >
           <strong>Resultado:</strong> {resultadoTexto.texto}
         </div>
       </main>

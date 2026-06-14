@@ -36,7 +36,7 @@ const webAppSchema = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [
     'ITP por comunidad autónoma para garaje (tipo residencial)',
-    'IVA 10% en garaje de obra nueva',
+    'IVA 10% (vinculado a vivienda) o 21% (independiente) en garaje de obra nueva',
     'Gastos de notaría y registro de la propiedad',
     'Plusvalía municipal del vendedor',
     'IRPF sobre ganancia patrimonial',
@@ -59,7 +59,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
-      answer: 'Un garaje de primera transmisión (nuevo, del promotor) paga IVA al 10% más AJD (entre 0,5% y 1,5% según la comunidad). Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.',
+      answer: 'Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (entre 0,5% y 1,5% según la comunidad). El IVA es del 10% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del 21% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.',
     },
     {
       question: '¿El vendedor de un garaje paga plusvalía municipal?',
@@ -99,7 +99,7 @@ export const faqJsonLd = {
       name: '¿Garaje nuevo o de segunda mano: qué impuesto se paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un garaje de primera transmisión (nuevo, del promotor) paga IVA al 10% más AJD (entre 0,5% y 1,5% según la comunidad). Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.',
+        text: 'Un garaje de primera transmisión (nuevo, del promotor) paga IVA más AJD (entre 0,5% y 1,5% según la comunidad). El IVA es del 10% si el garaje va vinculado a la vivienda (máximo 2 plazas, mismo edificio y promotor) y del 21% si se adquiere de forma independiente o en un edificio de uso no residencial. Un garaje de segunda mano paga ITP al tipo general de la comunidad autónoma. No pueden coexistir ITP e IVA en la misma operación.',
       },
     },
     {
