@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Simulador Bono Joven Alquiler',
     description:
-      'Comprueba si tienes derecho al Bono Alquiler Joven: €250/mes durante 2 años. Orientador rápido y gratuito.',
+      'Comprueba si tienes derecho al Bono Joven Alquiler: hasta 300 €/mes vivienda o 200 €/mes habitación. Orientador rápido y gratuito.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
@@ -40,7 +40,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Simulador del Bono Joven Alquiler (Plan Estatal de Vivienda 2026-2030, RD 326/2026): comprueba si cumples los requisitos y calcula tu ayuda mensual. Hasta 300 €/mes para vivienda completa o 200 €/mes para habitación en piso compartido, durante hasta 4 años.",
   url: "https://meskeia.com/simulador-bono-joven-alquiler/",
   category: 'FinanceApplication',
-  features: [],
+  features: [
+    "Comprueba elegibilidad para el Bono Joven Alquiler 2026-2030 (RD 326/2026) con checklist de requisitos",
+    "Calcula la ayuda mensual efectiva: hasta 300 €/mes en vivienda completa o 200 €/mes en habitación",
+    "Muestra el límite del 60% de la renta y el ahorro total acumulado en hasta 4 años",
+    "Diferencia entre requisitos imprescindibles y condicionantes para la aprobación",
+    "Guía del proceso de solicitud paso a paso por Comunidad Autónoma",
+    "Funciona sin registro, sin enviar datos personales al servidor",
+    "RegionBadge: ayuda aplicable exclusivamente en España",
+  ],
 });
 
 export const faqJsonLd = {

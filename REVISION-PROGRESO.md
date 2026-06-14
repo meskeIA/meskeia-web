@@ -11,7 +11,7 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 142 / 999
+- ✅ Revisadas: 146 / 999
 - ⬜ Pendientes: 861 / 999
 
 ## Resumen por suite primaria
@@ -347,7 +347,7 @@
 | [ ] | Curso de Emprendimiento | `/curso-emprendimiento/` | diseno, cultura |
 | [ ] | Curso de Empresa Familiar | `/curso-empresa-familiar/` | diseno, cultura |
 | [ ] | Curso de Estrategia Empresarial | `/curso-estrategia-empresarial/` | diseno, cultura |
-| [ ] | Curso de Marketing Digital 2025 | `/curso-marketing-digital/` | diseno, cultura |
+| [x] | Curso de Marketing Digital 2025 | `/curso-marketing-digital/` | diseno, cultura |
 | [x] | Curso de Negociación Exitosa | `/curso-negociacion/` | diseno, cultura |
 | [x] | Curso de Optimización para IAs (GEO/AEO) | `/curso-optimizacion-ia/` | diseno, cultura |
 | [ ] | Editor EXIF | `/editor-exif/` | diseno, tecnicas |
@@ -577,7 +577,7 @@
 | [x] | Simulador de Movimiento Circular | `/simulador-movimiento-circular/` | estudiantes |
 | [x] | Simulador de Oferta y Demanda | `/simulador-oferta-demanda/` | estudiantes |
 | [ ] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
-| [ ] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
+| [x] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
 | [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
 | [x] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
@@ -702,7 +702,7 @@
 | [ ] | Diagnóstico de Modelo de Negocio | `/diagnostico-modelo-negocio/` | freelance, finanzas |
 | [ ] | El Ciclo de Vida de un Proyecto Freelance | `/visualizador-ciclo-vida-freelance/` | freelance, cultura |
 | [ ] | Estimador Break-Even | `/estimador-break-even/` | freelance |
-| [ ] | Estimador ROI Marketing | `/estimador-roi-marketing/` | freelance, diseno |
+| [x] | Estimador ROI Marketing | `/estimador-roi-marketing/` | freelance, diseno |
 | [ ] | Estructura de Costes del Autónomo | `/visualizador-estructura-costes-autonomo/` | freelance, finanzas, cultura |
 | [ ] | Generador de Facturas | `/generador-facturas/` | freelance |
 | [ ] | Lista de Tareas | `/lista-tareas/` | freelance, productividad |
@@ -835,7 +835,7 @@
 | [ ] | Selector de Tarifa Eléctrica | `/selector-tarifa-electrica/` | inmobiliaria, tecnicas |
 | [ ] | Selector de Tipo de Vivienda | `/selector-tipo-vivienda/` | inmobiliaria |
 | [ ] | Selector de Zona de Residencia | `/selector-zona-residencia/` | inmobiliaria, productividad |
-| [ ] | Simulador Bono Joven Alquiler | `/simulador-bono-joven-alquiler/` | inmobiliaria, finanzas, legal-fiscal |
+| [x] | Simulador Bono Joven Alquiler | `/simulador-bono-joven-alquiler/` | inmobiliaria, finanzas, legal-fiscal |
 | [ ] | Simulador de Ahorro con Placas Solares | `/simulador-placas-solares/` | inmobiliaria, tecnicas, finanzas |
 | [ ] | Simulador de Subvenciones para Rehabilitación Energética | `/simulador-subvenciones-rehabilitacion/` | inmobiliaria, finanzas |
 | [ ] | Simulador Gastos Compra Nave Industrial | `/simulador-gastos-compraventa-nave-industrial/` | inmobiliaria, legal-fiscal, freelance |

@@ -46,7 +46,7 @@ export default function CursoMarketingDigitalPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📈</span>
+        <span className={styles.heroIcon} aria-hidden="true">📈</span>
         <h1 className={styles.title}>Curso de Marketing Digital</h1>
         <p className={styles.subtitle}>
           Domina el marketing digital en 2025: desde fundamentos de branding hasta IA y automatización.
@@ -58,7 +58,7 @@ export default function CursoMarketingDigitalPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -68,22 +68,22 @@ export default function CursoMarketingDigitalPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}/{totalChapters}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -93,22 +93,22 @@ export default function CursoMarketingDigitalPage() {
       <section className={styles.overviewSection}>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📚</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📚</span>
             <h3>Fundamentos</h3>
             <p>Evolución del marketing, las nuevas 4P y segmentación</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🎨</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🎨</span>
             <h3>Branding</h3>
             <p>Posicionamiento, storytelling y marca personal</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>✍️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">✍️</span>
             <h3>SEO y Contenidos</h3>
             <p>Estrategia de contenidos, SEO y GEO/AEO</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📣</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📣</span>
             <h3>Publicidad</h3>
             <p>Meta Ads, Google Ads y medición</p>
           </div>
@@ -117,7 +117,7 @@ export default function CursoMarketingDigitalPage() {
 
       {/* Modules Section */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido del Curso</h2>
 
         {modules.map((module) => {
           const completedInModule = module.chapters.filter(ch => isCompleted(ch.id)).length;
@@ -154,7 +154,7 @@ export default function CursoMarketingDigitalPage() {
                         <span className={styles.chapterNumber}>{globalChapterIndex}</span>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>{chapter.title}</h4>
-                          <span className={styles.chapterDuration}>⏱️ {chapter.duration} min</span>
+                          <span className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</span>
                         </div>
                       </div>
                       <div className={styles.chapterTopics}>
@@ -190,20 +190,20 @@ export default function CursoMarketingDigitalPage() {
 
       {/* Recursos adicionales */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>🔧 Herramientas Relacionadas</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🔧</span> Herramientas Relacionadas</h2>
         <div className={styles.resourcesGrid}>
           <Link href="/generador-palabras-clave" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>🔍</span>
+            <span className={styles.resourceIcon} aria-hidden="true">🔍</span>
             <div className={styles.resourceName}>Generador de Keywords</div>
             <div className={styles.resourceDesc}>Encuentra palabras clave para tu contenido</div>
           </Link>
           <Link href="/analizador-geo" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>🤖</span>
+            <span className={styles.resourceIcon} aria-hidden="true">🤖</span>
             <div className={styles.resourceName}>Analizador GEO/AEO</div>
             <div className={styles.resourceDesc}>Optimiza para ChatGPT, Perplexity y Gemini</div>
           </Link>
           <Link href="/calculadora-roi-marketing" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>📊</span>
+            <span className={styles.resourceIcon} aria-hidden="true">📊</span>
             <div className={styles.resourceName}>Calculadora ROI Marketing</div>
             <div className={styles.resourceDesc}>Mide el retorno de tus campañas</div>
           </Link>

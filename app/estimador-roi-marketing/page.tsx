@@ -324,7 +324,7 @@ export default function CalculadoraROIMarketingPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Estimador ROI Marketing</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📈</span> Estimador ROI Marketing</h1>
         <p className={styles.subtitle}>
           Mide la rentabilidad de tus campañas por canal. Compara Google Ads, redes sociales, email y más.
         </p>
@@ -334,7 +334,7 @@ export default function CalculadoraROIMarketingPage() {
 
       {/* Resumen global */}
       <section className={styles.resumenGlobal}>
-        <div className={styles.resumenGrid}>
+        <div className={styles.resumenGrid} role="status" aria-live="polite" aria-atomic="true">
           <ResultCard
             title="ROI Total"
             value={formatNumber(calculos.roiTotal, 1)}
@@ -393,7 +393,7 @@ export default function CalculadoraROIMarketingPage() {
             <NumberInput
               value={valorVidaCliente}
               onChange={setValorVidaCliente}
-              label=""
+              label="Valor de vida del cliente (CLV)"
               placeholder="500"
               suffix="€"
               helperText="Usado para calcular ratio CLV/CAC"
@@ -407,8 +407,10 @@ export default function CalculadoraROIMarketingPage() {
         <div className={styles.sectionHeader}>
           <h2>Canales de Marketing</h2>
           <button
+            type="button"
             className={styles.btnAgregar}
             onClick={() => setMostrarFormNuevo(!mostrarFormNuevo)}
+            aria-expanded={mostrarFormNuevo}
           >
             + Añadir Canal
           </button>
@@ -449,11 +451,12 @@ export default function CalculadoraROIMarketingPage() {
                 <span className={styles.canalIcono}>{canal.icono}</span>
                 <h3>{canal.nombre}</h3>
                 <button
+                  type="button"
                   className={styles.btnEliminar}
                   onClick={() => eliminarCanal(canal.id)}
-                  title="Eliminar canal"
+                  aria-label={`Eliminar canal ${canal.nombre}`}
                 >
-                  ×
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
 
@@ -514,7 +517,7 @@ export default function CalculadoraROIMarketingPage() {
       {/* Gráficos de Análisis */}
       {calculos.ranking.length > 0 && (
         <section className={styles.chartsSection}>
-          <h2>📊 Análisis Visual de Canales</h2>
+          <h2><span aria-hidden="true">📊</span> Análisis Visual de Canales</h2>
           <div className={styles.chartsGrid}>
             <div className={styles.chartCard}>
               <h3>ROI por Canal</h3>
@@ -544,7 +547,7 @@ export default function CalculadoraROIMarketingPage() {
       {/* Tabla Comparativa */}
       {calculos.ranking.length > 0 && (
         <section className={styles.tablaSection}>
-          <h2>📋 Tabla Comparativa de Métricas</h2>
+          <h2><span aria-hidden="true">📋</span> Tabla Comparativa de Métricas</h2>
           <div className={styles.tablaWrapper}>
             <table className={styles.tablaComparativa}>
               <thead>
@@ -618,7 +621,7 @@ export default function CalculadoraROIMarketingPage() {
       {/* Ranking */}
       {calculos.ranking.length > 1 && (
         <section className={styles.rankingSection}>
-          <h2>🏆 Ranking de Canales por ROI</h2>
+          <h2><span aria-hidden="true">🏆</span> Ranking de Canales por ROI</h2>
           <div className={styles.rankingLista}>
             {calculos.ranking.map((canal, idx) => (
               <div key={canal.id} className={styles.rankingItem}>

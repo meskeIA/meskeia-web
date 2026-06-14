@@ -318,14 +318,18 @@ export default function SimuladorPenduloPage() {
         {/* Selector de modelo */}
         <div className={styles.tabBar}>
           <button
+            type="button"
             className={`${styles.tabBtn} ${modelo === 'numerico' ? styles.tabActive : ''}`}
             onClick={() => setModelo('numerico')}
+            aria-pressed={modelo === 'numerico'}
           >
             Modelo numérico (cualquier ángulo)
           </button>
           <button
+            type="button"
             className={`${styles.tabBtn} ${modelo === 'pequeno' ? styles.tabActive : ''}`}
             onClick={() => setModelo('pequeno')}
+            aria-pressed={modelo === 'pequeno'}
           >
             Aproximación pequeños ángulos
           </button>
@@ -400,6 +404,7 @@ export default function SimuladorPenduloPage() {
                 <input
                   id="grav"
                   type="number"
+                  inputMode="decimal"
                   min={0.1}
                   max={50}
                   step={0.01}
@@ -442,12 +447,15 @@ export default function SimuladorPenduloPage() {
 
             <div className={styles.actionBar}>
               <button
+                type="button"
                 className={running ? styles.calcBtnSecondary : styles.calcBtn}
                 onClick={() => setRunning((r) => !r)}
+                aria-pressed={running}
+                aria-label={running ? 'Pausar simulación' : 'Iniciar simulación'}
               >
                 {running ? '⏸ Pausar' : '▶ Iniciar'}
               </button>
-              <button className={styles.calcBtnGhost} onClick={reiniciar}>
+              <button type="button" className={styles.calcBtnGhost} onClick={reiniciar}>
                 ↺ Reiniciar
               </button>
             </div>
@@ -564,7 +572,7 @@ export default function SimuladorPenduloPage() {
 
             {showCorreccion && (
               <div className={styles.warningInline}>
-                ⚠️ θ₀ = {formatNumber(theta0Deg, 0)}° está fuera de la aproximación de pequeños
+                <span aria-hidden="true">⚠️</span> θ₀ = {formatNumber(theta0Deg, 0)}° está fuera de la aproximación de pequeños
                 ángulos. El periodo real difiere por un factor 1 + θ²/16, es decir un{' '}
                 <strong>+{formatNumber(correccionPct, 2)}%</strong>. Período corregido aproximado:{' '}
                 <strong>{formatNumber(derivados1.Tcorregido, 3)} s</strong>.

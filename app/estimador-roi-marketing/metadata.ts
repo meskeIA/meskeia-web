@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Calcula el ROI de tus campañas de marketing por canal. Analiza Google Ads, Facebook, Instagram, Email y SEO. Métricas CAC, CLV y recomendaciones.",
   url: "https://meskeia.com/estimador-roi-marketing/",
   category: 'BusinessApplication',
-  features: [],
+  features: [
+    "Analiza el ROI, CAC y ROAS de hasta 5 canales de marketing en simultáneo",
+    "Canales predefinidos: Google Ads, Facebook, Instagram, Email Marketing y SEO",
+    "Calcula la ratio CLV/CAC para evaluar la rentabilidad a largo plazo de cada canal",
+    "Ranking automático de canales por ROI con recomendación de acción (escalar, mantener, pausar)",
+    "Gráficos comparativos de ROI por canal e inversión vs retorno",
+    "Tabla completa de métricas con totales: inversión, ingresos, beneficio, ROI, CAC y ROAS",
+    "Funciona en el navegador sin enviar datos a servidores externos",
+  ],
 });
 
 export const faqJsonLd = {

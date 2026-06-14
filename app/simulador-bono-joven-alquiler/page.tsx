@@ -134,13 +134,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
 
       {/* Sección de tu alquiler */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>💶 Tu alquiler actual</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">💶</span> Tu alquiler actual</h2>
 
         <div className={styles.field}>
           <span className={styles.label}>¿Alquilas una vivienda completa o una habitación?</span>
           <div className={styles.tipoSelector}>
             <button
               className={`${styles.tipoBtn} ${tipoVivienda === 'vivienda' ? styles.tipoBtnActivo : ''}`}
+              type="button"
               onClick={() => setTipoVivienda('vivienda')}
               aria-pressed={tipoVivienda === 'vivienda'}
             >
@@ -148,6 +149,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoVivienda === 'habitacion' ? styles.tipoBtnActivo : ''}`}
+              type="button"
               onClick={() => setTipoVivienda('habitacion')}
               aria-pressed={tipoVivienda === 'habitacion'}
             >
@@ -163,6 +165,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <input
               id="alquiler"
               type="number"
+              inputMode="decimal"
               min={0}
               step={10}
               value={alquilMensual}
@@ -198,7 +201,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
 
       {/* Checklist de requisitos */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>✅ Comprueba tus requisitos</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">✅</span> Comprueba tus requisitos</h2>
 
         <div className={styles.checkGrid} role="list">
           {REQUISITOS.map(req => {
@@ -242,9 +245,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
       {/* Resultado */}
       {resultado !== 'pendiente' && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>📊 Tu resultado</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Tu resultado</h2>
           {resultado === 'apto' && (
-            <div className={`${styles.resultadoCard} ${styles['resultado-apto']}`} role="alert" aria-live="polite">
+            <div className={`${styles.resultadoCard} ${styles['resultado-apto']}`} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultadoIcon} aria-hidden="true">🎉</div>
               <h3 className={styles.resultadoTitulo}>¡Cumples todos los requisitos!</h3>
               <p className={styles.resultadoTexto}>
@@ -254,7 +257,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
           )}
           {resultado === 'casi' && (
-            <div className={`${styles.resultadoCard} ${styles['resultado-casi']}`} role="alert" aria-live="polite">
+            <div className={`${styles.resultadoCard} ${styles['resultado-casi']}`} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultadoIcon} aria-hidden="true">⚠️</div>
               <h3 className={styles.resultadoTitulo}>Cumples los requisitos básicos</h3>
               <p className={styles.resultadoTexto}>
@@ -264,7 +267,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
           )}
           {resultado === 'no-apto' && (
-            <div className={`${styles.resultadoCard} ${styles['resultado-no-apto']}`} role="alert" aria-live="polite">
+            <div className={`${styles.resultadoCard} ${styles['resultado-no-apto']}`} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultadoIcon} aria-hidden="true">❌</div>
               <h3 className={styles.resultadoTitulo}>No cumples los requisitos obligatorios</h3>
               <p className={styles.resultadoTexto}>
@@ -278,7 +281,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
 
       {/* Próximos pasos */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>📋 Proceso de solicitud</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Proceso de solicitud</h2>
         <div className={styles.pasosGrid}>
           {[
             { num: '1', titulo: 'Verifica disponibilidad en tu CA', desc: 'Cada Comunidad Autónoma gestiona su propia convocatoria. Algunas están activas todo el año, otras tienen plazos específicos.' },
