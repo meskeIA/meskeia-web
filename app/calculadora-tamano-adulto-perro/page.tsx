@@ -74,6 +74,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   const [edadSemanas, setEdadSemanas] = useState('');
   const [tamanoRaza, setTamanoRaza] = useState<TamanoRaza>('mediano');
   const [filtroRaza, setFiltroRaza] = useState<TamanoRaza | 'todas'>('todas');
+  const [error, setError] = useState<string | null>(null);
   const [resultado, setResultado] = useState<{
     pesoAdultoMin: number;
     pesoAdultoMax: number;
@@ -114,9 +115,18 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     const peso = parseFloat(pesoActual.replace(',', '.'));
     const edad = parseFloat(edadSemanas);
 
-    if (isNaN(peso) || peso <= 0 || peso > 50) return;
-    if (isNaN(edad) || edad < 4 || edad > 150) return;
+    if (isNaN(peso) || peso <= 0 || peso > 50) {
+      setError('Introduce un peso actual válido, entre 0 y 50 kg.');
+      setResultado(null);
+      return;
+    }
+    if (isNaN(edad) || edad < 4 || edad > 150) {
+      setError('Introduce una edad válida, entre 4 y 150 semanas.');
+      setResultado(null);
+      return;
+    }
 
+    setError(null);
     const porcentaje = obtenerPorcentajeCrecimiento(edad, tamanoRaza);
 
     // Peso adulto estimado
@@ -148,6 +158,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     setPesoActual('');
     setEdadSemanas('');
     setResultado(null);
+    setError(null);
   };
 
   const razasFiltradas = filtroRaza === 'todas'
@@ -177,6 +188,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             <div className={styles.inputConUnidad}>
               <input
                 type="text"
+                inputMode="decimal"
                 value={pesoActual}
                 onChange={(e) => setPesoActual(e.target.value)}
                 placeholder="5"
@@ -192,6 +204,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             <div className={styles.inputConUnidad}>
               <input
                 type="text"
+                inputMode="numeric"
                 value={edadSemanas}
                 onChange={(e) => setEdadSemanas(e.target.value)}
                 placeholder="16"
@@ -220,6 +233,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   key={t.id}
                   className={`${styles.tamanoBtn} ${tamanoRaza === t.id ? styles.active : ''}`}
                   onClick={() => setTamanoRaza(t.id)}
+                  aria-pressed={tamanoRaza === t.id}
                 >
                   <span className={styles.tamanoLabel}>{t.label}</span>
                   <span className={styles.tamanoPeso}>{t.peso}</span>
@@ -236,9 +250,15 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               Limpiar
             </button>
           </div>
+
+          {error && (
+            <p className={styles.errorMsg} role="alert">
+              ⚠️ {error}
+            </p>
+          )}
         </div>
 
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite">
           {resultado ? (
             <>
               <div className={styles.resultadoPrincipal}>
@@ -306,36 +326,42 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           <button
             className={`${styles.filtroBtn} ${filtroRaza === 'todas' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('todas')}
+            aria-pressed={filtroRaza === 'todas'}
           >
             Todas
           </button>
           <button
             className={`${styles.filtroBtn} ${filtroRaza === 'mini' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('mini')}
+            aria-pressed={filtroRaza === 'mini'}
           >
             Mini
           </button>
           <button
             className={`${styles.filtroBtn} ${filtroRaza === 'pequeno' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('pequeno')}
+            aria-pressed={filtroRaza === 'pequeno'}
           >
             Pequeño
           </button>
           <button
             className={`${styles.filtroBtn} ${filtroRaza === 'mediano' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('mediano')}
+            aria-pressed={filtroRaza === 'mediano'}
           >
             Mediano
           </button>
           <button
             className={`${styles.filtroBtn} ${filtroRaza === 'grande' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('grande')}
+            aria-pressed={filtroRaza === 'grande'}
           >
             Grande
           </button>
           <button
             className={`${styles.filtroBtn} ${filtroRaza === 'gigante' ? styles.active : ''}`}
             onClick={() => setFiltroRaza('gigante')}
+            aria-pressed={filtroRaza === 'gigante'}
           >
             Gigante
           </button>
@@ -353,8 +379,6 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           ))}
         </div>
       </div>
-
-      
 
       <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-tamano-adulto-perro">
         <p>Esta calculadora usa curvas de crecimiento promedio. <strong>Limitaciones:</strong></p>

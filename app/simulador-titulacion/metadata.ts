@@ -3,8 +3,8 @@ import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/s
 
 export const metadata: Metadata = {
   title: 'Simulador de Titulación Ácido-Base | meskeIA',
-  description: 'Titula gota a gota ácidos fuertes/débiles con bases fuertes/débiles. Curva de pH en tiempo real, punto de equivalencia, pKa, indicadores y zona tampón. Química Bachillerato.',
-  keywords: 'titulación ácido base, valoración ácido base, curva de pH, punto de equivalencia, indicador fenolftaleína, pKa, Henderson-Hasselbalch, química bachillerato',
+  description: 'Titula gota a gota ácidos fuertes/débiles con bases fuertes/débiles. Curva de pH en tiempo real, punto de equivalencia, pKa, indicadores y zona tampón. Química de secundaria.',
+  keywords: 'titulación ácido base, valoración ácido base, curva de pH, punto de equivalencia, indicador fenolftaleína, pKa, Henderson-Hasselbalch, química secundaria',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -44,7 +44,7 @@ const webAppSchema = generateWebAppSchema({
     'Gratuito y sin publicidad',
     'En español',
   ],
-  keywords: ['titulación', 'valoración', 'pH', 'química bachillerato'],
+  keywords: ['titulación', 'valoración', 'pH', 'química secundaria'],
 });
 
 const faqSchema = generateFAQSchema({

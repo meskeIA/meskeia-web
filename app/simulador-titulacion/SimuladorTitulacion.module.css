@@ -307,6 +307,30 @@
   border-color: var(--primary);
 }
 
+.gotaBtn:focus-visible,
+.calcBtn:focus-visible,
+.resetBtn:focus-visible,
+.tabBtn:focus-visible,
+.indicatorBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gotaBtn,
+  .calcBtn,
+  .resetBtn,
+  .tabBtn,
+  .indicatorBtn {
+    transition-duration: 0.01ms !important;
+  }
+
+  .gotaBtn:active,
+  .calcBtn:active {
+    transform: none;
+  }
+}
+
 /* Resultados */
 .resultBlock {
   background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
@@ -352,22 +376,6 @@
   color: var(--primary);
   font-size: 1rem;
   font-family: 'Courier New', monospace;
-}
-
-/* Animación de gota */
-@keyframes gotaCae {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(120px); opacity: 0; }
-}
-
-.gotaAnim {
-  animation: gotaCae 0.5s ease-in;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gotaAnim {
-    animation: none;
-  }
 }
 
 /* EducationalSection v2.0 */

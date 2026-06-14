@@ -36,7 +36,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Predice el peso adulto de tu cachorro según su edad, peso actual y tamaño de raza. Curvas de crecimiento y tabla de razas de referencia.",
   url: "https://meskeia.com/calculadora-tamano-adulto-perro/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Predicción del peso adulto a partir del peso y edad actuales del cachorro',
+    'Curvas de crecimiento específicas para 5 tamaños de raza (mini a gigante)',
+    'Rango de peso probable con margen de error del ±15%',
+    'Tabla de referencia con más de 25 razas y su peso adulto típico',
+    'Indicación de la edad de maduración esperada según el tamaño',
+    'Filtros por categoría de tamaño en la tabla de razas',
+  ],
 });
 
 export const faqJsonLd = {

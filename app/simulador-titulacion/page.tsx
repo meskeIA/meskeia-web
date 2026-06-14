@@ -347,12 +347,11 @@ export default function SimuladorTitulacion() {
         {/* Selector de tipo */}
         <section className={styles.panel}>
           <h2 className={styles.panelTitle}>1. Elige el tipo de titulación</h2>
-          <div className={styles.tabBar} role="tablist">
+          <div className={styles.tabBar} role="group" aria-label="Tipo de titulación">
             {(Object.keys(TIPOS_TITULACION) as TipoTitulacion[]).map((t) => (
               <button
                 key={t}
-                role="tab"
-                aria-selected={tipo === t}
+                aria-pressed={tipo === t}
                 className={`${styles.tabBtn} ${tipo === t ? styles.tabActive : ''}`}
                 onClick={() => {
                   setTipo(t);
@@ -476,6 +475,7 @@ export default function SimuladorTitulacion() {
               return (
                 <button
                   key={ind}
+                  aria-pressed={indicador === ind}
                   className={`${styles.indicatorBtn} ${indicador === ind ? styles.indicatorActive : ''}`}
                   onClick={() => setIndicador(ind)}
                 >
@@ -672,7 +672,7 @@ export default function SimuladorTitulacion() {
           </div>
 
           {/* Resultados */}
-          <div className={styles.resultBlock}>
+          <div className={styles.resultBlock} role="status" aria-live="polite">
             <h3 className={styles.resultTitle}>Estado actual</h3>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>pH actual</span>
