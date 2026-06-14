@@ -1,10 +1,8 @@
 'use client';
-
+// @disclaimer: exempt
 import { useState, useMemo } from 'react';
 import styles from './ContadorPalabras.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
-  DisclaimerCard,
-} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -32,6 +30,7 @@ interface PalabraFrecuencia {
 export default function ContadorPalabrasPage() {
   const [texto, setTexto] = useState('');
   const [mostrarDensidad, setMostrarDensidad] = useState(false);
+  const [copiado, setCopiado] = useState(false);
 
   // Calcular estadísticas
   const estadisticas = useMemo((): EstadisticasTexto => {
@@ -166,9 +165,10 @@ export default function ContadorPalabrasPage() {
 
     try {
       await navigator.clipboard.writeText(stats);
-      alert('Estadísticas copiadas al portapapeles');
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
     } catch {
-      alert('No se pudieron copiar las estadísticas');
+      // Fallo silencioso
     }
   };
 
@@ -185,25 +185,20 @@ export default function ContadorPalabrasPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="contador-palabras-disclaimer"
-      />
-
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
         <section className={styles.inputPanel}>
           <div className={styles.inputHeader}>
             <h2 className={styles.sectionTitle}>Tu texto</h2>
             <div className={styles.inputActions}>
-              <button onClick={limpiarTexto} className={styles.btnSecundario}>
+              <button type="button" onClick={limpiarTexto} className={styles.btnSecundario}>
                 Limpiar
               </button>
             </div>
           </div>
           <textarea
+            id="texto-entrada"
+            aria-label="Texto a analizar"
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             placeholder="Escribe o pega tu texto aquí para analizar..."
@@ -216,13 +211,18 @@ export default function ContadorPalabrasPage() {
         <section className={styles.resultsPanel}>
           <div className={styles.resultsHeader}>
             <h2 className={styles.sectionTitle}>Estadísticas</h2>
-            <button onClick={copiarEstadisticas} className={styles.btnSecundario}>
-              Copiar
+            <button
+              type="button"
+              onClick={copiarEstadisticas}
+              className={styles.btnSecundario}
+              aria-label={copiado ? 'Estadísticas copiadas' : 'Copiar estadísticas'}
+            >
+              {copiado ? '¡Copiado!' : 'Copiar'}
             </button>
           </div>
 
           {/* Estadísticas principales */}
-          <div className={styles.statsGrid}>
+          <div className={styles.statsGrid} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.statCard}>
               <span className={styles.statValue}>{formatNumber(estadisticas.palabras, 0)}</span>
               <span className={styles.statLabel}>Palabras</span>
@@ -252,14 +252,14 @@ export default function ContadorPalabrasPage() {
           {/* Tiempos */}
           <div className={styles.tiemposGrid}>
             <div className={styles.tiempoCard}>
-              <span className={styles.tiempoIcon}>📖</span>
+              <span className={styles.tiempoIcon} aria-hidden="true">📖</span>
               <div className={styles.tiempoInfo}>
                 <span className={styles.tiempoLabel}>Tiempo de lectura</span>
                 <span className={styles.tiempoValue}>{estadisticas.tiempoLectura}</span>
               </div>
             </div>
             <div className={styles.tiempoCard}>
-              <span className={styles.tiempoIcon}>🎤</span>
+              <span className={styles.tiempoIcon} aria-hidden="true">🎤</span>
               <div className={styles.tiempoInfo}>
                 <span className={styles.tiempoLabel}>Tiempo hablado</span>
                 <span className={styles.tiempoValue}>{estadisticas.tiempoHablado}</span>
@@ -269,8 +269,10 @@ export default function ContadorPalabrasPage() {
 
           {/* Toggle densidad */}
           <button
+            type="button"
             onClick={() => setMostrarDensidad(!mostrarDensidad)}
             className={styles.btnDensidad}
+            aria-expanded={mostrarDensidad}
           >
             {mostrarDensidad ? '▼' : '▶'} Densidad de palabras clave
           </button>
@@ -315,21 +317,21 @@ export default function ContadorPalabrasPage() {
         <h3>Sobre esta herramienta</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🔒</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔒</span>
             <div>
               <strong>100% Privado</strong>
               <p>Tu texto nunca sale de tu navegador</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⚡</span>
+            <span className={styles.infoIcon} aria-hidden="true">⚡</span>
             <div>
               <strong>Tiempo real</strong>
               <p>Resultados instantáneos mientras escribes</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📊</span>
+            <span className={styles.infoIcon} aria-hidden="true">📊</span>
             <div>
               <strong>Análisis SEO</strong>
               <p>Densidad de palabras clave para optimización</p>

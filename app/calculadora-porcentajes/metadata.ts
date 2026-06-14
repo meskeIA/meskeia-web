@@ -84,8 +84,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-porcentajes/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    "5 modos de cálculo: porcentaje de cantidad, qué % es, aumento, disminución y variación",
+    "Calcula descuentos, IVA y subidas de precio con un solo paso",
+    "Muestra la fórmula matemática utilizada en cada cálculo",
+    "Formato numérico en español (punto de miles, coma decimal)",
+    "Resultados instantáneos sin necesidad de pulsar Enter",
+    "Interfaz adaptada a móvil y escritorio",
+    "Sin registro ni instalación, funciona completamente en el navegador",
   ],
 });

@@ -75,9 +75,7 @@ export default function CalculadoraSuscripcionesPage() {
 
   // Guardar en localStorage
   useEffect(() => {
-    if (suscripciones.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(suscripciones));
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(suscripciones));
   }, [suscripciones]);
 
   // Calcular totales
@@ -202,15 +200,15 @@ export default function CalculadoraSuscripcionesPage() {
 
       <DisclaimerCard
         variant="financial"
-        severity="medium"
-        collapsible={true}
+        severity="high"
+        collapsible={false}
         context="calculadora-suscripciones"
       />
 
       <div className={styles.mainContent}>
         {/* Resumen de gastos */}
         <section className={styles.resumenPanel}>
-          <div className={styles.resumenGrid}>
+          <div className={styles.resumenGrid} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.resumenCard}>
               <span className={styles.resumenLabel}>Gasto mensual</span>
               <span className={styles.resumenValor}>{formatCurrency(totales.mensual)}</span>
@@ -239,7 +237,7 @@ export default function CalculadoraSuscripcionesPage() {
                 .sort((a, b) => b[1] - a[1])
                 .map(([cat, monto]) => (
                   <div key={cat} className={styles.categoriaItem}>
-                    <span className={styles.categoriaIcono}>{getIcono(cat)}</span>
+                    <span className={styles.categoriaIcono} aria-hidden="true">{getIcono(cat)}</span>
                     <span className={styles.categoriaNombre}>
                       {categorias.find(c => c.id === cat)?.nombre || cat}
                     </span>
@@ -279,7 +277,7 @@ export default function CalculadoraSuscripcionesPage() {
                   className={`${styles.suscripcionItem} ${!s.activa ? styles.inactiva : ''}`}
                 >
                   <div className={styles.suscripcionInfo}>
-                    <span className={styles.suscripcionIcono}>{getIcono(s.categoria)}</span>
+                    <span className={styles.suscripcionIcono} aria-hidden="true">{getIcono(s.categoria)}</span>
                     <div className={styles.suscripcionTexto}>
                       <span className={styles.suscripcionNombre}>{s.nombre}</span>
                       <span className={styles.suscripcionCiclo}>
@@ -300,7 +298,8 @@ export default function CalculadoraSuscripcionesPage() {
                       type="button"
                       className={`${styles.btnToggle} ${s.activa ? styles.activo : ''}`}
                       onClick={() => toggleActiva(s.id)}
-                      title={s.activa ? 'Pausar' : 'Activar'}
+                      aria-pressed={s.activa}
+                      aria-label={s.activa ? `Pausar ${s.nombre}` : `Activar ${s.nombre}`}
                     >
                       {s.activa ? '✓' : '○'}
                     </button>
@@ -308,17 +307,17 @@ export default function CalculadoraSuscripcionesPage() {
                       type="button"
                       className={styles.btnEditar}
                       onClick={() => editarSuscripcion(s)}
-                      title="Editar"
+                      aria-label={`Editar ${s.nombre}`}
                     >
-                      ✏️
+                      <span aria-hidden="true">✏️</span>
                     </button>
                     <button
                       type="button"
                       className={styles.btnEliminar}
                       onClick={() => eliminarSuscripcion(s.id)}
-                      title="Eliminar"
+                      aria-label={`Eliminar ${s.nombre}`}
                     >
-                      🗑️
+                      <span aria-hidden="true">🗑️</span>
                     </button>
                   </div>
                 </div>
@@ -343,7 +342,7 @@ export default function CalculadoraSuscripcionesPage() {
                   onClick={() => agregarPopular(pop)}
                   disabled={yaExiste}
                 >
-                  <span className={styles.popularIcono}>{getIcono(pop.categoria)}</span>
+                  <span className={styles.popularIcono} aria-hidden="true">{getIcono(pop.categoria)}</span>
                   <span className={styles.popularNombre}>{pop.nombre}</span>
                   <span className={styles.popularPrecio}>{formatCurrency(pop.precio)}</span>
                 </button>
@@ -376,6 +375,7 @@ export default function CalculadoraSuscripcionesPage() {
                   <input
                     id="precio"
                     type="text"
+                    inputMode="decimal"
                     value={precio}
                     onChange={e => setPrecio(e.target.value)}
                     placeholder="0,00"

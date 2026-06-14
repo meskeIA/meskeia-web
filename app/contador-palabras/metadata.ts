@@ -40,9 +40,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/contador-palabras/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    "Cuenta palabras, caracteres (con y sin espacios), frases, párrafos y líneas en tiempo real",
+    "Calcula el tiempo estimado de lectura silenciosa y de presentación oral",
+    "Análisis de densidad de palabras clave con clasificación y barra visual (top 10)",
+    "Exporta todas las estadísticas al portapapeles con un clic",
+    "Procesamiento 100% local: el texto nunca sale del navegador",
+    "Actualización instantánea mientras se escribe o pega el texto",
+    "Sin registro, sin cookies de rastreo, sin límite de caracteres",
   ],
 });
 

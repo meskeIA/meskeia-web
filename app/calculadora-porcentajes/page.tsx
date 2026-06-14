@@ -1,10 +1,8 @@
 'use client';
-
+// @disclaimer: exempt
 import { useState } from 'react';
 import styles from './CalculadoraPorcentajes.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection,
-  DisclaimerCard,
-} from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -160,24 +158,18 @@ export default function CalculadoraPorcentajesPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="calculadora-porcentajes-disclaimer"
-      />
-
       <div className={styles.modeSelector}>
         {MODES.map((m) => (
           <button
             key={m.id}
             className={`${styles.modeBtn} ${mode === m.id ? styles.active : ''}`}
+            aria-pressed={mode === m.id}
             onClick={() => {
               setMode(m.id);
               limpiar();
             }}
           >
-            <span className={styles.modeIcon}>{m.icon}</span>
+            <span className={styles.modeIcon} aria-hidden="true">{m.icon}</span>
             <span className={styles.modeTitle}>{m.title}</span>
           </button>
         ))}
@@ -186,7 +178,7 @@ export default function CalculadoraPorcentajesPage() {
       <div className={styles.mainContent}>
         <div className={styles.inputPanel}>
           <div className={styles.modeDescription}>
-            <span className={styles.descIcon}>{currentMode.icon}</span>
+            <span className={styles.descIcon} aria-hidden="true">{currentMode.icon}</span>
             <p>{currentMode.description}</p>
           </div>
 
@@ -205,16 +197,16 @@ export default function CalculadoraPorcentajesPage() {
           />
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
         </div>
 
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           {resultado ? (
             <>
               <ResultCard

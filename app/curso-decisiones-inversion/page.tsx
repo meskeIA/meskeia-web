@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import styles from './CursoInversion.module.css';
-import { MeskeiaLogo, Footer, DisclaimerCard, LegalNotice, RelatedApps, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, DisclaimerCard, LegalNotice, RelatedApps, ShareCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { CHAPTERS, TOOLS, RESOURCES, useCourse } from './CourseContext';
 
@@ -21,7 +21,7 @@ export default function CursoDecisionesInversionPage() {
 
       {/* Hero */}
       <header className={styles.hero}>
-        <div className={styles.heroIcon}>📊</div>
+        <div className={styles.heroIcon} aria-hidden="true">📊</div>
         <h1 className={styles.title}>Curso de Decisiones de Inversión</h1>
         <p className={styles.subtitle}>
           Aprende a invertir desde cero con metodología profesional. 10 capítulos con
@@ -34,12 +34,14 @@ export default function CursoDecisionesInversionPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
 
       <LegalNotice lastUpdated="2026-02-02" />
+
+      <RegionBadge variant="es-only" />
 
       {/* Stats */}
       <div className={styles.statsGrid}>

@@ -11,7 +11,7 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 138 / 999
+- ✅ Revisadas: 142 / 999
 - ⬜ Pendientes: 861 / 999
 
 ## Resumen por suite primaria
@@ -337,7 +337,7 @@
 | [ ] | Calculadora Tiempo de Lectura | `/calculadora-tiempo-lectura/` | diseno |
 | [ ] | Comparador de Textos | `/comparador-textos/` | diseno, productividad |
 | [ ] | Compresor de Imágenes por Lotes | `/compresor-imagenes/` | diseno |
-| [ ] | Contador de Palabras | `/contador-palabras/` | diseno, productividad |
+| [x] | Contador de Palabras | `/contador-palabras/` | diseno, productividad |
 | [ ] | Conversor Base64 | `/conversor-base64/` | diseno, tecnicas |
 | [ ] | Conversor de Colores | `/conversor-colores/` | diseno |
 | [ ] | Conversor de Imágenes | `/conversor-imagenes/` | diseno, productividad |
@@ -641,7 +641,7 @@
 | [ ] | Comparador Eléctrico vs Combustión | `/comparador-electrico/` | finanzas, inmobiliaria |
 | [ ] | Comparador Tipos de Seguros | `/comparador-tipos-seguros/` | finanzas, cultura |
 | [ ] | Control de Gastos | `/control-gastos/` | finanzas |
-| [ ] | Curso Decisiones de Inversión | `/curso-decisiones-inversion/` | finanzas, cultura |
+| [x] | Curso Decisiones de Inversión | `/curso-decisiones-inversion/` | finanzas, cultura |
 | [ ] | Desigualdad de la Riqueza - Curva de Lorenz y Coeficiente Gini | `/visualizador-desigualdad-riqueza/` | finanzas, cultura, estudiantes |
 | [ ] | Deuda Pública - Bonos, Prima de Riesgo y Sostenibilidad | `/visualizador-deuda-publica/` | finanzas, cultura |
 | [ ] | El Dinero y el Tiempo | `/visualizador-dinero-y-tiempo/` | finanzas, cultura, freelance |
@@ -804,7 +804,7 @@
 | [ ] | Calculadora de Materiales de Construcción | `/calculadora-materiales-construccion/` | inmobiliaria |
 | [x] | Calculadora de Pintura | `/calculadora-pintura/` | inmobiliaria |
 | [ ] | Calculadora de Piscinas | `/calculadora-piscinas/` | inmobiliaria |
-| [ ] | Calculadora de Suscripciones | `/calculadora-suscripciones/` | inmobiliaria, finanzas |
+| [x] | Calculadora de Suscripciones | `/calculadora-suscripciones/` | inmobiliaria, finanzas |
 | [ ] | Calculadora Roommates | `/calculadora-roommates/` | inmobiliaria, finanzas |
 | [ ] | Estimación de Ahorro Hídrico | `/estimacion-ahorro-hidrico/` | inmobiliaria, finanzas |
 | [ ] | Estimación de Certificación Energética | `/estimacion-certificacion-energetica/` | inmobiliaria, tecnicas |
@@ -927,7 +927,7 @@
 | [ ] | Auditoría de Reuniones | `/auditoria-reuniones/` | productividad, freelance |
 | [ ] | Calculadora Costes Teletrabajo | `/calculadora-costes-teletrabajo/` | productividad, finanzas, freelance |
 | [x] | Calculadora de Fechas | `/calculadora-fechas/` | productividad |
-| [ ] | Calculadora de Porcentajes | `/calculadora-porcentajes/` | productividad, estudiantes |
+| [x] | Calculadora de Porcentajes | `/calculadora-porcentajes/` | productividad, estudiantes |
 | [ ] | Calculadora Regla de Tres | `/calculadora-regla-de-tres/` | productividad, estudiantes |
 | [ ] | Checklist Pre-Mortem | `/checklist-pre-mortem/` | productividad, freelance |
 | [ ] | Conversor de Formatos | `/conversor-formatos/` | productividad |

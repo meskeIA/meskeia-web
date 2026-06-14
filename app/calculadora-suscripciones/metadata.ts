@@ -37,9 +37,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-suscripciones/',
   category: 'FinanceApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    "Registra suscripciones mensual, anual o semanal y convierte todo a base mensual y anual",
+    "Desglose del gasto por categorías (streaming, música, gaming, productividad, etc.)",
+    "Activa o pausa suscripciones sin perder los datos para comparar escenarios",
+    "Añade rápidamente servicios populares como Netflix, Spotify o Amazon Prime con un clic",
+    "Datos guardados localmente en el navegador, sin enviar información a ningún servidor",
+    "Identifica qué categoría supone el mayor gasto relativo en tu presupuesto",
+    "Interfaz adaptada a móvil y escritorio",
   ],
 });
 
