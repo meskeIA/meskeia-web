@@ -24,7 +24,7 @@ interface PreguntaQuiz {
 const NIVEL_CONFIG: Record<Nivel, { label: string; desc: string }> = {
   basico:      { label: '🟢 Básico',       desc: '10 figuras esenciales — ESO'       },
   intermedio:  { label: '🟡 Intermedio',   desc: '10 figuras habituales — Bachillerato' },
-  avanzado:    { label: '🔴 Avanzado',     desc: '7 figuras complejas — Selectividad' },
+  avanzado:    { label: '🔴 Avanzado',     desc: '6 figuras complejas — Selectividad' },
   todos:       { label: '⭐ Todas',        desc: '27 figuras completas'               },
 };
 
@@ -278,7 +278,6 @@ export default function QuizFigurasRetoricaPage() {
               <div
                 className={`${styles.feedbackPanel} ${seleccionada === pregunta.respuestaCorrecta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}
                 role="alert"
-                aria-live="polite"
               >
                 <div className={styles.feedbackCabecera}>
                   <span className={styles.feedbackIcono}>

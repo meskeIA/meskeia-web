@@ -3,7 +3,8 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
+import { getRelatedApps } from '@/data/app-relations';
 import { ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
 type Modo = 'simbolo-nombre' | 'nombre-simbolo';
@@ -170,6 +171,8 @@ export default function QuizSimbolosQuimicosPage() {
         </div>
       </header>
 
+      <LegalNotice />
+
       {/* ── INICIO ── */}
       {fase === 'inicio' && (
         <div className={styles.inicioPanel}>
@@ -201,7 +204,7 @@ export default function QuizSimbolosQuimicosPage() {
                 >
                   <span className={styles.difEmoji} aria-hidden="true">{cfg.emoji}</span>
                   <strong>{cfg.label}</strong>
-                  <span>{cfg.preguntas} preguntas · {cfg.categorias.length === 1 ? 'Elementos comunes' : cfg.categorias.length === 2 ? 'Más variedad' : 'Todos los elementos'}</span>
+                  <span>{cfg.preguntas} preguntas · {cfg.categorias.length === 1 ? 'Elementos comunes' : cfg.categorias.length === 2 ? 'Más variedad' : 'Elementos avanzados'}</span>
                 </button>
               ))}
             </div>
@@ -220,13 +223,14 @@ export default function QuizSimbolosQuimicosPage() {
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
               <span>Pregunta {indice + 1} / {preguntas.length}</span>
-              <span>✅ {aciertos} · 🔥 Racha: {rachaActual}</span>
+              <span role="status" aria-live="polite">✅ {aciertos} · 🔥 Racha: {rachaActual}</span>
             </div>
             <div className={styles.progresoTrack}>
               <div
                 className={styles.progresoFill}
                 style={{ width: `${((indice) / preguntas.length) * 100}%` }}
                 role="progressbar"
+                aria-valuemin={0}
                 aria-valuenow={indice}
                 aria-valuemax={preguntas.length}
               />
@@ -268,7 +272,7 @@ export default function QuizSimbolosQuimicosPage() {
           {/* Feedback + siguiente */}
           {fase === 'respondida' && (
             <div className={styles.feedbackPanel}>
-              <div className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
+              <div role="alert" className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
                 {seleccionada === preguntaActual.correcta ? (
                   <>✅ ¡Correcto! <strong>{preguntaActual.elemento.nombre}</strong> · símbolo <strong>{preguntaActual.elemento.simbolo}</strong> · Z={preguntaActual.elemento.z}</>
                 ) : (
@@ -569,6 +573,7 @@ export default function QuizSimbolosQuimicosPage() {
         </section>
       </EducationalSection>
 
+      <RelatedApps apps={getRelatedApps('quiz-simbolos-quimicos')} />
       <ShareCard appName="quiz-simbolos-quimicos" />
       <Footer appName="quiz-simbolos-quimicos" />
     </div>

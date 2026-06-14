@@ -1,8 +1,9 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './PlaygroundSQL.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { DATASETS, getDatasetById, EXERCISES, getExerciseById } from './components';
 import type { Dataset, QueryResult, Exercise, ExerciseProgress } from './components/types';
@@ -448,6 +449,10 @@ export default function PlaygroundSQLPage() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Escribe tu consulta SQL aquí..."
               spellCheck={false}
+              aria-label="Editor de consultas SQL"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
             />
             <div className={styles.editorFooter}>
               <span className={styles.shortcutHint}>
@@ -471,7 +476,7 @@ export default function PlaygroundSQLPage() {
           )}
 
           {/* Resultados */}
-          <div className={styles.resultsSection}>
+          <div className={styles.resultsSection} role="status" aria-live="polite">
             <div className={styles.resultsHeader}>
               <span>Resultados</span>
               {result && !result.error && (
@@ -494,7 +499,7 @@ export default function PlaygroundSQLPage() {
             )}
 
             {result?.error && (
-              <div className={styles.resultsError}>
+              <div role="alert" className={styles.resultsError}>
                 <p>❌ Error: {result.error}</p>
               </div>
             )}
@@ -505,7 +510,7 @@ export default function PlaygroundSQLPage() {
                   <thead>
                     <tr>
                       {result.columns.map((col, idx) => (
-                        <th key={idx}>{col}</th>
+                        <th key={idx} scope="col">{col}</th>
                       ))}
                     </tr>
                   </thead>
@@ -536,17 +541,6 @@ export default function PlaygroundSQLPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
-      
-
-      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="playground-sql">
-        <p>Este playground es una <strong>herramienta educativa</strong> para aprender SQL en el navegador:</p>
-        <ul className={styles.disclaimerList}>
-          <li><strong>Verifica sintaxis en proyectos reales</strong>: Los dialectos SQL varían (PostgreSQL, MySQL, SQL Server), consulta la documentación oficial</li>
-          <li><strong>No uses datos sensibles</strong>: Todo se ejecuta localmente en tu navegador, pero evita copiar datos confidenciales</li>
-        </ul>
-      </DisclaimerCard>
-
       {/* Sección educativa */}
       <EducationalSection
         title="📚 ¿Quieres aprender más sobre SQL?"
@@ -564,11 +558,11 @@ export default function PlaygroundSQLPage() {
             <table className={styles.comparativaTable}>
               <thead>
                 <tr>
-                  <th>Criterio</th>
-                  <th>SQLite</th>
-                  <th>MySQL 8</th>
-                  <th>PostgreSQL 16</th>
-                  <th>SQL Server 2022</th>
+                  <th scope="col">Criterio</th>
+                  <th scope="col">SQLite</th>
+                  <th scope="col">MySQL 8</th>
+                  <th scope="col">PostgreSQL 16</th>
+                  <th scope="col">SQL Server 2022</th>
                 </tr>
               </thead>
               <tbody>

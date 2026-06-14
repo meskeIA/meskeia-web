@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Quiz Figuras Retóricas - Identifica Metáfora, Hipérbole, Símil y más | meskeIA',
   description: 'Aprende a identificar las figuras retóricas con este quiz interactivo. 27 figuras (básico, bachillerato, selectividad): metáfora, hipérbole, anáfora, oxímoron y mucho más. Sin registro.',
-  keywords: 'figuras retoicas, quiz figuras retorias, metafora hiperbole simil, recursos literarios, lengua española, selectividad lengua, bachillerato lengua, figuras literarias ejercicios',
+  keywords: 'figuras retóricas, quiz figuras retóricas, metáfora hipérbole símil, recursos literarios, lengua española, selectividad lengua, bachillerato lengua, figuras literarias ejercicios',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -39,7 +39,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Aprende a identificar las figuras retóricas con este quiz interactivo. 27 figuras (básico, bachillerato, selectividad): metáfora, hipérbole, anáfora, oxímoron y mucho más. Sin registro.",
   url: "https://meskeia.com/quiz-figuras-retoricas/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    '27 figuras retóricas con definición, distinción y ejemplos canónicos',
+    '4 niveles: básico (ESO), intermedio (Bachillerato), avanzado (Selectividad) y todas',
+    'Feedback educativo con definición y ejemplo correctos tras cada respuesta',
+    'Historial de errores con revisión al final del quiz',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y en español',
+  ],
 });
 
 export const faqJsonLd = {

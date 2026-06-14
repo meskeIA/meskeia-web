@@ -159,7 +159,7 @@ export const figurasRetorica: FiguraRetorica[] = [
     nivel: 'basico',
     ejemplos: [
       'Del monte en la ladera. (En la ladera del monte)',
-      'Verde que te quiero verde. (Quiero verde que te)',
+      'A Dafne ya los brazos le crecían. (Ya le crecían los brazos a Dafne) — Garcilaso de la Vega, Soneto XIII',
       'De su patria el recuerdo le dolía. (El recuerdo de su patria le dolía)',
       'Aquel que de mi nombre se ha enterado. (Aquel que se ha enterado de mi nombre)',
     ],
@@ -273,7 +273,7 @@ export const figurasRetorica: FiguraRetorica[] = [
   },
 
   {
-    id: 'perifrasIs',
+    id: 'perifrasis',
     nombre: 'Perífrasis',
     definicion: 'Expresión de algo mediante un rodeo de palabras cuando podría decirse con menos, por elegancia o para evitar nombrar algo directamente.',
     distincion: 'A diferencia del eufemismo, no siempre suaviza algo negativo: puede ser simplemente un rodeo estilístico para nombrar algo de forma más elaborada.',

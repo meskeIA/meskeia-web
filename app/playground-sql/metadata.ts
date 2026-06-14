@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Aprende SQL practicando en el navegador. Editor interactivo con datasets de ejemplo, ejercicios guiados y resultados en tiempo real. Sin instalar nada.",
   url: "https://meskeia.com/playground-sql/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Editor SQL interactivo con resaltado de sintaxis en el navegador',
+    'Datasets de ejemplo incluidos (empleados, ventas, inventario)',
+    'Ejercicios guiados con corrección automática',
+    'Resultados en tabla con recuento de filas y tiempo de ejecución',
+    'Referencia comparativa de dialectos SQL (SQLite, MySQL, PostgreSQL, SQL Server)',
+    'Ejecución 100% local vía WebAssembly (sin servidor, sin enviar datos)',
+    'Gratuito, sin registro ni instalación',
+  ],
 });
 
 export const faqJsonLd = {

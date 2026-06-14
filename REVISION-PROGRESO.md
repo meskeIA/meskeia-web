@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 111 / 999
-- ⬜ Pendientes: 888 / 999
+- ✅ Revisadas: 115 / 999
+- ⬜ Pendientes: 884 / 999
 
 ## Resumen por suite primaria
 
@@ -54,7 +54,7 @@
 | [ ] | Recordatorio Visual de Medicación | `/recordatorio-medicacion/` | accesibilidad, salud, productividad |
 | [ ] | Semáforo Emocional | `/semaforo-emocional/` | accesibilidad, salud, productividad, estudiantes |
 | [ ] | Simulador de Baja Visión | `/simulador-baja-vision/` | accesibilidad, diseno |
-| [ ] | Simulador de Daltonismo | `/simulador-daltonismo/` | accesibilidad, diseno |
+| [x] | Simulador de Daltonismo | `/simulador-daltonismo/` | accesibilidad, diseno |
 | [ ] | Tablero de Comunicación AAC | `/tablero-comunicacion/` | accesibilidad, salud, productividad |
 | [ ] | Temporizador Visual | `/temporizador-visual/` | accesibilidad, salud, productividad |
 
@@ -367,7 +367,7 @@
 | [ ] | Generador de Tipografías | `/generador-tipografias/` | diseno |
 | [ ] | Generador Imágenes OG | `/generador-og-images/` | diseno |
 | [ ] | Generador Lorem Ipsum | `/generador-lorem-ipsum/` | diseno |
-| [ ] | Playground SQL | `/playground-sql/` | diseno, estudiantes |
+| [x] | Playground SQL | `/playground-sql/` | diseno, estudiantes |
 | [ ] | Recortador de Audio | `/recortador-audio/` | diseno, productividad |
 | [ ] | Selector de Canal de Venta | `/selector-canal-venta/` | diseno, freelance |
 | [x] | Simulador de Puertas Lógicas | `/simulador-puertas-logicas/` | diseno, estudiantes |
@@ -522,12 +522,12 @@
 | [ ] | Quiz Biología Molecular — ADN, ARN, Replicación y Traducción | `/quiz-biologia-molecular/` | estudiantes, cultura |
 | [ ] | Quiz Complejidad Algorítmica — Big O, Ordenación y Estructuras de Datos | `/quiz-complejidad-algoritmos/` | estudiantes, tecnicas |
 | [ ] | Quiz de Conceptos Financieros | `/quiz-conceptos-financieros/` | estudiantes, finanzas |
-| [ ] | Quiz Figuras Retóricas | `/quiz-figuras-retoricas/` | estudiantes, juegos |
+| [x] | Quiz Figuras Retóricas | `/quiz-figuras-retoricas/` | estudiantes, juegos |
 | [ ] | Quiz Geografía de España | `/quiz-geografia-espana/` | estudiantes |
 | [ ] | Quiz Historia de España | `/quiz-historia-espana/` | estudiantes |
 | [ ] | Quiz Países y Capitales | `/quiz-paises-capitales/` | estudiantes, juegos |
 | [ ] | Quiz Reinos de la Naturaleza | `/quiz-reinos-naturaleza/` | estudiantes, juegos |
-| [ ] | Quiz Símbolos Químicos | `/quiz-simbolos-quimicos/` | estudiantes |
+| [x] | Quiz Símbolos Químicos | `/quiz-simbolos-quimicos/` | estudiantes |
 | [ ] | Quiz Tabla Periódica | `/quiz-tabla-periodica/` | estudiantes, juegos |
 | [ ] | Quiz: Clasifica 40 Plantas — ¿Musgo, Helecho o Angiosperma? | `/quiz-tipos-plantas/` | estudiantes, juegos |
 | [ ] | Radioactividad: Desintegración, Vida Media y Datación | `/visualizador-radioactividad/` | estudiantes, cultura |

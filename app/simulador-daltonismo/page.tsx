@@ -135,17 +135,29 @@ function clamp255(v: number): number {
   return Math.round(v);
 }
 
+// Las matrices de Machado et al. (2009) operan sobre RGB lineal, no sRGB.
+// Hay que linearizar antes de aplicar la matriz y comprimir después.
+function srgbToLinear(c: number): number {
+  const s = c / 255;
+  return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+}
+
+function linearToSrgb(c: number): number {
+  const s = c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+  return clamp255(s * 255);
+}
+
 function aplicarMatriz(src: ImageData, m: number[][]): ImageData {
   const dst = new ImageData(src.width, src.height);
   const sd = src.data;
   const dd = dst.data;
   for (let i = 0; i < sd.length; i += 4) {
-    const r = sd[i];
-    const g = sd[i + 1];
-    const b = sd[i + 2];
-    dd[i] = clamp255(r * m[0][0] + g * m[0][1] + b * m[0][2]);
-    dd[i + 1] = clamp255(r * m[1][0] + g * m[1][1] + b * m[1][2]);
-    dd[i + 2] = clamp255(r * m[2][0] + g * m[2][1] + b * m[2][2]);
+    const r = srgbToLinear(sd[i]);
+    const g = srgbToLinear(sd[i + 1]);
+    const b = srgbToLinear(sd[i + 2]);
+    dd[i]     = linearToSrgb(r * m[0][0] + g * m[0][1] + b * m[0][2]);
+    dd[i + 1] = linearToSrgb(r * m[1][0] + g * m[1][1] + b * m[1][2]);
+    dd[i + 2] = linearToSrgb(r * m[2][0] + g * m[2][1] + b * m[2][2]);
     dd[i + 3] = sd[i + 3];
   }
   return dst;
@@ -361,6 +373,7 @@ export default function SimuladorDaltonismoPage() {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
         role="button"
         tabIndex={0}
         aria-label="Subir imagen para simulación de daltonismo"

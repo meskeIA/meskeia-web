@@ -40,7 +40,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Pon a prueba tus conocimientos de química: adivina el nombre del elemento por su símbolo o viceversa. 3 dificultades, 2 modos, 85 elementos. ¡Cuántos conoces?",
   url: "https://meskeia.com/quiz-simbolos-quimicos/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    '85 elementos de la tabla periódica',
+    '2 modos: símbolo → nombre y nombre → símbolo',
+    '3 niveles de dificultad: fácil (10 preguntas), medio (15) y difícil (20)',
+    'Feedback inmediato con nombre, símbolo y número atómico',
+    'Racha de aciertos y resumen de errores al final',
+    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Gratuito y en español',
+  ],
 });
 
 export const faqJsonLd = {
