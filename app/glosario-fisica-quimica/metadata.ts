@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Glosario de Física y Química - Definiciones y Conceptos | meskeIA',
-  description: 'Glosario completo de términos de física y química. Más de 100 definiciones con niveles básico, intermedio y avanzado. Búsqueda por categorías y modo quiz para aprender.',
+  description: 'Glosario de 50 términos de física y química con definición, fórmula y ejemplo. Niveles básico, intermedio y avanzado. Filtrado por categoría y búsqueda en tiempo real.',
   keywords: 'glosario física, glosario química, definiciones física, conceptos química, términos científicos, diccionario ciencias',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -33,13 +33,16 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Glosario de Física y Química - Definiciones y Conceptos",
-  description: "Glosario completo de términos de física y química. Más de 100 definiciones con niveles básico, intermedio y avanzado. Búsqueda por categorías y modo quiz para aprender.",
+  description: "Glosario de 50 términos de física y química con definición, fórmula y ejemplo. Niveles básico, intermedio y avanzado. Búsqueda y filtrado por categoría.",
   url: 'https://meskeia.com/glosario-fisica-quimica/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "50 términos de física y química con definición, fórmula y ejemplo",
+      "3 niveles de dificultad: básico, intermedio y avanzado",
+      "Filtrado por categoría (física / química) y nivel",
+      "Búsqueda en tiempo real por término o texto de la definición",
+      "Tarjetas expandibles con fórmula y ejemplo al hacer clic",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 
@@ -52,7 +55,7 @@ export const faqJsonLd = {
       name: '¿Cuántos términos incluye este glosario de física y química?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El glosario recoge más de 100 definiciones de física y química organizadas en categorías como mecánica, termodinámica, electromagnetismo, química orgánica, ácidos y bases, y reacciones químicas. Cada término indica su nivel de dificultad (básico, intermedio o avanzado) para que el estudiante pueda orientar su estudio según su nivel educativo.',
+        text: 'El glosario recoge 50 definiciones de física y química organizadas por categoría y nivel. Física incluye mecánica (fuerza, velocidad, energía), electromagnetismo, termodinámica y física moderna (relatividad, cuántica). Química incluye conceptos básicos (átomo, pH, enlace), intermedios (mol, oxidación, catalizador) y avanzados (hibridación, entalpía, energía de activación). Cada término indica su nivel (básico, intermedio o avanzado).',
       },
     },
     {
@@ -73,10 +76,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es el modo quiz y cómo ayuda a aprender los conceptos?',
+      name: '¿El glosario incluye fórmulas matemáticas junto a las definiciones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El modo quiz presenta definiciones y pide al usuario que identifique el término correcto entre varias opciones, o viceversa. Este sistema de práctica activa mejora la retención frente a la simple lectura pasiva, ya que fuerza al cerebro a recuperar la información. Es especialmente útil los días previos a un examen para consolidar el vocabulario científico.',
+        text: 'Sí. Los términos con fórmula matemática asociada la muestran al expandir la tarjeta. Por ejemplo, la Segunda Ley de Newton muestra F = m × a, la Ley de Ohm muestra V = I × R y la energía cinética muestra Ec = ½mv². Los términos sin fórmula exacta (como ondas o conceptos cualitativos) incluyen un ejemplo cotidiano en su lugar, facilitando la comprensión práctica antes de un examen.',
       },
     },
     {

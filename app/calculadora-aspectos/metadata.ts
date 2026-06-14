@@ -29,11 +29,15 @@ export const jsonLd = generateWebAppSchema({
   name: "Calculadora de Aspectos de Imagen - Mantén Proporciones",
   description: "Calcula proporciones perfectas para redimensionar imágenes sin deformarlas. Presets para Instagram, YouTube, Facebook y más redes sociales.",
   url: 'https://meskeia.com/calculadora-aspectos/',
-  category: 'FinanceApplication',
+  category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "17 presets de dimensiones populares: Redes Sociales, Vídeo y Fotografía",
+      "Cálculo automático proporcional al introducir ancho o alto",
+      "Bloqueo de proporción configurable para redimensionado libre",
+      "Vista previa visual de la relación de aspecto en tiempo real",
+      "Botón de intercambio rápido para girar el formato",
+      "Ratio simplificado (ej: 16:9) y decimal mostrados simultáneamente",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 

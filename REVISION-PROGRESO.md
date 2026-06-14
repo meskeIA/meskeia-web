@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 119 / 999
-- ⬜ Pendientes: 880 / 999
+- ✅ Revisadas: 123 / 999
+- ⬜ Pendientes: 876 / 999
 
 ## Resumen por suite primaria
 
@@ -332,7 +332,7 @@
 | [ ] | Analizador de Densidad SEO | `/analizador-densidad-seo/` | diseno |
 | [ ] | Analizador de Títulos SEO | `/analizador-titulos-seo/` | diseno |
 | [ ] | Analizador GEO/AEO | `/analizador-geo/` | diseno |
-| [ ] | Calculadora de Aspectos | `/calculadora-aspectos/` | diseno |
+| [x] | Calculadora de Aspectos | `/calculadora-aspectos/` | diseno |
 | [ ] | Calculadora de Legibilidad | `/calculadora-legibilidad/` | diseno |
 | [ ] | Calculadora Tiempo de Lectura | `/calculadora-tiempo-lectura/` | diseno |
 | [ ] | Comparador de Textos | `/comparador-textos/` | diseno, productividad |
@@ -480,7 +480,7 @@
 | [ ] | Geometría Fractal - Autosimilitud e Infinito | `/visualizador-geometria-fractales/` | estudiantes, cultura |
 | [ ] | Geopolítica Energética: Flujos, Dependencias e Infraestructuras | `/visualizador-geopolitica-energetica/` | estudiantes, cultura, tecnicas |
 | [ ] | Germinación - De la Semilla a la Planta | `/visualizador-germinacion/` | estudiantes, cultura |
-| [ ] | Glosario de Física y Química | `/glosario-fisica-quimica/` | estudiantes |
+| [x] | Glosario de Física y Química | `/glosario-fisica-quimica/` | estudiantes |
 | [ ] | Glosario de Programación | `/glosario-programacion/` | estudiantes, tecnicas |
 | [ ] | Inferencia Bayesiana | `/inferencia-bayesiana/` | estudiantes |
 | [ ] | La Célula por Dentro - Animal vs Vegetal | `/visualizador-celula/` | estudiantes, cultura, salud |
@@ -580,7 +580,7 @@
 | [ ] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
 | [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
-| [ ] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
+| [x] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
 | [ ] | Simulador de Recursión y Pila de Llamadas | `/simulador-recursion/` | estudiantes, tecnicas |
 | [ ] | Simulador de Reemplazo de Páginas | `/simulador-reemplazo-paginas/` | estudiantes, tecnicas |
 | [ ] | Simulador de Regresión Lineal y Logística | `/simulador-regresion/` | estudiantes, tecnicas |
@@ -812,7 +812,7 @@
 | [x] | Estimador Compraventa Inmobiliaria | `/estimador-compraventa-inmueble/` | inmobiliaria, finanzas |
 | [ ] | Estimador Coste Vivienda | `/estimador-coste-vivienda/` | inmobiliaria, finanzas |
 | [x] | Estimador de Hipoteca | `/estimador-hipoteca/` | inmobiliaria, finanzas |
-| [ ] | Estimador de Préstamos | `/estimador-prestamos/` | inmobiliaria, finanzas |
+| [x] | Estimador de Préstamos | `/estimador-prestamos/` | inmobiliaria, finanzas |
 | [ ] | Estimador Gastos de Comunidad | `/estimador-gastos-comunidad/` | inmobiliaria, finanzas |
 | [ ] | Estimador Reformas del Hogar | `/estimador-reformas-hogar/` | inmobiliaria, finanzas |
 | [ ] | Etiqueta DGT y Zonas de Bajas Emisiones | `/etiqueta-dgt/` | inmobiliaria, productividad |

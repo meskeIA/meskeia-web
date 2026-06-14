@@ -505,16 +505,18 @@ export default function SimuladorPrestamosPage() {
           type="button"
           className={`${styles.modoBtn} ${modo === 'simulador' ? styles.modoActivo : ''}`}
           onClick={() => setModo('simulador')}
+          aria-pressed={modo === 'simulador'}
         >
-          <span className={styles.modoIcon}>🧮</span>
+          <span className={styles.modoIcon} aria-hidden="true">🧮</span>
           <span className={styles.modoNombre}>Simulador</span>
         </button>
         <button
           type="button"
           className={`${styles.modoBtn} ${modo === 'comparador' ? styles.modoActivo : ''}`}
           onClick={() => setModo('comparador')}
+          aria-pressed={modo === 'comparador'}
         >
-          <span className={styles.modoIcon}>📊</span>
+          <span className={styles.modoIcon} aria-hidden="true">📊</span>
           <span className={styles.modoNombre}>Comparador</span>
         </button>
       </div>
@@ -525,9 +527,11 @@ export default function SimuladorPrestamosPage() {
           <h2 className={styles.sectionTitle}>Datos del préstamo</h2>
 
           <div className={styles.formGroup}>
-            <label>Capital solicitado (€)</label>
+            <label htmlFor="capitalInput">Capital solicitado (€)</label>
             <input
+              id="capitalInput"
               type="text"
+              inputMode="decimal"
               value={capital}
               onChange={(e) => setCapital(e.target.value)}
               placeholder="10000"
@@ -536,9 +540,11 @@ export default function SimuladorPrestamosPage() {
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label>Plazo (meses)</label>
+              <label htmlFor="plazoInput">Plazo (meses)</label>
               <input
+                id="plazoInput"
                 type="number"
+                inputMode="numeric"
                 value={plazoMeses}
                 onChange={(e) => setPlazoMeses(e.target.value)}
                 min="1"
@@ -546,9 +552,11 @@ export default function SimuladorPrestamosPage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label>TIN anual (%)</label>
+              <label htmlFor="tinInput">TIN anual (%)</label>
               <input
+                id="tinInput"
                 type="text"
+                inputMode="decimal"
                 value={tin}
                 onChange={(e) => setTin(e.target.value)}
                 placeholder="7"
@@ -557,9 +565,11 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Comisión apertura (%)</label>
+            <label htmlFor="comisionInput">Comisión apertura (%)</label>
             <input
+              id="comisionInput"
               type="text"
+              inputMode="decimal"
               value={comisionApertura}
               onChange={(e) => setComisionApertura(e.target.value)}
               placeholder="1"
@@ -576,7 +586,7 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           {taeCalculada !== null && (
-            <div className={styles.taeBox}>
+            <div className={styles.taeBox} role="status" aria-live="polite">
               <div className={styles.taeLabel}>TAE aproximada</div>
               <div className={styles.taeValue}>{formatNumber(taeCalculada, 2)}%</div>
               <p className={styles.taeNote}>
@@ -597,6 +607,7 @@ export default function SimuladorPrestamosPage() {
                     key={r.sistema}
                     className={`${styles.sistemaCard} ${sistemaSeleccionado === r.sistema ? styles.active : ''}`}
                     onClick={() => setSistemaSeleccionado(r.sistema)}
+                    aria-pressed={sistemaSeleccionado === r.sistema}
                   >
                     <h3>{r.nombre}</h3>
                     <div className={styles.sistemaStats}>
@@ -650,6 +661,7 @@ export default function SimuladorPrestamosPage() {
               <button
                 onClick={() => setMostrarCuadro(!mostrarCuadro)}
                 className={styles.btnToggleCuadro}
+                aria-expanded={mostrarCuadro}
               >
                 {mostrarCuadro ? '▲ Ocultar' : '▼ Ver'} cuadro de amortización ({resultadoActual?.nombre})
               </button>
@@ -711,22 +723,25 @@ export default function SimuladorPrestamosPage() {
                 type="button"
                 className={`${styles.sistemaBtn} ${sistemaComparador === 'frances' ? styles.sistemaActivo : ''}`}
                 onClick={() => setSistemaComparador('frances')}
+                aria-pressed={sistemaComparador === 'frances'}
               >
-                🇫🇷 Francés
+                <span aria-hidden="true">🇫🇷</span> Francés
               </button>
               <button
                 type="button"
                 className={`${styles.sistemaBtn} ${sistemaComparador === 'aleman' ? styles.sistemaActivo : ''}`}
                 onClick={() => setSistemaComparador('aleman')}
+                aria-pressed={sistemaComparador === 'aleman'}
               >
-                🇩🇪 Alemán
+                <span aria-hidden="true">🇩🇪</span> Alemán
               </button>
               <button
                 type="button"
                 className={`${styles.sistemaBtn} ${sistemaComparador === 'americano' ? styles.sistemaActivo : ''}`}
                 onClick={() => setSistemaComparador('americano')}
+                aria-pressed={sistemaComparador === 'americano'}
               >
-                🇺🇸 Americano
+                <span aria-hidden="true">🇺🇸</span> Americano
               </button>
             </div>
           </div>
@@ -740,18 +755,22 @@ export default function SimuladorPrestamosPage() {
                 Préstamo 1
               </h3>
               <div className={styles.prestamoInputGroup}>
-                <label>Capital (€)</label>
+                <label htmlFor="p1capital">Capital (€)</label>
                 <input
+                  id="p1capital"
                   type="text"
+                  inputMode="decimal"
                   value={prestamo1.capital}
                   onChange={(e) => setPrestamo1({ ...prestamo1, capital: e.target.value })}
                   placeholder="10000"
                 />
               </div>
               <div className={styles.prestamoInputGroup}>
-                <label>Plazo (meses)</label>
+                <label htmlFor="p1plazo">Plazo (meses)</label>
                 <input
+                  id="p1plazo"
                   type="number"
+                  inputMode="numeric"
                   value={prestamo1.plazoMeses}
                   onChange={(e) => setPrestamo1({ ...prestamo1, plazoMeses: e.target.value })}
                   min="1"
@@ -760,9 +779,11 @@ export default function SimuladorPrestamosPage() {
                 />
               </div>
               <div className={styles.prestamoInputGroup}>
-                <label>TIN anual (%)</label>
+                <label htmlFor="p1tin">TIN anual (%)</label>
                 <input
+                  id="p1tin"
                   type="text"
+                  inputMode="decimal"
                   value={prestamo1.tin}
                   onChange={(e) => setPrestamo1({ ...prestamo1, tin: e.target.value })}
                   placeholder="7"
@@ -777,18 +798,22 @@ export default function SimuladorPrestamosPage() {
                 Préstamo 2
               </h3>
               <div className={styles.prestamoInputGroup}>
-                <label>Capital (€)</label>
+                <label htmlFor="p2capital">Capital (€)</label>
                 <input
+                  id="p2capital"
                   type="text"
+                  inputMode="decimal"
                   value={prestamo2.capital}
                   onChange={(e) => setPrestamo2({ ...prestamo2, capital: e.target.value })}
                   placeholder="15000"
                 />
               </div>
               <div className={styles.prestamoInputGroup}>
-                <label>Plazo (meses)</label>
+                <label htmlFor="p2plazo">Plazo (meses)</label>
                 <input
+                  id="p2plazo"
                   type="number"
+                  inputMode="numeric"
                   value={prestamo2.plazoMeses}
                   onChange={(e) => setPrestamo2({ ...prestamo2, plazoMeses: e.target.value })}
                   min="1"
@@ -797,9 +822,11 @@ export default function SimuladorPrestamosPage() {
                 />
               </div>
               <div className={styles.prestamoInputGroup}>
-                <label>TIN anual (%)</label>
+                <label htmlFor="p2tin">TIN anual (%)</label>
                 <input
+                  id="p2tin"
                   type="text"
+                  inputMode="decimal"
                   value={prestamo2.tin}
                   onChange={(e) => setPrestamo2({ ...prestamo2, tin: e.target.value })}
                   placeholder="6,5"
@@ -814,18 +841,22 @@ export default function SimuladorPrestamosPage() {
                 Préstamo 3
               </h3>
               <div className={styles.prestamoInputGroup}>
-                <label>Capital (€)</label>
+                <label htmlFor="p3capital">Capital (€)</label>
                 <input
+                  id="p3capital"
                   type="text"
+                  inputMode="decimal"
                   value={prestamo3.capital}
                   onChange={(e) => setPrestamo3({ ...prestamo3, capital: e.target.value })}
                   placeholder="20000"
                 />
               </div>
               <div className={styles.prestamoInputGroup}>
-                <label>Plazo (meses)</label>
+                <label htmlFor="p3plazo">Plazo (meses)</label>
                 <input
+                  id="p3plazo"
                   type="number"
+                  inputMode="numeric"
                   value={prestamo3.plazoMeses}
                   onChange={(e) => setPrestamo3({ ...prestamo3, plazoMeses: e.target.value })}
                   min="1"
@@ -834,9 +865,11 @@ export default function SimuladorPrestamosPage() {
                 />
               </div>
               <div className={styles.prestamoInputGroup}>
-                <label>TIN anual (%)</label>
+                <label htmlFor="p3tin">TIN anual (%)</label>
                 <input
+                  id="p3tin"
                   type="text"
+                  inputMode="decimal"
                   value={prestamo3.tin}
                   onChange={(e) => setPrestamo3({ ...prestamo3, tin: e.target.value })}
                   placeholder="6"
@@ -848,7 +881,7 @@ export default function SimuladorPrestamosPage() {
           {/* Gráfico de evolución del saldo */}
           <div className={styles.chartSection}>
             <h3 className={styles.chartTitle}>Evolución del Saldo Pendiente</h3>
-            <div className={styles.chartContainer}>
+            <div className={styles.chartContainer} role="img" aria-label="Gráfico de evolución del saldo pendiente de los tres préstamos comparados">
               <canvas ref={chartRef}></canvas>
             </div>
           </div>
@@ -1045,9 +1078,9 @@ export default function SimuladorPrestamosPage() {
             <thead>
               <tr>
                 <th>Característica</th>
-                <th>🇫🇷 Francés</th>
-                <th>🇩🇪 Alemán</th>
-                <th>🇺🇸 Americano</th>
+                <th><span aria-hidden="true">🇫🇷</span> Francés</th>
+                <th><span aria-hidden="true">🇩🇪</span> Alemán</th>
+                <th><span aria-hidden="true">🇺🇸</span> Americano</th>
               </tr>
             </thead>
             <tbody>
@@ -1574,7 +1607,7 @@ export default function SimuladorPrestamosPage() {
       <section className={styles.warningSection}>
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h2>Errores Comunes que Debes Evitar</h2>
           </div>
           <div className={styles.warningContent}>
@@ -1708,7 +1741,7 @@ export default function SimuladorPrestamosPage() {
         <h2>Sistemas de Amortización</h2>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <h3>🇫🇷 Sistema Francés</h3>
+            <h3><span aria-hidden="true">🇫🇷</span> Sistema Francés</h3>
             <p><strong>Cuota fija</strong> durante todo el préstamo.</p>
             <ul>
               <li>Al principio pagas más intereses</li>
@@ -1718,7 +1751,7 @@ export default function SimuladorPrestamosPage() {
             </ul>
           </div>
           <div className={styles.infoCard}>
-            <h3>🇩🇪 Sistema Alemán</h3>
+            <h3><span aria-hidden="true">🇩🇪</span> Sistema Alemán</h3>
             <p><strong>Amortización constante</strong>, cuota decreciente.</p>
             <ul>
               <li>Cuotas altas al principio</li>
@@ -1728,7 +1761,7 @@ export default function SimuladorPrestamosPage() {
             </ul>
           </div>
           <div className={styles.infoCard}>
-            <h3>🇺🇸 Sistema Americano</h3>
+            <h3><span aria-hidden="true">🇺🇸</span> Sistema Americano</h3>
             <p><strong>Solo intereses</strong>, capital al vencimiento.</p>
             <ul>
               <li>Cuotas muy bajas durante el préstamo</li>

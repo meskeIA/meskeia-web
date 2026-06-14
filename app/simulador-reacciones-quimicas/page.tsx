@@ -266,7 +266,7 @@ const REACCIONES: Reaccion[] = [
     ],
   },
   {
-    id: 'acido-sulfo', nombre: 'Neutralización: H₂SO₄ + NaOH', tipo: 'redox', energia: 'exotérmica',
+    id: 'acido-sulfo', nombre: 'Neutralización: H₂SO₄ + NaOH', tipo: 'desplazamiento-doble', energia: 'exotérmica',
     ecuacion: 'H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O',
     descripcion: 'El ácido sulfúrico, un ácido dibásico, requiere el doble de base para su neutralización completa.',
     aplicaciones: 'Tratamiento de efluentes industriales, fabricación de jabones, análisis volumétrico.',
@@ -397,14 +397,17 @@ export default function SimuladorReaccionesQuimicas() {
       <LegalNotice />
 
       <main className={styles.main}>
-        <nav className={styles.tabBar} aria-label="Secciones del simulador">
+        <nav className={styles.tabBar} aria-label="Secciones del simulador" role="tablist">
           {(['catalogo', 'estequiometria', 'limitante'] as Tab[]).map(t => (
             <button
               key={t}
+              role="tab"
+              aria-selected={tab === t}
               className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`}
               onClick={() => setTab(t)}
             >
-              {t === 'catalogo' ? '📋 Catálogo' : t === 'estequiometria' ? '⚖️ Estequiometría' : '🎯 Reactivo Límite'}
+              <span aria-hidden="true">{t === 'catalogo' ? '📋' : t === 'estequiometria' ? '⚖️' : '🎯'}</span>{' '}
+              {t === 'catalogo' ? 'Catálogo' : t === 'estequiometria' ? 'Estequiometría' : 'Reactivo Límite'}
             </button>
           ))}
         </nav>
@@ -413,7 +416,7 @@ export default function SimuladorReaccionesQuimicas() {
         {tab === 'catalogo' && (
           <div>
             <div className={styles.filtros}>
-              <button className={`${styles.filtroBtn} ${filtro === 'todas' ? styles.filtroActivo : ''}`} onClick={() => setFiltro('todas')}>
+              <button className={`${styles.filtroBtn} ${filtro === 'todas' ? styles.filtroActivo : ''}`} onClick={() => setFiltro('todas')} aria-pressed={filtro === 'todas'}>
                 Todas ({REACCIONES.length})
               </button>
               {TODOS_TIPOS.map(t => (
@@ -421,8 +424,9 @@ export default function SimuladorReaccionesQuimicas() {
                   key={t}
                   className={`${styles.filtroBtn} ${filtro === t ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltro(t)}
+                  aria-pressed={filtro === t}
                 >
-                  {TIPOS_INFO[t].icono} {LABEL_TIPO[t]} ({REACCIONES.filter(r => r.tipo === t).length})
+                  <span aria-hidden="true">{TIPOS_INFO[t].icono}</span>{' '}{LABEL_TIPO[t]} ({REACCIONES.filter(r => r.tipo === t).length})
                 </button>
               ))}
             </div>
@@ -492,8 +496,8 @@ export default function SimuladorReaccionesQuimicas() {
               </p>
 
               <div className={styles.selectGroup}>
-                <label>Reacción</label>
-                <select value={stoicId} onChange={e => { setStoicId(e.target.value); setStoicSustIdx(0); setStoicResultado(null); setStoicError(''); }}>
+                <label htmlFor="stoicReaccion">Reacción</label>
+                <select id="stoicReaccion" value={stoicId} onChange={e => { setStoicId(e.target.value); setStoicSustIdx(0); setStoicResultado(null); setStoicError(''); }}>
                   {REACCIONES.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
                 </select>
               </div>
@@ -501,8 +505,8 @@ export default function SimuladorReaccionesQuimicas() {
               <div className={styles.ecuacionDisplay}>{stoicReaccion.ecuacion}</div>
 
               <div className={styles.selectGroup}>
-                <label>Sustancia conocida</label>
-                <select value={stoicSustIdx} onChange={e => { setStoicSustIdx(Number(e.target.value)); setStoicResultado(null); }}>
+                <label htmlFor="stoicSustancia">Sustancia conocida</label>
+                <select id="stoicSustancia" value={stoicSustIdx} onChange={e => { setStoicSustIdx(Number(e.target.value)); setStoicResultado(null); }}>
                   {stoicReaccion.sustancias.map((s, i) => (
                     <option key={i} value={i}>{s.formula} — {s.nombre} ({s.esReactivo ? 'reactivo' : 'producto'})</option>
                   ))}
@@ -510,8 +514,8 @@ export default function SimuladorReaccionesQuimicas() {
               </div>
 
               <div className={styles.unidadToggle}>
-                <button className={`${styles.unidadBtn} ${stoicUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => setStoicUnidad('gramos')}>Gramos</button>
-                <button className={`${styles.unidadBtn} ${stoicUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => setStoicUnidad('moles')}>Moles</button>
+                <button className={`${styles.unidadBtn} ${stoicUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => setStoicUnidad('gramos')} aria-pressed={stoicUnidad === 'gramos'}>Gramos</button>
+                <button className={`${styles.unidadBtn} ${stoicUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => setStoicUnidad('moles')} aria-pressed={stoicUnidad === 'moles'}>Moles</button>
               </div>
 
               <div className={styles.selectGroup} style={{ maxWidth: '240px' }}>
@@ -526,10 +530,11 @@ export default function SimuladorReaccionesQuimicas() {
                 />
               </div>
 
-              {stoicError && <p className={styles.errorMsg}>{stoicError}</p>}
+              {stoicError && <p role="alert" className={styles.errorMsg}>{stoicError}</p>}
               <button className={styles.calcBtn} onClick={calcStoic}>Calcular</button>
 
               {stoicResultado && (
+                <div role="status" aria-live="polite">
                 <table className={styles.resultTable}>
                   <thead>
                     <tr>
@@ -553,6 +558,7 @@ export default function SimuladorReaccionesQuimicas() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </div>
@@ -568,8 +574,8 @@ export default function SimuladorReaccionesQuimicas() {
               </p>
 
               <div className={styles.selectGroup}>
-                <label>Reacción</label>
-                <select value={limId} onChange={e => { setLimId(e.target.value); setLimCants({}); setLimResultado(null); setLimError(''); }}>
+                <label htmlFor="limReaccion">Reacción</label>
+                <select id="limReaccion" value={limId} onChange={e => { setLimId(e.target.value); setLimCants({}); setLimResultado(null); setLimError(''); }}>
                   {REACCIONES.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
                 </select>
               </div>
@@ -577,19 +583,20 @@ export default function SimuladorReaccionesQuimicas() {
               <div className={styles.ecuacionDisplay}>{limReaccion.ecuacion}</div>
 
               <div className={styles.unidadToggle}>
-                <button className={`${styles.unidadBtn} ${limUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => setLimUnidad('gramos')}>Gramos</button>
-                <button className={`${styles.unidadBtn} ${limUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => setLimUnidad('moles')}>Moles</button>
+                <button className={`${styles.unidadBtn} ${limUnidad === 'gramos' ? styles.unidadBtnActivo : ''}`} onClick={() => setLimUnidad('gramos')} aria-pressed={limUnidad === 'gramos'}>Gramos</button>
+                <button className={`${styles.unidadBtn} ${limUnidad === 'moles' ? styles.unidadBtnActivo : ''}`} onClick={() => setLimUnidad('moles')} aria-pressed={limUnidad === 'moles'}>Moles</button>
               </div>
 
               <div className={styles.reactivosGrid}>
                 {limReaccion.sustancias.filter(s => s.esReactivo).map((s, i) => (
                   <div key={i} className={styles.reactivoInput}>
-                    <span className={styles.reactivoFormula}>{s.formula}</span>
+                    <span className={styles.reactivoFormula} aria-hidden="true">{s.formula}</span>
                     <span className={styles.reactivoNombre}>{s.nombre}</span>
                     <input
                       type="number"
                       inputMode="decimal"
                       min="0"
+                      aria-label={`Cantidad de ${s.formula} (${s.nombre}) en ${limUnidad}`}
                       placeholder={limUnidad === 'gramos' ? 'gramos' : 'moles'}
                       value={limCants[i] ?? ''}
                       onChange={e => setLimCants(prev => ({ ...prev, [i]: e.target.value }))}
@@ -598,12 +605,12 @@ export default function SimuladorReaccionesQuimicas() {
                 ))}
               </div>
 
-              {limError && <p className={styles.errorMsg}>{limError}</p>}
+              {limError && <p role="alert" className={styles.errorMsg}>{limError}</p>}
               <button className={styles.calcBtn} onClick={calcLimite}>Calcular reactivo limitante</button>
 
               {limResultado && (
-                <>
-                  <table className={styles.resultTable}>
+                <div role="status" aria-live="polite">
+                <table className={styles.resultTable}>
                     <thead>
                       <tr>
                         <th>Sustancia</th>
@@ -648,7 +655,7 @@ export default function SimuladorReaccionesQuimicas() {
                       </span>
                     </div>
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>

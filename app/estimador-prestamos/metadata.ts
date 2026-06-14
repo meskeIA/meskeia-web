@@ -37,9 +37,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/estimador-prestamos/',
   category: 'FinanceApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "Simulación comparativa de 3 sistemas: francés (cuota fija), alemán (amortización constante) y americano (bullet)",
+      "Cuadro de amortización mensual completo por sistema seleccionado",
+      "Calculadora de TAE a partir de TIN más comisión de apertura",
+      "Modo comparador: analiza hasta 3 préstamos distintos con gráfico de saldo pendiente",
+      "Exportación del cuadro de amortización en código HTML reutilizable",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 

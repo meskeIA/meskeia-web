@@ -128,9 +128,9 @@ export default function GlosarioFisicaQuimicaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📖 Glosario de Física y Química</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📖</span> Glosario de Física y Química</h1>
         <p className={styles.subtitle}>
-          Más de {stats.total} términos y definiciones para estudiantes
+          {stats.total} términos y definiciones para estudiantes
         </p>
       </header>
 
@@ -143,8 +143,9 @@ export default function GlosarioFisicaQuimicaPage() {
 
           {/* Búsqueda */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Buscar término</label>
+            <label className={styles.label} htmlFor="busquedaTermino">Buscar término</label>
             <input
+              id="busquedaTermino"
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
@@ -160,20 +161,23 @@ export default function GlosarioFisicaQuimicaPage() {
               <button
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'todos' ? styles.selectorActivo : ''}`}
                 onClick={() => setCategoriaFiltro('todos')}
+                aria-pressed={categoriaFiltro === 'todos'}
               >
                 Todos
               </button>
               <button
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'fisica' ? styles.selectorActivo : ''}`}
                 onClick={() => setCategoriaFiltro('fisica')}
+                aria-pressed={categoriaFiltro === 'fisica'}
               >
-                🔬 Física
+                <span aria-hidden="true">🔬</span> Física
               </button>
               <button
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'quimica' ? styles.selectorActivo : ''}`}
                 onClick={() => setCategoriaFiltro('quimica')}
+                aria-pressed={categoriaFiltro === 'quimica'}
               >
-                ⚗️ Química
+                <span aria-hidden="true">⚗️</span> Química
               </button>
             </div>
           </div>
@@ -185,24 +189,28 @@ export default function GlosarioFisicaQuimicaPage() {
               <button
                 className={`${styles.selectorBtn} ${nivelFiltro === 'todos' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('todos')}
+                aria-pressed={nivelFiltro === 'todos'}
               >
                 Todos
               </button>
               <button
                 className={`${styles.selectorBtn} ${nivelFiltro === 'basico' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('basico')}
+                aria-pressed={nivelFiltro === 'basico'}
               >
                 Básico
               </button>
               <button
                 className={`${styles.selectorBtn} ${nivelFiltro === 'intermedio' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('intermedio')}
+                aria-pressed={nivelFiltro === 'intermedio'}
               >
                 Intermedio
               </button>
               <button
                 className={`${styles.selectorBtn} ${nivelFiltro === 'avanzado' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('avanzado')}
+                aria-pressed={nivelFiltro === 'avanzado'}
               >
                 Avanzado
               </button>
@@ -237,16 +245,20 @@ export default function GlosarioFisicaQuimicaPage() {
           </h2>
 
           {terminosFiltrados.length > 0 ? (
-            <div className={styles.terminosList}>
+            <div className={styles.terminosList} role="status" aria-live="polite" aria-atomic="false">
               {terminosFiltrados.map((t) => (
                 <div
                   key={t.id}
                   className={`${styles.terminoCard} ${terminoExpandido === t.id ? styles.expandido : ''}`}
                   onClick={() => setTerminoExpandido(terminoExpandido === t.id ? null : t.id)}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={terminoExpandido === t.id}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setTerminoExpandido(terminoExpandido === t.id ? null : t.id)}
                 >
                   <div className={styles.terminoHeader}>
                     <div className={styles.terminoInfo}>
-                      <span className={styles.terminoCategoriaIcon}>
+                      <span className={styles.terminoCategoriaIcon} aria-hidden="true">
                         {t.categoria === 'fisica' ? '🔬' : '⚗️'}
                       </span>
                       <h3 className={styles.terminoNombre}>{t.termino}</h3>
@@ -254,7 +266,7 @@ export default function GlosarioFisicaQuimicaPage() {
                         {t.nivel}
                       </span>
                     </div>
-                    <span className={styles.expandIcon}>
+                    <span className={styles.expandIcon} aria-hidden="true">
                       {terminoExpandido === t.id ? '▲' : '▼'}
                     </span>
                   </div>

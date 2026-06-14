@@ -147,7 +147,7 @@ export default function CalculadoraAspectosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📐 Calculadora de Aspectos</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📐</span> Calculadora de Aspectos</h1>
         <p className={styles.subtitle}>
           Redimensiona imágenes manteniendo proporciones perfectas
         </p>
@@ -162,9 +162,11 @@ export default function CalculadoraAspectosPage() {
 
           <div className={styles.dimensionInputs}>
             <div className={styles.inputGroup}>
-              <label>Ancho (px)</label>
+              <label htmlFor="originalWidth">Ancho (px)</label>
               <input
+                id="originalWidth"
                 type="number"
+                inputMode="numeric"
                 value={originalWidth}
                 onChange={(e) => {
                   setOriginalWidth(e.target.value);
@@ -175,13 +177,15 @@ export default function CalculadoraAspectosPage() {
                 placeholder="1920"
               />
             </div>
-            <button onClick={swapDimensions} className={styles.swapBtn} title="Intercambiar">
+            <button onClick={swapDimensions} className={styles.swapBtn} title="Intercambiar" aria-label="Intercambiar ancho y alto">
               ⇄
             </button>
             <div className={styles.inputGroup}>
-              <label>Alto (px)</label>
+              <label htmlFor="originalHeight">Alto (px)</label>
               <input
+                id="originalHeight"
                 type="number"
+                inputMode="numeric"
                 value={originalHeight}
                 onChange={(e) => {
                   setOriginalHeight(e.target.value);
@@ -194,7 +198,7 @@ export default function CalculadoraAspectosPage() {
             </div>
           </div>
 
-          <div className={styles.ratioDisplay}>
+          <div className={styles.ratioDisplay} role="status" aria-live="polite">
             <span className={styles.ratioLabel}>Ratio actual:</span>
             <span className={styles.ratioValue}>{currentRatio.ratio}</span>
             <span className={styles.ratioDecimal}>({currentRatio.decimal.toFixed(3)})</span>
@@ -214,9 +218,11 @@ export default function CalculadoraAspectosPage() {
 
             <div className={styles.dimensionInputs}>
               <div className={styles.inputGroup}>
-                <label>Nuevo Ancho</label>
+                <label htmlFor="newWidth">Nuevo Ancho</label>
                 <input
+                  id="newWidth"
                   type="number"
+                  inputMode="numeric"
                   value={newWidth}
                   onChange={(e) => calculateNewDimension(e.target.value, 'width')}
                   onFocus={() => setActiveField('width')}
@@ -226,9 +232,11 @@ export default function CalculadoraAspectosPage() {
               </div>
               <span className={styles.dimensionX}>×</span>
               <div className={styles.inputGroup}>
-                <label>Nuevo Alto</label>
+                <label htmlFor="newHeight">Nuevo Alto</label>
                 <input
+                  id="newHeight"
                   type="number"
+                  inputMode="numeric"
                   value={newHeight}
                   onChange={(e) => calculateNewDimension(e.target.value, 'height')}
                   onFocus={() => setActiveField('height')}
@@ -239,7 +247,7 @@ export default function CalculadoraAspectosPage() {
             </div>
 
             {(newWidth || newHeight) && (
-              <div className={styles.resultInfo}>
+              <div className={styles.resultInfo} role="status" aria-live="polite">
                 <span>Resolución: <strong>{pixelCount}</strong></span>
               </div>
             )}
@@ -271,6 +279,7 @@ export default function CalculadoraAspectosPage() {
                 key={cat}
                 className={`${styles.categoryBtn} ${selectedCategory === cat ? styles.categoryActive : ''}`}
                 onClick={() => setSelectedCategory(cat)}
+                aria-pressed={selectedCategory === cat}
               >
                 {cat}
               </button>
@@ -284,7 +293,7 @@ export default function CalculadoraAspectosPage() {
                 className={styles.presetBtn}
                 onClick={() => applyPreset(preset)}
               >
-                <span className={styles.presetIcon}>{preset.icon}</span>
+                <span className={styles.presetIcon} aria-hidden="true">{preset.icon}</span>
                 <span className={styles.presetName}>{preset.name}</span>
                 <span className={styles.presetSize}>{preset.width}×{preset.height}</span>
                 <span className={styles.presetRatio}>{preset.ratio}</span>
@@ -299,17 +308,17 @@ export default function CalculadoraAspectosPage() {
         <h3>¿Por qué mantener la proporción?</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🖼️</span>
+            <span className={styles.infoIcon} aria-hidden="true">🖼️</span>
             <h4>Sin Distorsión</h4>
             <p>Las imágenes mantienen su aspecto original sin estirarse ni comprimirse</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📱</span>
+            <span className={styles.infoIcon} aria-hidden="true">📱</span>
             <h4>Optimizado para Redes</h4>
             <p>Cada red social tiene dimensiones ideales para mejor visualización</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>✨</span>
+            <span className={styles.infoIcon} aria-hidden="true">✨</span>
             <h4>Calidad Profesional</h4>
             <p>Mantén la calidad visual en cualquier tamaño de redimensionado</p>
           </div>

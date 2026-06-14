@@ -37,10 +37,17 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Simulador de Reacciones Químicas",
-  description: "Calculadora de estequiometría y reactivo limitante para 20 reacciones químicas reales. Dado X gramos o moles de una sustancia, calcula todos los demás. Encuentra el reactivo que agota primero y el ren",
+  description: "Calculadora de estequiometría y reactivo limitante para 20 reacciones químicas reales. Dado X gramos o moles de una sustancia, calcula todos los demás. Encuentra el reactivo que se agota primero y el rendimiento teórico.",
   url: "https://meskeia.com/simulador-reacciones-quimicas/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    "20 reacciones reales de 6 tipos: síntesis, descomposición, desplazamiento simple/doble, combustión y redox",
+    "Calculadora estequiométrica: introduce gramos o moles de una sustancia y calcula el resto",
+    "Calculadora de reactivo limitante: identifica qué reactivo se agota primero y el exceso sobrante",
+    "Conversión automática gramos ↔ moles con masas molares precisas para cada sustancia",
+    "Catálogo con ecuación balanceada, descripción y aplicaciones industriales de cada reacción",
+    "Gratuito, sin registro ni instalación",
+  ],
 });
 
 export const faqJsonLd = {
@@ -84,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Qué tipos de reacciones químicas incluye el simulador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El simulador incluye 20 reacciones reales de los principales tipos: síntesis (combinación de elementos simples), descomposición (ruptura de un compuesto), combustión (reacción con oxígeno que produce CO₂ y H₂O) y doble desplazamiento (intercambio de iones). Cada reacción usa coeficientes estequiométricos reales y masas molares precisas de los elementos.',
+        text: 'El simulador incluye 20 reacciones de los 6 tipos principales: síntesis (A + B → AB, ej: síntesis del amoniaco), descomposición (AB → A + B, ej: calcinación de caliza), desplazamiento simple (A + BC → AC + B, ej: zinc en ácido clorhídrico), desplazamiento doble (AB + CD → AD + CB, ej: neutralización ácido-base), combustión (CₓHᵧ + O₂ → CO₂ + H₂O, ej: metano) y redox (transferencia de electrones, ej: herrumbre del hierro). Cada reacción incluye masas molares precisas y aplicaciones industriales.',
       },
     },
   ],
