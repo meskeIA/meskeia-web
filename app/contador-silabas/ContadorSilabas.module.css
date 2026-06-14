@@ -237,12 +237,6 @@
   font-weight: 500;
 }
 
-.separador {
-  color: var(--text-muted);
-  margin: 0 2px;
-  display: none;
-}
-
 .palabraTotal {
   font-size: 0.8rem;
   color: var(--text-secondary);

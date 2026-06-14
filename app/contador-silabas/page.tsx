@@ -7,6 +7,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber } from '@/lib';
 
 // Algoritmo de silabeo en español
 const separarSilabas = (palabra: string): string[] => {
@@ -170,6 +171,7 @@ export default function ContadorSilabasPage() {
               placeholder="Escribe una palabra, frase o texto completo..."
               className={styles.textarea}
               rows={6}
+              lang="es"
             />
           </div>
 
@@ -180,6 +182,7 @@ export default function ContadorSilabasPage() {
                 key={ej}
                 onClick={() => cargarEjemplo(ej)}
                 className={styles.ejemploBtn}
+                aria-label={`Cargar ejemplo: ${ej}`}
               >
                 {ej}
               </button>
@@ -197,7 +200,7 @@ export default function ContadorSilabasPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite">
           {resultado ? (
             <>
               {/* Resumen */}
@@ -213,7 +216,7 @@ export default function ContadorSilabasPage() {
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenValor}>
                     {resultado.totalPalabras > 0
-                      ? (resultado.totalSilabas / resultado.totalPalabras).toFixed(1)
+                      ? formatNumber(resultado.totalSilabas / resultado.totalPalabras, 1)
                       : '0'}
                   </span>
                   <span className={styles.resumenLabel}>Media por palabra</span>
@@ -231,7 +234,6 @@ export default function ContadorSilabasPage() {
                         {p.silabas.map((s, i) => (
                           <span key={i} className={styles.silaba}>
                             {s}
-                            {i < p.silabas.length - 1 && <span className={styles.separador}>-</span>}
                           </span>
                         ))}
                       </div>
@@ -514,6 +516,7 @@ export default function ContadorSilabasPage() {
                 <li><strong>Sinalefas entre palabras no se calculan:</strong> Esta herramienta silabea cada palabra de forma aislada. Las sinalefas (fusión vocal final + vocal inicial de la siguiente palabra) ocurren en el verso completo y deben aplicarse manualmente para obtener sílabas métricas correctas.</li>
                 <li><strong>Palabras compuestas y prefijadas:</strong> En palabras como &quot;subrayar&quot;, &quot;deshacer&quot; o &quot;transatlántico&quot;, el silabeo puede variar según se considere la morfología o solo la fonética. La RAE y las distintas tradiciones gramaticales no siempre coinciden.</li>
                 <li><strong>Nombres propios y extranjerismos:</strong> El algoritmo puede fallar con nombres como &quot;Shakespeare&quot;, &quot;Nietzsche&quot; o topónimos poco frecuentes cuya pronunciación en español no sigue las reglas estándar.</li>
+                <li><strong>Secuencias &quot;ui&quot;/&quot;iu&quot; en verbos como &quot;construir&quot;:</strong> la RAE admite tanto el diptongo (cons-truir, 2 sílabas) como el hiato (cons-tru-ir, 3 sílabas) según la pronunciación. El algoritmo aplica siempre el criterio de diptongo.</li>
                 <li><strong>No es árbitro de exámenes:</strong> Para dudas concretas en contexto académico, consulta la Nueva Gramática de la Lengua Española (RAE/ASALE, 2009) o el Diccionario panhispánico de dudas, que son las referencias normativas oficiales.</li>
               </ul>
             </div>

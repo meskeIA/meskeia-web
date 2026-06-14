@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './JuegoMemoria.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -83,6 +83,8 @@ export default function JuegoMemoriaPage() {
     medio: null,
     dificil: null,
   });
+  const [anuncio, setAnuncio] = useState('');
+  const playAgainRef = useRef<HTMLButtonElement>(null);
 
   // Cargar mejores tiempos
   useEffect(() => {
@@ -128,6 +130,7 @@ export default function JuegoMemoriaPage() {
     if (cartas.length > 0 && cartas.every(c => c.encontrada)) {
       setJuegoTerminado(true);
       setJuegoActivo(false);
+      setAnuncio(`¡Felicidades! Completaste el juego en ${formatearTiempo(tiempo)} con ${movimientos} movimientos.`);
 
       // Guardar mejor tiempo
       const mejorActual = mejoresTiempos[dificultad];
@@ -137,7 +140,14 @@ export default function JuegoMemoriaPage() {
         localStorage.setItem('memory-best', JSON.stringify(nuevosMejores));
       }
     }
-  }, [cartas, tiempo, dificultad, mejoresTiempos]);
+  }, [cartas, tiempo, movimientos, dificultad, mejoresTiempos]);
+
+  // Mover el foco al botón "Jugar de nuevo" al abrir el modal de victoria
+  useEffect(() => {
+    if (juegoTerminado) {
+      playAgainRef.current?.focus();
+    }
+  }, [juegoTerminado]);
 
   // Click en carta
   const clickCarta = (id: number) => {
@@ -165,9 +175,17 @@ export default function JuegoMemoriaPage() {
       if (carta1.parejaId === carta2.parejaId) {
         // ¡Pareja encontrada!
         setTimeout(() => {
-          setCartas(prev => prev.map(c =>
-            c.id === id1 || c.id === id2 ? { ...c, encontrada: true } : c
-          ));
+          setCartas(prev => {
+            const actualizadas = prev.map(c =>
+              c.id === id1 || c.id === id2 ? { ...c, encontrada: true } : c
+            );
+            const encontradas = actualizadas.filter(c => c.encontrada).length / 2;
+            const totalParejas = CONFIGURACION[dificultad].parejas;
+            if (encontradas < totalParejas) {
+              setAnuncio(`¡Pareja encontrada! ${encontradas} de ${totalParejas} parejas.`);
+            }
+            return actualizadas;
+          });
           setSeleccionadas([]);
         }, 300);
       } else {
@@ -198,6 +216,10 @@ export default function JuegoMemoriaPage() {
       </header>
 
       <LegalNotice />
+
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {anuncio}
+      </div>
 
       <div className={styles.mainContent}>
         {/* Panel de control */}
@@ -249,6 +271,13 @@ export default function JuegoMemoriaPage() {
               onClick={() => clickCarta(carta.id)}
               className={`${styles.carta} ${carta.volteada || carta.encontrada ? styles.volteada : ''} ${carta.encontrada ? styles.encontrada : ''}`}
               disabled={carta.volteada || carta.encontrada}
+              aria-label={
+                carta.encontrada
+                  ? `Carta ${carta.emoji}, pareja encontrada`
+                  : carta.volteada
+                    ? `Carta volteada, ${carta.emoji}`
+                    : 'Carta oculta'
+              }
             >
               <div className={styles.cartaInner}>
                 <div className={styles.cartaFront}>❓</div>
@@ -260,9 +289,9 @@ export default function JuegoMemoriaPage() {
 
         {/* Modal de victoria */}
         {juegoTerminado && (
-          <div className={styles.modalOverlay}>
+          <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-labelledby="modalVictoriaTitulo">
             <div className={styles.modal}>
-              <h2>🎉 ¡Felicidades!</h2>
+              <h2 id="modalVictoriaTitulo">🎉 ¡Felicidades!</h2>
               <p>Encontraste todas las parejas</p>
               <div className={styles.modalStats}>
                 <div>⏱️ Tiempo: <strong>{formatearTiempo(tiempo)}</strong></div>
@@ -271,7 +300,7 @@ export default function JuegoMemoriaPage() {
               {mejoresTiempos[dificultad] === tiempo && (
                 <p className={styles.nuevoRecord}>🏆 ¡Nuevo récord!</p>
               )}
-              <button onClick={() => iniciarJuego(dificultad)} className={styles.playAgainBtn}>
+              <button ref={playAgainRef} onClick={() => iniciarJuego(dificultad)} className={styles.playAgainBtn}>
                 🔄 Jugar de nuevo
               </button>
             </div>

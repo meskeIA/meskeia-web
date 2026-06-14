@@ -774,7 +774,13 @@
   .escenarioCard,
   .tipCard,
   .step,
-  .faqItem {
+  .faqItem,
+  .cartaInner {
     transition: none;
+  }
+
+  .modalOverlay,
+  .modal {
+    animation: none;
   }
 }
