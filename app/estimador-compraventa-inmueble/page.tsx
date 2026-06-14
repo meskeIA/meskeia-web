@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import styles from './EstimadorCompraventa.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, ShareCard, RegionBadge } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -123,7 +123,6 @@ export default function SimuladorCompraventaPage() {
     const precio = parseSpanishNumber(precioVenta);
     if (precio <= 0) return null;
 
-    const comisionPct = parseSpanishNumber(comisionInmobiliaria) / 100;
     const gestoria = parseSpanishNumber(gastosGestoria);
 
     let impuesto = 0;
@@ -281,7 +280,7 @@ export default function SimuladorCompraventaPage() {
 
       <RegionBadge variant="es-only" />
 
-      <LegalNotice lastUpdated="2024-12-20" />
+      <LegalNotice lastUpdated={FISCAL_INMUEBLES_META.verificado} />
 
       {/* Disclaimer Legal - CRÍTICO */}
       <DisclaimerCard
@@ -289,6 +288,13 @@ export default function SimuladorCompraventaPage() {
         severity="critical"
         context="estimador-compraventa-inmueble"
         collapsible={false}
+      />
+      <DataReference
+        normativa={`ITP/AJD ${FISCAL_INMUEBLES_META.vigencia}`}
+        fuente={FISCAL_INMUEBLES_META.fuente}
+        verificado={FISCAL_INMUEBLES_META.verificado}
+        urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
+        nota={FISCAL_INMUEBLES_META.nota}
       />
 
       {/* Formulario principal */}
@@ -704,8 +710,8 @@ export default function SimuladorCompraventaPage() {
 
         <h4>⚠️ Verificación de Datos Tributarios</h4>
         <p>
-          Los tipos de <strong>ITP, AJD y aranceles notariales</strong> pueden haber cambiado desde la última actualización
-          de esta herramienta (diciembre 2024). <strong>Verifica los tipos vigentes</strong> con tu comunidad autónoma
+          Los tipos de <strong>ITP, AJD y aranceles notariales</strong> pueden haber cambiado desde la última verificación
+          de esta herramienta (ver fecha en &quot;Datos de referencia&quot; más arriba). <strong>Verifica los tipos vigentes</strong> con tu comunidad autónoma
           antes de tomar decisiones.
         </p>
 
@@ -775,6 +781,10 @@ export default function SimuladorCompraventaPage() {
               </p>
               <p>
                 <strong>Si no hay ganancia, no se paga</strong> (sentencia del Tribunal Constitucional).
+              </p>
+              <p>
+                Esta calculadora aplica un <strong>tipo del 25%</strong> como referencia orientativa habitual;
+                cada ayuntamiento fija su propio tipo, con un <strong>máximo legal del 30%</strong>.
               </p>
             </div>
 

@@ -376,6 +376,11 @@ export default function SimuladorEcosistemaTroficoPage() {
 
             {/* Leyenda energía */}
             <div className={styles.leyendaEnergia}>
+              <p className={styles.leyendaNota}>
+                Esta leyenda representa la <strong>transferencia de energía</strong> entre niveles (regla del 10%),
+                un concepto distinto de la <strong>población relativa</strong> mostrada en las barras de arriba:
+                un nivel puede tener pocos individuos pero canalizar mucha energía, o al contrario.
+              </p>
               <div className={styles.leyendaFila}>
                 <div className={styles.leyendaLinea}>
                   <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[0] }} />
@@ -512,12 +517,12 @@ export default function SimuladorEcosistemaTroficoPage() {
               </div>
               <div className={styles.scenarioCard}>
                 <span className={styles.scenarioIcon}>🦈</span>
-                <strong>Sobrepesca de tiburones en el Atlántico</strong>
+                <strong>Sobrepesca de tiburones en el Atlántico noroeste</strong>
                 <p>
-                  La reducción del 97% de los grandes tiburones costeros disparó la población de
-                  rayas (sus presas), que arrasaron los bancos de vieiras y bivalvos. La industria
-                  pesquera de Carolina del Norte colapsó. Eliminar un superdepredador puede destruir
-                  toda la red alimentaria subyacente.
+                  Según Myers et al. (2007, <em>Science</em>), el desplome de los grandes tiburones
+                  costeros en varias décadas disparó la población de rayas (sus presas), que arrasaron
+                  los bancos de vieiras. La industria pesquera de Carolina del Norte colapsó. Eliminar
+                  un superdepredador puede destruir toda la red alimentaria subyacente.
                 </p>
               </div>
               <div className={styles.scenarioCard}>
@@ -646,7 +651,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                 <div className={styles.stepNumber}>3</div>
                 <div className={styles.stepContent}>
                   <strong>Evalúa la magnitud del impacto con el modelo simplificado</strong>
-                  <p>Aplica el principio de que cada nivel trófico atenúa el impacto. Un cambio del 50% en un nivel puede causar solo un 20-30% de cambio en los niveles adyacentes. Los ecosistemas tienen cierta inercia y capacidad de amortiguación.</p>
+                  <p>Como aproximación orientativa (no una ley empírica), cada nivel trófico tiende a atenuar el impacto: un cambio del 50% en un nivel suele traducirse en un cambio menor —del orden del 20-30%— en los niveles adyacentes, ya que los ecosistemas tienen cierta inercia y capacidad de amortiguación. La magnitud real varía mucho según el ecosistema y las especies implicadas.</p>
                 </div>
               </div>
               <div className={styles.step}>

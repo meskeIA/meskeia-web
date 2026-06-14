@@ -387,6 +387,13 @@
   border-top: 1px solid var(--border);
 }
 
+.leyendaNota {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.4;
+}
+
 .leyendaFila {
   display: flex;
   flex-direction: column;
