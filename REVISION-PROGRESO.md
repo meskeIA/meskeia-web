@@ -1,7 +1,7 @@
 # REVISION-PROGRESO.md — Lista maestra de revisión (todas las apps)
 
 > Lista maestra **deduplicada por slug** (`url`), generada desde `data/applications.ts`.
-> Total de apps: **998**. Cada app aparece UNA sola vez, agrupada bajo su **suite primaria** (primera suite declarada en `applications.ts`), pero la columna "Suites" muestra todas las suites a las que pertenece.
+> Total de apps: **999**. Cada app aparece UNA sola vez, agrupada bajo su **suite primaria** (primera suite declarada en `applications.ts`), pero la columna "Suites" muestra todas las suites a las que pertenece.
 
 > **Cómo usar este archivo**: al revisar una suite, busca en la columna "Suites" las filas que la contengan (independientemente de bajo qué grupo estén listadas) y marca `[x]` las que ya se han revisado (sin importar en qué sesión/suite se hizo). Así una app revisada en una suite no se vuelve a revisar al auditar otra suite a la que también pertenece.
 
@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 16 / 998
-- ⬜ Pendientes: 982 / 998
+- ✅ Revisadas: 85 / 999
+- ⬜ Pendientes: 914 / 999
 
 ## Resumen por suite primaria
 
@@ -27,11 +27,11 @@
 | Herramientas Técnicas (`tecnicas`) | 57 |
 | Inmobiliaria y Hogar (`inmobiliaria`) | 46 |
 | Juegos y Ocio (`juegos`) | 20 |
-| Legal, Fiscal y Patrimonio (`legal-fiscal`) | 44 |
+| Legal, Fiscal y Patrimonio (`legal-fiscal`) | 45 |
 | Productividad (`productividad`) | 34 |
 | Salud y Bienestar (`salud`) | 122 |
 | Viajes y Turismo (`viajes`) | 10 |
-| **Total** | **998** |
+| **Total** | **999** |
 
 ---
 
@@ -41,7 +41,7 @@
 |---|---|---|---|
 | [ ] | Adaptador de Lectura para Dislexia | `/adaptador-dislexia/` | accesibilidad, salud, productividad, estudiantes |
 | [ ] | Calculadora de Contraste | `/contraste-colores/` | accesibilidad, diseno |
-| [ ] | Conversor Braille | `/conversor-braille/` | accesibilidad, cultura |
+| [x] | Conversor Braille | `/conversor-braille/` | accesibilidad, cultura |
 | [ ] | Conversor de Código Morse | `/conversor-morse/` | accesibilidad, cultura |
 | [ ] | Convertidor de Subtítulos | `/convertidor-subtitulos/` | accesibilidad, diseno, tecnicas |
 | [ ] | Ejercicios de Vocalización para Parkinson | `/ejercicios-vocalizacion/` | accesibilidad, salud |
@@ -137,7 +137,7 @@
 | [ ] | Falsos Amigos Español-Inglés: Catálogo y Práctica | `/falsos-amigos-ingles/` | cultura, estudiantes |
 | [ ] | Flujos Migratorios Globales: Mapa 2024 | `/visualizador-migracion-global/` | cultura |
 | [ ] | Francia Contemporánea: De la Tercera República a Macron | `/visualizador-historia/historia-francia-contemporanea/` | cultura |
-| [ ] | Generador de Anagramas | `/generador-anagramas/` | cultura, juegos |
+| [x] | Generador de Anagramas | `/generador-anagramas/` | cultura, juegos |
 | [ ] | Generador de Íncipit | `/generador-incipit/` | cultura, estudiantes |
 | [ ] | Generador de Poemas por Forma | `/generador-poemas/` | cultura, estudiantes |
 | [ ] | Geopolítica de los Recursos - Petróleo, Litio y Tierras Raras | `/visualizador-geopolitica-recursos/` | cultura, estudiantes |
@@ -342,14 +342,14 @@
 | [ ] | Conversor de Colores | `/conversor-colores/` | diseno |
 | [ ] | Conversor de Imágenes | `/conversor-imagenes/` | diseno, productividad |
 | [ ] | Conversor Markdown-HTML | `/conversor-markdown-html/` | diseno |
-| [ ] | Creador de Paletas | `/creador-paletas/` | diseno |
+| [x] | Creador de Paletas | `/creador-paletas/` | diseno |
 | [ ] | Creador de Thumbnails YouTube | `/creador-thumbnails/` | diseno |
 | [ ] | Curso de Emprendimiento | `/curso-emprendimiento/` | diseno, cultura |
 | [ ] | Curso de Empresa Familiar | `/curso-empresa-familiar/` | diseno, cultura |
 | [ ] | Curso de Estrategia Empresarial | `/curso-estrategia-empresarial/` | diseno, cultura |
 | [ ] | Curso de Marketing Digital 2025 | `/curso-marketing-digital/` | diseno, cultura |
 | [ ] | Curso de Negociación Exitosa | `/curso-negociacion/` | diseno, cultura |
-| [ ] | Curso de Optimización para IAs (GEO/AEO) | `/curso-optimizacion-ia/` | diseno, cultura |
+| [x] | Curso de Optimización para IAs (GEO/AEO) | `/curso-optimizacion-ia/` | diseno, cultura |
 | [ ] | Editor EXIF | `/editor-exif/` | diseno, tecnicas |
 | [ ] | Generador de Avatares | `/generador-avatares/` | diseno |
 | [ ] | Generador de Carruseles | `/generador-carruseles/` | diseno |
@@ -370,7 +370,7 @@
 | [ ] | Playground SQL | `/playground-sql/` | diseno, estudiantes |
 | [ ] | Recortador de Audio | `/recortador-audio/` | diseno, productividad |
 | [ ] | Selector de Canal de Venta | `/selector-canal-venta/` | diseno, freelance |
-| [ ] | Simulador de Puertas Lógicas | `/simulador-puertas-logicas/` | diseno, estudiantes |
+| [x] | Simulador de Puertas Lógicas | `/simulador-puertas-logicas/` | diseno, estudiantes |
 | [ ] | Validador JSON | `/validador-json/` | diseno, tecnicas |
 | [ ] | Validador RegEx | `/validador-regex/` | diseno, tecnicas |
 | [ ] | Visualizador de Algoritmos | `/visualizador-algoritmos/` | diseno, estudiantes |
@@ -397,7 +397,7 @@
 | [ ] | Calculadora de Electricidad | `/calculadora-electricidad/` | estudiantes |
 | [ ] | Calculadora de Geometría | `/calculadora-geometria/` | estudiantes |
 | [ ] | Calculadora de Movimiento | `/calculadora-movimiento/` | estudiantes |
-| [ ] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
+| [x] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
 | [ ] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
 | [ ] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
 | [ ] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
@@ -420,7 +420,7 @@
 | [ ] | Cómo Funciona la Probabilidad | `/visualizador-probabilidad/` | estudiantes, cultura |
 | [ ] | Computación Cuántica - Qubits, Puertas y Algoritmo de Shor | `/visualizador-computacion-cuantica/` | estudiantes, cultura, tecnicas |
 | [ ] | Conjugador de Verbos Español | `/conjugador-verbos/` | estudiantes |
-| [ ] | Contador de Sílabas | `/contador-silabas/` | estudiantes |
+| [x] | Contador de Sílabas | `/contador-silabas/` | estudiantes |
 | [ ] | Conversor IEEE 754 | `/conversor-ieee754/` | estudiantes, tecnicas |
 | [ ] | Cosmología: Composición del Universo y su Destino | `/visualizador-cosmologia/` | estudiantes, cultura |
 | [ ] | Creador de Flashcards | `/creador-flashcards/` | estudiantes |
@@ -545,11 +545,11 @@
 | [ ] | Selector de Método de Estudio | `/selector-metodo-estudio/` | estudiantes, productividad |
 | [ ] | Series y Convergencia: Taylor, Criterios y π | `/visualizador-series-convergencia/` | estudiantes, tecnicas |
 | [ ] | Simulador Circuitos Eléctricos | `/simulador-circuitos-electricos/` | estudiantes, tecnicas |
-| [ ] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
+| [x] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
 | [ ] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |
 | [ ] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
-| [ ] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
+| [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
 | [ ] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
 | [ ] | Simulador de Cinética Química: Ecuación de Arrhenius | `/simulador-cinetica-arrhenius/` | estudiantes |
 | [ ] | Simulador de Colisiones — Elásticas e Inelásticas | `/simulador-colisiones/` | estudiantes, cultura |
@@ -557,24 +557,24 @@
 | [ ] | Simulador de Deriva Genética y Selección | `/simulador-deriva-genetica/` | estudiantes |
 | [ ] | Simulador de Derivadas: Pendiente de la Tangente | `/simulador-derivada-pendiente/` | estudiantes |
 | [ ] | Simulador de Distribución Normal | `/simulador-distribucion-normal/` | estudiantes |
-| [ ] | Simulador de Ecosistema: Cadena Trófica | `/simulador-ecosistema-trofico/` | estudiantes |
+| [x] | Simulador de Ecosistema: Cadena Trófica | `/simulador-ecosistema-trofico/` | estudiantes |
 | [ ] | Simulador de Elasticidad Precio de la Demanda | `/simulador-elasticidad-precio/` | estudiantes |
-| [ ] | Simulador de Equilibrio Químico (Le Chatelier) | `/simulador-equilibrio-quimico/` | estudiantes |
+| [x] | Simulador de Equilibrio Químico (Le Chatelier) | `/simulador-equilibrio-quimico/` | estudiantes |
 | [ ] | Simulador de Estequiometría: Reactivo Limitante | `/simulador-estequiometria/` | estudiantes |
-| [ ] | Simulador de Física | `/simulador-fisica/` | estudiantes |
+| [x] | Simulador de Física | `/simulador-fisica/` | estudiantes |
 | [ ] | Simulador de Fluidos: Ecuación de Bernoulli | `/simulador-fluidos-bernoulli/` | estudiantes |
 | [ ] | Simulador de Fotosíntesis: Factores Limitantes | `/simulador-fotosintesis-factores/` | estudiantes |
 | [ ] | Simulador de Gas Ideal y Termodinámica | `/simulador-gas-ideal/` | estudiantes |
-| [ ] | Simulador de Genética Mendeliana | `/simulador-genetica/` | estudiantes, salud |
+| [x] | Simulador de Genética Mendeliana | `/simulador-genetica/` | estudiantes, salud |
 | [ ] | Simulador de Hashing y Colisiones | `/simulador-hashing-colisiones/` | estudiantes |
 | [ ] | Simulador de Integrales: Área bajo la Curva | `/simulador-integral-area/` | estudiantes |
 | [ ] | Simulador de Intervalos de Confianza | `/simulador-intervalos-confianza/` | estudiantes |
 | [ ] | Simulador de K-Means Clustering | `/simulador-kmeans/` | estudiantes, tecnicas |
 | [ ] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |
-| [ ] | Simulador de Lentes Ópticas: Trazado de Rayos | `/simulador-lentes-opticas/` | estudiantes |
-| [ ] | Simulador de Máquina de Turing | `/simulador-maquina-turing/` | estudiantes, tecnicas |
+| [x] | Simulador de Lentes Ópticas: Trazado de Rayos | `/simulador-lentes-opticas/` | estudiantes |
+| [x] | Simulador de Máquina de Turing | `/simulador-maquina-turing/` | estudiantes, tecnicas |
 | [ ] | Simulador de Mitosis y Meiosis | `/simulador-mitosis-meiosis/` | estudiantes |
-| [ ] | Simulador de Movimiento Circular | `/simulador-movimiento-circular/` | estudiantes |
+| [x] | Simulador de Movimiento Circular | `/simulador-movimiento-circular/` | estudiantes |
 | [ ] | Simulador de Oferta y Demanda | `/simulador-oferta-demanda/` | estudiantes |
 | [ ] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
 | [ ] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
@@ -586,7 +586,7 @@
 | [ ] | Simulador de Regresión Lineal y Logística | `/simulador-regresion/` | estudiantes, tecnicas |
 | [ ] | Simulador de SQL JOIN Visual | `/simulador-sql-join/` | estudiantes, tecnicas |
 | [ ] | Simulador de Test de Hipótesis | `/simulador-test-hipotesis/` | estudiantes |
-| [ ] | Simulador de Titulación Ácido-Base | `/simulador-titulacion/` | estudiantes |
+| [x] | Simulador de Titulación Ácido-Base | `/simulador-titulacion/` | estudiantes |
 | [ ] | Simulador de Transformaciones de Funciones | `/simulador-funciones-transformaciones/` | estudiantes |
 | [ ] | Simulador del Ciclo de Carnot | `/simulador-termodinamica-carnot/` | estudiantes |
 | [ ] | Simulador del Círculo Trigonométrico | `/simulador-trigonometria-circulo-unitario/` | estudiantes |
@@ -604,7 +604,7 @@
 | [ ] | Sistemas Operativos: Procesos, Scheduling, Memoria y Ficheros | `/visualizador-sistemas-operativos/` | estudiantes, tecnicas |
 | [ ] | Sonido y Ondas - Frecuencia, Amplitud y Decibelios | `/visualizador-sonido-ondas/` | estudiantes, cultura |
 | [ ] | Superconductividad: Efecto Meissner y Pares de Cooper | `/visualizador-superconductividad/` | estudiantes, tecnicas |
-| [ ] | Tabla Periódica Interactiva | `/tabla-periodica/` | estudiantes |
+| [x] | Tabla Periódica Interactiva | `/tabla-periodica/` | estudiantes |
 | [ ] | Tectónica de Placas | `/visualizador-tectonica-placas/` | estudiantes, cultura |
 | [ ] | Tendencias de la Tabla Periódica | `/visualizador-tabla-periodica-interactiva/` | estudiantes, cultura |
 | [ ] | Tendencias de la Tabla Periódica | `/simulador-tabla-periodica-tendencias/` | estudiantes |
@@ -629,7 +629,7 @@
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
 | [ ] | ¿Cuánto tardo en ahorrar? | `/estimador-tiempo-ahorro/` | finanzas, estudiantes |
-| [ ] | Anatomía de una Nómina | `/visualizador-anatomia-nomina/` | finanzas, cultura |
+| [x] | Anatomía de una Nómina | `/visualizador-anatomia-nomina/` | finanzas, cultura |
 | [ ] | Burbuja Especulativa: Las 5 Fases de Minsky | `/visualizador-burbuja-especulativa/` | finanzas, cultura |
 | [ ] | Calculadora de Descuentos | `/calculadora-descuentos/` | finanzas, productividad |
 | [x] | Calculadora de Propinas | `/calculadora-propinas/` | finanzas, productividad, viajes |
@@ -675,25 +675,25 @@
 | [ ] | Selector de Seguro de Coche | `/selector-seguro-coche/` | finanzas, tecnicas |
 | [ ] | Selector de Seguro de Vida | `/selector-seguro-vida/` | finanzas, salud |
 | [ ] | Selector de Tipo de Ahorro | `/selector-tipo-ahorro/` | finanzas, productividad |
-| [ ] | Selector de Tipo de Hipoteca | `/selector-tipo-hipoteca/` | finanzas, inmobiliaria |
+| [x] | Selector de Tipo de Hipoteca | `/selector-tipo-hipoteca/` | finanzas, inmobiliaria |
 | [ ] | Selector de Tipo de Inversión | `/selector-inversiones/` | finanzas |
 | [ ] | Selector de Tipo de Préstamo | `/selector-tipo-prestamo/` | finanzas, inmobiliaria |
 | [ ] | Selector de Tipo de Vehículo | `/selector-vehiculo/` | finanzas, inmobiliaria, productividad |
 | [ ] | Simulador de Paga y Ahorro | `/simulador-paga-ahorro/` | finanzas, estudiantes |
 | [ ] | Simulador Sesgos del Inversor | `/simulador-sesgos-inversor/` | finanzas, cultura |
-| [ ] | Test de Perfil Inversor | `/test-perfil-inversor/` | finanzas |
+| [x] | Test de Perfil Inversor | `/test-perfil-inversor/` | finanzas |
 | [ ] | Test de Tolerancia al Riesgo Detallado | `/test-tolerancia-riesgo-detallado/` | finanzas |
 | [ ] | Tipos de Interés BCE - Transmisión Monetaria | `/visualizador-tipos-interes-bce/` | finanzas, cultura, estudiantes |
 | [ ] | Tu Jubilación en Perspectiva | `/visualizador-jubilacion-perspectiva/` | finanzas, cultura |
-| [ ] | Tu Sueldo al Desnudo | `/visualizador-sueldo-neto/` | finanzas, freelance, cultura |
+| [x] | Tu Sueldo al Desnudo | `/visualizador-sueldo-neto/` | finanzas, freelance, cultura |
 
 ## Freelance y Autónomo (`freelance`) — 38 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
 | [ ] | Auditoría de Propuesta de Valor | `/auditoria-propuesta-valor/` | freelance, diseno |
-| [ ] | Calculadora de IVA | `/calculadora-iva/` | freelance, productividad |
-| [ ] | Calculadora de Precio por Proyecto Freelance | `/calculadora-precio-por-proyecto/` | freelance, productividad |
+| [x] | Calculadora de IVA | `/calculadora-iva/` | freelance, productividad |
+| [x] | Calculadora de Precio por Proyecto Freelance | `/calculadora-precio-por-proyecto/` | freelance, productividad |
 | [ ] | Calculadora de Presupuestos | `/calculadora-presupuestos/` | freelance |
 | [ ] | Calculadora de Productividad | `/calculadora-productividad/` | freelance, productividad |
 | [ ] | Checklist Cambio de Régimen Fiscal Autónomo | `/checklist-cambio-regimen-autonomo/` | freelance |
@@ -714,7 +714,7 @@
 | [ ] | Orientador de Ayudas para Autónomos y Pymes | `/orientador-ayudas-autonomos-pymes/` | freelance, legal-fiscal |
 | [ ] | Orientador de Diversificación de Clientes | `/orientador-diversificacion-clientes/` | freelance, productividad |
 | [ ] | Orientador Facturación y Retenciones | `/orientador-facturacion-retencion/` | freelance, finanzas |
-| [ ] | Orientador Tarifa Freelance | `/orientador-tarifa-freelance/` | freelance |
+| [x] | Orientador Tarifa Freelance | `/orientador-tarifa-freelance/` | freelance |
 | [ ] | Planificador Cash Flow | `/planificador-cashflow/` | freelance |
 | [ ] | Planificador de Vacaciones para Autónomos | `/planificador-vacaciones-autonomo/` | freelance, productividad |
 | [ ] | Planificador Trimestral para Autónomos | `/planificador-trimestres-freelance/` | freelance, productividad |
@@ -722,7 +722,7 @@
 | [ ] | Selector de Forma Jurídica | `/selector-forma-juridica/` | freelance, finanzas |
 | [ ] | Selector de Modelo de Negocio | `/selector-modelo-negocio/` | freelance, finanzas, productividad |
 | [ ] | Selector de Tipo de Contrato | `/selector-contrato-trabajo/` | freelance, productividad |
-| [ ] | Selector Régimen Fiscal Autónomo | `/selector-regimen-fiscal-autonomo/` | freelance, finanzas |
+| [x] | Selector Régimen Fiscal Autónomo | `/selector-regimen-fiscal-autonomo/` | freelance, finanzas |
 | [ ] | Simulador de Colchón de Emergencia Freelance | `/simulador-colchon-emergencia-freelance/` | freelance, finanzas |
 | [ ] | Temporizador Pomodoro | `/temporizador-pomodoro/` | freelance, productividad, estudiantes |
 | [ ] | Test de Salud de tu Negocio Freelance | `/test-salud-negocio-freelance/` | freelance, productividad |
@@ -773,7 +773,7 @@
 | [ ] | Generador de Contraseñas | `/generador-contrasenas/` | tecnicas |
 | [ ] | Generador de Hashes | `/generador-hashes/` | tecnicas |
 | [ ] | Generador de Ondas y Visualizador | `/generador-ondas/` | tecnicas, estudiantes |
-| [ ] | Generador de Tonos de Audio | `/generador-tonos/` | tecnicas |
+| [x] | Generador de Tonos de Audio | `/generador-tonos/` | tecnicas |
 | [ ] | IDEs con IA 2026: Cursor vs Windsurf vs VS Code vs Zed vs JetBrains | `/comparador-ides-ia/` | tecnicas, productividad |
 | [ ] | Impacto de la IA en los Sectores - Automatización y Empleos | `/visualizador-impacto-ia-sectores/` | tecnicas, cultura, estudiantes |
 | [ ] | Luxómetro / Fotómetro | `/luxometro/` | tecnicas |
@@ -796,9 +796,9 @@
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Amortización Anticipada Hipoteca | `/amortizacion-hipoteca/` | inmobiliaria, finanzas |
+| [x] | Amortización Anticipada Hipoteca | `/amortizacion-hipoteca/` | inmobiliaria, finanzas |
 | [x] | Calculadora Consumo Combustible | `/calculadora-combustible/` | inmobiliaria, finanzas, viajes |
-| [ ] | Calculadora de Cocina | `/calculadora-cocina/` | inmobiliaria, cultura |
+| [x] | Calculadora de Cocina | `/calculadora-cocina/` | inmobiliaria, cultura |
 | [ ] | Calculadora de Eficiencia Energética | `/calculadora-eficiencia-energetica/` | inmobiliaria, finanzas |
 | [ ] | Calculadora de Gasto Energético | `/calculadora-gasto-energetico/` | inmobiliaria, finanzas |
 | [ ] | Calculadora de Materiales de Construcción | `/calculadora-materiales-construccion/` | inmobiliaria |
@@ -809,9 +809,9 @@
 | [ ] | Estimación de Ahorro Hídrico | `/estimacion-ahorro-hidrico/` | inmobiliaria, finanzas |
 | [ ] | Estimación de Certificación Energética | `/estimacion-certificacion-energetica/` | inmobiliaria, tecnicas |
 | [ ] | Estimador Actualización Alquiler 2026 | `/estimador-actualizacion-alquiler/` | inmobiliaria, legal-fiscal |
-| [ ] | Estimador Compraventa Inmobiliaria | `/estimador-compraventa-inmueble/` | inmobiliaria, finanzas |
+| [x] | Estimador Compraventa Inmobiliaria | `/estimador-compraventa-inmueble/` | inmobiliaria, finanzas |
 | [ ] | Estimador Coste Vivienda | `/estimador-coste-vivienda/` | inmobiliaria, finanzas |
-| [ ] | Estimador de Hipoteca | `/estimador-hipoteca/` | inmobiliaria, finanzas |
+| [x] | Estimador de Hipoteca | `/estimador-hipoteca/` | inmobiliaria, finanzas |
 | [ ] | Estimador de Préstamos | `/estimador-prestamos/` | inmobiliaria, finanzas |
 | [ ] | Estimador Gastos de Comunidad | `/estimador-gastos-comunidad/` | inmobiliaria, finanzas |
 | [ ] | Estimador Reformas del Hogar | `/estimador-reformas-hogar/` | inmobiliaria, finanzas |
@@ -826,7 +826,7 @@
 | [ ] | Orientador Deducción IRPF Obras Energéticas | `/orientador-deduccion-obras-energeticas/` | inmobiliaria, finanzas, legal-fiscal |
 | [ ] | Planificador de Menú Semanal | `/planificador-menu/` | inmobiliaria, salud |
 | [ ] | Planificador de Mudanzas | `/planificador-mudanzas/` | inmobiliaria, productividad |
-| [ ] | Rentabilidad de Inversión en Alquiler | `/calculadora-rentabilidad-alquiler/` | inmobiliaria, finanzas |
+| [x] | Rentabilidad de Inversión en Alquiler | `/calculadora-rentabilidad-alquiler/` | inmobiliaria, finanzas |
 | [ ] | Selector de Alquiler o Compra | `/selector-alquiler-vs-compra/` | inmobiliaria, finanzas |
 | [ ] | Selector de Energía para el Hogar | `/selector-energia-hogar/` | inmobiliaria, tecnicas |
 | [ ] | Selector de Estilo de Decoración | `/selector-estilo-decoracion/` | inmobiliaria, productividad |
@@ -839,8 +839,8 @@
 | [ ] | Simulador de Ahorro con Placas Solares | `/simulador-placas-solares/` | inmobiliaria, tecnicas, finanzas |
 | [ ] | Simulador de Subvenciones para Rehabilitación Energética | `/simulador-subvenciones-rehabilitacion/` | inmobiliaria, finanzas |
 | [ ] | Simulador Gastos Compra Nave Industrial | `/simulador-gastos-compraventa-nave-industrial/` | inmobiliaria, legal-fiscal, freelance |
-| [ ] | Simulador Gastos Compraventa Garaje | `/simulador-gastos-compraventa-garaje/` | inmobiliaria, legal-fiscal |
-| [ ] | Simulador Gastos Compraventa Trastero | `/simulador-gastos-compraventa-trastero/` | inmobiliaria, legal-fiscal |
+| [x] | Simulador Gastos Compraventa Garaje | `/simulador-gastos-compraventa-garaje/` | inmobiliaria, legal-fiscal |
+| [x] | Simulador Gastos Compraventa Trastero | `/simulador-gastos-compraventa-trastero/` | inmobiliaria, legal-fiscal |
 | [ ] | Tu Electricidad al Desnudo | `/visualizador-factura-electrica/` | inmobiliaria, cultura |
 
 ## Juegos y Ocio (`juegos`) — 20 apps
@@ -868,26 +868,26 @@
 | [x] | Test de Velocidad de Escritura | `/test-velocidad-escritura/` | juegos, productividad |
 | [x] | Tirador de Dados | `/tirador-dados/` | juegos |
 
-## Legal, Fiscal y Patrimonio (`legal-fiscal`) — 44 apps
+## Legal, Fiscal y Patrimonio (`legal-fiscal`) — 45 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Asistente Alta Autónomo | `/asistente-alta-autonomo/` | legal-fiscal, freelance |
+| [x] | Asistente Alta Autónomo | `/asistente-alta-autonomo/` | legal-fiscal, freelance |
 | [ ] | Asistente Constitución Asociación | `/asistente-constitucion-asociacion/` | legal-fiscal |
 | [ ] | Asistente Constitución Sociedad | `/asistente-constitucion-sociedad/` | legal-fiscal, freelance |
-| [ ] | Calendario Fiscal Emprendedor | `/calendario-fiscal-emprendedor/` | legal-fiscal, freelance |
+| [x] | Calendario Fiscal Emprendedor | `/calendario-fiscal-emprendedor/` | legal-fiscal, freelance |
 | [ ] | Checklist Declaración de la Renta 2026 | `/checklist-declaracion-renta/` | legal-fiscal, finanzas, freelance |
-| [ ] | Comparador Autónomo vs SL | `/comparador-autonomo-vs-sl/` | legal-fiscal, freelance |
+| [x] | Comparador Autónomo vs SL | `/comparador-autonomo-vs-sl/` | legal-fiscal, freelance |
 | [ ] | Comparador de Formas Jurídicas | `/comparador-formas-juridicas/` | legal-fiscal, freelance |
 | [ ] | Declaración Renta Persona Fallecida | `/declaracion-renta-fallecidos/` | legal-fiscal, finanzas |
 | [ ] | Estimador de Complemento a Mínimos | `/estimador-complemento-minimos/` | legal-fiscal, finanzas |
 | [ ] | Estimador de Costas Judiciales | `/estimador-costas-judiciales/` | legal-fiscal |
 | [ ] | Estimador de Costes de Divorcio | `/estimador-costes-divorcio/` | legal-fiscal |
-| [ ] | Estimador de Cuota de Autónomo | `/estimador-cuota-autonomo/` | legal-fiscal, freelance |
-| [ ] | Estimador de Legítimas | `/estimador-legitimas/` | legal-fiscal, finanzas |
-| [ ] | Estimador de Sueldo Neto | `/estimador-sueldo-neto/` | legal-fiscal, freelance |
-| [ ] | Estimador Impuesto de Donaciones | `/estimador-impuesto-donaciones/` | legal-fiscal |
-| [ ] | Estimador Impuesto de Sucesiones | `/estimador-impuesto-sucesiones/` | legal-fiscal |
+| [x] | Estimador de Cuota de Autónomo | `/estimador-cuota-autonomo/` | legal-fiscal, freelance |
+| [x] | Estimador de Legítimas | `/estimador-legitimas/` | legal-fiscal, finanzas |
+| [x] | Estimador de Sueldo Neto | `/estimador-sueldo-neto/` | legal-fiscal, freelance |
+| [x] | Estimador Impuesto de Donaciones | `/estimador-impuesto-donaciones/` | legal-fiscal |
+| [x] | Estimador Impuesto de Sucesiones | `/estimador-impuesto-sucesiones/` | legal-fiscal |
 | [ ] | Estimador IRPF | `/estimador-irpf/` | legal-fiscal |
 | [ ] | Estimador IRPF Pensionista | `/estimador-irpf-pensionista/` | legal-fiscal, finanzas |
 | [ ] | Estimador Pensión de Viudedad | `/estimador-pension-viudedad/` | legal-fiscal, finanzas |
@@ -898,24 +898,25 @@
 | [ ] | Guía para Gestionar una Herencia | `/guia/herencias/` | legal-fiscal |
 | [ ] | Impuestos en el Divorcio | `/impuestos-divorcio/` | legal-fiscal, finanzas |
 | [ ] | Optimizador de Rentas 60+ | `/optimizador-rentas-60/` | legal-fiscal, finanzas |
-| [ ] | Orientación para Tramitar una Herencia | `/orientacion-tramitacion-herencias/` | legal-fiscal |
+| [x] | Orientación para Tramitar una Herencia | `/orientacion-tramitacion-herencias/` | legal-fiscal |
 | [ ] | Orientador de Ayudas y Prestaciones para Personas y Familias | `/orientador-ayudas-personas-familias/` | legal-fiscal, finanzas |
 | [ ] | Orientador de Becas y Ayudas al Estudio | `/orientador-becas-ayudas-estudio/` | legal-fiscal, estudiantes |
-| [ ] | Orientador de Gastos Deducibles | `/orientador-gastos-deducibles/` | legal-fiscal, freelance |
+| [x] | Orientador de Gastos Deducibles | `/orientador-gastos-deducibles/` | legal-fiscal, freelance |
 | [ ] | Orientador de Intereses de Demora | `/orientador-intereses-demora/` | legal-fiscal, freelance |
 | [ ] | Orientador de Justicia Gratuita | `/orientador-justicia-gratuita/` | legal-fiscal |
+| [ ] | Orientador de Trámites de Jubilación | `/orientador-tramites-jubilacion/` | legal-fiscal, finanzas |
 | [ ] | Orientador Límite Conjunto IRPF-Patrimonio | `/orientador-limite-conjunto-patrimonio/` | legal-fiscal, finanzas |
 | [ ] | Orientador Visa Nómada Digital | `/requisitos-nomada-digital/` | legal-fiscal, freelance |
 | [ ] | Planificador de Ahorro para la Jubilación | `/planificador-ahorro-jubilacion/` | legal-fiscal, finanzas |
 | [ ] | Simulador de Jubilación Pública | `/simulador-jubilacion-publica/` | legal-fiscal, finanzas |
 | [ ] | Simulador del Mito del Tramo Superior IRPF | `/simulador-mito-tramo-superior/` | legal-fiscal, finanzas |
-| [ ] | Simulador Desglose de Nómina (Bruto a Neto) | `/simulador-desglose-nomina/` | legal-fiscal, finanzas |
-| [ ] | Simulador Heredar Vivienda (ISD + Plusvalía + IRPF) | `/simulador-heredar-vivienda/` | legal-fiscal, inmobiliaria |
+| [x] | Simulador Desglose de Nómina (Bruto a Neto) | `/simulador-desglose-nomina/` | legal-fiscal, finanzas |
+| [x] | Simulador Heredar Vivienda (ISD + Plusvalía + IRPF) | `/simulador-heredar-vivienda/` | legal-fiscal, inmobiliaria |
 | [ ] | Simulador Módulos vs Estimación Directa Autónomos | `/simulador-modulos-vs-directa/` | legal-fiscal, freelance |
 | [ ] | Simulador Plan de Pensiones IRPF: Aporte vs Rescate | `/simulador-renta-plan-pensiones/` | legal-fiscal, finanzas |
-| [ ] | Simulador Visual de Tramos IRPF 2025 | `/simulador-irpf-tramos/` | legal-fiscal, finanzas |
+| [x] | Simulador Visual de Tramos IRPF 2025 | `/simulador-irpf-tramos/` | legal-fiscal, finanzas |
 | [ ] | Test Obligación Declarar Renta 2025 | `/test-obligado-declarar-renta/` | legal-fiscal, finanzas, freelance |
-| [ ] | Verificador del Complemento por Brecha de Género | `/verificador-complemento-brecha-genero/` | legal-fiscal, finanzas |
+| [x] | Verificador del Complemento por Brecha de Género | `/verificador-complemento-brecha-genero/` | legal-fiscal, finanzas |
 
 ## Productividad (`productividad`) — 34 apps
 
@@ -983,7 +984,7 @@
 | [ ] | Calculadora de Zonas Cardíacas (Karvonen) | `/calculadora-zonas-cardiacas/` | salud, tecnicas |
 | [ ] | Calculadora Edad Mascotas | `/calculadora-edad-mascotas/` | salud |
 | [ ] | Calculadora SWOLF — Eficiencia en Natación | `/calculadora-swolf-natacion/` | salud, tecnicas |
-| [ ] | Calculadora Tamaño Adulto Cachorro | `/calculadora-tamano-adulto-perro/` | salud |
+| [x] | Calculadora Tamaño Adulto Cachorro | `/calculadora-tamano-adulto-perro/` | salud |
 | [ ] | Calculadora Zonas de Entrenamiento — FC por Zona y Karvonen | `/calculadora-zonas-entrenamiento/` | salud |
 | [ ] | Catalasa - La Enzima más Rápida del Cuerpo | `/visualizador-catalasa/` | salud, cultura, estudiantes |
 | [ ] | Cerebro y Emociones - Amígdala, Neurotransmisores y Regulación | `/visualizador-cerebro-emociones/` | salud, estudiantes, cultura |

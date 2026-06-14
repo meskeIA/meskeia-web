@@ -23,6 +23,7 @@
 - [ ] Build falló → **PIPELINE PAUSADO**. Error: ...
 
 ## Estado del pipeline
-- audit-state.json actualizado: sí/no (lastTanda → N)
+- REVISION-PROGRESO.md: [x] marcadas las N apps de esta tanda (fuente única de verdad)
+- audit-state.json actualizado: lastTanda → N
 - Próxima tanda: [slugs] (ver find-next-batch.mjs)
 - Continúa automáticamente: sí (informe-only) / no (esperando revisión por hard-stop)

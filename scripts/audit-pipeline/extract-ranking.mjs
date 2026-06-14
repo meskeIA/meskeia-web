@@ -1,6 +1,7 @@
 // Extracción ÚNICA del ranking de uso real desde Turso (uso_aplicaciones),
 // excluyendo tráfico de bots/MCP/ChatGPT. Escribe el resultado en el campo
-// "ranking" de audit-state.json, conservando "audited" y "lastTanda".
+// "ranking" de audit-state.json, conservando "lastTanda" y demás claves.
+// El estado "revisada/no revisada" vive en REVISION-PROGRESO.md, no aquí.
 //
 // Uso: node scripts/audit-pipeline/extract-ranking.mjs
 import { createClient } from '@libsql/client';
