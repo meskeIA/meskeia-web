@@ -942,7 +942,7 @@ export default function SimuladorGrafosPage() {
   );
 
   const handleNodoClick = useCallback(
-    (nodoId: string, evt: React.MouseEvent | React.PointerEvent) => {
+    (nodoId: string, evt: React.SyntheticEvent) => {
       evt.stopPropagation();
       if (seleccionMarcado === 'origen') {
         setOrigen(nodoId);
@@ -999,6 +999,42 @@ export default function SimuladorGrafosPage() {
       arrastrandoNodo.current = nodoId;
     },
     [modo],
+  );
+
+  // Accesibilidad por teclado: Intro/Espacio ejecuta la acción del modo actual;
+  // en modo "mover", las flechas desplazan el nodo enfocado.
+  const handleNodoKeyDown = useCallback(
+    (nodoId: string, evt: React.KeyboardEvent<SVGGElement>) => {
+      if (evt.key === 'Enter' || evt.key === ' ') {
+        evt.preventDefault();
+        handleNodoClick(nodoId, evt);
+        return;
+      }
+      if (modo === 'move' && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(evt.key)) {
+        evt.preventDefault();
+        const paso = evt.shiftKey ? 30 : 10;
+        const deltas: Record<string, [number, number]> = {
+          ArrowUp: [0, -paso],
+          ArrowDown: [0, paso],
+          ArrowLeft: [-paso, 0],
+          ArrowRight: [paso, 0],
+        };
+        const [dx, dy] = deltas[evt.key];
+        setNodos((prev) =>
+          prev.map((n) =>
+            n.id === nodoId
+              ? {
+                  ...n,
+                  x: Math.max(RADIO_NODO, Math.min(SVG_WIDTH - RADIO_NODO, n.x + dx)),
+                  y: Math.max(RADIO_NODO, Math.min(SVG_HEIGHT - RADIO_NODO, n.y + dy)),
+                }
+              : n,
+          ),
+        );
+        setResultado(null);
+      }
+    },
+    [modo, handleNodoClick],
   );
 
   const handleSvgPointerMove = useCallback(
@@ -1093,6 +1129,38 @@ export default function SimuladorGrafosPage() {
     if (!pasoMostrar) return new Set<string>();
     return new Set(pasoMostrar.aristasResaltadas);
   }, [pasoMostrar]);
+
+  // Descripción accesible de un nodo: estado actual + acción disponible con Intro
+  const nodoAriaLabel = useCallback(
+    (nodo: Nodo): string => {
+      const estado = estadoVisualNodo(nodo);
+      const estadoTexto: Record<EstadoNodo, string> = {
+        'no-visitado': '',
+        'en-frontera': 'en la frontera',
+        actual: 'nodo actual del algoritmo',
+        visitado: 'visitado',
+        origen: 'origen',
+        destino: 'destino',
+        camino: 'parte del camino encontrado',
+      };
+      const partes = [`Nodo ${nodo.id}`];
+      if (estadoTexto[estado]) partes.push(estadoTexto[estado]);
+
+      if (seleccionMarcado === 'origen') partes.push('Pulsa Intro para marcarlo como origen');
+      else if (seleccionMarcado === 'destino') partes.push('Pulsa Intro para marcarlo como destino');
+      else if (modo === 'delete') partes.push('Pulsa Intro para eliminar este nodo');
+      else if (modo === 'add-edge') {
+        if (seleccionAristaFrom === nodo.id) partes.push('Pulsa Intro para cancelar la nueva arista');
+        else if (seleccionAristaFrom) partes.push(`Pulsa Intro para crear una arista desde ${seleccionAristaFrom}`);
+        else partes.push('Pulsa Intro para empezar una arista desde este nodo');
+      } else if (modo === 'move') {
+        partes.push('Usa las flechas para mover el nodo');
+      }
+
+      return partes.join('. ');
+    },
+    [estadoVisualNodo, seleccionMarcado, modo, seleccionAristaFrom],
+  );
 
   // Render auxiliar
   const renderAuxiliar = (): React.ReactElement => {
@@ -1527,7 +1595,12 @@ export default function SimuladorGrafosPage() {
                       key={n.id}
                       onPointerDown={(e) => handleNodoPointerDown(n.id, e)}
                       onClick={(e) => handleNodoClick(n.id, e)}
+                      onKeyDown={(e) => handleNodoKeyDown(n.id, e)}
                       style={{ cursor: modo === 'move' ? 'grab' : 'pointer' }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={nodoAriaLabel(n)}
+                      className={styles.nodoGrupo}
                     >
                       <circle
                         cx={n.x}
@@ -1563,7 +1636,7 @@ export default function SimuladorGrafosPage() {
               <h3 className={styles.auxiliarTitle}>{tituloAuxiliar}</h3>
               {renderAuxiliar()}
               {pasoMostrar && (
-                <div className={styles.descripcionPaso}>
+                <div className={styles.descripcionPaso} role="status" aria-live="polite" aria-atomic="true">
                   <strong>Paso {pasoActual + 1} / {resultado!.pasos.length}:</strong> {pasoMostrar.descripcion}
                 </div>
               )}
@@ -1640,7 +1713,7 @@ export default function SimuladorGrafosPage() {
                 </button>
               </div>
 
-              <div className={styles.metricsGrid}>
+              <div className={styles.metricsGrid} role="status" aria-live="polite" aria-atomic="true">
                 <div className={styles.metricCard}>
                   <span className={styles.metricLabel}>Nodos visitados</span>
                   <span className={styles.metricValue}>{formatNumber(resultado.nodosVisitados, 0)}</span>
@@ -1659,10 +1732,15 @@ export default function SimuladorGrafosPage() {
                   </span>
                 </div>
                 <div className={styles.metricCard}>
-                  <span className={styles.metricLabel}>Coste total</span>
+                  <span className={styles.metricLabel}>
+                    {algoritmo === 'bfs' || algoritmo === 'dfs' ? 'Coste total (nº de saltos)' : 'Coste total'}
+                  </span>
                   <span className={styles.metricValue}>
                     {resultado.caminoEncontrado.length === 0 ? '—' : formatNumber(resultado.costeTotal, 0)}
                   </span>
+                  {(algoritmo === 'bfs' || algoritmo === 'dfs') && resultado.caminoEncontrado.length > 0 && (
+                    <span className={styles.metricNote}>BFS y DFS no tienen en cuenta el peso de las aristas</span>
+                  )}
                 </div>
                 <div className={styles.metricCard}>
                   <span className={styles.metricLabel}>Complejidad</span>
@@ -1673,7 +1751,7 @@ export default function SimuladorGrafosPage() {
               </div>
 
               {resultado.caminoEncontrado.length > 0 && (
-                <div className={styles.resultBlock}>
+                <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Camino encontrado:</span>
                     <span className={`${styles.resultValue} ${styles.resultValueAccent}`}>

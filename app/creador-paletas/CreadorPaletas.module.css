@@ -262,12 +262,15 @@
   justify-content: flex-end;
   padding: var(--spacing-md);
   transition: transform 0.2s ease;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .colorCard:hover {
   transform: scale(1.05);
+}
+
+.colorCard:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .colorName {
@@ -312,6 +315,12 @@
   z-index: 1;
 }
 
+.shadeCard:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
 .shadeName {
   font-size: 0.7rem;
   font-weight: 600;
@@ -328,8 +337,16 @@
   transition: opacity 0.2s ease;
 }
 
-.shadeCard:hover .shadeHex {
+.shadeCard:hover .shadeHex,
+.shadeCard:focus-visible .shadeHex {
   opacity: 1;
+}
+
+/* Dispositivos táctiles: sin :hover persistente, mostrar siempre el código */
+@media (hover: none) {
+  .shadeHex {
+    opacity: 1;
+  }
 }
 
 /* Export */

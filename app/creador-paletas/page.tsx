@@ -67,6 +67,18 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
 }
 
+// Color de texto (negro o blanco) con mejor contraste sobre un fondo HEX (WCAG)
+function getContrastColor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+  const toLinear = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  const luminance = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+
+  return luminance > 0.179 ? '#1A1A1A' : '#FFFFFF';
+}
+
 // Generadores de armonías
 function generateHarmony(baseColor: string, type: HarmonyType): PaletteColor[] {
   const hsl = hexToHsl(baseColor);
@@ -148,13 +160,15 @@ export default function CreadorPaletasPage() {
   const [harmonyType, setHarmonyType] = useState<HarmonyType>('complementary');
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState<'css' | 'scss' | 'json'>('css');
+  const [copyMessage, setCopyMessage] = useState('');
 
   const palette = useMemo(() => generateHarmony(baseColor, harmonyType), [baseColor, harmonyType]);
   const shades = useMemo(() => generateShades(baseColor), [baseColor]);
 
-  const copyColor = useCallback(async (color: string) => {
+  const copyColor = useCallback(async (color: string, etiqueta: string) => {
     await navigator.clipboard.writeText(color);
     setCopiedColor(color);
+    setCopyMessage(`${etiqueta} copiado al portapapeles`);
     setTimeout(() => setCopiedColor(null), 1500);
   }, []);
 
@@ -185,6 +199,7 @@ export default function CreadorPaletasPage() {
   const copyExport = async () => {
     await navigator.clipboard.writeText(exportCode);
     setCopiedColor('export');
+    setCopyMessage('Código copiado al portapapeles');
     setTimeout(() => setCopiedColor(null), 1500);
   };
 
@@ -200,6 +215,10 @@ export default function CreadorPaletasPage() {
       </header>
 
       <LegalNotice />
+
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {copyMessage}
+      </div>
 
       <div className={styles.mainContent}>
         {/* Panel izquierdo - Configuración */}
@@ -283,19 +302,27 @@ export default function CreadorPaletasPage() {
           <div className={styles.paletteSection}>
             <h3 className={styles.sectionTitle}>Armonía {HARMONY_INFO[harmonyType].name}</h3>
             <div className={styles.paletteGrid}>
-              {palette.map((color, i) => (
-                <button
-                  key={i}
-                  className={styles.colorCard}
-                  onClick={() => copyColor(color.hex)}
-                  style={{ backgroundColor: color.hex }}
-                >
-                  <span className={styles.colorName}>{color.name}</span>
-                  <span className={styles.colorHex}>
-                    {copiedColor === color.hex ? '✓ Copiado' : color.hex}
-                  </span>
-                </button>
-              ))}
+              {palette.map((color, i) => {
+                const textColor = getContrastColor(color.hex);
+                return (
+                  <button
+                    key={i}
+                    className={styles.colorCard}
+                    onClick={() => copyColor(color.hex, `Color ${color.hex} (${color.name})`)}
+                    style={{
+                      backgroundColor: color.hex,
+                      color: textColor,
+                      textShadow: textColor === '#FFFFFF' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
+                    }}
+                    aria-label={`Copiar color ${color.hex}, ${color.name}, al portapapeles`}
+                  >
+                    <span className={styles.colorName}>{color.name}</span>
+                    <span className={styles.colorHex}>
+                      {copiedColor === color.hex ? '✓ Copiado' : color.hex}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -307,8 +334,9 @@ export default function CreadorPaletasPage() {
                 <button
                   key={shade.name}
                   className={styles.shadeCard}
-                  onClick={() => copyColor(shade.hex)}
+                  onClick={() => copyColor(shade.hex, `Tono ${shade.name}, ${shade.hex}`)}
                   style={{ backgroundColor: shade.hex }}
+                  aria-label={`Copiar tono ${shade.name}, ${shade.hex}, al portapapeles`}
                 >
                   <span className={styles.shadeName}>{shade.name}</span>
                   <span className={styles.shadeHex}>
