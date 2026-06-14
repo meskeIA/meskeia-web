@@ -38,8 +38,15 @@ export const jsonLd = generateWebAppSchema({
   name: "Calculadora de Pintura",
   description: "Calcula cuántos litros de pintura necesitas según los metros cuadrados, número de capas y tipo de superficie. Incluye calculadora de coste total.",
   url: "https://meskeia.com/calculadora-pintura/",
-  category: 'FinanceApplication',
-  features: [],
+  category: 'UtilityApplication',
+  features: [
+      "Dos modos: por metros cuadrados directos o por dimensiones de habitación (largo × ancho × alto)",
+      "4 tipos de superficie con rendimiento diferenciado: lisa (12 m²/L), gotelé (8), rugosa (7) y porosa (6)",
+      "Selector de número de capas (1, 2 o 3) con ajuste automático de la cantidad",
+      "Campo opcional de precio por litro para calcular el coste total del proyecto",
+      "Sugerencia de litros a comprar con margen del 10% para repasos",
+      "Gratuito, sin registro ni instalación",
+  ],
 });
 
 export const faqJsonLd = {

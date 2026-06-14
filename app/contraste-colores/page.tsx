@@ -193,7 +193,7 @@ export default function ContrasteColoresPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎯 Contraste de Colores</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎯</span> Contraste de Colores</h1>
         <p className={styles.subtitle}>
           Verifica la accesibilidad según WCAG 2.1
         </p>
@@ -235,7 +235,7 @@ export default function ContrasteColoresPage() {
           </div>
 
           {/* Ratio de contraste */}
-          <div className={styles.ratioSection}>
+          <div className={styles.ratioSection} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.ratioDisplay}>
               <span className={styles.ratioValue} style={{ color: getRatioColor() }}>
                 {result.ratio.toFixed(2)}:1
@@ -262,7 +262,7 @@ export default function ContrasteColoresPage() {
           </div>
 
           {/* Tabla WCAG */}
-          <div className={styles.wcagTable}>
+          <div className={styles.wcagTable} aria-live="polite">
             <div className={styles.wcagHeader}>
               <span></span>
               <span>AA</span>
@@ -271,25 +271,25 @@ export default function ContrasteColoresPage() {
             <div className={styles.wcagRow}>
               <span>Texto Normal</span>
               <span className={result.normalAA ? styles.pass : styles.fail}>
-                {result.normalAA ? '✓ Pasa' : '✗ Falla'}
+                <span aria-hidden="true">{result.normalAA ? '✓' : '✗'}</span> {result.normalAA ? 'Pasa' : 'Falla'}
               </span>
               <span className={result.normalAAA ? styles.pass : styles.fail}>
-                {result.normalAAA ? '✓ Pasa' : '✗ Falla'}
+                <span aria-hidden="true">{result.normalAAA ? '✓' : '✗'}</span> {result.normalAAA ? 'Pasa' : 'Falla'}
               </span>
             </div>
             <div className={styles.wcagRow}>
               <span>Texto Grande</span>
               <span className={result.largeAA ? styles.pass : styles.fail}>
-                {result.largeAA ? '✓ Pasa' : '✗ Falla'}
+                <span aria-hidden="true">{result.largeAA ? '✓' : '✗'}</span> {result.largeAA ? 'Pasa' : 'Falla'}
               </span>
               <span className={result.largeAAA ? styles.pass : styles.fail}>
-                {result.largeAAA ? '✓ Pasa' : '✗ Falla'}
+                <span aria-hidden="true">{result.largeAAA ? '✓' : '✗'}</span> {result.largeAAA ? 'Pasa' : 'Falla'}
               </span>
             </div>
           </div>
 
           <button onClick={copyResult} className={styles.copyBtn}>
-            {copied ? '✓ Copiado' : '📋 Copiar Resultados'}
+            {copied ? <><span aria-hidden="true">✓</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar Resultados</>}
           </button>
         </div>
 
@@ -299,15 +299,17 @@ export default function ContrasteColoresPage() {
 
           {/* Color de texto */}
           <div className={styles.colorGroup}>
-            <label className={styles.label}>Color de Texto (Foreground)</label>
+            <label htmlFor="fgHexInput" className={styles.label}>Color de Texto (Foreground)</label>
             <div className={styles.colorInputRow}>
               <input
                 type="color"
                 value={foreground}
                 onChange={(e) => setForeground(e.target.value)}
                 className={styles.colorPicker}
+                aria-label="Seleccionar color de texto"
               />
               <input
+                id="fgHexInput"
                 type="text"
                 value={foreground.toUpperCase()}
                 onChange={(e) => {
@@ -318,10 +320,12 @@ export default function ContrasteColoresPage() {
                 }}
                 className={styles.hexInput}
                 maxLength={7}
+                aria-label="Código hexadecimal del color de texto"
               />
               <div
                 className={styles.colorSwatch}
                 style={{ backgroundColor: foreground }}
+                aria-hidden="true"
               />
             </div>
           </div>
@@ -333,15 +337,17 @@ export default function ContrasteColoresPage() {
 
           {/* Color de fondo */}
           <div className={styles.colorGroup}>
-            <label className={styles.label}>Color de Fondo (Background)</label>
+            <label htmlFor="bgHexInput" className={styles.label}>Color de Fondo (Background)</label>
             <div className={styles.colorInputRow}>
               <input
                 type="color"
                 value={background}
                 onChange={(e) => setBackground(e.target.value)}
                 className={styles.colorPicker}
+                aria-label="Seleccionar color de fondo"
               />
               <input
+                id="bgHexInput"
                 type="text"
                 value={background.toUpperCase()}
                 onChange={(e) => {
@@ -352,10 +358,12 @@ export default function ContrasteColoresPage() {
                 }}
                 className={styles.hexInput}
                 maxLength={7}
+                aria-label="Código hexadecimal del color de fondo"
               />
               <div
                 className={styles.colorSwatch}
                 style={{ backgroundColor: background }}
+                aria-hidden="true"
               />
             </div>
           </div>
@@ -384,22 +392,22 @@ export default function ContrasteColoresPage() {
         <h3>Niveles de Conformidad WCAG 2.1</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📝</span>
+            <span className={styles.infoIcon} aria-hidden="true">📝</span>
             <h4>Texto Normal (AA)</h4>
             <p>Requiere ratio mínimo de <strong>4.5:1</strong>. Aplica a texto menor de 18pt o 14pt negrita.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>📰</span>
+            <span className={styles.infoIcon} aria-hidden="true">📰</span>
             <h4>Texto Grande (AA)</h4>
             <p>Requiere ratio mínimo de <strong>3:1</strong>. Texto de 18pt o más, o 14pt negrita o más.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>⭐</span>
+            <span className={styles.infoIcon} aria-hidden="true">⭐</span>
             <h4>Nivel AAA</h4>
             <p>Máximo nivel de accesibilidad. Requiere <strong>7:1</strong> para normal y <strong>4.5:1</strong> para grande.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>♿</span>
+            <span className={styles.infoIcon} aria-hidden="true">♿</span>
             <h4>¿Por qué importa?</h4>
             <p>Un buen contraste mejora la legibilidad para personas con baja visión y en condiciones de luz adversas.</p>
           </div>
@@ -411,7 +419,7 @@ export default function ContrasteColoresPage() {
         <div className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>💻 Código CSS de implementación</h2>
+              <h2><span aria-hidden="true">💻</span> Código CSS de implementación</h2>
               <p className={styles.htmlSubtitle}>
                 Variables CSS listas para usar con tu combinación de colores validada por WCAG
               </p>
@@ -421,8 +429,9 @@ export default function ContrasteColoresPage() {
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
               aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+              aria-expanded={htmlExpanded}
             >
-              {htmlExpanded ? '🔼 Ocultar código' : '🔽 Ver código completo'}
+              {htmlExpanded ? <><span aria-hidden="true">🔼</span> Ocultar código</> : <><span aria-hidden="true">🔽</span> Ver código completo</>}
             </button>
           </div>
 
@@ -432,7 +441,7 @@ export default function ContrasteColoresPage() {
                 <code>{htmlCode}</code>
               </pre>
               <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-                📋 Copiar código completo
+                <span aria-hidden="true">📋</span> Copiar código completo
               </button>
             </div>
           )}

@@ -363,10 +363,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Valor"
                 className={styles.input}
+                aria-label="Valor a insertar"
               />
               <button onClick={handleArrayPush} className={styles.btnPrimary}>
                 Push (añadir)
@@ -378,10 +380,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Buscar"
                 className={styles.input}
+                aria-label="Valor a buscar"
               />
               <button onClick={handleArraySearch} className={styles.btnSearch}>
                 Buscar
@@ -396,10 +400,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Valor"
                 className={styles.input}
+                aria-label="Valor a insertar"
               />
               <button onClick={handleStackPush} className={styles.btnPrimary}>
                 Push
@@ -420,10 +426,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Valor"
                 className={styles.input}
+                aria-label="Valor a insertar"
               />
               <button onClick={handleQueueEnqueue} className={styles.btnPrimary}>
                 Enqueue
@@ -444,10 +452,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Valor"
                 className={styles.input}
+                aria-label="Valor a insertar"
               />
               <button onClick={handleLinkedInsertHead} className={styles.btnPrimary}>
                 Insertar Inicio
@@ -468,10 +478,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Valor"
                 className={styles.input}
+                aria-label="Valor a insertar"
               />
               <button onClick={handleBstInsert} className={styles.btnPrimary}>
                 Insertar
@@ -480,10 +492,12 @@ export default function VisualizadorEstructurasDatosPage() {
             <div className={styles.controlRow}>
               <input
                 type="number"
+                inputMode="numeric"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Buscar"
                 className={styles.input}
+                aria-label="Valor a buscar"
               />
               <button onClick={handleBstSearch} className={styles.btnSearch}>
                 Buscar
@@ -511,7 +525,7 @@ export default function VisualizadorEstructurasDatosPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📦</span>
+        <span className={styles.heroIcon} aria-hidden="true">📦</span>
         <h1 className={styles.title}>Visualizador de Estructuras de Datos</h1>
         <p className={styles.subtitle}>
           Explora arrays, pilas, colas, listas enlazadas y árboles binarios con animaciones interactivas
@@ -522,14 +536,16 @@ export default function VisualizadorEstructurasDatosPage() {
 
       {/* Selector de estructura */}
       <section className={styles.selectorSection}>
-        <div className={styles.structureSelector}>
+        <div className={styles.structureSelector} role="tablist">
           {structures.map((s) => (
             <button
               key={s.type}
+              role="tab"
+              aria-selected={structure === s.type}
               className={`${styles.structureBtn} ${structure === s.type ? styles.structureBtnActive : ''}`}
               onClick={() => setStructure(s.type)}
             >
-              <span className={styles.structureIcon}>{s.icon}</span>
+              <span className={styles.structureIcon} aria-hidden="true">{s.icon}</span>
               <span className={styles.structureName}>{s.label}</span>
             </button>
           ))}
@@ -545,7 +561,7 @@ export default function VisualizadorEstructurasDatosPage() {
       <section className={styles.controlsSection}>
         <h2 className={styles.sectionTitle}>Operaciones</h2>
         {renderControls()}
-        {message && <div className={styles.message}>{message}</div>}
+        <div className={styles.message} role="status" aria-live="polite">{message}</div>
       </section>
 
       {/* Información de complejidad */}
@@ -704,7 +720,7 @@ export default function VisualizadorEstructurasDatosPage() {
           <div className={styles.scenarioGrid}>
             <div className={styles.scenarioCard}>
               <div className={styles.scenarioHeader}>
-                <span className={styles.scenarioIcon}>🌐</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🌐</span>
                 <h4>Navegador web</h4>
               </div>
               <p>El historial usa una Pila (Stack): cada página visitada se apila, el botón atrás hace pop. Las pestañas abiertas usan una lista doblemente enlazada.</p>
@@ -715,7 +731,7 @@ export default function VisualizadorEstructurasDatosPage() {
 
             <div className={styles.scenarioCard}>
               <div className={styles.scenarioHeader}>
-                <span className={styles.scenarioIcon}>🔍</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🔍</span>
                 <h4>Motor de búsqueda</h4>
               </div>
               <p>Google usa tablas hash invertidas: palabra → lista de URLs. Con 50.000M páginas, la búsqueda es O(1) en lugar de O(n).</p>
@@ -726,7 +742,7 @@ export default function VisualizadorEstructurasDatosPage() {
 
             <div className={styles.scenarioCard}>
               <div className={styles.scenarioHeader}>
-                <span className={styles.scenarioIcon}>🎮</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🎮</span>
                 <h4>Pathfinding en videojuegos</h4>
               </div>
               <p>A* usa una Cola de Prioridad (heap). En un mapa 1000×1000 con obstáculos, encuentra el camino óptimo en &lt;10ms.</p>
@@ -737,7 +753,7 @@ export default function VisualizadorEstructurasDatosPage() {
 
             <div className={styles.scenarioCard}>
               <div className={styles.scenarioHeader}>
-                <span className={styles.scenarioIcon}>🗺️</span>
+                <span className={styles.scenarioIcon} aria-hidden="true">🗺️</span>
                 <h4>GPS y redes sociales</h4>
               </div>
               <p>Dijkstra sobre un grafo de 300M nodos (red de carreteras de Europa) encuentra la ruta óptima. LinkedIn representa conexiones como grafo no dirigido ponderado.</p>
@@ -848,32 +864,32 @@ export default function VisualizadorEstructurasDatosPage() {
           <h3 className={styles.eduSectionTitle}>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
               <h4>Localidad de caché</h4>
               <p>Arrays son 5-10x más rápidos que listas enlazadas para iteración secuencial por localidad de caché. Prefiere arrays salvo que las inserciones en medio sean críticas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Factor de carga</h4>
               <p>Mantén el factor de carga de Hash Tables entre 0,6-0,75. Sobre 0,8, las colisiones degradan el rendimiento a O(n).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌳</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌳</span>
               <h4>Árboles siempre balanceados</h4>
               <p>Nunca implementes BST sin balanceo en producción. Usa TreeMap (Java), SortedDict (Python sortedcontainers) o equivalente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔗</span>
               <h4>Listas doblemente enlazadas</h4>
               <p>Para eliminación O(1) cuando tienes el nodo (LRU Cache usa HashMap + Lista doblemente enlazada). Sola, la lista enlazada rara vez es óptima.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💡</span>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <h4>Estructura compuesta</h4>
               <p>Los problemas reales usan combinaciones: HashMap&lt;String, BST&gt; para búsqueda de rango por clave, o Array of Linked Lists para hash table con chaining.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <h4>Mide con tus datos reales</h4>
               <p>La complejidad teórica asume distribución uniforme. Mide con tus datos reales: un HashMap puede ser más lento que un Array pequeño por el overhead de hashing.</p>
             </div>
@@ -883,7 +899,7 @@ export default function VisualizadorEstructurasDatosPage() {
         {/* Sección 6: Warning Box */}
         <section className={styles.eduSection}>
           <div className={styles.warningBox}>
-            <h3 className={styles.warningTitle}>⚠️ Errores comunes con estructuras de datos</h3>
+            <h3 className={styles.warningTitle}><span aria-hidden="true">⚠️</span> Errores comunes con estructuras de datos</h3>
             <ul className={styles.warningList}>
               <li><strong>ArrayList con inserción frecuente en medio:</strong> O(n) por desplazamiento. Con 1M elementos y 1000 inserciones/s, usa LinkedList o deque.</li>
               <li><strong>HashMap sin hashCode() correcto:</strong> En Java/Python, si dos objetos iguales tienen distinto hashCode, tendrás duplicados y comportamiento indefinido.</li>

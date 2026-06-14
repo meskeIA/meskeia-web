@@ -117,12 +117,14 @@ export default function CalculadoraPinturaPage() {
             <button
               className={`${styles.modoBtn} ${modo === 'metros' ? styles.active : ''}`}
               onClick={() => setModo('metros')}
+              aria-pressed={modo === 'metros'}
             >
               Por m² directos
             </button>
             <button
               className={`${styles.modoBtn} ${modo === 'habitacion' ? styles.active : ''}`}
               onClick={() => setModo('habitacion')}
+              aria-pressed={modo === 'habitacion'}
             >
               Por habitación
             </button>
@@ -130,8 +132,9 @@ export default function CalculadoraPinturaPage() {
 
           {modo === 'metros' ? (
             <div className={styles.inputGroup}>
-              <label>Metros cuadrados a pintar</label>
+              <label htmlFor="metrosCuadradosInput">Metros cuadrados a pintar</label>
               <input
+                id="metrosCuadradosInput"
                 type="text"
                 inputMode="decimal"
                 value={metrosCuadrados}
@@ -143,8 +146,9 @@ export default function CalculadoraPinturaPage() {
           ) : (
             <div className={styles.habitacionInputs}>
               <div className={styles.inputGroup}>
-                <label>Largo (m)</label>
+                <label htmlFor="largoInput">Largo (m)</label>
                 <input
+                  id="largoInput"
                   type="text"
                   inputMode="decimal"
                   value={largo}
@@ -154,8 +158,9 @@ export default function CalculadoraPinturaPage() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Ancho (m)</label>
+                <label htmlFor="anchoInput">Ancho (m)</label>
                 <input
+                  id="anchoInput"
                   type="text"
                   inputMode="decimal"
                   value={ancho}
@@ -165,8 +170,9 @@ export default function CalculadoraPinturaPage() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Alto (m)</label>
+                <label htmlFor="altoInput">Alto (m)</label>
                 <input
+                  id="altoInput"
                   type="text"
                   inputMode="decimal"
                   value={alto}
@@ -179,8 +185,9 @@ export default function CalculadoraPinturaPage() {
           )}
 
           <div className={styles.inputGroup}>
-            <label>Número de capas</label>
+            <label htmlFor="numCapasSelect">Número de capas</label>
             <select
+              id="numCapasSelect"
               value={numCapas}
               onChange={(e) => setNumCapas(e.target.value)}
               className={styles.select}
@@ -192,8 +199,9 @@ export default function CalculadoraPinturaPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Tipo de superficie</label>
+            <label htmlFor="tipoSuperficieSelect">Tipo de superficie</label>
             <select
+              id="tipoSuperficieSelect"
               value={tipoSuperficie}
               onChange={(e) => setTipoSuperficie(e.target.value as TipoSuperficie)}
               className={styles.select}
@@ -207,9 +215,10 @@ export default function CalculadoraPinturaPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Precio por litro (opcional)</label>
+            <label htmlFor="precioLitroInput">Precio por litro (opcional)</label>
             <div className={styles.inputConUnidad}>
               <input
+                id="precioLitroInput"
                 type="text"
                 inputMode="decimal"
                 value={precioPorLitro}
@@ -232,11 +241,11 @@ export default function CalculadoraPinturaPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           {resultado ? (
             <>
               <div className={styles.resultadoPrincipal}>
-                <span className={styles.resultadoIcon}>🎨</span>
+                <span className={styles.resultadoIcon} aria-hidden="true">🎨</span>
                 <div className={styles.resultadoValor}>
                   {formatNumber(resultado.litrosNecesarios, 1)} L
                 </div>
@@ -278,7 +287,7 @@ export default function CalculadoraPinturaPage() {
               </div>
 
               <div className={styles.consejos}>
-                <h4>💡 Consejos</h4>
+                <h4><span aria-hidden="true">💡</span> Consejos</h4>
                 <ul>
                   <li>Compra un 10% extra para retoques y reserva</li>
                   <li>El rendimiento real varía según marca y técnica</li>
@@ -288,7 +297,7 @@ export default function CalculadoraPinturaPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🖌️</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🖌️</span>
               <p>Introduce los datos para calcular la cantidad de pintura</p>
             </div>
           )}
@@ -299,7 +308,7 @@ export default function CalculadoraPinturaPage() {
         title="Guía de pintura interior y exterior"
         subtitle="Qué tipo de pintura elegir según la estancia, cómo preparar la superficie correctamente y cuándo necesitas imprimación"
       >
-        <h3 className={styles.eduTitle}>🎨 Tipos de pintura y sus usos</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">🎨</span> Tipos de pintura y sus usos</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -351,39 +360,39 @@ export default function CalculadoraPinturaPage() {
           </table>
         </div>
 
-        <h3 className={styles.eduTitle}>🏠 Situaciones habituales</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">🏠</span> Situaciones habituales</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🛏️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🛏️</span>
               <h4>Dormitorio o salón</h4>
             </div>
             <p className={styles.escenarioDesc}>Plástica mate en paredes lisas, 2 manos. Si cambias de color oscuro a claro, puede hacer falta una tercera mano.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🍳</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
               <h4>Cocina o baño</h4>
             </div>
             <p className={styles.escenarioDesc}>Plástica satinada o esmalte lavable. Resisten la humedad y se limpian fácilmente. Evita la pintura mate en estas zonas.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🚪</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🚪</span>
               <h4>Puertas y carpintería</h4>
             </div>
             <p className={styles.escenarioDesc}>Esmalte al agua (secado rápido, menos olor) o al aceite (más durable). Requiere lijar y limpiar antes de aplicar.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🌧️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🌧️</span>
               <h4>Exterior o fachada</h4>
             </div>
             <p className={styles.escenarioDesc}>Pintura para fachadas con agentes antihumedad y flexibilidad. Verifica temperatura mínima de aplicación (más de 5 °C).</p>
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes sobre pintura</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes sobre pintura</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <strong>¿Cuántas manos de pintura necesito?</strong>
@@ -411,7 +420,7 @@ export default function CalculadoraPinturaPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>📋 Cómo usar esta calculadora paso a paso</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">📋</span> Cómo usar esta calculadora paso a paso</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <span className={styles.stepNumber}>1</span>
@@ -450,37 +459,37 @@ export default function CalculadoraPinturaPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>💡 Consejos para pintar mejor</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">💡</span> Consejos para pintar mejor</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎨</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎨</span>
             <p>Compra toda la pintura del mismo lote. Pequeñas diferencias de tono entre lotes son visibles en la pared.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⬇️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⬇️</span>
             <p>Pinta siempre de arriba abajo: primero el techo, luego las paredes y por último los rodapiés.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⏱️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
             <p>Deja secar completamente entre capas (mínimo 2–4 horas). No apliques la segunda mano con la primera aún húmeda.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💧</span>
+            <span className={styles.tipIcon} aria-hidden="true">💧</span>
             <p>Humedece ligeramente el rodillo antes de empezar. Evitará que absorba demasiada pintura al inicio.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📏</span>
+            <span className={styles.tipIcon} aria-hidden="true">📏</span>
             <p>Cubre rodapiés, marcos y enchufes con cinta de carrocero. Es mucho más rápido que intentar limpiar después.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🫙</span>
+            <span className={styles.tipIcon} aria-hidden="true">🫙</span>
             <p>Guarda el sobrante en un tarro hermético bien cerrado. Aguanta meses para pequeños retoques futuros.</p>
           </div>
         </div>
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al calcular pintura</strong>
           </div>
           <ul className={styles.warningList}>

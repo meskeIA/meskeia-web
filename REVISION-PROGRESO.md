@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 123 / 999
-- ⬜ Pendientes: 876 / 999
+- ✅ Revisadas: 127 / 999
+- ⬜ Pendientes: 872 / 999
 
 ## Resumen por suite primaria
 
@@ -40,7 +40,7 @@
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
 | [ ] | Adaptador de Lectura para Dislexia | `/adaptador-dislexia/` | accesibilidad, salud, productividad, estudiantes |
-| [ ] | Calculadora de Contraste | `/contraste-colores/` | accesibilidad, diseno |
+| [x] | Calculadora de Contraste | `/contraste-colores/` | accesibilidad, diseno |
 | [x] | Conversor Braille | `/conversor-braille/` | accesibilidad, cultura |
 | [ ] | Conversor de Código Morse | `/conversor-morse/` | accesibilidad, cultura |
 | [ ] | Convertidor de Subtítulos | `/convertidor-subtitulos/` | accesibilidad, diseno, tecnicas |
@@ -402,7 +402,7 @@
 | [ ] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
 | [ ] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
 | [x] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
-| [ ] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
+| [x] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
 | [ ] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
 | [ ] | Calculadora Teoría de Colas | `/calculadora-teoria-colas/` | estudiantes |
 | [ ] | Calculadora Teoría de Números | `/calculadora-teoria-numeros/` | estudiantes |
@@ -620,7 +620,7 @@
 | [ ] | Transporte en las Plantas - Agua que Sube sin Motor | `/visualizador-transporte-plantas/` | estudiantes, cultura |
 | [ ] | Trigonometría: Círculo Unitario y Funciones | `/visualizador-trigonometria/` | estudiantes, tecnicas |
 | [ ] | Tu ADN en Números | `/visualizador-adn-numeros/` | estudiantes, cultura |
-| [ ] | Visualizador de Estructuras de Datos | `/visualizador-estructuras-datos/` | estudiantes, diseno |
+| [x] | Visualizador de Estructuras de Datos | `/visualizador-estructuras-datos/` | estudiantes, diseno |
 | [ ] | Visualizador de Volúmenes 3D: Esfera, Cubo, Cilindro, Cono y Pirámide | `/visualizador-volumenes/` | estudiantes, cultura |
 | [ ] | Vuelo de Avión: El Gran Mito de Bernoulli | `/visualizador-vuelo-avion/` | estudiantes, cultura |
 
@@ -802,7 +802,7 @@
 | [ ] | Calculadora de Eficiencia Energética | `/calculadora-eficiencia-energetica/` | inmobiliaria, finanzas |
 | [ ] | Calculadora de Gasto Energético | `/calculadora-gasto-energetico/` | inmobiliaria, finanzas |
 | [ ] | Calculadora de Materiales de Construcción | `/calculadora-materiales-construccion/` | inmobiliaria |
-| [ ] | Calculadora de Pintura | `/calculadora-pintura/` | inmobiliaria |
+| [x] | Calculadora de Pintura | `/calculadora-pintura/` | inmobiliaria |
 | [ ] | Calculadora de Piscinas | `/calculadora-piscinas/` | inmobiliaria |
 | [ ] | Calculadora de Suscripciones | `/calculadora-suscripciones/` | inmobiliaria, finanzas |
 | [ ] | Calculadora Roommates | `/calculadora-roommates/` | inmobiliaria, finanzas |

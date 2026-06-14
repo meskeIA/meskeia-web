@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Visualizador de Estructuras de Datos - Arrays, Pilas, Colas, Árboles | meskeIA',
-  description: 'Visualiza operaciones en estructuras de datos: arrays, pilas (stacks), colas (queues), listas enlazadas, árboles binarios y grafos. Animaciones paso a paso para entender cada operación.',
-  keywords: 'estructuras de datos, array, pila, stack, cola, queue, lista enlazada, árbol binario, grafo, BST, push, pop, enqueue, dequeue, insertar, eliminar, buscar, programación, algoritmos, universidad',
+  description: 'Visualiza operaciones en estructuras de datos: arrays, pilas (stacks), colas (queues), listas enlazadas y árboles binarios de búsqueda. Animaciones paso a paso para entender cada operación.',
+  keywords: 'estructuras de datos, array, pila, stack, cola, queue, lista enlazada, árbol binario, BST, push, pop, enqueue, dequeue, insertar, eliminar, buscar, programación, algoritmos, universidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,13 +36,16 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Visualizador de Estructuras de Datos - Arrays, Pilas, Colas, Árboles",
-  description: "Visualiza operaciones en estructuras de datos: arrays, pilas (stacks), colas (queues), listas enlazadas, árboles binarios y grafos. Animaciones paso a paso para entender cada operación.",
+  description: "Visualiza operaciones en 5 estructuras de datos: array, pila (stack), cola (queue), lista enlazada y árbol binario de búsqueda (BST). Animaciones paso a paso para entender push, pop, enqueue, insert y search.",
   url: 'https://meskeia.com/visualizador-estructuras-datos/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "5 estructuras interactivas: array, pila (stack), cola (queue), lista enlazada y árbol BST",
+      "Animaciones paso a paso de push, pop, enqueue, dequeue, insertar, eliminar y buscar",
+      "Tabla de complejidad temporal O(n) integrada con resaltado de la operación activa",
+      "Panel de mensajes que describe cada operación ejecutada en lenguaje natural",
+      "Sección educativa con escenarios reales de uso de cada estructura",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 
@@ -55,7 +58,7 @@ export const faqJsonLd = {
       name: '¿Qué es una estructura de datos y para qué sirve?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una estructura de datos es una forma organizada de almacenar y gestionar información en memoria para que pueda usarse de manera eficiente. Cada tipo —array, pila, cola, lista enlazada, árbol, grafo— tiene sus propias ventajas según el problema a resolver. Elegir la estructura correcta puede reducir el tiempo de ejecución de un algoritmo de forma drástica.',
+        text: 'Una estructura de datos es una forma organizada de almacenar y gestionar información en memoria para que pueda usarse de manera eficiente. Cada tipo —array, pila, cola, lista enlazada, árbol— tiene sus propias ventajas según el problema a resolver. Elegir la estructura correcta puede reducir el tiempo de ejecución de un algoritmo de forma drástica.',
       },
     },
     {

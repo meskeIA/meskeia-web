@@ -31,9 +31,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/contraste-colores/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "Cálculo del ratio de contraste WCAG 2.1 en tiempo real al modificar los colores",
+      "Verificación de cumplimiento en 4 niveles: Texto Normal AA/AAA y Texto Grande AA/AAA",
+      "8 combinaciones predefinidas (presets) con estilos habituales en diseño web",
+      "Vista previa en vivo del contraste con ejemplos de texto normal y grande",
+      "Generación de código CSS con variables validadas listas para copiar y usar",
+      "Gratuito, sin registro ni instalación",
   ],
 });
 

@@ -225,7 +225,7 @@ export default function CalculadoraMatematicaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔢 Calculadora Matemática Avanzada</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔢</span> Calculadora Matemática Avanzada</h1>
         <p className={styles.subtitle}>
           Matrices, fracciones, potencias, raíces y logaritmos
         </p>
@@ -237,14 +237,16 @@ export default function CalculadoraMatematicaPage() {
         <div className={styles.configPanel}>
           <h2 className={styles.sectionTitle}>Tipo de Operación</h2>
 
-          <div className={styles.tiposGrid}>
+          <div className={styles.tiposGrid} role="tablist">
             {tipos.map((tipo) => (
               <button
                 key={tipo.id}
+                role="tab"
+                aria-selected={tipoOperacion === tipo.id}
                 className={`${styles.tipoBtn} ${tipoOperacion === tipo.id ? styles.tipoActivo : ''}`}
                 onClick={() => setTipoOperacion(tipo.id)}
               >
-                <span className={styles.tipoIcono}>{tipo.icono}</span>
+                <span className={styles.tipoIcono} aria-hidden="true">{tipo.icono}</span>
                 <span className={styles.tipoNombre}>{tipo.nombre}</span>
               </button>
             ))}
@@ -259,6 +261,7 @@ export default function CalculadoraMatematicaPage() {
                       key={op}
                       className={`${styles.opBtn} ${operacionMatriz === op ? styles.opActivo : ''}`}
                       onClick={() => setOperacionMatriz(op)}
+                      aria-pressed={operacionMatriz === op}
                     >
                       {op === 'suma' ? 'A+B' : op === 'resta' ? 'A-B' : op === 'mult' ? 'A×B' : op === 'det' ? 'Det' : 'A⁻¹'}
                     </button>
@@ -267,16 +270,18 @@ export default function CalculadoraMatematicaPage() {
 
                 <div className={styles.matricesContainer}>
                   <div className={styles.matrizInput}>
-                    <h4>Matriz A</h4>
+                    <h3>Matriz A</h3>
                     <div className={styles.matrizGrid}>
                       {[0, 1, 2, 3].map(i => (
                         <input
                           key={i}
                           type="text"
+                          inputMode="decimal"
                           value={matrizA[i]}
                           onChange={(e) => actualizarMatriz('A', i, e.target.value)}
                           className={styles.matrizCell}
                           placeholder="0"
+                          aria-label={`Matriz A, fila ${i < 2 ? 1 : 2} columna ${i % 2 + 1}`}
                         />
                       ))}
                     </div>
@@ -284,16 +289,18 @@ export default function CalculadoraMatematicaPage() {
 
                   {operacionMatriz !== 'det' && operacionMatriz !== 'inv' && (
                     <div className={styles.matrizInput}>
-                      <h4>Matriz B</h4>
+                      <h3>Matriz B</h3>
                       <div className={styles.matrizGrid}>
                         {[0, 1, 2, 3].map(i => (
                           <input
                             key={i}
                             type="text"
+                            inputMode="decimal"
                             value={matrizB[i]}
                             onChange={(e) => actualizarMatriz('B', i, e.target.value)}
                             className={styles.matrizCell}
                             placeholder="0"
+                            aria-label={`Matriz B, fila ${i < 2 ? 1 : 2} columna ${i % 2 + 1}`}
                           />
                         ))}
                       </div>
@@ -309,18 +316,22 @@ export default function CalculadoraMatematicaPage() {
                   <div className={styles.fraccion}>
                     <input
                       type="text"
+                      inputMode="numeric"
                       value={num1}
                       onChange={(e) => setNum1(e.target.value)}
                       placeholder="Num"
                       className={styles.fraccionInput}
+                      aria-label="Numerador de la primera fracción"
                     />
                     <div className={styles.fraccionLinea} />
                     <input
                       type="text"
+                      inputMode="numeric"
                       value={den1}
                       onChange={(e) => setDen1(e.target.value)}
                       placeholder="Den"
                       className={styles.fraccionInput}
+                      aria-label="Denominador de la primera fracción"
                     />
                   </div>
 
@@ -330,6 +341,7 @@ export default function CalculadoraMatematicaPage() {
                         key={op}
                         className={`${styles.opFracBtn} ${operacionFraccion === op ? styles.opActivo : ''}`}
                         onClick={() => setOperacionFraccion(op)}
+                        aria-pressed={operacionFraccion === op}
                       >
                         {op === '*' ? '×' : op === '/' ? '÷' : op}
                       </button>
@@ -339,18 +351,22 @@ export default function CalculadoraMatematicaPage() {
                   <div className={styles.fraccion}>
                     <input
                       type="text"
+                      inputMode="numeric"
                       value={num2}
                       onChange={(e) => setNum2(e.target.value)}
                       placeholder="Num"
                       className={styles.fraccionInput}
+                      aria-label="Numerador de la segunda fracción"
                     />
                     <div className={styles.fraccionLinea} />
                     <input
                       type="text"
+                      inputMode="numeric"
                       value={den2}
                       onChange={(e) => setDen2(e.target.value)}
                       placeholder="Den"
                       className={styles.fraccionInput}
+                      aria-label="Denominador de la segunda fracción"
                     />
                   </div>
                 </div>
@@ -414,17 +430,17 @@ export default function CalculadoraMatematicaPage() {
           </div>
         </div>
 
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite">
           <h2 className={styles.sectionTitle}>Resultados</h2>
 
           {!resultados ? (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🧮</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🧮</span>
               <p>Ingresa los valores para calcular</p>
             </div>
           ) : resultados.tipo === 'error' ? (
-            <div className={styles.error}>
-              <span>⚠️</span>
+            <div className={styles.error} role="alert">
+              <span aria-hidden="true">⚠️</span>
               <p>{resultados.mensaje}</p>
             </div>
           ) : (
