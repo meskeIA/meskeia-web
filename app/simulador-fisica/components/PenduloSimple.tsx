@@ -23,6 +23,9 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
+  const lastFrameTimeRef = useRef<number>(0);
+  const thetaRef = useRef<number>(0);
+  const omegaRadRef = useRef<number>(0);
   const estelaRef = useRef<{x: number, y: number}[]>([]);
 
   const [params, setParams] = useState<Params>({
@@ -42,17 +45,23 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
     periodo: 0,
   });
 
-  // Calcular período
+  // Calcular período (con corrección de amplitud, válida hasta ~90°)
   const calcularPeriodo = useCallback(() => {
-    return 2 * Math.PI * Math.sqrt(params.longitud / G);
-  }, [params.longitud]);
+    const periodoAngular = 2 * Math.PI * Math.sqrt(params.longitud / G);
+    const theta0 = params.anguloInicial * Math.PI / 180;
+    const correccionAmplitud = 1 + (theta0 ** 2) / 16 + (11 * theta0 ** 4) / 3072;
+    return periodoAngular * correccionAmplitud;
+  }, [params.longitud, params.anguloInicial]);
 
   // Resetear simulación
   const resetSimulacion = useCallback(() => {
     startTimeRef.current = 0;
+    lastFrameTimeRef.current = 0;
     estelaRef.current = [];
     const periodo = calcularPeriodo();
     const anguloRad = params.anguloInicial * Math.PI / 180;
+    thetaRef.current = anguloRad;
+    omegaRadRef.current = 0;
     const altura = params.longitud * (1 - Math.cos(anguloRad));
 
     setEstado({
@@ -66,27 +75,26 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
     onReset();
   }, [params, calcularPeriodo, onReset]);
 
-  // Física del péndulo (aproximación para ángulos pequeños con corrección)
-  const calcularAngulo = useCallback((t: number) => {
-    const omega = Math.sqrt(G / params.longitud);
-    const theta0 = params.anguloInicial * Math.PI / 180;
+  // Ecuación del péndulo no lineal: θ'' = -(g/L)·sin(θ) - γ·θ'
+  // (válida para cualquier ángulo, no solo para la aproximación de ángulos pequeños)
+  const derivada = useCallback((theta: number, omega: number) => {
     const gamma = params.amortiguamiento;
+    const omegaPunto = -(G / params.longitud) * Math.sin(theta) - gamma * omega;
+    return { thetaPunto: omega, omegaPunto };
+  }, [params.longitud, params.amortiguamiento]);
 
-    if (gamma > 0) {
-      // Con amortiguamiento
-      const omegaAmort = Math.sqrt(omega * omega - gamma * gamma / 4);
-      const theta = theta0 * Math.exp(-gamma * t / 2) * Math.cos(omegaAmort * t);
-      const thetaDot = -theta0 * Math.exp(-gamma * t / 2) * (
-        gamma / 2 * Math.cos(omegaAmort * t) + omegaAmort * Math.sin(omegaAmort * t)
-      );
-      return { theta, thetaDot };
-    } else {
-      // Sin amortiguamiento
-      const theta = theta0 * Math.cos(omega * t);
-      const thetaDot = -theta0 * omega * Math.sin(omega * t);
-      return { theta, thetaDot };
-    }
-  }, [params]);
+  // Integración numérica (Runge-Kutta de 4º orden) de un paso temporal
+  const pasoRK4 = useCallback((theta: number, omega: number, dt: number) => {
+    const k1 = derivada(theta, omega);
+    const k2 = derivada(theta + k1.thetaPunto * dt / 2, omega + k1.omegaPunto * dt / 2);
+    const k3 = derivada(theta + k2.thetaPunto * dt / 2, omega + k2.omegaPunto * dt / 2);
+    const k4 = derivada(theta + k3.thetaPunto * dt, omega + k3.omegaPunto * dt);
+
+    return {
+      theta: theta + (dt / 6) * (k1.thetaPunto + 2 * k2.thetaPunto + 2 * k3.thetaPunto + k4.thetaPunto),
+      omega: omega + (dt / 6) * (k1.omegaPunto + 2 * k2.omegaPunto + 2 * k3.omegaPunto + k4.omegaPunto),
+    };
+  }, [derivada]);
 
   // Dibujar en el canvas
   const dibujar = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
@@ -243,29 +251,45 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
     resize();
 
     const animate = (timestamp: number) => {
-      if (!startTimeRef.current) startTimeRef.current = timestamp;
+      if (!startTimeRef.current) {
+        startTimeRef.current = timestamp;
+        lastFrameTimeRef.current = timestamp;
+      }
 
       const rect = canvas.getBoundingClientRect();
 
       if (isPlaying) {
-        const t = (timestamp - startTimeRef.current) / 1000;
-        const { theta, thetaDot } = calcularAngulo(t);
-        const anguloGrados = theta * 180 / Math.PI;
+        const dtTotal = Math.min((timestamp - lastFrameTimeRef.current) / 1000, 0.05);
+        lastFrameTimeRef.current = timestamp;
+        const tiempoTotal = (timestamp - startTimeRef.current) / 1000;
+
+        // Subdividir el paso en varios sub-pasos para estabilidad numérica
+        const subPasos = 5;
+        const dt = dtTotal / subPasos;
+        for (let i = 0; i < subPasos; i++) {
+          const resultado = pasoRK4(thetaRef.current, omegaRadRef.current, dt);
+          thetaRef.current = resultado.theta;
+          omegaRadRef.current = resultado.omega;
+        }
+
+        const anguloGrados = thetaRef.current * 180 / Math.PI;
 
         // Calcular energías
-        const altura = params.longitud * (1 - Math.cos(theta));
-        const velocidadLineal = params.longitud * Math.abs(thetaDot);
+        const altura = params.longitud * (1 - Math.cos(thetaRef.current));
+        const velocidadLineal = params.longitud * Math.abs(omegaRadRef.current);
         const energiaCinetica = 0.5 * params.masa * velocidadLineal * velocidadLineal;
         const energiaPotencial = params.masa * G * altura;
 
         setEstado(prev => ({
           ...prev,
-          tiempo: t,
+          tiempo: tiempoTotal,
           angulo: anguloGrados,
-          velocidadAngular: thetaDot * 180 / Math.PI,
+          velocidadAngular: omegaRadRef.current * 180 / Math.PI,
           energiaCinetica,
           energiaPotencial,
         }));
+      } else {
+        lastFrameTimeRef.current = timestamp;
       }
 
       dibujar(ctx, rect.width, rect.height);
@@ -279,7 +303,7 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
       cancelAnimationFrame(animationRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, [isPlaying, calcularAngulo, dibujar]);
+  }, [isPlaying, pasoRK4, dibujar, params.longitud, params.masa]);
 
   // Resetear cuando cambian parámetros
   useEffect(() => {
@@ -417,9 +441,9 @@ export default function PenduloSimple({ isPlaying, onReset }: PenduloSimpleProps
         <div className={styles.formulasSection}>
           <h4 className={styles.formulasTitle}>Fórmulas</h4>
           <div className={styles.formulasList}>
-            <div className={styles.formulaItem}>T = 2π√(L/g)</div>
-            <div className={styles.formulaItem}>θ(t) = θ₀cos(ωt)</div>
-            <div className={styles.formulaItem}>ω = √(g/L)</div>
+            <div className={styles.formulaItem}>θ&apos;&apos; = -(g/L)·sin(θ) - γθ&apos;</div>
+            <div className={styles.formulaItem}>T ≈ 2π√(L/g) para θ₀ pequeño</div>
+            <div className={styles.formulaItem}>T crece con la amplitud θ₀</div>
           </div>
         </div>
       </div>

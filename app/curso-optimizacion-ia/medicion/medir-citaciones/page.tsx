@@ -54,7 +54,7 @@ export default function MedirCitacionesPage() {
         </ul>
 
         <p>
-          Los modelos actuales como GPT-4o y Claude 4 utilizan sistemas de evaluación que
+          Los modelos más avanzados de proveedores como OpenAI y Anthropic utilizan sistemas de evaluación que
           consideran simultáneamente la precisión factual, originalidad del análisis, profundidad de
           investigación, relevancia contextual y coherencia argumentativa.
         </p>

@@ -42,9 +42,9 @@ export default function LLMsRAGPage() {
         <p>
           En su arquitectura fundamental, estos modelos funcionan mediante <strong>transformers</strong>,
           una tecnología que permite analizar secuencias completas de texto de manera simultánea.
-          Modelos actuales como GPT-4o procesan hasta 128,000 tokens de contexto, equivalente a
-          aproximadamente 300 páginas de texto, mientras que Claude 3.7 y Claude 4 pueden manejar
-          contextos extendidos de hasta 200,000 tokens.
+          Los modelos más avanzados de proveedores como OpenAI, Anthropic o Google procesan ya
+          contextos de cientos de miles de tokens —equivalentes a cientos de páginas de texto—, y
+          esa capacidad sigue creciendo con cada nueva generación.
         </p>
         <p>
           Lo que hace especialmente relevante a estos sistemas para creadores de contenido es su capacidad
@@ -61,8 +61,9 @@ export default function LLMsRAGPage() {
         </div>
 
         <p>
-          La evolución reciente ha introducido capacidades multimodales avanzadas, donde modelos como
-          GPT-4o Vision, Gemini 2.0 y Claude pueden integrar información de gráficos, tablas, infografías y documentos PDF.
+          La evolución reciente ha introducido capacidades multimodales avanzadas: los modelos más
+          recientes de OpenAI, Google y Anthropic pueden integrar información de gráficos, tablas,
+          infografías y documentos PDF.
           Para el mercado hispanohablante, esto significa que contenido visualmente rico, con datos
           estructurados y análisis multidimensional, obtiene ventajas significativas en procesos de
           selección y citación.

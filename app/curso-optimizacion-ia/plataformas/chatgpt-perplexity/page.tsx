@@ -41,10 +41,10 @@ export default function PlataformasIAPage() {
           <h2 className={styles.sectionTitleText}>ChatGPT: El Estándar de Referencia Global</h2>
         </div>
         <p>
-          ChatGPT se ha consolidado como la plataforma conversacional de mayor adopción global. Con más de
-          400 millones de usuarios activos semanales, ha evolucionado desde GPT-4 hasta GPT-4o y modelos
-          de razonamiento avanzado (o1, o3), integrando capacidades de búsqueda web, generación de imágenes
-          y análisis de documentos en una sola plataforma.
+          ChatGPT se ha consolidado como la plataforma conversacional de mayor adopción global. OpenAI
+          ha ido incorporando sucesivas generaciones de modelos, cada vez con mayores capacidades de
+          razonamiento avanzado, integrando búsqueda web, generación de imágenes y análisis de documentos
+          en una sola plataforma.
         </p>
         <p>
           El algoritmo de selección de fuentes de ChatGPT prioriza contenido que demuestre tres
@@ -141,12 +141,12 @@ export default function PlataformasIAPage() {
           <div className={styles.conceptCard}>
             <span className={styles.conceptIcon}>🤖</span>
             <h4>Claude (Anthropic)</h4>
-            <p>Prioriza balance, razonamiento ético y múltiples perspectivas. Los modelos Claude 3.5/4 son líderes en seguimiento de instrucciones y análisis de documentos.</p>
+            <p>Prioriza balance, razonamiento ético y múltiples perspectivas. Los modelos de Anthropic destacan en seguimiento de instrucciones y análisis de documentos.</p>
           </div>
           <div className={styles.conceptCard}>
             <span className={styles.conceptIcon}>✨</span>
             <h4>Gemini (Google)</h4>
-            <p>Integrado con Knowledge Graph y búsqueda de Google. Gemini 2.0/2.5 tienen acceso directo a información web actualizada y son la base de AI Overviews en Search.</p>
+            <p>Integrado con Knowledge Graph y búsqueda de Google. Los modelos Gemini tienen acceso directo a información web actualizada y son la base de AI Overviews en Search.</p>
           </div>
           <div className={styles.conceptCard}>
             <span className={styles.conceptIcon}>⚡</span>
@@ -156,7 +156,7 @@ export default function PlataformasIAPage() {
           <div className={styles.conceptCard}>
             <span className={styles.conceptIcon}>🔷</span>
             <h4>Microsoft Copilot</h4>
-            <p>Basado en GPT-4o e integrado en el ecosistema Microsoft 365. Clave para contenido orientado a entornos empresariales y productividad profesional.</p>
+            <p>Basado en modelos de OpenAI e integrado en el ecosistema Microsoft 365. Clave para contenido orientado a entornos empresariales y productividad profesional.</p>
           </div>
         </div>
 
