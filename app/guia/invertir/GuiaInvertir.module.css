@@ -268,6 +268,11 @@
   transform: translateY(-4px);
 }
 
+.toolCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .toolHeader {
   display: flex;
   align-items: center;
@@ -396,6 +401,17 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .faqAnswer {
+    animation: none !important;
+  }
+  .toolCard:hover,
+  .ctaButton:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* Disclaimer Section */
 .disclaimerSection {
   margin-bottom: var(--spacing-2xl);
@@ -465,6 +481,11 @@
 .ctaButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(46, 134, 171, 0.3);
+}
+
+.ctaButton:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
 }
 
 /* Other Guides Section */

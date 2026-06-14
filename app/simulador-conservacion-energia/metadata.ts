@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     '4 perfiles de pista (rampa, valle parabólico, montaña rusa, looping suave)',
-    'Animación en tiempo real con integración numérica (Verlet)',
+    'Animación en tiempo real con integración numérica (Euler semi-implícito)',
     'Barras de energía cinética y potencial cambiando dinámicamente',
     'Controles de masa, altura inicial, gravedad y fricción',
     'Visualización de v, h, E_c, E_p y E_total en cualquier instante',
@@ -77,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Qué son los perfiles de pista disponibles en el simulador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El simulador incluye cuatro perfiles: una rampa inclinada simple, un valle parabólico donde la pelota oscila de lado a lado, una pista de montaña rusa con subidas y bajadas, y un looping suave con un bucle circular. Cada perfil permite observar el intercambio energético en geometrías distintas y comprobar si la pelota llega o no al punto más alto con energía suficiente.',
+        text: 'El simulador incluye cuatro perfiles: una rampa inclinada simple, un valle parabólico donde la pelota oscila de lado a lado, una pista de montaña rusa con subidas y bajadas, y una pista de doble joroba con dos cimas separadas por un valle. Cada perfil permite observar el intercambio energético en geometrías distintas y comprobar si la pelota llega o no a la segunda cima con energía suficiente.',
       },
     },
     {

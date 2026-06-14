@@ -58,7 +58,7 @@ const journeySteps = [
     number: 2,
     title: 'Entiende el interés compuesto',
     description: 'El tiempo es tu mayor aliado. Empezar pronto importa más que empezar con mucho.',
-    tip: '10.000€ al 7% anual son 76.000€ en 30 años. El secreto es el tiempo, no la cantidad inicial.',
+    tip: '10.000€ creciendo a un 7% anual (media histórica aproximada de índices globales como el MSCI World en USD; no garantizada) serían ~76.000€ en 30 años. El secreto es el tiempo, no la cantidad inicial.',
   },
   {
     number: 3,
@@ -82,11 +82,11 @@ const faqData = [
   },
   {
     question: '¿Qué son los fondos indexados?',
-    answer: 'Son fondos que replican un índice bursátil (como el MSCI World o S&P 500) de forma automática. Tienen comisiones muy bajas (0.1-0.3% anual) y ofrecen diversificación instantánea en cientos de empresas. Son la opción favorita para inversores pasivos.',
+    answer: 'Son fondos que replican un índice bursátil (como el MSCI World o el S&P 500 de EE. UU.) de forma automática. Tienen comisiones muy bajas (0,1-0,3% anual) y ofrecen diversificación instantánea en cientos de empresas. Son la opción favorita para inversores pasivos. El MSCI World incluye empresas de múltiples países y se considera más adecuado como referencia para el inversor internacional.',
   },
   {
     question: '¿Cuánto debería invertir de mi sueldo?',
-    answer: 'Una regla común es el 50/30/20: 50% necesidades, 30% deseos, 20% ahorro/inversión. Pero primero asegura un fondo de emergencia de 3-6 meses de gastos. Después, invierte lo que puedas mantener a largo plazo sin necesitar.',
+    answer: 'Una guía orientativa es destinar un porcentaje a necesidades básicas, otro a gastos discrecionales y otro a ahorro/inversión (la proporción depende de tu nivel de ingresos y situación). Antes de invertir, conviene tener un fondo de emergencia de 3-6 meses de gastos. Invierte únicamente lo que puedas mantener a largo plazo sin necesitar.',
   },
   {
     question: '¿Es seguro invertir en bolsa?',
@@ -104,7 +104,7 @@ const caseStudy = {
   situation: 'Ingeniero de 30 años, sueldo neto de 2.200€/mes. Tiene 5.000€ ahorrados y quiere empezar a invertir pensando en los próximos 30-35 años.',
   steps: [
     { tool: 'Test Perfil Inversor', result: 'Perfil moderado-agresivo. Con 30+ años por delante, puede asumir volatilidad a cambio de mayor rentabilidad esperada.' },
-    { tool: 'Interés Compuesto', result: 'Invirtiendo 300€/mes al 7% anual durante 30 años: 340.000€ (de los cuales 108.000€ son aportaciones y 232.000€ son intereses).' },
+    { tool: 'Interés Compuesto', result: 'Invirtiendo 300€/mes a un 7% anual estimado (media histórica aproximada de índices globales; no garantizada) durante 30 años: ~340.000€ (108.000€ aportaciones + 232.000€ rendimiento).' },
     { tool: 'Simulador Cartera', result: 'Cartera 80% renta variable global / 20% bonos. Rentabilidad esperada 6-7%, volatilidad asumible para su perfil.' },
   ],
   conclusion: 'Pablo decide invertir 300€/mes en un fondo indexado global. Automatiza las aportaciones y se compromete a no tocar el dinero hasta la jubilación.',

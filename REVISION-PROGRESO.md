@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 104 / 999
-- ⬜ Pendientes: 895 / 999
+- ✅ Revisadas: 107 / 999
+- ⬜ Pendientes: 892 / 999
 
 ## Resumen por suite primaria
 
@@ -548,12 +548,12 @@
 | [x] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
 | [ ] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |
-| [ ] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
+| [x] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
 | [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
 | [ ] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
 | [ ] | Simulador de Cinética Química: Ecuación de Arrhenius | `/simulador-cinetica-arrhenius/` | estudiantes |
 | [ ] | Simulador de Colisiones — Elásticas e Inelásticas | `/simulador-colisiones/` | estudiantes, cultura |
-| [ ] | Simulador de Conservación de la Energía | `/simulador-conservacion-energia/` | estudiantes |
+| [x] | Simulador de Conservación de la Energía | `/simulador-conservacion-energia/` | estudiantes |
 | [ ] | Simulador de Deriva Genética y Selección | `/simulador-deriva-genetica/` | estudiantes |
 | [ ] | Simulador de Derivadas: Pendiente de la Tangente | `/simulador-derivada-pendiente/` | estudiantes |
 | [ ] | Simulador de Distribución Normal | `/simulador-distribucion-normal/` | estudiantes |
@@ -578,7 +578,7 @@
 | [ ] | Simulador de Oferta y Demanda | `/simulador-oferta-demanda/` | estudiantes |
 | [ ] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
 | [ ] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
-| [ ] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
+| [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
 | [ ] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
 | [ ] | Simulador de Recursión y Pila de Llamadas | `/simulador-recursion/` | estudiantes, tecnicas |

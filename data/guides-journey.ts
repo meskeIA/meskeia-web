@@ -40,7 +40,7 @@ export const guidesJourney: GuideJourney[] = [
     icon: '📈',
     description: 'Primeros pasos en inversión: ahorro, fondos y planificación',
     url: '/guia/invertir/',
-    toolsCount: 5,
+    toolsCount: 4,
     available: true,
   },
   {

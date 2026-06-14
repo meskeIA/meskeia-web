@@ -541,6 +541,7 @@ export default function SimuladorPlanificadorProcesos() {
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'fcfs' ? styles.algoritmoActive : ''}`}
               onClick={() => setAlgoritmo('fcfs')}
+              aria-pressed={algoritmo === 'fcfs'}
             >
               <span className={styles.algoritmoNombre}>FCFS</span>
               <span className={styles.algoritmoDesc}>Por orden de llegada</span>
@@ -549,6 +550,7 @@ export default function SimuladorPlanificadorProcesos() {
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'sjf' ? styles.algoritmoActive : ''}`}
               onClick={() => setAlgoritmo('sjf')}
+              aria-pressed={algoritmo === 'sjf'}
             >
               <span className={styles.algoritmoNombre}>SJF</span>
               <span className={styles.algoritmoDesc}>Más corto, no apropiativo</span>
@@ -557,6 +559,7 @@ export default function SimuladorPlanificadorProcesos() {
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'srtf' ? styles.algoritmoActive : ''}`}
               onClick={() => setAlgoritmo('srtf')}
+              aria-pressed={algoritmo === 'srtf'}
             >
               <span className={styles.algoritmoNombre}>SRTF</span>
               <span className={styles.algoritmoDesc}>Más corto, apropiativo</span>
@@ -565,6 +568,7 @@ export default function SimuladorPlanificadorProcesos() {
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'rr' ? styles.algoritmoActive : ''}`}
               onClick={() => setAlgoritmo('rr')}
+              aria-pressed={algoritmo === 'rr'}
             >
               <span className={styles.algoritmoNombre}>Round Robin</span>
               <span className={styles.algoritmoDesc}>Turnos con quantum</span>
@@ -573,6 +577,7 @@ export default function SimuladorPlanificadorProcesos() {
               type="button"
               className={`${styles.algoritmoBtn} ${algoritmo === 'priority' ? styles.algoritmoActive : ''}`}
               onClick={() => setAlgoritmo('priority')}
+              aria-pressed={algoritmo === 'priority'}
             >
               <span className={styles.algoritmoNombre}>Priority</span>
               <span className={styles.algoritmoDesc}>Por prioridad</span>
@@ -797,7 +802,7 @@ export default function SimuladorPlanificadorProcesos() {
         {/* Métricas globales */}
         {resultado.metricas.length > 0 && (
           <>
-            <div className={styles.metricasGrid}>
+            <div className={styles.metricasGrid} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Tiempo medio de espera</span>
                 <div className={styles.metricValue}>

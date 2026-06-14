@@ -606,8 +606,10 @@ export default function SimuladorConservacionEnergiaPage() {
             <button
               className={styles.actionBtn}
               onClick={running ? pause : play}
+              aria-pressed={running}
+              aria-label={running ? 'Pausar simulación' : 'Iniciar simulación'}
             >
-              {running ? '⏸ Pausa' : '▶ Iniciar'}
+              <span aria-hidden="true">{running ? '⏸' : '▶'}</span> {running ? 'Pausa' : 'Iniciar'}
             </button>
             <button
               className={`${styles.actionBtn} ${styles.actionBtnSecondary}`}
@@ -624,7 +626,7 @@ export default function SimuladorConservacionEnergiaPage() {
         </div>
 
         {/* BARRAS DE ENERGÍA */}
-        <div className={styles.energyBarsWrapper}>
+        <div className={styles.energyBarsWrapper} role="status" aria-live="polite" aria-atomic="false" aria-label="Barras de energía cinética, potencial y mecánica total">
           <div className={styles.energyBar}>
             <div className={styles.energyBarLabel}>
               <span>⚡ Cinética (E_c)</span>

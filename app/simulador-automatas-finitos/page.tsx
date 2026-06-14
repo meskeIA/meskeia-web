@@ -670,6 +670,7 @@ export default function SimuladorAutomatasFinitos() {
                 setOrigenTransicion(null);
               }}
               aria-label="Mover estados"
+              aria-pressed={modo === 'move'}
             >
               <span aria-hidden="true">✋</span>
               <span>Mover</span>
@@ -682,6 +683,7 @@ export default function SimuladorAutomatasFinitos() {
                 setOrigenTransicion(null);
               }}
               aria-label="Añadir estado"
+              aria-pressed={modo === 'add-state'}
             >
               <span aria-hidden="true">⊕</span>
               <span>Añadir estado</span>
@@ -694,6 +696,7 @@ export default function SimuladorAutomatasFinitos() {
                 setOrigenTransicion(null);
               }}
               aria-label="Añadir transición"
+              aria-pressed={modo === 'add-transition'}
             >
               <span aria-hidden="true">→</span>
               <span>Transición</span>
@@ -706,6 +709,7 @@ export default function SimuladorAutomatasFinitos() {
                 setOrigenTransicion(null);
               }}
               aria-label="Marcar estado inicial"
+              aria-pressed={modo === 'set-initial'}
             >
               <span aria-hidden="true">▶</span>
               <span>Marcar inicial</span>
@@ -718,6 +722,7 @@ export default function SimuladorAutomatasFinitos() {
                 setOrigenTransicion(null);
               }}
               aria-label="Alternar estado final"
+              aria-pressed={modo === 'toggle-final'}
             >
               <span aria-hidden="true">◎</span>
               <span>Toggle final</span>
@@ -730,6 +735,7 @@ export default function SimuladorAutomatasFinitos() {
                 setOrigenTransicion(null);
               }}
               aria-label="Eliminar"
+              aria-pressed={modo === 'delete'}
             >
               <span aria-hidden="true">✕</span>
               <span>Eliminar</span>
@@ -1048,12 +1054,13 @@ export default function SimuladorAutomatasFinitos() {
           {/* Resultado */}
           {pasoActual >= 0 && (
             <div className={styles.resultadoBox}>
-              <div className={styles.pasoDescripcion}>
+              <div className={styles.pasoDescripcion} aria-live="polite" aria-atomic="true">
                 Paso {pasoActual + 1} / {validacion.pasos.length}:{' '}
                 {validacion.pasos[pasoActual]?.descripcion}
               </div>
               {pasoActual >= validacion.pasos.length - 1 && (
                 <div
+                  role="alert"
                   className={
                     validacion.resultado === 'aceptada'
                       ? styles.resultadoAceptada
