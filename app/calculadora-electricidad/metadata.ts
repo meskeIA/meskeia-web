@@ -37,9 +37,14 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-electricidad/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Ley de Ohm: calcula voltaje, corriente o resistencia dado cualquier par de valores',
+    'Potencia eléctrica: P=VI y fórmulas derivadas con conversión automática de unidades',
+    'Circuitos en serie y paralelo: resistencia equivalente para hasta 6 componentes',
+    'Divisor de tensión y divisor de corriente con fórmulas explicadas',
+    'Circuitos mixtos con sintaxis serie(...)/paralelo(...) anidable',
+    'Circuitos RC y RL: constante de tiempo τ, respuesta transitoria y frecuencia de corte',
+    'Calculadora de consumo energético: potencia, horas de uso, kWh y coste en €',
+    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

@@ -148,8 +148,10 @@ export default function DiapasonPage() {
         <button
           className={`${styles.btnDiapason} ${reproduciendo ? styles.activo : ''}`}
           onClick={toggleAudio}
+          aria-pressed={reproduciendo}
+          aria-label={reproduciendo ? 'Detener tono de referencia' : 'Reproducir tono de referencia'}
         >
-          <span className={styles.diapasonIcon}>
+          <span className={styles.diapasonIcon} aria-hidden="true">
             {reproduciendo ? '🔊' : '🔇'}
           </span>
           <span className={styles.diapasonTexto}>
@@ -235,8 +237,9 @@ export default function DiapasonPage() {
               key={tipo}
               className={`${styles.ondaBtn} ${tipoOnda === tipo ? styles.ondaActiva : ''}`}
               onClick={() => setTipoOnda(tipo)}
+              aria-pressed={tipoOnda === tipo}
             >
-              <span className={styles.ondaIcono}>
+              <span className={styles.ondaIcono} aria-hidden="true">
                 {tipo === 'sine' && '〰️'}
                 {tipo === 'triangle' && '📐'}
                 {tipo === 'square' && '⬜'}
@@ -304,7 +307,7 @@ export default function DiapasonPage() {
                 <td>415,0 Hz</td>
                 <td>S. XVII-XVIII / Europa</td>
                 <td>Grupos de música antigua</td>
-                <td>-84 cents (casi un semitono)</td>
+                <td>-99 cents (casi un semitono)</td>
               </tr>
               <tr>
                 <td><strong>Renacentista</strong></td>

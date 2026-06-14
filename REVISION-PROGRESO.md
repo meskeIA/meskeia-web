@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 100 / 999
-- ⬜ Pendientes: 899 / 999
+- ✅ Revisadas: 104 / 999
+- ⬜ Pendientes: 895 / 999
 
 ## Resumen por suite primaria
 
@@ -394,9 +394,9 @@
 | [ ] | Calculadora de Cálculo | `/calculadora-calculo/` | estudiantes |
 | [ ] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
 | [ ] | Calculadora de Ecuaciones | `/algebra-ecuaciones/` | estudiantes |
-| [ ] | Calculadora de Electricidad | `/calculadora-electricidad/` | estudiantes |
+| [x] | Calculadora de Electricidad | `/calculadora-electricidad/` | estudiantes |
 | [x] | Calculadora de Geometría | `/calculadora-geometria/` | estudiantes |
-| [ ] | Calculadora de Movimiento | `/calculadora-movimiento/` | estudiantes |
+| [x] | Calculadora de Movimiento | `/calculadora-movimiento/` | estudiantes |
 | [x] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
 | [ ] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
 | [ ] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
@@ -765,7 +765,7 @@
 | [ ] | Conversor de Unidades RF | `/conversor-unidades-rf/` | tecnicas |
 | [ ] | Criptografía - AES, RSA, ECDSA, SHA-256 y TLS | `/visualizador-criptografia/` | tecnicas, cultura, estudiantes |
 | [ ] | Desarrolladores — Servidor MCP de meskeIA | `/developers/` | tecnicas |
-| [ ] | Diapasón Digital (La 440Hz) | `/diapason/` | tecnicas, cultura |
+| [x] | Diapasón Digital (La 440Hz) | `/diapason/` | tecnicas, cultura |
 | [ ] | Escalador de Recetas | `/escalador-recetas/` | tecnicas, productividad |
 | [ ] | Espejo Digital | `/espejo/` | tecnicas |
 | [ ] | Extractor de Audio de Vídeo | `/extractor-audio-video/` | tecnicas, productividad |
@@ -998,7 +998,7 @@
 | [ ] | Cómo Piensa tu Cerebro | `/visualizador-cerebro/` | salud, cultura, estudiantes |
 | [ ] | Cómo se Descubre un Medicamento | `/visualizador-desarrollo-farmaco/` | salud, cultura |
 | [ ] | Cortisol - La Hormona del Estrés en tu Cuerpo | `/visualizador-cortisol/` | salud, cultura |
-| [ ] | Curso de Nutrición | `/curso-nutrisalud/` | salud, cultura |
+| [x] | Curso de Nutrición | `/curso-nutrisalud/` | salud, cultura |
 | [ ] | Diario Emocional Visual | `/diario-emocional/` | salud |
 | [ ] | Dopamina - El Sistema de Recompensa del Cerebro | `/visualizador-dopamina/` | salud, cultura, estudiantes |
 | [ ] | El Hierro: Hemoglobina, Absorción y Anemia Ferropénica | `/visualizador-hierro/` | salud, cultura, estudiantes |

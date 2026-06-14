@@ -173,7 +173,7 @@ export default function CalculadoraElectricidadPage() {
         ratio: R2 / (R1 + R2)
       };
     } else {
-      const Iin = parseSpanishNumber(corrienteFuente);
+      const Iin = parseSpanishNumber(corrienteFuente) / 1000; // entrada en mA → A
       if (isNaN(Iin)) return null;
 
       // Divisor de corriente: I2 = Iin × R1 / (R1 + R2)
@@ -350,50 +350,57 @@ export default function CalculadoraElectricidadPage() {
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'ohm' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('ohm')}
+              aria-pressed={tipoCalculo === 'ohm'}
             >
-              <span className={styles.tipoIcono}>V=IR</span>
+              <span className={styles.tipoIcono} aria-hidden="true">V=IR</span>
               <span className={styles.tipoNombre}>Ley de Ohm</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'potencia' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('potencia')}
+              aria-pressed={tipoCalculo === 'potencia'}
             >
-              <span className={styles.tipoIcono}>P=VI</span>
+              <span className={styles.tipoIcono} aria-hidden="true">P=VI</span>
               <span className={styles.tipoNombre}>Potencia</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'circuito' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('circuito')}
+              aria-pressed={tipoCalculo === 'circuito'}
             >
-              <span className={styles.tipoIcono}>⫘</span>
+              <span className={styles.tipoIcono} aria-hidden="true">⫘</span>
               <span className={styles.tipoNombre}>Serie/Paralelo</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'divisor' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('divisor')}
+              aria-pressed={tipoCalculo === 'divisor'}
             >
-              <span className={styles.tipoIcono}>⫗</span>
+              <span className={styles.tipoIcono} aria-hidden="true">⫗</span>
               <span className={styles.tipoNombre}>Divisores</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'mixto' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('mixto')}
+              aria-pressed={tipoCalculo === 'mixto'}
             >
-              <span className={styles.tipoIcono}>⫘⫗</span>
+              <span className={styles.tipoIcono} aria-hidden="true">⫘⫗</span>
               <span className={styles.tipoNombre}>Mixtos</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'rcrl' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('rcrl')}
+              aria-pressed={tipoCalculo === 'rcrl'}
             >
-              <span className={styles.tipoIcono}>τ</span>
+              <span className={styles.tipoIcono} aria-hidden="true">τ</span>
               <span className={styles.tipoNombre}>RC/RL</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoCalculo === 'consumo' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('consumo')}
+              aria-pressed={tipoCalculo === 'consumo'}
             >
-              <span className={styles.tipoIcono}>💡</span>
+              <span className={styles.tipoIcono} aria-hidden="true">💡</span>
               <span className={styles.tipoNombre}>Consumo</span>
             </button>
           </div>
@@ -829,7 +836,7 @@ export default function CalculadoraElectricidadPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="false">
           <h2 className={styles.sectionTitle}>Resultados</h2>
 
           {tipoCalculo === 'ohm' && resultadoOhm && (
@@ -926,11 +933,11 @@ export default function CalculadoraElectricidadPage() {
                   <div className={styles.divisorGrid}>
                     <div className={styles.divisorCardDestacado}>
                       <span className={styles.divisorLabel}>Corriente por R1</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corrienteR1 ?? 0, 4)} mA</span>
+                      <span className={styles.divisorValor}>{formatNumber((resultadoDivisor.corrienteR1 ?? 0) * 1000, 4)} mA</span>
                     </div>
                     <div className={styles.divisorCardDestacado}>
                       <span className={styles.divisorLabel}>Corriente por R2</span>
-                      <span className={styles.divisorValor}>{formatNumber(resultadoDivisor.corrienteR2 ?? 0, 4)} mA</span>
+                      <span className={styles.divisorValor}>{formatNumber((resultadoDivisor.corrienteR2 ?? 0) * 1000, 4)} mA</span>
                     </div>
                     <div className={styles.divisorCard}>
                       <span className={styles.divisorLabel}>Voltaje común</span>
@@ -966,7 +973,7 @@ export default function CalculadoraElectricidadPage() {
           )}
 
           {tipoCalculo === 'mixto' && !resultadoMixto && configuracionMixta && (
-            <div className={styles.errorBox}>
+            <div className={styles.errorBox} role="alert">
               <p>Error en la sintaxis. Verifica la expresión del circuito.</p>
               <p>Usa: serie(...) y paralelo(...) con valores numéricos.</p>
             </div>

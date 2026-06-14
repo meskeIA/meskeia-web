@@ -89,6 +89,14 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .consentOverlay,
+  .consentModal {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .consentHeader {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;

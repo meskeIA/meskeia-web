@@ -336,9 +336,11 @@ export default function CerebroPage() {
           <div className={styles.highlightBox}>
             <p>
               <strong>🧠 Dieta MIND:</strong> Combina mediterránea y DASH, diseñada
-              específicamente para salud cerebral. Reduce el riesgo de Alzheimer
-              hasta un 53% en quienes la siguen rigurosamente, y 35% en adherencia
-              moderada. Prioriza bayas, verduras de hoja, pescado y nueces.
+              específicamente para salud cerebral. El estudio observacional de Morris et al.
+              (2015, Rush University) encontró asociaciones de hasta 53% de reducción de
+              riesgo de Alzheimer en alta adherencia y 35% en adherencia moderada, aunque
+              estos datos provienen de un único estudio observacional que no establece
+              causalidad. Prioriza bayas, verduras de hoja, pescado y nueces.
             </p>
           </div>
         </>

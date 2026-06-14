@@ -315,7 +315,7 @@ export default function CardiovascularPage() {
             <li>Aceite de oliva como grasa principal</li>
             <li>Pescado frecuente, carne roja ocasional</li>
             <li>Frutos secos diarios</li>
-            <li>Vino tinto moderado (opcional)</li>
+            <li>Consumo opcional de alcohol — el PREDIMED incluía vino tinto, pero la OMS (2023) no recomienda ningún nivel de consumo de alcohol dado su clasificación como carcinógeno Grupo 1 IARC</li>
             <li>Socialización y comida en compañía</li>
           </ul>
 

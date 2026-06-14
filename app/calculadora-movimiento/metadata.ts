@@ -37,9 +37,13 @@ const webAppSchema = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-movimiento/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Cuatro modos: MRU, MRUA, caída libre y tiro parabólico',
+    'Calcula velocidad, aceleración, distancia, tiempo y ángulo según los valores disponibles',
+    'Descomposición vectorial automática en tiro parabólico (vx, vy, tiempo de vuelo, alcance, altura máxima)',
+    'Fórmulas relevantes mostradas junto a los resultados en cada modo',
+    'Ejemplos cargables con un clic para ilustrar cada tipo de movimiento',
+    'Bloque educativo con tabla de comparativa, errores frecuentes y laboratorio de medición de g',
+    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

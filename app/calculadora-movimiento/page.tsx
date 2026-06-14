@@ -154,7 +154,7 @@ export default function CalculadoraMovimientoPage() {
       case 'caida':
         return ['v = v₀ + g × t', 'h = v₀ × t + ½ × g × t²', 'v² = v₀² + 2 × g × h'];
       case 'parabolico':
-        return ['vₓ = v₀ × cos(θ)', 'vᵧ = v₀ × sin(θ)', 'H = vᵧ² / (2g)', 'R = vₓ × T'];
+        return ['vₓ = v₀ × cos(θ)', 'vᵧ = v₀ × sin(θ)', 'T = 2 × vᵧ / g', 'H = vᵧ² / (2g)', 'R = vₓ × T'];
       default:
         return [];
     }
@@ -184,29 +184,33 @@ export default function CalculadoraMovimientoPage() {
             <button
               className={`${styles.tipoBtn} ${tipoMovimiento === 'mru' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('mru')}
+              aria-pressed={tipoMovimiento === 'mru'}
             >
-              <span className={styles.tipoIcono}>→</span>
+              <span className={styles.tipoIcono} aria-hidden="true">→</span>
               <span className={styles.tipoNombre}>MRU</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoMovimiento === 'mrua' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('mrua')}
+              aria-pressed={tipoMovimiento === 'mrua'}
             >
-              <span className={styles.tipoIcono}>⟶</span>
+              <span className={styles.tipoIcono} aria-hidden="true">⟶</span>
               <span className={styles.tipoNombre}>MRUA</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoMovimiento === 'caida' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('caida')}
+              aria-pressed={tipoMovimiento === 'caida'}
             >
-              <span className={styles.tipoIcono}>↓</span>
+              <span className={styles.tipoIcono} aria-hidden="true">↓</span>
               <span className={styles.tipoNombre}>Caída</span>
             </button>
             <button
               className={`${styles.tipoBtn} ${tipoMovimiento === 'parabolico' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('parabolico')}
+              aria-pressed={tipoMovimiento === 'parabolico'}
             >
-              <span className={styles.tipoIcono}>↗</span>
+              <span className={styles.tipoIcono} aria-hidden="true">↗</span>
               <span className={styles.tipoNombre}>Parabólico</span>
             </button>
           </div>
@@ -302,7 +306,7 @@ export default function CalculadoraMovimientoPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="false">
           <h2 className={styles.sectionTitle}>Resultados</h2>
 
           {resultado ? (

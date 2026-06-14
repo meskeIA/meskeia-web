@@ -36,7 +36,16 @@ export const jsonLd = generateWebAppSchema({
   description: "Diapasón digital gratuito con tono de referencia La 440Hz. Ideal para afinar instrumentos, coros y orquestas. Incluye otras frecuencias de afinación.",
   url: "https://meskeia.com/diapason/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Tono La 440 Hz (ISO 16) generado con Web Audio API, sin archivos de audio externos',
+    'Presets de afinación: barroco 415 Hz, estándar 440 Hz, orquesta europea 442/443 Hz, Renacimiento 466 Hz',
+    'Frecuencia personalizable de 20 a 2000 Hz con slider y control numérico',
+    'Cuatro tipos de onda: senoidal, triangular, cuadrada y sierra',
+    'Control de volumen con rampa suave (sin clic ni artefactos de audio)',
+    'Visualización animada de onda durante la reproducción',
+    'Tabla de cents comparativa entre frecuencias de afinación históricas',
+    'Funciona en el navegador del móvil sin instalación, ideal para ensayos',
+  ],
 });
 
 export const faqJsonLd = {
