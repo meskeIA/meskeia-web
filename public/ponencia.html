@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>meskeIA — Presentación de Proyecto 2026</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
+
+  <style>
+    :root {
+      --p:  #2E86AB;
+      --s:  #48A9A6;
+      --h:  #1a5278;
+      --a:  #7FB3D3;
+      --bg: #f3f8fc;
+      --dk: #1A1A1A;
+      --mi: #5a6a7a;
+    }
+
+    /* ── BASE ────────────────────────────────────────── */
+    .reveal { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .reveal h1, .reveal h2 { color: var(--p); text-transform: none; font-weight: 700; letter-spacing: -0.5px; }
+    .reveal h3 { color: var(--dk); text-transform: none; }
+    .reveal .progress { color: var(--s); height: 4px; }
+    .reveal .controls { color: var(--p); }
+    .reveal .slides section {
+      text-align: left; box-sizing: border-box;
+      padding: 8px 20px !important; overflow: hidden;
+    }
+    .reveal .slides section.dark { color: white; }
+    .reveal .slides section.dark h1,
+    .reveal .slides section.dark h2,
+    .reveal .slides section.dark h3 { color: white; }
+
+    /* ── PORTADA ─────────────────────────────────────── */
+    .p-wrap { text-align: center; padding-top: 7%; }
+    .p-logo { font-size: 3.5em; font-weight: 900; color: white; letter-spacing: -1px; line-height: 1; margin-bottom: 0.12em; }
+    .p-logo span { color: var(--s); }
+    .p-tag  { font-size: 1.2em; color: rgba(255,255,255,0.9); font-weight: 300; }
+    .p-sub  { font-size: 0.88em; color: var(--a); margin-top: 0.35em; }
+    .p-badge {
+      display: inline-block; margin-top: 2.2em; padding: 0.38em 1.1em;
+      border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
+      font-size: 0.62em; color: rgba(255,255,255,0.5); letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    /* ── CABECERA DE SLIDE ───────────────────────────── */
+    .stitle {
+      display: flex; align-items: center; gap: 0.5em;
+      margin-bottom: 0.34em; padding-bottom: 0.24em;
+      border-bottom: 3px solid var(--p);
+    }
+    .stitle h2 { font-size: 1.05em !important; margin: 0 !important; color: var(--p) !important; }
+    .snum {
+      margin-left: auto; background: var(--p); color: white;
+      font-size: 0.52em; padding: 0.22em 0.65em; border-radius: 12px;
+      white-space: nowrap; flex-shrink: 0; font-weight: 600;
+    }
+    .snum-light {
+      background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.7);
+      font-size: 0.52em; padding: 0.22em 0.65em; border-radius: 12px;
+      white-space: nowrap; font-weight: 600; border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* ── PROBLEMA ────────────────────────────────────── */
+    .prob {
+      display: flex; gap: 0.6em; align-items: flex-start;
+      padding: 0.36em 0.75em; margin-bottom: 0.28em;
+      background: var(--bg); border-left: 4px solid var(--p); border-radius: 0 6px 6px 0;
+    }
+    .prob-ico { font-size: 1.35em; flex-shrink: 0; line-height: 1.3; }
+    .prob-t { font-size: 0.64em; font-weight: 700; color: var(--p); margin-bottom: 0.1em; }
+    .prob-d { font-size: 0.58em; color: var(--mi); line-height: 1.33; }
+
+    /* ── QUÉ ES ──────────────────────────────────────── */
+    .statement {
+      background: linear-gradient(135deg, var(--p), var(--s));
+      color: white; padding: 0.62em 1.05em; border-radius: 10px;
+      font-size: 0.92em; line-height: 1.48; text-align: center; margin-bottom: 0.5em;
+    }
+    .statement strong { font-weight: 800; }
+    .slabel { font-size: 0.52em; color: var(--a); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.28em; display: block; }
+    .sgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25em; }
+    .spill {
+      display: flex; align-items: center; gap: 0.28em;
+      padding: 0.27em 0.42em; background: var(--bg); border-radius: 6px;
+      font-size: 0.57em; border: 1px solid #d8eaf3; color: var(--dk);
+    }
+    .spill span { font-size: 1.2em; }
+
+    /* ── SEGMENTOS (compactados) ─────────────────────── */
+    .seggs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.25em; }
+    .segg {
+      background: var(--bg); border-radius: 10px; padding: 0.38em 0.68em;
+      border-top: 4px solid var(--p);
+    }
+    .segg.alt { border-top-color: var(--s); }
+    .segg-ico { font-size: 1.15em; display: block; margin-bottom: 0.1em; }
+    .segg-t { font-size: 0.65em; font-weight: 700; color: var(--dk); margin: 0 0 0.1em 0; }
+    .segg-d { font-size: 0.52em; color: var(--mi); margin: 0; line-height: 1.3; }
+
+    /* ── CANALES ─────────────────────────────────────── */
+    .cflow { display: flex; align-items: stretch; gap: 0.42em; }
+    .ccard {
+      flex: 1; background: white; border: 2px solid var(--p);
+      border-radius: 10px; padding: 0.68em 0.6em; text-align: center;
+    }
+    .ccard-ico { font-size: 1.8em; display: block; margin-bottom: 0.24em; }
+    .ccard-t { font-size: 0.67em; font-weight: 700; color: var(--p); margin: 0 0 0.15em 0; }
+    .ccard-d { font-size: 0.56em; color: var(--mi); margin: 0; line-height: 1.32; }
+    .carrow { display: flex; align-items: center; color: var(--a); font-size: 1.5em; flex-shrink: 0; }
+
+    /* ── DIFERENCIADORES ─────────────────────────────── */
+    .vs-intro {
+      font-size: 0.7em; color: var(--mi); margin-bottom: 0.32em;
+      border-left: 3px solid var(--s); padding-left: 0.7em; line-height: 1.38;
+    }
+    .vs-intro strong { color: var(--p); }
+    .vs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.38em; }
+    .vs-card {
+      background: white; border-radius: 12px; padding: 0.52em 0.65em;
+      border-top: 4px solid var(--p);
+      box-shadow: 0 2px 10px rgba(46,134,171,0.09);
+    }
+    .vs-card.alt  { border-top-color: var(--s); }
+    .vs-card.alt2 { border-top-color: var(--a); }
+    .vs-ico  { font-size: 1.35em; display: block; margin-bottom: 0.14em; }
+    .vs-not  { font-size: 0.48em; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.08em; }
+    .vs-title { font-size: 0.68em; font-weight: 800; color: var(--p); margin: 0 0 0.2em; line-height: 1.2; }
+    .vs-card.alt  .vs-title { color: var(--s); }
+    .vs-card.alt2 .vs-title { color: #5a80a0; }
+    .vs-tagline {
+      font-size: 0.58em; font-style: italic; color: var(--dk);
+      border-left: 2px solid var(--s); padding-left: 0.5em;
+      margin-bottom: 0.22em; line-height: 1.3;
+    }
+    .vs-body { font-size: 0.54em; color: var(--mi); line-height: 1.38; margin: 0; }
+
+    /* ── NÚMEROS ─────────────────────────────────────── */
+    .bnums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.44em; }
+    .bnum-c {
+      background: white; border-radius: 10px; padding: 0.68em; text-align: center;
+      box-shadow: 0 2px 10px rgba(46,134,171,0.1); border-bottom: 4px solid var(--p);
+    }
+    .bnum-c.alt { border-bottom-color: var(--s); }
+    .bnum { font-size: 1.85em; font-weight: 900; color: var(--p); line-height: 1; display: block; }
+    .bnum-c.alt .bnum { color: var(--s); }
+    .bnum-l { font-size: 0.56em; color: var(--mi); margin-top: 0.24em; display: block; line-height: 1.3; }
+
+    /* ── MODELO ECONÓMICO ────────────────────────────── */
+    .esplit { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65em; }
+    .euser {
+      background: linear-gradient(135deg, var(--p), var(--s));
+      border-radius: 10px; padding: 0.78em; text-align: center; color: white;
+    }
+    .euser-ico { font-size: 1.8em; display: block; }
+    .efree { font-size: 2.1em; font-weight: 900; color: white; line-height: 1.15; }
+    .euser-t { font-size: 0.72em; font-weight: 600; margin: 0.18em 0 0.22em; }
+    .euser-d { font-size: 0.58em; opacity: 0.88; line-height: 1.38; }
+    .einfra { background: var(--bg); border-radius: 10px; padding: 0.65em 0.88em; }
+    .einfra-t { font-size: 0.75em; font-weight: 700; color: var(--dk); margin: 0 0 0.42em 0; }
+    .erow {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.24em 0; border-bottom: 1px solid #d8eaf3; font-size: 0.59em;
+    }
+    .erow:last-of-type { border-bottom: none; }
+    .erow span { color: var(--mi); }
+    .etag { background: var(--s); color: white; padding: 0.08em 0.46em; border-radius: 10px; font-size: 0.84em; font-weight: 600; }
+    .enote { font-size: 0.54em; color: var(--mi); margin-top: 0.5em; line-height: 1.36; }
+
+    /* ── VISIÓN (compactada) ─────────────────────────── */
+    .vlist { position: relative; padding-left: 1.25em; }
+    .vlist::before {
+      content: ''; position: absolute; left: 0.38em; top: 0.5em; bottom: 0.5em;
+      width: 2px; background: linear-gradient(to bottom, var(--p), var(--s));
+    }
+    .vi { position: relative; margin-bottom: 0.22em; }
+    .vi::before {
+      content: ''; position: absolute; left: -0.98em; top: 0.6em;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--p); border: 2px solid white; box-shadow: 0 0 0 1px var(--p);
+    }
+    .vi-body { background: var(--bg); border-radius: 0 8px 8px 0; padding: 0.3em 0.65em; display: flex; align-items: baseline; gap: 0.45em; }
+    .vi-t { font-size: 0.64em; font-weight: 700; color: var(--p); margin: 0; white-space: nowrap; flex-shrink: 0; }
+    .vi-sep { font-size: 0.58em; color: var(--a); flex-shrink: 0; }
+    .vi-d { font-size: 0.56em; color: var(--mi); margin: 0; line-height: 1.32; }
+
+    /* ── EL MOTIVO (slide oscuro) ────────────────────── */
+    .why-wrap { text-align: center; padding-top: 4%; }
+    .why-mark { font-size: 5em; color: rgba(255,255,255,0.12); font-family: Georgia, serif; line-height: 0.75; }
+    .why-quote-text {
+      font-size: 1.18em; font-weight: 600; color: white; font-style: italic;
+      line-height: 1.45; max-width: 85%; margin: 0 auto 0.55em;
+    }
+    .why-body {
+      font-size: 0.72em; color: rgba(255,255,255,0.8); line-height: 1.55;
+      max-width: 78%; margin: 0 auto 0.38em;
+    }
+    .why-origin {
+      font-size: 0.66em; color: var(--a); line-height: 1.45;
+      max-width: 72%; margin: 0 auto;
+    }
+
+    /* ── CIERRE ──────────────────────────────────────── */
+    .cw { text-align: center; padding-top: 7%; }
+    .c-logo { font-size: 3.0em; font-weight: 900; color: white; letter-spacing: -1px; }
+    .c-logo span { color: var(--s); }
+    .c-claim { font-size: 1.08em; color: rgba(255,255,255,0.88); margin-top: 0.28em; }
+    .cpills { display: flex; justify-content: center; gap: 0.72em; margin-top: 1.8em; flex-wrap: wrap; }
+    .cpill {
+      display: flex; align-items: center; gap: 0.38em;
+      padding: 0.36em 0.92em; border: 1px solid rgba(255,255,255,0.28); border-radius: 20px;
+      font-size: 0.62em; color: rgba(255,255,255,0.75);
+    }
+
+    /* ── FRAGMENT ────────────────────────────────────── */
+    .reveal .fragment.fade-up { opacity: 0; transform: translateY(14px); }
+    .reveal .fragment.fade-up.visible {
+      opacity: 1; transform: translateY(0);
+      transition: opacity 0.38s ease, transform 0.38s ease;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 1 — PORTADA
+    ══════════════════════════════════════════════ -->
+    <section class="dark" data-background-gradient="linear-gradient(135deg,#1a5278 0%,#0d3a5a 100%)">
+      <div class="p-wrap">
+        <div class="p-logo">meske<span>IA</span></div>
+        <div class="p-tag">Plataforma gratuita en español</div>
+        <div class="p-sub">Estudio, finanzas personales y herramientas prácticas</div>
+        <div><div class="p-badge">Presentación de proyecto &middot; 2026</div></div>
+      </div>
+      <aside class="notes">
+        Bienvenidos. En los próximos minutos os explico qué es meskeIA, para qué sirve, qué la hace diferente y hacia dónde va.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 2 — EL PROBLEMA  (1/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Por qué existe meskeIA?</h2>
+        <span class="snum">1 / 9</span>
+      </div>
+      <div class="prob fragment fade-up">
+        <span class="prob-ico">🔍</span>
+        <div>
+          <div class="prob-t">Publicidad en cada búsqueda</div>
+          <div class="prob-d">Buscas una calculadora de hipoteca y encuentras banners, cookies y formularios. La herramienta real está enterrada bajo capas de publicidad.</div>
+        </div>
+      </div>
+      <div class="prob fragment fade-up">
+        <span class="prob-ico">🌐</span>
+        <div>
+          <div class="prob-t">Todo está en inglés</div>
+          <div class="prob-d">Las mejores herramientas online están pensadas para el mercado anglosajón. El hispanohablante —600 millones de personas— queda en segundo plano.</div>
+        </div>
+      </div>
+      <div class="prob fragment fade-up">
+        <span class="prob-ico">📧</span>
+        <div>
+          <div class="prob-t">Registro obligatorio para lo más básico</div>
+          <div class="prob-d">Quieres convertir unidades o calcular tu IMC y te piden email, contraseña y aceptar doce políticas de privacidad.</div>
+        </div>
+      </div>
+      <div class="prob fragment fade-up">
+        <span class="prob-ico">📦</span>
+        <div>
+          <div class="prob-t">Sin una solución integrada en español</div>
+          <div class="prob-d">No existía una "caja de herramientas" de confianza, gratuita y pensada desde el inicio para España y Latinoamérica.</div>
+        </div>
+      </div>
+      <aside class="notes">
+        El punto de partida es real y todos lo hemos vivido. Buscas algo sencillo y acabas en una web llena de publicidad, en inglés, o que te pide registrarte. meskeIA nace para resolver exactamente eso.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 3 — QUÉ ES meskeIA  (2/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Qué es meskeIA?</h2>
+        <span class="snum">2 / 9</span>
+      </div>
+      <div class="statement fragment fade-up">
+        Una plataforma de <strong>herramientas gratuitas en español</strong>, disponibles sin registro, sin publicidad y accesibles desde cualquier dispositivo.
+      </div>
+      <span class="slabel">13 categorías temáticas que cubren el día a día</span>
+      <div class="sgrid">
+        <div class="spill fragment fade-up"><span>🧮</span> Estudiantes</div>
+        <div class="spill fragment fade-up"><span>📈</span> Finanzas</div>
+        <div class="spill fragment fade-up"><span>🏥</span> Salud</div>
+        <div class="spill fragment fade-up"><span>⚖️</span> Legal y Fiscal</div>
+        <div class="spill fragment fade-up"><span>💼</span> Freelance</div>
+        <div class="spill fragment fade-up"><span>🏘️</span> Inmobiliaria</div>
+        <div class="spill fragment fade-up"><span>⚡</span> Productividad</div>
+        <div class="spill fragment fade-up"><span>✈️</span> Viajes</div>
+        <div class="spill fragment fade-up"><span>🎨</span> Diseño</div>
+        <div class="spill fragment fade-up"><span>📚</span> Cultura</div>
+        <div class="spill fragment fade-up"><span>🎲</span> Juegos y Ocio</div>
+        <div class="spill fragment fade-up"><span>🔧</span> Técnicas</div>
+        <div class="spill fragment fade-up"><span>♿</span> Accesibilidad</div>
+      </div>
+      <aside class="notes">
+        En una frase: meskeIA es tu caja de herramientas digital en español. Entras, usas lo que necesitas y te vas. Sin cuenta. Sin publicidad. Sin coste.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 4 — ¿QUIÉN LA USA?  (3/9)
+         Tarjetas compactadas para caber en el slide.
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Quién la usa?</h2>
+        <span class="snum">3 / 9</span>
+      </div>
+      <div class="seggs">
+        <div class="segg fragment fade-up">
+          <span class="segg-ico">🎓</span>
+          <div class="segg-t">Estudiantes y familias</div>
+          <p class="segg-d">Matemáticas, ciencias, notas y nutrición. Herramientas para el estudio y la vida cotidiana.</p>
+        </div>
+        <div class="segg alt fragment fade-up">
+          <span class="segg-ico">💼</span>
+          <div class="segg-t">Profesionales y autónomos</div>
+          <p class="segg-d">Herramientas fiscales, nóminas, IVA y tarifas freelance. Todo lo que un profesional independiente necesita a mano.</p>
+        </div>
+        <div class="segg alt fragment fade-up">
+          <span class="segg-ico">🌍</span>
+          <div class="segg-t">El hispanohablante global</div>
+          <p class="segg-d">España y Latinoamérica: herramientas en su idioma, sin registro ni pago. Presente en todos los continentes.</p>
+        </div>
+        <div class="segg fragment fade-up">
+          <span class="segg-ico">🤖</span>
+          <div class="segg-t">Usuarios de asistentes IA</div>
+          <p class="segg-d">Quienes usan ChatGPT o Claude y acceden a meskeIA desde la conversación, sin abrir el navegador.</p>
+        </div>
+      </div>
+      <aside class="notes">
+        El perfil es muy amplio: desde un estudiante que necesita resolver una integral hasta un autónomo que calcula su cuota de la seguridad social, o alguien de México que quiere planificar sus finanzas.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 5 — CANALES  (4/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Cómo llega a sus usuarios?</h2>
+        <span class="snum">4 / 9</span>
+      </div>
+      <div class="cflow">
+        <div class="ccard fragment fade-up">
+          <span class="ccard-ico">🔍</span>
+          <div class="ccard-t">Google y buscadores</div>
+          <p class="ccard-d">El canal principal. Las herramientas aparecen cuando alguien busca exactamente lo que necesita. Sin publicidad de pago — solo relevancia real.</p>
+        </div>
+        <div class="carrow fragment fade-up">›</div>
+        <div class="ccard fragment fade-up">
+          <span class="ccard-ico">🤖</span>
+          <div class="ccard-t">Asistentes de IA</div>
+          <p class="ccard-d">Integrado en ChatGPT y Claude. El usuario pregunta al asistente y meskeIA responde en la misma conversación, sin salir de la aplicación.</p>
+        </div>
+        <div class="carrow fragment fade-up">›</div>
+        <div class="ccard fragment fade-up">
+          <span class="ccard-ico">🌐</span>
+          <div class="ccard-t">Directo</div>
+          <p class="ccard-d">Usuarios que van directamente a meskeia.com porque ya confían en la plataforma y la tienen integrada en su rutina diaria.</p>
+        </div>
+      </div>
+      <aside class="notes">
+        No hay publicidad de pago. El crecimiento es orgánico: apareces cuando alguien te necesita, o a través de los asistentes IA que millones de personas ya usan. El coste de adquisición de usuario es prácticamente cero.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 6 — DIFERENCIADORES  (5/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Qué hace meskeIA que otros no?</h2>
+        <span class="snum">5 / 9</span>
+      </div>
+      <p class="vs-intro fragment fade-up">
+        Hay hojas de cálculo, hay inteligencia artificial, hay enciclopedias.
+        <strong>meskeIA no compite con ellas: resuelve lo que las demás no hacen.</strong>
+      </p>
+      <div class="vs-grid">
+        <div class="vs-card fragment fade-up">
+          <span class="vs-ico">🧮</span>
+          <div class="vs-not">vs. hoja de cálculo</div>
+          <div class="vs-title">Respuestas, no fórmulas</div>
+          <div class="vs-tagline">Rellenas tus datos. Obtienes tu resultado.</div>
+          <p class="vs-body">Una hoja de cálculo te obliga a configurarla y saber qué fórmula aplicar. meskeIA guía paso a paso y devuelve el resultado interpretado, con normativa actualizada. Sin tocar una sola celda.</p>
+        </div>
+        <div class="vs-card alt fragment fade-up">
+          <span class="vs-ico">🤖</span>
+          <div class="vs-not">vs. IA generativa</div>
+          <div class="vs-title">Exactitud, siempre</div>
+          <div class="vs-tagline">No improvisa. No alucina. No varía.</div>
+          <p class="vs-body">Un asistente IA puede equivocarse en cálculos o usar datos obsoletos. meskeIA emplea normativa verificada —IRPF 2025, Seguridad Social 2025— y devuelve siempre el mismo resultado correcto. Datos revisados y actualizados periódicamente.</p>
+        </div>
+        <div class="vs-card alt2 fragment fade-up">
+          <span class="vs-ico">📷</span>
+          <div class="vs-not">vs. enciclopedias</div>
+          <div class="vs-title">Interactivo, no informativo</div>
+          <div class="vs-tagline">No lees sobre fotografía: experimentas con ella.</div>
+          <p class="vs-body">Wikipedia describe la apertura, el ISO y la velocidad de obturación. El simulador fotográfico de meskeIA te deja ajustar cada parámetro en tiempo real y ver cómo cambia la exposición, el bokeh y la profundidad de campo.</p>
+        </div>
+      </div>
+      <aside class="notes">
+        La pregunta clave: ¿para qué sirve si ya tengo Excel, ChatGPT o Google? La respuesta es que meskeIA combina la precisión de una hoja de cálculo, la accesibilidad de una IA y la profundidad de una enciclopedia, con tus datos, en español y gratis.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 7 — LOS NÚMEROS  (6/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>meskeIA en números</h2>
+        <span class="snum">6 / 9</span>
+      </div>
+      <div class="bnums">
+        <div class="bnum-c fragment fade-up">
+          <span class="bnum">+1.000</span>
+          <span class="bnum-l">herramientas publicadas</span>
+        </div>
+        <div class="bnum-c alt fragment fade-up">
+          <span class="bnum">13</span>
+          <span class="bnum-l">categorías temáticas</span>
+        </div>
+        <div class="bnum-c fragment fade-up">
+          <span class="bnum">41</span>
+          <span class="bnum-l">países con usuarios activos</span>
+        </div>
+        <div class="bnum-c alt fragment fade-up">
+          <span class="bnum">38 %</span>
+          <span class="bnum-l">del tráfico desde Latinoamérica</span>
+        </div>
+        <div class="bnum-c fragment fade-up">
+          <span class="bnum">+185</span>
+          <span class="bnum-l">herramientas accesibles desde asistentes IA</span>
+        </div>
+        <div class="bnum-c alt fragment fade-up">
+          <span class="bnum">+99 %</span>
+          <span class="bnum-l">crecimiento de visitas en un solo mes</span>
+        </div>
+      </div>
+      <aside class="notes">
+        Datos reales de mayo 2026. El crecimiento es orgánico — sin publicidad de pago — y el 38% desde Latinoamérica confirma que la propuesta en español tiene alcance global.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 8 — MODELO ECONÓMICO  (7/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Cómo se sostiene?</h2>
+        <span class="snum">7 / 9</span>
+      </div>
+      <div class="esplit">
+        <div class="euser fragment fade-up">
+          <span class="euser-ico">👤</span>
+          <div class="efree">GRATIS</div>
+          <div class="euser-t">Para el usuario, siempre</div>
+          <div class="euser-d">Sin suscripción. Sin versión "Pro".<br/>Sin anuncios. Sin trampa.</div>
+        </div>
+        <div class="einfra fragment fade-up">
+          <div class="einfra-t">Infraestructura real</div>
+          <div class="erow"><span>🌐 Hosting en la nube</span><span class="etag">mínimo</span></div>
+          <div class="erow"><span>🗄️ Base de datos</span><span class="etag">mínimo</span></div>
+          <div class="erow"><span>🔗 Dominio meskeia.com</span><span class="etag">mínimo</span></div>
+          <div class="erow"><span>⏱️ Inversión real</span><span class="etag">tiempo</span></div>
+          <p class="enote">Las plataformas tecnológicas actuales permiten mantener miles de herramientas con un coste de infraestructura muy bajo. El valor no está en servidores caros, sino en el tiempo dedicado a construir algo útil.</p>
+        </div>
+      </div>
+      <aside class="notes">
+        Si es gratis, ¿cómo se paga? La infraestructura cloud moderna es muy barata a esta escala. La inversión real es el tiempo. No hay detrás una gran empresa con inversores: hay un proyecto construido con dedicación.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 9 — VISIÓN FUTURA  (8/9)
+         Vi-body en flexbox horizontal para compactar.
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Hacia dónde va?</h2>
+        <span class="snum">8 / 9</span>
+      </div>
+      <div class="vlist">
+        <div class="vi fragment fade-up">
+          <div class="vi-body">
+            <div class="vi-t">📦 Catálogo en crecimiento</div>
+            <span class="vi-sep">—</span>
+            <p class="vi-d">La primera opción en español para cualquier necesidad cotidiana o profesional. Gratuito y sin registro.</p>
+          </div>
+        </div>
+        <div class="vi fragment fade-up">
+          <div class="vi-body">
+            <div class="vi-t">⚖️ Delegum</div>
+            <span class="vi-sep">—</span>
+            <p class="vi-d">Orientación fiscal, laboral y patrimonial en España: para cualquier persona, sin tecnicismos y sin coste.</p>
+          </div>
+        </div>
+        <div class="vi fragment fade-up">
+          <div class="vi-body">
+            <div class="vi-t">🤖 Integración universal con IA</div>
+            <span class="vi-sep">—</span>
+            <p class="vi-d">Integrado en los grandes asistentes de IA: el usuario accede a meskeIA desde donde prefiera, sin fricciones.</p>
+          </div>
+        </div>
+        <div class="vi fragment fade-up">
+          <div class="vi-body">
+            <div class="vi-t">🌎 La referencia en español</div>
+            <span class="vi-sep">—</span>
+            <p class="vi-d">La plataforma de referencia para los 600 millones de hispanohablantes del mundo.</p>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        El horizonte es claro: más herramientas, mayor presencia en IA, Delegum para el ámbito fiscal, y la escala global que el español merece.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 10 — EL MOTIVO  (9/9)
+         Slide oscuro con la filosofía personal.
+    ══════════════════════════════════════════════ -->
+    <section class="dark" data-background-gradient="linear-gradient(135deg,#0d3a5a 0%,#1a5278 60%,#1d6a8a 100%)">
+      <div style="position:absolute;top:0.5em;right:0.8em;">
+        <span class="snum-light">9 / 9</span>
+      </div>
+      <div class="why-wrap">
+        <div class="why-mark fragment fade-up">"</div>
+        <div class="why-quote-text fragment fade-up">
+          El conocimiento debe ser un bien compartido y gratuito.
+        </div>
+        <p class="why-body fragment fade-up">
+          Resolver un cálculo, entender un concepto o simplificar una tarea tiene que estar al alcance de todas las personas, sin depender de su capacidad económica.
+        </p>
+        <p class="why-origin fragment fade-up">
+          Por ello nació meskeIA: para facilitar herramientas que empezaron siendo necesidades propias y se han ido ampliando para servir a todos.
+        </p>
+      </div>
+      <aside class="notes">
+        Esta es la razón real por la que existe meskeIA. No es un negocio en busca de inversores: es un proyecto construido sobre la convicción de que el conocimiento útil debe ser accesible para todo el mundo.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 11 — CIERRE
+    ══════════════════════════════════════════════ -->
+    <section class="dark" data-background-gradient="linear-gradient(135deg,#1a5278 0%,#0d3a5a 100%)">
+      <div class="cw">
+        <div class="c-logo">meske<span>IA</span>.com</div>
+        <div class="c-claim">Gratuito. En español. Para todos.</div>
+        <div class="cpills fragment fade-up">
+          <div class="cpill">🌐 +1.000 herramientas</div>
+          <div class="cpill">🌍 41 países</div>
+          <div class="cpill">🤖 Integrado en IA</div>
+          <div class="cpill">💬 Sin registro ni publicidad</div>
+        </div>
+      </div>
+      <aside class="notes">
+        meskeia.com. Gratuito, en español, para todos. Entrad ahora mismo y usad la primera herramienta que necesitéis — no hace falta registrarse. Muchas gracias.
+      </aside>
+    </section>
+
+  </div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash:                 true,
+    slideNumber:          false,
+    progress:             true,
+    controls:             true,
+    center:               false,
+    transition:           'slide',
+    transitionSpeed:      'default',
+    backgroundTransition: 'fade',
+    plugins:              [RevealNotes],
+    width:                1200,
+    height:               750,
+    margin:               0.04,
+    minScale:             0.2,
+    maxScale:             2.0,
+  });
+</script>
+</body>
+</html>

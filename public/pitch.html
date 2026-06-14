@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>meskeIA — Presentación para Inversores y Socios Técnicos 2026</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
+
+  <style>
+    :root {
+      --p:  #2E86AB;
+      --s:  #48A9A6;
+      --h:  #1a5278;
+      --a:  #7FB3D3;
+      --bg: #f0f6fb;
+      --dk: #1A1A1A;
+      --mi: #5a6a7a;
+      --ok: #27ae60;
+      --warn: #e67e22;
+    }
+
+    /* ── BASE ──────────────────────────────────────── */
+    .reveal { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .reveal h1, .reveal h2 { color: var(--p); text-transform: none; font-weight: 700; letter-spacing: -0.5px; }
+    .reveal .progress { color: var(--s); height: 4px; }
+    .reveal .controls { color: var(--p); }
+    .reveal .slides section {
+      text-align: left; box-sizing: border-box;
+      padding: 8px 22px !important; overflow: hidden;
+    }
+    .reveal .slides section.dark { color: white; }
+    .reveal .slides section.dark h1,
+    .reveal .slides section.dark h2 { color: white; }
+
+    /* ── CABECERA ───────────────────────────────────── */
+    .stitle {
+      display: flex; align-items: center; gap: 0.5em;
+      margin-bottom: 0.3em; padding-bottom: 0.22em;
+      border-bottom: 3px solid var(--p);
+    }
+    .stitle h2 { font-size: 1.05em !important; margin: 0 !important; color: var(--p) !important; }
+    .snum {
+      margin-left: auto; background: var(--p); color: white;
+      font-size: 0.52em; padding: 0.22em 0.65em; border-radius: 12px;
+      white-space: nowrap; flex-shrink: 0; font-weight: 600;
+    }
+    .snum-light {
+      background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.75);
+      font-size: 0.52em; padding: 0.22em 0.65em; border-radius: 12px;
+      white-space: nowrap; font-weight: 600; border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* ── PORTADA ───────────────────────────────────── */
+    .p-wrap { text-align: center; padding-top: 6%; }
+    .p-logo { font-size: 3.4em; font-weight: 900; color: white; letter-spacing: -1px; line-height: 1; }
+    .p-logo span { color: var(--s); }
+    .p-sub { font-size: 0.9em; color: rgba(255,255,255,0.85); margin-top: 0.3em; font-weight: 300; }
+    .p-tags { display: flex; justify-content: center; gap: 0.7em; margin-top: 1.6em; flex-wrap: wrap; }
+    .p-tag {
+      padding: 0.3em 0.85em; border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px; font-size: 0.6em; color: rgba(255,255,255,0.7);
+    }
+    .p-year { font-size: 0.55em; color: rgba(255,255,255,0.35); margin-top: 2.2em; letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── OPORTUNIDAD ───────────────────────────────── */
+    .opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.42em; margin-bottom: 0.38em; }
+    .opp-card {
+      background: var(--bg); border-radius: 10px; padding: 0.5em 0.75em;
+      border-left: 4px solid var(--p);
+    }
+    .opp-card.alt { border-left-color: var(--s); }
+    .opp-n { font-size: 1.7em; font-weight: 900; color: var(--p); line-height: 1; display: block; }
+    .opp-card.alt .opp-n { color: var(--s); }
+    .opp-l { font-size: 0.56em; color: var(--mi); display: block; margin-top: 0.1em; line-height: 1.3; }
+    .opp-gap {
+      background: linear-gradient(90deg, var(--p), var(--s));
+      color: white; border-radius: 8px; padding: 0.45em 0.85em;
+      font-size: 0.65em; line-height: 1.42; text-align: center;
+    }
+    .opp-gap strong { font-weight: 800; font-size: 1.08em; }
+
+    /* ── ESTADO ACTUAL ─────────────────────────────── */
+    .today-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.38em; margin-bottom: 0.36em; }
+    .today-card {
+      background: white; border-radius: 10px; padding: 0.56em 0.65em; text-align: center;
+      box-shadow: 0 2px 10px rgba(46,134,171,0.1); border-bottom: 3px solid var(--p);
+    }
+    .today-card.alt { border-bottom-color: var(--s); }
+    .today-n { font-size: 1.8em; font-weight: 900; color: var(--p); line-height: 1; display: block; }
+    .today-card.alt .today-n { color: var(--s); }
+    .today-l { font-size: 0.52em; color: var(--mi); margin-top: 0.2em; display: block; line-height: 1.25; }
+    .today-cats {
+      display: flex; flex-wrap: wrap; gap: 0.22em;
+      background: var(--bg); border-radius: 8px; padding: 0.38em 0.55em;
+    }
+    .today-pill {
+      font-size: 0.5em; padding: 0.18em 0.48em;
+      background: white; border: 1px solid #c8dff0; border-radius: 10px; color: var(--mi);
+    }
+
+    /* ── TRACCIÓN ──────────────────────────────────── */
+    .tract-table { width: 100%; border-collapse: collapse; font-size: 0.6em; margin-bottom: 0.36em; }
+    .tract-table thead tr { background: var(--p); color: white; }
+    .tract-table thead th { padding: 0.38em 0.65em; text-align: left; font-weight: 600; }
+    .tract-table tbody tr { border-bottom: 1px solid #d8eaf3; }
+    .tract-table tbody tr:nth-child(even) { background: var(--bg); }
+    .tract-table tbody td { padding: 0.32em 0.65em; color: var(--dk); }
+    .tract-table tbody td.num { text-align: right; font-weight: 700; color: var(--p); }
+    .tract-table tbody td.trend { text-align: right; font-weight: 700; }
+    .trend-up   { color: var(--ok); }
+    .trend-down { color: var(--warn); }
+    .trend-new  { color: var(--mi); font-style: italic; }
+    .bar { display: inline-block; height: 7px; border-radius: 4px; background: var(--p); vertical-align: middle; margin-right: 0.4em; }
+    .bar.alt { background: var(--s); }
+    .tract-note { font-size: 0.52em; color: var(--mi); line-height: 1.35; }
+    .tract-note strong { color: var(--p); }
+    .gsc-note {
+      margin-top: 0.26em; font-size: 0.52em; background: #f0faf4;
+      border-radius: 6px; padding: 0.32em 0.65em;
+      border-left: 3px solid var(--ok); color: var(--mi);
+    }
+    .gsc-note strong { color: var(--ok); }
+
+    /* ── CANALES ─────────────────────────────────── */
+    .chan-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    .chan-block { background: var(--bg); border-radius: 10px; padding: 0.5em 0.75em; }
+    .chan-title { font-size: 0.62em; font-weight: 700; color: var(--p); margin: 0 0 0.35em; border-bottom: 2px solid var(--p); padding-bottom: 0.2em; }
+    .chan-row { display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.22em; font-size: 0.56em; }
+    .chan-bar-wrap { flex: 1; background: #d8eaf3; border-radius: 4px; height: 7px; }
+    .chan-bar-fill { height: 7px; border-radius: 4px; background: var(--p); }
+    .chan-bar-fill.alt { background: var(--s); }
+    .chan-pct { font-weight: 700; color: var(--p); min-width: 2.8em; text-align: right; }
+    .chan-label { min-width: 10em; color: var(--mi); }
+    .latam-big { font-size: 2.8em; font-weight: 900; color: var(--p); line-height: 1; }
+    .latam-sub { font-size: 0.56em; color: var(--mi); margin-top: 0.15em; line-height: 1.35; }
+    .latam-trend { font-size: 0.58em; color: var(--ok); font-weight: 700; margin-top: 0.28em; }
+
+    /* ── STACK TÉCNICO ─────────────────────────────── */
+    .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.26em; margin-bottom: 0.22em; }
+    .stack-card {
+      background: white; border-radius: 10px; padding: 0.38em 0.55em;
+      border-top: 3px solid var(--p);
+      box-shadow: 0 2px 8px rgba(46,134,171,0.08);
+    }
+    .stack-card.alt { border-top-color: var(--s); }
+    .stack-ico { font-size: 1.0em; display: block; margin-bottom: 0.08em; }
+    .stack-t { font-size: 0.60em; font-weight: 700; color: var(--p); margin: 0 0 0.08em; }
+    .stack-card.alt .stack-t { color: var(--s); }
+    .stack-d { font-size: 0.49em; color: var(--mi); margin: 0; line-height: 1.28; }
+    .stack-why {
+      font-size: 0.52em; background: linear-gradient(90deg, var(--p), var(--s));
+      color: white; border-radius: 8px; padding: 0.36em 0.72em; line-height: 1.42;
+    }
+    .stack-why strong { font-weight: 800; }
+
+    /* ── MOAT ────────────────────────────────────── */
+    .moat-list { list-style: none; padding: 0; margin: 0; }
+    .moat-item {
+      display: flex; gap: 0.6em; align-items: flex-start;
+      padding: 0.38em 0.7em; margin-bottom: 0.25em;
+      background: var(--bg); border-left: 4px solid var(--p); border-radius: 0 8px 8px 0;
+    }
+    .moat-item.alt { border-left-color: var(--s); }
+    .moat-ico { font-size: 1.3em; flex-shrink: 0; line-height: 1.3; }
+    .moat-t { font-size: 0.64em; font-weight: 700; color: var(--p); margin-bottom: 0.06em; }
+    .moat-item.alt .moat-t { color: var(--s); }
+    .moat-d { font-size: 0.55em; color: var(--mi); line-height: 1.32; }
+
+    /* ── MODELO NEGOCIO ────────────────────────────── */
+    .biz-layers { display: flex; flex-direction: column; gap: 0.3em; margin-bottom: 0.32em; }
+    .biz-layer {
+      border-radius: 10px; padding: 0.45em 0.85em;
+      display: flex; align-items: center; gap: 0.85em;
+    }
+    .biz-layer-1 { background: var(--bg); border: 2px solid var(--p); }
+    .biz-layer-2 { background: rgba(46,134,171,0.12); border: 2px solid var(--s); }
+    .biz-layer-3 { background: linear-gradient(90deg, var(--p), var(--s)); color: white; }
+    .biz-badge {
+      font-size: 0.55em; font-weight: 700; padding: 0.18em 0.58em;
+      border-radius: 10px; white-space: nowrap; flex-shrink: 0;
+    }
+    .biz-layer-1 .biz-badge { background: var(--p); color: white; }
+    .biz-layer-2 .biz-badge { background: var(--s); color: white; }
+    .biz-layer-3 .biz-badge { background: white; color: var(--p); }
+    .biz-content { flex: 1; }
+    .biz-t { font-size: 0.68em; font-weight: 700; margin: 0 0 0.06em; }
+    .biz-layer-3 .biz-t { color: white; }
+    .biz-d { font-size: 0.54em; margin: 0; line-height: 1.32; color: var(--mi); }
+    .biz-layer-3 .biz-d { color: rgba(255,255,255,0.85); }
+    .biz-arr { font-size: 1.0em; color: var(--a); text-align: center; line-height: 1; flex-shrink: 0; margin: 0 0.2em; }
+    .biz-note {
+      font-size: 0.55em; background: var(--bg); border-radius: 8px;
+      padding: 0.38em 0.72em; color: var(--mi); line-height: 1.38;
+    }
+    .biz-note strong { color: var(--p); }
+
+    /* ── VERTICALES ─────────────────────────────────── */
+    .vert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.22em; margin-bottom: 0.22em; }
+    .vert-card {
+      background: white; border-radius: 10px; padding: 0.34em 0.55em;
+      box-shadow: 0 2px 8px rgba(46,134,171,0.09);
+      border-top: 4px solid var(--p);
+    }
+    .vert-card.live { border-top-color: var(--ok); }
+    .vert-card.next { border-top-color: var(--s); }
+    .vert-card.future { border-top-color: var(--a); border-top-style: dashed; }
+    .vert-status {
+      font-size: 0.42em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 0.14em; display: block;
+    }
+    .live  .vert-status { color: var(--ok); }
+    .next  .vert-status { color: var(--s); }
+    .future .vert-status { color: var(--a); }
+    .vert-ico { font-size: 1.05em; display: inline-block; margin-right: 0.15em; }
+    .vert-t { font-size: 0.62em; font-weight: 700; color: var(--dk); display: inline; }
+    .vert-d { font-size: 0.48em; color: var(--mi); margin: 0.1em 0 0; line-height: 1.28; }
+    .vert-tags { display: flex; gap: 0.18em; margin-top: 0.14em; flex-wrap: wrap; }
+    .vert-tag {
+      font-size: 0.41em; padding: 0.08em 0.38em;
+      background: var(--bg); border-radius: 8px; color: var(--mi);
+      border: 1px solid #c8dff0;
+    }
+    .vert-thesis {
+      background: linear-gradient(90deg, var(--p), var(--s)); color: white;
+      border-radius: 8px; padding: 0.34em 0.72em; font-size: 0.52em; line-height: 1.42;
+    }
+    .vert-thesis strong { font-weight: 800; font-size: 1.05em; }
+
+    /* ── CÓMO PARTICIPAR ────────────────────────────── */
+    .part-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4em; margin-bottom: 0.32em; }
+    .part-card {
+      background: white; border-radius: 10px; padding: 0.58em 0.65em; text-align: center;
+      box-shadow: 0 2px 10px rgba(46,134,171,0.09); border-bottom: 4px solid var(--p);
+    }
+    .part-card.alt { border-bottom-color: var(--s); }
+    .part-card.alt2 { border-bottom-color: var(--a); }
+    .part-ico { font-size: 1.6em; display: block; margin-bottom: 0.16em; }
+    .part-t { font-size: 0.66em; font-weight: 700; color: var(--p); margin: 0 0 0.18em; }
+    .part-card.alt .part-t { color: var(--s); }
+    .part-card.alt2 .part-t { color: #5a80a0; }
+    .part-d { font-size: 0.52em; color: var(--mi); margin: 0; line-height: 1.32; text-align: left; }
+    .part-note {
+      font-size: 0.56em; background: var(--bg); border-radius: 8px;
+      padding: 0.38em 0.72em; color: var(--mi); line-height: 1.4; text-align: center;
+    }
+    .part-note strong { color: var(--p); }
+
+    /* ── CIERRE ─────────────────────────────────────── */
+    .cw { text-align: center; padding-top: 6%; }
+    .c-logo { font-size: 3.0em; font-weight: 900; color: white; letter-spacing: -1px; }
+    .c-logo span { color: var(--s); }
+    .c-claim { font-size: 0.9em; color: rgba(255,255,255,0.82); margin-top: 0.28em; }
+    .c-contact { margin-top: 1.4em; font-size: 0.65em; color: rgba(255,255,255,0.6); }
+    .c-contact a { color: var(--a); text-decoration: none; }
+    .cpills { display: flex; justify-content: center; gap: 0.65em; margin-top: 1.5em; flex-wrap: wrap; }
+    .cpill {
+      display: flex; align-items: center; gap: 0.35em;
+      padding: 0.34em 0.88em; border: 1px solid rgba(255,255,255,0.25); border-radius: 20px;
+      font-size: 0.58em; color: rgba(255,255,255,0.7);
+    }
+
+    /* ── FRAGMENTS ──────────────────────────────────── */
+    .reveal .fragment.fade-up { opacity: 0; transform: translateY(12px); }
+    .reveal .fragment.fade-up.visible {
+      opacity: 1; transform: translateY(0);
+      transition: opacity 0.32s ease, transform 0.32s ease;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 1 — PORTADA
+    ══════════════════════════════════════════════ -->
+    <section class="dark" data-background-gradient="linear-gradient(135deg,#0d2f45 0%,#1a5278 60%,#1d7a8a 100%)">
+      <div class="p-wrap">
+        <div class="p-logo">meske<span>IA</span></div>
+        <div class="p-sub">Plataforma de herramientas gratuitas en español<br/>+ verticales premium de especialización</div>
+        <div class="p-tags">
+          <div class="p-tag">💼 Inversores</div>
+          <div class="p-tag">🔧 Socios técnicos</div>
+          <div class="p-tag">🤝 Colaboradores</div>
+        </div>
+        <div class="p-year">Presentación confidencial · Junio 2026</div>
+      </div>
+      <aside class="notes">
+        Esta presentación está dirigida a potenciales inversores, socios técnicos y colaboradores. Cubre el estado actual, la tracción real, el stack técnico, el moat competitivo y el modelo de monetización basado en verticales premium.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 2 — LA OPORTUNIDAD  (1/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>La oportunidad</h2>
+        <span class="snum">1 / 9</span>
+      </div>
+      <div class="opp-grid">
+        <div class="opp-card fragment fade-up">
+          <span class="opp-n">600 M</span>
+          <span class="opp-l">hispanohablantes en el mundo — el tercer idioma más hablado del planeta</span>
+        </div>
+        <div class="opp-card alt fragment fade-up">
+          <span class="opp-n">&lt; 5 %</span>
+          <span class="opp-l">de las mejores herramientas online existen en español, sin publicidad y sin registro</span>
+        </div>
+        <div class="opp-card fragment fade-up">
+          <span class="opp-n">95 %</span>
+          <span class="opp-l">del tráfico de meskeIA es orgánico — coste de adquisición de usuario prácticamente cero</span>
+        </div>
+        <div class="opp-card alt fragment fade-up">
+          <span class="opp-n">61 %</span>
+          <span class="opp-l">del tráfico actual ya proviene de Latinoamérica — expansión regional sin esfuerzo comercial</span>
+        </div>
+      </div>
+      <div class="opp-gap fragment fade-up">
+        <strong>El hueco real:</strong> millones de personas buscan herramientas útiles en su idioma y encuentran publicidad, registros obligatorios o resultados en inglés. meskeIA resuelve exactamente eso.
+      </div>
+      <aside class="notes">
+        El mercado hispanohablante está desatendido en herramientas digitales. No hay competencia directa consolidada en este segmento: la mayoría de utilidades online de calidad están en inglés o detrás de muros de pago.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 3 — ESTADO ACTUAL  (2/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>meskeIA hoy</h2>
+        <span class="snum">2 / 9</span>
+      </div>
+      <div class="today-grid">
+        <div class="today-card fragment fade-up">
+          <span class="today-n">+1.000</span>
+          <span class="today-l">herramientas publicadas y operativas</span>
+        </div>
+        <div class="today-card alt fragment fade-up">
+          <span class="today-n">13</span>
+          <span class="today-l">categorías temáticas desde finanzas hasta salud, ocio o legal-fiscal</span>
+        </div>
+        <div class="today-card fragment fade-up">
+          <span class="today-n">+185</span>
+          <span class="today-l">herramientas accesibles desde ChatGPT, Claude y Mistral (MCP server propio)</span>
+        </div>
+        <div class="today-card alt fragment fade-up">
+          <span class="today-n">49</span>
+          <span class="today-l">países con usuarios activos (pico mayo 2026)</span>
+        </div>
+        <div class="today-card fragment fade-up">
+          <span class="today-n">0 €</span>
+          <span class="today-l">coste para el usuario — sin suscripción, sin anuncios, sin registro</span>
+        </div>
+        <div class="today-card alt fragment fade-up">
+          <span class="today-n">1</span>
+          <span class="today-l">persona construyendo todo el proyecto — arquitectura diseñada para escalar</span>
+        </div>
+      </div>
+      <div class="today-cats fragment fade-up">
+        <span class="today-pill">🧮 Estudiantes</span>
+        <span class="today-pill">📈 Finanzas</span>
+        <span class="today-pill">🏥 Salud</span>
+        <span class="today-pill">⚖️ Legal y Fiscal</span>
+        <span class="today-pill">💼 Freelance</span>
+        <span class="today-pill">🏘️ Inmobiliaria</span>
+        <span class="today-pill">⚡ Productividad</span>
+        <span class="today-pill">✈️ Viajes</span>
+        <span class="today-pill">🎨 Diseño</span>
+        <span class="today-pill">📚 Cultura</span>
+        <span class="today-pill">🎲 Ocio</span>
+        <span class="today-pill">🔧 Técnicas</span>
+        <span class="today-pill">♿ Accesibilidad</span>
+      </div>
+      <aside class="notes">
+        Todo construido por una sola persona. 1.000 herramientas operativas, MCP server propio, presencia en 49 países. La arquitectura está diseñada para que nuevas herramientas se generen y desplieguen en minutos, no en semanas.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 4 — TRACCIÓN  (3/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>Tracción real — crecimiento orgánico</h2>
+        <span class="snum">3 / 9</span>
+      </div>
+      <table class="tract-table fragment fade-up">
+        <thead>
+          <tr>
+            <th>Mes</th>
+            <th>Volumen de visitas</th>
+            <th style="text-align:right">Países</th>
+            <th style="text-align:right">Variación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Enero 2026</td>
+            <td><span class="bar" style="width:15px"></span>137</td>
+            <td class="num">10</td>
+            <td class="trend trend-new">inicio</td>
+          </tr>
+          <tr>
+            <td>Febrero 2026</td>
+            <td><span class="bar" style="width:50px"></span>484</td>
+            <td class="num">15</td>
+            <td class="trend trend-up">+253 %</td>
+          </tr>
+          <tr>
+            <td>Marzo 2026</td>
+            <td><span class="bar" style="width:95px"></span>976</td>
+            <td class="num">32</td>
+            <td class="trend trend-up">+102 %</td>
+          </tr>
+          <tr>
+            <td>Abril 2026</td>
+            <td><span class="bar" style="width:105px"></span>1.066</td>
+            <td class="num">28</td>
+            <td class="trend trend-up">+9 %</td>
+          </tr>
+          <tr>
+            <td>Mayo 2026</td>
+            <td><span class="bar alt" style="width:225px"></span>2.307</td>
+            <td class="num">49</td>
+            <td class="trend trend-up">+116 %</td>
+          </tr>
+          <tr>
+            <td>Junio 2026 <em style="font-size:0.85em;color:var(--mi)">(datos al 14-6)</em></td>
+            <td><span class="bar alt" style="width:215px"></span>2.182</td>
+            <td class="num">44</td>
+            <td class="trend trend-down">−5 % parcial</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="tract-note fragment fade-up">
+        <strong>17× de crecimiento en 5 meses.</strong> 100 % orgánico — sin publicidad de pago, sin campañas de adquisición. El canal IA (ChatGPT, Claude, Mistral) ya representa el 3 % del tráfico y crece mes a mes sin esfuerzo comercial activo.
+      </p>
+      <div class="gsc-note fragment fade-up">
+        🔍 <strong>900 clics orgánicos en Google en 28 días</strong> — certificado por Google Search Console · 12 jun 2026. Posicionamiento SEO en crecimiento sostenido.
+      </div>
+      <aside class="notes">
+        La variación de junio es parcial — el mes no ha terminado. El dato relevante es la tendencia acumulada: de 137 visitas en enero a más de 2.300 en mayo, sin invertir un euro en publicidad.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 5 — CANALES Y LATAM  (4/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>Canales de tráfico y alcance global</h2>
+        <span class="snum">4 / 9</span>
+      </div>
+      <div class="chan-wrap">
+        <div class="chan-block fragment fade-up">
+          <div class="chan-title">Origen de visitas — junio 2026</div>
+          <div class="chan-row">
+            <span class="chan-label">🔍 Orgánico / Directo</span>
+            <div class="chan-bar-wrap"><div class="chan-bar-fill" style="width:95%"></div></div>
+            <span class="chan-pct">95 %</span>
+          </div>
+          <div class="chan-row">
+            <span class="chan-label">🤖 IAs (ChatGPT, Claude, Mistral)</span>
+            <div class="chan-bar-wrap"><div class="chan-bar-fill alt" style="width:3%"></div></div>
+            <span class="chan-pct" style="color:var(--s)">3 %</span>
+          </div>
+          <div class="chan-row">
+            <span class="chan-label">📱 Redes sociales (X)</span>
+            <div class="chan-bar-wrap"><div class="chan-bar-fill" style="width:1%;background:#aaa"></div></div>
+            <span class="chan-pct" style="color:#aaa">1 %</span>
+          </div>
+          <div class="chan-row">
+            <span class="chan-label">📲 PWA instalada</span>
+            <div class="chan-bar-wrap"><div class="chan-bar-fill" style="width:0.3%;background:#ccc"></div></div>
+            <span class="chan-pct" style="color:#aaa">&lt;1 %</span>
+          </div>
+        </div>
+        <div class="chan-block fragment fade-up" style="text-align:center">
+          <div class="chan-title" style="text-align:left">Alcance LATAM</div>
+          <div class="latam-big">61.3 %</div>
+          <div class="latam-sub">del tráfico actual proviene<br/>de Latinoamérica</div>
+          <div class="latam-trend">↑ desde 57.7 % en mayo · expansión regional sin acción directa</div>
+          <div style="font-size:0.5em;color:var(--mi);margin-top:0.7em;line-height:1.4">
+            Objetivo inicial de reposicionamiento: ≥30 % LATAM.<br/>
+            <strong style="color:var(--ok)">Superado con el doble.</strong>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        Dos datos clave: el 95% orgánico confirma coste de adquisición cero. El 61% LATAM indica que la propuesta en español tiene alcance regional real y que el mercado latinoamericano está respondiendo sin que hayamos hecho ninguna acción específica dirigida a él.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 6 — STACK TÉCNICO  (5/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>Arquitectura técnica</h2>
+        <span class="snum">5 / 9</span>
+      </div>
+      <div class="stack-grid">
+        <div class="stack-card fragment fade-up">
+          <span class="stack-ico">⚡</span>
+          <div class="stack-t">Next.js 16 + React 19</div>
+          <p class="stack-d">App Router, SSG estático para SEO, server components. 1.000+ páginas prerenderizadas en &lt;90 segundos.</p>
+        </div>
+        <div class="stack-card alt fragment fade-up">
+          <span class="stack-ico">🌐</span>
+          <div class="stack-t">Vercel (serverless)</div>
+          <p class="stack-d">Escala a cero automáticamente. Sin servidores que gestionar. CDN global. Despliegue continuo en &lt;60 segundos.</p>
+        </div>
+        <div class="stack-card fragment fade-up">
+          <span class="stack-ico">🗄️</span>
+          <div class="stack-t">Turso (SQLite cloud)</div>
+          <p class="stack-d">Base de datos distribuida en EU West. Analytics en tiempo real. Coste marginal por visita prácticamente cero.</p>
+        </div>
+        <div class="stack-card alt fragment fade-up">
+          <span class="stack-ico">🤖</span>
+          <div class="stack-t">MCP Server propio</div>
+          <p class="stack-d">185 herramientas expuestas como tools para ChatGPT, Claude y Mistral. Protocolo estándar de la industria.</p>
+        </div>
+        <div class="stack-card fragment fade-up">
+          <span class="stack-ico">🔷</span>
+          <div class="stack-t">TypeScript estricto</div>
+          <p class="stack-d">100 % del código tipado. Sin errores TS en build. Codebase mantenible a escala por un equipo pequeño.</p>
+        </div>
+        <div class="stack-card alt fragment fade-up">
+          <span class="stack-ico">🔒</span>
+          <div class="stack-t">Security headers + RGPD</div>
+          <p class="stack-d">Cabeceras HTTP en dos capas (Vercel + Next.js). Contacto anónimo RGPD-compliant. Sin cookies de terceros.</p>
+        </div>
+      </div>
+      <div class="stack-why fragment fade-up">
+        <strong>Por qué este stack escala:</strong> coste de infraestructura fijo aunque el tráfico se multiplique por 10. Una herramienta nueva tarda minutos en estar en producción y prerenderizada. El MCP server añade un canal de distribución de IA sin trabajo adicional por herramienta.
+      </div>
+      <aside class="notes">
+        El stack no es experimental: es producción real con 1.000 páginas y tráfico creciente. La decisión clave fue SSG — las páginas se sirven como HTML estático desde CDN, sin computación por visita. El coste escala logarítmicamente, no linealmente.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 7 — EL MOAT  (6/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Por qué es difícil de replicar?</h2>
+        <span class="snum">6 / 9</span>
+      </div>
+      <ul class="moat-list">
+        <li class="moat-item fragment fade-up">
+          <span class="moat-ico">📈</span>
+          <div>
+            <div class="moat-t">Flywheel de SEO ya en marcha</div>
+            <div class="moat-d">1.000+ páginas indexadas con autoridad creciente. Un competidor que empiece hoy tarda meses en aparecer donde meskeIA ya aparece. La ventaja se amplía con cada nueva herramienta.</div>
+          </div>
+        </li>
+        <li class="moat-item alt fragment fade-up">
+          <span class="moat-ico">🤖</span>
+          <div>
+            <div class="moat-t">Canal IA — ventaja de first-mover</div>
+            <div class="moat-d">Integrado en ChatGPT, Claude y Mistral antes de que este canal esté saturado. Los asistentes de IA tienden a mantener sus integraciones — el coste de desplazarnos crece con el tiempo.</div>
+          </div>
+        </li>
+        <li class="moat-item fragment fade-up">
+          <span class="moat-ico">🌍</span>
+          <div>
+            <div class="moat-t">Marca en español con tracción global</div>
+            <div class="moat-d">61 % de tráfico LATAM, 49 países. Construir confianza de marca lleva tiempo. meskeIA ya tiene usuarios recurrentes en 49 países sin haber hecho una sola campaña internacional.</div>
+          </div>
+        </li>
+        <li class="moat-item alt fragment fade-up">
+          <span class="moat-ico">⚡</span>
+          <div>
+            <div class="moat-t">Velocidad de producción — ventaja de escala</div>
+            <div class="moat-d">La arquitectura permite generar y desplegar herramientas en minutos. A 1.000 herramientas, una copia directa necesita meses de trabajo humano. La distancia aumenta con cada semana.</div>
+          </div>
+        </li>
+      </ul>
+      <aside class="notes">
+        El moat no es tecnológico en el sentido clásico — es temporal, de distribución y de marca. En internet, quien llega primero con calidad y se indexa bien construye una ventaja que solo el tiempo puede igualar.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 8 — MODELO DE NEGOCIO  (7/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>Modelo de negocio</h2>
+        <span class="snum">7 / 9</span>
+      </div>
+      <div class="biz-layers">
+        <div class="biz-layer biz-layer-1 fragment fade-up">
+          <div class="biz-badge">CAPA 1</div>
+          <div class="biz-content">
+            <div class="biz-t" style="color:var(--p)">meskeIA — Plataforma gratuita (siempre)</div>
+            <div class="biz-d">+1.000 herramientas abiertas. Motor de adquisición de usuarios a coste cero. SEO + canal IA como distribución orgánica. Fideliza audiencia hispanohablante de escala global.</div>
+          </div>
+          <div class="biz-arr">👥<br/><span style="font-size:0.7em;color:var(--mi)">audiencia</span></div>
+        </div>
+        <div class="biz-layer biz-layer-2 fragment fade-up">
+          <div class="biz-badge">CAPA 2</div>
+          <div class="biz-content">
+            <div class="biz-t" style="color:var(--s)">MCP / API — Acceso programático (B2B)</div>
+            <div class="biz-d">185 tools ya expuestas al ecosistema IA. Potencial de licenciamiento B2B a empresas que integren las herramientas en sus productos o asistentes propios.</div>
+          </div>
+          <div class="biz-arr">🏢<br/><span style="font-size:0.7em;color:var(--mi)">B2B</span></div>
+        </div>
+        <div class="biz-layer biz-layer-3 fragment fade-up">
+          <div class="biz-badge">CAPA 3</div>
+          <div class="biz-content">
+            <div class="biz-t">Verticales premium — Modelo Delegum</div>
+            <div class="biz-d">Suites temáticas especializadas que ofrecen valor profesional diferencial. Apps gratuitas individuales → producto especializado freemium o de suscripción. Mayor profundidad, normativa actualizada, orientación personalizada.</div>
+          </div>
+          <div class="biz-arr">💰<br/><span style="font-size:0.7em;color:rgba(255,255,255,0.6)">premium</span></div>
+        </div>
+      </div>
+      <div class="biz-note fragment fade-up">
+        <strong>La clave:</strong> las apps gratuitas no son el producto final — son el canal de adquisición. Las verticales premium capturan el valor añadido que el usuario más exigente está dispuesto a pagar.
+      </div>
+      <aside class="notes">
+        Es un modelo de tres capas clásico en plataformas de utilidades: base gratuita masiva → capa API/B2B → verticales premium de nicho. Cada capa refuerza a las demás: más apps = más SEO = más usuarios = más potenciales clientes de las verticales.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 9 — VERTICALES PREMIUM  (8/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>Verticales premium — roadmap</h2>
+        <span class="snum">8 / 9</span>
+      </div>
+      <div class="vert-grid">
+        <div class="vert-card live fragment fade-up">
+          <span class="vert-status">✅ En producción (free → premium)</span>
+          <span class="vert-ico">⚖️</span><span class="vert-t">Delegum</span>
+          <div class="vert-d">Orientación fiscal, laboral y patrimonial en España. 40+ herramientas integradas: IRPF, autónomos, hipotecas, herencias, pensiones. Integrado en Claude, ChatGPT y Mistral como servidor MCP propio.</div>
+          <div class="vert-tags">
+            <span class="vert-tag">fiscal</span>
+            <span class="vert-tag">laboral</span>
+            <span class="vert-tag">patrimonio</span>
+            <span class="vert-tag">MCP propio</span>
+          </div>
+        </div>
+        <div class="vert-card next fragment fade-up">
+          <span class="vert-status">🔵 En evaluación</span>
+          <span class="vert-ico">📷</span><span class="vert-t">Fotografía & Vídeo</span>
+          <div class="vert-d">Simuladores interactivos de exposición, profundidad de campo, astrofotografía, regla 180°, filtros ND. Alternativa en español a PhotoPills y similares — enfoque práctico y sin fricción.</div>
+          <div class="vert-tags">
+            <span class="vert-tag">simuladores</span>
+            <span class="vert-tag">fotografía</span>
+            <span class="vert-tag">vídeo</span>
+            <span class="vert-tag">astrofoto</span>
+          </div>
+        </div>
+        <div class="vert-card future fragment fade-up">
+          <span class="vert-status">⬜ Pipeline</span>
+          <span class="vert-ico">🏋️</span><span class="vert-t">Fitness & Entrenamiento</span>
+          <div class="vert-d">1RM, zonas cardíacas, pace, potencia ciclismo, planificador de carrera. Suite completa para el deportista que quiere herramientas de precisión sin apps de pago.</div>
+          <div class="vert-tags">
+            <span class="vert-tag">running</span>
+            <span class="vert-tag">ciclismo</span>
+            <span class="vert-tag">natación</span>
+          </div>
+        </div>
+        <div class="vert-card future fragment fade-up">
+          <span class="vert-status">⬜ Pipeline</span>
+          <span class="vert-ico">🏘️</span><span class="vert-t">Inmobiliaria & Hogar</span>
+          <div class="vert-d">Hipotecas, rentabilidad alquiler, ITP/AJD por comunidad, plusvalías, gastos de comunidad. Suite integrada para compradores, inversores y propietarios.</div>
+          <div class="vert-tags">
+            <span class="vert-tag">hipotecas</span>
+            <span class="vert-tag">alquiler</span>
+            <span class="vert-tag">fiscal</span>
+          </div>
+        </div>
+      </div>
+      <div class="vert-thesis fragment fade-up">
+        <strong>Tesis:</strong> cada vertical agrupa herramientas ya existentes en meskeIA, las vincula con lógica de negocio adicional y añade capas de contexto que el usuario exigente valora — y por las que está dispuesto a pagar.
+      </div>
+      <aside class="notes">
+        Delegum es la prueba de concepto ya en producción. Las herramientas base están construidas — la vertical es la capa de orquestación, contexto y monetización por encima. El coste marginal de crear una nueva vertical es mucho menor que construirla desde cero.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 10 — CÓMO PARTICIPAR  (9/9)
+    ══════════════════════════════════════════════ -->
+    <section>
+      <div class="stitle">
+        <h2>¿Cómo participar?</h2>
+        <span class="snum">9 / 9</span>
+      </div>
+      <div class="part-grid">
+        <div class="part-card fragment fade-up">
+          <span class="part-ico">💰</span>
+          <div class="part-t">Capital</div>
+          <p class="part-d">Tracción real validada. Coste de infraestructura muy bajo. La inversión se destinaría a acelerar el desarrollo de verticales premium y expansión LATAM activa.</p>
+        </div>
+        <div class="part-card alt fragment fade-up">
+          <span class="part-ico">🔧</span>
+          <div class="part-t">Socio técnico</div>
+          <p class="part-d">Stack moderno (Next.js, TS, Vercel, MCP). Codebase limpio y escalable. Buscamos perfiles con experiencia en productos SaaS, IA o plataformas de utilidades.</p>
+        </div>
+        <div class="part-card alt2 fragment fade-up">
+          <span class="part-ico">🤝</span>
+          <div class="part-t">Partnership</div>
+          <p class="part-d">Acuerdos de distribución, co-creación de verticales o integración B2B. El MCP server ya está listo para conectarse con productos de terceros.</p>
+        </div>
+      </div>
+      <div class="part-note fragment fade-up">
+        Acceso a demo técnica, métricas completas y código bajo NDA disponible para inversores y socios calificados.<br/>
+        <strong>Contacto:</strong> meskeia@proton.me · meskeia.com
+      </div>
+      <aside class="notes">
+        No es una ronda de millones — es una conversación para encontrar el encaje correcto. Si el proyecto os parece interesante, el siguiente paso es una demo técnica y acceso a los datos reales.
+      </aside>
+    </section>
+
+    <!-- ══════════════════════════════════════════════
+         SLIDE 11 — CIERRE
+    ══════════════════════════════════════════════ -->
+    <section class="dark" data-background-gradient="linear-gradient(135deg,#0d2f45 0%,#1a5278 60%,#1d7a8a 100%)">
+      <div class="cw">
+        <div class="c-logo">meske<span>IA</span></div>
+        <div class="c-claim">La plataforma de herramientas en español que escala hacia verticales premium.</div>
+        <div class="c-contact">
+          meskeia@proton.me &nbsp;·&nbsp; <a href="#">meskeia.com</a> &nbsp;·&nbsp; <a href="#">delegum.com</a>
+        </div>
+        <div class="cpills fragment fade-up">
+          <div class="cpill">📈 17× en 5 meses</div>
+          <div class="cpill">🌍 49 países</div>
+          <div class="cpill">🌎 61 % LATAM</div>
+          <div class="cpill">🤖 185 tools MCP</div>
+          <div class="cpill">💼 0 € publicidad</div>
+        </div>
+      </div>
+      <aside class="notes">
+        Muchas gracias. Quedo a vuestra disposición para resolver cualquier pregunta y para organizar una sesión de due diligence técnica cuando lo estiméis oportuno.
+      </aside>
+    </section>
+
+  </div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash:                 true,
+    slideNumber:          false,
+    progress:             true,
+    controls:             true,
+    center:               false,
+    transition:           'slide',
+    transitionSpeed:      'fast',
+    backgroundTransition: 'fade',
+    plugins:              [RevealNotes],
+    width:                1200,
+    height:               750,
+    margin:               0.04,
+    minScale:             0.2,
+    maxScale:             2.0,
+  });
+</script>
+</body>
+</html>
