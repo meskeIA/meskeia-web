@@ -259,7 +259,7 @@ export default function CalculadoraTrigonometriaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📐 Calculadora de Trigonometría</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📐</span> Calculadora de Trigonometría</h1>
         <p className={styles.subtitle}>
           Funciones trigonométricas, resolución de triángulos, conversiones e identidades
         </p>
@@ -275,10 +275,12 @@ export default function CalculadoraTrigonometriaPage() {
             {tipos.map((tipo) => (
               <button
                 key={tipo.id}
+                type="button"
                 className={`${styles.tipoBtn} ${tipoCalculo === tipo.id ? styles.tipoActivo : ''}`}
                 onClick={() => setTipoCalculo(tipo.id)}
+                aria-pressed={tipoCalculo === tipo.id}
               >
-                <span className={styles.tipoIcono}>{tipo.icono}</span>
+                <span className={styles.tipoIcono} aria-hidden="true">{tipo.icono}</span>
                 <span className={styles.tipoNombre}>{tipo.nombre}</span>
               </button>
             ))}
@@ -287,14 +289,18 @@ export default function CalculadoraTrigonometriaPage() {
           {(tipoCalculo === 'funciones' || tipoCalculo === 'identidades') && (
             <div className={styles.unidadSelector}>
               <button
+                type="button"
                 className={`${styles.unidadBtn} ${unidad === 'grados' ? styles.unidadActiva : ''}`}
                 onClick={() => setUnidad('grados')}
+                aria-pressed={unidad === 'grados'}
               >
                 Grados (°)
               </button>
               <button
+                type="button"
                 className={`${styles.unidadBtn} ${unidad === 'radianes' ? styles.unidadActiva : ''}`}
                 onClick={() => setUnidad('radianes')}
+                aria-pressed={unidad === 'radianes'}
               >
                 Radianes
               </button>
@@ -315,6 +321,7 @@ export default function CalculadoraTrigonometriaPage() {
                   {[0, 30, 45, 60, 90, 180, 270, 360].map(a => (
                     <button
                       key={a}
+                      type="button"
                       onClick={() => setAngulo(unidad === 'grados' ? a.toString() : formatNumber(a * PI / 180, 4))}
                       className={styles.btnAngulo}
                     >
@@ -367,8 +374,10 @@ export default function CalculadoraTrigonometriaPage() {
                   {(['grados', 'radianes', 'gradianes'] as const).map(u => (
                     <button
                       key={u}
+                      type="button"
                       className={`${styles.unidadOrigenBtn} ${unidadOrigen === u ? styles.unidadOrigenActiva : ''}`}
                       onClick={() => setUnidadOrigen(u)}
+                      aria-pressed={unidadOrigen === u}
                     >
                       {u === 'grados' ? 'Grados (°)' : u === 'radianes' ? 'Radianes' : 'Gradianes'}
                     </button>
@@ -397,12 +406,12 @@ export default function CalculadoraTrigonometriaPage() {
           </div>
         </div>
 
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <h2 className={styles.sectionTitle}>Resultados</h2>
 
           {!resultados ? (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>📐</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">📐</span>
               <p>Ingresa los valores para calcular</p>
             </div>
           ) : (

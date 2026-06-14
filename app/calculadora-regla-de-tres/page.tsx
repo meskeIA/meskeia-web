@@ -1,10 +1,9 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './ReglaDeTres.module.css';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard,
-  DisclaimerCard,
-} from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -196,13 +195,6 @@ export default function CalculadoraReglaDeTresPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="calculadora-regla-de-tres-disclaimer"
-      />
-
       <main className={styles.mainContent}>
         {/* Panel de configuración */}
         <section className={styles.configPanel}>
@@ -210,20 +202,26 @@ export default function CalculadoraReglaDeTresPage() {
 
           <div className={styles.tipoSelector}>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoRegla === 'simple-directa' ? styles.activo : ''}`}
               onClick={() => { setTipoRegla('simple-directa'); limpiarCampos(); }}
+              aria-pressed={tipoRegla === 'simple-directa'}
             >
               Simple Directa
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoRegla === 'simple-inversa' ? styles.activo : ''}`}
               onClick={() => { setTipoRegla('simple-inversa'); limpiarCampos(); }}
+              aria-pressed={tipoRegla === 'simple-inversa'}
             >
               Simple Inversa
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoRegla === 'compuesta' ? styles.activo : ''}`}
               onClick={() => { setTipoRegla('compuesta'); limpiarCampos(); }}
+              aria-pressed={tipoRegla === 'compuesta'}
             >
               Compuesta
             </button>
@@ -268,6 +266,7 @@ export default function CalculadoraReglaDeTresPage() {
                     value={valorA}
                     onChange={(e) => setValorA(e.target.value)}
                     placeholder="ej: 3"
+                    inputMode="decimal"
                     className={styles.input}
                   />
                 </div>
@@ -280,6 +279,7 @@ export default function CalculadoraReglaDeTresPage() {
                     value={valorB}
                     onChange={(e) => setValorB(e.target.value)}
                     placeholder="ej: 4,50"
+                    inputMode="decimal"
                     className={styles.input}
                   />
                 </div>
@@ -294,6 +294,7 @@ export default function CalculadoraReglaDeTresPage() {
                     value={valorC}
                     onChange={(e) => setValorC(e.target.value)}
                     placeholder="ej: 5"
+                    inputMode="decimal"
                     className={styles.input}
                   />
                 </div>
@@ -320,6 +321,7 @@ export default function CalculadoraReglaDeTresPage() {
                       value={valorA}
                       onChange={(e) => setValorA(e.target.value)}
                       placeholder="ej: 5"
+                      inputMode="decimal"
                       className={styles.input}
                     />
                   </div>
@@ -332,6 +334,7 @@ export default function CalculadoraReglaDeTresPage() {
                       value={valorC}
                       onChange={(e) => setValorC(e.target.value)}
                       placeholder="ej: 3"
+                      inputMode="decimal"
                       className={styles.input}
                     />
                   </div>
@@ -359,6 +362,7 @@ export default function CalculadoraReglaDeTresPage() {
                       value={valorD}
                       onChange={(e) => setValorD(e.target.value)}
                       placeholder="ej: 8"
+                      inputMode="decimal"
                       className={styles.input}
                     />
                   </div>
@@ -371,6 +375,7 @@ export default function CalculadoraReglaDeTresPage() {
                       value={valorE}
                       onChange={(e) => setValorE(e.target.value)}
                       placeholder="ej: 12"
+                      inputMode="decimal"
                       className={styles.input}
                     />
                   </div>
@@ -388,6 +393,7 @@ export default function CalculadoraReglaDeTresPage() {
                       value={valorB}
                       onChange={(e) => setValorB(e.target.value)}
                       placeholder="ej: 200"
+                      inputMode="decimal"
                       className={styles.input}
                     />
                   </div>
@@ -403,16 +409,16 @@ export default function CalculadoraReglaDeTresPage() {
             </div>
           )}
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
 
           <div className={styles.botonesAccion}>
-            <button onClick={calcularReglaDeTres} className={styles.btnPrimary}>
+            <button type="button" onClick={calcularReglaDeTres} className={styles.btnPrimary}>
               Calcular
             </button>
-            <button onClick={cargarEjemplo} className={styles.btnSecondary}>
+            <button type="button" onClick={cargarEjemplo} className={styles.btnSecondary}>
               Cargar Ejemplo
             </button>
-            <button onClick={limpiarCampos} className={styles.btnOutline}>
+            <button type="button" onClick={limpiarCampos} className={styles.btnOutline}>
               Limpiar
             </button>
           </div>
@@ -420,7 +426,7 @@ export default function CalculadoraReglaDeTresPage() {
 
         {/* Panel de resultados */}
         {resultado && (
-          <section className={styles.resultadosPanel}>
+          <section className={styles.resultadosPanel} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.sectionTitle}>Resultado</h2>
 
             <ResultCard

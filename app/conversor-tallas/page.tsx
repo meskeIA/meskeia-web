@@ -1,10 +1,9 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './ConversorTallas.module.css';
-import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice, ShareCard,
-  DisclaimerCard,
-} from '@/components';
+import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
@@ -389,36 +388,37 @@ export default function ConversorTallasPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="conversor-tallas-disclaimer"
-      />
-
       {/* Tabs */}
       <div className={styles.tabs}>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'hombre' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('hombre')}
+          aria-pressed={activeTab === 'hombre'}
         >
           Hombre
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'mujer' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('mujer')}
+          aria-pressed={activeTab === 'mujer'}
         >
           Mujer
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'calzado' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('calzado')}
+          aria-pressed={activeTab === 'calzado'}
         >
           Calzado
         </button>
         <button
+          type="button"
           className={`${styles.tab} ${activeTab === 'complementos' ? styles.tabActive : ''}`}
           onClick={() => handleTabChange('complementos')}
+          aria-pressed={activeTab === 'complementos'}
         >
           Complementos
         </button>
@@ -473,12 +473,12 @@ export default function ConversorTallasPage() {
                 />
               </div>
 
-              <button className={styles.btnPrimary} onClick={convertHombreTalla}>
+              <button type="button" className={styles.btnPrimary} onClick={convertHombreTalla}>
                 Convertir Talla
               </button>
             </div>
 
-            <div className={styles.resultsSection}>
+            <div className={styles.resultsSection} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.sectionTitle}>Equivalencias</h3>
 
               {hombreResult ? (
@@ -543,12 +543,12 @@ export default function ConversorTallasPage() {
                 />
               </div>
 
-              <button className={styles.btnPrimary} onClick={convertMujerTalla}>
+              <button type="button" className={styles.btnPrimary} onClick={convertMujerTalla}>
                 Convertir Talla
               </button>
             </div>
 
-            <div className={styles.resultsSection}>
+            <div className={styles.resultsSection} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.sectionTitle}>Equivalencias</h3>
 
               {mujerResult ? (
@@ -613,12 +613,12 @@ export default function ConversorTallasPage() {
                 />
               </div>
 
-              <button className={styles.btnPrimary} onClick={convertCalzadoTalla}>
+              <button type="button" className={styles.btnPrimary} onClick={convertCalzadoTalla}>
                 Convertir Talla
               </button>
             </div>
 
-            <div className={styles.resultsSection}>
+            <div className={styles.resultsSection} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.sectionTitle}>Equivalencias</h3>
 
               {calzadoResult ? (
@@ -691,12 +691,12 @@ export default function ConversorTallasPage() {
                 />
               </div>
 
-              <button className={styles.btnPrimary} onClick={convertComplementoTalla}>
+              <button type="button" className={styles.btnPrimary} onClick={convertComplementoTalla}>
                 Convertir Talla
               </button>
             </div>
 
-            <div className={styles.resultsSection}>
+            <div className={styles.resultsSection} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.sectionTitle}>Equivalencias</h3>
 
               {complementoResult ? (
@@ -721,30 +721,30 @@ export default function ConversorTallasPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h4>Informacion Importante sobre Equivalencias de Tallas</h4>
+        <h4>Información Importante sobre Equivalencias de Tallas</h4>
         <p>
           <strong>Las equivalencias mostradas son aproximadas</strong> y pueden variar significativamente
-          entre fabricantes, marcas y paises. Cada empresa puede tener sus propios estandares de tallaje.
+          entre fabricantes, marcas y países. Cada empresa puede tener sus propios estándares de tallaje.
         </p>
         <p style={{ marginTop: '12px' }}>
           <strong>Recomendaciones para compras online:</strong>
         </p>
         <ul>
           <li>
-            Consulta siempre la <strong>guia de tallas especifica</strong> del fabricante
+            Consulta siempre la <strong>guía de tallas específica</strong> del fabricante
           </li>
           <li>
-            Lee las <strong>resenas de otros compradores</strong> sobre el tallaje del producto
+            Lee las <strong>reseñas de otros compradores</strong> sobre el tallaje del producto
           </li>
-          <li>Para calzado, mide tu pie en centimetros y comparalo con las medidas del fabricante</li>
+          <li>Para calzado, mide tu pie en centímetros y compáralo con las medidas del fabricante</li>
           <li>
-            En caso de duda, elige la <strong>talla mayor</strong> - es mas facil ajustar que estirar
+            En caso de duda, elige la <strong>talla mayor</strong> — es más fácil ajustar que estirar
           </li>
-          <li>Ropa asiatica suele tallar mas pequeno - considera subir 1-2 tallas</li>
+          <li>Ropa asiática suele tallar más pequeño — considera subir 1-2 tallas</li>
         </ul>
         <p style={{ marginTop: '12px' }}>
-          meskeIA no se hace responsable de problemas de tallas en compras realizadas basandose
-          unicamente en estas equivalencias.
+          meskeIA no se hace responsable de problemas de tallas en compras realizadas basándose
+          únicamente en estas equivalencias.
         </p>
       </div>
 

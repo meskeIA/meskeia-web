@@ -246,7 +246,7 @@ export default function ConvertidorColoresPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎨 Convertidor de Colores</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎨</span> Convertidor de Colores</h1>
         <p className={styles.subtitle}>
           Convierte entre HEX, RGB, HSL y CMYK al instante
         </p>
@@ -268,6 +268,7 @@ export default function ConvertidorColoresPage() {
               value={color.hex}
               onChange={handleColorPickerChange}
               className={styles.colorPicker}
+              aria-label="Selector de color visual"
             />
           </div>
 
@@ -286,6 +287,7 @@ export default function ConvertidorColoresPage() {
               maxLength={7}
             />
             <button
+              type="button"
               onClick={() => copyToClipboard(color.hex, 'hex')}
               className={styles.copyBtn}
             >
@@ -295,7 +297,7 @@ export default function ConvertidorColoresPage() {
         </div>
 
         {/* Panel derecho - Valores */}
-        <div className={styles.panel}>
+        <div className={styles.panel} role="status" aria-live="polite" aria-atomic="true">
           <h2 className={styles.panelTitle}>Valores del Color</h2>
 
           {/* RGB */}
@@ -303,6 +305,7 @@ export default function ConvertidorColoresPage() {
             <div className={styles.sectionHeader}>
               <h3>RGB</h3>
               <button
+                type="button"
                 onClick={() => copyToClipboard(formatRgb, 'rgb')}
                 className={styles.copyBtn}
               >
@@ -379,6 +382,7 @@ export default function ConvertidorColoresPage() {
             <div className={styles.sectionHeader}>
               <h3>HSL</h3>
               <button
+                type="button"
                 onClick={() => copyToClipboard(formatHsl, 'hsl')}
                 className={styles.copyBtn}
               >
@@ -452,6 +456,7 @@ export default function ConvertidorColoresPage() {
             <div className={styles.sectionHeader}>
               <h3>CMYK</h3>
               <button
+                type="button"
                 onClick={() => copyToClipboard(formatCmyk, 'cmyk')}
                 className={styles.copyBtn}
               >
@@ -518,15 +523,17 @@ export default function ConvertidorColoresPage() {
         <div className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>💻 Código de implementación</h2>
+              <h2><span aria-hidden="true">💻</span> Código de implementación</h2>
               <p className={styles.htmlSubtitle}>
                 Exporta este color a tu blog de diseño, guía de estilo o documentación
               </p>
             </div>
             <button
+              type="button"
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
               aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+              aria-expanded={htmlExpanded}
             >
               {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
             </button>
@@ -537,7 +544,7 @@ export default function ConvertidorColoresPage() {
               <pre className={styles.codeBlock}>
                 <code>{htmlCode}</code>
               </pre>
-              <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+              <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
                 {copiedField === 'html' ? '✅ Copiado' : '📋 Copiar código'}
               </button>
             </div>
@@ -550,22 +557,22 @@ export default function ConvertidorColoresPage() {
         <h3>¿Cuándo usar cada formato?</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🌐</span>
+            <span className={styles.infoIcon} aria-hidden="true">🌐</span>
             <h4>HEX</h4>
             <p>Estándar para desarrollo web. Compacto y fácil de usar en CSS</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🖥️</span>
+            <span className={styles.infoIcon} aria-hidden="true">🖥️</span>
             <h4>RGB</h4>
             <p>Pantallas y monitores. Ideal para manipular canales individuales</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🎨</span>
+            <span className={styles.infoIcon} aria-hidden="true">🎨</span>
             <h4>HSL</h4>
             <p>Intuitivo para diseñadores. Fácil ajustar tono, saturación y brillo</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🖨️</span>
+            <span className={styles.infoIcon} aria-hidden="true">🖨️</span>
             <h4>CMYK</h4>
             <p>Impresión profesional. Necesario para materiales impresos</p>
           </div>

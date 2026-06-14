@@ -339,7 +339,7 @@
 | [ ] | Compresor de Imágenes por Lotes | `/compresor-imagenes/` | diseno |
 | [x] | Contador de Palabras | `/contador-palabras/` | diseno, productividad |
 | [ ] | Conversor Base64 | `/conversor-base64/` | diseno, tecnicas |
-| [ ] | Conversor de Colores | `/conversor-colores/` | diseno |
+| [x] | Conversor de Colores | `/conversor-colores/` | diseno |
 | [ ] | Conversor de Imágenes | `/conversor-imagenes/` | diseno, productividad |
 | [ ] | Conversor Markdown-HTML | `/conversor-markdown-html/` | diseno |
 | [x] | Creador de Paletas | `/creador-paletas/` | diseno |
@@ -400,7 +400,7 @@
 | [x] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
 | [ ] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
 | [ ] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
-| [ ] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
+| [x] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
 | [x] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
 | [x] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
 | [ ] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
@@ -928,10 +928,10 @@
 | [ ] | Calculadora Costes Teletrabajo | `/calculadora-costes-teletrabajo/` | productividad, finanzas, freelance |
 | [x] | Calculadora de Fechas | `/calculadora-fechas/` | productividad |
 | [x] | Calculadora de Porcentajes | `/calculadora-porcentajes/` | productividad, estudiantes |
-| [ ] | Calculadora Regla de Tres | `/calculadora-regla-de-tres/` | productividad, estudiantes |
+| [x] | Calculadora Regla de Tres | `/calculadora-regla-de-tres/` | productividad, estudiantes |
 | [ ] | Checklist Pre-Mortem | `/checklist-pre-mortem/` | productividad, freelance |
 | [ ] | Conversor de Formatos | `/conversor-formatos/` | productividad |
-| [ ] | Conversor de Tallas | `/conversor-tallas/` | productividad |
+| [x] | Conversor de Tallas | `/conversor-tallas/` | productividad |
 | [ ] | Conversor de Texto | `/conversor-texto/` | productividad |
 | [x] | Conversor de Unidades | `/conversor-unidades/` | productividad, viajes |
 | [ ] | Cronómetro y Temporizador | `/cronometro/` | productividad |

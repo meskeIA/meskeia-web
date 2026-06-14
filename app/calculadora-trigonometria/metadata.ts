@@ -37,9 +37,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-trigonometria/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Calcula las 6 funciones trigonométricas: seno, coseno, tangente, cosecante, secante y cotangente',
+    'Resolución de triángulos rectángulos con teorema del seno y del coseno',
+    'Conversión entre grados, radianes y gradianes con resultado inmediato',
+    'Acceso directo a ángulos notables: 0°, 30°, 45°, 60°, 90°, 180°, 270° y 360°',
+    'Tabla de identidades trigonométricas: Pitágoras, suma de ángulos y doble ángulo',
+    'Modo grados y modo radianes seleccionable en el mismo panel',
+    'Resultados con 8 decimales para cálculos de precisión en física e ingeniería',
   ],
 });
 

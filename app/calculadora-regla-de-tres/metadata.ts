@@ -39,7 +39,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Calculadora online de regla de tres simple directa, inversa y compuesta. Resuelve proporciones con explicaciones paso a paso y ejemplos prácticos. Gratis y sin registro.",
   url: "https://meskeia.com/calculadora-regla-de-tres/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Regla de tres simple directa: calcula proporciones que aumentan juntas (más kg → más precio)',
+    'Regla de tres simple inversa: calcula proporciones inversas (más obreros → menos días)',
+    'Regla de tres compuesta con 3 o más magnitudes y relaciones directas o inversas',
+    'Explicación paso a paso con fórmula y planteamiento visible para cada cálculo',
+    'Carga de ejemplos predefinidos: naranjas, obreros y producción industrial',
+    'Formato numérico en español (coma decimal, punto de miles)',
+    'Sin instalación ni registro, funciona completamente en el navegador',
+  ],
 });
 
 export const faqJsonLd = {

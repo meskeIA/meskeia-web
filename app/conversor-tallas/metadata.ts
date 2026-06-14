@@ -53,6 +53,15 @@ export const jsonLd = {
   applicationCategory: 'Shopping',
   operatingSystem: 'Any',
   browserRequirements: 'Requires JavaScript. Requires HTML5.',
+  featureList: [
+    'Conversión de tallas de ropa de hombre: camisas casuales, formales, pantalones y chaquetas',
+    'Conversión de tallas de ropa de mujer: blusas, pantalones y vestidos entre ES/EU, US y UK',
+    'Conversión de calzado para hombre, mujer y niño con longitud del pie en centímetros',
+    'Conversión de complementos: anillos (con diámetro mm), gorros y guantes',
+    'Compatibilidad con los tres sistemas más usados: España/Europa, Estados Unidos y Reino Unido',
+    'Entrada libre: introduce tu talla en cualquier sistema y obtén las equivalencias al instante',
+    'Aviso de variabilidad entre fabricantes incluido para evitar errores en compras online',
+  ],
   offers: {
     '@type': 'Offer',
     price: '0',

@@ -31,9 +31,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/conversor-colores/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Conversión instantánea entre HEX, RGB, HSL y CMYK con actualización en tiempo real',
+    'Color picker visual integrado para seleccionar cualquier color con el ratón o en pantalla táctil',
+    'Sliders interactivos para ajustar canales RGB, tono/saturación/luminosidad HSL y CMYK',
+    'Generación de paleta armónica: complementarios, análogos y triádicos desde el color base',
+    'Exportación de código HTML/CSS listo para copiar y pegar en proyectos web',
+    'Vista previa en tiempo real del color resultante con nombre aproximado',
+    'Soporte de entrada directa en HEX con validación automática del formato',
   ],
 });
 
