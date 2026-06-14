@@ -681,6 +681,7 @@ export default function SimuladorArbolesBstAvl() {
               type="button"
               onClick={() => handleCambiarTipo('bst')}
               className={`${styles.tipoBtn} ${tipo === 'bst' ? styles.tipoActive : ''}`}
+              aria-pressed={tipo === 'bst'}
             >
               <span className={styles.tipoNombre}>BST</span>
               <span className={styles.tipoDesc}>Árbol binario de búsqueda simple, sin balanceo automático</span>
@@ -689,6 +690,7 @@ export default function SimuladorArbolesBstAvl() {
               type="button"
               onClick={() => handleCambiarTipo('avl')}
               className={`${styles.tipoBtn} ${tipo === 'avl' ? styles.tipoActive : ''}`}
+              aria-pressed={tipo === 'avl'}
             >
               <span className={styles.tipoNombre}>AVL</span>
               <span className={styles.tipoDesc}>Auto-balanceado mediante rotaciones LL, RR, LR, RL</span>
@@ -850,7 +852,7 @@ export default function SimuladorArbolesBstAvl() {
 
         {/* Mensaje de estado */}
         {mensaje && (
-          <div className={styles.statusMessage}>
+          <div className={styles.statusMessage} role="status" aria-live="polite">
             <strong>Última operación:</strong> {mensaje}
           </div>
         )}

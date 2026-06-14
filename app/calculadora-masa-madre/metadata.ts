@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'Calculadora de Sustitución de Levadura por Masa Madre',
     description: 'Convierte cualquier receta de levadura comercial a masa madre con ajuste automático de harina y agua.',
-    url: 'https://meskeia.com/calculadora-masa-madre',
+    url: 'https://meskeia.com/calculadora-masa-madre/',
     siteName: 'meskeIA',
     locale: 'es_ES',
   },

@@ -45,7 +45,7 @@ export default function CalculadoraMasaMadrePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🍞 Calculadora de Masa Madre</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🍞</span> Calculadora de Masa Madre</h1>
         <p className={styles.subtitle}>
           Sustituye la levadura comercial por masa madre en cualquier receta con ajuste automático de harina y agua
         </p>
@@ -125,7 +125,7 @@ export default function CalculadoraMasaMadrePage() {
         </div>
 
         {res && (
-          <div className={styles.resultadoBox}>
+          <div className={styles.resultadoBox} role="status" aria-live="polite">
             <div className={styles.resultadoGrid}>
               <div className={styles.resultItem}>
                 <div className={styles.resultLabel}>Masa madre a añadir</div>
@@ -160,7 +160,7 @@ export default function CalculadoraMasaMadrePage() {
         )}
 
         {!res && (
-          <div role="alert" aria-live="polite" className={styles.equivalenciasBox}>
+          <div role="status" aria-live="polite" className={styles.equivalenciasBox}>
             Introduce los gramos de levadura de tu receta original para ver el resultado.
           </div>
         )}
@@ -209,7 +209,7 @@ export default function CalculadoraMasaMadrePage() {
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioIcon}>🍕</div>
             <h3>Pizza con 5 g levadura fresca</h3>
-            <p>Con MM al 100%: añadir 33 g de masa madre, restar 17 g harina y 17 g agua. Retardo en nevera 24–48h para más sabor.</p>
+            <p>Con MM al 100%: añadir 33 g de masa madre, restar 17 g harina y 16 g agua. Retardo en nevera 24–48h para más sabor.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioIcon}>🫓</div>

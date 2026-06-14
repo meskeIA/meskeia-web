@@ -209,7 +209,7 @@ export default function CalculadoraGanachePage() {
 
         {/* Resultado */}
         {calculado && (
-          <section className={styles.resultadoSection} role="region" aria-label="Resultado del cálculo">
+          <section className={styles.resultadoSection} role="region" aria-label="Resultado del cálculo" aria-live="polite">
             <h2 className={styles.resultadoTitulo}>Proporciones para {resultado.total_g} g de ganache</h2>
 
             <div className={styles.propGrid}>

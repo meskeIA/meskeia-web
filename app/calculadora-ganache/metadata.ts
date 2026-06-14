@@ -88,7 +88,7 @@ export const faqJsonLd = {
       name: '¿A qué temperatura se trabaja el ganache según su uso?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para glasear tartas se vierte el ganache entre 32 y 35 °C, cuando está fluido pero empieza a espesar. Para rellenar bombones o picar como trufa se deja enfriar a temperatura ambiente hasta que esté manejable (unos 25–28 °C). Para montar el ganache con varillas es necesario que esté completamente frío, idealmente tras reposar en nevera unas horas.',
+        text: 'Para glasear tartas se vierte el ganache entre 30 y 32 °C, cuando está fluido pero empieza a espesar. Para rellenar bombones o picar como trufa se deja enfriar a temperatura ambiente hasta que esté manejable (unos 25–28 °C). Para montar el ganache con varillas es necesario que esté completamente frío, idealmente tras reposar en nevera unas horas.',
       },
     },
     {

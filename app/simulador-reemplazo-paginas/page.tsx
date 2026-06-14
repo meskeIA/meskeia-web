@@ -438,7 +438,7 @@ export default function SimuladorReemplazoPaginas() {
             spellCheck={false}
           />
           {!parseado.ok && parseado.error && (
-            <p className={styles.expressionError}>{parseado.error}</p>
+            <p role="alert" className={styles.expressionError}>{parseado.error}</p>
           )}
           {parseado.ok && (
             <p className={styles.refsInfo}>
@@ -485,6 +485,7 @@ export default function SimuladorReemplazoPaginas() {
                 type="button"
                 className={`${styles.algoritmoBtn} ${algoritmoActivo === alg ? styles.algoritmoActive : ''}`}
                 onClick={() => setAlgoritmoActivo(alg)}
+                aria-pressed={algoritmoActivo === alg}
                 title={ALGORITMOS[alg].descripcion}
               >
                 <span className={styles.algoritmoNombre}>{ALGORITMOS[alg].nombre}</span>
@@ -519,7 +520,7 @@ export default function SimuladorReemplazoPaginas() {
                   </h3>
 
                   {/* Métricas */}
-                  <div className={styles.metricsGrid}>
+                  <div className={styles.metricsGrid} role="status" aria-live="polite" aria-atomic="true">
                     <div className={styles.metricCard}>
                       <div className={styles.metricLabel}>Fallos de página</div>
                       <div className={styles.metricValue}>{formatNumber(r.faults, 0)}</div>
