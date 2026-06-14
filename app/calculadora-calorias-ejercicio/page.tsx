@@ -117,7 +117,7 @@ export default function CalculadoraCaloriasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔥 Calculadora de Calorías</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔥</span> Calculadora de Calorías</h1>
         <p className={styles.subtitle}>
           Calcula las calorías quemadas según tu actividad física usando valores MET científicos
         </p>
@@ -158,6 +158,7 @@ export default function CalculadoraCaloriasPage() {
                   key={cat}
                   className={`${styles.categoriaTab} ${categoriaFiltro === cat ? styles.activo : ''}`}
                   onClick={() => setCategoriaFiltro(cat)}
+                  aria-pressed={categoriaFiltro === cat}
                 >
                   {cat}
                 </button>
@@ -170,9 +171,10 @@ export default function CalculadoraCaloriasPage() {
                   key={index}
                   className={`${styles.actividadCard} ${actividadSeleccionada?.nombre === actividad.nombre ? styles.seleccionada : ''}`}
                   onClick={() => setActividadSeleccionada(actividad)}
-                  title={`MET: ${actividad.met}`}
+                  aria-pressed={actividadSeleccionada?.nombre === actividad.nombre}
+                  aria-label={`${actividad.nombre} (MET ${actividad.met})`}
                 >
-                  <span className={styles.actividadIcono}>{actividad.icono}</span>
+                  <span className={styles.actividadIcono} aria-hidden="true">{actividad.icono}</span>
                   <span className={styles.actividadNombre}>{actividad.nombre}</span>
                   <span className={styles.actividadMet}>MET {actividad.met}</span>
                 </button>
@@ -194,11 +196,11 @@ export default function CalculadoraCaloriasPage() {
           </div>
         </div>
 
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           {resultado && actividadSeleccionada ? (
             <>
               <div className={styles.actividadResumen}>
-                <span className={styles.resumenIcono}>{actividadSeleccionada.icono}</span>
+                <span className={styles.resumenIcono} aria-hidden="true">{actividadSeleccionada.icono}</span>
                 <div>
                   <h3>{actividadSeleccionada.nombre}</h3>
                   <p>{duracion} minutos • {peso} kg</p>
@@ -217,11 +219,11 @@ export default function CalculadoraCaloriasPage() {
               </div>
 
               <div className={styles.equivalenciasSection}>
-                <h3>💡 Esto equivale a:</h3>
+                <h3><span aria-hidden="true">💡</span> Esto equivale a:</h3>
                 <div className={styles.equivalenciasGrid}>
                   {resultado.equivalencias.map((eq, index) => (
                     <div key={index} className={styles.equivalenciaCard}>
-                      <span className={styles.eqIcono}>{eq.icono}</span>
+                      <span className={styles.eqIcono} aria-hidden="true">{eq.icono}</span>
                       <span className={styles.eqCantidad}>{eq.cantidad}</span>
                       <span className={styles.eqNombre}>{eq.nombre}</span>
                     </div>
@@ -233,7 +235,7 @@ export default function CalculadoraCaloriasPage() {
               </div>
 
               <div className={styles.formulaBox}>
-                <h4>📐 Fórmula MET</h4>
+                <h4><span aria-hidden="true">📐</span> Fórmula MET</h4>
                 <p className={styles.formulaText}>
                   Calorías = MET × Peso (kg) × Tiempo (horas)
                 </p>
@@ -244,7 +246,7 @@ export default function CalculadoraCaloriasPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🔥</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🔥</span>
               <p>Selecciona una actividad e introduce tus datos para calcular las calorías quemadas</p>
             </div>
           )}

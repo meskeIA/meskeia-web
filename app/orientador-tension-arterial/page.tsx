@@ -39,7 +39,7 @@ interface Medicion {
   clasificacionId: ClasificacionId;
 }
 
-// ─── Clasificaciones ESH/ESC 2018 ────────────────────────────────────────────
+// ─── Clasificaciones ESH/ESC 2023 ────────────────────────────────────────────
 
 const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
   hipotension: {
@@ -101,7 +101,7 @@ const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
   'crisis-hipertensiva': {
     id: 'crisis-hipertensiva',
     nombre: 'Crisis Hipertensiva',
-    descripcion: 'Tensión sistólica > 180 mmHg y/o diastólica > 120 mmHg',
+    descripcion: 'Tensión sistólica ≥ 180 mmHg y/o diastólica ≥ 120 mmHg',
     recomendacion: '⚠️ Acude a urgencias inmediatamente o llama al 112.',
     color: 'var(--cl-crisis)',
     urgencia: 'emergencia',
@@ -116,19 +116,19 @@ const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
   },
 };
 
-const URGENCIA_ETIQUETAS: Record<Clasificacion['urgencia'], string> = {
-  normal:     '✅ Normal',
-  atencion:   '👀 Atención',
-  alerta:     '⚠️ Alerta',
-  urgente:    '🔶 Urgente',
-  emergencia: '🚨 Emergencia',
+const URGENCIA_ETIQUETAS: Record<Clasificacion['urgencia'], { emoji: string; texto: string }> = {
+  normal:     { emoji: '✅', texto: 'Normal' },
+  atencion:   { emoji: '👀', texto: 'Atención' },
+  alerta:     { emoji: '⚠️', texto: 'Alerta' },
+  urgente:    { emoji: '🔶', texto: 'Urgente' },
+  emergencia: { emoji: '🚨', texto: 'Emergencia' },
 };
 
-// ─── Lógica de clasificación ESH/ESC 2018 ────────────────────────────────────
+// ─── Lógica de clasificación ESH/ESC 2023 ────────────────────────────────────
 
 function clasificarTension(sis: number, dia: number): ClasificacionId {
-  // Crisis hipertensiva (prioridad máxima)
-  if (sis > 180 || dia > 120) return 'crisis-hipertensiva';
+  // Crisis hipertensiva (prioridad máxima) — umbral ≥ según guías ESH/ESC 2023
+  if (sis >= 180 || dia >= 120) return 'crisis-hipertensiva';
 
   // Hipotensión
   if (sis < 90 || dia < 60) return 'hipotension';
@@ -212,7 +212,10 @@ function Resultado({ sistolica, diastolica, pulso }: ResultadoProps) {
   return (
     <div className={styles.resultado} style={{ borderColor: cl.color }}>
       <div className={styles.resultadoCabecera} style={{ background: cl.color }}>
-        <span className={styles.resultadoUrgencia}>{URGENCIA_ETIQUETAS[cl.urgencia]}</span>
+        <span className={styles.resultadoUrgencia}>
+          <span aria-hidden="true">{URGENCIA_ETIQUETAS[cl.urgencia].emoji}</span>
+          {' '}{URGENCIA_ETIQUETAS[cl.urgencia].texto}
+        </span>
         <h2 className={styles.resultadoNombre}>{cl.nombre}</h2>
         <p className={styles.resultadoDescripcion}>{cl.descripcion}</p>
       </div>
@@ -284,7 +287,7 @@ function TablaClasificaciones() {
 
   return (
     <div className={styles.tablaWrapper}>
-      <table className={styles.tabla} aria-label="Clasificación de tensión arterial ESH/ESC 2018">
+      <table className={styles.tabla} aria-label="Clasificación de tensión arterial ESH/ESC 2023">
         <thead>
           <tr>
             <th>Categoría</th>
@@ -308,7 +311,7 @@ function TablaClasificaciones() {
           })}
         </tbody>
       </table>
-      <p className={styles.tablaFuente}>Fuente: Guías ESH/ESC 2018 para el manejo de la hipertensión arterial</p>
+      <p className={styles.tablaFuente}>Fuente: Guías ESH/ESC 2023 para el manejo de la hipertensión arterial</p>
     </div>
   );
 }
@@ -414,7 +417,7 @@ export default function CalculadoraTensionArterial() {
 
       <header className={styles.hero}>
         <h1 className={styles.heroTitulo}>Orientador Tensión Arterial</h1>
-        <p className={styles.heroSubtitulo}>Clasifica tu presión según las guías ESH/ESC 2018 · Calcula TAM y presión de pulso</p>
+        <p className={styles.heroSubtitulo}>Clasifica tu presión según las guías ESH/ESC 2023 · Calcula TAM y presión de pulso</p>
       </header>
 
       <LegalNotice />
@@ -430,7 +433,7 @@ export default function CalculadoraTensionArterial() {
         >
           <p>
             Esta herramienta es <strong>exclusivamente orientativa y educativa</strong>. Los resultados que ofrece
-            se basan en las guías ESH/ESC 2018 y <strong>no constituyen ni sustituyen un diagnóstico médico</strong>,
+            se basan en las guías ESH/ESC 2023 y <strong>no constituyen ni sustituyen un diagnóstico médico</strong>,
             una consulta profesional ni ningún tipo de prescripción o consejo clínico.
           </p>
           <p>
@@ -524,11 +527,13 @@ export default function CalculadoraTensionArterial() {
       </div>
 
       {/* Resultado */}
-      {resultado && (
-        <div className={styles.resultadoWrapper}>
-          <Resultado sistolica={resultado.sis} diastolica={resultado.dia} pulso={resultado.pulso} />
-        </div>
-      )}
+      <div role="status" aria-live="polite" aria-atomic="true">
+        {resultado && (
+          <div className={styles.resultadoWrapper}>
+            <Resultado sistolica={resultado.sis} diastolica={resultado.dia} pulso={resultado.pulso} />
+          </div>
+        )}
+      </div>
 
       {/* Tabla de referencia */}
       <div className={styles.tablaSeccion}>
@@ -538,7 +543,7 @@ export default function CalculadoraTensionArterial() {
           type="button"
           aria-expanded={mostrarTabla}
         >
-          {mostrarTabla ? '▲ Ocultar' : '▼ Ver'} tabla de clasificación ESH/ESC 2018
+          {mostrarTabla ? '▲ Ocultar' : '▼ Ver'} tabla de clasificación ESH/ESC 2023
         </button>
         {mostrarTabla && <TablaClasificaciones />}
       </div>
@@ -610,7 +615,7 @@ export default function CalculadoraTensionArterial() {
         subtitle="Guía educativa sobre presión arterial, medición correcta y factores de riesgo"
         icon="🩺"
       >
-        {/* Tabla comparativa - Clasificación ESH/ESC 2018 */}
+        {/* Tabla comparativa - Clasificación ESH/ESC 2023 */}
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -687,7 +692,7 @@ export default function CalculadoraTensionArterial() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <h3>🩺 Hipertenso en tratamiento</h3>
-            <p>Si tomas antihipertensivos, monitoriza si tus valores están en el rango objetivo (&lt;130/80 mmHg según las guías ESH/ESC 2018 para pacientes en tratamiento). Lleva un registro para tu médico.</p>
+            <p>Si tomas antihipertensivos, monitoriza si tus valores están en el rango objetivo (&lt;130/80 mmHg según las guías ESH/ESC 2023 para pacientes en tratamiento). Lleva un registro para tu médico.</p>
           </div>
           <div className={styles.escenarioCard}>
             <h3>🏠 Medición domiciliaria</h3>
@@ -781,14 +786,14 @@ export default function CalculadoraTensionArterial() {
             <div className={styles.stepNumber}>5</div>
             <div className={styles.stepContent}>
               <h3>Introduce los valores en la calculadora</h3>
-              <p>Usa la media de tus mediciones. Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH/ESC 2018, la TAM y la presión de pulso.</p>
+              <p>Usa la media de tus mediciones. Introduce sistólica, diastólica y opcionalmente el pulso. La app calculará la clasificación ESH/ESC 2023, la TAM y la presión de pulso.</p>
             </div>
           </div>
           <div className={styles.step}>
             <div className={styles.stepNumber}>6</div>
             <div className={styles.stepContent}>
               <h3>Interpreta la clasificación</h3>
-              <p>Consulta la tabla de clasificación ESH/ESC 2018 para entender en qué categoría estás. Recuerda que un valor aislado no es diagnóstico — se necesitan mediciones repetidas.</p>
+              <p>Consulta la tabla de clasificación ESH/ESC 2023 para entender en qué categoría estás. Recuerda que un valor aislado no es diagnóstico — se necesitan mediciones repetidas.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -832,7 +837,7 @@ export default function CalculadoraTensionArterial() {
         <div className={styles.warningBox}>
           <h3>⚠️ Esta herramienta no reemplaza la atención médica</h3>
           <ul className={styles.warningList}>
-            <li>Los resultados son orientativos basados en guías ESH/ESC 2018. No constituyen diagnóstico ni prescripción médica.</li>
+            <li>Los resultados son orientativos basados en guías ESH/ESC 2023. No constituyen diagnóstico ni prescripción médica.</li>
             <li>Ante lecturas repetidamente elevadas (HTA Grado 1 o superior), consulta a tu médico. No modifiques ni suspendas medicación antihipertensiva por tu cuenta.</li>
             <li>En crisis hipertensiva (sistólica ≥180 o diastólica ≥120), especialmente con síntomas (dolor de cabeza intenso, visión borrosa, dolor en el pecho), llama al 112 o acude a urgencias inmediatamente.</li>
             <li>Una sola medición elevada no es diagnóstico de hipertensión. Se requieren mediciones repetidas en condiciones correctas a lo largo de varios días.</li>

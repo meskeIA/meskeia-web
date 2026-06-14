@@ -36,10 +36,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Orientador Tensión Arterial",
-  description: "Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH/ESC 2018. Calcula TAM, presión de pulso y guarda tu historial.",
+  description: "Introduce tu tensión arterial sistólica y diastólica y obtén tu clasificación según las guías europeas ESH/ESC 2023. Calcula TAM, presión de pulso y guarda tu historial.",
   url: "https://meskeia.com/orientador-tension-arterial/",
-  category: 'FinanceApplication',
-  features: [],
+  category: 'UtilityApplication',
+  features: [
+    'Clasificación de tensión arterial según guías ESH/ESC 2023 (hipotensión, óptima, normal, normal-alta, HTA grados 1-3, crisis)',
+    'Cálculo de TAM (Tensión Arterial Media) con fórmula diastólica + (sistólica − diastólica) / 3',
+    'Cálculo e interpretación de la presión de pulso (normal 40-60 mmHg)',
+    'Historial de mediciones con almacenamiento local (hasta 20 entradas)',
+    'Tabla de referencia visual con rangos por categoría',
+    'Aviso inmediato de crisis hipertensiva (≥ 180/120 mmHg)',
+    'Detección de HTA sistólica aislada (≥ 140 / < 90 mmHg)',
+  ],
 });
 
 export const faqJsonLd = {

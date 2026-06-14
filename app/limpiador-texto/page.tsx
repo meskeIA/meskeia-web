@@ -1,10 +1,8 @@
 'use client';
-
+// @disclaimer: exempt
 import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
-  DisclaimerCard,
-} from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -21,6 +19,7 @@ interface OpcionLimpieza {
 
 export default function LimpiadorTextoPage() {
   const [textoEntrada, setTextoEntrada] = useState('');
+  const [copiado, setCopiado] = useState(false);
   const [opciones, setOpciones] = useState<OpcionLimpieza[]>([
     { id: 'espaciosExtra', nombre: 'Espacios extra', descripcion: 'Reduce múltiples espacios a uno solo', activo: true },
     { id: 'espaciosInicio', nombre: 'Espacios inicio/fin', descripcion: 'Elimina espacios al inicio y fin de líneas', activo: true },
@@ -138,9 +137,10 @@ export default function LimpiadorTextoPage() {
     if (!textoLimpio) return;
     try {
       await navigator.clipboard.writeText(textoLimpio);
-      alert('Texto copiado al portapapeles');
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
     } catch {
-      alert('No se pudo copiar el texto');
+      // Fallback silencioso — el botón no cambia de estado
     }
   };
 
@@ -166,13 +166,6 @@ export default function LimpiadorTextoPage() {
       </header>
 
       <LegalNotice />
-
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="limpiador-texto-disclaimer"
-      />
 
       <div className={styles.mainContent}>
         {/* Panel de opciones */}
@@ -217,6 +210,8 @@ export default function LimpiadorTextoPage() {
               </button>
             </div>
             <textarea
+              id="texto-entrada"
+              aria-label="Texto original a limpiar"
               value={textoEntrada}
               onChange={(e) => setTextoEntrada(e.target.value)}
               placeholder="Pega o escribe tu texto aquí..."
@@ -227,7 +222,7 @@ export default function LimpiadorTextoPage() {
 
           {/* Estadísticas */}
           {textoEntrada && (
-            <div className={styles.statsBar}>
+            <div className={styles.statsBar} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Antes:</span>
                 <span className={styles.statValue}>{formatNumber(estadisticas.caracteresAntes, 0)}</span>
@@ -242,7 +237,7 @@ export default function LimpiadorTextoPage() {
                   {formatNumber(estadisticas.diferencia, 0)} ({formatNumber(estadisticas.porcentaje, 1)}%)
                 </span>
               </div>
-              <button type="button" onClick={usarResultado} className={styles.btnUsar} title="Usar resultado como entrada">
+              <button type="button" onClick={usarResultado} className={styles.btnUsar} aria-label="Usar texto limpio como nueva entrada">
                 ↓ Aplicar
               </button>
             </div>
@@ -256,12 +251,14 @@ export default function LimpiadorTextoPage() {
                 type="button"
                 onClick={copiarResultado}
                 className={styles.btnSecundario}
+                aria-label={copiado ? 'Texto copiado al portapapeles' : 'Copiar texto limpio'}
                 disabled={!textoLimpio}
               >
-                Copiar
+                {copiado ? '¡Copiado!' : 'Copiar'}
               </button>
             </div>
             <textarea
+              aria-label="Texto limpio resultante"
               value={textoLimpio}
               readOnly
               placeholder="El resultado aparecerá aquí..."
@@ -277,21 +274,21 @@ export default function LimpiadorTextoPage() {
         <h3>Sobre esta herramienta</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🔒</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔒</span>
             <div>
               <strong>100% Privado</strong>
               <p>Tu texto nunca sale de tu navegador</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>⚡</span>
+            <span className={styles.infoIcon} aria-hidden="true">⚡</span>
             <div>
               <strong>Tiempo real</strong>
               <p>Ve los cambios mientras escribes</p>
             </div>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🔄</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔄</span>
             <div>
               <strong>Múltiples pasadas</strong>
               <p>Aplica el resultado como entrada</p>

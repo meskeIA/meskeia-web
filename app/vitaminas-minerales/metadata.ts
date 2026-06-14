@@ -40,9 +40,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/vitaminas-minerales/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Fichas completas de 30 nutrientes esenciales (13 vitaminas y 17 minerales)',
+    'Búsqueda por nombre, función o alimento fuente',
+    'Filtro por tipo (vitamina/mineral) y subtipo (hidrosoluble, liposoluble, macromineral, oligoelemento)',
+    'Valores CDR (Cantidad Diaria Recomendada) para adultos según referencias EFSA',
+    'Síntomas de deficiencia y exceso para cada nutriente',
+    'Grupos de riesgo específicos por nutriente',
+    'Curiosidades y datos científicos verificados',
   ],
 });
 

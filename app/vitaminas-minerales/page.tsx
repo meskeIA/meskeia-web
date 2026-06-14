@@ -66,7 +66,7 @@ export default function VitaminasMineralesPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🥗</span>
+        <span className={styles.heroIcon} aria-hidden="true">🥗</span>
         <h1 className={styles.title}>Vitaminas y Minerales</h1>
         <p className={styles.subtitle}>
           Guía de 30 nutrientes esenciales: funciones, fuentes alimentarias,
@@ -77,18 +77,18 @@ export default function VitaminasMineralesPage() {
       <LegalNotice />
 
       <DisclaimerCard
-        variant="educational"
-        severity="medium"
-        collapsible={true}
-        context="vitaminas-minerales-disclaimer"
+        variant="medical"
+        severity="high"
+        collapsible={false}
       />
 
       {/* Buscador y Filtros */}
       <div className={styles.searchSection}>
         <div className={styles.searchBox}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
             type="text"
+            aria-label="Buscar nutriente por nombre, función o alimento"
             placeholder="Buscar por nombre, función o alimento..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -138,7 +138,7 @@ export default function VitaminasMineralesPage() {
           </div>
         </div>
 
-        <div className={styles.resultsCount}>
+        <div className={styles.resultsCount} role="status" aria-live="polite" aria-atomic="true">
           Mostrando {filteredNutrients.length} de {NUTRIENTS.length} nutrientes
         </div>
       </div>
@@ -149,17 +149,21 @@ export default function VitaminasMineralesPage() {
           <article
             key={nutrient.id}
             className={`${styles.nutrientCard} ${expandedId === nutrient.id ? styles.expanded : ''}`}
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedId === nutrient.id}
             onClick={() => toggleExpand(nutrient.id)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(nutrient.id); } }}
           >
             <div className={styles.cardHeader}>
               <div className={styles.cardTitle}>
-                <span className={styles.typeEmoji}>{TIPO_EMOJI[nutrient.tipo]}</span>
+                <span className={styles.typeEmoji} aria-hidden="true">{TIPO_EMOJI[nutrient.tipo]}</span>
                 <div>
                   <h2 className={styles.nutrientName}>{nutrient.nombre}</h2>
                   <p className={styles.scientificName}>{nutrient.nombreCientifico}</p>
                 </div>
               </div>
-              <span className={styles.expandIcon}>
+              <span className={styles.expandIcon} aria-hidden="true">
                 {expandedId === nutrient.id ? '−' : '+'}
               </span>
             </div>
@@ -186,12 +190,12 @@ export default function VitaminasMineralesPage() {
             {expandedId === nutrient.id && (
               <div className={styles.cardDetails}>
                 <div className={styles.detailSection}>
-                  <h3>⚡ Función</h3>
+                  <h3><span aria-hidden="true">⚡</span> Función</h3>
                   <p>{nutrient.funcion}</p>
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>🥦 Fuentes Alimentarias</h3>
+                  <h3><span aria-hidden="true">🥦</span> Fuentes Alimentarias</h3>
                   <div className={styles.sourcesList}>
                     {nutrient.fuentes.map((fuente, index) => (
                       <span key={index} className={styles.sourceTag}>
@@ -202,23 +206,23 @@ export default function VitaminasMineralesPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>📊 Dosis Diaria Recomendada</h3>
+                  <h3><span aria-hidden="true">📊</span> Dosis Diaria Recomendada</h3>
                   <p className={styles.cdrValue}>{nutrient.cdrAdultos}</p>
                 </div>
 
                 <div className={styles.detailGrid}>
                   <div className={styles.detailBox}>
-                    <h3>⚠️ Deficiencia</h3>
+                    <h3><span aria-hidden="true">⚠️</span> Deficiencia</h3>
                     <p>{nutrient.deficiencia}</p>
                   </div>
                   <div className={styles.detailBox}>
-                    <h3>🚫 Exceso</h3>
+                    <h3><span aria-hidden="true">🚫</span> Exceso</h3>
                     <p>{nutrient.exceso}</p>
                   </div>
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>👥 Grupos de Riesgo</h3>
+                  <h3><span aria-hidden="true">👥</span> Grupos de Riesgo</h3>
                   <div className={styles.riskGroups}>
                     {nutrient.gruposRiesgo.map((grupo, index) => (
                       <span key={index} className={styles.riskTag}>
@@ -229,7 +233,7 @@ export default function VitaminasMineralesPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>💡 Curiosidad</h3>
+                  <h3><span aria-hidden="true">💡</span> Curiosidad</h3>
                   <p className={styles.curiosity}>{nutrient.curiosidad}</p>
                 </div>
               </div>
@@ -241,7 +245,7 @@ export default function VitaminasMineralesPage() {
       {/* Sin resultados */}
       {filteredNutrients.length === 0 && (
         <div className={styles.noResults}>
-          <span className={styles.noResultsIcon}>🔬</span>
+          <span className={styles.noResultsIcon} aria-hidden="true">🔬</span>
           <p>No se encontraron nutrientes con esos criterios.</p>
           <button
             type="button"

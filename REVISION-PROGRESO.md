@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 134 / 999
-- ⬜ Pendientes: 865 / 999
+- ✅ Revisadas: 138 / 999
+- ⬜ Pendientes: 861 / 999
 
 ## Resumen por suite primaria
 
@@ -941,7 +941,7 @@
 | [ ] | Diagnóstico Explotación vs Exploración | `/diagnostico-explotacion-exploracion/` | productividad, freelance |
 | [ ] | Generador de Actas de Reunión | `/generador-actas/` | productividad |
 | [ ] | Generador de Firmas Email | `/generador-firma-email/` | productividad |
-| [ ] | Limpiador de Texto | `/limpiador-texto/` | productividad |
+| [x] | Limpiador de Texto | `/limpiador-texto/` | productividad |
 | [x] | Lista de Equipaje | `/lista-equipaje/` | productividad, viajes |
 | [ ] | Mapa de Compromisos vs Capacidad | `/mapa-compromisos-capacidad/` | productividad, freelance |
 | [ ] | Mapa de Decisiones Urgentes vs Importantes | `/mapa-decisiones-urgentes-importantes/` | productividad, freelance |
@@ -973,7 +973,7 @@
 | [ ] | Ayuno Intermitente: Fases Metabólicas y Autofagia | `/visualizador-ayuno-intermitente/` | salud |
 | [ ] | Calculadora de 1RM — Repetición Máxima | `/calculadora-1rm-gimnasio/` | salud, tecnicas |
 | [ ] | Calculadora de Alimentación Mascotas | `/calculadora-alimentacion-mascotas/` | salud |
-| [ ] | Calculadora de Calorías | `/calculadora-calorias-ejercicio/` | salud |
+| [x] | Calculadora de Calorías | `/calculadora-calorias-ejercicio/` | salud |
 | [ ] | Calculadora de Estadística Médica | `/calculadora-estadistica-medica/` | salud, estudiantes |
 | [ ] | Calculadora de Hidratación | `/calculadora-hidratacion/` | salud |
 | [ ] | Calculadora de Macros | `/calculadora-macros/` | salud |
@@ -1050,7 +1050,7 @@
 | [ ] | Orientador IMC | `/orientador-imc/` | salud |
 | [ ] | Orientador Medicamentos Mascotas | `/orientador-medicamentos-mascotas/` | salud |
 | [x] | Orientador Percentiles Infantiles | `/orientador-percentiles/` | salud |
-| [ ] | Orientador Tensión Arterial | `/orientador-tension-arterial/` | salud, legal-fiscal |
+| [x] | Orientador Tensión Arterial | `/orientador-tension-arterial/` | salud, legal-fiscal |
 | [ ] | Oxitocina - La Hormona del Vínculo Social | `/visualizador-oxitocina/` | salud, cultura, estudiantes |
 | [ ] | Paracetamol: Cómo Actúa en el Sistema Nervioso Central | `/visualizador-paracetamol/` | salud, cultura, estudiantes |
 | [ ] | Planificador de Gastos del Primer Año del Bebé | `/planificador-gastos-bebe/` | salud, finanzas |
@@ -1082,7 +1082,7 @@
 | [ ] | Tu Cuerpo en Números | `/visualizador-cuerpo-numeros/` | salud, cultura, estudiantes |
 | [ ] | Vitamina B12: Ciclo de Metilación y Factor Intrínseco | `/visualizador-vitamina-b12/` | salud, cultura, estudiantes |
 | [ ] | Vitamina D: La Vitamina que Actúa como Hormona | `/visualizador-vitamina-d/` | salud, cultura, estudiantes |
-| [ ] | Vitaminas y Minerales | `/vitaminas-minerales/` | salud, cultura |
+| [x] | Vitaminas y Minerales | `/vitaminas-minerales/` | salud, cultura |
 
 ## Viajes y Turismo (`viajes`) — 10 apps
 

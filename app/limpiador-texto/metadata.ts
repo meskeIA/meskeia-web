@@ -39,7 +39,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Limpia texto al instante: elimina espacios sobrantes, líneas duplicadas, saltos de línea, caracteres especiales y formato copiado. Pega, limpia y copia. Sin registro.",
   url: "https://meskeia.com/limpiador-texto/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    '13 opciones de limpieza: espacios, líneas vacías, duplicados, tabulaciones, caracteres especiales, números, puntuación, emojis, HTML, URLs y emails',
+    'Procesamiento 100% local en el navegador — el texto nunca sale de tu dispositivo',
+    'Estadísticas en tiempo real: caracteres antes/después y porcentaje eliminado',
+    'Botón "Aplicar resultado" para encadenar múltiples limpiezas',
+    'Copia al portapapeles con un clic',
+    'Función de deduplicación de líneas con normalización por mayúsculas/minúsculas',
+    'Sin registro, sin publicidad, funciona sin conexión',
+  ],
 });
 
 export const faqJsonLd = {
