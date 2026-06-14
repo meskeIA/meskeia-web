@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Calcula tu tarifa freelance ideal considerando gastos, impuestos, vacaciones y margen de beneficio. Herramienta gratuita para autónomos y freelancers en España.",
   url: "https://meskeia.com/orientador-tarifa-freelance/",
   category: 'BusinessApplication',
-  features: [],
+  features: [
+    'Cálculo de tarifa por hora, día y semana según ingresos objetivo',
+    'Desglose completo de gastos fijos y variables personalizables',
+    'Estimación de IRPF con fórmula correcta sobre rendimiento neto',
+    'Proyección anual de facturación, gastos y beneficio neto',
+    'Cálculo de horas y días facturables descontando vacaciones y festivos',
+    'Margen de beneficio configurable para imprevistos',
+    'Comparativa de tarifa con y sin IVA (21%)',
+  ],
 });
 
 export const faqJsonLd = {

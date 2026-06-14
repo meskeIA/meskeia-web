@@ -174,21 +174,26 @@ export default function CalculadoraPercentilesPage() {
             <button
               className={`${styles.sexoBtn} ${sexo === 'nino' ? styles.active : ''}`}
               onClick={() => setSexo('nino')}
+              aria-pressed={sexo === 'nino'}
+              aria-label="Niño"
             >
-              👦 Niño
+              <span aria-hidden="true">👦</span> Niño
             </button>
             <button
               className={`${styles.sexoBtn} ${sexo === 'nina' ? styles.active : ''}`}
               onClick={() => setSexo('nina')}
+              aria-pressed={sexo === 'nina'}
+              aria-label="Niña"
             >
-              👧 Niña
+              <span aria-hidden="true">👧</span> Niña
             </button>
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Edad (meses)</label>
+            <label htmlFor="edad-meses">Edad (meses)</label>
             <div className={styles.inputConUnidad}>
               <input
+                id="edad-meses"
                 type="number"
                 value={edadMeses}
                 onChange={(e) => setEdadMeses(e.target.value)}
@@ -199,14 +204,16 @@ export default function CalculadoraPercentilesPage() {
               />
               <span className={styles.unidad}>meses</span>
             </div>
-            <span className={styles.hint}>De 0 a 60 meses (5 años)</span>
+            <span className={styles.hint}>De 0 a 60 meses (5 años). Para edades intermedias (p.ej. 30 meses), el resultado es aproximado.</span>
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Peso</label>
+            <label htmlFor="input-peso">Peso</label>
             <div className={styles.inputConUnidad}>
               <input
+                id="input-peso"
                 type="text"
+                inputMode="decimal"
                 value={peso}
                 onChange={(e) => setPeso(e.target.value)}
                 placeholder="10,5"
@@ -217,10 +224,12 @@ export default function CalculadoraPercentilesPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Talla / Altura</label>
+            <label htmlFor="input-talla">Talla / Altura</label>
             <div className={styles.inputConUnidad}>
               <input
+                id="input-talla"
                 type="text"
+                inputMode="decimal"
                 value={talla}
                 onChange={(e) => setTalla(e.target.value)}
                 placeholder="75"
@@ -241,13 +250,13 @@ export default function CalculadoraPercentilesPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           {resultado ? (
             <>
               {/* Percentil de Peso */}
               <div className={`${styles.resultadoCard} ${getColorPercentil(resultado.percentilPeso)}`}>
                 <div className={styles.resultadoHeader}>
-                  <span className={styles.resultadoIcon}>⚖️</span>
+                  <span className={styles.resultadoIcon} aria-hidden="true">⚖️</span>
                   <span className={styles.resultadoTipo}>Percentil de Peso</span>
                 </div>
                 <div className={styles.resultadoValor}>
@@ -261,7 +270,7 @@ export default function CalculadoraPercentilesPage() {
               {/* Percentil de Talla */}
               <div className={`${styles.resultadoCard} ${getColorPercentil(resultado.percentilTalla)}`}>
                 <div className={styles.resultadoHeader}>
-                  <span className={styles.resultadoIcon}>📏</span>
+                  <span className={styles.resultadoIcon} aria-hidden="true">📏</span>
                   <span className={styles.resultadoTipo}>Percentil de Talla</span>
                 </div>
                 <div className={styles.resultadoValor}>
@@ -303,7 +312,7 @@ export default function CalculadoraPercentilesPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>👶</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">👶</span>
               <p>Introduce los datos para calcular los percentiles</p>
             </div>
           )}

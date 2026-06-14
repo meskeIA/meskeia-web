@@ -180,14 +180,19 @@ export default function CalculadoraDistribucionesPage() {
             pdf = jStat.poisson.pdf(k, lambda);
             cdf = jStat.poisson.cdf(k, lambda);
           }
-          const kMin = Math.floor(xMinVal);
+          const kMin = Math.ceil(xMinVal);
           const kMax = Math.floor(xMaxVal);
           cdfRange = 0;
           for (let i = Math.max(0, kMin); i <= kMax; i++) {
             cdfRange += jStat.poisson.pdf(i, lambda);
           }
-          // Cuantil aproximado para Poisson
-          quantileVal = Math.round(lambda + Math.sqrt(lambda) * jStat.normal.inv(p, 0, 1));
+          // Cuantil exacto para Poisson (búsqueda secuencial)
+          let cumProbPoisson = 0;
+          quantileVal = 0;
+          for (let k2 = 0; k2 <= Math.ceil(lambda * 5 + 50); k2++) {
+            cumProbPoisson += jStat.poisson.pdf(k2, lambda);
+            if (cumProbPoisson >= p) { quantileVal = k2; break; }
+          }
           mean = lambda;
           variance = lambda;
           mode = Math.floor(lambda).toString();
@@ -293,7 +298,7 @@ export default function CalculadoraDistribucionesPage() {
             pdf = jStat.binomial.pdf(k, nInt, prob);
             cdf = jStat.binomial.cdf(k, nInt, prob);
           }
-          const kMin = Math.floor(xMinVal);
+          const kMin = Math.ceil(xMinVal);
           const kMax = Math.floor(xMaxVal);
           cdfRange = 0;
           for (let i = Math.max(0, kMin); i <= Math.min(nInt, kMax); i++) {
@@ -351,7 +356,6 @@ export default function CalculadoraDistribucionesPage() {
     setSelectedDist(dist);
     setParams({});
     // Valores predeterminados de x según distribución
-    const config = distributions.find(d => d.id === dist)!;
     if (dist === 'poisson' || dist === 'binomial') {
       setXValue('5');
       setXMin('0');
@@ -388,7 +392,7 @@ export default function CalculadoraDistribucionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📊</span>
+        <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Calculadora de Distribuciones</h1>
         <p className={styles.subtitle}>
           Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student
@@ -407,8 +411,9 @@ export default function CalculadoraDistribucionesPage() {
                 key={dist.id}
                 onClick={() => handleDistChange(dist.id)}
                 className={`${styles.distCard} ${selectedDist === dist.id ? styles.distSelected : ''}`}
+                aria-pressed={selectedDist === dist.id}
               >
-                <span className={styles.distIcon}>{dist.icon}</span>
+                <span className={styles.distIcon} aria-hidden="true">{dist.icon}</span>
                 <span className={styles.distName}>{dist.name}</span>
                 <span className={styles.distType}>{dist.isContinuous ? 'Continua' : 'Discreta'}</span>
               </button>
@@ -426,21 +431,26 @@ export default function CalculadoraDistribucionesPage() {
 
             <div className={styles.paramSection}>
               <h3 className={styles.paramTitle}>Parámetros</h3>
-              {currentDist.params.map(param => (
-                <div key={param.symbol} className={styles.inputGroup}>
-                  <label className={styles.label}>
-                    {param.name} ({param.symbol})
-                  </label>
-                  <input
-                    type="text"
-                    value={params[param.symbol] ?? param.default}
-                    onChange={e => updateParam(param.symbol, e.target.value)}
-                    className={styles.input}
-                    placeholder={param.default}
-                  />
-                  <span className={styles.helpText}>{param.help}</span>
-                </div>
-              ))}
+              {currentDist.params.map(param => {
+                const paramId = `param-${param.symbol}-${selectedDist}`;
+                return (
+                  <div key={param.symbol} className={styles.inputGroup}>
+                    <label htmlFor={paramId} className={styles.label}>
+                      {param.name} ({param.symbol})
+                    </label>
+                    <input
+                      id={paramId}
+                      type="text"
+                      inputMode={param.step === 1 ? 'numeric' : 'decimal'}
+                      value={params[param.symbol] ?? param.default}
+                      onChange={e => updateParam(param.symbol, e.target.value)}
+                      className={styles.input}
+                      placeholder={param.default}
+                    />
+                    <span className={styles.helpText}>{param.help}</span>
+                  </div>
+                );
+              })}
             </div>
 
             <div className={styles.modeSection}>
@@ -451,6 +461,7 @@ export default function CalculadoraDistribucionesPage() {
                     key={mode.id}
                     onClick={() => setCalcMode(mode.id)}
                     className={`${styles.modeBtn} ${calcMode === mode.id ? styles.modeActive : ''}`}
+                    aria-pressed={calcMode === mode.id}
                   >
                     <span className={styles.modeName}>{mode.name}</span>
                     <span className={styles.modeDesc}>{mode.description}</span>
@@ -463,11 +474,13 @@ export default function CalculadoraDistribucionesPage() {
             <div className={styles.valueSection}>
               {(calcMode === 'pdf' || calcMode === 'cdf') && (
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>
+                  <label htmlFor="input-x-value" className={styles.label}>
                     Valor {currentDist.isContinuous ? 'x' : 'k'}
                   </label>
                   <input
+                    id="input-x-value"
                     type="text"
+                    inputMode={currentDist.isContinuous ? 'decimal' : 'numeric'}
                     value={xValue}
                     onChange={e => setXValue(e.target.value)}
                     className={styles.input}
@@ -479,9 +492,11 @@ export default function CalculadoraDistribucionesPage() {
               {calcMode === 'cdf_range' && (
                 <>
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Valor mínimo (a)</label>
+                    <label htmlFor="input-x-min" className={styles.label}>Valor mínimo (a)</label>
                     <input
+                      id="input-x-min"
                       type="text"
+                      inputMode="decimal"
                       value={xMin}
                       onChange={e => setXMin(e.target.value)}
                       className={styles.input}
@@ -489,9 +504,11 @@ export default function CalculadoraDistribucionesPage() {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Valor máximo (b)</label>
+                    <label htmlFor="input-x-max" className={styles.label}>Valor máximo (b)</label>
                     <input
+                      id="input-x-max"
                       type="text"
+                      inputMode="decimal"
                       value={xMax}
                       onChange={e => setXMax(e.target.value)}
                       className={styles.input}
@@ -503,9 +520,11 @@ export default function CalculadoraDistribucionesPage() {
 
               {calcMode === 'quantile' && (
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Probabilidad (0 a 1)</label>
+                  <label htmlFor="input-probability" className={styles.label}>Probabilidad (0 a 1)</label>
                   <input
+                    id="input-probability"
                     type="text"
+                    inputMode="decimal"
                     value={probability}
                     onChange={e => setProbability(e.target.value)}
                     className={styles.input}
@@ -520,7 +539,7 @@ export default function CalculadoraDistribucionesPage() {
           </section>
 
           {/* Panel de resultados */}
-          <section className={styles.resultsPanel}>
+          <section className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.panelTitle}>Resultados</h2>
 
             {results ? (

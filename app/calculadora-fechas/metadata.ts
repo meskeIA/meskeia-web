@@ -43,6 +43,14 @@ export const jsonLd = {
   url: 'https://meskeia.com/calculadora-fechas/',
   applicationCategory: 'UtilityApplication',
   operatingSystem: 'Any',
+  featureList: [
+    'Diferencia exacta entre dos fechas en días, semanas, meses y años',
+    'Suma y resta de días, semanas, meses o años a una fecha',
+    'Día de la semana de cualquier fecha desde 1900',
+    'Cálculo de edad exacta en años, meses y días',
+    'Próximo cumpleaños con días restantes',
+    'Compatible con años bisiestos y meses irregulares',
+  ],
   offers: {
     '@type': 'Offer',
     price: '0',

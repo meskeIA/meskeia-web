@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 127 / 999
-- ⬜ Pendientes: 872 / 999
+- ✅ Revisadas: 134 / 999
+- ⬜ Pendientes: 865 / 999
 
 ## Resumen por suite primaria
 
@@ -392,7 +392,7 @@
 | [ ] | Calculadora Álgebra Abstracta | `/calculadora-algebra-abstracta/` | estudiantes |
 | [x] | Calculadora de Álgebra Booleana | `/calculadora-algebra-booleana/` | estudiantes, tecnicas |
 | [ ] | Calculadora de Cálculo | `/calculadora-calculo/` | estudiantes |
-| [ ] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
+| [x] | Calculadora de Distribuciones | `/calculadora-distribuciones/` | estudiantes |
 | [ ] | Calculadora de Ecuaciones | `/algebra-ecuaciones/` | estudiantes |
 | [x] | Calculadora de Electricidad | `/calculadora-electricidad/` | estudiantes |
 | [x] | Calculadora de Geometría | `/calculadora-geometria/` | estudiantes |
@@ -547,7 +547,7 @@
 | [x] | Simulador Circuitos Eléctricos | `/simulador-circuitos-electricos/` | estudiantes, tecnicas |
 | [x] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
 | [x] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
-| [ ] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |
+| [x] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |
 | [x] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
 | [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
 | [ ] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
@@ -582,7 +582,7 @@
 | [ ] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
 | [x] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
 | [ ] | Simulador de Recursión y Pila de Llamadas | `/simulador-recursion/` | estudiantes, tecnicas |
-| [ ] | Simulador de Reemplazo de Páginas | `/simulador-reemplazo-paginas/` | estudiantes, tecnicas |
+| [x] | Simulador de Reemplazo de Páginas | `/simulador-reemplazo-paginas/` | estudiantes, tecnicas |
 | [ ] | Simulador de Regresión Lineal y Logística | `/simulador-regresion/` | estudiantes, tecnicas |
 | [ ] | Simulador de SQL JOIN Visual | `/simulador-sql-join/` | estudiantes, tecnicas |
 | [ ] | Simulador de Test de Hipótesis | `/simulador-test-hipotesis/` | estudiantes |
@@ -747,13 +747,13 @@
 | [ ] | Calculadora de Bitrate y Tamaño de Vídeo | `/calculadora-bitrate-video/` | tecnicas, diseno |
 | [ ] | Calculadora de Cámara Lenta (Slow Motion) | `/calculadora-camara-lenta/` | tecnicas, diseno |
 | [ ] | Calculadora de Filtro ND para Vídeo | `/calculadora-filtro-nd-video/` | tecnicas, diseno |
-| [ ] | Calculadora de Ganache de Chocolate | `/calculadora-ganache/` | tecnicas, cultura |
+| [x] | Calculadora de Ganache de Chocolate | `/calculadora-ganache/` | tecnicas, cultura |
 | [ ] | Calculadora de Hidratación del Pan | `/calculadora-hidratacion-pan/` | tecnicas, cultura |
 | [ ] | Calculadora de Puntos del Azúcar | `/calculadora-puntos-azucar/` | tecnicas, cultura |
 | [ ] | Calculadora de Resistencias para LED | `/calculadora-resistencias-led/` | tecnicas, estudiantes |
 | [ ] | Calculadora de Subredes IP | `/calculadora-subredes/` | tecnicas, estudiantes |
 | [ ] | Calculadora de Sustitución de Gelatina | `/calculadora-gelatina/` | tecnicas |
-| [ ] | Calculadora de Sustitución de Levadura por Masa Madre | `/calculadora-masa-madre/` | tecnicas, cultura |
+| [x] | Calculadora de Sustitución de Levadura por Masa Madre | `/calculadora-masa-madre/` | tecnicas, cultura |
 | [ ] | Calculadora Regla de los 180° para Vídeo | `/calculadora-regla-180-video/` | tecnicas, diseno |
 | [ ] | Cifrado AES | `/cifrado-aes/` | tecnicas |
 | [ ] | Codificador Base64 | `/codificador-base64/` | tecnicas |
@@ -926,7 +926,7 @@
 | [ ] | Auditoría de Habilidades vs Mercado | `/auditoria-habilidades-mercado/` | productividad, cultura |
 | [ ] | Auditoría de Reuniones | `/auditoria-reuniones/` | productividad, freelance |
 | [ ] | Calculadora Costes Teletrabajo | `/calculadora-costes-teletrabajo/` | productividad, finanzas, freelance |
-| [ ] | Calculadora de Fechas | `/calculadora-fechas/` | productividad |
+| [x] | Calculadora de Fechas | `/calculadora-fechas/` | productividad |
 | [ ] | Calculadora de Porcentajes | `/calculadora-porcentajes/` | productividad, estudiantes |
 | [ ] | Calculadora Regla de Tres | `/calculadora-regla-de-tres/` | productividad, estudiantes |
 | [ ] | Checklist Pre-Mortem | `/checklist-pre-mortem/` | productividad, freelance |
@@ -1049,7 +1049,7 @@
 | [ ] | Orientador Grado de Discapacidad | `/orientador-discapacidad/` | salud, legal-fiscal |
 | [ ] | Orientador IMC | `/orientador-imc/` | salud |
 | [ ] | Orientador Medicamentos Mascotas | `/orientador-medicamentos-mascotas/` | salud |
-| [ ] | Orientador Percentiles Infantiles | `/orientador-percentiles/` | salud |
+| [x] | Orientador Percentiles Infantiles | `/orientador-percentiles/` | salud |
 | [ ] | Orientador Tensión Arterial | `/orientador-tension-arterial/` | salud, legal-fiscal |
 | [ ] | Oxitocina - La Hormona del Vínculo Social | `/visualizador-oxitocina/` | salud, cultura, estudiantes |
 | [ ] | Paracetamol: Cómo Actúa en el Sistema Nervioso Central | `/visualizador-paracetamol/` | salud, cultura, estudiantes |

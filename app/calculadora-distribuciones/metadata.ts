@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Distribuciones de Probabilidad | meskeIA',
-  description: 'Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma y Beta. Funciones PDF, CDF y cuantiles con visualización.',
-  keywords: 'distribución normal, distribución poisson, distribución exponencial, gaussiana, probabilidad, estadística, PDF, CDF, cuantiles, función densidad',
+  description: 'Calcula probabilidades con 8 distribuciones: Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t de Student. Funciones PDF, CDF y cuantiles con visualización.',
+  keywords: 'distribución normal, distribución poisson, distribución exponencial, binomial, t-student, gaussiana, probabilidad, estadística, PDF, CDF, cuantiles, función densidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Calculadora de Distribuciones de Probabilidad | meskeIA',
-    description: 'Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma y Beta. Con visualización de PDF y CDF.',
+    description: 'Calcula probabilidades con 8 distribuciones: Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t de Student. Con visualización de PDF y CDF.',
     url: 'https://meskeia.com/calculadora-distribuciones/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,20 +26,24 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Calculadora de Distribuciones de Probabilidad',
-    description: 'Normal, Poisson, Exponencial, Uniforme, Gamma y Beta con PDF, CDF y cuantiles.',
+    description: 'Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t-Student con PDF, CDF y cuantiles.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: "Calculadora de Distribuciones de Probabilidad",
-  description: "Calcula probabilidades con distribuciones Normal, Poisson, Exponencial, Uniforme, Gamma y Beta. Funciones PDF, CDF y cuantiles con visualización.",
+  description: "Calcula probabilidades con 8 distribuciones: Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t de Student. Funciones PDF, CDF y cuantiles con visualización.",
   url: 'https://meskeia.com/calculadora-distribuciones/',
   category: 'EducationalApplication',
   features: [
+      "8 distribuciones: Normal, Poisson, Exponencial, Uniforme, Gamma, Beta, Binomial y t de Student",
+      "Calcula PDF/PMF, CDF, probabilidad en rango P(a≤X≤b) y cuantiles",
+      "Muestra media, varianza, desviación estándar, moda y mediana de cada distribución",
+      "Tabla de cuantiles comunes (5%, 10%, 25%, 50%, 75%, 90%, 95%, 99%)",
+      "Soporte para distribuciones continuas y discretas",
       "Funciona 100% en el navegador, sin registro ni instalación",
       "Gratuito y sin publicidad",
-      "En español"
   ],
 });
 
@@ -52,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Qué distribuciones de probabilidad incluye esta calculadora?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La herramienta cubre seis distribuciones: Normal (gaussiana), Poisson, Exponencial, Uniforme continua, Gamma y Beta. Para cada una permite calcular la función de densidad de probabilidad (PDF), la función de distribución acumulada (CDF) y los cuantiles, además de visualizar la curva con los parámetros elegidos.',
+        text: 'La herramienta cubre ocho distribuciones: Normal (gaussiana), Poisson, Exponencial, Uniforme continua, Gamma, Beta, Binomial y t de Student. Para cada una permite calcular la función de densidad de probabilidad (PDF o PMF), la función de distribución acumulada (CDF) y los cuantiles, además de mostrar media, varianza y moda.',
       },
     },
     {

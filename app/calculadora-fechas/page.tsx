@@ -1,11 +1,8 @@
 'use client';
-
+// @disclaimer: exempt
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard,
-  DisclaimerCard,
-} from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
-import { jsonLd, faqSchema } from './metadata';
 import styles from './CalculadoraFechas.module.css';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -41,14 +38,22 @@ export default function CalculadoraFechas() {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const formatDate = (date: Date) => date.toISOString().split('T')[0];
+    // Formato YYYY-MM-DD usando hora local para evitar desfase UTC en zonas UTC-
+    const formatLocalDate = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-    setEndDate(formatDate(today));
-    setStartDate(formatDate(yesterday));
-    setBaseDate(formatDate(today));
-    setDayDate(formatDate(today));
-    setReferenceDate(formatDate(today));
+    setEndDate(formatLocalDate(today));
+    setStartDate(formatLocalDate(yesterday));
+    setBaseDate(formatLocalDate(today));
+    setDayDate(formatLocalDate(today));
+    setReferenceDate(formatLocalDate(today));
   }, []);
+
+  /** Parsea ISO YYYY-MM-DD como fecha LOCAL para evitar desfase UTC en zonas UTC- */
+  const parseLocalDate = (iso: string): Date => {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  };
 
   /**
    * Formatea fecha a formato largo español
@@ -78,8 +83,8 @@ export default function CalculadoraFechas() {
       return;
     }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = parseLocalDate(startDate);
+    const end = parseLocalDate(endDate);
 
     if (start > end) {
       alert('La fecha inicial debe ser anterior a la fecha final');
@@ -91,17 +96,18 @@ export default function CalculadoraFechas() {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const diffWeeks = Math.floor(diffDays / 7);
     const diffMonths = Math.floor(diffDays / 30.44);
-    const diffYears = Math.floor(diffDays / 365.25);
 
-    // Calcular diferencia exacta
+    // Calcular diferencia exacta con manejo correcto de meses con distinto nº de días
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
     let days = end.getDate() - start.getDate();
 
-    if (days < 0) {
+    // Mientras los días sean negativos, retrocedemos un mes y sumamos sus días
+    const tempEnd = new Date(end);
+    while (days < 0) {
       months--;
-      const lastMonth = new Date(end.getFullYear(), end.getMonth(), 0);
-      days += lastMonth.getDate();
+      tempEnd.setMonth(tempEnd.getMonth() - 1);
+      days += new Date(tempEnd.getFullYear(), tempEnd.getMonth() + 1, 0).getDate();
     }
 
     if (months < 0) {
@@ -113,7 +119,6 @@ export default function CalculadoraFechas() {
       diffDays,
       diffWeeks,
       diffMonths,
-      diffYears,
       exactYears: years,
       exactMonths: months,
       exactDays: days,
@@ -129,7 +134,7 @@ export default function CalculadoraFechas() {
       return;
     }
 
-    const base = new Date(baseDate);
+    const base = parseLocalDate(baseDate);
     const result = new Date(base);
     const multiplier = operation === 'add' ? 1 : -1;
 
@@ -173,7 +178,7 @@ export default function CalculadoraFechas() {
       return;
     }
 
-    const date = new Date(dayDate);
+    const date = parseLocalDate(dayDate);
     const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const dayOfWeek = dayNames[date.getDay()];
 
@@ -217,23 +222,24 @@ export default function CalculadoraFechas() {
       return;
     }
 
-    const birth = new Date(birthDate);
-    const reference = referenceDate ? new Date(referenceDate) : new Date();
+    const birth = parseLocalDate(birthDate);
+    const reference = referenceDate ? parseLocalDate(referenceDate) : new Date();
 
     if (birth > reference) {
       alert('La fecha de nacimiento debe ser anterior a la fecha de referencia');
       return;
     }
 
-    // Calcular edad exacta
+    // Calcular edad exacta con manejo correcto de meses con distinto nº de días
     let years = reference.getFullYear() - birth.getFullYear();
     let months = reference.getMonth() - birth.getMonth();
     let days = reference.getDate() - birth.getDate();
 
-    if (days < 0) {
+    const tempRef = new Date(reference);
+    while (days < 0) {
       months--;
-      const lastMonth = new Date(reference.getFullYear(), reference.getMonth(), 0);
-      days += lastMonth.getDate();
+      tempRef.setMonth(tempRef.getMonth() - 1);
+      days += new Date(tempRef.getFullYear(), tempRef.getMonth() + 1, 0).getDate();
     }
 
     if (months < 0) {
@@ -264,16 +270,6 @@ export default function CalculadoraFechas() {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-
       {/* Analytics */}
       <AnalyticsTracker applicationName="calculadora-fechas" />
 
@@ -282,17 +278,10 @@ export default function CalculadoraFechas() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="calculadora-fechas-disclaimer"
-      />
-
       <main className={styles.container}>
         {/* Header */}
         <header className={styles.header}>
-          <h1 className={styles.title}>📅 Calculadora de Fechas Online</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📅</span> Calculadora de Fechas Online</h1>
           <p className={styles.subtitle}>
             Herramienta profesional para cálculos temporales y cronológicos
           </p>
@@ -336,6 +325,7 @@ export default function CalculadoraFechas() {
               🔢 Calcular Diferencia
             </button>
 
+            <div role="status" aria-live="polite" aria-atomic="true">
             {diffResult && (
               <div className={styles.resultsSection}>
                 <ResultCard
@@ -362,6 +352,7 @@ export default function CalculadoraFechas() {
                 />
               </div>
             )}
+            </div>
           </article>
 
           {/* 2. Sumar/Restar tiempo */}
@@ -435,6 +426,7 @@ export default function CalculadoraFechas() {
               ⚡ Calcular
             </button>
 
+            <div role="status" aria-live="polite" aria-atomic="true">
             {addSubResult && (
               <div className={styles.resultsSection}>
                 <ResultCard
@@ -451,6 +443,7 @@ export default function CalculadoraFechas() {
                 />
               </div>
             )}
+            </div>
           </article>
 
           {/* 3. Día de la semana */}
@@ -475,6 +468,7 @@ export default function CalculadoraFechas() {
               🗓️ ¿Qué día era?
             </button>
 
+            <div role="status" aria-live="polite" aria-atomic="true">
             {dayResult && (
               <div className={styles.resultsSection}>
                 <ResultCard
@@ -491,6 +485,7 @@ export default function CalculadoraFechas() {
                 />
               </div>
             )}
+            </div>
           </article>
 
           {/* 4. Calcular edad */}
@@ -528,6 +523,7 @@ export default function CalculadoraFechas() {
               🎯 Calcular Edad
             </button>
 
+            <div role="status" aria-live="polite" aria-atomic="true">
             {ageResult && (
               <div className={styles.resultsSection}>
                 <ResultCard
@@ -550,6 +546,7 @@ export default function CalculadoraFechas() {
                 />
               </div>
             )}
+            </div>
           </article>
         </div>
 
@@ -740,11 +737,10 @@ export default function CalculadoraFechas() {
                     salvo que sean divisibles por 400 (ej: 2000).</li>
                   <li><strong>Meses variables:</strong> Febrero (28/29 días), meses de 30 días (abril, junio, septiembre, noviembre),
                     meses de 31 días (resto).</li>
-                  <li><strong>Cálculos exactos:</strong> Al sumar/restar meses, ajusta automáticamente si el día no existe
-                    (ej: 31 de febrero → 28/29 de febrero).</li>
+                  <li><strong>Cálculos con meses:</strong> JavaScript ajusta por desbordamiento cuando el día no existe en el mes destino (ej: sumar 1 mes al 31/01/2026 puede devolver 03/03/2026, porque 31/02 no existe y se desplaza al mes siguiente). Para obtener el último día del mes destino, calcula primero cuántos días tiene ese mes.</li>
                 </ul>
                 <p className={styles.faqTip}>
-                  <strong>Ejemplo práctico:</strong> Sumar 1 mes al 31/01/2026 devuelve 28/02/2026 (no 31/02, que no existe).
+                  <strong>Consejo:</strong> Cuando necesites plazos exactos (contratos, trámites legales), verifica siempre el resultado, especialmente en meses con distinto número de días.
                 </p>
               </div>
 
@@ -989,8 +985,7 @@ export default function CalculadoraFechas() {
                 <span className={styles.tipIcon}>⚠️</span>
                 <h3>Cuidado con los fines de mes al sumar meses</h3>
                 <p>
-                  Sumar 1 mes al 31/01 devuelve 28/29 de febrero (no 31). Si necesitas mantener el día exacto, usa días
-                  en lugar de meses (ej: +30 días).
+                  Sumar 1 mes al 31/01 puede desbordarse al mes siguiente si el día no existe (31/02 → 03/03). Si necesitas mantener el día exacto, usa días en lugar de meses (ej: +28 días para febrero).
                 </p>
               </div>
 
@@ -1081,9 +1076,9 @@ export default function CalculadoraFechas() {
       </main>
 
       {/* Footer meskeIA */}
-      <RelatedApps apps={getRelatedApps('Calculadora de Fechas')} />
-      <ShareCard appName="Calculadora de Fechas" />
-      <Footer appName="Calculadora de Fechas" />
+      <RelatedApps apps={getRelatedApps('calculadora-fechas')} />
+      <ShareCard appName="calculadora-fechas" />
+      <Footer appName="calculadora-fechas" />
     </>
   );
 }

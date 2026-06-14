@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react';
 import styles from './OrientadorTarifaFreelance.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
+import DataReference from '@/components/DataReference';
+import { FISCAL_AUTONOMOS_META } from '@/data/fiscal';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -12,7 +14,7 @@ interface GastoItem {
   importe: string;
 }
 
-export default function CalculadoraTarifaFreelancePage() {
+export default function OrientadorTarifaFreelancePage() {
   // Estado: Ingresos objetivo
   const [ingresoNetoDeseado, setIngresoNetoDeseado] = useState('2000');
 
@@ -101,9 +103,9 @@ export default function CalculadoraTarifaFreelancePage() {
     const horasFacturablesMes = horasFacturablesAno / 12;
 
     // Ingresos brutos necesarios (antes de IRPF)
-    // Fórmula: Bruto = (Neto deseado + Gastos) / (1 - IRPF) * (1 + Margen)
-    const baseNecesariaMensual = ingresoNeto + totalGastosMensuales;
-    const brutoAntesIRPFMensual = baseNecesariaMensual / (1 - irpf);
+    // El IRPF recae sobre el rendimiento neto (facturación - gastos), no sobre los gastos.
+    // Facturación = ingresoNeto / (1 - irpf) + gastos
+    const brutoAntesIRPFMensual = ingresoNeto / (1 - irpf) + totalGastosMensuales;
     const brutoConMargenMensual = brutoAntesIRPFMensual * (1 + margen);
 
     // Tarifas
@@ -152,7 +154,7 @@ export default function CalculadoraTarifaFreelancePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💼 Orientador Tarifa Freelance</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💼</span> Orientador Tarifa Freelance</h1>
         <p className={styles.subtitle}>
           Calcula tu tarifa por hora, día y proyecto considerando todos tus gastos, impuestos y vacaciones. Evita cobrar de menos.
         </p>
@@ -186,7 +188,7 @@ export default function CalculadoraTarifaFreelancePage() {
             <p className={styles.sectionDesc}>Gastos que pagas cada mes independientemente de tu facturación</p>
 
             <div className={styles.gastosLista}>
-              {gastosFijos.map((gasto) => (
+              {gastosFijos.map((gasto, index) => (
                 <div key={gasto.id} className={styles.gastoItem}>
                   <input
                     type="text"
@@ -194,14 +196,17 @@ export default function CalculadoraTarifaFreelancePage() {
                     value={gasto.concepto}
                     onChange={(e) => actualizarGastoFijo(gasto.id, 'concepto', e.target.value)}
                     placeholder="Concepto"
+                    aria-label={`Concepto del gasto fijo ${index + 1}`}
                   />
                   <div className={styles.gastoImporteWrapper}>
                     <input
                       type="text"
+                      inputMode="decimal"
                       className={styles.gastoImporte}
                       value={gasto.importe}
                       onChange={(e) => actualizarGastoFijo(gasto.id, 'importe', e.target.value)}
                       placeholder="0"
+                      aria-label={`Importe del gasto fijo ${index + 1} en euros`}
                     />
                     <span className={styles.gastoSuffix}>€</span>
                   </div>
@@ -209,7 +214,7 @@ export default function CalculadoraTarifaFreelancePage() {
                     type="button"
                     className={styles.btnEliminar}
                     onClick={() => eliminarGastoFijo(gasto.id)}
-                    title="Eliminar gasto"
+                    aria-label={`Eliminar ${gasto.concepto || `gasto fijo ${index + 1}`}`}
                   >
                     ×
                   </button>
@@ -230,7 +235,7 @@ export default function CalculadoraTarifaFreelancePage() {
             <p className={styles.sectionDesc}>Gastos que pueden variar según tu actividad</p>
 
             <div className={styles.gastosLista}>
-              {gastosVariables.map((gasto) => (
+              {gastosVariables.map((gasto, index) => (
                 <div key={gasto.id} className={styles.gastoItem}>
                   <input
                     type="text"
@@ -238,14 +243,17 @@ export default function CalculadoraTarifaFreelancePage() {
                     value={gasto.concepto}
                     onChange={(e) => actualizarGastoVariable(gasto.id, 'concepto', e.target.value)}
                     placeholder="Concepto"
+                    aria-label={`Concepto del gasto variable ${index + 1}`}
                   />
                   <div className={styles.gastoImporteWrapper}>
                     <input
                       type="text"
+                      inputMode="decimal"
                       className={styles.gastoImporte}
                       value={gasto.importe}
                       onChange={(e) => actualizarGastoVariable(gasto.id, 'importe', e.target.value)}
                       placeholder="0"
+                      aria-label={`Importe del gasto variable ${index + 1} en euros`}
                     />
                     <span className={styles.gastoSuffix}>€</span>
                   </div>
@@ -253,7 +261,7 @@ export default function CalculadoraTarifaFreelancePage() {
                     type="button"
                     className={styles.btnEliminar}
                     onClick={() => eliminarGastoVariable(gasto.id)}
-                    title="Eliminar gasto"
+                    aria-label={`Eliminar ${gasto.concepto || `gasto variable ${index + 1}`}`}
                   >
                     ×
                   </button>
@@ -372,8 +380,8 @@ export default function CalculadoraTarifaFreelancePage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
-          <h2 className={styles.resultsTitleMain}>📊 Tu Tarifa Recomendada</h2>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
+          <h2 className={styles.resultsTitleMain}><span aria-hidden="true">📊</span> Tu Tarifa Recomendada</h2>
 
           {/* Tarifas principales */}
           <div className={styles.tarifasPrincipales}>
@@ -489,8 +497,14 @@ export default function CalculadoraTarifaFreelancePage() {
         context="orientador-tarifa-freelance"
         collapsible={false}
       />
+      <DataReference
+        normativa="RETA / IRPF 2025"
+        fuente={FISCAL_AUTONOMOS_META.fuente}
+        verificado={FISCAL_AUTONOMOS_META.verificado}
+        urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
+      />
 
-      
+
 
       {/* Contenido educativo v2.0 */}
       <EducationalSection title="Guía completa: cómo fijar tu tarifa freelance" subtitle="Métodos, estrategias y errores a evitar para cobrar lo que mereces" defaultOpen={false}>

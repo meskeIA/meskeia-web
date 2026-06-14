@@ -73,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Se puede calcular el percentil de adultos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Este orientador está diseñado para niños de 0 a 18 años usando tablas pediátricas de la OMS. Para adultos existen índices distintos como el IMC (Índice de Masa Corporal), que relaciona peso y altura sin comparar con una población de referencia.',
+        text: 'Este orientador está diseñado para niños de 0 a 60 meses (5 años) usando las tablas de crecimiento de la OMS. Para niños mayores y adultos existen referencias pediátricas y el IMC (Índice de Masa Corporal), que relaciona peso y altura sin comparar con una población de referencia.',
       },
     },
   ],
