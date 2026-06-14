@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Simulador de Oferta y Demanda | meskeIA',
     description:
       'Mueve los desplazadores de oferta y demanda para ver el equilibrio en tiempo real. Experimenta con precios máximos y mínimos.',
-    url: 'https://meskeia.com/simulador-oferta-demanda',
+    url: 'https://meskeia.com/simulador-oferta-demanda/',
     siteName: 'meskeIA',
     locale: 'es_ES',
   },

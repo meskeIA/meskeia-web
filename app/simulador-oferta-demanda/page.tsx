@@ -84,8 +84,8 @@ function calcularEquilibrio(curvas: Curvas): Equilibrio {
 function calcularExcedente(curvas: Curvas, P: number, Q: number): Excedente {
   // Intercepto demanda en eje P: a/b
   const Pmax = curvas.a / curvas.b;
-  // Intercepto oferta en eje P: -c/d
-  const Pmin = -curvas.c / curvas.d;
+  // Intercepto oferta en eje P: -c/d (clamp a 0 para consistencia con el canvas)
+  const Pmin = Math.max(0, -curvas.c / curvas.d);
   const EC = 0.5 * (Pmax - P) * Q;
   const EP = 0.5 * (P - Pmin) * Q;
   return { EC: Math.max(0, EC), EP: Math.max(0, EP) };
@@ -556,12 +556,12 @@ export default function SimuladorOfertaDemandaPage() {
           />
           <span className={styles.precioUnidad}>€ / u.</span>
           {modo === 'maximo' && precioFijado >= equilibrio.P && (
-            <span className={styles.precioAdvertencia}>
+            <span role="alert" className={styles.precioAdvertencia}>
               ⚠️ P_max debe ser menor que P* ({fmt(equilibrio.P)}) para causar escasez
             </span>
           )}
           {modo === 'minimo' && precioFijado <= equilibrio.P && (
-            <span className={styles.precioAdvertencia}>
+            <span role="alert" className={styles.precioAdvertencia}>
               ⚠️ P_min debe ser mayor que P* ({fmt(equilibrio.P)}) para causar excedente
             </span>
           )}
@@ -574,6 +574,7 @@ export default function SimuladorOfertaDemandaPage() {
       <div className={styles.canvasWrapper}>
         <canvas
           ref={canvasRef}
+          role="img"
           className={styles.canvas}
           aria-label="Gráfica de oferta y demanda con punto de equilibrio"
         />
@@ -582,7 +583,7 @@ export default function SimuladorOfertaDemandaPage() {
       {/* ============================================
           PANEL DE RESULTADOS
       ============================================ */}
-      <div className={styles.resultadosGrid}>
+      <div className={styles.resultadosGrid} role="status" aria-live="polite">
         <div className={styles.resultCard}>
           <span className={styles.resultLabel}>Precio de equilibrio P*</span>
           <span className={styles.resultValue}>{fmt(equilibrio.P)} €</span>
@@ -763,11 +764,12 @@ export default function SimuladorOfertaDemandaPage() {
             productores aumentan su oferta: el mercado se autoregula.
           </p>
           <p>
-            El economista Friedrich Hayek explicó que el precio condensa toda la información
+            El economista Friedrich Hayek propuso que el precio condensa toda la información
             dispersa en la economía (escasez de recursos, preferencias, costes de producción) en
-            un único número accesible a todos los agentes. Es por eso que los mercados libres
-            tienden a ser eficientes: nadie necesita conocer todos los datos; basta con observar
-            el precio.
+            un único número accesible a todos los agentes. Según este argumento, el mecanismo de
+            precios tiende a coordinar la información descentralizada sin que nadie necesite conocer
+            todos los datos; basta con observar el precio. Este planteamiento no descarta la
+            existencia de fallos de mercado (externalidades, bienes públicos, información asimétrica).
           </p>
           <div className={styles.formulaBox}>
             <strong>Equilibrio:</strong> P* = (a − c) / (b + d) &nbsp;·&nbsp; Q* = a − b · P*

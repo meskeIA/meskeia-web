@@ -133,6 +133,11 @@
   border-color: var(--primary);
 }
 
+.arrayInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .arrayError {
   color: #ef4444;
   font-size: 0.9rem;

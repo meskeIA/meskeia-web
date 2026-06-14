@@ -179,6 +179,9 @@ export default function SimuladorBalanceBlancosPage() {
                   step={TEMP_STEP}
                   value={tempWB}
                   onChange={(e) => setTempWBRaw(parseInt(e.target.value))}
+                  aria-valuemin={TEMP_MIN}
+                  aria-valuemax={TEMP_MAX}
+                  aria-valuenow={tempWB}
                   aria-valuetext={`${tempWB} Kelvin`}
                   className={styles.sliderKelvin}
                 />
@@ -207,6 +210,7 @@ export default function SimuladorBalanceBlancosPage() {
                     className={`${styles.presetBtn} ${tempWB === p.kelvin ? styles.presetActive : ''}`}
                     onClick={() => setTempWBRaw(p.kelvin)}
                     title={`${p.kelvin} K`}
+                    aria-pressed={tempWB === p.kelvin}
                   >
                     <span className={styles.presetIcon} aria-hidden="true">{p.icono}</span>
                     <span className={styles.presetNombre}>{p.nombre}</span>
@@ -248,7 +252,7 @@ export default function SimuladorBalanceBlancosPage() {
               </p>
             </div>
 
-            <div className={styles.resultBlock}>
+            <div className={styles.resultBlock} role="status" aria-live="polite">
               <h3 className={styles.resultTitle}>Lectura de la imagen</h3>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Tinte dominante</span>

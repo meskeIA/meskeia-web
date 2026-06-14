@@ -11,8 +11,8 @@
 
 ## Progreso global
 
-- ✅ Revisadas: 107 / 999
-- ⬜ Pendientes: 892 / 999
+- ✅ Revisadas: 111 / 999
+- ⬜ Pendientes: 888 / 999
 
 ## Resumen por suite primaria
 
@@ -313,7 +313,7 @@
 | [ ] | Recursos Literarios | `/visualizador-recursos-literarios/` | cultura, estudiantes |
 | [ ] | Revoluciones Industriales: Cronología de la Máquina de Vapor a la Industria 5.0 | `/visualizador-revoluciones-industriales/` | cultura, tecnicas |
 | [ ] | Selector de Tipo de Alojamiento | `/selector-tipo-alojamiento/` | cultura, productividad |
-| [ ] | Simulador de Balance de Blancos (2500K-10000K) | `/simulador-balance-blancos/` | cultura, tecnicas |
+| [x] | Simulador de Balance de Blancos (2500K-10000K) | `/simulador-balance-blancos/` | cultura, tecnicas |
 | [x] | Simulador de Fotografía: Triángulo de Exposición | `/simulador-fotografia/` | cultura, tecnicas |
 | [ ] | Termodinámica Química: ΔG, Equilibrio y Le Chatelier | `/visualizador-termodinamica-quimica/` | cultura, estudiantes, tecnicas |
 | [ ] | Test de Dependencia Tecnológica | `/test-dependencia-tecnologica/` | cultura, productividad |
@@ -546,7 +546,7 @@
 | [ ] | Series y Convergencia: Taylor, Criterios y π | `/visualizador-series-convergencia/` | estudiantes, tecnicas |
 | [x] | Simulador Circuitos Eléctricos | `/simulador-circuitos-electricos/` | estudiantes, tecnicas |
 | [x] | Simulador de Algoritmos de Grafos (BFS, DFS, Dijkstra, A*) | `/simulador-grafos/` | estudiantes, tecnicas |
-| [ ] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
+| [x] | Simulador de Algoritmos de Ordenación | `/simulador-ordenacion/` | estudiantes, tecnicas |
 | [ ] | Simulador de Árboles BST y AVL | `/simulador-arboles-bst-avl/` | estudiantes, tecnicas |
 | [x] | Simulador de Autómatas Finitos DFA y NFA | `/simulador-automatas-finitos/` | estudiantes, tecnicas |
 | [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
@@ -568,14 +568,14 @@
 | [x] | Simulador de Genética Mendeliana | `/simulador-genetica/` | estudiantes, salud |
 | [ ] | Simulador de Hashing y Colisiones | `/simulador-hashing-colisiones/` | estudiantes |
 | [ ] | Simulador de Integrales: Área bajo la Curva | `/simulador-integral-area/` | estudiantes |
-| [ ] | Simulador de Intervalos de Confianza | `/simulador-intervalos-confianza/` | estudiantes |
+| [x] | Simulador de Intervalos de Confianza | `/simulador-intervalos-confianza/` | estudiantes |
 | [ ] | Simulador de K-Means Clustering | `/simulador-kmeans/` | estudiantes, tecnicas |
 | [ ] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |
 | [x] | Simulador de Lentes Ópticas: Trazado de Rayos | `/simulador-lentes-opticas/` | estudiantes |
 | [x] | Simulador de Máquina de Turing | `/simulador-maquina-turing/` | estudiantes, tecnicas |
 | [ ] | Simulador de Mitosis y Meiosis | `/simulador-mitosis-meiosis/` | estudiantes |
 | [x] | Simulador de Movimiento Circular | `/simulador-movimiento-circular/` | estudiantes |
-| [ ] | Simulador de Oferta y Demanda | `/simulador-oferta-demanda/` | estudiantes |
+| [x] | Simulador de Oferta y Demanda | `/simulador-oferta-demanda/` | estudiantes |
 | [ ] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
 | [ ] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
 | [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |

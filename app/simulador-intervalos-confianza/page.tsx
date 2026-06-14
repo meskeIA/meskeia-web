@@ -57,13 +57,20 @@ function zCritico(nivel: number): number {
   return invNormal(1 - alpha / 2);
 }
 
-// Aproximación de t crítico vía Cornish-Fisher (precisión razonable para Bachillerato/uni)
-// Para df grande, t ≈ z. Para df pequeño, ajuste.
+// Tabla de valores exactos t de Student para df = 1..30, niveles 80/90/95/99% (dos colas)
+const T_TABLE: Record<number, number[]> = {
+  0.80: [3.078,1.886,1.638,1.533,1.476,1.440,1.415,1.397,1.383,1.372,1.363,1.356,1.350,1.345,1.341,1.337,1.333,1.330,1.328,1.325,1.323,1.321,1.319,1.318,1.316,1.315,1.314,1.313,1.311,1.310],
+  0.90: [6.314,2.920,2.353,2.132,2.015,1.943,1.895,1.860,1.833,1.812,1.796,1.782,1.771,1.761,1.753,1.746,1.740,1.734,1.729,1.725,1.721,1.717,1.714,1.711,1.708,1.706,1.703,1.701,1.699,1.697],
+  0.95: [12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228,2.201,2.179,2.160,2.145,2.131,2.120,2.110,2.101,2.093,2.086,2.080,2.074,2.069,2.064,2.060,2.056,2.052,2.048,2.045,2.042],
+  0.99: [63.657,9.925,5.841,4.604,4.032,3.707,3.499,3.355,3.250,3.169,3.106,3.055,3.012,2.977,2.947,2.921,2.898,2.878,2.861,2.845,2.831,2.819,2.807,2.797,2.787,2.779,2.771,2.763,2.756,2.750],
+};
+
+// t crítico: tabla exacta para df ≤ 30, Cornish-Fisher para df > 30
 function tCritico(nivel: number, df: number): number {
   if (df < 1) return zCritico(nivel);
+  const tabla = T_TABLE[nivel];
+  if (tabla && df <= 30) return tabla[df - 1];
   const z = zCritico(nivel);
-  // Aproximación basada en expansión de Cornish-Fisher de z para t
-  // Más preciso que solo z; error típico < 0.02 para df ≥ 5
   const z3 = z * z * z;
   const z5 = z3 * z * z;
   const ajuste = (z3 + z) / (4 * df) + (5 * z5 + 16 * z3 + 3 * z) / (96 * df * df);
@@ -544,7 +551,7 @@ export default function SimuladorIntervalosConfianzaPage() {
 
             {/* CANVAS */}
             <div className={styles.canvasWrapper}>
-              <canvas ref={canvasRef} className={styles.canvas} aria-label="Visualización de 100 intervalos de confianza" />
+              <canvas ref={canvasRef} role="img" className={styles.canvas} aria-label="Visualización de 100 intervalos de confianza" />
               <div className={styles.legendRow}>
                 <span className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: '#48A9A6' }} />
@@ -562,7 +569,7 @@ export default function SimuladorIntervalosConfianzaPage() {
             </div>
 
             {/* RESULTADOS */}
-            <div className={styles.resultsPanel}>
+            <div className={styles.resultsPanel} role="status" aria-live="polite">
               <div className={styles.resultCardMain}>
                 <span className={styles.resultLabel}>Cobertura empírica</span>
                 <span className={styles.resultValueLarge}>{fmt(cobertura * 100, 1)} %</span>
@@ -607,6 +614,7 @@ export default function SimuladorIntervalosConfianzaPage() {
                   </label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     value={xBarCalc}
                     step={0.1}
                     onChange={e => setXBarCalc(parseFloat(e.target.value) || 0)}
@@ -620,6 +628,7 @@ export default function SimuladorIntervalosConfianzaPage() {
                   </label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     value={sCalc}
                     step={0.1}
                     min={0}
@@ -637,6 +646,7 @@ export default function SimuladorIntervalosConfianzaPage() {
                   </label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={nCalc}
                     step={1}
                     min={2}
@@ -676,12 +686,12 @@ export default function SimuladorIntervalosConfianzaPage() {
 
             {/* CANVAS */}
             <div className={styles.canvasWrapper}>
-              <canvas ref={canvasRef} className={styles.canvas} aria-label="Visualización del intervalo de confianza" />
+              <canvas ref={canvasRef} role="img" className={styles.canvas} aria-label="Visualización del intervalo de confianza" />
             </div>
 
             {/* RESULTADOS */}
             {calcResultado && (
-              <div className={styles.resultsPanel}>
+              <div className={styles.resultsPanel} role="status" aria-live="polite">
                 <div className={styles.resultCardMain}>
                   <span className={styles.resultLabel}>IC al {(nivelCalc * 100).toFixed(0)} % para μ</span>
                   <span className={styles.resultValueLarge}>
@@ -902,7 +912,7 @@ export default function SimuladorIntervalosConfianzaPage() {
               <div className={styles.stepNumber}>5</div>
               <div className={styles.stepContent}>
                 <strong>Construye el IC e interpreta</strong>
-                <p>IC = [X̄ − margen ; X̄ + margen]. Interpreta así: &quot;al 95 % de confianza, la verdadera media poblacional está en este rango&quot;. NO digas &quot;hay 95 % de probabilidad&quot;: es el error más común.</p>
+                <p>IC = [X̄ − margen ; X̄ + margen]. Interpreta así: &quot;si repitiéramos el muestreo muchas veces, el 95 % de los intervalos construidos con este procedimiento contendrían la media verdadera μ&quot;. NO digas &quot;hay 95 % de probabilidad de que μ esté aquí&quot;: μ es fija, no probabilística.</p>
               </div>
             </div>
           </div>

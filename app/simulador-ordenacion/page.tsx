@@ -968,6 +968,7 @@ export default function SimuladorOrdenacion() {
             value={velocidad}
             onChange={(e) => setVelocidad(Number(e.target.value))}
             className={styles.speedSlider}
+            aria-valuetext={`${velocidad} ms por paso`}
           />
           <span className={styles.speedValue}>{velocidad} ms</span>
         </div>
@@ -979,8 +980,10 @@ export default function SimuladorOrdenacion() {
             className={styles.playBtn}
             onClick={reproduciendo ? detenerReproduccion : iniciarReproduccion}
             disabled={!arrayValido}
+            aria-pressed={reproduciendo}
+            aria-label={reproduciendo ? 'Pausar animación' : 'Iniciar animación'}
           >
-            {reproduciendo ? '⏸ Pausar' : '▶ Iniciar'}
+            <span aria-hidden="true">{reproduciendo ? '⏸' : '▶'}</span> {reproduciendo ? 'Pausar' : 'Iniciar'}
           </button>
           <button
             type="button"
