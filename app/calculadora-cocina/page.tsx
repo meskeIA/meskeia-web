@@ -43,7 +43,7 @@ const densidadesIngredientes: Record<string, number> = {
   'sal': 1.2,
   'arroz': 0.75,
   'miel': 1.42,
-  'mantequilla': 0.91,
+  'mantequilla': 0.946,
   'cacao': 0.52,
   'avena': 0.4,
 };
@@ -387,6 +387,7 @@ export default function CalculadoraCocinaPage() {
                 <input
                   type="text"
                   id="cantidadOrigen"
+                  inputMode="decimal"
                   value={cantidadOrigen}
                   onChange={(e) => setCantidadOrigen(e.target.value)}
                   placeholder="ej: 2"
@@ -473,12 +474,14 @@ export default function CalculadoraCocinaPage() {
             </button>
 
             {resultadoConversion && (
-              <ResultCard
-                title="Resultado"
-                value={resultadoConversion}
-                variant="highlight"
-                icon="="
-              />
+              <div role="status" aria-live="polite">
+                <ResultCard
+                  title="Resultado"
+                  value={resultadoConversion}
+                  variant="highlight"
+                  icon="="
+                />
+              </div>
             )}
 
             {/* Tabla de referencia rápida */}
@@ -534,6 +537,7 @@ export default function CalculadoraCocinaPage() {
                 <input
                   type="text"
                   id="porcionesOriginales"
+                  inputMode="decimal"
                   value={porcionesOriginales}
                   onChange={(e) => setPorcionesOriginales(e.target.value)}
                   placeholder="ej: 4"
@@ -546,6 +550,7 @@ export default function CalculadoraCocinaPage() {
                 <input
                   type="text"
                   id="porcionesDeseadas"
+                  inputMode="decimal"
                   value={porcionesDeseadas}
                   onChange={(e) => setPorcionesDeseadas(e.target.value)}
                   placeholder="ej: 6"
@@ -573,7 +578,7 @@ export default function CalculadoraCocinaPage() {
             </button>
 
             {resultadoEscalado && (
-              <div className={styles.resultadoEscalado}>
+              <div className={styles.resultadoEscalado} role="status" aria-live="polite">
                 <h3>Ingredientes escalados</h3>
                 <pre className={styles.preResultado}>{resultadoEscalado}</pre>
               </div>

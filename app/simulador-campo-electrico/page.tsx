@@ -497,8 +497,13 @@ export default function SimuladorCampoElectrico() {
     if (n === 0) return '0';
     const abs = Math.abs(n);
     if (abs >= 1e6 || abs < 1e-3) {
-      const exp = Math.floor(Math.log10(abs));
-      const mant = n / Math.pow(10, exp);
+      let exp = Math.floor(Math.log10(abs));
+      let mant = n / Math.pow(10, exp);
+      // Si el redondeo a `decimales` eleva la mantisa a 10, normalizar (ej. 9,995 → 10,00 × 10^n se convierte en 1,00 × 10^(n+1))
+      if (Math.abs(Number(mant.toFixed(decimales))) >= 10) {
+        mant /= 10;
+        exp += 1;
+      }
       return `${formatNumber(mant, decimales)} × 10^${exp}`;
     }
     return formatNumber(n, decimales);
@@ -859,7 +864,7 @@ export default function SimuladorCampoElectrico() {
             </div>
 
             {/* Panel de resultados */}
-            <div className={styles.resultBlock}>
+            <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.resultTitle}>Carga de prueba q₀ = +1 nC</h3>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Posición x</span>
