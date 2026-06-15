@@ -168,23 +168,23 @@ export default function DetectorIdiomaPage() {
         </div>
 
         <div className={styles.buttonRow}>
-          <button onClick={detectarIdioma} className={styles.btnPrimary} disabled={!texto.trim()}>
+          <button type="button" onClick={detectarIdioma} className={styles.btnPrimary} disabled={!texto.trim()}>
             🔍 Detectar Idioma
           </button>
-          <button onClick={limpiar} className={styles.btnSecondary}>
+          <button type="button" onClick={limpiar} className={styles.btnSecondary}>
             Limpiar
           </button>
         </div>
 
         {analizado && (
-          <div className={styles.resultsSection}>
+          <div className={styles.resultsSection} role="status" aria-live="polite" aria-atomic="true">
             <h3>Resultados del análisis</h3>
             {resultados.length > 0 ? (
               <div className={styles.resultsList}>
                 {resultados.map((r, i) => (
                   <div key={r.codigo} className={`${styles.resultItem} ${i === 0 ? styles.topResult : ''}`}>
                     <div className={styles.resultMain}>
-                      <span className={styles.resultFlag}>{r.bandera}</span>
+                      <span className={styles.resultFlag} aria-hidden="true">{r.bandera}</span>
                       <span className={styles.resultName}>{r.idioma}</span>
                       {i === 0 && <span className={styles.topBadge}>Más probable</span>}
                     </div>
@@ -212,6 +212,7 @@ export default function DetectorIdiomaPage() {
             {ejemplos.map((ej, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => cargarEjemplo(ej.texto)}
                 className={styles.exampleBtn}
               >
@@ -227,7 +228,7 @@ export default function DetectorIdiomaPage() {
         <div className={styles.languagesGrid}>
           {Object.entries(PATRONES_IDIOMAS).map(([codigo, { nombre, bandera }]) => (
             <div key={codigo} className={styles.languageCard}>
-              <span className={styles.langFlag}>{bandera}</span>
+              <span className={styles.langFlag} aria-hidden="true">{bandera}</span>
               <span className={styles.langName}>{nombre}</span>
             </div>
           ))}
@@ -265,7 +266,7 @@ export default function DetectorIdiomaPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🌐</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
               <strong>Desarrollador Web</strong>
             </div>
             <p>Detecta el idioma del contenido enviado por usuarios para redirigir automáticamente a la versión localizada del sitio o aplicar el diccionario de corrección correcto.</p>
@@ -273,7 +274,7 @@ export default function DetectorIdiomaPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📚</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
               <strong>Docente / Investigador</strong>
             </div>
             <p>Analiza corpus de textos multilingüe para clasificar documentos, identificar mezclas de idiomas (code-switching) o verificar la coherencia lingüística de traducciones.</p>
@@ -281,7 +282,7 @@ export default function DetectorIdiomaPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💬</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💬</span>
               <strong>Community Manager</strong>
             </div>
             <p>Clasifica comentarios y menciones en redes sociales por idioma para derivarlos al equipo de atención al cliente correcto o gestionar campañas segmentadas geográficamente.</p>
@@ -289,7 +290,7 @@ export default function DetectorIdiomaPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🔍</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🔍</span>
               <strong>Analista de Datos</strong>
             </div>
             <p>Preprocesa datasets de texto para etiquetarlos por idioma antes de aplicar modelos de NLP específicos (sentiment analysis, NER) que requieren un idioma concreto.</p>
@@ -367,32 +368,32 @@ export default function DetectorIdiomaPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📏</span>
+            <span className={styles.tipIcono} aria-hidden="true">📏</span>
             <strong>Longitud mínima</strong>
             <p>Para resultados fiables usa siempre textos de más de 50 palabras. Con menos de 20 palabras el margen de error se multiplica.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🧹</span>
+            <span className={styles.tipIcono} aria-hidden="true">🧹</span>
             <strong>Limpia antes de detectar</strong>
             <p>Elimina URLs, código, emojis y caracteres especiales. El texto limpio mejora la precisión hasta un 15% en textos cortos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔢</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔢</span>
             <strong>Los números no ayudan</strong>
             <p>Los dígitos y cifras no aportan señal de idioma. Textos muy numéricos (tablas, datos) son difíciles de detectar correctamente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🌐</span>
+            <span className={styles.tipIcono} aria-hidden="true">🌐</span>
             <strong>Nombres propios</strong>
             <p>Los nombres de personas y lugares pueden &quot;contaminar&quot; la detección. Un texto en alemán con muchos nombres en español puede confundir el algoritmo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔤</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔤</span>
             <strong>Mayúsculas y minúsculas</strong>
             <p>Los algoritmos modernos son case-insensitive, pero el uso de ALL CAPS reduce la información morfológica disponible para la detección.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎯</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎯</span>
             <strong>Umbral de confianza</strong>
             <p>En automatizaciones, establece un umbral mínimo de confianza del 85% antes de actuar. Por debajo, deriva a revisión manual.</p>
           </div>
@@ -401,7 +402,7 @@ export default function DetectorIdiomaPage() {
         {/* 6. WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <strong>Limitaciones importantes de la detección automática</strong>
           </div>
           <ul className={styles.warningList}>

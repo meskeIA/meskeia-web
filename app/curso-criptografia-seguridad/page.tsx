@@ -76,7 +76,7 @@ export default function CursoCriptografiaSeguridadPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔐</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔐</span>
         <h1 className={styles.title}>Curso de Criptografía y Seguridad</h1>
         <p className={styles.subtitle}>
           Domina los fundamentos de la criptografía: desde cifrados históricos como César y Vigenère
@@ -88,7 +88,7 @@ export default function CursoCriptografiaSeguridadPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -98,22 +98,22 @@ export default function CursoCriptografiaSeguridadPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -121,25 +121,25 @@ export default function CursoCriptografiaSeguridadPage() {
 
       {/* Overview Section */}
       <section className={styles.overviewSection}>
-        <h2 className={styles.sectionTitle}>📋 ¿Qué aprenderás?</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> ¿Qué aprenderás?</h2>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📜</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📜</span>
             <h3>Historia</h3>
             <p>Desde César hasta Enigma: la evolución de los cifrados</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🔑</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🔑</span>
             <h3>Fundamentos</h3>
             <p>Cifrado simétrico, asimétrico y el estándar AES</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🔢</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🔢</span>
             <h3>Hashes</h3>
             <p>MD5, SHA-256 y verificación de integridad</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🛡️</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🛡️</span>
             <h3>Seguridad</h3>
             <p>Contraseñas seguras, 2FA y buenas prácticas</p>
           </div>
@@ -148,7 +148,7 @@ export default function CursoCriptografiaSeguridadPage() {
 
       {/* Modules Section */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido del Curso</h2>
 
         {modules.map((module) => {
           const moduleProgress = getModuleProgress(module.id);
@@ -159,7 +159,7 @@ export default function CursoCriptografiaSeguridadPage() {
                   className={styles.moduleIcon}
                   style={{ background: MODULE_COLORS[module.id] || MODULE_COLORS['fundamentos'] }}
                 >
-                  {MODULE_ICONS[module.id] || '📚'}
+                  <span aria-hidden="true">{MODULE_ICONS[module.id] || '📚'}</span>
                 </div>
                 <div className={styles.moduleInfo}>
                   <h3 className={styles.moduleTitle}>{module.title}</h3>
@@ -182,7 +182,7 @@ export default function CursoCriptografiaSeguridadPage() {
                         <div className={styles.chapterNumber}>{globalChapterIndex}</div>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>{chapter.title}</h4>
-                          <p className={styles.chapterDuration}>⏱️ {chapter.duration} min</p>
+                          <p className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</p>
                         </div>
                       </div>
                       <div className={styles.chapterTopics}>
@@ -205,7 +205,11 @@ export default function CursoCriptografiaSeguridadPage() {
       {/* CTA Section */}
       <section className={styles.ctaSection}>
         <h2 className={styles.ctaTitle}>
-          {completedCount === 0 ? '🚀 ¡Comienza tu Aprendizaje!' : '📖 Continúa donde lo dejaste'}
+          {completedCount === 0 ? (
+            <><span aria-hidden="true">🚀</span> ¡Comienza tu Aprendizaje!</>
+          ) : (
+            <><span aria-hidden="true">📖</span> Continúa donde lo dejaste</>
+          )}
         </h2>
         <p className={styles.ctaText}>
           {completedCount === 0
@@ -223,14 +227,14 @@ export default function CursoCriptografiaSeguridadPage() {
 
       {/* Resources Section - Herramientas Vinculadas */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>🛠️ Herramientas para Practicar</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🛠️</span> Herramientas para Practicar</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--spacing-lg)' }}>
           Cada capítulo incluye enlaces a estas herramientas para que puedas practicar lo aprendido.
         </p>
         <div className={styles.resourcesGrid}>
           {LINKED_TOOLS.map((tool) => (
             <Link key={tool.url} href={tool.url} className={styles.resourceCard}>
-              <span className={styles.resourceIcon}>{tool.icon}</span>
+              <span className={styles.resourceIcon} aria-hidden="true">{tool.icon}</span>
               <div className={styles.resourceName}>{tool.name}</div>
               <div className={styles.resourceDesc}>{tool.desc}</div>
             </Link>

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Desglose de precios por producto: quién se lleva qué del precio final',
     'Cifras de desperdicio alimentario y gasto familiar en España',
     'Comparativa entre modelo convencional y alternativas locales/km0',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -100,10 +100,10 @@
 | [x] | Cuánta Agua Gastas sin Saberlo | `/visualizador-agua-virtual/` | cultura, salud |
 | [x] | Cuánto Pesa una Decisión | `/visualizador-peso-decisiones/` | cultura, salud, finanzas |
 | [x] | Cuánto Tarda el Mundo | `/visualizador-escalas-tiempo/` | cultura |
-| [ ] | Curso de Criptografía y Seguridad | `/curso-criptografia-seguridad/` | cultura, tecnicas |
-| [ ] | De la Granja a tu Mesa | `/visualizador-cadena-alimentaria/` | cultura, salud |
-| [ ] | Del Mercantilismo al Capitalismo de Plataformas: Historia del Capitalismo | `/visualizador-historia/historia-capitalismo/` | cultura |
-| [ ] | Detector de Idioma | `/detector-idioma/` | cultura, productividad |
+| [x] | Curso de Criptografía y Seguridad | `/curso-criptografia-seguridad/` | cultura, tecnicas |
+| [x] | De la Granja a tu Mesa | `/visualizador-cadena-alimentaria/` | cultura, salud |
+| [x] | Del Mercantilismo al Capitalismo de Plataformas: Historia del Capitalismo | `/visualizador-historia/historia-capitalismo/` | cultura |
+| [x] | Detector de Idioma | `/detector-idioma/` | cultura, productividad |
 | [ ] | Detector de Sesgos Cognitivos | `/detector-sesgos-cognitivos/` | cultura, productividad |
 | [ ] | Diagnóstico de Brecha IA | `/diagnostico-brecha-ia/` | cultura, productividad |
 | [ ] | Economía Circular - De Lineal a Circular | `/visualizador-economia-circular/` | cultura, estudiantes |
