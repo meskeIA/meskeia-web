@@ -132,10 +132,10 @@
 | [x] | Estilos y Movimientos Literarios | `/visualizador-estilos-literarios/` | cultura, estudiantes |
 | [x] | Estratificación Social: Clases, Gini, Movilidad y Teorías Sociológicas | `/visualizador-estratificacion-social/` | cultura, estudiantes |
 | [x] | Evaluador de Prompts | `/evaluador-prompts/` | cultura, productividad |
-| [ ] | Evolución Humana - De los Primeros Homínidos al Homo Sapiens | `/visualizador-evolucion-humana/` | cultura, estudiantes |
-| [ ] | Falacias Lógicas - Guía Visual de Errores de Razonamiento | `/visualizador-falacias-logicas/` | cultura, estudiantes |
-| [ ] | Falsos Amigos Español-Inglés: Catálogo y Práctica | `/falsos-amigos-ingles/` | cultura, estudiantes |
-| [ ] | Flujos Migratorios Globales: Mapa 2024 | `/visualizador-migracion-global/` | cultura |
+| [x] | Evolución Humana - De los Primeros Homínidos al Homo Sapiens | `/visualizador-evolucion-humana/` | cultura, estudiantes |
+| [x] | Falacias Lógicas - Guía Visual de Errores de Razonamiento | `/visualizador-falacias-logicas/` | cultura, estudiantes |
+| [x] | Falsos Amigos Español-Inglés: Catálogo y Práctica | `/falsos-amigos-ingles/` | cultura, estudiantes |
+| [x] | Flujos Migratorios Globales: Mapa 2024 | `/visualizador-migracion-global/` | cultura |
 | [ ] | Francia Contemporánea: De la Tercera República a Macron | `/visualizador-historia/historia-francia-contemporanea/` | cultura |
 | [x] | Generador de Anagramas | `/generador-anagramas/` | cultura, juegos |
 | [ ] | Generador de Íncipit | `/generador-incipit/` | cultura, estudiantes |

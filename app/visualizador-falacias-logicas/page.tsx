@@ -389,7 +389,7 @@ export default function VisualizadorFalaciasLogicasPage() {
               aria-label={`Detalle: ${familiaSeleccionada.nombre}`}
             >
               <p className={styles.familiaDetalleTitle}>
-                {familiaSeleccionada.icono} {familiaSeleccionada.nombre}
+                <span aria-hidden="true">{familiaSeleccionada.icono}</span>{' '}{familiaSeleccionada.nombre}
               </p>
               <p className={styles.familiaDetalleDesc}>{familiaSeleccionada.definicion}</p>
               <p className={styles.familiaDetalleDesc}>
@@ -531,9 +531,9 @@ export default function VisualizadorFalaciasLogicasPage() {
                       <p className={styles.ejemploFalacia}>
                         {ejemplo.correcta}
                         {esAcierto ? (
-                          <span className={styles.aciertoBadge}>✓ Acertaste</span>
+                          <span className={styles.aciertoBadge}><span aria-hidden="true">✓</span> Acertaste</span>
                         ) : (
-                          <span className={styles.erroBadge}>✗ Respondiste: {respuesta}</span>
+                          <span className={styles.erroBadge}><span aria-hidden="true">✗</span> Respondiste: {respuesta}</span>
                         )}
                       </p>
                       <p className={styles.ejemploExplicacion}>{ejemplo.explicacion}</p>
@@ -597,14 +597,14 @@ export default function VisualizadorFalaciasLogicasPage() {
                 <div className={styles.transformacionBody}>
                   <div className={styles.transformacionCol}>
                     <p className={`${styles.transformacionLabel} ${styles.transformacionLabelMalo}`}>
-                      ✗ Argumento falaz
+                      <span aria-hidden="true">✗</span> Argumento falaz
                     </p>
                     <p className={styles.transformacionTexto}>{t.argumentoFalaz}</p>
                     <p className={styles.transformacionFalacia}>Falacia: {t.falaciaUsada}</p>
                   </div>
                   <div className={styles.transformacionCol}>
                     <p className={`${styles.transformacionLabel} ${styles.transformacionLabelBueno}`}>
-                      ✓ Argumento sólido
+                      <span aria-hidden="true">✓</span> Argumento sólido
                     </p>
                     <p className={styles.transformacionTexto}>{t.argumentoSolido}</p>
                   </div>

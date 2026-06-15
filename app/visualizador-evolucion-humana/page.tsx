@@ -296,6 +296,7 @@ export default function VisualizadorEvolucionHumana() {
             <button
               key={sec.id}
               className={`${styles.navBtn} ${seccionActiva === sec.id ? styles.navActivo : ''}`}
+              type="button"
               onClick={() => setSeccionActiva(sec.id)}
               aria-pressed={seccionActiva === sec.id}
             >
@@ -380,6 +381,7 @@ export default function VisualizadorEvolucionHumana() {
               <button
                 key={esp.id}
                 className={`${styles.especieCard} ${esp.id === especieSeleccionada ? styles.especieCardActiva : ''}`}
+                type="button"
                 onClick={() => handleEspecie(esp.id)}
                 role="listitem"
                 aria-pressed={esp.id === especieSeleccionada}
@@ -437,6 +439,7 @@ export default function VisualizadorEvolucionHumana() {
               <button
                 key={c.id}
                 className={`${styles.anatomiaNavBtn} ${caracteristicaActiva === c.id ? styles.anatomiaNavBtnActivo : ''}`}
+                type="button"
                 onClick={() => setCaracteristicaActiva(c.id)}
                 aria-pressed={caracteristicaActiva === c.id}
               >

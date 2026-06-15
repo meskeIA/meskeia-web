@@ -385,6 +385,7 @@ export default function MigracionGlobalPage() {
       {regionDetalle && (
         <div className={styles.panelDetalle} role="region" aria-label={`Detalle de ${regionDetalle.label}`}>
           <button
+            type="button"
             onClick={() => setRegionActiva(null)}
             className={styles.btnCerrar}
             aria-label="Cerrar panel de detalle"
@@ -401,6 +402,7 @@ export default function MigracionGlobalPage() {
       {flujoDetalle && (
         <div className={styles.panelDetalle} role="region" aria-label={`Detalle de flujo migratorio`}>
           <button
+            type="button"
             onClick={() => setFlujoActivo(null)}
             className={styles.btnCerrar}
             aria-label="Cerrar panel de flujo"

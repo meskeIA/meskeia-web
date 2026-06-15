@@ -233,13 +233,17 @@ export default function FalsosAmigosIngles() {
       <div className={styles.tabsWrapper}>
         <div className={styles.tabBar}>
           <button
+            type="button"
             className={`${styles.tabBtn} ${tab === 'catalogo' ? styles.tabActivo : ''}`}
+            aria-pressed={tab === 'catalogo'}
             onClick={() => setTab('catalogo')}
           >
             📖 Catálogo
           </button>
           <button
+            type="button"
             className={`${styles.tabBtn} ${tab === 'practica' ? styles.tabActivo : ''}`}
+            aria-pressed={tab === 'practica'}
             onClick={() => setTab('practica')}
           >
             🎯 Práctica
@@ -261,7 +265,7 @@ export default function FalsosAmigosIngles() {
                 aria-label="Buscar falsos amigos"
               />
               {busqueda && (
-                <button className={styles.btnLimpiar} onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda">✕</button>
+                <button type="button" className={styles.btnLimpiar} onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda">✕</button>
               )}
             </div>
 
@@ -270,9 +274,9 @@ export default function FalsosAmigosIngles() {
               <div className={styles.filtroGrupo}>
                 <span className={styles.filtroLabel}>Categoría:</span>
                 <div className={styles.chips}>
-                  <button className={`${styles.chip} ${catFiltro === 'todas' ? styles.chipActivo : ''}`} onClick={() => setCatFiltro('todas')}>Todas</button>
+                  <button type="button" className={`${styles.chip} ${catFiltro === 'todas' ? styles.chipActivo : ''}`} aria-pressed={catFiltro === 'todas'} onClick={() => setCatFiltro('todas')}>Todas</button>
                   {(Object.keys(CATEGORIAS) as Categoria[]).map(c => (
-                    <button key={c} className={`${styles.chip} ${catFiltro === c ? styles.chipActivo : ''}`} onClick={() => setCatFiltro(c)}>
+                    <button key={c} type="button" className={`${styles.chip} ${catFiltro === c ? styles.chipActivo : ''}`} aria-pressed={catFiltro === c} onClick={() => setCatFiltro(c)}>
                       {CATEGORIAS[c].emoji} {CATEGORIAS[c].nombre}
                     </button>
                   ))}
@@ -281,9 +285,9 @@ export default function FalsosAmigosIngles() {
               <div className={styles.filtroGrupo}>
                 <span className={styles.filtroLabel}>Nivel:</span>
                 <div className={styles.chips}>
-                  <button className={`${styles.chip} ${nivelFiltro === 'todos' ? styles.chipActivo : ''}`} onClick={() => setNivelFiltro('todos')}>Todos</button>
+                  <button type="button" className={`${styles.chip} ${nivelFiltro === 'todos' ? styles.chipActivo : ''}`} aria-pressed={nivelFiltro === 'todos'} onClick={() => setNivelFiltro('todos')}>Todos</button>
                   {(Object.keys(NIVELES) as Nivel[]).map(n => (
-                    <button key={n} className={`${styles.chip} ${nivelFiltro === n ? styles.chipActivo : ''}`} onClick={() => setNivelFiltro(n)}>
+                    <button key={n} type="button" className={`${styles.chip} ${nivelFiltro === n ? styles.chipActivo : ''}`} aria-pressed={nivelFiltro === n} onClick={() => setNivelFiltro(n)}>
                       {NIVELES[n].emoji} {NIVELES[n].nombre}
                     </button>
                   ))}
@@ -335,7 +339,7 @@ export default function FalsosAmigosIngles() {
             {/* Inicio */}
             {fasePractica === 'inicio' && (
               <div className={styles.practicaInicio}>
-                <div className={styles.practicaInicioIcon}>🎯</div>
+                <div className={styles.practicaInicioIcon} aria-hidden="true">🎯</div>
                 <h2>Pon a prueba tu inglés</h2>
                 <p>{N_PRACTICA} palabras aleatorias. Para cada una, elige el significado REAL en inglés.</p>
                 <div className={styles.practicaStats}>
@@ -343,7 +347,7 @@ export default function FalsosAmigosIngles() {
                   <div><strong>3</strong> opciones</div>
                   <div><strong>~3</strong> min</div>
                 </div>
-                <button className={styles.btnIniciarPractica} onClick={iniciarPractica}>
+                <button type="button" className={styles.btnIniciarPractica} onClick={iniciarPractica}>
                   Empezar práctica
                 </button>
               </div>
@@ -377,6 +381,7 @@ export default function FalsosAmigosIngles() {
                     return (
                       <button
                         key={i}
+                        type="button"
                         className={`${styles.opcion} ${estadoClase}`}
                         onClick={() => responder(op)}
                         disabled={fasePractica === 'revelado'}
@@ -398,7 +403,7 @@ export default function FalsosAmigosIngles() {
                       {' '}No confundir con <strong>{preguntaActual.espanol}</strong> (español), que significa <em>{preguntaActual.significadoEspanol}</em>.
                     </p>
                     <p className={styles.feedbackEjemplo}>{preguntaActual.ejemplo}</p>
-                    <button className={styles.btnSiguiente} onClick={siguiente}>
+                    <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                       {indice + 1 < N_PRACTICA ? 'Siguiente →' : 'Ver resultados'}
                     </button>
                   </div>
@@ -409,7 +414,7 @@ export default function FalsosAmigosIngles() {
             {/* Fin */}
             {fasePractica === 'fin' && (
               <div className={styles.practicaFin}>
-                <div className={styles.finEmoji}>{nivelResultado.emoji}</div>
+                <div className={styles.finEmoji} aria-hidden="true">{nivelResultado.emoji}</div>
                 <h2 className={styles.finTitulo}>{nivelResultado.titulo}</h2>
                 <p className={styles.finDesc}>{nivelResultado.desc}</p>
                 <div className={styles.finPuntuacion}>
@@ -418,8 +423,8 @@ export default function FalsosAmigosIngles() {
                   <span className={styles.finPct}>{Math.round((aciertos / N_PRACTICA) * 100)}%</span>
                 </div>
                 <div className={styles.finBotones}>
-                  <button className={styles.btnRepetir} onClick={iniciarPractica}>Repetir práctica</button>
-                  <button className={styles.btnVerCatalogo} onClick={() => setTab('catalogo')}>Ver catálogo</button>
+                  <button type="button" className={styles.btnRepetir} onClick={iniciarPractica}>Repetir práctica</button>
+                  <button type="button" className={styles.btnVerCatalogo} onClick={() => setTab('catalogo')}>Ver catálogo</button>
                 </div>
               </div>
             )}
@@ -562,19 +567,19 @@ export default function FalsosAmigosIngles() {
         <h3>Curiosidades sobre los falsos amigos</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔤</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔤</span>
             <p><strong>Pan, once, red, pie, sin:</strong> cinco palabras que se escriben igual en inglés y en español pero no comparten ningún significado. La coincidencia es puramente gráfica, no histórica — llegaron al mismo resultado por caminos distintos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📜</span>
+            <span className={styles.tipIcon} aria-hidden="true">📜</span>
             <p>La conquista normanda de Inglaterra en 1066 introdujo decenas de miles de palabras de origen francés-latino al inglés antiguo. Muchas de estas palabras también existían en castellano medieval, creando el caldo de cultivo para cientos de falsos amigos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚠️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
             <p><strong>Molest</strong> es el falso amigo más peligroso: en inglés implica acoso o abuso sexual, no mera molestia. Usar "he molested me" para decir "me molestó" en una conversación en inglés puede causar un malentendido muy serio.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌍</span>
             <p>Los falsos amigos no son exclusivos del inglés y el español. Existen entre casi todos los pares de lenguas con raíz común: <em>gift</em> significa "veneno" en alemán pero "regalo" en inglés y en contextos informales en español. Las lenguas comparten palabras pero no siempre comparten significados.</p>
           </div>
         </div>
@@ -582,7 +587,7 @@ export default function FalsosAmigosIngles() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores comunes al trabajar con falsos amigos
           </div>
           <ul className={styles.warningList}>
