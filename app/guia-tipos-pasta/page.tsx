@@ -799,6 +799,7 @@ export default function GuiaTiposPastaPage() {
             <div className={styles.filtroBotones}>
               <button
                 type="button"
+                aria-pressed={formaFiltro === 'Todas'}
                 onClick={() => setFormaFiltro('Todas')}
                 className={`${styles.filtroBtn} ${formaFiltro === 'Todas' ? styles.filtroBtnActivo : ''}`}
               >
@@ -808,6 +809,7 @@ export default function GuiaTiposPastaPage() {
                 <button
                   key={forma}
                   type="button"
+                  aria-pressed={formaFiltro === forma}
                   onClick={() => setFormaFiltro(forma)}
                   className={`${styles.filtroBtn} ${formaFiltro === forma ? styles.filtroBtnActivo : ''}`}
                 >
@@ -822,6 +824,7 @@ export default function GuiaTiposPastaPage() {
             <div className={styles.filtroBotones}>
               <button
                 type="button"
+                aria-pressed={regionFiltro === 'Todas'}
                 onClick={() => setRegionFiltro('Todas')}
                 className={`${styles.filtroBtn} ${regionFiltro === 'Todas' ? styles.filtroBtnActivo : ''}`}
               >
@@ -831,6 +834,7 @@ export default function GuiaTiposPastaPage() {
                 <button
                   key={region}
                   type="button"
+                  aria-pressed={regionFiltro === region}
                   onClick={() => setRegionFiltro(region)}
                   className={`${styles.filtroBtn} ${regionFiltro === region ? styles.filtroBtnActivo : ''}`}
                 >
@@ -845,6 +849,7 @@ export default function GuiaTiposPastaPage() {
             <div className={styles.filtroBotones}>
               <button
                 type="button"
+                aria-pressed={salsaFiltro === 'Todas'}
                 onClick={() => setSalsaFiltro('Todas')}
                 className={`${styles.filtroBtn} ${salsaFiltro === 'Todas' ? styles.filtroBtnActivo : ''}`}
               >
@@ -854,6 +859,7 @@ export default function GuiaTiposPastaPage() {
                 <button
                   key={salsa}
                   type="button"
+                  aria-pressed={salsaFiltro === salsa}
                   onClick={() => setSalsaFiltro(salsa)}
                   className={`${styles.filtroBtn} ${salsaFiltro === salsa ? styles.filtroBtnActivo : ''}`}
                 >
@@ -868,6 +874,7 @@ export default function GuiaTiposPastaPage() {
             <div className={styles.filtroBotones}>
               <button
                 type="button"
+                aria-pressed={dificultadFiltro === 'Todas'}
                 onClick={() => setDificultadFiltro('Todas')}
                 className={`${styles.filtroBtn} ${dificultadFiltro === 'Todas' ? styles.filtroBtnActivo : ''}`}
               >
@@ -877,6 +884,7 @@ export default function GuiaTiposPastaPage() {
                 <button
                   key={dif}
                   type="button"
+                  aria-pressed={dificultadFiltro === dif}
                   onClick={() => setDificultadFiltro(dif)}
                   className={`${styles.filtroBtn} ${dificultadFiltro === dif ? styles.filtroBtnActivo : ''}`}
                 >

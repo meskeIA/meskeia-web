@@ -149,10 +149,10 @@
 | [x] | Guía de Métrica y Estrofas | `/guia-metrica-estrofas/` | cultura, estudiantes |
 | [x] | Guía de Tejidos y Fibras | `/guia-tejidos-fibras/` | cultura, tecnicas |
 | [x] | Guía de Tipos de Arroz | `/guia-tipos-arroz/` | cultura, salud |
-| [ ] | Guía de Tipos de Pan | `/guia-tipos-pan/` | cultura, salud |
-| [ ] | Guía de Tipos de Pasta | `/guia-tipos-pasta/` | cultura, salud |
-| [ ] | Guía de Varietales de Vino | `/guia-varietales-vino/` | cultura, juegos |
-| [ ] | Guía de Vinagres del Mundo | `/guia-vinagres-mundo/` | cultura, salud |
+| [x] | Guía de Tipos de Pan | `/guia-tipos-pan/` | cultura, salud |
+| [x] | Guía de Tipos de Pasta | `/guia-tipos-pasta/` | cultura, salud |
+| [x] | Guía de Varietales de Vino | `/guia-varietales-vino/` | cultura, juegos |
+| [x] | Guía de Vinagres del Mundo | `/guia-vinagres-mundo/` | cultura, salud |
 | [ ] | Hipertensión — Qué le Ocurre al Cuerpo con la Presión Alta | `/visualizador-hipertension/` | cultura, estudiantes, salud |
 | [ ] | Historia de África: De Berlín a la Potencia Emergente | `/visualizador-historia/historia-africa/` | cultura |
 | [ ] | Historia de Alemania: Del Imperio al Motor de Europa | `/visualizador-historia/historia-alemania/` | cultura |

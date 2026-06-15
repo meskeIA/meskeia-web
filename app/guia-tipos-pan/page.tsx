@@ -532,7 +532,7 @@ export default function GuiaTiposPan() {
                 </span>
                 <span className={styles.badgeSecundario}>{pan.harina}</span>
                 <span className={styles.badgeFermentacion}>
-                  {FERMENTACION_EMOJI[pan.fermentacion]} {pan.fermentacion}
+                  <span aria-hidden="true">{FERMENTACION_EMOJI[pan.fermentacion]}</span> {pan.fermentacion}
                 </span>
                 <span className={styles.badgeTextura}>{pan.texturaMiga}</span>
               </div>

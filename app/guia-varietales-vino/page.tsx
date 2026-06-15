@@ -644,7 +644,7 @@ export default function GuiaVarietalesVinoPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1>🍷 Guía de Varietales de Vino</h1>
+          <h1><span aria-hidden="true">🍷</span> Guía de Varietales de Vino</h1>
           <p>45 uvas del mundo: notas de sabor, cuerpo, taninos, temperatura de servicio y maridaje</p>
         </header>
 
@@ -669,6 +669,7 @@ export default function GuiaVarietalesVinoPage() {
                 {TIPOS.map((t) => (
                   <button
                     key={t}
+                    type="button"
                     className={`${styles.filtroBtn} ${tipo === t ? styles.filtroActivo : ''}`}
                     onClick={() => setTipo(t)}
                     aria-pressed={tipo === t}
@@ -696,7 +697,7 @@ export default function GuiaVarietalesVinoPage() {
                   <p className={styles.nombreOriginal}>{v.nombreOriginal}</p>
                 )}
 
-                <span className={styles.origenPill}>📍 {v.origen}</span>
+                <span className={styles.origenPill}><span aria-hidden="true">📍</span> {v.origen}</span>
 
                 <p className={styles.descripcion}>{v.descripcion}</p>
 
@@ -866,7 +867,7 @@ export default function GuiaVarietalesVinoPage() {
           <h3>¿Qué vino para cada ocasión?</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>🕯️ Cena romántica</h4>
+              <h4><span aria-hidden="true">🕯️</span> Cena romántica</h4>
               <p>
                 Pinot Noir de Borgoña o Mencía de Ribeira Sacra. Elegantes, complejos y ligeros:
                 no abruman, seducen. Si prefieres blanco, un Viognier de Condrieu o un Godello
@@ -874,7 +875,7 @@ export default function GuiaVarietalesVinoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🥩 Maridaje con carne roja</h4>
+              <h4><span aria-hidden="true">🥩</span> Maridaje con carne roja</h4>
               <p>
                 Cabernet Sauvignon de Napa o Barolo para carnes de vacuno de alta calidad.
                 Malbec argentino de alta altitud para el asado. Syrah del Ródano para cordero
@@ -882,7 +883,7 @@ export default function GuiaVarietalesVinoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🥂 Aperitivo o celebración</h4>
+              <h4><span aria-hidden="true">🥂</span> Aperitivo o celebración</h4>
               <p>
                 Cava Brut Nature (Xarel·lo + Macabeo + Parellada) para eventos en España.
                 Prosecco Extra Brut para ocasiones más informales. Champagne Blanc de Blancs
@@ -890,7 +891,7 @@ export default function GuiaVarietalesVinoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🏺 Coleccionista o regalo especial</h4>
+              <h4><span aria-hidden="true">🏺</span> Coleccionista o regalo especial</h4>
               <p>
                 Nebbiolo (Barolo o Barbaresco) para colección a largo plazo (15-30 años).
                 Riesling Auslese del Mosela para 20-50 años. Pinot Noir de grands crus de
@@ -912,7 +913,7 @@ export default function GuiaVarietalesVinoPage() {
                 de la uva y la habilidad del enólogo.
               </p>
               <span className={styles.faqTip}>
-                💡 Un joven de varietal expresivo puede superar a una crianza de uva mediocre.
+                <span aria-hidden="true">💡</span> Un joven de varietal expresivo puede superar a una crianza de uva mediocre.
               </span>
             </li>
             <li className={styles.faqItem}>
@@ -945,7 +946,7 @@ export default function GuiaVarietalesVinoPage() {
                 a los 22-24 °C de una casa moderna.
               </p>
               <span className={styles.faqTip}>
-                💡 Regla práctica: 30 minutos en el frigorífico para un tinto servido a temperatura de sala.
+                <span aria-hidden="true">💡</span> Regla práctica: 30 minutos en el frigorífico para un tinto servido a temperatura de sala.
               </span>
             </li>
             <li className={styles.faqItem}>

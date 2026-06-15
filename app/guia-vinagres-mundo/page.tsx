@@ -842,6 +842,8 @@ export default function GuiaVinagresMundo() {
                 aria-label="Filtrar por materia prima"
               >
                 <button
+                  type="button"
+                  aria-pressed={origen === 'Todos'}
                   className={`${styles.filtroBtn} ${
                     origen === 'Todos' ? styles.filtroActivo : ''
                   }`}
@@ -852,6 +854,8 @@ export default function GuiaVinagresMundo() {
                 {ORIGENES.map((o) => (
                   <button
                     key={o}
+                    type="button"
+                    aria-pressed={origen === o}
                     className={`${styles.filtroBtn} ${
                       origen === o ? styles.filtroActivo : ''
                     }`}
@@ -871,6 +875,8 @@ export default function GuiaVinagresMundo() {
                 aria-label="Filtrar por región"
               >
                 <button
+                  type="button"
+                  aria-pressed={region === 'Todos'}
                   className={`${styles.filtroBtn} ${
                     region === 'Todos' ? styles.filtroActivo : ''
                   }`}
@@ -881,6 +887,8 @@ export default function GuiaVinagresMundo() {
                 {REGIONES.map((r) => (
                   <button
                     key={r}
+                    type="button"
+                    aria-pressed={region === r}
                     className={`${styles.filtroBtn} ${
                       region === r ? styles.filtroActivo : ''
                     }`}
@@ -900,6 +908,8 @@ export default function GuiaVinagresMundo() {
                 aria-label="Filtrar por acidez"
               >
                 <button
+                  type="button"
+                  aria-pressed={acidez === 'Todos'}
                   className={`${styles.filtroBtn} ${
                     acidez === 'Todos' ? styles.filtroActivo : ''
                   }`}
@@ -910,6 +920,8 @@ export default function GuiaVinagresMundo() {
                 {ACIDEZES.map((a) => (
                   <button
                     key={a}
+                    type="button"
+                    aria-pressed={acidez === a}
                     className={`${styles.filtroBtn} ${
                       acidez === a ? styles.filtroActivo : ''
                     }`}
@@ -929,6 +941,8 @@ export default function GuiaVinagresMundo() {
                 aria-label="Filtrar por intensidad"
               >
                 <button
+                  type="button"
+                  aria-pressed={intensidad === 'Todos'}
                   className={`${styles.filtroBtn} ${
                     intensidad === 'Todos' ? styles.filtroActivo : ''
                   }`}
@@ -939,6 +953,8 @@ export default function GuiaVinagresMundo() {
                 {INTENSIDADES.map((i) => (
                   <button
                     key={i}
+                    type="button"
+                    aria-pressed={intensidad === i}
                     className={`${styles.filtroBtn} ${
                       intensidad === i ? styles.filtroActivo : ''
                     }`}
@@ -958,6 +974,8 @@ export default function GuiaVinagresMundo() {
                 aria-label="Filtrar por uso culinario"
               >
                 <button
+                  type="button"
+                  aria-pressed={uso === 'Todos'}
                   className={`${styles.filtroBtn} ${
                     uso === 'Todos' ? styles.filtroActivo : ''
                   }`}
@@ -968,6 +986,8 @@ export default function GuiaVinagresMundo() {
                 {USOS.map((u) => (
                   <button
                     key={u}
+                    type="button"
+                    aria-pressed={uso === u}
                     className={`${styles.filtroBtn} ${
                       uso === u ? styles.filtroActivo : ''
                     }`}
@@ -1424,7 +1444,7 @@ export default function GuiaVinagresMundo() {
         </div>
 
         <div className={styles.warningBox}>
-          <h4>⚠️ Errores comunes que conviene evitar</h4>
+          <h4><span aria-hidden="true">⚠️</span> Errores comunes que conviene evitar</h4>
           <ul>
             <li>
               <strong>Diferencia entre IGP y DOP de Módena</strong>: el IGP
