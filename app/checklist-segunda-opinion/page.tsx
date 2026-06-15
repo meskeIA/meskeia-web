@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -236,26 +235,20 @@ export default function ChecklistSegundaOpinionPage() {
   const posY = 100 - ((puntuacionCuestionamiento - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🔍 Checklist de Segunda Opinión</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🔍</span> Checklist de Segunda Opinión</h1>
           <p className={styles.subtitle}>
             Antes de decidir: ¿has buscado razones para NO hacerlo?
             <br />
             Principio de adversario (red team)
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -292,6 +285,7 @@ export default function ChecklistSegundaOpinionPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -311,6 +305,7 @@ export default function ChecklistSegundaOpinionPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -326,23 +321,23 @@ export default function ChecklistSegundaOpinionPage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🔍 Alto Cuestionamiento</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🔍</span> Alto Cuestionamiento</span>
                 <span className={styles.mapLabelBottom}>Bajo Cuestionamiento</span>
                 <span className={styles.mapLabelLeft}>Baja Certeza</span>
-                <span className={styles.mapLabelRight}>🔒 Alta Certeza</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🔒</span> Alta Certeza</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔍 Escéptico Constructivo</span>
+                  <span><span aria-hidden="true">🔍</span> Escéptico Constructivo</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🛡️ Convicciones Testadas</span>
+                  <span><span aria-hidden="true">🛡️</span> Convicciones Testadas</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🌫️ Sin Posición Clara</span>
+                  <span><span aria-hidden="true">🌫️</span> Sin Posición Clara</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🔒 Certeza Ciega</span>
+                  <span><span aria-hidden="true">🔒</span> Certeza Ciega</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -361,7 +356,7 @@ export default function ChecklistSegundaOpinionPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔒 Certeza</span>
+                  <span><span aria-hidden="true">🔒</span> Certeza</span>
                   <span className={styles.scoreValue}>{puntuacionCerteza}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -373,7 +368,7 @@ export default function ChecklistSegundaOpinionPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔍 Cuestionamiento</span>
+                  <span><span aria-hidden="true">🔍</span> Cuestionamiento</span>
                   <span className={styles.scoreValue}>{puntuacionCuestionamiento}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -387,14 +382,14 @@ export default function ChecklistSegundaOpinionPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -402,7 +397,7 @@ export default function ChecklistSegundaOpinionPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -412,7 +407,7 @@ export default function ChecklistSegundaOpinionPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -421,7 +416,7 @@ export default function ChecklistSegundaOpinionPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
@@ -476,6 +471,5 @@ export default function ChecklistSegundaOpinionPage() {
         <ShareCard appName="checklist-segunda-opinion" />
         <Footer appName="checklist-segunda-opinion" />
       </div>
-    </>
   );
 }

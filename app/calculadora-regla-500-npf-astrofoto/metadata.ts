@@ -40,8 +40,8 @@ export const jsonLd = generateWebAppSchema({
     'Visualización SVG: estrellas puntuales o con estela según el tiempo elegido',
     'Comparativa entre tiempo elegido y los dos límites',
     'Guía completa de astrofotografía nocturna',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
+    'Fórmula NPF de Frédéric Michaud con tres parámetros: focal, apertura y pixel pitch',
+    'Regla 300 conservadora incluida como referencia adicional para gran angular',
   ],
 });
 

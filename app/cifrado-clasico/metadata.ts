@@ -36,7 +36,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Cifrados clásicos gratuitos: César, ROT13 y Atbash. Encripta y descifra mensajes con métodos históricos. Visualización del alfabeto cifrado y explicaciones educativas.",
   url: "https://meskeia.com/cifrado-clasico/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Cifrado César con desplazamiento configurable de 1 a 25 posiciones',
+    'ROT13 simétrico: la misma acción cifra y descifra',
+    'Cifrado Atbash: inversión completa del alfabeto (A↔Z, B↔Y…)',
+    'Tabla comparativa del alfabeto original vs. cifrado en tiempo real',
+    'Análisis de frecuencias con guía para romper el cifrado por fuerza bruta',
+    'Exportación del resultado como código HTML embebible',
+  ],
 });
 
 export const faqJsonLd = {

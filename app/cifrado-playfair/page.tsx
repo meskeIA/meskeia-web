@@ -210,15 +210,17 @@ export default function CifradoPlayfairPage() {
               type="button"
               className={`${styles.modoBtn} ${modo === 'cifrar' ? styles.active : ''}`}
               onClick={() => setModo('cifrar')}
+              aria-pressed={modo === 'cifrar'}
             >
-              🔒 Cifrar
+              <span aria-hidden="true">🔒</span> Cifrar
             </button>
             <button
               type="button"
               className={`${styles.modoBtn} ${modo === 'descifrar' ? styles.active : ''}`}
               onClick={() => setModo('descifrar')}
+              aria-pressed={modo === 'descifrar'}
             >
-              🔓 Descifrar
+              <span aria-hidden="true">🔓</span> Descifrar
             </button>
           </div>
 
@@ -286,13 +288,13 @@ export default function CifradoPlayfairPage() {
             className={styles.btnPrimary}
             disabled={!texto.trim() || !clave.trim()}
           >
-            {modo === 'cifrar' ? '🔒 Cifrar' : '🔓 Descifrar'}
+            {modo === 'cifrar' ? <><span aria-hidden="true">🔒</span> Cifrar</> : <><span aria-hidden="true">🔓</span> Descifrar</>}
           </button>
         </section>
 
         {/* Digramas procesados */}
         {digramasResaltados.length > 0 && (
-          <section className={styles.digramasPanel}>
+          <section className={styles.digramasPanel} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.sectionTitle}>Proceso de {modo === 'cifrar' ? 'cifrado' : 'descifrado'}</h2>
             <div className={styles.digramasGrid}>
               {digramasResaltados.map(([original, cifrado], i) => (
@@ -308,11 +310,11 @@ export default function CifradoPlayfairPage() {
 
         {/* Resultado */}
         {resultado && (
-          <section className={styles.resultPanel}>
+          <section className={styles.resultPanel} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.panelHeader}>
               <h2 className={styles.sectionTitle}>Resultado</h2>
               <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
-                {copiado ? '✅ Copiado' : '📋 Copiar'}
+                {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
             <div className={styles.resultBox}>
@@ -343,7 +345,7 @@ export default function CifradoPlayfairPage() {
                 </p>
                 <pre className={styles.htmlPre}>{htmlCode}</pre>
                 <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
-                  {htmlCopiado ? '✅ ¡Copiado!' : '📋 Copiar código HTML'}
+                  {htmlCopiado ? <><span aria-hidden="true">✅</span> ¡Copiado!</> : <><span aria-hidden="true">📋</span> Copiar código HTML</>}
                 </button>
               </div>
             )}
@@ -393,7 +395,7 @@ export default function CifradoPlayfairPage() {
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Playfair vs otros cifrados clásicos</h2>
+          <h2><span aria-hidden="true">📊</span> Playfair vs otros cifrados clásicos</h2>
           <p className={styles.comparativaSubtitle}>
             Comparativa entre los principales cifrados de la era pre-computacional
           </p>
@@ -402,9 +404,9 @@ export default function CifradoPlayfairPage() {
               <thead>
                 <tr>
                   <th>Característica</th>
-                  <th>👑 César</th>
-                  <th>🌊 Vigenère</th>
-                  <th>🔲 Playfair</th>
+                  <th><span aria-hidden="true">👑</span> César</th>
+                  <th><span aria-hidden="true">🌊</span> Vigenère</th>
+                  <th><span aria-hidden="true">🔲</span> Playfair</th>
                 </tr>
               </thead>
               <tbody>
@@ -451,10 +453,10 @@ export default function CifradoPlayfairPage() {
 
         {/* ========== SECCIÓN 2: HISTORIA ========== */}
         <section className={styles.infoSection}>
-          <h2>🏛️ Historia del cifrado Playfair</h2>
+          <h2><span aria-hidden="true">🏛️</span> Historia del cifrado Playfair</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>📜 Origen (1854)</h3>
+              <h3><span aria-hidden="true">📜</span> Origen (1854)</h3>
               <p>
                 Inventado por <strong>Charles Wheatstone</strong>, físico inglés conocido
                 también por el puente de Wheatstone, pero popularizado por su amigo
@@ -463,7 +465,7 @@ export default function CifradoPlayfairPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>⚔️ Guerra de los Boers (1899-1902)</h3>
+              <h3><span aria-hidden="true">⚔️</span> Guerra de los Boers (1899-1902)</h3>
               <p>
                 Los británicos adoptaron oficialmente el Playfair para comunicaciones
                 de campo durante la Guerra de los Boers en Sudáfrica. Su rapidez de
@@ -472,7 +474,7 @@ export default function CifradoPlayfairPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🌍 Primera y Segunda Guerra Mundial</h3>
+              <h3><span aria-hidden="true">🌍</span> Primera y Segunda Guerra Mundial</h3>
               <p>
                 Se usó ampliamente en la WWI por las fuerzas aliadas. En la WWII,
                 Australia lo mantuvo para comunicaciones tácticas de nivel bajo.
@@ -481,7 +483,7 @@ export default function CifradoPlayfairPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔓 Primera ruptura documentada</h3>
+              <h3><span aria-hidden="true">🔓</span> Primera ruptura documentada</h3>
               <p>
                 El criptógrafo <strong>Alfred Dillwyn Knox</strong> del gobierno
                 británico sistematizó métodos para romperlo durante la WWI. Con suficiente
@@ -494,7 +496,7 @@ export default function CifradoPlayfairPage() {
 
         {/* ========== SECCIÓN 3: FAQ ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre Playfair</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre Playfair</h2>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary className={styles.faqQuestion}>
@@ -558,7 +560,7 @@ export default function CifradoPlayfairPage() {
 
         {/* ========== SECCIÓN 4: REGLAS DETALLADAS ========== */}
         <section className={styles.reglasDetalladasSection}>
-          <h2>🔲 Las tres reglas de cifrado en detalle</h2>
+          <h2><span aria-hidden="true">🔲</span> Las tres reglas de cifrado en detalle</h2>
           <div className={styles.reglasGrid}>
             <div className={styles.reglaDetallada}>
               <div className={styles.reglaNum}>↔</div>
@@ -595,31 +597,31 @@ export default function CifradoPlayfairPage() {
 
         {/* ========== SECCIÓN 5: CONSEJOS ========== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Consejos para usar Playfair correctamente</h2>
+          <h2><span aria-hidden="true">💡</span> Consejos para usar Playfair correctamente</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔑</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔑</span>
               <div>
                 <strong>Claves sin letras repetidas</strong>
                 <p>Las repeticiones en la clave se eliminan al construir la matriz. «SECRETO» solo aporta las letras únicas S-E-C-R-T-O. Una clave más variada crea una matriz más impredecible.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔤</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔤</span>
               <div>
                 <strong>Recuerda la regla I=J</strong>
                 <p>Al descifrar un mensaje, recuerda que la I puede representar tanto I como J. El contexto del mensaje permite distinguir: «BANIO» vs «BANJO» según tiene sentido.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <div>
                 <strong>Mensajes cortos son más seguros</strong>
                 <p>Con menos de 100 caracteres, el análisis estadístico de digramas tiene poca muestra. Para uso lúdico, mantén los mensajes cortos y cambia la clave frecuentemente.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎭</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎭</span>
               <div>
                 <strong>Ideal para puzzles y escape rooms</strong>
                 <p>La matriz 5x5 visible añade un elemento visual atractivo. Los participantes pueden reconstruir la matriz manualmente, lo que lo hace perfecto para actividades educativas y juegos de enigmas.</p>
@@ -630,31 +632,31 @@ export default function CifradoPlayfairPage() {
 
         {/* ========== SECCIÓN 6: WARNING BOX ========== */}
         <div className={styles.warningBox}>
-          <h2>⚠️ Errores frecuentes con el cifrado Playfair</h2>
+          <h2><span aria-hidden="true">⚠️</span> Errores frecuentes con el cifrado Playfair</h2>
           <ul className={styles.warningList}>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Olvidar que J se trata como I</strong>
                 <p>Si envías un mensaje con J y el receptor no lo sabe, el descifrado producirá texto incomprensible. Ambas partes deben acordar esta convención antes de intercambiar mensajes.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Usarlo para datos sensibles reales</strong>
                 <p>Playfair fue descifrado sistemáticamente durante la WWI (~1914). Cualquier programa moderno lo rompe en milisegundos. Para información confidencial real, usa AES-256 con una contraseña robusta.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>No comunicar la clave por un canal seguro</strong>
                 <p>Si el atacante captura la clave Playfair, puede descifrar todos los mensajes cifrados con ella. La seguridad de Playfair depende 100% del secreto de la clave.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>✅</span>
+              <span className={styles.warningIcon} aria-hidden="true">✅</span>
               <div>
                 <strong>Uso correcto: educación, historia y juegos</strong>
                 <p>Playfair es excepcional para aprender criptografía de digramas, diseñar escape rooms temáticos, recrear mensajes históricos de la WWI/WWII, y entender la evolución hacia los cifrados modernos.</p>

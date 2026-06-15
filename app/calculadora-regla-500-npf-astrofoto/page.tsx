@@ -138,7 +138,7 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🌌 Regla 500 y NPF para Astrofotografía</h1>
+        <h1><span aria-hidden="true">🌌</span> Regla 500 y NPF para Astrofotografía</h1>
         <p>
           Calcula el tiempo máximo de exposición antes de que las estrellas dejen de ser puntos y
           se conviertan en estelas. Regla 500 simple y NPF precisa con visualización en vivo.
@@ -226,8 +226,10 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
                 {APERTURAS.map((a, idx) => (
                   <button
                     key={a}
+                    type="button"
                     className={`${styles.aperturaBtn} ${aperturaIdx === idx ? styles.aperturaActive : ''}`}
                     onClick={() => setAperturaIdx(idx)}
+                    aria-pressed={aperturaIdx === idx}
                   >
                     f/{formatNumber(a, a < 10 && a % 1 !== 0 ? 1 : 0)}
                   </button>
@@ -258,9 +260,11 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
                 {PRESETS_DECLINACION.map((p) => (
                   <button
                     key={p.id}
+                    type="button"
                     className={`${styles.focalChip} ${declinacion === p.declinacion ? styles.chipActive : ''}`}
                     onClick={() => setDeclinacion(p.declinacion)}
                     title={`${p.declinacion}°`}
+                    aria-pressed={declinacion === p.declinacion}
                   >
                     <span aria-hidden="true">{p.emoji}</span> {p.nombre}
                   </button>
@@ -300,7 +304,7 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
             </p>
             <p className={styles.veredictoDesc}>{veredicto.descripcion}</p>
 
-            <div className={styles.resultBlock}>
+            <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.resultTitle}>Tiempos máximos</h3>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>NPF (precisa)</span>
@@ -405,21 +409,21 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
           <h3 className={styles.eduSubtitle}>Ejemplos rápidos en Full Frame 24 MP</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>🌌 Vía Láctea — 14 mm f/2,8 cerca del ecuador celeste</h4>
+              <h4><span aria-hidden="true">🌌</span> Vía Láctea — 14 mm f/2,8 cerca del ecuador celeste</h4>
               <p>
                 Regla 500: ~35 s. NPF: ~19 s. Usa 15-20 s a ISO 3200-6400 según contaminación
                 lumínica. Con cámara muy resuelta (45+ MP), baja a 13 s.
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>⭐ Constelación con 50 mm f/1,8 a declinación 30°</h4>
+              <h4><span aria-hidden="true">⭐</span> Constelación con 50 mm f/1,8 a declinación 30°</h4>
               <p>
                 Regla 500: 10 s. NPF: ~6 s. Con un 50 mm el límite cae rápido. Aquí ayuda mucho que
                 la apertura sea amplia para mantener ISO razonable.
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🧭 Cielo cercano a Polaris</h4>
+              <h4><span aria-hidden="true">🧭</span> Cielo cercano a Polaris</h4>
               <p>
                 Las estrellas circumpolares apenas se mueven respecto al sensor. NPF tiende a
                 infinito y puedes exponer 60-120 s sin problema con focales cortas. Ideal para
@@ -427,7 +431,7 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>📷 Star trails intencionados</h4>
+              <h4><span aria-hidden="true">📷</span> Star trails intencionados</h4>
               <p>
                 Para hacer rayas circulares en torno a Polaris: ignora la NPF. Toma muchas fotos de
                 20-30 s seguidas (intervalómetro) y combínalas. O una sola de 10-60 minutos si tu
@@ -477,7 +481,7 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
                 divide el resultado de la 500 entre 1,5.
               </p>
               <p className={styles.faqTip}>
-                💡 Si solo vas a publicar a tamaño web, la regla 500 sigue siendo aceptable.
+                <span aria-hidden="true">💡</span> Si solo vas a publicar a tamaño web, la regla 500 sigue siendo aceptable.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -505,7 +509,7 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
                 no lo sabes, deja 0° (peor caso) y vas a salvo.
               </p>
               <p className={styles.faqTip}>
-                💡 La regla 500 ignora la declinación y por eso es más conservadora al cerca del
+                <span aria-hidden="true">💡</span> La regla 500 ignora la declinación y por eso es más conservadora al cerca del
                 ecuador y demasiado conservadora cerca de los polos celestes.
               </p>
             </div>

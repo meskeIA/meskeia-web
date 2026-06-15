@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Diagnóstico visual con mapa 2D y perfil personalizado',
     'Basado en el principio de red team (adversario)',
     'Acciones concretas según tu resultado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    '4 perfiles: Escéptico Constructivo, Convicciones Testadas, Sin Posición Clara y Certeza Ciega',
+    'Mapa 2D de cuadrantes con ejes de certeza y cuestionamiento',
+    'Listado de fortalezas, riesgos y acciones específicas por perfil',
   ],
 });
 

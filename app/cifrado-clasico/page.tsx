@@ -185,28 +185,34 @@ export default function CifradoClasicoPage() {
         {/* Selector de método */}
         <div className={styles.methodSelector}>
           <button
+            type="button"
             className={`${styles.methodBtn} ${metodo === 'cesar' ? styles.active : ''}`}
             onClick={() => { setMetodo('cesar'); setResultado(''); setHtmlCode(''); }}
+            aria-pressed={metodo === 'cesar'}
           >
-            👑 César
+            <span aria-hidden="true">👑</span> César
           </button>
           <button
+            type="button"
             className={`${styles.methodBtn} ${metodo === 'rot13' ? styles.active : ''}`}
             onClick={() => { setMetodo('rot13'); setResultado(''); setHtmlCode(''); }}
+            aria-pressed={metodo === 'rot13'}
           >
-            🔄 ROT13
+            <span aria-hidden="true">🔄</span> ROT13
           </button>
           <button
+            type="button"
             className={`${styles.methodBtn} ${metodo === 'atbash' ? styles.active : ''}`}
             onClick={() => { setMetodo('atbash'); setResultado(''); setHtmlCode(''); }}
+            aria-pressed={metodo === 'atbash'}
           >
-            🔀 Atbash
+            <span aria-hidden="true">🔀</span> Atbash
           </button>
         </div>
 
         {/* Descripción del método */}
         <div className={styles.methodInfo}>
-          <span className={styles.methodEmoji}>{metodosInfo[metodo].emoji}</span>
+          <span className={styles.methodEmoji} aria-hidden="true">{metodosInfo[metodo].emoji}</span>
           <div>
             <strong>{metodosInfo[metodo].nombre}</strong>
             <p>{metodosInfo[metodo].descripcion}</p>
@@ -217,16 +223,20 @@ export default function CifradoClasicoPage() {
         {!esMetodoSimetrico && (
           <div className={styles.modeSelector}>
             <button
+              type="button"
               className={`${styles.modeBtn} ${modo === 'cifrar' ? styles.active : ''}`}
               onClick={() => setModo('cifrar')}
+              aria-pressed={modo === 'cifrar'}
             >
-              🔒 Cifrar
+              <span aria-hidden="true">🔒</span> Cifrar
             </button>
             <button
+              type="button"
               className={`${styles.modeBtn} ${modo === 'descifrar' ? styles.active : ''}`}
               onClick={() => setModo('descifrar')}
+              aria-pressed={modo === 'descifrar'}
             >
-              🔓 Descifrar
+              <span aria-hidden="true">🔓</span> Descifrar
             </button>
           </div>
         )}
@@ -293,12 +303,12 @@ export default function CifradoClasicoPage() {
 
         {/* Botones de acción */}
         <div className={styles.buttonRow}>
-          <button onClick={procesar} className={styles.btnPrimary} disabled={!texto.trim()}>
+          <button type="button" onClick={procesar} className={styles.btnPrimary} disabled={!texto.trim()}>
             {esMetodoSimetrico
-              ? '🔐 Procesar texto'
-              : modo === 'cifrar' ? '🔒 Cifrar mensaje' : '🔓 Descifrar mensaje'}
+              ? <><span aria-hidden="true">🔐</span> Procesar texto</>
+              : modo === 'cifrar' ? <><span aria-hidden="true">🔒</span> Cifrar mensaje</> : <><span aria-hidden="true">🔓</span> Descifrar mensaje</>}
           </button>
-          <button onClick={limpiar} className={styles.btnSecondary}>
+          <button type="button" onClick={limpiar} className={styles.btnSecondary}>
             Limpiar
           </button>
         </div>
@@ -307,9 +317,9 @@ export default function CifradoClasicoPage() {
         {resultado && (
           <div className={styles.resultSection}>
             <label className={styles.label}>Resultado:</label>
-            <div className={styles.resultBox}>{resultado}</div>
-            <button onClick={copiarResultado} className={styles.btnCopy}>
-              {copiado ? '✅ Copiado' : '📋 Copiar resultado'}
+            <div className={styles.resultBox} role="status" aria-live="polite" aria-atomic="true">{resultado}</div>
+            <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
+              {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar resultado</>}
             </button>
           </div>
         )}
@@ -333,8 +343,8 @@ export default function CifradoClasicoPage() {
                   Copia este código HTML para incrustar el mensaje cifrado en cualquier página web:
                 </p>
                 <pre className={styles.htmlPre}>{htmlCode}</pre>
-                <button onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
-                  {htmlCopiado ? '✅ ¡Copiado!' : '📋 Copiar código HTML'}
+                <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
+                  {htmlCopiado ? <><span aria-hidden="true">✅</span> ¡Copiado!</> : <><span aria-hidden="true">📋</span> Copiar código HTML</>}
                 </button>
               </div>
             )}
@@ -349,7 +359,7 @@ export default function CifradoClasicoPage() {
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Comparativa de los tres cifrados</h2>
+          <h2><span aria-hidden="true">📊</span> Comparativa de los tres cifrados</h2>
           <p className={styles.comparativaSubtitle}>
             César, ROT13 y Atbash frente a frente: tipo, claves posibles, simetría, origen histórico y uso actual
           </p>
@@ -358,9 +368,9 @@ export default function CifradoClasicoPage() {
               <thead>
                 <tr>
                   <th>Característica</th>
-                  <th>👑 César</th>
-                  <th>🔄 ROT13</th>
-                  <th>🔀 Atbash</th>
+                  <th><span aria-hidden="true">👑</span> César</th>
+                  <th><span aria-hidden="true">🔄</span> ROT13</th>
+                  <th><span aria-hidden="true">🔀</span> Atbash</th>
                 </tr>
               </thead>
               <tbody>
@@ -407,10 +417,10 @@ export default function CifradoClasicoPage() {
 
         {/* ========== SECCIÓN 2: HISTORIA ========== */}
         <section className={styles.infoSection}>
-          <h2>🏛️ Historia y origen de cada cifrado</h2>
+          <h2><span aria-hidden="true">🏛️</span> Historia y origen de cada cifrado</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>👑 Cifrado César (~50 a.C.)</h3>
+              <h3><span aria-hidden="true">👑</span> Cifrado César (~50 a.C.)</h3>
               <p>
                 Julio César lo usó para comunicarse con sus generales durante las
                 Guerras de las Galias. El desplazamiento habitual era de 3 posiciones:
@@ -419,7 +429,7 @@ export default function CifradoClasicoPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔄 ROT13 (~1980, Usenet)</h3>
+              <h3><span aria-hidden="true">🔄</span> ROT13 (~1980, Usenet)</h3>
               <p>
                 Surgió en los grupos de noticias de Usenet a principios de los
                 años 80. Se usaba para ocultar respuestas a acertijos, spoilers de
@@ -429,7 +439,7 @@ export default function CifradoClasicoPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔀 Cifrado Atbash (~600 a.C.)</h3>
+              <h3><span aria-hidden="true">🔀</span> Cifrado Atbash (~600 a.C.)</h3>
               <p>
                 De origen hebreo, su nombre proviene de las primeras y últimas
                 letras del alfabeto hebreo: Alef-Tav-Bet-Shin. Aparece en el
@@ -439,7 +449,7 @@ export default function CifradoClasicoPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>📖 Análisis de frecuencias (~850 d.C.)</h3>
+              <h3><span aria-hidden="true">📖</span> Análisis de frecuencias (~850 d.C.)</h3>
               <p>
                 El matemático árabe Al-Kindi desarrolló la técnica del análisis
                 de frecuencias, que rompe cualquier cifrado de sustitución
@@ -453,7 +463,7 @@ export default function CifradoClasicoPage() {
 
         {/* ========== SECCIÓN 3: FAQ ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre cifrados clásicos</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre cifrados clásicos</h2>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary className={styles.faqQuestion}>
@@ -516,7 +526,7 @@ export default function CifradoClasicoPage() {
 
         {/* ========== SECCIÓN 4: EJEMPLOS FAMOSOS ========== */}
         <section className={styles.examplesSection}>
-          <h2>📜 Ejemplos históricos y famosos</h2>
+          <h2><span aria-hidden="true">📜</span> Ejemplos históricos y famosos</h2>
           <div className={styles.examplesList}>
             <div className={styles.exampleItem}>
               <div className={styles.exampleHeader}>
@@ -567,14 +577,14 @@ export default function CifradoClasicoPage() {
 
         {/* ========== SECCIÓN 5: ANÁLISIS DE FRECUENCIAS ========== */}
         <section className={styles.frecuenciasSection}>
-          <h2>📈 Análisis de frecuencias: cómo romper estos cifrados</h2>
+          <h2><span aria-hidden="true">📈</span> Análisis de frecuencias: cómo romper estos cifrados</h2>
           <p className={styles.frecuenciasIntro}>
             Al-Kindi (~850 d.C.) descubrió que las letras en cualquier idioma aparecen con
             frecuencias predecibles. Esto hace vulnerables a todos los cifrados de sustitución monoalfabética.
           </p>
           <div className={styles.frecuenciasGrid}>
             <div className={styles.frecuenciasCard}>
-              <h3>🇪🇸 Frecuencias en español</h3>
+              <h3><span aria-hidden="true">🇪🇸</span> Frecuencias en español</h3>
               <div className={styles.frecuenciasBars}>
                 {[
                   { letra: 'E', pct: 13.7 }, { letra: 'A', pct: 12.2 },
@@ -591,7 +601,7 @@ export default function CifradoClasicoPage() {
               </div>
             </div>
             <div className={styles.frecuenciasCard}>
-              <h3>🔍 Pasos para romper el César</h3>
+              <h3><span aria-hidden="true">🔍</span> Pasos para romper el César</h3>
               <ol className={styles.pasosList}>
                 <li>Contar la frecuencia de cada letra en el texto cifrado</li>
                 <li>La letra más frecuente probablemente es la <strong>E</strong> cifrada</li>
@@ -605,31 +615,31 @@ export default function CifradoClasicoPage() {
 
         {/* ========== SECCIÓN 6: WARNING BOX ========== */}
         <div className={styles.warningBox}>
-          <h2>⚠️ Errores frecuentes al usar cifrados clásicos</h2>
+          <h2><span aria-hidden="true">⚠️</span> Errores frecuentes al usar cifrados clásicos</h2>
           <ul className={styles.warningList}>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Usarlos para proteger datos reales</strong>
                 <p>César, ROT13 y Atbash son solo herramientas educativas. Para cifrado real usa AES-256, que es el estándar actual. Nunca uses cifrados clásicos para contraseñas, mensajes privados o datos sensibles.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Confundir codificación con cifrado</strong>
                 <p>ROT13 suele llamarse «cifrado», pero en realidad es una transformación pública sin secreto: cualquiera que sepa que es ROT13 puede revertirlo instantáneamente. Un cifrado seguro requiere una clave secreta.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Creer que combinar varios cifrados da seguridad</strong>
                 <p>Aplicar César sobre Atbash sobre ROT13 sigue siendo un cifrado de sustitución monoalfabética. Un análisis de frecuencias lo rompe igualmente. La complejidad no implica seguridad en criptografía clásica.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>✅</span>
+              <span className={styles.warningIcon} aria-hidden="true">✅</span>
               <div>
                 <strong>Uso correcto: aprendizaje y juegos</strong>
                 <p>Estos cifrados son perfectos para enseñar los fundamentos de la criptografía, crear actividades lúdicas, diseñar puzzles o escapadas temáticas, y entender la historia de la seguridad informática.</p>

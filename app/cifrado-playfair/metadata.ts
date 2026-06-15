@@ -36,7 +36,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Cifra textos con el método Playfair usando una matriz 5x5. Cifrado por pares de letras usado en guerras mundiales. Visualización interactiva de la matriz.",
   url: "https://meskeia.com/cifrado-playfair/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Matriz Playfair 5×5 generada a partir de una palabra clave personalizada',
+    'Cifrado y descifrado por pares de letras (dígrafos) con resaltado visual',
+    'Eliminación automática de la J y sustitución por I (norma original Playfair)',
+    'Panel de dígrafos procesados con emparejamiento origen → resultado',
+    'Historia del cifrado Playfair: uso en la Primera y Segunda Guerra Mundial',
+    'Exportación del texto cifrado como código HTML embebible',
+  ],
 });
 
 export const faqJsonLd = {

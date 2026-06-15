@@ -71,10 +71,10 @@
 | [x] | Asistente de Reclamaciones al Consumidor | `/asistente-reclamaciones/` | cultura, productividad |
 | [x] | Calculadora de Profundidad de Campo (DoF) | `/calculadora-profundidad-campo/` | cultura, tecnicas |
 | [x] | Calculadora Huella de Carbono | `/calculadora-huella-carbono/` | cultura, inmobiliaria |
-| [ ] | Calculadora Regla 500 y NPF (Astrofotografía) | `/calculadora-regla-500-npf-astrofoto/` | cultura, tecnicas |
-| [ ] | Checklist de Segunda Opinión | `/checklist-segunda-opinion/` | cultura, productividad |
-| [ ] | Cifrado Clásico | `/cifrado-clasico/` | cultura |
-| [ ] | Cifrado Playfair | `/cifrado-playfair/` | cultura |
+| [x] | Calculadora Regla 500 y NPF (Astrofotografía) | `/calculadora-regla-500-npf-astrofoto/` | cultura, tecnicas |
+| [x] | Checklist de Segunda Opinión | `/checklist-segunda-opinion/` | cultura, productividad |
+| [x] | Cifrado Clásico | `/cifrado-clasico/` | cultura |
+| [x] | Cifrado Playfair | `/cifrado-playfair/` | cultura |
 | [x] | Cifrado por Transposición | `/cifrado-transposicion/` | cultura |
 | [ ] | Cifrado Vigenère | `/cifrado-vigenere/` | cultura |
 | [ ] | Cinética Química: Arrhenius, Órdenes y Catalizadores | `/visualizador-cinetica-quimica/` | cultura, estudiantes, tecnicas |
