@@ -96,10 +96,10 @@
 | [x] | Constructor de Personaje | `/constructor-personaje/` | cultura, estudiantes |
 | [x] | Conversor Binario | `/conversor-binario/` | cultura, estudiantes |
 | [x] | Conversor Números Romanos | `/conversor-numeros-romanos/` | cultura |
-| [ ] | Cronobiología: Relojes Circadianos, Cronotipos y Cronofarmacología | `/visualizador-cronobiologia/` | cultura, estudiantes, salud |
-| [ ] | Cuánta Agua Gastas sin Saberlo | `/visualizador-agua-virtual/` | cultura, salud |
-| [ ] | Cuánto Pesa una Decisión | `/visualizador-peso-decisiones/` | cultura, salud, finanzas |
-| [ ] | Cuánto Tarda el Mundo | `/visualizador-escalas-tiempo/` | cultura |
+| [x] | Cronobiología: Relojes Circadianos, Cronotipos y Cronofarmacología | `/visualizador-cronobiologia/` | cultura, estudiantes, salud |
+| [x] | Cuánta Agua Gastas sin Saberlo | `/visualizador-agua-virtual/` | cultura, salud |
+| [x] | Cuánto Pesa una Decisión | `/visualizador-peso-decisiones/` | cultura, salud, finanzas |
+| [x] | Cuánto Tarda el Mundo | `/visualizador-escalas-tiempo/` | cultura |
 | [ ] | Curso de Criptografía y Seguridad | `/curso-criptografia-seguridad/` | cultura, tecnicas |
 | [ ] | De la Granja a tu Mesa | `/visualizador-cadena-alimentaria/` | cultura, salud |
 | [ ] | Del Mercantilismo al Capitalismo de Plataformas: Historia del Capitalismo | `/visualizador-historia/historia-capitalismo/` | cultura |

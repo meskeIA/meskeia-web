@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos
@@ -95,13 +94,7 @@ export default function VisualizadorEscalasTiempoPage() {
   const maxLog = Math.log10(FENOMENOS[FENOMENOS.length - 1].segundos);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -244,7 +237,6 @@ export default function VisualizadorEscalasTiempoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-escalas-tiempo')} />
         <ShareCard appName="visualizador-escalas-tiempo" />
         <Footer appName="visualizador-escalas-tiempo" />
-      </div>
-    </>
+    </div>
   );
 }

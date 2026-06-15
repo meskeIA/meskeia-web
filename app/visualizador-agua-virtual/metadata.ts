@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     'Comparacion huella hidrica de alimentos',
     'Agua virtual en la industria textil',
     'Estres hidrico global y comercio de agua virtual',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
-    'Disponible en espanol',
+    'Desglose del desayuno: agua en café, leche, huevos y cereales',
+    'Guardarropa: litros ocultos en algodón, cuero y ropa sintética',
+    'Mapa de exportación de agua virtual entre países',
   ],
 });
 

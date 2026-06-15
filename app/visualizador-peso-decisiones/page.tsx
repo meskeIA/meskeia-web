@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos: decisiones y su impacto acumulado
@@ -201,13 +200,7 @@ export default function VisualizadorPesoDecisionesPage() {
   const horizonteKey = horizonte === 1 ? 'anio1' : horizonte === 5 ? 'anio5' : 'anio10';
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -257,7 +250,7 @@ export default function VisualizadorPesoDecisionesPage() {
         </div>
 
         {/* Detalle de la decisión activa */}
-        <div className={styles.detalleDecision} style={{ borderLeftColor: decision.color }}>
+        <div className={styles.detalleDecision} style={{ borderLeftColor: decision.color }} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.detalleHeader}>
             <span className={styles.detalleIcono} aria-hidden="true">{decision.icono}</span>
             <div>
@@ -331,7 +324,6 @@ export default function VisualizadorPesoDecisionesPage() {
         <RelatedApps apps={getRelatedApps('visualizador-peso-decisiones')} />
         <ShareCard appName="visualizador-peso-decisiones" />
         <Footer appName="visualizador-peso-decisiones" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     'Proyección a 1, 5 y 10 años',
     'Categorías: salud, dinero, tiempo, bienestar',
     'Efecto acumulado visualizado con barras',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Esfuerzo vs. impacto: dificultad de cada decisión frente a su beneficio',
+    'Desglose por ámbito: horas ganadas, euros ahorrados, puntos de salud',
+    'Ejemplos reales: ejercicio, sueño, comida procesada, ahorro mensual',
   ],
 });
 

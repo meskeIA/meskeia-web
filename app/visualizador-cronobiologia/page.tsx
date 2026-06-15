@@ -449,7 +449,7 @@ function TabReloj() {
         </div>
 
         {/* Panel de fase activa */}
-        <div className={styles.faseInfo}>
+        <div className={styles.faseInfo} role="status" aria-live="polite" aria-atomic="true">
           <h3 className={styles.faseInfoTitulo}>Fase activa a las {horaSeleccionada}:00h</h3>
           <div className={styles.faseInfoFase} style={{ borderLeftColor: FASES_RELOJ[faseActiva].color }}>
             <span className={styles.faseInfoNombre} style={{ color: FASES_RELOJ[faseActiva].color }}>
@@ -867,7 +867,7 @@ export default function VisualizadorCronobiologiaPage() {
         {/* Cabecera de la pestaña activa */}
         <div className={styles.tabHeader}>
           <h2 className={styles.tabTitulo}>
-            {TABS.find((t) => t.id === tabActiva)?.icono}{' '}
+            <span aria-hidden="true">{TABS.find((t) => t.id === tabActiva)?.icono}{' '}</span>
             {TABS.find((t) => t.id === tabActiva)?.titulo}
           </h2>
           <p className={styles.tabSubtitulo}>{TABS.find((t) => t.id === tabActiva)?.subtitulo}</p>

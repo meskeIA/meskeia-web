@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     'Categorías: instantes, humano, naturaleza, geológico, cósmico',
     'Barras logarítmicas proporcionales',
     'Comparaciones sorprendentes entre fenómenos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Rango extremo: desde microsegundos hasta miles de millones de años',
+    'Escala logarítmica proporcional para comparar duraciones incomparables',
+    'Filtros por categoría: instante, humano, natural, geológico, cósmico',
   ],
 });
 
