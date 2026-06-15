@@ -436,7 +436,7 @@ export default function SimuladorFluidosBernoulliPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌊 Simulador de Fluidos: Ecuación de Bernoulli</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🌊</span> Simulador de Fluidos: Ecuación de Bernoulli</h1>
         <p className={styles.subtitle}>
           Visualiza por qué <strong>más velocidad implica menos presión</strong>. Tubería con manómetros y
           partículas animadas: la paradoja que sostiene los aviones, los venturímetros y la circulación.
@@ -448,29 +448,32 @@ export default function SimuladorFluidosBernoulliPage() {
       {/* GEOMETRÍA */}
       <div className={styles.geomSelector}>
         <button
+          type="button"
           className={`${styles.geomBtn} ${geom === 'venturi' ? styles.geomBtnActive : ''}`}
           onClick={() => setGeom('venturi')}
           aria-pressed={geom === 'venturi'}
         >
-          <span className={styles.geomIcon}>⌛</span>
+          <span className={styles.geomIcon} aria-hidden="true">⌛</span>
           <span className={styles.geomName}>Venturi horizontal</span>
           <span className={styles.geomDesc}>Tubo recto con estrechamiento suave</span>
         </button>
         <button
+          type="button"
           className={`${styles.geomBtn} ${geom === 'desnivel' ? styles.geomBtnActive : ''}`}
           onClick={() => setGeom('desnivel')}
           aria-pressed={geom === 'desnivel'}
         >
-          <span className={styles.geomIcon}>📈</span>
+          <span className={styles.geomIcon} aria-hidden="true">📈</span>
           <span className={styles.geomName}>Tubería con desnivel</span>
           <span className={styles.geomDesc}>Mismo diámetro, distinta altura</span>
         </button>
         <button
+          type="button"
           className={`${styles.geomBtn} ${geom === 'estenosis' ? styles.geomBtnActive : ''}`}
           onClick={() => setGeom('estenosis')}
           aria-pressed={geom === 'estenosis'}
         >
-          <span className={styles.geomIcon}>🩺</span>
+          <span className={styles.geomIcon} aria-hidden="true">🩺</span>
           <span className={styles.geomName}>Vena con estenosis</span>
           <span className={styles.geomDesc}>Estrechamiento brusco (bio-fluido)</span>
         </button>
@@ -510,6 +513,7 @@ export default function SimuladorFluidosBernoulliPage() {
               <div className={styles.fluidSelector} role="group" aria-label="Tipo de fluido">
                 {FLUIDOS.map(f => (
                   <button
+                    type="button"
                     key={f.id}
                     className={`${styles.fluidBtn} ${fluidoId === f.id ? styles.fluidBtnActive : ''}`}
                     onClick={() => setFluidoId(f.id)}
@@ -589,15 +593,15 @@ export default function SimuladorFluidosBernoulliPage() {
           <canvas ref={canvasRef} className={styles.canvas} aria-label="Tubería con flujo y manómetros" />
           <div className={styles.legendRow}>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#2E86AB' }} />
+              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#2E86AB' }} />
               Partículas de fluido
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#E07A1F' }} />
+              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#E07A1F' }} />
               Vector velocidad
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#A82E68' }} />
+              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#A82E68' }} />
               Manómetro (presión local)
             </span>
           </div>
@@ -630,7 +634,7 @@ export default function SimuladorFluidosBernoulliPage() {
         </table>
 
         {/* RESULTADOS */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardOk}>
             <span className={styles.resultLabel}>Diferencia de presión P₂ − P₁ {datos.length > 1 && `(de ${datos[0].nombre} a ${datos[1].nombre})`}</span>
             <span className={styles.resultValueLarge} style={{ color: dP < 0 ? '#A82E68' : '#48A9A6' }}>
@@ -754,22 +758,22 @@ export default function SimuladorFluidosBernoulliPage() {
           <h3>4 escenarios donde Bernoulli es la pieza clave</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>✈️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">✈️</span>
               <strong>Sustentación aerodinámica</strong>
               <p>El aire fluye más rápido por la curva superior del ala que por la inferior. Por Bernoulli, la presión arriba es menor: la diferencia neta empuja el ala hacia arriba. (Aunque el efecto es más complejo: también hay desviación del flujo, ley de Newton.)</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🩺</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🩺</span>
               <strong>Circulación sanguínea y estenosis</strong>
               <p>Una arteria parcialmente bloqueada (estenosis) acelera la sangre en la zona estrecha. La presión local cae, lo que el ecocardiograma Doppler detecta y cuantifica. Diferencias de presión &gt; 50 mmHg indican estenosis severa.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📏</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📏</span>
               <strong>Tubo de Venturi (medidor de caudal)</strong>
               <p>Un Venturi industrial mide el caudal Q a partir de la diferencia de presión P₁ − P₂. Es un dispositivo sin partes móviles, fiable y barato, presente en plantas químicas, motores y conductos de aire acondicionado.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🚿</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🚿</span>
               <strong>Tubo de Pitot y velocímetros</strong>
               <p>Un Pitot mide la velocidad de un avión calculando la diferencia entre presión total (P + ½ρv²) y estática (P). Bernoulli convierte ΔP en velocidad: el indicador de velocidad de cualquier avión funciona así.</p>
             </div>
@@ -856,22 +860,22 @@ export default function SimuladorFluidosBernoulliPage() {
           <h3>4 buenas prácticas con problemas de Bernoulli</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Dibuja siempre la tubería antes</strong>
               <p>Marca las dos secciones, anota lo conocido, ponle nombre a las incógnitas. Te ahorra confusiones de subíndices y te clarifica qué falta calcular.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Comprueba unidades antes de calcular</strong>
               <p>Caudal puede venir en L/min, L/h, m³/s. Diámetros en mm o cm. Conviértelo todo a SI antes de meter números en la fórmula. Errores de unidades son los más frecuentes y los más caros en exámenes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <strong>Identifica si Bernoulli ideal es razonable</strong>
               <p>¿Fluido casi sin viscosidad (agua, aire)? ¿Tubo corto? ¿Velocidad moderada? Si sí, Bernoulli ideal vale. Si tienes miel, aceite frío o tubería kilométrica, hay que añadir pérdidas por fricción.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Usa Bernoulli + continuidad como pareja</strong>
               <p>Casi nunca hay un problema con sólo una de las dos. Continuidad te da las velocidades, Bernoulli te da las presiones. Si te falta un dato, lo más probable es que necesites la otra ecuación.</p>
             </div>
@@ -880,7 +884,7 @@ export default function SimuladorFluidosBernoulliPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con Bernoulli</strong>
           </div>
           <ul className={styles.warningList}>

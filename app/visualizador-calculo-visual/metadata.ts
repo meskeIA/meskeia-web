@@ -23,7 +23,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Visualiza los conceptos del cálculo en tiempo real. Límites, derivadas (tangente deslizante) e integrales (área de Riemann) animados con sliders interactivos.",
   url: "https://meskeia.com/visualizador-calculo-visual/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Visualización de límites: animación del proceso de aproximación desde ambos lados con slider interactivo',
+    'Derivada animada: recta tangente deslizante que muestra la pendiente instantánea en cada punto',
+    'Integral de Riemann: sumas con n rectángulos ajustable de 1 a 100 con área coloreada positiva/negativa',
+    'Tres funciones predefinidas: cuadrática, seno y cúbica con comportamientos distintos',
+    'Tres secciones independientes: límites, derivadas e integrales en pestañas separadas',
+    'Cálculo simbólico exacto de la derivada y la integral para comparar con la aproximación visual',
+  ],
 });
 
 export const faqJsonLd = {

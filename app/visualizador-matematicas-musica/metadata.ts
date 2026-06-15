@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Acordes mayores y menores: por qué suenan alegre o triste',
     'Ritmo, compases y BPM por género musical',
     'Proporción áurea y Fibonacci en composiciones de Debussy y Tool',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparación con el valor exacto (cuando hay primitiva elemental)',
     'Cálculo de error absoluto y relativo de la aproximación',
     'Distinción visual entre áreas positivas y negativas',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['integral definida', 'suma de Riemann', 'área', 'cálculo integral', 'trapecio', 'punto medio', 'EBAU', 'Bachillerato'],
 });

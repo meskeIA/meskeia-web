@@ -291,7 +291,7 @@
 | [ ] | Las Cruzadas: De Clermont a la Caída de Acre | `/visualizador-historia/las-cruzadas/` | cultura |
 | [ ] | Las Grandes Dinastías Chinas: De Qin a la República | `/visualizador-historia/china-dinastias/` | cultura |
 | [ ] | Las Guerras Napoleónicas: Europa en Llamas (1799-1815) | `/visualizador-historia/guerras-napoleonicas/` | cultura, estudiantes |
-| [ ] | Los Números de la Música | `/visualizador-matematicas-musica/` | cultura, estudiantes |
+| [x] | Los Números de la Música | `/visualizador-matematicas-musica/` | cultura, estudiantes |
 | [ ] | Los Números del Océano | `/visualizador-oceano/` | cultura, estudiantes |
 | [ ] | Mapa de Automatización Personal | `/mapa-automatizacion-personal/` | cultura, productividad |
 | [ ] | Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida | `/visualizador-microbiologia/` | cultura, estudiantes, salud |
@@ -406,7 +406,7 @@
 | [ ] | Calculadora MCD y MCM | `/calculadora-mcd-mcm/` | estudiantes |
 | [ ] | Calculadora Teoría de Colas | `/calculadora-teoria-colas/` | estudiantes |
 | [ ] | Calculadora Teoría de Números | `/calculadora-teoria-numeros/` | estudiantes |
-| [ ] | Cálculo Visual: Límites, Derivadas e Integrales | `/visualizador-calculo-visual/` | estudiantes, tecnicas |
+| [x] | Cálculo Visual: Límites, Derivadas e Integrales | `/visualizador-calculo-visual/` | estudiantes, tecnicas |
 | [ ] | Cáncer: Biología Molecular, Hallmarks e Inmunoterapia | `/visualizador-cancer/` | estudiantes, cultura, salud |
 | [ ] | Caos y Mariposa: El Atractor de Lorenz | `/visualizador-caos-mariposa/` | estudiantes, cultura, tecnicas |
 | [ ] | Capas de la Tierra - Del Suelo al Núcleo | `/visualizador-capas-tierra/` | estudiantes, cultura |
@@ -562,12 +562,12 @@
 | [x] | Simulador de Equilibrio Químico (Le Chatelier) | `/simulador-equilibrio-quimico/` | estudiantes |
 | [ ] | Simulador de Estequiometría: Reactivo Limitante | `/simulador-estequiometria/` | estudiantes |
 | [x] | Simulador de Física | `/simulador-fisica/` | estudiantes |
-| [ ] | Simulador de Fluidos: Ecuación de Bernoulli | `/simulador-fluidos-bernoulli/` | estudiantes |
+| [x] | Simulador de Fluidos: Ecuación de Bernoulli | `/simulador-fluidos-bernoulli/` | estudiantes |
 | [ ] | Simulador de Fotosíntesis: Factores Limitantes | `/simulador-fotosintesis-factores/` | estudiantes |
 | [ ] | Simulador de Gas Ideal y Termodinámica | `/simulador-gas-ideal/` | estudiantes |
 | [x] | Simulador de Genética Mendeliana | `/simulador-genetica/` | estudiantes, salud |
 | [ ] | Simulador de Hashing y Colisiones | `/simulador-hashing-colisiones/` | estudiantes |
-| [ ] | Simulador de Integrales: Área bajo la Curva | `/simulador-integral-area/` | estudiantes |
+| [x] | Simulador de Integrales: Área bajo la Curva | `/simulador-integral-area/` | estudiantes |
 | [x] | Simulador de Intervalos de Confianza | `/simulador-intervalos-confianza/` | estudiantes |
 | [ ] | Simulador de K-Means Clustering | `/simulador-kmeans/` | estudiantes, tecnicas |
 | [ ] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |

@@ -451,7 +451,7 @@ export default function SimuladorIntegralAreaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📐 Simulador de Integrales: Área bajo la Curva</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📐</span> Simulador de Integrales: Área bajo la Curva</h1>
         <p className={styles.subtitle}>
           Aproxima la integral definida con sumas de Riemann. Ajusta n, los límites a y b, y compara
           <strong> 4 métodos</strong> con el valor exacto. Ahí vive el concepto de integral como límite de áreas.
@@ -464,6 +464,7 @@ export default function SimuladorIntegralAreaPage() {
       <div className={styles.functionSelector}>
         {FUNCION_IDS.map(id => (
           <button
+            type="button"
             key={id}
             className={`${styles.funcBtn} ${funcId === id ? styles.funcBtnActive : ''}`}
             onClick={() => setFuncId(id)}
@@ -489,12 +490,13 @@ export default function SimuladorIntegralAreaPage() {
         <div className={styles.methodSelector} role="group" aria-label="Método de aproximación">
           {METODOS.map(m => (
             <button
+              type="button"
               key={m.id}
               className={`${styles.methodBtn} ${metodo === m.id ? styles.methodBtnActive : ''}`}
               onClick={() => setMetodo(m.id)}
               aria-pressed={metodo === m.id}
             >
-              <span className={styles.methodIcon}>{m.icono}</span>
+              <span className={styles.methodIcon} aria-hidden="true">{m.icono}</span>
               <span className={styles.methodName}>{m.nombre}</span>
               <span className={styles.methodDesc}>{m.desc}</span>
             </button>
@@ -543,6 +545,7 @@ export default function SimuladorIntegralAreaPage() {
             <div className={styles.discreteSteps} role="group" aria-label="Número de rectángulos">
               {N_VALORES.map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.stepBtn} ${n === v ? styles.stepBtnActive : ''}`}
                   onClick={() => setN(v)}
@@ -571,18 +574,18 @@ export default function SimuladorIntegralAreaPage() {
 
         {/* AVISOS */}
         {!valido && (
-          <div className={styles.warningPanel}>
+          <div className={styles.warningPanel} role="alert">
             ⚠️ Algunos rectángulos están fuera del dominio de {funcion.expr}. La aproximación se ha calculado solo sobre los válidos.
           </div>
         )}
         {!funcion.F && mostrarExacto && (
-          <div className={styles.warningPanel}>
+          <div className={styles.warningPanel} role="alert">
             ℹ️ {funcion.expr} no tiene primitiva elemental. El valor exacto de la integral solo se puede calcular numéricamente.
           </div>
         )}
 
         {/* RESULTADOS */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardMain}>
             <span className={styles.resultLabel}>
               ∫<sub>{fmt(Math.min(a, b), 2)}</sub><sup>{fmt(Math.max(a, b), 2)}</sup> {funcion.expr.replace('f(x) = ', '')} dx
@@ -714,22 +717,22 @@ export default function SimuladorIntegralAreaPage() {
           <h3>4 contextos donde la integral tiene sentido físico</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🚗</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🚗</span>
               <strong>Velocidad → distancia</strong>
               <p>Si v(t) es la velocidad de un coche, ∫<sub>0</sub><sup>T</sup> v(t) dt es la distancia recorrida en [0, T]. Por eso un cuentakilómetros integra continuamente la velocidad.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>⚙️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">⚙️</span>
               <strong>Fuerza → trabajo</strong>
               <p>El trabajo realizado por una fuerza variable es W = ∫ F(x) dx. La integral es la única forma de sumar correctamente cuando la fuerza cambia con la posición (resortes, gravedad, etc.).</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📊</span>
               <strong>Densidad de probabilidad</strong>
               <p>Para una variable continua, P(a &lt; X &lt; b) = ∫<sub>a</sub><sup>b</sup> f(x) dx donde f es la PDF. El área bajo la curva normal entre dos límites es la probabilidad de ese tramo.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Valor medio de una función</strong>
               <p>El valor medio de f en [a, b] es (1/(b−a)) · ∫<sub>a</sub><sup>b</sup> f(x) dx. Por ejemplo, la temperatura media de un día se obtiene integrando T(t) y dividiendo por 24 horas.</p>
             </div>
@@ -819,22 +822,22 @@ export default function SimuladorIntegralAreaPage() {
           <h3>4 buenas prácticas con integrales definidas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Dibuja antes de integrar</strong>
               <p>Esboza la función y marca a y b. Si f cambia de signo en el tramo, hazte una idea de dónde se cancelan áreas. Te ahorra errores de signo y te permite validar el resultado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔪</span>
               <strong>Separa el dominio si f cambia de signo</strong>
               <p>Si quieres el <em>área geométrica</em> y no la integral con signo, divide [a, b] en los tramos donde f es positiva y donde es negativa, integra cada uno y suma valores absolutos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Usa Simpson para integración numérica</strong>
               <p>El método de Simpson combina punto medio y trapecio: error de orden 4 (Δx⁴). Con solo n = 10 ya da resultados con 6-7 dígitos de precisión. Es el siguiente paso tras los métodos del simulador.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Verifica con n grande</strong>
               <p>Si tienes dudas sobre una integral analítica, ejecuta la suma de Riemann con n = 500 (punto medio) y compara. Coincidencia hasta 4 decimales = tu primitiva probablemente está bien.</p>
             </div>
@@ -844,7 +847,7 @@ export default function SimuladorIntegralAreaPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes al calcular integrales</strong>
           </div>
           <ul className={styles.warningList}>

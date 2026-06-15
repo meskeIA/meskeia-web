@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Sliders para caudal, densidad, ratio de estrechamiento y altura',
     'Cálculo de velocidad, presión y verificación de la conservación',
     'Comparación con líquidos reales (agua, aceite, sangre, aire)',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['ecuación de Bernoulli', 'fluidos', 'efecto Venturi', 'presión', 'caudal', 'EBAU', 'Bachillerato', 'física'],
 });

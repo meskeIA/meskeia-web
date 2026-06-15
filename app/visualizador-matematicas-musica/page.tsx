@@ -518,7 +518,8 @@ function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
             <div className={styles.acordeHeader}>
               <h3 className={styles.acordeNombre}>{ac.nombre}</h3>
               <span className={`${styles.acordeTipo} ${ac.tipo === 'mayor' ? styles.tipoMayor : styles.tipoMenor}`}>
-                {ac.tipo === 'mayor' ? '😊 Mayor' : '😢 Menor'}
+                <span aria-hidden="true">{ac.tipo === 'mayor' ? '😊' : '😢'}</span>{' '}
+                {ac.tipo === 'mayor' ? 'Mayor' : 'Menor'}
               </span>
             </div>
             <div className={styles.acordeNotas}>{ac.notas}</div>
@@ -542,7 +543,7 @@ function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
             <p className={styles.acordeEmocion}>{ac.emocion}</p>
             <div className={styles.acordeEjemplos}>
               {ac.ejemplos.map((ej, j) => (
-                <span key={j} className={styles.acordeEjemplo}>♪ {ej}</span>
+                <span key={j} className={styles.acordeEjemplo}><span aria-hidden="true">♪</span> {ej}</span>
               ))}
             </div>
           </div>
@@ -584,7 +585,7 @@ function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
             <div className={styles.progresionAcordes}>{prog.acordes}</div>
             <div className={styles.progresionCanciones}>
               {prog.canciones.map((c, j) => (
-                <span key={j} className={styles.progresionCancion}>♪ {c}</span>
+                <span key={j} className={styles.progresionCancion}><span aria-hidden="true">♪</span> {c}</span>
               ))}
             </div>
             <PlayButton onClick={() => audio.playProgression(getProgFreqs(prog.acordes))} label={`Escuchar ${prog.nombre}`} />
@@ -784,13 +785,15 @@ export default function VisualizadorMatematicasMusicaPage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
         </div>
 
-        {renderSeccion()}
+        <div aria-live="polite" aria-atomic="true">
+          {renderSeccion()}
+        </div>
 
         <EducationalSection
           title="Más sobre matemáticas y música"

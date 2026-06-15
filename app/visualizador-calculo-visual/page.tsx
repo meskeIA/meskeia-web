@@ -213,6 +213,7 @@ export default function CalculoVisualPage() {
       <div className={styles.seccionTabs}>
         {(['limite', 'derivada', 'integral'] as Seccion[]).map(s => (
           <button
+            type="button"
             key={s}
             className={`${styles.tab} ${seccion === s ? styles.tabActivo : ''}`}
             onClick={() => setSeccion(s)}
@@ -228,9 +229,11 @@ export default function CalculoVisualPage() {
         <span className={styles.selectorLabel}>Función:</span>
         {(Object.keys(FUNCIONES) as FuncionKey[]).map(k => (
           <button
+            type="button"
             key={k}
             className={`${styles.btnFuncion} ${funcionKey === k ? styles.btnFuncionActivo : ''}`}
             onClick={() => setFuncionKey(k)}
+            aria-pressed={funcionKey === k}
           >
             {FUNCIONES[k].label}
           </button>
@@ -263,7 +266,7 @@ export default function CalculoVisualPage() {
               className={styles.slider}
             />
           </label>
-          <div className={styles.resultado}>
+          <div className={styles.resultado} role="status" aria-live="polite" aria-atomic="true">
             <span className={styles.formula}>{derLabel}</span>
             <span className={styles.valor}>
               f&apos;({xPunto.toFixed(1)}) = <strong>{valorDerivada}</strong>
@@ -301,7 +304,7 @@ export default function CalculoVisualPage() {
               className={styles.slider}
             />
           </label>
-          <div className={styles.resultado}>
+          <div className={styles.resultado} role="status" aria-live="polite" aria-atomic="true">
             <span className={styles.valor}>
               ∫[{limA.toFixed(1)},{limB.toFixed(1)}] f(x)dx = <strong>{valorIntegral}</strong>
             </span>
@@ -326,16 +329,16 @@ export default function CalculoVisualPage() {
               className={styles.slider}
             />
           </label>
-          <div className={styles.resultado}>
+          <div className={styles.resultado} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.limiteRow}>
               <span className={styles.puntoIzq}>
-                ■ f({(xPunto - 0.5).toFixed(1)}) = {fn(xPunto - 0.5).toFixed(3)}
+                <span aria-hidden="true">■</span> f({(xPunto - 0.5).toFixed(1)}) = {fn(xPunto - 0.5).toFixed(3)}
               </span>
               <span className={styles.limiteFinal}>
                 lim(x→{xPunto.toFixed(1)}) = <strong>{valorLimite}</strong>
               </span>
               <span className={styles.puntoDer}>
-                ■ f({(xPunto + 0.5).toFixed(1)}) = {fn(xPunto + 0.5).toFixed(3)}
+                <span aria-hidden="true">■</span> f({(xPunto + 0.5).toFixed(1)}) = {fn(xPunto + 0.5).toFixed(3)}
               </span>
             </div>
           </div>
