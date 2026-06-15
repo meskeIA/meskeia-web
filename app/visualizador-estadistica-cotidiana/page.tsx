@@ -221,9 +221,11 @@ export default function VisualizadorEstadisticaCotidiana() {
       <nav className={styles.conceptoNav} aria-label="Conceptos estadísticos">
         {CONCEPTOS.map((c) => (
           <button
+            type="button"
             key={c.id}
             className={`${styles.conceptoBtn} ${conceptoActivo === c.id ? styles.conceptoBtnActivo : ''}`}
             onClick={() => setConceptoActivo(c.id)}
+            aria-pressed={conceptoActivo === c.id}
           >
             <span className={styles.conceptoIcono} aria-hidden="true">{c.icono}</span>
             <span className={styles.conceptoTitulo}>{c.titulo}</span>
@@ -238,7 +240,7 @@ export default function VisualizadorEstadisticaCotidiana() {
       {conceptoActivo === 'bayes' && (
         <section className={styles.conceptoPanel}>
           <div className={styles.panelHeader}>
-            <h2>🏥 Probabilidad Condicional: ¿Debo preocuparme si el test es positivo?</h2>
+            <h2><span aria-hidden="true">🏥</span> Probabilidad Condicional: ¿Debo preocuparme si el test es positivo?</h2>
             <p className={styles.panelIntro}>
               Un test con 99% de precisión puede dar muchos falsos positivos si la enfermedad es rara.
               Mueve el slider para ver cómo cambia la probabilidad real.
@@ -313,7 +315,7 @@ export default function VisualizadorEstadisticaCotidiana() {
       {conceptoActivo === 'regresion' && (
         <section className={styles.conceptoPanel}>
           <div className={styles.panelHeader}>
-            <h2>📊 Regresión a la Media: ¿El castigo funciona?</h2>
+            <h2><span aria-hidden="true">📊</span> Regresión a la Media: ¿El castigo funciona?</h2>
             <p className={styles.panelIntro}>
               Los estudiantes que sacaron un 10 en el primer examen tienden a sacar menos en el segundo,
               no porque empeoraron — es que la nota extrema tenía componente de suerte.
@@ -344,6 +346,7 @@ export default function VisualizadorEstadisticaCotidiana() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimario}
             onClick={() => setEstudiantes(generarEstudiantes())}
           >
@@ -376,7 +379,7 @@ export default function VisualizadorEstadisticaCotidiana() {
       {conceptoActivo === 'simpson' && (
         <section className={styles.conceptoPanel}>
           <div className={styles.panelHeader}>
-            <h2>🔄 Paradoja de Simpson: Los números mienten (sin mentir)</h2>
+            <h2><span aria-hidden="true">🔄</span> Paradoja de Simpson: Los números mienten (sin mentir)</h2>
             <p className={styles.panelIntro}>
               Caso real: admisiones en UC Berkeley (1973). Los datos globales parecen mostrar discriminación,
               pero al desagregar por departamento la conclusión se invierte.
@@ -385,14 +388,18 @@ export default function VisualizadorEstadisticaCotidiana() {
 
           <div className={styles.toggleVista}>
             <button
+              type="button"
               className={`${styles.toggleBtn} ${vistaGlobal ? styles.toggleBtnActivo : ''}`}
               onClick={() => setVistaGlobal(true)}
+              aria-pressed={vistaGlobal}
             >
               Vista global
             </button>
             <button
+              type="button"
               className={`${styles.toggleBtn} ${!vistaGlobal ? styles.toggleBtnActivo : ''}`}
               onClick={() => setVistaGlobal(false)}
+              aria-pressed={!vistaGlobal}
             >
               Vista por departamento
             </button>
@@ -468,7 +475,7 @@ export default function VisualizadorEstadisticaCotidiana() {
       {conceptoActivo === 'supervivencia' && (
         <section className={styles.conceptoPanel}>
           <div className={styles.panelHeader}>
-            <h2>✈️ Sesgo de Supervivencia: Lo que no ves importa</h2>
+            <h2><span aria-hidden="true">✈️</span> Sesgo de Supervivencia: Lo que no ves importa</h2>
             <p className={styles.panelIntro}>
               Durante la II Guerra Mundial, los ingenieros querían reforzar las zonas con más impactos
               en los aviones que regresaban. El estadístico Abraham Wald les dijo que estaban equivocados.
@@ -554,7 +561,7 @@ export default function VisualizadorEstadisticaCotidiana() {
       {conceptoActivo === 'grandesNumeros' && (
         <section className={styles.conceptoPanel}>
           <div className={styles.panelHeader}>
-            <h2>🎰 Ley de los Grandes Números: ¿Es el casino justo?</h2>
+            <h2><span aria-hidden="true">🎰</span> Ley de los Grandes Números: ¿Es el casino justo?</h2>
             <p className={styles.panelIntro}>
               Con pocos lanzamientos de moneda, el resultado parece muy variable.
               Con miles de lanzamientos, la proporción converge inevitablemente hacia el 50%.
@@ -582,16 +589,16 @@ export default function VisualizadorEstadisticaCotidiana() {
             </div>
 
             <div className={styles.botonesMoneda}>
-              <button className={styles.btnPrimario} onClick={() => lanzarMonedas(10)}>
+              <button type="button" className={styles.btnPrimario} onClick={() => lanzarMonedas(10)}>
                 Lanzar 10 veces
               </button>
-              <button className={styles.btnSecundario} onClick={() => lanzarMonedas(100)}>
+              <button type="button" className={styles.btnSecundario} onClick={() => lanzarMonedas(100)}>
                 Lanzar 100 veces
               </button>
-              <button className={styles.btnSecundario} onClick={() => lanzarMonedas(1000)}>
+              <button type="button" className={styles.btnSecundario} onClick={() => lanzarMonedas(1000)}>
                 Lanzar 1.000 veces
               </button>
-              <button className={styles.btnReset} onClick={reiniciarMoneda}>
+              <button type="button" className={styles.btnReset} onClick={reiniciarMoneda}>
                 Reiniciar
               </button>
             </div>

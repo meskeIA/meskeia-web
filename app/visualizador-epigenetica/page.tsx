@@ -150,18 +150,20 @@ const SeccionNucleosoma = () => {
 
       <div className={styles.toggleRow}>
         <button
+          type="button"
           className={`${styles.toggleBtn} ${esActivo ? styles.toggleBtnActive : ''}`}
           onClick={() => setEstado('activo')}
           aria-pressed={esActivo}
         >
-          ✅ Gen activo (acetilación)
+          <span aria-hidden="true">✅</span> Gen activo (acetilación)
         </button>
         <button
+          type="button"
           className={`${styles.toggleBtn} ${!esActivo ? styles.toggleBtnActive : ''}`}
           onClick={() => setEstado('silenciado')}
           aria-pressed={!esActivo}
         >
-          🔴 Gen silenciado (metilación)
+          <span aria-hidden="true">🔴</span> Gen silenciado (metilación)
         </button>
       </div>
 
@@ -395,7 +397,7 @@ const SeccionMetilacion = () => {
               >
                 <p className={styles.genNombre}>{gen.nombre}</p>
                 <span className={`${styles.genEstado} ${activo ? styles.estadoActivo : styles.estadoSilenciado}`}>
-                  {activo ? '🟢 Activo' : '🔴 Silenciado'}
+                  {activo ? <><span aria-hidden="true">🟢</span> Activo</> : <><span aria-hidden="true">🔴</span> Silenciado</>}
                 </span>
                 <p className={styles.genDesc}>
                   {activo ? gen.descripcionActivo : gen.descripcionSilenciado}
@@ -504,9 +506,9 @@ const SeccionHistonas = () => {
                 : styles.efectoSenal
             }`}
           >
-            {detalle.tipoEfecto === 'activa' && '✅ Activa transcripción'}
-            {detalle.tipoEfecto === 'silencia' && '🔴 Silencia transcripción'}
-            {detalle.tipoEfecto === 'senal' && '⚡ Señalización / Reparación'}
+            {detalle.tipoEfecto === 'activa' && <><span aria-hidden="true">✅</span> Activa transcripción</>}
+            {detalle.tipoEfecto === 'silencia' && <><span aria-hidden="true">🔴</span> Silencia transcripción</>}
+            {detalle.tipoEfecto === 'senal' && <><span aria-hidden="true">⚡</span> Señalización / Reparación</>}
           </span>
           <p className={styles.histonaDetalleContexto}>{detalle.contexto}</p>
         </div>
@@ -610,12 +612,12 @@ const SeccionImprinting = () => {
               >
                 <p className={styles.imprintingGenNombre}>{gen.nombre}</p>
                 <p className={styles.imprintingGenOrigen}>
-                  Expresado desde alelo {gen.origen === 'paterno' ? '👨 paterno' : '👩 materno'}
+                  Expresado desde alelo{' '}{gen.origen === 'paterno' ? <><span aria-hidden="true">👨</span> paterno</> : <><span aria-hidden="true">👩</span> materno</>}
                 </p>
                 <span
                   className={`${styles.imprintingEstadoBadge} ${activo ? styles.badgeActivo : styles.badgeSilenciado}`}
                 >
-                  {activo ? '🟢 Activo ahora' : '⚫ Silenciado ahora'}
+                  {activo ? <><span aria-hidden="true">🟢</span> Activo ahora</> : <><span aria-hidden="true">⚫</span> Silenciado ahora</>}
                 </span>
                 <p className={styles.imprintingGenDesc}>
                   <strong>Función:</strong> {gen.funcion}<br /><br />

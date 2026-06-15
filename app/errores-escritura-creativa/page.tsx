@@ -329,6 +329,7 @@ export default function ErroresEscrituraCreativaPage() {
                 <h2 className={styles.modalTitulo}>{seleccionado.nombre}</h2>
               </div>
               <button
+                type="button"
                 className={styles.modalClose}
                 onClick={() => setSeleccionado(null)}
                 aria-label="Cerrar"
@@ -340,12 +341,12 @@ export default function ErroresEscrituraCreativaPage() {
             <p className={styles.modalDescripcion}>{seleccionado.descripcion}</p>
 
             <div className={styles.ejemploMalo}>
-              <span className={styles.ejemplosLabel}>❌ Ejemplo con el error</span>
+              <span className={styles.ejemplosLabel}><span aria-hidden="true">❌</span> Ejemplo con el error</span>
               <p className={styles.ejemploTexto}>{seleccionado.ejemploMalo}</p>
             </div>
 
             <div className={styles.ejemploBueno}>
-              <span className={styles.ejemplosLabel}>✅ Corrección</span>
+              <span className={styles.ejemplosLabel}><span aria-hidden="true">✅</span> Corrección</span>
               <p className={styles.ejemploTexto}>{seleccionado.ejemploBueno}</p>
             </div>
 
@@ -355,7 +356,7 @@ export default function ErroresEscrituraCreativaPage() {
             </div>
 
             <div className={styles.tipBox}>
-              <span className={styles.tipBoxLabel}>💡 Consejo práctico</span>
+              <span className={styles.tipBoxLabel}><span aria-hidden="true">💡</span> Consejo práctico</span>
               <p className={styles.tipTexto}>{seleccionado.tip}</p>
             </div>
           </div>

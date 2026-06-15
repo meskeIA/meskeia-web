@@ -124,10 +124,10 @@
 | [x] | El Viaje de un Paquete | `/visualizador-viaje-paquete/` | cultura, tecnicas |
 | [x] | El Viaje de una Ley | `/visualizador-proceso-legislativo/` | cultura |
 | [x] | Electroquímica: Pilas, Electrólisis y Baterías Li-ion | `/visualizador-electroquimica/` | cultura, estudiantes, tecnicas |
-| [ ] | Epigenética: Metilación, Histonas e Imprinting | `/visualizador-epigenetica/` | cultura, estudiantes, salud |
-| [ ] | Errores de Escritura Creativa | `/errores-escritura-creativa/` | cultura, estudiantes |
-| [ ] | España Contemporánea: De las Guerras Napoleónicas a la Democracia | `/visualizador-historia/espana-contemporanea/` | cultura |
-| [ ] | Estadística en la Vida Cotidiana - Probabilidad y Sesgos | `/visualizador-estadistica-cotidiana/` | cultura, estudiantes |
+| [x] | Epigenética: Metilación, Histonas e Imprinting | `/visualizador-epigenetica/` | cultura, estudiantes, salud |
+| [x] | Errores de Escritura Creativa | `/errores-escritura-creativa/` | cultura, estudiantes |
+| [x] | España Contemporánea: De las Guerras Napoleónicas a la Democracia | `/visualizador-historia/espana-contemporanea/` | cultura |
+| [x] | Estadística en la Vida Cotidiana - Probabilidad y Sesgos | `/visualizador-estadistica-cotidiana/` | cultura, estudiantes |
 | [ ] | Estilos Arquitectónicos: Cronología del Griego Clásico a la Arquitectura Sostenible | `/visualizador-arquitectura-estilos/` | cultura, diseno |
 | [ ] | Estilos y Movimientos Literarios | `/visualizador-estilos-literarios/` | cultura, estudiantes |
 | [ ] | Estratificación Social: Clases, Gini, Movilidad y Teorías Sociológicas | `/visualizador-estratificacion-social/` | cultura, estudiantes |
