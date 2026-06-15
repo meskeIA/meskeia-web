@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -236,25 +235,20 @@ export default function AnalisisDecisionReversiblePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🚪 Decisiones Reversibles vs Irreversibles</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🚪</span> Decisiones Reversibles vs Irreversibles</h1>
           <p className={styles.subtitle}>
             ¿Das vueltas a cosas que podrías simplemente probar?
             <br />
             Basado en el marco de Jeff Bezos: puertas tipo 1 y tipo 2
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -298,6 +292,7 @@ export default function AnalisisDecisionReversiblePage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -317,6 +312,7 @@ export default function AnalisisDecisionReversiblePage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -332,10 +328,10 @@ export default function AnalisisDecisionReversiblePage() {
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>♟️ Alta Prudencia</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">♟️</span> Alta Prudencia</span>
                 <span className={styles.mapLabelBottom}>Baja Prudencia</span>
                 <span className={styles.mapLabelLeft}>Baja Parálisis</span>
-                <span className={styles.mapLabelRight}>🧊 Alta Parálisis</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🧊</span> Alta Parálisis</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
@@ -400,7 +396,7 @@ export default function AnalisisDecisionReversiblePage() {
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -408,7 +404,7 @@ export default function AnalisisDecisionReversiblePage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -418,7 +414,7 @@ export default function AnalisisDecisionReversiblePage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -427,7 +423,7 @@ export default function AnalisisDecisionReversiblePage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>

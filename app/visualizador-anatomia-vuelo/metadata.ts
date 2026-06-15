@@ -42,9 +42,8 @@ export const jsonLd = generateWebAppSchema({
     'Las 7 fases del vuelo con perfil de altitud y velocidades reales',
     'Datos reales del vuelo Madrid-Londres: distancia, combustible, CO2, comparativas',
     'Instrumentos de cabina explicados: altimetro, horizonte artificial, velocimetro',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
-    'Disponible en espanol',
+    'Comparativa ambiental: CO2 por pasajero en avión, tren, coche y autobús en el trayecto Madrid-Londres',
+    'Curiosidades de cabina: por qué se tapan los oídos, por qué la comida sabe diferente y por qué las ventanillas son redondas',
   ],
 });
 

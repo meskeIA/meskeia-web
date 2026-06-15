@@ -384,7 +384,7 @@ function TipoBadge({ tipo }: { tipo: TipoVino }) {
   const iconos: Record<TipoVino, string> = {
     Tinto: '🍷', Blanco: '🥂', Espumoso: '🍾', Generoso: '🥃',
   };
-  return <span className={styles.tipoBadge}>{iconos[tipo]} {tipo}</span>;
+  return <span className={styles.tipoBadge}><span aria-hidden="true">{iconos[tipo]}</span> {tipo}</span>;
 }
 
 function VinoCard({ vino, esTop, posicion }: { vino: Recomendacion; esTop?: boolean; posicion?: number }) {
@@ -396,7 +396,7 @@ function VinoCard({ vino, esTop, posicion }: { vino: Recomendacion; esTop?: bool
         {vino.porcentaje > 0 && <span className={styles.porcentaje}>{vino.porcentaje}% afinidad</span>}
       </header>
       <h3 className={styles.vinoNombre}>{vino.nombre}</h3>
-      <p className={styles.vinoOrigen}>📍 {vino.origen}</p>
+      <p className={styles.vinoOrigen}><span aria-hidden="true">📍</span> {vino.origen}</p>
       <p className={styles.vinoPerfil}>{vino.perfilCorto}</p>
       <div className={styles.notasContainer}>
         {vino.notasClave.map((n) => <span key={n} className={styles.nota}>{n}</span>)}
@@ -405,7 +405,7 @@ function VinoCard({ vino, esTop, posicion }: { vino: Recomendacion; esTop?: bool
         <strong>¿Por qué?</strong>
         <p>{vino.porQue}</p>
       </div>
-      <p className={styles.tempServicio}>🌡️ Servir a {vino.temperaturaServicio}</p>
+      <p className={styles.tempServicio}><span aria-hidden="true">🌡️</span> Servir a {vino.temperaturaServicio}</p>
     </article>
   );
 }
@@ -437,13 +437,13 @@ export default function QueVinoElegir() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🍷 ¿Qué vino elegir?</h1>
+        <h1><span aria-hidden="true">🍷</span> ¿Qué vino elegir?</h1>
         <p>Asistente situacional: dime qué necesitas y te recomiendo el vino adecuado</p>
       </header>
 
       <LegalNotice />
 
-      <DisclaimerCard variant="alcohol" severity="high" />
+      <DisclaimerCard variant="alcohol" severity="high" collapsible={false} />
 
       <main className={styles.main}>
         {/* Stepper */}
@@ -506,7 +506,7 @@ export default function QueVinoElegir() {
 
         {/* Paso 3: resultados */}
         {step === 3 && resultados && situacion && (
-          <section className={styles.paso}>
+          <section className={styles.paso} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.pasoTitulo}>Estas son mis recomendaciones</h2>
             <p className={styles.subtituloResultado}>Tres opciones razonadas + una alternativa para salir de tu zona de confort</p>
 
@@ -517,7 +517,7 @@ export default function QueVinoElegir() {
             </div>
 
             <div className={styles.alternativaSection}>
-              <h3 className={styles.alternativaTitulo}>🎲 Y si quieres salir de tu zona de confort…</h3>
+              <h3 className={styles.alternativaTitulo}><span aria-hidden="true">🎲</span> Y si quieres salir de tu zona de confort…</h3>
               <VinoCard vino={resultados.alternativa} />
             </div>
 
@@ -638,6 +638,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.plato === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('plato', op.v)}
+                aria-pressed={respuestas.plato === op.v}
               >
                 {op.l}
               </button>
@@ -659,6 +660,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.tipo === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('tipo', op.v)}
+                aria-pressed={respuestas.tipo === op.v}
               >
                 {op.l}
               </button>
@@ -679,6 +681,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.presupuesto === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('presupuesto', op.v)}
+                aria-pressed={respuestas.presupuesto === op.v}
               >
                 {op.l}
               </button>
@@ -708,6 +711,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.receptor === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('receptor', op.v)}
+                aria-pressed={respuestas.receptor === op.v}
               >
                 {op.l}
               </button>
@@ -730,6 +734,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.preferencia === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('preferencia', op.v)}
+                aria-pressed={respuestas.preferencia === op.v}
               >
                 {op.l}
               </button>
@@ -750,6 +755,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.presupuesto === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('presupuesto', op.v)}
+                aria-pressed={respuestas.presupuesto === op.v}
               >
                 {op.l}
               </button>
@@ -782,6 +788,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.ocasion === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('ocasion', op.v)}
+                aria-pressed={respuestas.ocasion === op.v}
               >
                 {op.l}
               </button>
@@ -802,6 +809,7 @@ function PreguntasPorSituacion({
                 type="button"
                 className={`${styles.chip} ${respuestas.presupuesto === op.v ? styles.chipActivo : ''}`}
                 onClick={() => setRespuesta('presupuesto', op.v)}
+                aria-pressed={respuestas.presupuesto === op.v}
               >
                 {op.l}
               </button>
@@ -831,6 +839,7 @@ function PreguntasPorSituacion({
               type="button"
               className={`${styles.chip} ${respuestas.estiloDeseado === op.v ? styles.chipActivo : ''}`}
               onClick={() => setRespuesta('estiloDeseado', op.v)}
+              aria-pressed={respuestas.estiloDeseado === op.v}
             >
               {op.l}
             </button>
@@ -853,6 +862,7 @@ function PreguntasPorSituacion({
               type="button"
               className={`${styles.chip} ${respuestas.intensidad === op.v ? styles.chipActivo : ''}`}
               onClick={() => setRespuesta('intensidad', op.v)}
+              aria-pressed={respuestas.intensidad === op.v}
             >
               {op.l}
             </button>

@@ -184,7 +184,7 @@ function SeccionMinerales() {
                   <span className={styles.mineralMetaValor}>{m.cuotaMundial}</span>
                 </div>
                 <div className={styles.mineralProblema}>
-                  <span className={styles.mineralProblemaLabel}>⚠️ Problema:</span>
+                  <span className={styles.mineralProblemaLabel}><span aria-hidden="true">⚠️</span> Problema:</span>
                   <span>{m.problema}</span>
                 </div>
               </div>
@@ -252,6 +252,7 @@ function SeccionPrecio() {
             aria-label={`${c.nombre}: ${formatCurrency(c.euros)}`}
             onFocus={() => setPartidaActiva(c.nombre)}
             onBlur={() => setPartidaActiva(null)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPartidaActiva(c.nombre); }}
           >
             <span className={styles.costeSegmentoTexto}>
               {c.euros >= 50 ? `${formatCurrency(c.euros)}` : ''}
@@ -475,7 +476,7 @@ export default function VisualizadorAnatomiaSmartphonePage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>

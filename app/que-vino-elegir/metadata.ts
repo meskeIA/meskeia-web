@@ -46,8 +46,8 @@ export const jsonLd = generateWebAppSchema({
     'Uvas LATAM incluidas: Malbec, Torrontés, Carménère, País',
     'Alternativa "fuera de zona de confort" para explorar',
     'Tips de servicio: temperatura y maridaje',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
+    'Catálogo de 24 varietales: tintos, blancos, espumosos y generosos de España, Francia, Italia, Argentina y Chile',
+    'Motor de scoring por tags: plato, presupuesto y ocasión calculan el porcentaje de afinidad de cada vino',
   ],
 });
 

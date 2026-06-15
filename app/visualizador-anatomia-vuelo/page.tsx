@@ -586,7 +586,7 @@ export default function VisualizadorAnatomiaVueloPage() {
         {/* Cabecera seccion */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -595,43 +595,43 @@ export default function VisualizadorAnatomiaVueloPage() {
         {renderSeccion()}
 
         <EducationalSection
-          title="Mas sobre aviacion"
-          subtitle="Preguntas frecuentes sobre como vuelan los aviones"
+          title="Más sobre aviación"
+          subtitle="Preguntas frecuentes sobre cómo vuelan los aviones"
           defaultOpen={false}
         >
-          <h3>Es seguro volar?</h3>
+          <h3>¿Es seguro volar?</h3>
           <p>
-            El avion es el <strong>medio de transporte mas seguro</strong> del mundo por kilometro recorrido.
+            El avión es el <strong>medio de transporte más seguro</strong> del mundo por kilómetro recorrido.
             La probabilidad de un accidente fatal es de 1 entre 11 millones de vuelos. Conduces un coche
-            con un riesgo miles de veces mayor cada dia.
+            con un riesgo miles de veces mayor cada día.
           </p>
 
-          <h3>Que pasa si falla un motor?</h3>
+          <h3>¿Qué pasa si falla un motor?</h3>
           <p>
-            Los aviones comerciales estan disenados para volar con un solo motor. De hecho, una de las pruebas
-            de certificacion es demostrar que el avion puede despegar, volar y aterrizar con un motor inoperativo.
-            Los pilotos practican esta situacion regularmente en simulador.
+            Los aviones comerciales están diseñados para volar con un solo motor. De hecho, una de las pruebas
+            de certificación es demostrar que el avión puede despegar, volar y aterrizar con un motor inoperativo.
+            Los pilotos practican esta situación regularmente en simulador.
           </p>
 
-          <h3>Por que hay turbulencias?</h3>
+          <h3>¿Por qué hay turbulencias?</h3>
           <p>
-            Las turbulencias son movimientos irregulares del aire causados por corrientes termicas, cambios de
-            viento (jet stream) o el relieve del terreno. Son molestas pero rara vez peligrosas. El avion esta
-            disenado para soportar fuerzas muy superiores a cualquier turbulencia normal.
+            Las turbulencias son movimientos irregulares del aire causados por corrientes térmicas, cambios de
+            viento (jet stream) o el relieve del terreno. Son molestas pero rara vez peligrosas. El avión está
+            diseñado para soportar fuerzas muy superiores a cualquier turbulencia normal.
           </p>
 
-          <h3>Que es la caja negra?</h3>
+          <h3>¿Qué es la caja negra?</h3>
           <p>
             En realidad son <strong>dos cajas naranjas</strong>: el FDR (Flight Data Recorder) graba
-            parametros del vuelo (altitud, velocidad, posicion de controles) y el CVR (Cockpit Voice Recorder)
+            parámetros del vuelo (altitud, velocidad, posición de controles) y el CVR (Cockpit Voice Recorder)
             graba las conversaciones en cabina. Resisten impactos de 3.400 G, fuego a 1.100 °C durante 1 hora
-            y sumersion a 6.000 m de profundidad.
+            y sumersión a 6.000 m de profundidad.
           </p>
 
           <div className={styles.warningBox}>
-            <strong>Nota:</strong> este explicador simplifica conceptos de aerodinamica y aviacion con fines
-            educativos. La fisica del vuelo real es mas compleja e incluye factores como la compresibilidad
-            del aire, capas limite, efectos de sustentacion por angulo de ataque (Newton) ademas de Bernoulli, etc.
+            <strong>Nota:</strong> este explicador simplifica conceptos de aerodinámica y aviación con fines
+            educativos. La física del vuelo real es más compleja e incluye factores como la compresibilidad
+            del aire, capas límite, efectos de sustentación por ángulo de ataque (Newton) además de Bernoulli, etc.
           </div>
         </EducationalSection>
 

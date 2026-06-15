@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Diagnóstico visual con mapa 2D y perfil personalizado',
     'Basado en el marco de Jeff Bezos: puertas tipo 1 y tipo 2',
     'Acciones concretas según tu resultado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Mapa 2D de cuadrantes: visualiza tu posición en los ejes parálisis/prudencia',
+    '6 perfiles diferenciados: Analista Ansioso, Bloqueo Decisional, Decisor Estratégico, Impulso sin Filtro y matices intermedios',
+    'Acciones concretas según perfil, no consejos genéricos',
   ],
 });
 

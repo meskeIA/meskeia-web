@@ -63,10 +63,10 @@
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
 | [x] | ¿Qué cerveza elegir? | `/que-cerveza-elegir/` | cultura, juegos |
-| [ ] | ¿Qué vino elegir? | `/que-vino-elegir/` | cultura, juegos |
-| [ ] | Análisis Decisión Reversible vs Irreversible | `/analisis-decision-reversible/` | cultura, productividad |
-| [ ] | Anatomía de un Smartphone | `/visualizador-anatomia-smartphone/` | cultura, tecnicas |
-| [ ] | Anatomía de un Vuelo | `/visualizador-anatomia-vuelo/` | cultura, tecnicas |
+| [x] | ¿Qué vino elegir? | `/que-vino-elegir/` | cultura, juegos |
+| [x] | Análisis Decisión Reversible vs Irreversible | `/analisis-decision-reversible/` | cultura, productividad |
+| [x] | Anatomía de un Smartphone | `/visualizador-anatomia-smartphone/` | cultura, tecnicas |
+| [x] | Anatomía de un Vuelo | `/visualizador-anatomia-vuelo/` | cultura, tecnicas |
 | [ ] | Anatomía de una Ciudad | `/visualizador-ciudad/` | cultura, tecnicas |
 | [ ] | Asistente de Reclamaciones al Consumidor | `/asistente-reclamaciones/` | cultura, productividad |
 | [ ] | Calculadora de Profundidad de Campo (DoF) | `/calculadora-profundidad-campo/` | cultura, tecnicas |

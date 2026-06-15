@@ -42,9 +42,8 @@ export const jsonLd = generateWebAppSchema({
     'Mapa de minerales: 30+ minerales de 15+ países con cadenas de suministro',
     'Desglose de costes de un móvil de 1.000 €: componentes, ensamblaje, I+D, marketing, margen',
     'Datos de obsolescencia: vida media, residuos electrónicos, tasas de reciclaje',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Sección de obsolescencia: vida media, tasa de reciclaje y destino real de los móviles desechados',
+    'Comparativa laboral: salario del trabajador de fábrica vs. precio final de venta',
   ],
 });
 
