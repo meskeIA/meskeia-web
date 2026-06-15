@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     'Comparación visual: proporcional vs mayoritario vs mixto',
     'Mismo resultado de votos, distintos repartos de escaños',
     'Mapa de circunscripciones y el "bonus rural"',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Comparativa de sistemas electorales: cuándo favorecen a partidos grandes o pequeños',
+    'Circunscripciones electorales y su efecto en la representatividad por tamaño de provincia',
+    'Simulación interactiva con datos reales del sistema electoral español',
   ],
 });
 

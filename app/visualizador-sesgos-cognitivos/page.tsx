@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos de sesgos
@@ -173,13 +172,7 @@ export default function VisualizadorSesgosCognitivosPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -210,7 +203,7 @@ export default function VisualizadorSesgosCognitivosPage() {
         <div className={styles.sesgoContent}>
           <div className={styles.sesgoHeader} style={{ borderLeftColor: sesgo.color }}>
             <span className={styles.sesgoCategoria} style={{ color: sesgo.color }}>{sesgo.categoria}</span>
-            <h2 className={styles.sesgoTitulo}>{sesgo.icono} {sesgo.nombre}</h2>
+            <h2 className={styles.sesgoTitulo}><span aria-hidden="true">{sesgo.icono}</span> {sesgo.nombre}</h2>
             <p className={styles.sesgoDefinicion}>{sesgo.definicion}</p>
           </div>
 
@@ -243,11 +236,11 @@ export default function VisualizadorSesgosCognitivosPage() {
             {respuestaSeleccionada !== null && (
               <div className={`${styles.testResultado} ${
                 sesgo.opciones[respuestaSeleccionada].esSesgo ? styles.testResultadoSesgo : styles.testResultadoOk
-              }`}>
+              }`} role="status" aria-live="polite" aria-atomic="true">
                 <p className={styles.testEtiqueta}>
                   {sesgo.opciones[respuestaSeleccionada].esSesgo
-                    ? '🧠 Sesgo detectado'
-                    : '✅ Pensamiento racional'}
+                    ? <><span aria-hidden="true">🧠</span> Sesgo detectado</>
+                    : <><span aria-hidden="true">✅</span> Pensamiento racional</>}
                 </p>
                 <p className={styles.testExplicacion}>{sesgo.opciones[respuestaSeleccionada].explicacion}</p>
               </div>
@@ -311,7 +304,6 @@ export default function VisualizadorSesgosCognitivosPage() {
         <RelatedApps apps={getRelatedApps('visualizador-sesgos-cognitivos')} />
         <ShareCard appName="visualizador-sesgos-cognitivos" />
         <Footer appName="visualizador-sesgos-cognitivos" />
-      </div>
-    </>
+    </div>
   );
 }

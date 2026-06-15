@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     'Mini-ejemplos interactivos para cada sesgo',
     'Categorías: dinero, percepción, social, lógica',
     'Consejos para contrarrestar cada sesgo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Mini-test interactivo: pon a prueba cada sesgo con un ejemplo real',
+    'Iconos y categorías por tipo: dinero, percepción, lógica y sesgo social',
+    'Estrategias concretas para contrarrestar cada sesgo en decisiones cotidianas',
   ],
 });
 

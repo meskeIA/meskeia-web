@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Los pasos del viaje de una petición web
@@ -178,13 +177,7 @@ export default function VisualizadorInternet60SegundosPage() {
   const paso = PASOS.find(p => p.id === pasoActivo)!;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -229,6 +222,7 @@ export default function VisualizadorInternet60SegundosPage() {
             type="button"
             className={`${styles.vistaBtn} ${vistaDetalle === 'simple' ? styles.vistaActiva : ''}`}
             onClick={() => setVistaDetalle('simple')}
+            aria-pressed={vistaDetalle === 'simple'}
           >
             Explicación simple
           </button>
@@ -236,13 +230,14 @@ export default function VisualizadorInternet60SegundosPage() {
             type="button"
             className={`${styles.vistaBtn} ${vistaDetalle === 'tecnico' ? styles.vistaActiva : ''}`}
             onClick={() => setVistaDetalle('tecnico')}
+            aria-pressed={vistaDetalle === 'tecnico'}
           >
             Detalle técnico
           </button>
         </div>
 
         {/* Detalle del paso */}
-        <div className={styles.pasoDetalle} style={{ borderLeftColor: paso.color }}>
+        <div className={styles.pasoDetalle} style={{ borderLeftColor: paso.color }} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.pasoHeader}>
             <span className={styles.pasoIcono} aria-hidden="true">{paso.icono}</span>
             <div>
@@ -374,7 +369,6 @@ export default function VisualizadorInternet60SegundosPage() {
         <RelatedApps apps={getRelatedApps('visualizador-internet-60-segundos')} />
         <ShareCard appName="visualizador-internet-60-segundos" />
         <Footer appName="visualizador-internet-60-segundos" />
-      </div>
-    </>
+    </div>
   );
 }

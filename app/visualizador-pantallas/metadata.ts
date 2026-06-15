@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa de resoluciones: HD, Full HD, 2K, 4K, 8K con número de píxeles',
     'PPI por dispositivo y resolución angular a distancia',
     'Datos sobre luz azul, regla 20-20-20 y salud visual',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Tabla de PPI por dispositivo y resolución angular a la distancia habitual de uso',
+    'Datos clínicos sobre luz azul, ritmo circadiano y la regla 20-20-20',
+    'Comparativa de tecnologías: tiempo de respuesta, contraste, consumo y durabilidad',
   ],
 });
 

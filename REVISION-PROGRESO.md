@@ -84,10 +84,10 @@
 | [x] | Cómo Funciona el Clima | `/visualizador-clima/` | cultura, estudiantes |
 | [x] | Cómo Funciona el GPS | `/visualizador-gps/` | cultura, tecnicas |
 | [x] | Cómo Funciona el WiFi | `/visualizador-como-funciona-wifi/` | cultura, tecnicas |
-| [ ] | Cómo Funciona Internet en 60 Segundos | `/visualizador-internet-60-segundos/` | cultura, tecnicas |
-| [ ] | Cómo Funciona tu Cerebro al Decidir | `/visualizador-sesgos-cognitivos/` | cultura |
-| [ ] | Cómo Funciona una Elección | `/visualizador-sistema-electoral/` | cultura |
-| [ ] | Cómo Funciona una Pantalla | `/visualizador-pantallas/` | cultura, tecnicas |
+| [x] | Cómo Funciona Internet en 60 Segundos | `/visualizador-internet-60-segundos/` | cultura, tecnicas |
+| [x] | Cómo Funciona tu Cerebro al Decidir | `/visualizador-sesgos-cognitivos/` | cultura |
+| [x] | Cómo Funciona una Elección | `/visualizador-sistema-electoral/` | cultura |
+| [x] | Cómo Funciona una Pantalla | `/visualizador-pantallas/` | cultura, tecnicas |
 | [ ] | Cómo se Construye un Edificio | `/visualizador-construccion-edificio/` | cultura, tecnicas, inmobiliaria |
 | [ ] | Cómo se Produce la Energía | `/visualizador-produccion-energia/` | cultura, tecnicas |
 | [ ] | Comparador de Voces Narrativas | `/comparador-voces-narrativas/` | cultura, estudiantes |

@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     '10 pasos desde el navegador hasta la respuesta',
     'Tiempos reales en milisegundos',
     'Datos sobre infraestructura global de Internet',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Vista simple vs. detalle técnico: dos niveles de profundidad por cada paso',
+    'Diagrama de cables submarinos, data centers y CDNs de la infraestructura global',
+    'Cifrado HTTPS y handshake TLS explicados paso a paso',
   ],
 });
 

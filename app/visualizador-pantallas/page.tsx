@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -246,7 +245,7 @@ function SeccionPixel() {
           </button>
         </div>
 
-        <div className={styles.pixelResultado}>
+        <div className={styles.pixelResultado} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.pixelMuestra} style={{ backgroundColor: colorResultante }}>
             <div className={styles.pixelSubpixeles}>
               <div className={`${styles.subpixelStripe} ${rActivo ? styles.stripeR : styles.stripeOff}`} />
@@ -564,13 +563,7 @@ export default function VisualizadorPantallasPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -597,9 +590,9 @@ export default function VisualizadorPantallasPage() {
         </nav>
 
         {/* Cabecera sección */}
-        <div className={styles.seccionHeader}>
+        <div className={styles.seccionHeader} role="status" aria-live="polite" aria-atomic="true">
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -652,7 +645,6 @@ export default function VisualizadorPantallasPage() {
         <RelatedApps apps={getRelatedApps('visualizador-pantallas')} />
         <ShareCard appName="visualizador-pantallas" />
         <Footer appName="visualizador-pantallas" />
-      </div>
-    </>
+    </div>
   );
 }
