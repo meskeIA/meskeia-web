@@ -236,26 +236,32 @@ export default function CalculadoraEstadisticaMedicaPage() {
       {/* Selector de modo */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'diagnostico' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('diagnostico')}
+          aria-pressed={mode === 'diagnostico'}
         >
-          <span className={styles.modeIcon}>🔬</span>
+          <span className={styles.modeIcon} aria-hidden="true">🔬</span>
           <span className={styles.modeName}>Pruebas Diagnósticas</span>
           <span className={styles.modeDesc}>Sensibilidad, Especificidad, VPP, VPN</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'epidemiologia' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('epidemiologia')}
+          aria-pressed={mode === 'epidemiologia'}
         >
-          <span className={styles.modeIcon}>📊</span>
+          <span className={styles.modeIcon} aria-hidden="true">📊</span>
           <span className={styles.modeName}>Epidemiología</span>
           <span className={styles.modeDesc}>Odds Ratio, Riesgo Relativo</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'nnt' ? styles.modeBtnActive : ''}`}
           onClick={() => setMode('nnt')}
+          aria-pressed={mode === 'nnt'}
         >
-          <span className={styles.modeIcon}>💊</span>
+          <span className={styles.modeIcon} aria-hidden="true">💊</span>
           <span className={styles.modeName}>NNT Directo</span>
           <span className={styles.modeDesc}>Número Necesario a Tratar</span>
         </button>
@@ -271,10 +277,10 @@ export default function CalculadoraEstadisticaMedicaPage() {
               {mode === 'nnt' && 'Tasas de Eventos'}
             </h2>
             <div className={styles.panelActions}>
-              <button onClick={loadExample} className={styles.exampleBtn}>
+              <button type="button" onClick={loadExample} className={styles.exampleBtn}>
                 Cargar ejemplo
               </button>
-              <button onClick={clearAll} className={styles.clearBtn}>
+              <button type="button" onClick={clearAll} className={styles.clearBtn}>
                 Limpiar
               </button>
             </div>
@@ -288,10 +294,10 @@ export default function CalculadoraEstadisticaMedicaPage() {
                     <tr>
                       <th></th>
                       <th className={styles.colHeader}>
-                        <span className={styles.colIcon}>✓</span> Enfermo
+                        <span className={styles.colIcon} aria-hidden="true">✓</span> Enfermo
                       </th>
                       <th className={styles.colHeader}>
-                        <span className={styles.colIcon}>✗</span> Sano
+                        <span className={styles.colIcon} aria-hidden="true">✗</span> Sano
                       </th>
                     </tr>
                   </thead>
@@ -367,10 +373,10 @@ export default function CalculadoraEstadisticaMedicaPage() {
                     <tr>
                       <th></th>
                       <th className={styles.colHeader}>
-                        <span className={styles.colIcon}>⚠️</span> Caso
+                        <span className={styles.colIcon} aria-hidden="true">⚠️</span> Caso
                       </th>
                       <th className={styles.colHeader}>
-                        <span className={styles.colIcon}>✓</span> Control
+                        <span className={styles.colIcon} aria-hidden="true">✓</span> Control
                       </th>
                     </tr>
                   </thead>
@@ -477,55 +483,55 @@ export default function CalculadoraEstadisticaMedicaPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <h2>Resultados</h2>
 
           {mode === 'diagnostico' && diagnosticResults && (
             <div className={styles.resultsGrid}>
               <div className={`${styles.resultCard} ${styles.highlight}`}>
-                <div className={styles.resultIcon}>🎯</div>
+                <div className={styles.resultIcon} aria-hidden="true">🎯</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.sensibilidad, 1)}%</div>
                 <div className={styles.resultLabel}>Sensibilidad</div>
                 <div className={styles.resultDesc}>Detecta enfermos correctamente</div>
               </div>
               <div className={`${styles.resultCard} ${styles.highlight}`}>
-                <div className={styles.resultIcon}>🛡️</div>
+                <div className={styles.resultIcon} aria-hidden="true">🛡️</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.especificidad, 1)}%</div>
                 <div className={styles.resultLabel}>Especificidad</div>
                 <div className={styles.resultDesc}>Identifica sanos correctamente</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>✅</div>
+                <div className={styles.resultIcon} aria-hidden="true">✅</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.vpp, 1)}%</div>
                 <div className={styles.resultLabel}>VPP</div>
                 <div className={styles.resultDesc}>Valor Predictivo Positivo</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>❌</div>
+                <div className={styles.resultIcon} aria-hidden="true">❌</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.vpn, 1)}%</div>
                 <div className={styles.resultLabel}>VPN</div>
                 <div className={styles.resultDesc}>Valor Predictivo Negativo</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📈</div>
+                <div className={styles.resultIcon} aria-hidden="true">📈</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.lrPositivo, 2)}</div>
                 <div className={styles.resultLabel}>LR+</div>
                 <div className={styles.resultDesc}>{interpretLR(diagnosticResults.lrPositivo, true)}</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📉</div>
+                <div className={styles.resultIcon} aria-hidden="true">📉</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.lrNegativo, 2)}</div>
                 <div className={styles.resultLabel}>LR-</div>
                 <div className={styles.resultDesc}>{interpretLR(diagnosticResults.lrNegativo, false)}</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📊</div>
+                <div className={styles.resultIcon} aria-hidden="true">📊</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.prevalencia, 1)}%</div>
                 <div className={styles.resultLabel}>Prevalencia</div>
                 <div className={styles.resultDesc}>Proporción de enfermos</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>🎯</div>
+                <div className={styles.resultIcon} aria-hidden="true">🎯</div>
                 <div className={styles.resultValue}>{formatNumber(diagnosticResults.exactitud, 1)}%</div>
                 <div className={styles.resultLabel}>Exactitud</div>
                 <div className={styles.resultDesc}>Aciertos totales</div>
@@ -536,7 +542,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
           {mode === 'epidemiologia' && epidemiologiaResults && (
             <div className={styles.resultsGrid}>
               <div className={`${styles.resultCard} ${styles.highlight}`}>
-                <div className={styles.resultIcon}>⚖️</div>
+                <div className={styles.resultIcon} aria-hidden="true">⚖️</div>
                 <div className={styles.resultValue}>{formatNumber(epidemiologiaResults.oddsRatio, 2)}</div>
                 <div className={styles.resultLabel}>Odds Ratio</div>
                 <div className={styles.resultDesc}>{interpretOR(epidemiologiaResults.oddsRatio)}</div>
@@ -545,7 +551,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
                 </div>
               </div>
               <div className={`${styles.resultCard} ${styles.highlight}`}>
-                <div className={styles.resultIcon}>📊</div>
+                <div className={styles.resultIcon} aria-hidden="true">📊</div>
                 <div className={styles.resultValue}>{formatNumber(epidemiologiaResults.riesgoRelativo, 2)}</div>
                 <div className={styles.resultLabel}>Riesgo Relativo</div>
                 <div className={styles.resultDesc}>Solo válido en cohortes</div>
@@ -554,19 +560,19 @@ export default function CalculadoraEstadisticaMedicaPage() {
                 </div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>⚠️</div>
+                <div className={styles.resultIcon} aria-hidden="true">⚠️</div>
                 <div className={styles.resultValue}>{formatNumber(epidemiologiaResults.riesgoExpuestos, 1)}%</div>
                 <div className={styles.resultLabel}>Riesgo Expuestos</div>
                 <div className={styles.resultDesc}>Incidencia en expuestos</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>✓</div>
+                <div className={styles.resultIcon} aria-hidden="true">✓</div>
                 <div className={styles.resultValue}>{formatNumber(epidemiologiaResults.riesgoNoExpuestos, 1)}%</div>
                 <div className={styles.resultLabel}>Riesgo No Expuestos</div>
                 <div className={styles.resultDesc}>Incidencia en no expuestos</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📉</div>
+                <div className={styles.resultIcon} aria-hidden="true">📉</div>
                 <div className={styles.resultValue}>{formatNumber(Math.abs(epidemiologiaResults.reduccionRiesgoAbsoluto), 1)}%</div>
                 <div className={styles.resultLabel}>{epidemiologiaResults.reduccionRiesgoAbsoluto >= 0 ? 'ARR' : 'ARI'}</div>
                 <div className={styles.resultDesc}>
@@ -574,7 +580,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
                 </div>
               </div>
               <div className={`${styles.resultCard} ${styles.success}`}>
-                <div className={styles.resultIcon}>💊</div>
+                <div className={styles.resultIcon} aria-hidden="true">💊</div>
                 <div className={styles.resultValue}>
                   {epidemiologiaResults.nnt === Infinity ? '∞' : formatNumber(epidemiologiaResults.nnt, 1)}
                 </div>
@@ -591,7 +597,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
           {mode === 'nnt' && nntResults && (
             <div className={styles.resultsGrid}>
               <div className={`${styles.resultCard} ${styles.highlight} ${styles.fullWidth}`}>
-                <div className={styles.resultIcon}>💊</div>
+                <div className={styles.resultIcon} aria-hidden="true">💊</div>
                 <div className={styles.resultValue}>
                   {nntResults.nnt === Infinity ? '∞' : formatNumber(nntResults.nnt, 1)}
                 </div>
@@ -603,19 +609,19 @@ export default function CalculadoraEstadisticaMedicaPage() {
                 </div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📊</div>
+                <div className={styles.resultIcon} aria-hidden="true">📊</div>
                 <div className={styles.resultValue}>{formatNumber(nntResults.cer, 1)}%</div>
                 <div className={styles.resultLabel}>CER</div>
                 <div className={styles.resultDesc}>Tasa grupo control</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>💉</div>
+                <div className={styles.resultIcon} aria-hidden="true">💉</div>
                 <div className={styles.resultValue}>{formatNumber(nntResults.eer, 1)}%</div>
                 <div className={styles.resultLabel}>EER</div>
                 <div className={styles.resultDesc}>Tasa grupo experimental</div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📉</div>
+                <div className={styles.resultIcon} aria-hidden="true">📉</div>
                 <div className={styles.resultValue}>{formatNumber(Math.abs(nntResults.arr), 1)}%</div>
                 <div className={styles.resultLabel}>{nntResults.arr >= 0 ? 'ARR' : 'ARI'}</div>
                 <div className={styles.resultDesc}>
@@ -623,7 +629,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
                 </div>
               </div>
               <div className={styles.resultCard}>
-                <div className={styles.resultIcon}>📈</div>
+                <div className={styles.resultIcon} aria-hidden="true">📈</div>
                 <div className={styles.resultValue}>{formatNumber(Math.abs(nntResults.rrr), 1)}%</div>
                 <div className={styles.resultLabel}>{nntResults.rrr >= 0 ? 'RRR' : 'RRI'}</div>
                 <div className={styles.resultDesc}>
@@ -637,7 +643,7 @@ export default function CalculadoraEstadisticaMedicaPage() {
             (mode === 'epidemiologia' && !epidemiologiaResults) ||
             (mode === 'nnt' && !nntResults)) && (
             <div className={styles.noResults}>
-              <span className={styles.noResultsIcon}>📊</span>
+              <span className={styles.noResultsIcon} aria-hidden="true">📊</span>
               <p>Introduce los datos para ver los resultados</p>
             </div>
           )}

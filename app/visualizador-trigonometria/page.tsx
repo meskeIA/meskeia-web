@@ -497,6 +497,7 @@ export default function VisualizadorTrigonometria() {
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             className={`${styles.tab} ${tabActiva === tab.id ? styles.tabActiva : ''}`}
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}
@@ -538,6 +539,7 @@ export default function VisualizadorTrigonometria() {
                   {[0, 90, 180, 270, 360].map((m) => (
                     <button
                       key={m}
+                      type="button"
                       className={styles.markBtn}
                       onClick={() => setEstadoCirculo({ angulo: m })}
                     >
@@ -548,6 +550,7 @@ export default function VisualizadorTrigonometria() {
               </div>
 
               <button
+                type="button"
                 className={styles.btnAnimacion}
                 onClick={toggleAnimacion}
                 aria-pressed={animando}
@@ -557,7 +560,7 @@ export default function VisualizadorTrigonometria() {
             </div>
 
             {/* Panel de valores */}
-            <div className={styles.valoresPanel}>
+            <div className={styles.valoresPanel} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.valoresTitulo}>Valores en θ = {estadoCirculo.angulo}°</h3>
               <div className={styles.valoresGrid}>
                 <div className={styles.valorCard} style={{ borderColor: '#2E86AB' }}>
@@ -604,8 +607,10 @@ export default function VisualizadorTrigonometria() {
                   {[0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360].map((a) => (
                     <button
                       key={a}
+                      type="button"
                       className={`${styles.notableBtn} ${estadoCirculo.angulo === a ? styles.notableBtnActivo : ''}`}
                       onClick={() => setEstadoCirculo({ angulo: a })}
+                      aria-pressed={estadoCirculo.angulo === a}
                     >
                       {a}°
                     </button>
@@ -708,13 +713,14 @@ export default function VisualizadorTrigonometria() {
                 />
               </div>
 
-              <div className={styles.formulaBox}>
+              <div className={styles.formulaBox} role="status" aria-live="polite" aria-atomic="true">
                 <span className={styles.formulaText}>
                   f(x) = {estadoGrafica.amplitud.toFixed(1)} · {estadoGrafica.funcion === 'sin' ? 'sen' : estadoGrafica.funcion}({estadoGrafica.frecuencia.toFixed(1)}x + {estadoGrafica.fase.toFixed(2)})
                 </span>
               </div>
 
               <button
+                type="button"
                 className={styles.btnAnimacion}
                 onClick={toggleAnimacion}
                 aria-pressed={animando}
@@ -771,7 +777,7 @@ export default function VisualizadorTrigonometria() {
                   className={styles.slider}
                 />
               </div>
-              <button className={styles.btnAnimacion} onClick={toggleAnimacion} aria-pressed={animando}>
+              <button type="button" className={styles.btnAnimacion} onClick={toggleAnimacion} aria-pressed={animando}>
                 {animando ? '⏸ Pausar' : '▶ Animar'}
               </button>
             </div>

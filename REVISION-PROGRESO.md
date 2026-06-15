@@ -466,7 +466,7 @@
 | [ ] | Estadística Inferencial: p-valor, Errores y Confianza | `/visualizador-estadistica-inferencial/` | estudiantes, tecnicas |
 | [ ] | Estados de la Materia | `/visualizador-estados-materia/` | estudiantes, cultura |
 | [ ] | Estructura del Átomo - Partículas, Orbitales e Isótopos | `/visualizador-estructura-atomo/` | estudiantes, cultura |
-| [ ] | Estructuras Cristalinas 3D - Celdas Unitarias Rotables | `/visualizador-estructuras-cristalinas/` | estudiantes, cultura |
+| [x] | Estructuras Cristalinas 3D - Celdas Unitarias Rotables | `/visualizador-estructuras-cristalinas/` | estudiantes, cultura |
 | [ ] | Estructuras de Mercado: Monopolio, Oligopolio y Competencia | `/visualizador-estructuras-mercado/` | estudiantes, cultura |
 | [ ] | Evolución Molecular: Relojes, Filogenética y Kimura | `/visualizador-evolucion-molecular/` | estudiantes, cultura |
 | [ ] | Exoplanetas: Tránsito, Zona Habitable y Kepler | `/visualizador-exoplanetas/` | estudiantes, cultura |
@@ -618,10 +618,10 @@
 | [ ] | Transferencia de Calor - Conducción, Convección y Radiación | `/visualizador-termodinamica/` | estudiantes, cultura |
 | [ ] | Transformada de Fourier: Señales y Frecuencias | `/visualizador-transformada-fourier/` | estudiantes, tecnicas |
 | [ ] | Transporte en las Plantas - Agua que Sube sin Motor | `/visualizador-transporte-plantas/` | estudiantes, cultura |
-| [ ] | Trigonometría: Círculo Unitario y Funciones | `/visualizador-trigonometria/` | estudiantes, tecnicas |
+| [x] | Trigonometría: Círculo Unitario y Funciones | `/visualizador-trigonometria/` | estudiantes, tecnicas |
 | [ ] | Tu ADN en Números | `/visualizador-adn-numeros/` | estudiantes, cultura |
 | [x] | Visualizador de Estructuras de Datos | `/visualizador-estructuras-datos/` | estudiantes, diseno |
-| [ ] | Visualizador de Volúmenes 3D: Esfera, Cubo, Cilindro, Cono y Pirámide | `/visualizador-volumenes/` | estudiantes, cultura |
+| [x] | Visualizador de Volúmenes 3D: Esfera, Cubo, Cilindro, Cono y Pirámide | `/visualizador-volumenes/` | estudiantes, cultura |
 | [ ] | Vuelo de Avión: El Gran Mito de Bernoulli | `/visualizador-vuelo-avion/` | estudiantes, cultura |
 
 ## Finanzas e Inversión (`finanzas`) — 58 apps
@@ -974,7 +974,7 @@
 | [ ] | Calculadora de 1RM — Repetición Máxima | `/calculadora-1rm-gimnasio/` | salud, tecnicas |
 | [ ] | Calculadora de Alimentación Mascotas | `/calculadora-alimentacion-mascotas/` | salud |
 | [x] | Calculadora de Calorías | `/calculadora-calorias-ejercicio/` | salud |
-| [ ] | Calculadora de Estadística Médica | `/calculadora-estadistica-medica/` | salud, estudiantes |
+| [x] | Calculadora de Estadística Médica | `/calculadora-estadistica-medica/` | salud, estudiantes |
 | [ ] | Calculadora de Hidratación | `/calculadora-hidratacion/` | salud |
 | [ ] | Calculadora de Macros | `/calculadora-macros/` | salud |
 | [ ] | Calculadora de Pace de Running | `/calculadora-pace-running/` | salud, tecnicas |

@@ -37,9 +37,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-estadistica-medica/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Tabla 2×2 diagnóstica: sensibilidad, especificidad, VPP, VPN y exactitud global',
+    'Cocientes de probabilidad (LR+ y LR-) para interpretar la utilidad clínica de una prueba',
+    'Calculadora epidemiológica: riesgo relativo, odds ratio y reducción de riesgo (RAR/RRR)',
+    'NNT directo desde riesgo control y riesgo tratamiento con IC 95% automático',
+    'Tres modos independientes: diagnóstico, epidemiología y NNT',
+    'Ejemplos precargados para pruebas de laboratorio, ensayos clínicos y cribado',
   ],
 });
 

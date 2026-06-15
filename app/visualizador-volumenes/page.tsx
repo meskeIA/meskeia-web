@@ -332,7 +332,7 @@ export default function VisualizadorVolumenesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔷 Visualizador de Volúmenes 3D</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔷</span> Visualizador de Volúmenes 3D</h1>
         <p className={styles.subtitle}>
           Selecciona una figura, ajusta las dimensiones con los sliders y observa cómo cambia el volumen en tiempo real
         </p>
@@ -345,6 +345,7 @@ export default function VisualizadorVolumenesPage() {
         {FIGURAS.map((f) => (
           <button
             key={f.id}
+            type="button"
             onClick={() => setFigura(f.id)}
             className={`${styles.figBtn} ${figura === f.id ? styles.figBtnActivo : ''}`}
             aria-pressed={figura === f.id}
@@ -406,7 +407,7 @@ export default function VisualizadorVolumenesPage() {
           )}
 
           {/* Resultado */}
-          <div className={styles.resultCard} role="region" aria-live="polite" aria-label="Resultado del volumen">
+          <div className={styles.resultCard} role="status" aria-live="polite" aria-atomic="true" aria-label="Resultado del volumen">
             <span className={styles.resultLabel}>Volumen</span>
             <span className={styles.resultValor}>{formatVolumen(volumen)}</span>
             <span className={styles.resultUnidad}>unidades³</span>
@@ -547,48 +548,48 @@ export default function VisualizadorVolumenesPage() {
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el cono tiene exactamente un tercio del volumen del cilindro?</h4>
+              <h4><span aria-hidden="true">❓</span>¿Por qué el cono tiene exactamente un tercio del volumen del cilindro?</h4>
               <p>
                 Esta relación se puede demostrar mediante el principio de Cavalieri: si se llena un cono y se vierte en un cilindro del mismo radio y altura, caben exactamente tres conos. La demostración rigurosa utiliza integración (sumas de discos infinitesimales), pero la relación 1/3 ya era conocida por Euclides y Arquímedes gracias a métodos geométricos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Experimenta:</strong> Pon el mismo radio y altura en el cilindro y en el cono y comprueba que el volumen del cono es exactamente un tercio.
+                <span aria-hidden="true">💡</span> <strong>Experimenta:</strong> Pon el mismo radio y altura en el cilindro y en el cono y comprueba que el volumen del cono es exactamente un tercio.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué significa "volumen" en unidades al cubo?</h4>
+              <h4><span aria-hidden="true">❓</span>¿Qué significa "volumen" en unidades al cubo?</h4>
               <p>
                 El volumen mide el espacio tridimensional que ocupa un objeto. Si las dimensiones están en centímetros, el volumen está en cm³ (centímetros cúbicos). 1 cm³ equivale a 1 mililitro de líquido. Si las dimensiones están en metros, 1 m³ = 1.000 litros. El "cubo" proviene de que se multiplican tres dimensiones lineales.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el volumen de la esfera tiene el factor (4/3)?</h4>
+              <h4><span aria-hidden="true">❓</span>¿Por qué el volumen de la esfera tiene el factor (4/3)?</h4>
               <p>
                 El factor (4/3) surge de la integración de discos circulares a lo largo del eje. Una esfera de radio r puede descomponerse en rodajas circulares infinitesimales cuya suma da π × r³ × (4/3). Arquímedes demostró que la esfera tiene exactamente 2/3 del volumen del cilindro que la circunscribe, lo que implica V = (4/3)πr³. Estaba tan orgulloso de este resultado que pidió que se grabara en su tumba.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Verifica:</strong> Compara el volumen de una esfera de radio 5 con el de un cilindro de radio 5 y altura 10: la esfera es 2/3 del cilindro.
+                <span aria-hidden="true">💡</span> <strong>Verifica:</strong> Compara el volumen de una esfera de radio 5 con el de un cilindro de radio 5 y altura 10: la esfera es 2/3 del cilindro.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué figura tiene más volumen para la misma superficie?</h4>
+              <h4><span aria-hidden="true">❓</span>¿Qué figura tiene más volumen para la misma superficie?</h4>
               <p>
                 La esfera es la figura más eficiente en términos de volumen por superficie. Para una misma cantidad de material (superficie), la esfera encierra más volumen que cualquier otra forma. Por eso las burbujas de jabón son esféricas (minimizan la tensión superficial) y los glóbulos rojos, que necesitan transportar el máximo de hemoglobina, tienen forma de disco bicóncavo (optimizada para otra función: maximizar el intercambio de oxígeno).
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo se calcula el volumen de una pirámide no cuadrada?</h4>
+              <h4><span aria-hidden="true">❓</span>¿Cómo se calcula el volumen de una pirámide no cuadrada?</h4>
               <p>
                 Este visualizador muestra la pirámide de base cuadrada (V = l²h/3). Para bases rectangulares la fórmula es V = (a×b×h)/3, donde a y b son los lados de la base. Para bases triangulares, V = (base × altura_triángulo × h_pirámide)/6. En general, el volumen de cualquier pirámide es siempre (1/3) × área_base × altura.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo afecta el radio al volumen en comparación con la altura?</h4>
+              <h4><span aria-hidden="true">❓</span>¿Cómo afecta el radio al volumen en comparación con la altura?</h4>
               <p>
                 El radio tiene mucho más impacto que la altura porque aparece elevado al cuadrado (cilindro, cono) o al cubo (esfera). Para un cilindro, duplicar el radio cuadruplica el volumen, mientras que duplicar la altura solo lo duplica. Esta es la razón por la que los bidones industriales son más anchos que altos: un pequeño incremento de radio equivale a mucho más volumen adicional que el mismo incremento en altura.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Compruébalo:</strong> Sube el radio del cilindro de 5 a 10 (×2) y observa que el volumen se multiplica por 4, no por 2.
+                <span aria-hidden="true">💡</span> <strong>Compruébalo:</strong> Sube el radio del cilindro de 5 a 10 (×2) y observa que el volumen se multiplica por 4, no por 2.
               </p>
             </div>
           </div>

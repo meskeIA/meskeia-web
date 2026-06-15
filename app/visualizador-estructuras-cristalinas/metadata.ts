@@ -43,8 +43,8 @@ export const jsonLd = generateWebAppSchema({
     'Estructuras metálicas BCC, FCC y HCP',
     'Cristales famosos: sal, diamante, grafito, cuarzo',
     'CSS 3D sin dependencias externas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
+    'Comparación de parámetros de red (a, b, c) y ángulos (α, β, γ) por sistema',
+    'Visualización de empaquetamiento BCC (68%), FCC/HCP (74%) con radio atómico',
   ],
 });
 

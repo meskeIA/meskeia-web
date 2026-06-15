@@ -805,10 +805,10 @@ function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Esc
       </div>
       {/* Botones de rotación para accesibilidad / reduced motion */}
       <div className={styles.botonesRotacion}>
-        <button onClick={() => rotar('y', -1)} aria-label="Rotar izquierda" className={styles.btnRotar}>◀</button>
-        <button onClick={() => rotar('x', -1)} aria-label="Rotar arriba" className={styles.btnRotar}>▲</button>
-        <button onClick={() => rotar('x', 1)} aria-label="Rotar abajo" className={styles.btnRotar}>▼</button>
-        <button onClick={() => rotar('y', 1)} aria-label="Rotar derecha" className={styles.btnRotar}>▶</button>
+        <button type="button" onClick={() => rotar('y', -1)} aria-label="Rotar izquierda" className={styles.btnRotar}>◀</button>
+        <button type="button" onClick={() => rotar('x', -1)} aria-label="Rotar arriba" className={styles.btnRotar}>▲</button>
+        <button type="button" onClick={() => rotar('x', 1)} aria-label="Rotar abajo" className={styles.btnRotar}>▼</button>
+        <button type="button" onClick={() => rotar('y', 1)} aria-label="Rotar derecha" className={styles.btnRotar}>▶</button>
       </div>
     </div>
   );
@@ -846,6 +846,7 @@ export default function VisualizadorEstructurasCristalinas() {
         {SECCIONES.map(s => (
           <button
             key={s.id}
+            type="button"
             className={`${styles.navBtn} ${seccion === s.id ? styles.navActivo : ''}`}
             onClick={() => setSeccion(s.id)}
             aria-current={seccion === s.id ? 'true' : undefined}
@@ -858,7 +859,7 @@ export default function VisualizadorEstructurasCristalinas() {
 
       {secActual && (
         <div className={styles.seccionHeader}>
-          <h2 className={styles.seccionTitulo}>{secActual.icono} {secActual.titulo}</h2>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">{secActual.icono}</span> {secActual.titulo}</h2>
           <p className={styles.seccionSubtitulo}>{secActual.subtitulo}</p>
         </div>
       )}
@@ -874,8 +875,10 @@ export default function VisualizadorEstructurasCristalinas() {
             {SISTEMAS.map((sis, i) => (
               <button
                 key={sis.nombre}
+                type="button"
                 className={`${styles.sistemaCard} ${sistemaActivo === i ? styles.sistemaCardActivo : ''}`}
                 onClick={() => setSistemaActivo(i)}
+                aria-pressed={sistemaActivo === i}
                 style={{ borderColor: sistemaActivo === i ? sis.color : undefined }}
               >
                 <span className={styles.sistemaIcono} aria-hidden="true">{sis.icono}</span>
@@ -885,9 +888,9 @@ export default function VisualizadorEstructurasCristalinas() {
           </div>
 
           {/* Detalle del sistema seleccionado */}
-          <div className={styles.sistemaDetalle} style={{ borderColor: SISTEMAS[sistemaActivo].color }}>
+          <div className={styles.sistemaDetalle} role="status" aria-live="polite" aria-atomic="true" style={{ borderColor: SISTEMAS[sistemaActivo].color }}>
             <h3 className={styles.sistemaDetalleNombre} style={{ color: SISTEMAS[sistemaActivo].color }}>
-              {SISTEMAS[sistemaActivo].icono} {SISTEMAS[sistemaActivo].nombre}
+              <span aria-hidden="true">{SISTEMAS[sistemaActivo].icono}</span> {SISTEMAS[sistemaActivo].nombre}
             </h3>
             <div className={styles.sistemaDetalleInfo}>
               <div className={styles.sistemaParam}>
@@ -925,8 +928,10 @@ export default function VisualizadorEstructurasCristalinas() {
             {ESTRUCTURAS_METALICAS.map((em, i) => (
               <button
                 key={em.siglas}
+                type="button"
                 className={`${styles.metalicaTab} ${metalicaActiva === i ? styles.metalicaTabActiva : ''}`}
                 onClick={() => setMetalicaActiva(i)}
+                aria-pressed={metalicaActiva === i}
                 style={{ borderColor: metalicaActiva === i ? em.color : undefined }}
               >
                 <span className={styles.metalicaSiglas}>{em.siglas}</span>
@@ -938,7 +943,7 @@ export default function VisualizadorEstructurasCristalinas() {
           {(() => {
             const em = ESTRUCTURAS_METALICAS[metalicaActiva];
             return (
-              <div className={styles.metalicaDetalle}>
+              <div className={styles.metalicaDetalle} role="status" aria-live="polite" aria-atomic="true">
                 <h3 className={styles.metalicaDetalleNombre} style={{ color: em.color }}>
                   {em.siglas} — {em.nombre}
                 </h3>
@@ -1012,8 +1017,10 @@ export default function VisualizadorEstructurasCristalinas() {
             {CRISTALES_FAMOSOS.map((cr, i) => (
               <button
                 key={cr.nombre}
+                type="button"
                 className={`${styles.cristalCard} ${cristalActivo === i ? styles.cristalCardActivo : ''}`}
                 onClick={() => setCristalActivo(i)}
+                aria-pressed={cristalActivo === i}
               >
                 <span className={styles.cristalIcono} aria-hidden="true">{cr.icono}</span>
                 <span className={styles.cristalNombre}>{cr.nombre}</span>
@@ -1025,8 +1032,8 @@ export default function VisualizadorEstructurasCristalinas() {
           {(() => {
             const cr = CRISTALES_FAMOSOS[cristalActivo];
             return (
-              <div className={styles.cristalDetalle}>
-                <h3 className={styles.cristalDetalleTitulo}>{cr.icono} {cr.nombre} ({cr.formula})</h3>
+              <div className={styles.cristalDetalle} role="status" aria-live="polite" aria-atomic="true">
+                <h3 className={styles.cristalDetalleTitulo}><span aria-hidden="true">{cr.icono}</span> {cr.nombre} ({cr.formula})</h3>
                 <p className={styles.cristalDetalleDesc}>{cr.descripcion}</p>
 
                 <Escena3D
@@ -1049,7 +1056,7 @@ export default function VisualizadorEstructurasCristalinas() {
 
           {/* Diamante vs Grafito */}
           <div className={styles.vsCard}>
-            <h3 className={styles.vsTitulo}>💎 Diamante vs ✏️ Grafito</h3>
+            <h3 className={styles.vsTitulo}><span aria-hidden="true">💎</span> Diamante vs <span aria-hidden="true">✏️</span> Grafito</h3>
             <p className={styles.vsSubtitulo}>Mismo átomo (C), distinta estructura → propiedades opuestas</p>
             <div className={styles.vsGrid}>
               <div className={styles.vsColumna}>

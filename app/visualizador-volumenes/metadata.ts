@@ -39,8 +39,8 @@ export const jsonLd = generateWebAppSchema({
     'Etiquetas de dimensiones sobre la figura 3D',
     'Tabla comparativa de fórmulas de volumen',
     'Guía educativa con casos de uso, FAQ y errores frecuentes',
-    'Funciona completamente en el navegador, sin registro',
-    'Gratuito y sin publicidad, con formato numérico en español',
+    'Relación demostrable 1/3 entre el volumen del cono y el cilindro equivalente',
+    'Resultado en m³ y cm³ simultáneamente para cada figura seleccionada',
   ],
 });
 
