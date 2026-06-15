@@ -10,7 +10,7 @@ export const jsonLd = generateWebAppSchema({
     'Gestión de medicamentos con pictogramas visuales',
     'Configuración de horarios y dosis personalizados',
     'Alertas recordatorio para cada toma',
-    'Funciona sin conexión a internet ni registro',
+    'Almacenamiento local sin cuenta: datos solo en tu dispositivo',
     'Datos almacenados únicamente en el dispositivo del usuario',
   ],
 });

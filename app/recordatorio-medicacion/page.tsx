@@ -179,7 +179,7 @@ export default function RecordatorioMedicacionPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>💊 Recordatorio de Medicación</h1>
+          <h1 className={styles.title}><span aria-hidden="true">💊</span> Recordatorio de Medicación</h1>
           <p className={styles.subtitle}>
             Gestiona tus medicamentos con pictogramas y horarios visuales
           </p>
@@ -189,19 +189,19 @@ export default function RecordatorioMedicacionPage() {
 
         {/* Progreso del día */}
         {totalTomas > 0 && (
-          <div className={styles.progresoCard}>
+          <div className={styles.progresoCard} role="status" aria-live="polite">
             <div className={styles.progresoHeader}>
-              <span className={styles.progresoTitulo}>📅 Hoy</span>
+              <span className={styles.progresoTitulo}><span aria-hidden="true">📅</span> Hoy</span>
               <span className={styles.progresoNum}>{tomasDone}/{totalTomas} tomas</span>
             </div>
             <div className={styles.progresoBar} role="progressbar" aria-valuenow={progresoPct} aria-valuemin={0} aria-valuemax={100}>
               <div className={styles.progresoFill} style={{ width: `${progresoPct}%` }} />
             </div>
             {proximaHora && (
-              <p className={styles.proximaToma}>⏰ Próxima toma: <strong>{proximaHora}</strong></p>
+              <p className={styles.proximaToma}><span aria-hidden="true">⏰</span> Próxima toma: <strong>{proximaHora}</strong></p>
             )}
             {progresoPct === 100 && (
-              <p className={styles.completado}>✅ ¡Todas las tomas del día completadas!</p>
+              <p className={styles.completado}><span aria-hidden="true">✅</span> ¡Todas las tomas del día completadas!</p>
             )}
           </div>
         )}
@@ -209,9 +209,9 @@ export default function RecordatorioMedicacionPage() {
         {/* Medicamentos vacío */}
         {medicamentos.length === 0 && (
           <div className={styles.vacio}>
-            <span className={styles.vacioEmoji}>💊</span>
+            <span className={styles.vacioEmoji} aria-hidden="true">💊</span>
             <p>Aún no tienes medicamentos configurados</p>
-            <button onClick={abrirNuevo} className={styles.btnPrimary}>
+            <button type="button" onClick={abrirNuevo} className={styles.btnPrimary}>
               + Añadir primer medicamento
             </button>
           </div>
@@ -227,7 +227,7 @@ export default function RecordatorioMedicacionPage() {
                 <div key={hora} className={`${styles.bloqueHora} ${todasTomadas ? styles.bloqueHoraCompleto : ''}`}>
                   <div className={styles.horaLabel}>
                     <span className={styles.horaTexto}>{hora}</span>
-                    {todasTomadas && <span className={styles.horaCheck}>✓</span>}
+                    {todasTomadas && <span className={styles.horaCheck} aria-hidden="true">✓</span>}
                   </div>
                   <div className={styles.medsBloqueGrid}>
                     {medsEstaHora.map(med => {
@@ -241,10 +241,10 @@ export default function RecordatorioMedicacionPage() {
                           aria-pressed={tomado}
                           aria-label={`${med.nombre}${tomado ? ' - tomado' : ' - pendiente'}`}
                         >
-                          <span className={styles.medEmoji}>{med.emoji}</span>
+                          <span className={styles.medEmoji} aria-hidden="true">{med.emoji}</span>
                           <span className={styles.medNombre}>{med.nombre}</span>
                           {med.dosis && <span className={styles.medDosis}>{med.dosis}</span>}
-                          <span className={styles.medEstado}>{tomado ? '✅' : '⭕'}</span>
+                          <span className={styles.medEstado} aria-hidden="true">{tomado ? '✅' : '⭕'}</span>
                         </button>
                       );
                     })}
@@ -257,10 +257,10 @@ export default function RecordatorioMedicacionPage() {
 
         {/* Botones de acción */}
         <div className={styles.acciones}>
-          <button onClick={() => setVista('lista')} className={styles.btnSecondary}>
-            📋 Mis medicamentos
+          <button type="button" onClick={() => setVista('lista')} className={styles.btnSecondary}>
+            <span aria-hidden="true">📋</span> Mis medicamentos
           </button>
-          <button onClick={abrirNuevo} className={styles.btnPrimary}>
+          <button type="button" onClick={abrirNuevo} className={styles.btnPrimary}>
             + Añadir
           </button>
         </div>
@@ -268,7 +268,7 @@ export default function RecordatorioMedicacionPage() {
         {/* Aviso médico */}
         <DisclaimerCard
           variant="medical"
-          severity="high"
+          severity="critical"
           context="recordatorio-medicacion"
         />
 
@@ -330,22 +330,22 @@ export default function RecordatorioMedicacionPage() {
             <h2>¿Quién se beneficia de esta herramienta?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioIcono}>🧩</div>
+                <div aria-hidden="true" className={styles.escenarioIcono}>🧩</div>
                 <h3>Persona con autismo</h3>
                 <p>Los pictogramas y colores reducen la ansiedad asociada a rutinas de medicación poco predecibles. El refuerzo visual ("✅ tomado") proporciona certeza inmediata.</p>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioIcono}>⚡</div>
+                <div aria-hidden="true" className={styles.escenarioIcono}>⚡</div>
                 <h3>Adolescente con TDAH</h3>
                 <p>Ayuda a establecer hábitos de medicación autónomos sin depender del adulto. La marca de "tomado" da sensación de logro y refuerza el cumplimiento.</p>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioIcono}>👴</div>
+                <div aria-hidden="true" className={styles.escenarioIcono}>👴</div>
                 <h3>Mayor con polimedicación</h3>
                 <p>Interfaz simple con botones grandes. Sin formularios ni contraseñas. El progreso del día visible reduce el olvido, especialmente en personas con deterioro cognitivo leve.</p>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioIcono}>👩‍⚕️</div>
+                <div aria-hidden="true" className={styles.escenarioIcono}>👩‍⚕️</div>
                 <h3>Cuidador o familiar</h3>
                 <p>Configura los medicamentos una vez y la persona a su cargo puede marcarlos de forma autónoma. Reduce la carga de supervisión constante del cuidador.</p>
               </div>
@@ -452,32 +452,32 @@ export default function RecordatorioMedicacionPage() {
             <h2>Mejores prácticas para cuidadores y familias</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcono}>🎨</div>
+                <div aria-hidden="true" className={styles.tipIcono}>🎨</div>
                 <h3>Usa un emoji reconocible</h3>
                 <p>Elige el emoji que la persona ya asocie con ese medicamento. Si la pastilla es redonda y blanca, quizás 💊. Si es jarabe, quizás 🥄 o 💧.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcono}>🌈</div>
+                <div aria-hidden="true" className={styles.tipIcono}>🌈</div>
                 <h3>Un color por medicamento</h3>
                 <p>Asocia el color digital al color real del blíster o frasco. Ayuda enormemente a personas con dificultades de lectura.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcono}>📱</div>
+                <div aria-hidden="true" className={styles.tipIcono}>📱</div>
                 <h3>Añade al escritorio del móvil</h3>
                 <p>En iOS y Android puedes añadir la página web al escritorio como acceso directo. Así la persona la encuentra fácilmente sin buscar.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcono}>🔔</div>
+                <div aria-hidden="true" className={styles.tipIcono}>🔔</div>
                 <h3>Combina con alarmas físicas</h3>
                 <p>Las alarmas del teléfono actúan como señal de inicio; la app, como confirmación visual. Juntas forman un sistema robusto.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcono}>✅</div>
+                <div aria-hidden="true" className={styles.tipIcono}>✅</div>
                 <h3>Celebra el progreso</h3>
                 <p>Cuando la barra de progreso llega al 100%, señálalo positivamente. El refuerzo positivo ayuda a consolidar el hábito de seguimiento.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcono}>👨‍⚕️</div>
+                <div aria-hidden="true" className={styles.tipIcono}>👨‍⚕️</div>
                 <h3>Muestra el historial al médico</h3>
                 <p>Aunque simple, el registro de "tomados" puede ser útil en consulta para verificar el cumplimiento real del tratamiento.</p>
               </div>
@@ -487,7 +487,7 @@ export default function RecordatorioMedicacionPage() {
           {/* 6. Warning box */}
           <section className={styles.guiaSeccion}>
             <div className={styles.warningBox}>
-              <h3>⚠️ Precauciones importantes</h3>
+              <h3><span aria-hidden="true">⚠️</span> Precauciones importantes</h3>
               <ul>
                 <li><strong>No es sustituto de supervisión médica</strong>: Esta herramienta apoya la gestión, pero no reemplaza a un profesional sanitario ni a un cuidador responsable.</li>
                 <li><strong>No guardes contraindicaciones aquí</strong>: No uses esta app para registrar alergias, interacciones o información crítica de seguridad. Esa información debe estar en sistemas médicos adecuados.</li>
@@ -516,22 +516,22 @@ export default function RecordatorioMedicacionPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>💊 Mis Medicamentos</h1>
+          <h1 className={styles.title}><span aria-hidden="true">💊</span> Mis Medicamentos</h1>
           <p className={styles.subtitle}>Gestiona tu lista de medicamentos</p>
         </header>
 
         <div className={styles.listaAcciones}>
-          <button onClick={() => setVista('hoy')} className={styles.btnSecondary}>
+          <button type="button" onClick={() => setVista('hoy')} className={styles.btnSecondary}>
             ← Vista del día
           </button>
-          <button onClick={abrirNuevo} className={styles.btnPrimary}>
+          <button type="button" onClick={abrirNuevo} className={styles.btnPrimary}>
             + Añadir medicamento
           </button>
         </div>
 
         {medicamentos.length === 0 && (
           <div className={styles.vacio}>
-            <span className={styles.vacioEmoji}>💊</span>
+            <span className={styles.vacioEmoji} aria-hidden="true">💊</span>
             <p>No hay medicamentos configurados aún</p>
           </div>
         )}
@@ -540,7 +540,7 @@ export default function RecordatorioMedicacionPage() {
           {medicamentos.map(med => (
             <div key={med.id} className={styles.medCard} style={{ borderLeftColor: med.color } as React.CSSProperties}>
               <div className={styles.medCardHeader}>
-                <span className={styles.medCardEmoji}>{med.emoji}</span>
+                <span className={styles.medCardEmoji} aria-hidden="true">{med.emoji}</span>
                 <div className={styles.medCardInfo}>
                   <span className={styles.medCardNombre}>{med.nombre}</span>
                   {med.dosis && <span className={styles.medCardDosis}>{med.dosis}</span>}
@@ -550,18 +550,20 @@ export default function RecordatorioMedicacionPage() {
                 </div>
                 <div className={styles.medCardAcciones}>
                   <button
+                    type="button"
                     onClick={() => abrirEditar(med)}
                     className={styles.btnEditar}
                     aria-label={`Editar ${med.nombre}`}
                   >
-                    ✏️
+                    <span aria-hidden="true">✏️</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => eliminarMedicamento(med.id)}
                     className={styles.btnEliminar}
                     aria-label={`Eliminar ${med.nombre}`}
                   >
-                    🗑️
+                    <span aria-hidden="true">🗑️</span>
                   </button>
                 </div>
               </div>
@@ -582,7 +584,7 @@ export default function RecordatorioMedicacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>{editando ? '✏️ Editar medicamento' : '+ Nuevo medicamento'}</h1>
+        <h1 className={styles.title}>{editando ? <><span aria-hidden="true">✏️</span> Editar medicamento</> : '+ Nuevo medicamento'}</h1>
         <p className={styles.subtitle}>Configura el nombre, pictograma y horarios</p>
       </header>
 

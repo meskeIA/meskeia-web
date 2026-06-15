@@ -1,8 +1,9 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useEffect, useRef } from 'react';
 import styles from './LupaDigital.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
@@ -144,28 +145,21 @@ export default function LupaDigitalPage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="lupa-digital-disclaimer"
-      />
-
       {/* Visor de la lupa */}
       <div className={styles.lupaContainer}>
         {!activo ? (
-          <div className={styles.lupaPlaceholder}>
+          <div className={styles.lupaPlaceholder} role="status" aria-live="polite">
             {permisoCamara === 'denied' ? (
-              <>
-                <span className={styles.placeholderIcon}>🚫</span>
+              <div role="alert">
+                <span aria-hidden="true" className={styles.placeholderIcon}>🚫</span>
                 <p>Permiso de cámara denegado</p>
                 <p className={styles.placeholderSubtexto}>
                   Activa la cámara en la configuración del navegador
                 </p>
-              </>
+              </div>
             ) : (
               <>
-                <span className={styles.placeholderIcon}>🔍</span>
+                <span aria-hidden="true" className={styles.placeholderIcon}>🔍</span>
                 <p>Pulsa para activar la lupa</p>
               </>
             )}
@@ -196,15 +190,17 @@ export default function LupaDigitalPage() {
       {/* Botón principal */}
       <div className={styles.controlPrincipal}>
         <button
+          type="button"
           className={`${styles.btnPrincipal} ${activo ? styles.activo : ''}`}
           onClick={activo ? detenerCamara : iniciarCamara}
+          aria-pressed={activo}
         >
-          {activo ? '⏹️ Detener' : '🔍 Activar lupa'}
+          {activo ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">🔍</span> Activar lupa</>}
         </button>
 
         {activo && (
-          <button className={styles.btnCambiarCamara} onClick={cambiarCamara}>
-            🔄 Cambiar cámara
+          <button type="button" className={styles.btnCambiarCamara} onClick={cambiarCamara}>
+            <span aria-hidden="true">🔄</span> Cambiar cámara
           </button>
         )}
       </div>
@@ -214,6 +210,7 @@ export default function LupaDigitalPage() {
         <h3 className={styles.sectionTitle}>Zoom: {zoom}x</h3>
         <div className={styles.zoomControl}>
           <button
+            type="button"
             className={styles.zoomBtn}
             onClick={() => setZoom(Math.max(1, zoom - 0.5))}
             disabled={zoom <= 1}
@@ -230,6 +227,7 @@ export default function LupaDigitalPage() {
             className={styles.zoomSlider}
           />
           <button
+            type="button"
             className={styles.zoomBtn}
             onClick={() => setZoom(Math.min(5, zoom + 0.5))}
             disabled={zoom >= 5}
@@ -240,9 +238,11 @@ export default function LupaDigitalPage() {
         <div className={styles.zoomPresets}>
           {[1, 1.5, 2, 3, 4, 5].map(z => (
             <button
+              type="button"
               key={z}
               className={`${styles.zoomPresetBtn} ${zoom === z ? styles.zoomPresetActivo : ''}`}
               onClick={() => setZoom(z)}
+              aria-pressed={zoom === z}
             >
               {z}x
             </button>
@@ -262,11 +262,13 @@ export default function LupaDigitalPage() {
             { id: 'sepia' as FiltroTipo, nombre: 'Sepia', icono: '📜' },
           ].map(f => (
             <button
+              type="button"
               key={f.id}
               className={`${styles.filtroBtn} ${filtro === f.id ? styles.filtroActivo : ''}`}
               onClick={() => setFiltro(f.id)}
+              aria-pressed={filtro === f.id}
             >
-              <span className={styles.filtroIcono}>{f.icono}</span>
+              <span aria-hidden="true" className={styles.filtroIcono}>{f.icono}</span>
               <span className={styles.filtroNombre}>{f.nombre}</span>
             </button>
           ))}
@@ -278,7 +280,7 @@ export default function LupaDigitalPage() {
         <h3 className={styles.sectionTitle}>Ajustes de imagen</h3>
 
         <div className={styles.ajuste}>
-          <label>☀️ Brillo: {brillo}%</label>
+          <label><span aria-hidden="true">☀️</span> Brillo: {brillo}%</label>
           <input
             type="range"
             min="50"
@@ -290,7 +292,7 @@ export default function LupaDigitalPage() {
         </div>
 
         <div className={styles.ajuste}>
-          <label>◐ Contraste: {contraste}%</label>
+          <label><span aria-hidden="true">◐</span> Contraste: {contraste}%</label>
           <input
             type="range"
             min="50"
@@ -303,14 +305,17 @@ export default function LupaDigitalPage() {
 
         {activo && (
           <button
+            type="button"
             className={`${styles.btnLinterna} ${linterna ? styles.linternaActiva : ''}`}
             onClick={() => toggleLinterna(!linterna)}
+            aria-pressed={linterna}
           >
-            {linterna ? '🔦 Linterna ON' : '💡 Activar linterna'}
+            {linterna ? <><span aria-hidden="true">🔦</span> Linterna ON</> : <><span aria-hidden="true">💡</span> Activar linterna</>}
           </button>
         )}
 
         <button
+          type="button"
           className={styles.btnReset}
           onClick={() => {
             setBrillo(100);
@@ -318,7 +323,7 @@ export default function LupaDigitalPage() {
             setFiltro('ninguno');
           }}
         >
-          ↺ Restablecer ajustes
+          <span aria-hidden="true">↺</span> Restablecer ajustes
         </button>
       </div>
 

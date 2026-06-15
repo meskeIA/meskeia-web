@@ -37,9 +37,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/planificador-rutinas/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Crea rutinas paso a paso con pictogramas emoji personalizables',
+    'Modo seguimiento en pantalla completa con tono de éxito al completar cada tarea',
+    'Barra de progreso visual y contador de posición en la secuencia',
+    'Diseñado para personas con TEA, TDAH y discapacidad cognitiva',
+    'Datos guardados localmente: funciona sin internet y sin cuenta',
+    'Múltiples rutinas independientes (mañana, tarde, noche, fin de semana)',
+    'Reordenación de tareas con duración orientativa por paso',
   ],
 });
 

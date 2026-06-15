@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Lupa digital gratuita que usa la cámara de tu dispositivo para ampliar texto, objetos pequeños y detalles. Ideal para leer letra pequeña y accesibilidad.",
   url: "https://meskeia.com/lupa-digital/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Ampliación digital de 1× a 5× con la cámara del dispositivo',
+    'Filtros de accesibilidad: alto contraste, inversión, escala de grises y sepia',
+    'Ajuste independiente de brillo y contraste en tiempo real',
+    'Modo congelado para leer sin mantener el pulso',
+    'Compatibilidad con cámara frontal y trasera',
+    'Activación de linterna integrada en dispositivos compatibles',
+    'Procesado 100 % local en el navegador, sin envío de imágenes',
+  ],
 });
 
 export const faqJsonLd = {

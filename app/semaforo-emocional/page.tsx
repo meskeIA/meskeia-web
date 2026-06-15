@@ -142,7 +142,7 @@ export default function SemaforoEmocionalPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🚦 Semáforo Emocional</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚦</span> Semáforo Emocional</h1>
         <p className={styles.subtitle}>
           Pulsa cómo te sientes ahora mismo.
           Te mostraremos estrategias para este momento.
@@ -153,8 +153,8 @@ export default function SemaforoEmocionalPage() {
 
       <DisclaimerCard
         variant="general"
-        severity="medium"
-        collapsible={true}
+        severity="high"
+        collapsible={false}
         context="semaforo-emocional-disclaimer"
       />
 
@@ -186,6 +186,8 @@ export default function SemaforoEmocionalPage() {
         <section
           className={styles.estrategiasPanel}
           aria-label={`Estrategias para el estado ${estadoConfig.etiqueta}`}
+          aria-live="polite"
+          aria-atomic="true"
           style={{ borderColor: estadoConfig.color, backgroundColor: estadoConfig.colorClaro }}
         >
           <h2 className={styles.estrategiasTitulo} style={{ color: estadoConfig.color }}>
@@ -212,7 +214,7 @@ export default function SemaforoEmocionalPage() {
               onClick={() => setMostrarHistorial(p => !p)}
               aria-expanded={mostrarHistorial}
             >
-              📋 Historial del día ({historial.length})
+              <span aria-hidden="true">📋</span> Historial del día ({historial.length})
               <span className={styles.toggleFlecha} aria-hidden="true">{mostrarHistorial ? '▲' : '▼'}</span>
             </button>
             <button
@@ -241,7 +243,7 @@ export default function SemaforoEmocionalPage() {
 
       {/* ---- AVISO ---- */}
       <div className={styles.avisoBox}>
-        <h3>⚠️ Aviso importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso importante</h3>
         <p>Esta herramienta es un <strong>apoyo visual para la autogestión emocional</strong>. No es un diagnóstico ni sustituye la atención de un profesional de salud mental. Si las dificultades de regulación emocional son frecuentes o intensas, consulta con un psicólogo, terapeuta o médico especializado.</p>
       </div>
 
@@ -298,22 +300,22 @@ export default function SemaforoEmocionalPage() {
           <h2>Quién puede beneficiarse y cómo</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>👦</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>👦</div>
               <h3>Niño con autismo en casa</h3>
               <p>Los padres abren el semáforo antes de actividades potencialmente difíciles (salidas, cambios de rutina). El niño pulsa cómo se siente y la familia adapta la transición según el estado. Reduce crisis porque hay un canal de comunicación claro.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>🎒</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>🎒</div>
               <h3>Adolescente con TDAH en el colegio</h3>
               <p>El tutor o PT tiene el semáforo en una tablet. El alumno lo consulta al llegar al aula o antes de un examen. Sirve como ritual de entrada que activa la consciencia emocional y ayuda al docente a ajustar el nivel de exigencia.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>💼</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>💼</div>
               <h3>Adulto con ansiedad laboral</h3>
               <p>Lo usa como check-in emocional al llegar al trabajo. Si selecciona amarillo o rojo, aplica las estrategias antes de entrar a una reunión importante. Le da autonomía para gestionar su estado sin depender de otras personas.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>🧑‍⚕️</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>🧑‍⚕️</div>
               <h3>Educador o terapeuta en sesión</h3>
               <p>Usa el semáforo al inicio y final de cada sesión para objetivar el estado del usuario. El historial exportable (visualmente) permite identificar patrones a lo largo de días o semanas, muy útil para informes y seguimiento.</p>
             </div>
@@ -424,32 +426,32 @@ export default function SemaforoEmocionalPage() {
           <h2>Mejores prácticas para familias y educadores</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🌅</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🌅</div>
               <h3>Úsalo como ritual diario</h3>
               <p>Incorporarlo al inicio del día o de cada actividad importante normaliza la consciencia emocional y reduce la resistencia en momentos de crisis.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🤝</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🤝</div>
               <h3>Valida siempre la emoción primero</h3>
               <p>Antes de proponer estrategias, di "entiendo que estás en rojo". La validación emocional es más eficaz que pasar directamente a las técnicas de calma.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>📊</div>
+              <div aria-hidden="true" className={styles.tipIcono}>📊</div>
               <h3>Revisa el historial sin juicios</h3>
               <p>Usa el historial para identificar patrones ("parece que los lunes hay muchos rojos"). No como control, sino como información compartida entre el usuario y el adulto.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🔗</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🔗</div>
               <h3>Conecta con estrategias físicas</h3>
               <p>Las estrategias más eficaces combinan movimiento y respiración. Conectar el semáforo con la guía de respiración o salidas breves al exterior multiplica su efectividad.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🌡️</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🌡️</div>
               <h3>Úsalo de forma anticipatoria</h3>
               <p>El mayor valor no es en la crisis, sino antes: "¿Cómo crees que estarás en la excursión de mañana?" prepara al usuario para activar estrategias preventivas.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🎨</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🎨</div>
               <h3>Adapta el vocabulario a la persona</h3>
               <p>Las etiquetas del semáforo pueden ajustarse verbalmente: "muy activado" puede ser "explosivo" para un adolescente o "muy fuerte" para un niño pequeño. Lo importante es que el usuario lo entienda.</p>
             </div>
@@ -459,7 +461,7 @@ export default function SemaforoEmocionalPage() {
         {/* 6. Warning box */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Aspectos importantes para usar esta herramienta bien</h3>
+            <h3><span aria-hidden="true">⚠️</span> Aspectos importantes para usar esta herramienta bien</h3>
             <ul>
               <li><strong>No forzar a cambiar de estado:</strong> si el usuario está en rojo, su emoción es válida. El objetivo es acompañar, no suprimir. Forzar un cambio puede generar más activación y desconfianza en la herramienta.</li>
               <li><strong>No usarlo como sistema de control o castigo:</strong> el semáforo no es un semáforo de comportamiento. No asociarlo con consecuencias negativas ("si estás en rojo no puedes..."). Perderá toda su función reguladora.</li>

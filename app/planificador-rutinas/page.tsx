@@ -255,18 +255,20 @@ export default function PlanificadorRutinasPage() {
         <div className={styles.seguirWrapper}>
           {rutinaTerminada ? (
             // ——— FIN DE RUTINA ———
-            <div className={styles.finRutina}>
-              <div className={styles.finEmoji}>🎉</div>
+            <div className={styles.finRutina} role="status" aria-live="polite">
+              <div className={styles.finEmoji} aria-hidden="true">🎉</div>
               <h2 className={styles.finTitulo}>¡Rutina completada!</h2>
               <p className={styles.finSubtitulo}>Has completado todas las tareas de <strong>{rutinaActiva.nombre}</strong></p>
               <div className={styles.finAcciones}>
                 <button
+                  type="button"
                   className={styles.btnFinPrimario}
                   onClick={() => iniciarRutina(rutinaActiva)}
                 >
                   🔄 Repetir rutina
                 </button>
                 <button
+                  type="button"
                   className={styles.btnFinSecundario}
                   onClick={() => setVista('lista')}
                 >
@@ -287,7 +289,7 @@ export default function PlanificadorRutinasPage() {
                 <div className={styles.tareaActualEmoji} aria-hidden="true">{tareaActual.emoji}</div>
                 <div className={styles.tareaActualNombre}>{tareaActual.nombre}</div>
                 {tareaActual.duracion > 0 && (
-                  <div className={styles.tareaActualDuracion}>⏱️ {tareaActual.duracion} min</div>
+                  <div className={styles.tareaActualDuracion}><span aria-hidden="true">⏱️</span> {tareaActual.duracion} min</div>
                 )}
               </div>
 
@@ -302,6 +304,7 @@ export default function PlanificadorRutinasPage() {
 
               {/* Botón principal: HECHO */}
               <button
+                type="button"
                 className={styles.btnHecho}
                 onClick={marcarCompletada}
                 aria-label="Marcar tarea como completada"
@@ -322,6 +325,7 @@ export default function PlanificadorRutinasPage() {
               </div>
 
               <button
+                type="button"
                 className={styles.btnSalir}
                 onClick={() => setVista('lista')}
                 aria-label="Salir del modo seguir rutina"
@@ -345,7 +349,7 @@ export default function PlanificadorRutinasPage() {
 
         <div className={styles.editorWrapper}>
           <div className={styles.editorHeader}>
-            <button className={styles.btnVolver} onClick={() => setVista('lista')}>
+            <button type="button" className={styles.btnVolver} onClick={() => setVista('lista')}>
               ← Volver
             </button>
             <h2 className={styles.editorTitulo}>
@@ -375,7 +379,7 @@ export default function PlanificadorRutinasPage() {
             )}
             {tareas.map((t, idx) => (
               <div key={t.id} className={styles.tareaEditorItem}>
-                <span className={styles.tareaEditorEmoji}>{t.emoji}</span>
+                <span className={styles.tareaEditorEmoji} aria-hidden="true">{t.emoji}</span>
                 <div className={styles.tareaEditorInfo}>
                   <span className={styles.tareaEditorNombre}>{t.nombre}</span>
                   {t.duracion > 0 && (
@@ -384,18 +388,21 @@ export default function PlanificadorRutinasPage() {
                 </div>
                 <div className={styles.tareaEditorAcciones}>
                   <button
+                    type="button"
                     className={styles.btnOrden}
                     onClick={() => moverTarea(idx, 'arriba')}
                     disabled={idx === 0}
                     aria-label="Mover arriba"
                   >▲</button>
                   <button
+                    type="button"
                     className={styles.btnOrden}
                     onClick={() => moverTarea(idx, 'abajo')}
                     disabled={idx === tareas.length - 1}
                     aria-label="Mover abajo"
                   >▼</button>
                   <button
+                    type="button"
                     className={styles.btnEliminarTarea}
                     onClick={() => eliminarTarea(t.id)}
                     aria-label={`Eliminar tarea ${t.nombre}`}
@@ -412,6 +419,7 @@ export default function PlanificadorRutinasPage() {
             {/* Selector de emoji */}
             <div className={styles.emojiSelector}>
               <button
+                type="button"
                 className={styles.btnEmojiActual}
                 onClick={() => setMostrarPicker(p => !p)}
                 aria-label={`Emoji seleccionado: ${nuevoEmoji}. Pulsa para cambiar`}
@@ -423,6 +431,7 @@ export default function PlanificadorRutinasPage() {
                 <div className={styles.emojiPicker} role="listbox" aria-label="Seleccionar emoji">
                   {EMOJIS_FRECUENTES.map(e => (
                     <button
+                      type="button"
                       key={e}
                       className={`${styles.emojiOpcion} ${e === nuevoEmoji ? styles.emojiOpcionActiva : ''}`}
                       onClick={() => { setNuevoEmoji(e); setMostrarPicker(false); }}
@@ -467,6 +476,7 @@ export default function PlanificadorRutinasPage() {
             </div>
 
             <button
+              type="button"
               className={styles.btnAgregarTarea}
               onClick={agregarTarea}
               disabled={!nuevoNombre.trim()}
@@ -477,11 +487,12 @@ export default function PlanificadorRutinasPage() {
 
           {/* Guardar rutina */}
           <button
+            type="button"
             className={styles.btnGuardarRutina}
             onClick={guardarRutina}
             disabled={!nombreRutina.trim() || tareas.length === 0}
           >
-            💾 Guardar rutina
+            <span aria-hidden="true">💾</span> Guardar rutina
           </button>
         </div>
 
@@ -496,7 +507,7 @@ export default function PlanificadorRutinasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📅 Planificador Visual de Rutinas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📅</span> Planificador Visual de Rutinas</h1>
         <p className={styles.subtitle}>
           Crea rutinas con pictogramas y sigue el paso a paso del día.
           Ideal para autismo, TDAH y estructuración de hábitos.
@@ -514,6 +525,7 @@ export default function PlanificadorRutinasPage() {
         <div className={styles.rutinasSectionHeader}>
           <h2 className={styles.seccionTitulo}>Mis rutinas</h2>
           <button
+            type="button"
             className={styles.btnNuevaRutina}
             onClick={abrirNuevaRutina}
             aria-label="Crear nueva rutina"
@@ -524,7 +536,7 @@ export default function PlanificadorRutinasPage() {
 
         {rutinas.length === 0 && (
           <div className={styles.sinRutinas}>
-            <div className={styles.sinRutinasEmoji}>📋</div>
+            <div className={styles.sinRutinasEmoji} aria-hidden="true">📋</div>
             <p>Aún no tienes rutinas. ¡Crea la primera!</p>
           </div>
         )}
@@ -551,6 +563,7 @@ export default function PlanificadorRutinasPage() {
 
               <div className={styles.rutinaCardAcciones}>
                 <button
+                  type="button"
                   className={styles.btnIniciarRutina}
                   onClick={() => iniciarRutina(rutina)}
                   aria-label={`Iniciar rutina ${rutina.nombre}`}
@@ -558,18 +571,20 @@ export default function PlanificadorRutinasPage() {
                   ▶ Iniciar
                 </button>
                 <button
+                  type="button"
                   className={styles.btnEditarRutina}
                   onClick={() => abrirEditorRutina(rutina)}
                   aria-label={`Editar rutina ${rutina.nombre}`}
                 >
-                  ✏️ Editar
+                  <span aria-hidden="true">✏️</span> Editar
                 </button>
                 <button
+                  type="button"
                   className={styles.btnEliminarRutina}
                   onClick={() => eliminarRutina(rutina.id)}
                   aria-label={`Eliminar rutina ${rutina.nombre}`}
                 >
-                  🗑️
+                  <span aria-hidden="true">🗑️</span>
                 </button>
               </div>
             </div>
@@ -663,22 +678,22 @@ export default function PlanificadorRutinasPage() {
           <h2>¿Para quién es este planificador?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧩</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>🧩</span>
               <h3>Niño con TEA en casa</h3>
               <p>La rutina visual de la mañana (levantarse, desayunar, vestirse, mochila, salir) reduce los meltdowns en transiciones. El tono de éxito al marcar cada tarea es un refuerzo positivo inmediato.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>⚡</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>⚡</span>
               <h3>Adulto con TDAH</h3>
               <p>Externalizar la secuencia de pasos de tareas complejas (preparar la reunión, hacer la compra) elimina la carga de recordar el siguiente paso y reduce la parálisis por decisión.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🤝</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>🤝</span>
               <h3>Persona con discapacidad intelectual</h3>
               <p>Una rutina visual creada por el educador o familiar permite a la persona seguir las actividades del día de forma más autónoma, sin depender de instrucciones verbales constantes.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>👩‍🏫</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>👩‍🏫</span>
               <h3>Educador o terapeuta ocupacional</h3>
               <p>Crear rutinas personalizadas para cada alumno en el dispositivo del centro, con los emojis que ese alumno ya conoce. El modo seguimiento permite acompañar sin intervenir constantemente.</p>
             </div>
@@ -785,27 +800,27 @@ export default function PlanificadorRutinasPage() {
           <h2>Buenas prácticas para una agenda visual efectiva</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>✏️</span>
+              <span aria-hidden="true" className={styles.tipIcono}>✏️</span>
               <p><strong>Crea la rutina con el usuario, no para el usuario.</strong> Su participación en la elección de emojis y el orden de tareas aumenta significativamente la aceptación y el seguimiento.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔄</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🔄</span>
               <p><strong>Anticipa los cambios con tiempo.</strong> Si la rutina va a ser diferente (visita al médico, salida especial), avísalo antes con la propia app: muestra las tareas del día distinto con antelación.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📏</span>
+              <span aria-hidden="true" className={styles.tipIcono}>📏</span>
               <p><strong>Mantén la rutina estable al principio.</strong> Cambia el orden de las tareas solo cuando la rutina original está bien interiorizada. Los cambios frecuentes reducen la seguridad que la agenda visual proporciona.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📲</span>
+              <span aria-hidden="true" className={styles.tipIcono}>📲</span>
               <p><strong>Asigna un dispositivo fijo para la app.</strong> Usar siempre el mismo tablet o móvil reduce la variable de aprender el dispositivo y permite que el usuario anticipe el ritual de consultar la agenda.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🎵</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🎵</span>
               <p><strong>El tono de éxito importa.</strong> El sonido de confirmación es un refuerzo positivo. Asegúrate de que el volumen sea audible pero no molesto. En entornos de grupo, considera bajar el volumen para no distraer a otros.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>👥</span>
+              <span aria-hidden="true" className={styles.tipIcono}>👥</span>
               <p><strong>Informa a todo el equipo.</strong> Que familia, profesores y terapeutas usen la misma rutina y el mismo lenguaje en torno a ella (los mismos nombres de tareas) refuerza la consistencia y acelera el aprendizaje.</p>
             </div>
           </div>
@@ -814,7 +829,7 @@ export default function PlanificadorRutinasPage() {
         {/* WARNING BOX */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Errores comunes en la implementación de rutinas visuales</h3>
+            <h3><span aria-hidden="true">⚠️</span> Errores comunes en la implementación de rutinas visuales</h3>
             <ul>
               <li><strong>Crear rutinas demasiado largas desde el inicio:</strong> más de 8-10 tareas puede resultar abrumador para usuarios con TEA o DI. Empieza siempre con pocas tareas y amplía gradualmente cuando la rutina corta esté consolidada.</li>
               <li><strong>Cambiar los emojis sin avisar:</strong> para muchos usuarios con TEA, el emoji específico es parte de la rutina. Cambiar 🥛 por 🍼 para representar el desayuno puede generar confusión o rechazo. Si necesitas cambiar un emoji, hazlo de forma gradual y explicada.</li>

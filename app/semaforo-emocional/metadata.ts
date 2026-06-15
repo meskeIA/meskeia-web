@@ -11,7 +11,7 @@ export const jsonLd = generateWebAppSchema({
     'Estrategias visuales de regulación emocional',
     'Identificación del estado emocional actual',
     'Técnicas de calma adaptadas por zona',
-    'Gratuito y sin registro requerido',
+    'Historial del día: registra hasta 8 estados con marca de hora',
   ],
 });
 
