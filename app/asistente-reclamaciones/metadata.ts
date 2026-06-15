@@ -36,7 +36,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Guía interactiva para reclamar tus derechos como consumidor en España. Árbol de decisión, plazos legales, organismos y modelos de carta.",
   url: "https://meskeia.com/asistente-reclamaciones/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Árbol de decisión en 3 pasos para identificar tu tipo de reclamación y vía más adecuada',
+    'Plazos legales actualizados: garantía 3 años (Directiva 2019/771/UE), desistimiento 14 días',
+    'Directorio de organismos: OMIC, Consumo autonómico, arbitraje y plataforma ODR europea',
+    'Modelo de carta de reclamación personalizable según tipo de problema y canal',
+    'Comparativa de vías de reclamación: coste, plazo y carácter vinculante',
+    'Cobertura de 5 tipos de incidencia: garantía, desistimiento, servicio defectuoso, factura incorrecta y vuelo',
+  ],
 });
 
 export const faqJsonLd = {

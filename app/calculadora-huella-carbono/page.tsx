@@ -367,7 +367,7 @@ export default function CalculadoraHuellaCarbono() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🌍</span>
+        <span className={styles.heroIcon} aria-hidden="true">🌍</span>
         <h1 className={styles.title}>Calculadora de Huella de Carbono</h1>
         <p className={styles.subtitle}>
           Descubre cuánto CO₂ generas al año y cómo reducir tu impacto ambiental
@@ -382,8 +382,10 @@ export default function CalculadoraHuellaCarbono() {
           {secciones.map((seccion, index) => (
             <button
               key={seccion}
+              type="button"
               className={`${styles.seccionBtn} ${seccionActiva === index ? styles.seccionActiva : ''}`}
               onClick={() => setSeccionActiva(index)}
+              aria-pressed={seccionActiva === index}
             >
               <span className={styles.seccionNumero}>{index + 1}</span>
               {seccion}
@@ -394,7 +396,7 @@ export default function CalculadoraHuellaCarbono() {
         {/* Sección Transporte */}
         {seccionActiva === 0 && (
           <div className={styles.seccionPanel}>
-            <h2 className={styles.seccionTitulo}>🚗 Transporte</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🚗</span> Transporte</h2>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Kilómetros en coche al año</label>
@@ -511,7 +513,7 @@ export default function CalculadoraHuellaCarbono() {
         {/* Sección Hogar */}
         {seccionActiva === 1 && (
           <div className={styles.seccionPanel}>
-            <h2 className={styles.seccionTitulo}>🏠 Hogar</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🏠</span> Hogar</h2>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Consumo eléctrico mensual (kWh)</label>
@@ -572,7 +574,7 @@ export default function CalculadoraHuellaCarbono() {
         {/* Sección Alimentación */}
         {seccionActiva === 2 && (
           <div className={styles.seccionPanel}>
-            <h2 className={styles.seccionTitulo}>🍽️ Alimentación</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🍽️</span> Alimentación</h2>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Tipo de dieta</label>
@@ -610,7 +612,7 @@ export default function CalculadoraHuellaCarbono() {
         {/* Sección Consumo */}
         {seccionActiva === 3 && (
           <div className={styles.seccionPanel}>
-            <h2 className={styles.seccionTitulo}>🛒 Consumo</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🛒</span> Consumo</h2>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Prendas de ropa nuevas al año</label>
@@ -667,6 +669,7 @@ export default function CalculadoraHuellaCarbono() {
         <div className={styles.botonesNav}>
           {seccionActiva > 0 && (
             <button
+              type="button"
               className={styles.btnSecondary}
               onClick={() => setSeccionActiva(seccionActiva - 1)}
             >
@@ -675,6 +678,7 @@ export default function CalculadoraHuellaCarbono() {
           )}
           {seccionActiva < 3 ? (
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={() => setSeccionActiva(seccionActiva + 1)}
             >
@@ -682,17 +686,18 @@ export default function CalculadoraHuellaCarbono() {
             </button>
           ) : (
             <button
+              type="button"
               className={styles.btnPrimary}
               onClick={calcularHuella}
             >
-              🌍 Calcular mi huella
+              <span aria-hidden="true">🌍</span> Calcular mi huella
             </button>
           )}
         </div>
 
         {/* Resultados */}
         {resultados && (
-          <div className={styles.resultados} ref={chartRef}>
+          <div className={styles.resultados} ref={chartRef} role="status" aria-live="polite" aria-label="Resultados de tu huella de carbono">
             <h2 className={styles.resultadosTitulo}>Tu Huella de Carbono</h2>
 
             <div className={styles.totalCard}>
@@ -722,22 +727,22 @@ export default function CalculadoraHuellaCarbono() {
 
             <div className={styles.desgloseCards}>
               <div className={styles.desgloseCard}>
-                <span className={styles.desgloseIcon}>🚗</span>
+                <span className={styles.desgloseIcon} aria-hidden="true">🚗</span>
                 <span className={styles.desgloseCategoria}>Transporte</span>
                 <span className={styles.desgloseValor}>{formatNumber(resultados.transporte, 2)} t</span>
               </div>
               <div className={styles.desgloseCard}>
-                <span className={styles.desgloseIcon}>🏠</span>
+                <span className={styles.desgloseIcon} aria-hidden="true">🏠</span>
                 <span className={styles.desgloseCategoria}>Hogar</span>
                 <span className={styles.desgloseValor}>{formatNumber(resultados.hogar, 2)} t</span>
               </div>
               <div className={styles.desgloseCard}>
-                <span className={styles.desgloseIcon}>🍽️</span>
+                <span className={styles.desgloseIcon} aria-hidden="true">🍽️</span>
                 <span className={styles.desgloseCategoria}>Alimentación</span>
                 <span className={styles.desgloseValor}>{formatNumber(resultados.alimentacion, 2)} t</span>
               </div>
               <div className={styles.desgloseCard}>
-                <span className={styles.desgloseIcon}>🛒</span>
+                <span className={styles.desgloseIcon} aria-hidden="true">🛒</span>
                 <span className={styles.desgloseCategoria}>Consumo</span>
                 <span className={styles.desgloseValor}>{formatNumber(resultados.consumo, 2)} t</span>
               </div>
@@ -745,7 +750,7 @@ export default function CalculadoraHuellaCarbono() {
 
             {getRecomendaciones().length > 0 && (
               <div className={styles.recomendaciones}>
-                <h3>💡 Recomendaciones personalizadas</h3>
+                <h3><span aria-hidden="true">💡</span> Recomendaciones personalizadas</h3>
                 <ul>
                   {getRecomendaciones().map((rec, i) => (
                     <li key={i}>{rec}</li>
@@ -754,8 +759,8 @@ export default function CalculadoraHuellaCarbono() {
               </div>
             )}
 
-            <button className={styles.btnReiniciar} onClick={reiniciar}>
-              🔄 Calcular de nuevo
+            <button type="button" className={styles.btnReiniciar} onClick={reiniciar}>
+              <span aria-hidden="true">🔄</span> Calcular de nuevo
             </button>
           </div>
         )}

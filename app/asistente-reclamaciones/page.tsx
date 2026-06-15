@@ -95,7 +95,7 @@ export default function AsistenteReclamacionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>⚖️</span>
+        <span className={styles.heroIcon} aria-hidden="true">⚖️</span>
         <h1 className={styles.title}>Asistente de Reclamaciones</h1>
         <p className={styles.subtitle}>
           Te ayudamos a conocer tus derechos como consumidor y cómo reclamar
@@ -106,8 +106,8 @@ export default function AsistenteReclamacionesPage() {
 
       <DisclaimerCard
         variant="general"
-        severity="medium"
-        collapsible={true}
+        severity="high"
+        collapsible={false}
         context="asistente-reclamaciones-disclaimer"
       />
 
@@ -137,13 +137,14 @@ export default function AsistenteReclamacionesPage() {
         {currentStep === 'problem' && (
           <div className={styles.stepCard}>
             <h2 className={styles.stepTitle}>
-              <span className={styles.stepIcon}>1️⃣</span>
+              <span className={styles.stepIcon} aria-hidden="true">1️⃣</span>
               ¿Qué tipo de problema tienes?
             </h2>
             <div className={styles.optionsGrid}>
               {PROBLEM_OPTIONS.map((option) => (
                 <button
                   key={option.id}
+                  type="button"
                   className={styles.optionCard}
                   onClick={() => handleProblemSelect(option.id)}
                 >
@@ -159,17 +160,18 @@ export default function AsistenteReclamacionesPage() {
         {/* Step 2: Purchase channel */}
         {currentStep === 'channel' && (
           <div className={styles.stepCard}>
-            <button className={styles.backButton} onClick={handleBack}>
+            <button type="button" className={styles.backButton} onClick={handleBack}>
               ← Volver
             </button>
             <h2 className={styles.stepTitle}>
-              <span className={styles.stepIcon}>2️⃣</span>
+              <span className={styles.stepIcon} aria-hidden="true">2️⃣</span>
               ¿Dónde compraste o contrataste?
             </h2>
             <div className={styles.optionsGridSmall}>
               {CHANNEL_OPTIONS.map((option) => (
                 <button
                   key={option.id}
+                  type="button"
                   className={styles.optionCardSmall}
                   onClick={() => handleChannelSelect(option.id)}
                 >
@@ -184,17 +186,18 @@ export default function AsistenteReclamacionesPage() {
         {/* Step 3: Time elapsed */}
         {currentStep === 'time' && (
           <div className={styles.stepCard}>
-            <button className={styles.backButton} onClick={handleBack}>
+            <button type="button" className={styles.backButton} onClick={handleBack}>
               ← Volver
             </button>
             <h2 className={styles.stepTitle}>
-              <span className={styles.stepIcon}>3️⃣</span>
+              <span className={styles.stepIcon} aria-hidden="true">3️⃣</span>
               ¿Cuánto tiempo ha pasado desde la compra?
             </h2>
             <div className={styles.optionsGridSmall}>
               {TIME_OPTIONS.map((option) => (
                 <button
                   key={option.id}
+                  type="button"
                   className={styles.optionCardSmall}
                   onClick={() => handleTimeSelect(option.id)}
                 >
@@ -208,26 +211,26 @@ export default function AsistenteReclamacionesPage() {
 
         {/* Step 4: Result */}
         {currentStep === 'result' && result && (
-          <div className={styles.resultContainer}>
+          <div className={styles.resultContainer} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.resultHeader}>
-              <button className={styles.backButton} onClick={handleBack}>
+              <button type="button" className={styles.backButton} onClick={handleBack}>
                 ← Volver
               </button>
-              <button className={styles.resetButton} onClick={handleReset}>
-                🔄 Nueva consulta
+              <button type="button" className={styles.resetButton} onClick={handleReset}>
+                <span aria-hidden="true">🔄</span> Nueva consulta
               </button>
             </div>
 
             <div className={styles.resultCard}>
               <h2 className={styles.resultTitle}>
-                <span className={styles.resultIcon}>✅</span>
+                <span className={styles.resultIcon} aria-hidden="true">✅</span>
                 {result.title}
               </h2>
 
               {/* Tus derechos */}
               <section className={styles.resultSection}>
                 <h3 className={styles.sectionTitle}>
-                  <span>⚖️</span> Tus derechos
+                  <span aria-hidden="true">⚖️</span> Tus derechos
                 </h3>
                 <ul className={styles.rightsList}>
                   {result.rights.map((right, index) => (
@@ -236,13 +239,13 @@ export default function AsistenteReclamacionesPage() {
                 </ul>
                 {result.deadline && (
                   <div className={styles.deadlineBox}>
-                    <span className={styles.deadlineIcon}>⏰</span>
+                    <span className={styles.deadlineIcon} aria-hidden="true">⏰</span>
                     <span>{result.deadline}</span>
                   </div>
                 )}
                 {result.legalReference && (
                   <p className={styles.legalRef}>
-                    📜 Referencia legal: {result.legalReference}
+                    <span aria-hidden="true">📜</span> Referencia legal: {result.legalReference}
                   </p>
                 )}
               </section>
@@ -250,7 +253,7 @@ export default function AsistenteReclamacionesPage() {
               {/* Pasos a seguir */}
               <section className={styles.resultSection}>
                 <h3 className={styles.sectionTitle}>
-                  <span>📋</span> Pasos a seguir
+                  <span aria-hidden="true">📋</span> Pasos a seguir
                 </h3>
                 <ol className={styles.stepsList}>
                   {result.steps.map((step, index) => (
@@ -262,7 +265,7 @@ export default function AsistenteReclamacionesPage() {
               {/* Organismos */}
               <section className={styles.resultSection}>
                 <h3 className={styles.sectionTitle}>
-                  <span>🏛️</span> Dónde reclamar
+                  <span aria-hidden="true">🏛️</span> Dónde reclamar
                 </h3>
                 <div className={styles.organismsGrid}>
                   {result.organisms.map((org, index) => (
@@ -289,26 +292,28 @@ export default function AsistenteReclamacionesPage() {
               {/* Modelo de carta */}
               <section className={styles.resultSection}>
                 <h3 className={styles.sectionTitle}>
-                  <span>✉️</span> Modelo de carta de reclamación
+                  <span aria-hidden="true">✉️</span> Modelo de carta de reclamación
                 </h3>
                 <button
+                  type="button"
                   className={styles.letterToggle}
                   onClick={() => setShowLetter(!showLetter)}
+                  aria-pressed={showLetter}
                 >
-                  {showLetter ? '📖 Ocultar modelo' : '📄 Ver modelo de carta'}
+                  {showLetter ? <><span aria-hidden="true">📖</span> Ocultar modelo</> : <><span aria-hidden="true">📄</span> Ver modelo de carta</>}
                 </button>
                 {showLetter && (
                   <div className={styles.letterContainer}>
                     <div className={styles.letterActions}>
-                      <button className={styles.copyButton} onClick={copyLetter}>
-                        {copied ? '✅ Copiado' : '📋 Copiar carta'}
+                      <button type="button" className={styles.copyButton} onClick={copyLetter}>
+                        {copied ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar carta</>}
                       </button>
                     </div>
                     <pre className={styles.letterTemplate}>
                       {result.letterTemplate}
                     </pre>
                     <p className={styles.letterNote}>
-                      💡 Personaliza los campos entre [corchetes] con tus datos
+                      <span aria-hidden="true">💡</span> Personaliza los campos entre [corchetes] con tus datos
                     </p>
                   </div>
                 )}
@@ -321,7 +326,7 @@ export default function AsistenteReclamacionesPage() {
       {/* Plazos legales importantes */}
       <section className={styles.deadlinesSection}>
         <h2 className={styles.deadlinesSectionTitle}>
-          <span>⏱️</span> Plazos legales importantes
+          <span aria-hidden="true">⏱️</span> Plazos legales importantes
         </h2>
         <div className={styles.deadlinesGrid}>
           {Object.entries(LEGAL_DEADLINES).map(([key, deadline]) => (
@@ -335,16 +340,6 @@ export default function AsistenteReclamacionesPage() {
           ))}
         </div>
       </section>
-
-      {/* Disclaimer */}
-      <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
-        <p>
-          Esta herramienta proporciona información orientativa basada en la legislación española de consumo.
-          No constituye asesoramiento jurídico profesional. Para casos complejos o de alto valor,
-          te recomendamos consultar con un abogado o acudir a tu OMIC local.
-        </p>
-      </div>
 
       {/* Contenido educativo */}
       <EducationalSection
@@ -420,7 +415,7 @@ export default function AsistenteReclamacionesPage() {
           <div className={styles.casosGrid}>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>📦</span>
+                <span className={styles.casoEmoji} aria-hidden="true">📦</span>
                 <span className={styles.casoTag}>Producto defectuoso en garantía</span>
               </div>
               <p>Un televisor comprado hace 2 años deja de funcionar sin causa aparente. El vendedor quiere
@@ -430,7 +425,7 @@ export default function AsistenteReclamacionesPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>🛒</span>
+                <span className={styles.casoEmoji} aria-hidden="true">🛒</span>
                 <span className={styles.casoTag}>Devolución compra online</span>
               </div>
               <p>Ropa comprada por internet no corresponde a las fotos. Se quiere devolver a los 10 días.
@@ -440,7 +435,7 @@ export default function AsistenteReclamacionesPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>✈️</span>
+                <span className={styles.casoEmoji} aria-hidden="true">✈️</span>
                 <span className={styles.casoTag}>Vuelo cancelado</span>
               </div>
               <p>Una aerolínea cancela un vuelo con menos de 14 días de antelación. El Reglamento UE 261/2004
@@ -450,7 +445,7 @@ export default function AsistenteReclamacionesPage() {
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
-                <span className={styles.casoEmoji}>📱</span>
+                <span className={styles.casoEmoji} aria-hidden="true">📱</span>
                 <span className={styles.casoTag}>Cobro indebido en factura</span>
               </div>
               <p>Una operadora cobra un servicio que nunca se contrató. Llamar al servicio al cliente exigiendo
@@ -466,7 +461,7 @@ export default function AsistenteReclamacionesPage() {
 
           <div className={styles.conceptsGrid}>
             <div className={styles.conceptCard}>
-              <h4>🛡️ Garantía legal</h4>
+              <h4><span aria-hidden="true">🛡️</span> Garantía legal</h4>
               <p>
                 Desde enero de 2022, todos los productos nuevos tienen <strong>3 años de garantía</strong>.
                 Los productos de segunda mano tienen mínimo 1 año. Durante los primeros 2 años,
@@ -475,7 +470,7 @@ export default function AsistenteReclamacionesPage() {
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>↩️ Derecho de desistimiento</h4>
+              <h4><span aria-hidden="true">↩️</span> Derecho de desistimiento</h4>
               <p>
                 En compras online, por teléfono o fuera de establecimiento, tienes <strong>14 días naturales</strong>
                 para devolver el producto <strong>sin dar explicaciones</strong>. El plazo empieza desde que
@@ -484,7 +479,7 @@ export default function AsistenteReclamacionesPage() {
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>📝 Hoja de reclamaciones</h4>
+              <h4><span aria-hidden="true">📝</span> Hoja de reclamaciones</h4>
               <p>
                 Todo establecimiento físico está obligado a tener <strong>hojas de reclamaciones oficiales</strong>
                 y dártelas si las pides. Negarlas es sancionable. Una copia va a la administración,
@@ -493,7 +488,7 @@ export default function AsistenteReclamacionesPage() {
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>⚖️ Arbitraje de consumo</h4>
+              <h4><span aria-hidden="true">⚖️</span> Arbitraje de consumo</h4>
               <p>
                 Sistema <strong>gratuito y voluntario</strong> para resolver conflictos. Si la empresa está
                 adherida al Sistema Arbitral de Consumo, la resolución es vinculante para ambas partes.

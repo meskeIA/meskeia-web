@@ -38,8 +38,16 @@ export const jsonLd = generateWebAppSchema({
   name: "Calculadora Huella de Carbono",
   description: "Calcula tu huella de carbono anual. Analiza el impacto de tu transporte, hogar, alimentación y consumo. Compara con la media española y obtén consejos para reducirla.",
   url: "https://meskeia.com/calculadora-huella-carbono/",
-  category: 'FinanceApplication',
-  features: [],
+  category: 'UtilityApplication',
+  features: [
+    'Calcula tu huella de carbono en 4 categorías: transporte, hogar, alimentación y consumo',
+    'Factores de emisión basados en fuentes oficiales (MITECO, ICAO, ADEME, REE 2024)',
+    'Comparativa visual con la media española (~7 t CO₂/año) y el objetivo sostenible (2 t para 2050)',
+    'Gráfico de donut y barras horizontales con desglose por categoría',
+    'Recomendaciones personalizadas según la categoría de mayor impacto',
+    'Soporte para 5 tipos de dieta y 5 tipos de vehículo',
+    'Flujo guiado por pasos: Transporte → Hogar → Alimentación → Consumo → Resultados',
+  ],
 });
 
 export const faqJsonLd = {

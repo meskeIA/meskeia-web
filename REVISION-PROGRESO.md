@@ -67,10 +67,10 @@
 | [x] | Análisis Decisión Reversible vs Irreversible | `/analisis-decision-reversible/` | cultura, productividad |
 | [x] | Anatomía de un Smartphone | `/visualizador-anatomia-smartphone/` | cultura, tecnicas |
 | [x] | Anatomía de un Vuelo | `/visualizador-anatomia-vuelo/` | cultura, tecnicas |
-| [ ] | Anatomía de una Ciudad | `/visualizador-ciudad/` | cultura, tecnicas |
-| [ ] | Asistente de Reclamaciones al Consumidor | `/asistente-reclamaciones/` | cultura, productividad |
-| [ ] | Calculadora de Profundidad de Campo (DoF) | `/calculadora-profundidad-campo/` | cultura, tecnicas |
-| [ ] | Calculadora Huella de Carbono | `/calculadora-huella-carbono/` | cultura, inmobiliaria |
+| [x] | Anatomía de una Ciudad | `/visualizador-ciudad/` | cultura, tecnicas |
+| [x] | Asistente de Reclamaciones al Consumidor | `/asistente-reclamaciones/` | cultura, productividad |
+| [x] | Calculadora de Profundidad de Campo (DoF) | `/calculadora-profundidad-campo/` | cultura, tecnicas |
+| [x] | Calculadora Huella de Carbono | `/calculadora-huella-carbono/` | cultura, inmobiliaria |
 | [ ] | Calculadora Regla 500 y NPF (Astrofotografía) | `/calculadora-regla-500-npf-astrofoto/` | cultura, tecnicas |
 | [ ] | Checklist de Segunda Opinión | `/checklist-segunda-opinion/` | cultura, productividad |
 | [ ] | Cifrado Clásico | `/cifrado-clasico/` | cultura |

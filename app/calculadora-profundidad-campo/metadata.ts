@@ -39,8 +39,8 @@ export const jsonLd = generateWebAppSchema({
     'Visualización en regla SVG con escala logarítmica y zona de nitidez',
     '5 presets típicos: retrato bokeh, paisaje todo nítido, macro, hiperfocal, astrofoto',
     'Guía educativa completa con círculo de confusión y consejos prácticos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
+    'Cálculo en tiempo real al mover los sliders de focal, apertura y distancia',
+    'Fórmulas de referencia de DoF y zona de nitidez disponibles para consulta',
   ],
 });
 

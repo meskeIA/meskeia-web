@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -176,19 +175,19 @@ function SeccionMoverse() {
 
             <div className={styles.modoStats}>
               <div className={styles.modoStat}>
-                <span className={styles.modoStatLabel}>⏱️ 10 km</span>
+                <span className={styles.modoStatLabel}><span aria-hidden="true">⏱️</span> 10 km</span>
                 <span className={styles.modoStatValor}>{m.tiempoMedio} min</span>
               </div>
               <div className={styles.modoStat}>
-                <span className={styles.modoStatLabel}>💨 CO₂/km</span>
+                <span className={styles.modoStatLabel}><span aria-hidden="true">💨</span> CO₂/km</span>
                 <span className={styles.modoStatValor}>{formatNumber(m.co2PorKm, 0)} g</span>
               </div>
               <div className={styles.modoStat}>
-                <span className={styles.modoStatLabel}>👥 Capacidad</span>
+                <span className={styles.modoStatLabel}><span aria-hidden="true">👥</span> Capacidad</span>
                 <span className={styles.modoStatValor}>{m.capacidad}</span>
               </div>
               <div className={styles.modoStat}>
-                <span className={styles.modoStatLabel}>💶 Coste</span>
+                <span className={styles.modoStatLabel}><span aria-hidden="true">💶</span> Coste</span>
                 <span className={styles.modoStatValor}>{m.coste}</span>
               </div>
             </div>
@@ -406,13 +405,7 @@ export default function VisualizadorCiudadPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -439,9 +432,9 @@ export default function VisualizadorCiudadPage() {
         </nav>
 
         {/* Cabecera sección */}
-        <div className={styles.seccionHeader}>
+        <div className={styles.seccionHeader} aria-live="polite" aria-atomic="true">
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -495,6 +488,5 @@ export default function VisualizadorCiudadPage() {
         <ShareCard appName="visualizador-ciudad" />
         <Footer appName="visualizador-ciudad" />
       </div>
-    </>
   );
 }

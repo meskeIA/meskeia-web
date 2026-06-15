@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Servicios de una ciudad de 1 millón de habitantes',
     'Desglose del presupuesto municipal por partida',
     'Toggle de capas de infraestructura on/off',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Visualización de profundidad a escala real de cada capa subterránea (agua, gas, metro, fibra)',
+    'Datos de CO₂ por pasajero-kilómetro para 6 modos de transporte urbano',
+    'Cifras de servicios municipales basadas en datos de ciudades españolas de 1 millón de habitantes',
   ],
 });
 

@@ -180,7 +180,7 @@ export default function CalculadoraProfundidadCampoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🎯 Calculadora de Profundidad de Campo</h1>
+        <h1><span aria-hidden="true">🎯</span> Calculadora de Profundidad de Campo</h1>
         <p>
           Calcula DoF, hiperfocal y zona de nitidez aceptable a partir de focal, apertura,
           distancia y sensor. Visualización en regla para ver dónde empieza y acaba lo nítido.
@@ -195,6 +195,7 @@ export default function CalculadoraProfundidadCampoPage() {
           {PRESETS.map((p) => (
             <button
               key={p.id}
+              type="button"
               className={styles.presetChip}
               onClick={() => aplicarPreset(p)}
               title={p.descripcion}
@@ -248,8 +249,10 @@ export default function CalculadoraProfundidadCampoPage() {
                 {FOCALES_RAPIDAS.map((f) => (
                   <button
                     key={f}
+                    type="button"
                     className={`${styles.focalChip} ${focal === f ? styles.chipActive : ''}`}
                     onClick={() => setFocal(f)}
+                    aria-pressed={focal === f}
                   >
                     {f}
                   </button>
@@ -266,8 +269,10 @@ export default function CalculadoraProfundidadCampoPage() {
                 {APERTURAS.map((a, idx) => (
                   <button
                     key={a}
+                    type="button"
                     className={`${styles.aperturaBtn} ${aperturaIdx === idx ? styles.aperturaActive : ''}`}
                     onClick={() => setAperturaIdx(idx)}
+                    aria-pressed={aperturaIdx === idx}
                   >
                     f/{formatNumber(a, a < 10 && a % 1 !== 0 ? 1 : 0)}
                   </button>
@@ -308,7 +313,7 @@ export default function CalculadoraProfundidadCampoPage() {
               dfEsInfinito={resultado.dfEsInfinito}
             />
 
-            <div className={styles.resultBlock}>
+            <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultRowBig}>
                 <span className={styles.resultLabelBig}>Profundidad de campo total</span>
                 <span className={styles.resultValueBig}>
@@ -423,14 +428,14 @@ export default function CalculadoraProfundidadCampoPage() {
           <h3 className={styles.eduSubtitle}>Casos típicos resueltos</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>👤 Retrato con bokeh — 85 mm f/2,8 a 2,5 m</h4>
+              <h4><span aria-hidden="true">👤</span> Retrato con bokeh — 85 mm f/2,8 a 2,5 m</h4>
               <p>
                 Hiperfocal ~85 m; DoF ~25 cm. Solo la cara queda nítida y el fondo se funde. Si
                 bajas a f/1,4, la DoF puede ser de solo 6-8 cm: un ojo nítido y el otro no.
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🏔️ Paisaje todo nítido — 24 mm f/11 a 5 m</h4>
+              <h4><span aria-hidden="true">🏔️</span> Paisaje todo nítido — 24 mm f/11 a 5 m</h4>
               <p>
                 Hiperfocal ~1,8 m; el sujeto (5 m) está más allá → Df infinito y Dn ~1,3 m. Todo
                 desde 1,3 m hasta el horizonte queda nítido. Trípode imprescindible si la luz es
@@ -438,7 +443,7 @@ export default function CalculadoraProfundidadCampoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🌸 Macro — 100 mm f/8 a 40 cm</h4>
+              <h4><span aria-hidden="true">🌸</span> Macro — 100 mm f/8 a 40 cm</h4>
               <p>
                 DoF de apenas 4-5 mm. Para una flor entera o un insecto entero, tendrás que cerrar
                 a f/16 o f/22 (con difracción) o usar focus stacking (varias tomas combinadas en
@@ -446,7 +451,7 @@ export default function CalculadoraProfundidadCampoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🌌 Astrofoto — 14 mm f/2,8 a infinito</h4>
+              <h4><span aria-hidden="true">🌌</span> Astrofoto — 14 mm f/2,8 a infinito</h4>
               <p>
                 Enfoque manual al infinito. La DoF abarca desde muy cerca hasta ∞. El reto no es la
                 DoF, sino la regla 500 (tiempo máximo sin estela) y la luz baja: ISO 3200-6400
@@ -465,7 +470,7 @@ export default function CalculadoraProfundidadCampoPage() {
                 Combina eso con menor DoF intrínseca del tele y obtienes el clásico fondo cremoso.
               </p>
               <p className={styles.faqTip}>
-                💡 Por eso un 85 mm f/2,8 da más bokeh que un 35 mm f/1,4 para el mismo retrato.
+                <span aria-hidden="true">💡</span> Por eso un 85 mm f/2,8 da más bokeh que un 35 mm f/1,4 para el mismo retrato.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -509,7 +514,7 @@ export default function CalculadoraProfundidadCampoPage() {
                 rápidas para sensores pequeños son tan apreciadas.
               </p>
               <p className={styles.faqTip}>
-                💡 Más detalles sobre equivalencias en el{' '}
+                <span aria-hidden="true">💡</span> Más detalles sobre equivalencias en el{' '}
                 <a href="/visualizador-focales-fotografia/">visualizador de focales</a>.
               </p>
             </div>
