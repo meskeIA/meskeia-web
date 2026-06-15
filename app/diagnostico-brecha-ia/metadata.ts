@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Evalúa criterio propio y aprovechamiento de la IA',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para un uso más inteligente de la IA',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

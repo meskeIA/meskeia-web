@@ -218,6 +218,7 @@ export default function VisualizadorEconomiaCircular() {
 
         <div className={styles.toggleWrapper}>
           <button
+            type="button"
             className={modoLineal ? styles.btnToggleActivo : styles.btnToggle}
             onClick={() => setModoLineal(true)}
             aria-pressed={modoLineal}
@@ -225,6 +226,7 @@ export default function VisualizadorEconomiaCircular() {
             📉 Modelo Lineal
           </button>
           <button
+            type="button"
             className={!modoLineal ? styles.btnToggleActivo : styles.btnToggle}
             onClick={() => setModoLineal(false)}
             aria-pressed={!modoLineal}
@@ -246,7 +248,7 @@ export default function VisualizadorEconomiaCircular() {
                   { etapa: '🗑️', nombre: 'Desechar', coste: 'Pérdida total de valor' },
                 ].map((paso, i) => (
                   <div key={i} className={styles.pasoLineal}>
-                    <div className={styles.pasoIcono}>{paso.etapa}</div>
+                    <div className={styles.pasoIcono} aria-hidden="true">{paso.etapa}</div>
                     <div className={styles.pasoNombre}>{paso.nombre}</div>
                     <div className={styles.pasoCoste}>{paso.coste}</div>
                     {i < 4 && <div className={styles.flechaLineal} aria-hidden="true">→</div>}
@@ -271,7 +273,7 @@ export default function VisualizadorEconomiaCircular() {
                   { etapa: '🗑️', estrategia: 'Reciclar', descripcion: 'Recuperar materiales' },
                 ].map((item, i) => (
                   <div key={i} className={styles.pasoCircular}>
-                    <div className={styles.pasoIcono}>{item.etapa}</div>
+                    <div className={styles.pasoIcono} aria-hidden="true">{item.etapa}</div>
                     <div className={styles.pasoNombre}>{item.estrategia}</div>
                     <div className={styles.pasoCoste}>{item.descripcion}</div>
                   </div>
@@ -322,6 +324,7 @@ export default function VisualizadorEconomiaCircular() {
             return (
               <div key={estrategia.id} className={styles.estrategiaFila}>
                 <button
+                  type="button"
                   className={isActiva ? styles.estrategiaCardActiva : styles.estrategiaCard}
                   onClick={() => toggleEstrategia(estrategia.id)}
                   aria-expanded={isActiva}
@@ -480,6 +483,7 @@ export default function VisualizadorEconomiaCircular() {
             return (
               <div key={caso.id} className={styles.casoCard}>
                 <button
+                  type="button"
                   className={styles.casoHeader}
                   onClick={() => toggleCaso(caso.id)}
                   aria-expanded={isActivo}
@@ -523,7 +527,7 @@ export default function VisualizadorEconomiaCircular() {
       >
         <div className={styles.eduGrid}>
           <div className={styles.eduCard}>
-            <h3 className={styles.eduCardTitulo}>📜 Del siglo XX a la crisis de materias primas</h3>
+            <h3 className={styles.eduCardTitulo}><span aria-hidden="true">📜</span> Del siglo XX a la crisis de materias primas</h3>
             <p>
               El modelo industrial del siglo XX se construyó sobre recursos aparentemente ilimitados. Tras la Segunda
               Guerra Mundial, el consumo masivo fue diseñado deliberadamente: en 1955, el artículo "The Waste Makers"
@@ -534,7 +538,7 @@ export default function VisualizadorEconomiaCircular() {
           </div>
 
           <div className={styles.eduCard}>
-            <h3 className={styles.eduCardTitulo}>🇪🇺 Reglamento de Ecodiseño UE 2024 y Derecho a Reparar</h3>
+            <h3 className={styles.eduCardTitulo}><span aria-hidden="true">🇪🇺</span> Reglamento de Ecodiseño UE 2024 y Derecho a Reparar</h3>
             <p>
               La Unión Europea aprobó en 2024 el Reglamento de Ecodiseño para Productos Sostenibles y la Directiva
               de Derecho a Reparar. Estos obligan a los fabricantes a: (1) vender piezas de repuesto durante mínimo
@@ -545,7 +549,7 @@ export default function VisualizadorEconomiaCircular() {
           </div>
 
           <div className={styles.eduCard}>
-            <h3 className={styles.eduCardTitulo}>🚨 Economía Circular vs Greenwashing</h3>
+            <h3 className={styles.eduCardTitulo}><span aria-hidden="true">🚨</span> Economía Circular vs Greenwashing</h3>
             <p>
               No todo lo que se llama "circular" lo es. Señales de greenwashing: (1) empresa que "recicla" sus
               propios residuos pero sigue produciendo residuos no reciclables, (2) programas de devolución de producto
@@ -556,7 +560,7 @@ export default function VisualizadorEconomiaCircular() {
           </div>
 
           <div className={styles.eduCard}>
-            <h3 className={styles.eduCardTitulo}>🏭 Simbiotismo Industrial</h3>
+            <h3 className={styles.eduCardTitulo}><span aria-hidden="true">🏭</span> Simbiotismo Industrial</h3>
             <p>
               El ejemplo más antiguo: Kalundborg (Dinamarca, desde 1972). Una central eléctrica, una refinería,
               una farmacéutica y una empresa de cartón intercambian residuos como recursos: el vapor sobrante
@@ -567,7 +571,7 @@ export default function VisualizadorEconomiaCircular() {
           </div>
 
           <div className={styles.eduCard}>
-            <h3 className={styles.eduCardTitulo}>🇪🇸 Plan de Economía Circular España 2021-2030</h3>
+            <h3 className={styles.eduCardTitulo}><span aria-hidden="true">🇪🇸</span> Plan de Economía Circular España 2021-2030</h3>
             <p>
               España aprobó su Plan de Acción de Economía Circular con 3 ejes: (1) producción y consumo sostenible,
               (2) gestión de residuos, (3) sectores prioritarios (alimentación, construcción, plásticos, textil).
@@ -578,7 +582,7 @@ export default function VisualizadorEconomiaCircular() {
           </div>
 
           <div className={styles.eduCard}>
-            <h3 className={styles.eduCardTitulo}>💡 El potencial: 45% de reducción de CO₂ global</h3>
+            <h3 className={styles.eduCardTitulo}><span aria-hidden="true">💡</span> El potencial: 45% de reducción de CO₂ global</h3>
             <p>
               La Fundación Ellen MacArthur (referencia mundial en economía circular) estima que una transición
               completa eliminaría el 45% de las emisiones globales de CO₂. El 55% restante viene de la energía

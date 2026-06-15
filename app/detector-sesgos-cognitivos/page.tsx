@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -235,26 +234,20 @@ export default function DetectorSesgosCognitivosPage() {
   const posY = 100 - ((puntuacionDeliberacion - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧠 Detector de Sesgos Cognitivos</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧠</span> Detector de Sesgos Cognitivos</h1>
           <p className={styles.subtitle}>
             ¿Qué sesgos podrían estar afectando tus decisiones?
             <br />
             Basado en Kahneman: Sistema 1 y Sistema 2
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -293,6 +286,7 @@ export default function DetectorSesgosCognitivosPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -312,6 +306,7 @@ export default function DetectorSesgosCognitivosPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -322,28 +317,28 @@ export default function DetectorSesgosCognitivosPage() {
         </section>
 
         {mostrarResultado && (
-          <section id="resultado" className={styles.resultSection} aria-live="polite">
+          <section id="resultado" className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.sectionTitle}>Tu diagnóstico</h2>
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🔬 Alta Deliberación</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🔬</span> Alta Deliberación</span>
                 <span className={styles.mapLabelBottom}>Baja Deliberación</span>
                 <span className={styles.mapLabelLeft}>Bajo Automatismo</span>
-                <span className={styles.mapLabelRight}>🤖 Alto Automatismo</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🤖</span> Alto Automatismo</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🔬 Pensador Deliberado</span>
+                  <span><span aria-hidden="true">🔬</span> Pensador Deliberado</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🧩 Pensador Híbrido</span>
+                  <span><span aria-hidden="true">🧩</span> Pensador Híbrido</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>😶 Indecisión</span>
+                  <span><span aria-hidden="true">😶</span> Indecisión</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🤖 Piloto Automático</span>
+                  <span><span aria-hidden="true">🤖</span> Piloto Automático</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -362,7 +357,7 @@ export default function DetectorSesgosCognitivosPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🤖 Automatismo (Sistema 1)</span>
+                  <span><span aria-hidden="true">🤖</span> Automatismo (Sistema 1)</span>
                   <span className={styles.scoreValue}>{puntuacionAutomatismo}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -374,7 +369,7 @@ export default function DetectorSesgosCognitivosPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔬 Deliberación (Sistema 2)</span>
+                  <span><span aria-hidden="true">🔬</span> Deliberación (Sistema 2)</span>
                   <span className={styles.scoreValue}>{puntuacionDeliberacion}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -388,14 +383,14 @@ export default function DetectorSesgosCognitivosPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -403,7 +398,7 @@ export default function DetectorSesgosCognitivosPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -413,7 +408,7 @@ export default function DetectorSesgosCognitivosPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -422,7 +417,7 @@ export default function DetectorSesgosCognitivosPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
@@ -477,7 +472,6 @@ export default function DetectorSesgosCognitivosPage() {
         <RelatedApps apps={getRelatedApps('detector-sesgos-cognitivos')} />
         <ShareCard appName="detector-sesgos-cognitivos" />
         <Footer appName="detector-sesgos-cognitivos" />
-      </div>
-    </>
+    </div>
   );
 }

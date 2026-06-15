@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -238,26 +237,20 @@ export default function DiagnosticoBrechaIAPage() {
   const posY = 100 - ((puntuacionCriterio - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧠 Diagnóstico de Brecha IA</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧠</span> Diagnóstico de Brecha IA</h1>
           <p className={styles.subtitle}>
             ¿Usas la IA para pensar mejor o para dejar de pensar?
             <br />
             Criterio propio y aprovechamiento: las dos dimensiones que importan
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -295,6 +288,7 @@ export default function DiagnosticoBrechaIAPage() {
                 {ESCALA.map((opcion) => (
                   <button
                     key={opcion.valor}
+                    type="button"
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}
                     role="radio"
@@ -314,6 +308,7 @@ export default function DiagnosticoBrechaIAPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -324,28 +319,28 @@ export default function DiagnosticoBrechaIAPage() {
         </section>
 
         {mostrarResultado && (
-          <section id="resultado" className={styles.resultSection} aria-live="polite">
+          <section id="resultado" className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.sectionTitle}>Tu diagnóstico</h2>
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>🛡️ Alto criterio propio</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">🛡️</span> Alto criterio propio</span>
                 <span className={styles.mapLabelBottom}>Bajo criterio propio</span>
                 <span className={styles.mapLabelLeft}>Bajo aprovechamiento IA</span>
-                <span className={styles.mapLabelRight}>🚀 Alto aprovechamiento IA</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🚀</span> Alto aprovechamiento IA</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🛡️ Escéptico Autosuficiente</span>
+                  <span><span aria-hidden="true">🛡️</span> Escéptico Autosuficiente</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🧠 Amplificador Consciente</span>
+                  <span><span aria-hidden="true">🧠</span> Amplificador Consciente</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🌫️ En Tierra de Nadie</span>
+                  <span><span aria-hidden="true">🌫️</span> En Tierra de Nadie</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🔌 Dependiente Productivo</span>
+                  <span><span aria-hidden="true">🔌</span> Dependiente Productivo</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -364,7 +359,7 @@ export default function DiagnosticoBrechaIAPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🛡️ Criterio propio</span>
+                  <span><span aria-hidden="true">🛡️</span> Criterio propio</span>
                   <span className={styles.scoreValue}>{puntuacionCriterio}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -376,7 +371,7 @@ export default function DiagnosticoBrechaIAPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🚀 Aprovechamiento IA</span>
+                  <span><span aria-hidden="true">🚀</span> Aprovechamiento IA</span>
                   <span className={styles.scoreValue}>{puntuacionAprovechamiento}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -390,14 +385,14 @@ export default function DiagnosticoBrechaIAPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -405,7 +400,7 @@ export default function DiagnosticoBrechaIAPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -415,7 +410,7 @@ export default function DiagnosticoBrechaIAPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -424,7 +419,7 @@ export default function DiagnosticoBrechaIAPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
@@ -501,7 +496,6 @@ export default function DiagnosticoBrechaIAPage() {
         <RelatedApps apps={getRelatedApps('diagnostico-brecha-ia')} />
         <ShareCard appName="diagnostico-brecha-ia" />
         <Footer appName="diagnostico-brecha-ia" />
-      </div>
-    </>
+    </div>
   );
 }

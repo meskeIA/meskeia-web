@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagnóstico visual con mapa 2D y perfil personalizado',
     'Basado en Kahneman: Sistema 1 y Sistema 2',
     'Acciones concretas según tu resultado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

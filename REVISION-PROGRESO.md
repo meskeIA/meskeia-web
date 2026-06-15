@@ -104,10 +104,10 @@
 | [x] | De la Granja a tu Mesa | `/visualizador-cadena-alimentaria/` | cultura, salud |
 | [x] | Del Mercantilismo al Capitalismo de Plataformas: Historia del Capitalismo | `/visualizador-historia/historia-capitalismo/` | cultura |
 | [x] | Detector de Idioma | `/detector-idioma/` | cultura, productividad |
-| [ ] | Detector de Sesgos Cognitivos | `/detector-sesgos-cognitivos/` | cultura, productividad |
-| [ ] | Diagnóstico de Brecha IA | `/diagnostico-brecha-ia/` | cultura, productividad |
-| [ ] | Economía Circular - De Lineal a Circular | `/visualizador-economia-circular/` | cultura, estudiantes |
-| [ ] | El Ciclo de la Desinformación: Cómo se Propaga un Bulo | `/visualizador-desinformacion/` | cultura, diseno |
+| [x] | Detector de Sesgos Cognitivos | `/detector-sesgos-cognitivos/` | cultura, productividad |
+| [x] | Diagnóstico de Brecha IA | `/diagnostico-brecha-ia/` | cultura, productividad |
+| [x] | Economía Circular - De Lineal a Circular | `/visualizador-economia-circular/` | cultura, estudiantes |
+| [x] | El Ciclo de la Desinformación: Cómo se Propaga un Bulo | `/visualizador-desinformacion/` | cultura, diseno |
 | [ ] | El Imperio Austro-Húngaro: La Última Gran Monarquía Multinacional | `/visualizador-historia/historia-austria-hungria/` | cultura |
 | [ ] | El Imperio Persa Aqueménida: De Ciro a Alejandro | `/visualizador-historia/imperio-persa/` | cultura |
 | [ ] | El Islam Clásico: Del Profeta a la Edad de Oro | `/visualizador-historia/historia-islam-clasico/` | cultura |
