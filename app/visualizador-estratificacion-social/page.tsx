@@ -486,6 +486,7 @@ export default function VisualizadorEstrategicacionSocial() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}
@@ -501,20 +502,26 @@ export default function VisualizadorEstrategicacionSocial() {
           <section className={styles.tabContent}>
             <div className={styles.modelosBtns} role="group" aria-label="Seleccionar modelo de clases">
               <button
+                type="button"
                 className={`${styles.modeloBtn} ${modeloActivo === 'piramide' ? styles.modeloBtnActivo : ''}`}
                 onClick={() => { setModeloActivo('piramide'); setNivelSeleccionado(null); }}
+                aria-pressed={modeloActivo === 'piramide'}
               >
                 Pirámide Clásica
               </button>
               <button
+                type="button"
                 className={`${styles.modeloBtn} ${modeloActivo === 'diamante' ? styles.modeloBtnActivo : ''}`}
                 onClick={() => { setModeloActivo('diamante'); setNivelSeleccionado(null); }}
+                aria-pressed={modeloActivo === 'diamante'}
               >
                 Diamante Clase Media
               </button>
               <button
+                type="button"
                 className={`${styles.modeloBtn} ${modeloActivo === 'gbcs' ? styles.modeloBtnActivo : ''}`}
                 onClick={() => { setModeloActivo('gbcs'); setClaseGbcsSeleccionada(null); }}
+                aria-pressed={modeloActivo === 'gbcs'}
               >
                 7 Clases (GBCS 2013)
               </button>
@@ -616,8 +623,10 @@ export default function VisualizadorEstrategicacionSocial() {
                 {PAISES_GINI.map((p) => (
                   <button
                     key={p.pais}
+                    type="button"
                     className={`${styles.paisBtn} ${paisActivo === p.pais ? styles.paisBtnActivo : ''}`}
                     onClick={() => { setGini(p.gini); setPaisActivo(p.pais); }}
+                    aria-pressed={paisActivo === p.pais}
                   >
                     <span className={styles.paisNombre}>{p.pais}</span>
                     <span className={styles.paisGiniVal} style={{ color: colorGini(p.gini) }}>{p.gini.toFixed(2)}</span>
@@ -639,14 +648,18 @@ export default function VisualizadorEstrategicacionSocial() {
 
               <div className={styles.escenarioBtns} role="group" aria-label="Seleccionar escenario de movilidad">
                 <button
+                  type="button"
                   className={`${styles.modeloBtn} ${escenario === 'dinamarca' ? styles.modeloBtnActivo : ''}`}
                   onClick={() => setEscenario('dinamarca')}
+                  aria-pressed={escenario === 'dinamarca'}
                 >
                   Alta movilidad (Dinamarca)
                 </button>
                 <button
+                  type="button"
                   className={`${styles.modeloBtn} ${escenario === 'usa' ? styles.modeloBtnActivo : ''}`}
                   onClick={() => setEscenario('usa')}
+                  aria-pressed={escenario === 'usa'}
                 >
                   Baja movilidad (USA)
                 </button>

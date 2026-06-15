@@ -128,10 +128,10 @@
 | [x] | Errores de Escritura Creativa | `/errores-escritura-creativa/` | cultura, estudiantes |
 | [x] | España Contemporánea: De las Guerras Napoleónicas a la Democracia | `/visualizador-historia/espana-contemporanea/` | cultura |
 | [x] | Estadística en la Vida Cotidiana - Probabilidad y Sesgos | `/visualizador-estadistica-cotidiana/` | cultura, estudiantes |
-| [ ] | Estilos Arquitectónicos: Cronología del Griego Clásico a la Arquitectura Sostenible | `/visualizador-arquitectura-estilos/` | cultura, diseno |
-| [ ] | Estilos y Movimientos Literarios | `/visualizador-estilos-literarios/` | cultura, estudiantes |
-| [ ] | Estratificación Social: Clases, Gini, Movilidad y Teorías Sociológicas | `/visualizador-estratificacion-social/` | cultura, estudiantes |
-| [ ] | Evaluador de Prompts | `/evaluador-prompts/` | cultura, productividad |
+| [x] | Estilos Arquitectónicos: Cronología del Griego Clásico a la Arquitectura Sostenible | `/visualizador-arquitectura-estilos/` | cultura, diseno |
+| [x] | Estilos y Movimientos Literarios | `/visualizador-estilos-literarios/` | cultura, estudiantes |
+| [x] | Estratificación Social: Clases, Gini, Movilidad y Teorías Sociológicas | `/visualizador-estratificacion-social/` | cultura, estudiantes |
+| [x] | Evaluador de Prompts | `/evaluador-prompts/` | cultura, productividad |
 | [ ] | Evolución Humana - De los Primeros Homínidos al Homo Sapiens | `/visualizador-evolucion-humana/` | cultura, estudiantes |
 | [ ] | Falacias Lógicas - Guía Visual de Errores de Razonamiento | `/visualizador-falacias-logicas/` | cultura, estudiantes |
 | [ ] | Falsos Amigos Español-Inglés: Catálogo y Práctica | `/falsos-amigos-ingles/` | cultura, estudiantes |

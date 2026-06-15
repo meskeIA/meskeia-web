@@ -413,7 +413,7 @@ export default function VisualizadorEstilosLiterariosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📚 Estilos y Movimientos Literarios</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📚</span> Estilos y Movimientos Literarios</h1>
         <p className={styles.subtitle}>De la Ilustración al Posmodernismo — autores, obras y fragmentos</p>
       </header>
 
@@ -431,9 +431,9 @@ export default function VisualizadorEstilosLiterariosPage() {
             <div>
               <h2 className={styles.detalleNombre}>{movimientoActual.nombre}</h2>
               <div className={styles.detalleMeta}>
-                <span className={styles.detallePeriodo}>🕰️ {movimientoActual.periodo}</span>
+                <span className={styles.detallePeriodo}><span aria-hidden="true">🕰️</span> {movimientoActual.periodo}</span>
                 {movimientoActual.regiones.map(r => (
-                  <span key={r} className={styles.detalleRegion}>🌍 {r}</span>
+                  <span key={r} className={styles.detalleRegion}><span aria-hidden="true">🌍</span> {r}</span>
                 ))}
               </div>
             </div>
@@ -444,7 +444,7 @@ export default function VisualizadorEstilosLiterariosPage() {
           <div className={styles.detalleGrid}>
             {/* Características */}
             <div className={styles.detalleCard}>
-              <h3 className={styles.detalleCardTitle}>📌 Características</h3>
+              <h3 className={styles.detalleCardTitle}><span aria-hidden="true">📌</span> Características</h3>
               <ul className={styles.caracteristicasList}>
                 {movimientoActual.caracteristicas.map((c, i) => (
                   <li key={i} className={styles.caracteristicaItem}>
@@ -457,7 +457,7 @@ export default function VisualizadorEstilosLiterariosPage() {
 
             {/* Fragmento */}
             <div className={styles.detalleCard}>
-              <h3 className={styles.detalleCardTitle}>💬 Fragmento representativo</h3>
+              <h3 className={styles.detalleCardTitle}><span aria-hidden="true">💬</span> Fragmento representativo</h3>
               <blockquote className={styles.fragmento} style={{ borderColor: movimientoActual.color }}>
                 <p className={styles.fragmentoTexto}>{movimientoActual.fragmento.texto}</p>
                 <footer className={styles.fragmentoAtribucion}>
@@ -471,7 +471,7 @@ export default function VisualizadorEstilosLiterariosPage() {
 
           {/* Autores */}
           <div className={styles.autoresSection}>
-            <h3 className={styles.detalleCardTitle}>✍️ Autores representativos</h3>
+            <h3 className={styles.detalleCardTitle}><span aria-hidden="true">✍️</span> Autores representativos</h3>
             <div className={styles.autoresGrid}>
               {movimientoActual.autores.map(autor => (
                 <div key={autor.nombre} className={styles.autorCard} style={{ borderTopColor: movimientoActual.color }}>
@@ -482,7 +482,7 @@ export default function VisualizadorEstilosLiterariosPage() {
                   <p className={styles.autorRasgo}>{autor.rasgo}</p>
                   <div className={styles.autorObras}>
                     {autor.obras.map((o, i) => (
-                      <span key={i} className={styles.obraTag}>📖 {o}</span>
+                      <span key={i} className={styles.obraTag}><span aria-hidden="true">📖</span> {o}</span>
                     ))}
                   </div>
                 </div>
@@ -719,42 +719,42 @@ export default function VisualizadorEstilosLiterariosPage() {
           <h2>Preguntas frecuentes sobre movimientos literarios</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿El «Modernismo» en español es lo mismo que el «Modernism» en inglés?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿El «Modernismo» en español es lo mismo que el «Modernism» en inglés?</h4>
               <p>No, y es una de las confusiones más frecuentes. El <strong>Modernismo hispanoamericano</strong> (Rubén Darío, 1888–1920) es un movimiento de refinamiento estético que nace en América Latina y se centra en la musicalidad y el simbolismo. El <strong>Modernism anglosajón</strong> (Joyce, Woolf, Eliot, 1910–1940) es una corriente de experimentación narrativa y concienciación social. Son contemporáneos, comparten algunas influencias simbolistas, pero son movimientos distintos con estéticas muy diferentes.</p>
               <p className={styles.faqTip}>💡 En exámenes españoles, «Modernismo» siempre se refiere al hispanoamericano de Darío. En bibliografía anglosajona, «Modernism» es Joyce y Woolf.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es la diferencia entre Realismo y Naturalismo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia entre Realismo y Naturalismo?</h4>
               <p>El Naturalismo es una radicalización del Realismo. Comparten la observación minuciosa de la realidad y la crítica social, pero el Naturalismo añade el <strong>determinismo</strong>: los personajes no tienen libre albedrío, están atrapados por su herencia genética y su entorno. Mientras Flaubert observa a Emma Bovary con distancia irónica (Realismo), Zola convierte a sus personajes en casos científicos que no pueden escapar de sus condiciones (Naturalismo). El tono también cambia: el Realismo puede ser mordaz pero esperanzador; el Naturalismo tiende al pesimismo sin salida.</p>
               <p className={styles.faqTip}>💡 Pregunta clave: ¿puede el protagonista cambiar su destino? Sí → probablemente Realismo. No → probablemente Naturalismo.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Borges es posmoderno, surrealista o un movimiento aparte?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Borges es posmoderno, surrealista o un movimiento aparte?</h4>
               <p>Borges es un caso único que no encaja perfectamente en ninguna etiqueta. Escribió su obra central (Ficciones, El Aleph) entre los 1940 y 1960, antes de que el Posmodernismo se definiera como movimiento. Sin embargo, sus temas — metaficción, laberintos de sentido, intertextualidad, cuestionamiento de la autoría — son tan fundacionales del Posmodernismo que se le considera su principal precursor. Al mismo tiempo, su dominio del lenguaje y su clasicismo formal lo alejan del Surrealismo. Lo más honesto es considerarlo una categoría en sí mismo: borgesiano.</p>
               <p className={styles.faqTip}>💡 Regla práctica: si un texto trata el universo como biblioteca o el tiempo como laberinto, Borges está en el árbol genealógico.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿El Realismo Mágico es solo latinoamericano?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿El Realismo Mágico es solo latinoamericano?</h4>
               <p>El término fue acuñado por el crítico alemán Franz Roh (1925) para describir la pintura europea, y el escritor venezolano Arturo Uslar Pietri lo aplicó a la literatura latinoamericana en 1948. Aunque García Márquez, Carpentier y Asturias son sus exponentes más conocidos, hay tradiciones similares en la literatura africana (Amos Tutuola), india (Salman Rushdie), checa (Milan Kundera) y japonesa (Haruki Murakami). Lo que hace específico el Realismo Mágico latinoamericano es que lo sobrenatural no se explica ni se justifica — simplemente sucede, integrado en la realidad cotidiana de los personajes.</p>
               <p className={styles.faqTip}>💡 Diferencia clave con la fantasía: en la fantasía existe un mundo alternativo; en el Realismo Mágico, lo maravilloso convive sin tensión con lo cotidiano.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Kafka es existencialista?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Kafka es existencialista?</h4>
               <p>Kafka (1883–1924) murió antes de que el Existencialismo se definiera como movimiento filosófico (Sartre publica <em>El ser y la nada</em> en 1943). Sin embargo, sus temas — el individuo atrapado en sistemas incomprensibles, la culpa sin causa, la alienación — anticipan tan perfectamente las preocupaciones existencialistas que Sartre y Camus lo reivindicaron como precursor. Lo más preciso es decir que Kafka es un autor proto-existencialista o que pertenece al expresionismo alemán — y que su influencia sobre el Existencialismo literario fue determinante.</p>
               <p className={styles.faqTip}>💡 Si quieres entender el Existencialismo, lee primero <em>La metamorfosis</em> de Kafka (40 páginas). Funciona como portal perfecto.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Los movimientos literarios tienen fechas de inicio y fin precisas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Los movimientos literarios tienen fechas de inicio y fin precisas?</h4>
               <p>No. Las fechas que usamos son convenciones académicas, no fronteras reales. Los movimientos se solapan, conviven y evolucionan. Flaubert (Realismo) se publicó al mismo tiempo que los últimos románticos. El Boom Latinoamericano tiene raíces en Borges (1940s) y sigue influyendo hoy. Muchos autores pertenecen a varios movimientos según la época de su obra (el Neruda surrealista de <em>Residencia en la Tierra</em> es muy diferente al Neruda popular de <em>Odas Elementales</em>). Las etiquetas son herramientas para orientarse, no jaulas.</p>
               <p className={styles.faqTip}>💡 Mejor pregunta que «¿de qué movimiento es este libro?»: «¿qué características de este movimiento reconozco en este texto?»</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por dónde empezar si nunca he leído literatura «clásica»?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por dónde empezar si nunca he leído literatura «clásica»?</h4>
               <p>La entrada más accesible depende de lo que te interese. Para el XIX: <em>El coronel no tiene quien le escriba</em> (García Márquez, 100 páginas, perfección narrativa). Para el XIX europeo: <em>Madame Bovary</em> o <em>La muerte de Iván Ilich</em> (Tolstói, 80 páginas). Para el siglo XX europeo: <em>El extranjero</em> (Camus, 130 páginas). Para la poesía: los <em>Veinte poemas de amor</em> (Neruda) o las <em>Rimas</em> (Bécquer). La clave es empezar con obras cortas de autores reconocidos — la extensión no es virtud literaria.</p>
               <p className={styles.faqTip}>💡 Regla: si tras 50 páginas un libro no te engancha, no es obligatorio terminarlo. Hay miles de libros excelentes; la vida es corta.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia a la Generación Beat del hippismo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia a la Generación Beat del hippismo?</h4>
               <p>La Generación Beat (1950s) es un fenómeno literario e intelectual de escritores con formación universitaria (Kerouac estudió en Columbia, Ginsberg también) que rechazaban la conformidad americana de posguerra. El hippismo (1960s) fue un movimiento social masivo y de masas que bebió de los Beat pero los transformó en cultura popular. Los Beat eran escritores que vivían en los márgenes; los hippies fueron un fenómeno político y contracultural más amplio. Kerouac, paradójicamente, era políticamente conservador y rechazó ser considerado padre del movimiento hippie.</p>
               <p className={styles.faqTip}>💡 Los Beat son a los hippies lo que Nietzsche al nazismo: una influencia que los sucesores malinterpretaron o simplificaron.</p>
             </div>

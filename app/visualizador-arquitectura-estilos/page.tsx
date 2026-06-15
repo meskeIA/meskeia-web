@@ -447,9 +447,11 @@ function TabDetalle() {
       <div className={styles.movimientoSelector}>
         {ESTILOS.map((est, i) => (
           <button
+            type="button"
             key={est.id}
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
+            aria-pressed={i === indice}
             style={i === indice ? { background: est.color, borderColor: est.color } : {}}
           >
             {est.nombre}
@@ -503,6 +505,7 @@ function TabDetalle() {
 
       <div className={styles.navBtns}>
         <button
+          type="button"
           className={styles.btnAnterior}
           onClick={() => setIndice((i) => Math.max(0, i - 1))}
           disabled={indice === 0}
@@ -512,6 +515,7 @@ function TabDetalle() {
         </button>
         <span className={styles.navCounter}>{indice + 1} / {ESTILOS.length}</span>
         <button
+          type="button"
           className={styles.btnSiguiente}
           onClick={() => setIndice((i) => Math.min(ESTILOS.length - 1, i + 1))}
           disabled={indice === ESTILOS.length - 1}
@@ -549,16 +553,20 @@ function TabComparativa() {
 
       <div className={styles.filtroCategoria}>
         <button
+          type="button"
           className={`${styles.filtroCatBtn} ${categoriaFiltro === 'todos' ? styles.filtroCatBtnActivo : ''}`}
           onClick={() => setCategoriaFiltro('todos')}
+          aria-pressed={categoriaFiltro === 'todos'}
         >
           Todos
         </button>
         {(Object.keys(ETIQUETAS_CATEGORIA) as Categoria[]).map((cat) => (
           <button
             key={cat}
+            type="button"
             className={`${styles.filtroCatBtn} ${categoriaFiltro === cat ? styles.filtroCatBtnActivo : ''}`}
             onClick={() => setCategoriaFiltro(cat)}
+            aria-pressed={categoriaFiltro === cat}
             style={categoriaFiltro === cat ? { background: COLORES_CATEGORIA[cat], borderColor: COLORES_CATEGORIA[cat] } : {}}
           >
             {ETIQUETAS_CATEGORIA[cat]}
@@ -732,6 +740,7 @@ export default function VisualizadorArquitecturaEstilos() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}

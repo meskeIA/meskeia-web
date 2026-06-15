@@ -241,16 +241,16 @@ export default function EvaluadorPromptsPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>💬 Evaluador de Prompts</h1>
+          <h1 className={styles.title}><span aria-hidden="true">💬</span> Evaluador de Prompts</h1>
           <p className={styles.subtitle}>
             ¿Tus instrucciones a la IA son específicas o vagas?
             <br />
             Cómo preguntas y cómo procesas: las dos claves del prompt engineering
           </p>
           <div className={styles.badges}>
-            <span className={styles.badge}>🕐 3 minutos</span>
-            <span className={styles.badge}>📊 10 preguntas</span>
-            <span className={styles.badge}>🔒 Sin registro</span>
+            <span className={styles.badge}><span aria-hidden="true">🕐</span> 3 minutos</span>
+            <span className={styles.badge}><span aria-hidden="true">📊</span> 10 preguntas</span>
+            <span className={styles.badge}><span aria-hidden="true">🔒</span> Sin registro</span>
           </div>
         </header>
 
@@ -306,6 +306,7 @@ export default function EvaluadorPromptsPage() {
           </div>
 
           <button
+            type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
@@ -316,28 +317,28 @@ export default function EvaluadorPromptsPage() {
         </section>
 
         {mostrarResultado && (
-          <section id="resultado" className={styles.resultSection} aria-live="polite">
+          <section id="resultado" className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.sectionTitle}>Tu diagnóstico</h2>
 
             <div className={styles.mapContainer}>
               <div className={styles.mapLabels}>
-                <span className={styles.mapLabelTop}>📝 Instrucciones claras</span>
+                <span className={styles.mapLabelTop}><span aria-hidden="true">📝</span> Instrucciones claras</span>
                 <span className={styles.mapLabelBottom}>Instrucciones vagas</span>
                 <span className={styles.mapLabelLeft}>Aceptar sin filtro</span>
-                <span className={styles.mapLabelRight}>🔍 Procesamiento crítico</span>
+                <span className={styles.mapLabelRight}><span aria-hidden="true">🔍</span> Procesamiento crítico</span>
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>📝 Buen Preguntador, Mal Filtro</span>
+                  <span><span aria-hidden="true">📝</span> Buen Preguntador, Mal Filtro</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🎯 Conversador Experto</span>
+                  <span><span aria-hidden="true">🎯</span> Conversador Experto</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🌱 Uso Básico</span>
+                  <span><span aria-hidden="true">🌱</span> Uso Básico</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🔍 Buen Filtro, Mala Pregunta</span>
+                  <span><span aria-hidden="true">🔍</span> Buen Filtro, Mala Pregunta</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -356,7 +357,7 @@ export default function EvaluadorPromptsPage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>📝 Calidad de instrucciones</span>
+                  <span><span aria-hidden="true">📝</span> Calidad de instrucciones</span>
                   <span className={styles.scoreValue}>{puntuacionEntrada}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -368,7 +369,7 @@ export default function EvaluadorPromptsPage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🔍 Procesamiento de salida</span>
+                  <span><span aria-hidden="true">🔍</span> Procesamiento de salida</span>
                   <span className={styles.scoreValue}>{puntuacionSalida}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -382,14 +383,14 @@ export default function EvaluadorPromptsPage() {
 
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
 
               <div className={styles.profileColumns}>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>✅ Fortalezas</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">✅</span> Fortalezas</h4>
                   <ul className={styles.profileList}>
                     {perfil.fortalezas.map((f, i) => (
                       <li key={i}>{f}</li>
@@ -397,7 +398,7 @@ export default function EvaluadorPromptsPage() {
                   </ul>
                 </div>
                 <div className={styles.profileColumn}>
-                  <h4 className={styles.columnTitle}>⚠️ Riesgos</h4>
+                  <h4 className={styles.columnTitle}><span aria-hidden="true">⚠️</span> Riesgos</h4>
                   <ul className={styles.profileList}>
                     {perfil.riesgos.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -407,7 +408,7 @@ export default function EvaluadorPromptsPage() {
               </div>
 
               <div className={styles.actionsSection}>
-                <h4 className={styles.actionsTitle}>🎯 Acciones sugeridas</h4>
+                <h4 className={styles.actionsTitle}><span aria-hidden="true">🎯</span> Acciones sugeridas</h4>
                 <ol className={styles.actionsList}>
                   {perfil.acciones.map((a, i) => (
                     <li key={i}>{a}</li>
@@ -416,7 +417,7 @@ export default function EvaluadorPromptsPage() {
               </div>
             </div>
 
-            <button className={styles.btnSecondary} onClick={reiniciar}>
+            <button type="button" className={styles.btnSecondary} onClick={reiniciar}>
               Repetir diagnóstico
             </button>
           </section>
