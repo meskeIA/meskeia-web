@@ -177,10 +177,10 @@
 | [x] | Historia de la Arquitectura Española: Del Románico al Guggenheim | `/visualizador-historia/arquitectura-espanola/` | cultura, tecnicas |
 | [x] | Historia de la Arquitectura Moderna: Del Crystal Palace a la IA | `/visualizador-historia/historia-arquitectura-moderna/` | cultura |
 | [x] | Historia de la Astronomía: De Stonehenge al Telescopio James Webb | `/visualizador-historia/astronomia/` | cultura |
-| [ ] | Historia de la Aviación: De los Hermanos Wright a la Aviación Eléctrica | `/visualizador-historia/aviacion/` | cultura, tecnicas |
-| [ ] | Historia de la Banca: De los Medici al Fintech y las Criptomonedas | `/visualizador-historia/banca/` | cultura, finanzas |
-| [ ] | Historia de la Cartografía: De los Primeros Mapas al GPS y los SIG | `/visualizador-historia/cartografia/` | cultura, estudiantes |
-| [ ] | Historia de la China Moderna: De la República a la Superpotencia | `/visualizador-historia/historia-china-moderna/` | cultura |
+| [x] | Historia de la Aviación: De los Hermanos Wright a la Aviación Eléctrica | `/visualizador-historia/aviacion/` | cultura, tecnicas |
+| [x] | Historia de la Banca: De los Medici al Fintech y las Criptomonedas | `/visualizador-historia/banca/` | cultura, finanzas |
+| [x] | Historia de la Cartografía: De los Primeros Mapas al GPS y los SIG | `/visualizador-historia/cartografia/` | cultura, estudiantes |
+| [x] | Historia de la China Moderna: De la República a la Superpotencia | `/visualizador-historia/historia-china-moderna/` | cultura |
 | [ ] | Historia de la Ciencia Española: De Al-Ándalus al CERN | `/visualizador-historia/historia-ciencia-espanola/` | cultura |
 | [ ] | Historia de la Danza: De los Rituales Egipcios al Breaking Olímpico | `/visualizador-historia/danza/` | cultura |
 | [ ] | Historia de la Economía Mundial: Del Crack del 29 al Siglo XXI | `/visualizador-historia/historia-economia-mundial/` | cultura, finanzas |
