@@ -443,7 +443,9 @@ export default function VisualizadorGenerosNovelaPage() {
             {FILTROS_BUSCO.map(f => (
               <button
                 key={f.id}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroBusco === f.id ? styles.filtroBtnActivo : ''}`}
+                aria-pressed={filtroBusco === f.id}
                 onClick={() => setFiltroBusco(f.id)}
               >
                 <span aria-hidden="true">{f.emoji}</span> {f.label}
@@ -471,6 +473,7 @@ export default function VisualizadorGenerosNovelaPage() {
             {generosFiltrados.map(genero => (
               <button
                 key={genero.id}
+                type="button"
                 className={styles.generoCard}
                 onClick={() => setGeneroActivo(genero)}
                 aria-label={`Ver detalle de ${genero.nombre}`}
@@ -492,7 +495,7 @@ export default function VisualizadorGenerosNovelaPage() {
         ) : (
           <div className={styles.sinResultados}>
             <p>No se encontraron géneros con ese criterio.</p>
-            <button className={styles.btnReset} onClick={() => { setBusqueda(''); setFiltroBusco('todos'); }}>
+            <button type="button" className={styles.btnReset} onClick={() => { setBusqueda(''); setFiltroBusco('todos'); }}>
               Limpiar filtros
             </button>
           </div>
@@ -502,7 +505,7 @@ export default function VisualizadorGenerosNovelaPage() {
         {generoActivo && (
           <div className={styles.modalOverlay} onClick={() => setGeneroActivo(null)} role="dialog" aria-modal="true" aria-label={`Detalle de ${generoActivo.nombre}`}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-              <button className={styles.modalCerrar} onClick={() => setGeneroActivo(null)} aria-label="Cerrar detalle">✕</button>
+              <button type="button" className={styles.modalCerrar} onClick={() => setGeneroActivo(null)} aria-label="Cerrar detalle">✕</button>
 
               <div className={styles.modalHeader} style={{ background: generoActivo.color }}>
                 <span className={styles.modalEmoji} aria-hidden="true">{generoActivo.emoji}</span>
@@ -644,28 +647,28 @@ export default function VisualizadorGenerosNovelaPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>⚡</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">⚡</span>
                   <h4>Lector de ritmo rápido</h4>
                 </div>
                 <p>Si te aburres si no pasa nada en 50 páginas, empieza por el thriller psicológico, la aventura o la novela negra. Capítulos cortos, giros frecuentes y tramas que avanzan sin parar.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🌍</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🌍</span>
                   <h4>Lector de mundos</h4>
                 </div>
                 <p>Si disfrutas perderte en un universo con su propia lógica, prueba la fantasía épica o la ciencia ficción. El worldbuilding es el placer principal: quieres habitar ese mundo, no solo seguir la trama.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🧠</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🧠</span>
                   <h4>Lector de ideas</h4>
                 </div>
                 <p>Si quieres que un libro te deje pensando días después, busca en la distopía, la ciencia ficción social o el realismo literario. El género es el vehículo; las ideas, el destino.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>❤️</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">❤️</span>
                   <h4>Lector de emociones</h4>
                 </div>
                 <p>Si quieres que un libro te haga llorar, reír o sentir con los personajes, el romanticismo, el realismo literario o incluso el gótico pueden darte una intensidad emocional que otros géneros no alcanzan.</p>
@@ -741,27 +744,27 @@ export default function VisualizadorGenerosNovelaPage() {
             <h3>Claves para disfrutar más de la lectura</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🎯</span>
+                <span className={styles.tipIcono} aria-hidden="true">🎯</span>
                 <h4>Abandona sin culpa</h4>
                 <p>Si un libro no te engancha en las primeras 50-100 páginas, no es obligatorio terminarlo. La vida es corta y hay demasiados libros buenos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🌱</span>
+                <span className={styles.tipIcono} aria-hidden="true">🌱</span>
                 <h4>Prueba un género nuevo al año</h4>
                 <p>Si siempre lees el mismo género, te pierdes experiencias que podrían sorprenderte. Una obra de entrada bien elegida puede abrirte un mundo entero.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔄</span>
+                <span className={styles.tipIcono} aria-hidden="true">🔄</span>
                 <h4>Alterna ritmos</h4>
                 <p>Después de un libro muy denso (realismo, novela histórica), un thriller ágil puede ser el descanso perfecto. El contraste mejora la experiencia de ambos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📖</span>
+                <span className={styles.tipIcono} aria-hidden="true">📖</span>
                 <h4>Lee los prólogos e introducciones</h4>
                 <p>Especialmente en clásicos y obras de género: contextualizan el libro en su tiempo, explican convenciones del género y preparan la lectura.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>💬</span>
+                <span className={styles.tipIcono} aria-hidden="true">💬</span>
                 <h4>Busca comunidades lectoras</h4>
                 <p>Los clubes de lectura online (BookTok, Goodreads, grupos específicos por género) son la forma más eficiente de descubrir recomendaciones dentro de tus géneros favoritos.</p>
               </div>
@@ -770,7 +773,7 @@ export default function VisualizadorGenerosNovelaPage() {
             {/* Warning box */}
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcono}>⚠️</span>
+                <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 <h4>Errores frecuentes al elegir lecturas</h4>
               </div>
               <ul className={styles.warningList}>

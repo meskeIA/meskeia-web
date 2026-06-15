@@ -141,10 +141,10 @@
 | [x] | Generador de Íncipit | `/generador-incipit/` | cultura, estudiantes |
 | [x] | Generador de Poemas por Forma | `/generador-poemas/` | cultura, estudiantes |
 | [x] | Geopolítica de los Recursos - Petróleo, Litio y Tierras Raras | `/visualizador-geopolitica-recursos/` | cultura, estudiantes |
-| [ ] | Grandes Géneros de la Novela | `/visualizador-generos-novela/` | cultura |
-| [ ] | Guía de Aves Comunes | `/guia-aves-comunes/` | cultura, salud |
-| [ ] | Guía de Comentario de Texto | `/guia-comentario-texto/` | cultura, estudiantes |
-| [ ] | Guía de Estilos de Cerveza | `/guia-estilos-cerveza/` | cultura, juegos |
+| [x] | Grandes Géneros de la Novela | `/visualizador-generos-novela/` | cultura |
+| [x] | Guía de Aves Comunes | `/guia-aves-comunes/` | cultura, salud |
+| [x] | Guía de Comentario de Texto | `/guia-comentario-texto/` | cultura, estudiantes |
+| [x] | Guía de Estilos de Cerveza | `/guia-estilos-cerveza/` | cultura, juegos |
 | [ ] | Guía de Maderas | `/guia-maderas/` | cultura, tecnicas |
 | [ ] | Guía de Métrica y Estrofas | `/guia-metrica-estrofas/` | cultura, estudiantes |
 | [ ] | Guía de Tejidos y Fibras | `/guia-tejidos-fibras/` | cultura, tecnicas |

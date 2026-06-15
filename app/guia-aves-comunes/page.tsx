@@ -826,7 +826,7 @@ export default function GuiaAvesComunesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>🐦 Guía de Aves Comunes</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">🐦</span> Guía de Aves Comunes</h1>
           <p className={styles.heroSubtitle}>
             40 aves de España y Europa: hábitat, alimentación, canto y cuándo verlas
           </p>
@@ -850,7 +850,9 @@ export default function GuiaAvesComunesPage() {
               <span className={styles.filtroLabel}>Hábitat</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por hábitat">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${habitatSelec === 'Todos' ? styles.filtroActivo : ''}`}
+                  aria-pressed={habitatSelec === 'Todos'}
                   onClick={() => setHabitatSelec('Todos')}
                 >
                   Todos
@@ -858,10 +860,12 @@ export default function GuiaAvesComunesPage() {
                 {HABITATS.map((h) => (
                   <button
                     key={h}
+                    type="button"
                     className={`${styles.filtroBtn} ${habitatSelec === h ? styles.filtroActivo : ''}`}
+                    aria-pressed={habitatSelec === h}
                     onClick={() => setHabitatSelec(h)}
                   >
-                    {HABITAT_ICONO[h]} {h}
+                    <span aria-hidden="true">{HABITAT_ICONO[h]}</span> {h}
                   </button>
                 ))}
               </div>
@@ -871,7 +875,9 @@ export default function GuiaAvesComunesPage() {
               <span className={styles.filtroLabel}>Presencia</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por presencia estacional">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${presenciaSelec === 'Todos' ? styles.filtroActivo : ''}`}
+                  aria-pressed={presenciaSelec === 'Todos'}
                   onClick={() => setPresenciaSelec('Todos')}
                 >
                   Todas
@@ -879,7 +885,9 @@ export default function GuiaAvesComunesPage() {
                 {PRESENCIAS.map((p) => (
                   <button
                     key={p}
+                    type="button"
                     className={`${styles.filtroBtn} ${presenciaSelec === p ? styles.filtroActivo : ''}`}
+                    aria-pressed={presenciaSelec === p}
                     onClick={() => setPresenciaSelec(p)}
                   >
                     {p}
@@ -892,7 +900,9 @@ export default function GuiaAvesComunesPage() {
               <span className={styles.filtroLabel}>Orden taxonómico</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por orden taxonómico">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${ordenSelec === 'Todos' ? styles.filtroActivo : ''}`}
+                  aria-pressed={ordenSelec === 'Todos'}
                   onClick={() => setOrdenSelec('Todos')}
                 >
                   Todos
@@ -900,7 +910,9 @@ export default function GuiaAvesComunesPage() {
                 {ORDENES.map((o) => (
                   <button
                     key={o}
+                    type="button"
                     className={`${styles.filtroBtn} ${ordenSelec === o ? styles.filtroActivo : ''}`}
+                    aria-pressed={ordenSelec === o}
                     onClick={() => setOrdenSelec(o)}
                   >
                     {o}
@@ -961,8 +973,8 @@ export default function GuiaAvesComunesPage() {
                 </div>
 
                 <div className={styles.medidas}>
-                  <span>📏 {ave.tamano}</span>
-                  <span>🦅 Env. {ave.envergadura}</span>
+                  <span><span aria-hidden="true">📏</span> {ave.tamano}</span>
+                  <span><span aria-hidden="true">🦅</span> Env. {ave.envergadura}</span>
                 </div>
 
                 <p className={styles.descripcion}>{ave.descripcion}</p>
@@ -973,7 +985,7 @@ export default function GuiaAvesComunesPage() {
                 </div>
 
                 <div className={styles.infoSection}>
-                  <span className={styles.infoLabel}>🎵 Canto</span>
+                  <span className={styles.infoLabel}><span aria-hidden="true">🎵</span> Canto</span>
                   <p className={styles.infoTexto}>{ave.cantoDescripcion}</p>
                 </div>
 
@@ -1070,7 +1082,7 @@ export default function GuiaAvesComunesPage() {
             <h2 className={styles.eduTitle}>Perfiles de observadores</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <strong>🌳 Observador principiante</strong>
+                <strong><span aria-hidden="true">🌳</span> Observador principiante</strong>
                 <p>
                   Empieza por las aves de jardín y parque: gorrión, petirrojo, mirlo, carbonero y
                   herrerillo. Son fáciles de ver y muy tolerantes con los humanos. Un comedero con
@@ -1078,7 +1090,7 @@ export default function GuiaAvesComunesPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <strong>📷 Fotógrafo de naturaleza</strong>
+                <strong><span aria-hidden="true">📷</span> Fotógrafo de naturaleza</strong>
                 <p>
                   Las rapaces en vuelo (ratonero, cernícalo, halcón peregrino) y las aves coloridas
                   (martín pescador, abejaruco, abubilla, carraca) son los objetivos más buscados.
@@ -1086,7 +1098,7 @@ export default function GuiaAvesComunesPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <strong>🧒 Niño en el parque</strong>
+                <strong><span aria-hidden="true">🧒</span> Niño en el parque</strong>
                 <p>
                   El ánade real en el estanque, las urracas en el cesped y las palomas torcaces
                   en los árboles son perfectas para iniciarse. Llevar pan no es ideal (perjudica
@@ -1094,7 +1106,7 @@ export default function GuiaAvesComunesPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <strong>🏡 Persona con jardín</strong>
+                <strong><span aria-hidden="true">🏡</span> Persona con jardín</strong>
                 <p>
                   Un comedero con girasol atrae jilgueros, verderones y pinzones. Una caja nido
                   puede alojar carboneros o herrerillos. Un bebedero con agua limpia atrae prácticamente

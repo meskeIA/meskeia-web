@@ -183,6 +183,7 @@ export default function GuiaComentarioTextoPage() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            type="button"
             className={`${styles.tabBtn} ${tab === t.id ? styles.tabBtnActive : ''}`}
             onClick={() => setTab(t.id)}
             role="tab"
@@ -563,6 +564,7 @@ export default function GuiaComentarioTextoPage() {
                       <div key={i} className={styles.plantillaFrase}>
                         <p className={styles.plantillaTexto}>{frase}</p>
                         <button
+                          type="button"
                           className={`${styles.copyBtn} ${copiado === `${p.seccion}-${i}` ? styles.copyBtnOk : ''}`}
                           onClick={() => copiar(frase, `${p.seccion}-${i}`)}
                           aria-label={`Copiar frase de ${p.seccion}`}
@@ -604,19 +606,19 @@ export default function GuiaComentarioTextoPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante de 2.º Bachillerato</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante de 2.º Bachillerato</strong>
             <p>El comentario de texto es obligatorio en la EBAU/PAES de Lengua Castellana. Puede suponer hasta 4 puntos sobre 10. Practicar con textos reales de exámenes anteriores es la mejor preparación. Usa la pestaña de Plantillas para acelerar la redacción en el examen.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📚 Estudiante de Filología o Humanidades</strong>
+            <strong><span aria-hidden="true">📚</span> Estudiante de Filología o Humanidades</strong>
             <p>En los primeros cursos universitarios, los comentarios de texto son la base del análisis literario. La metodología de esta guía es compatible con el enfoque más riguroso exigido en la universidad: solo necesitas ampliar el marco teórico (narratología, estilística).</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>✏️ Opositor a Secundaria</strong>
+            <strong><span aria-hidden="true">✏️</span> Opositor a Secundaria</strong>
             <p>Las oposiciones de Lengua y Literatura incluyen pruebas de análisis literario. Dominar el vocabulario técnico completo (pestaña de Vocabulario) y la metodología es imprescindible para las pruebas escritas y la programación didáctica.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📖 Lector que quiere entender mejor</strong>
+            <strong><span aria-hidden="true">📖</span> Lector que quiere entender mejor</strong>
             <p>El comentario de texto no es solo una herramienta de examen. Aplicar su metodología a cualquier poema o fragmento que te emocione transforma la experiencia lectora: convierte la intuición en comprensión articulada.</p>
           </div>
         </div>

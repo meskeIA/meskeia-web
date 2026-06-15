@@ -869,6 +869,7 @@ export default function GuiaEstilosCerveza() {
               <span className={styles.filtroLabel}>Tipo</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por tipo de cerveza">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroTipo === '' ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltroTipo('')}
                   aria-pressed={filtroTipo === ''}
@@ -878,6 +879,7 @@ export default function GuiaEstilosCerveza() {
                 {TIPOS.map((t) => (
                   <button
                     key={t}
+                    type="button"
                     className={`${styles.filtroBtn} ${filtroTipo === t ? styles.filtroActivo : ''}`}
                     onClick={() => setFiltroTipo(filtroTipo === t ? '' : t)}
                     aria-pressed={filtroTipo === t}
@@ -892,6 +894,7 @@ export default function GuiaEstilosCerveza() {
               <span className={styles.filtroLabel}>Fermentacion</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por fermentación">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroFermentacion === '' ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltroFermentacion('')}
                   aria-pressed={filtroFermentacion === ''}
@@ -901,6 +904,7 @@ export default function GuiaEstilosCerveza() {
                 {FERMENTACIONES.map((f) => (
                   <button
                     key={f}
+                    type="button"
                     className={`${styles.filtroBtn} ${filtroFermentacion === f ? styles.filtroActivo : ''}`}
                     onClick={() => setFiltroFermentacion(filtroFermentacion === f ? '' : f)}
                     aria-pressed={filtroFermentacion === f}
@@ -915,6 +919,7 @@ export default function GuiaEstilosCerveza() {
               <span className={styles.filtroLabel}>Amargor</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por nivel de amargor">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroAmargor === '' ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltroAmargor('')}
                   aria-pressed={filtroAmargor === ''}
@@ -924,6 +929,7 @@ export default function GuiaEstilosCerveza() {
                 {AMARGORES.map((a) => (
                   <button
                     key={a}
+                    type="button"
                     className={`${styles.filtroBtn} ${filtroAmargor === a ? styles.filtroActivo : ''}`}
                     onClick={() => setFiltroAmargor(filtroAmargor === a ? '' : a)}
                     aria-pressed={filtroAmargor === a}
@@ -938,6 +944,7 @@ export default function GuiaEstilosCerveza() {
               <span className={styles.filtroLabel}>Color EBC</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por color EBC">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${filtroColor === '' ? styles.filtroActivo : ''}`}
                   onClick={() => setFiltroColor('')}
                   aria-pressed={filtroColor === ''}
@@ -947,6 +954,7 @@ export default function GuiaEstilosCerveza() {
                 {COLORES.map((c) => (
                   <button
                     key={c}
+                    type="button"
                     className={`${styles.filtroBtn} ${filtroColor === c ? styles.filtroActivo : ''}`}
                     onClick={() => setFiltroColor(filtroColor === c ? '' : c)}
                     aria-pressed={filtroColor === c}
