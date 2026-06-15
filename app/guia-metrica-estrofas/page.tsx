@@ -285,6 +285,7 @@ export default function GuiaMetricaEstrofasPage() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            type="button"
             className={`${styles.tabBtn} ${tab === t.id ? styles.tabBtnActive : ''}`}
             onClick={() => setTab(t.id)}
             role="tab"
@@ -314,7 +315,7 @@ export default function GuiaMetricaEstrofasPage() {
               />
               <div className={styles.contadorEjemplos}>
                 {EJEMPLOS_CONTADOR.map((ej) => (
-                  <button key={ej} className={styles.contadorEjBtn} onClick={() => setVerso(ej)}>
+                  <button key={ej} type="button" className={styles.contadorEjBtn} onClick={() => setVerso(ej)}>
                     {ej}
                   </button>
                 ))}
@@ -458,6 +459,7 @@ export default function GuiaMetricaEstrofasPage() {
             {ESTROFAS.map((est) => (
               <div key={est.nombre} className={styles.estrofaCard}>
                 <button
+                  type="button"
                   className={styles.estrofaHeader}
                   onClick={() => setEstrofaAbierta(estrofaAbierta === est.nombre ? null : est.nombre)}
                   aria-expanded={estrofaAbierta === est.nombre}
@@ -543,19 +545,19 @@ export default function GuiaMetricaEstrofasPage() {
         <h3>Para qué tipo de lector y escritor es esta guía</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante de literatura</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante de literatura</strong>
             <p>El análisis métrico es una competencia evaluada en los exámenes de selectividad y en los primeros cursos universitarios. Conocer los tipos de verso y estrofa permite identificar la forma de un poema de forma rápida y precisa.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>✍️ Escritor de poesía</strong>
+            <strong><span aria-hidden="true">✍️</span> Escritor de poesía</strong>
             <p>Entender las reglas es necesario para saber cuándo y cómo romperlas. Muchos poetas modernos usan el metro "con acento" —conocen las formas clásicas y las subvierten conscientemente.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📖 Lector avanzado</strong>
+            <strong><span aria-hidden="true">📖</span> Lector avanzado</strong>
             <p>Saber que un poema está escrito en décimas o en tercetos encadenados añade una capa de lectura. La forma y el contenido no son separables: la elección del metro es parte del significado.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🌍 Hispanohablante de cualquier región</strong>
+            <strong><span aria-hidden="true">🌍</span> Hispanohablante de cualquier región</strong>
             <p>La décima es la estrofa de la improvisación oral en Cuba, Venezuela, Colombia y Argentina. El romance es base de la poesía popular en toda Latinoamérica. La métrica española es un patrimonio compartido.</p>
           </div>
         </div>

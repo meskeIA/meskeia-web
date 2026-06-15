@@ -748,7 +748,7 @@ export default function GuiaMaderasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🪵 Guía de Maderas</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🪵</span> Guía de Maderas</h1>
           <p className={styles.subtitle}>
             Directorio de 35 tipos de madera con dureza Janka, densidad, origen, usos y facilidad de trabajo.
             Para carpintería, construcción y decoración.
@@ -773,7 +773,9 @@ export default function GuiaMaderasPage() {
           <div className={styles.filtrosGrupo}>
             <span className={styles.filtrosLabel}>Tipo:</span>
             <button
+              type="button"
               className={`${styles.chipFiltro} ${filtroTipo === '' ? styles.chipActivo : ''}`}
+              aria-pressed={filtroTipo === ''}
               onClick={() => setFiltroTipo('')}
             >
               Todos
@@ -781,7 +783,9 @@ export default function GuiaMaderasPage() {
             {TIPOS.map((t) => (
               <button
                 key={t}
+                type="button"
                 className={`${styles.chipFiltro} ${filtroTipo === t ? styles.chipActivo : ''}`}
+                aria-pressed={filtroTipo === t}
                 onClick={() => setFiltroTipo(filtroTipo === t ? '' : t)}
                 style={filtroTipo === t ? { backgroundColor: TIPO_COLORES[t] } : undefined}
               >
@@ -793,7 +797,9 @@ export default function GuiaMaderasPage() {
           <div className={styles.filtrosGrupo}>
             <span className={styles.filtrosLabel}>Dificultad:</span>
             <button
+              type="button"
               className={`${styles.chipFiltro} ${filtroDificultad === '' ? styles.chipActivo : ''}`}
+              aria-pressed={filtroDificultad === ''}
               onClick={() => setFiltroDificultad('')}
             >
               Todas
@@ -801,7 +807,9 @@ export default function GuiaMaderasPage() {
             {DIFICULTADES.map((d) => (
               <button
                 key={d}
+                type="button"
                 className={`${styles.chipFiltro} ${filtroDificultad === d ? styles.chipActivo : ''}`}
+                aria-pressed={filtroDificultad === d}
                 onClick={() => setFiltroDificultad(filtroDificultad === d ? '' : d)}
                 style={filtroDificultad === d ? { backgroundColor: DIFICULTAD_COLORES[d] } : undefined}
               >
@@ -813,7 +821,9 @@ export default function GuiaMaderasPage() {
           <div className={styles.filtrosGrupo}>
             <span className={styles.filtrosLabel}>Sostenibilidad:</span>
             <button
+              type="button"
               className={`${styles.chipFiltro} ${filtroSostenibilidad === '' ? styles.chipActivo : ''}`}
+              aria-pressed={filtroSostenibilidad === ''}
               onClick={() => setFiltroSostenibilidad('')}
             >
               Todas
@@ -821,7 +831,9 @@ export default function GuiaMaderasPage() {
             {SOSTENIBILIDADES.map((s) => (
               <button
                 key={s}
+                type="button"
                 className={`${styles.chipFiltro} ${filtroSostenibilidad === s ? styles.chipActivo : ''}`}
+                aria-pressed={filtroSostenibilidad === s}
                 onClick={() => setFiltroSostenibilidad(filtroSostenibilidad === s ? '' : s)}
                 style={filtroSostenibilidad === s ? { backgroundColor: SOSTENIBILIDAD_COLORES[s] } : undefined}
               >
@@ -835,7 +847,7 @@ export default function GuiaMaderasPage() {
               <strong>{maderasFiltradas.length}</strong> maderas
             </span>
             {hayFiltrosActivos && (
-              <button className={styles.btnLimpiar} onClick={limpiarFiltros}>
+              <button type="button" className={styles.btnLimpiar} onClick={limpiarFiltros}>
                 Limpiar filtros
               </button>
             )}
@@ -927,7 +939,7 @@ export default function GuiaMaderasPage() {
                     className={styles.badge}
                     style={{ backgroundColor: SOSTENIBILIDAD_COLORES[m.sostenibilidad] }}
                   >
-                    🌱 {m.sostenibilidad}
+                    <span aria-hidden="true">🌱</span> {m.sostenibilidad}
                   </span>
                 </div>
 
@@ -950,6 +962,7 @@ export default function GuiaMaderasPage() {
                 )}
 
                 <button
+                  type="button"
                   className={styles.btnExpandir}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1038,7 +1051,7 @@ export default function GuiaMaderasPage() {
             <h2>Madera según tu perfil</h2>
             <div className={styles.casosGrid}>
               <div className={styles.casoCard}>
-                <h3>🔨 Bricolaje doméstico</h3>
+                <h3><span aria-hidden="true">🔨</span> Bricolaje doméstico</h3>
                 <p>
                   <strong>Recomendación:</strong> pino, DM, contrachapado.
                   Son fáciles de trabajar, económicos y hay tutoriales para cualquier proyecto.
@@ -1046,7 +1059,7 @@ export default function GuiaMaderasPage() {
                 </p>
               </div>
               <div className={styles.casoCard}>
-                <h3>🪑 Carpintero profesional</h3>
+                <h3><span aria-hidden="true">🪑</span> Carpintero profesional</h3>
                 <p>
                   <strong>Recomendación:</strong> roble, haya, arce y fresno para muebles funcionales;
                   nogal y cerezo para piezas de calidad; teca para exterior.
@@ -1054,14 +1067,14 @@ export default function GuiaMaderasPage() {
                 </p>
               </div>
               <div className={styles.casoCard}>
-                <h3>🎨 Diseñador de interiores</h3>
+                <h3><span aria-hidden="true">🎨</span> Diseñador de interiores</h3>
                 <p>
                   <strong>Recomendación:</strong> sapele, wengué o nogal americano para efectos visuales espectaculares.
                   El bambú laminado es una opción sostenible y moderna para suelos y revestimientos.
                 </p>
               </div>
               <div className={styles.casoCard}>
-                <h3>🏗️ Construcción</h3>
+                <h3><span aria-hidden="true">🏗️</span> Construcción</h3>
                 <p>
                   <strong>Recomendación:</strong> pino, douglas y alerce para estructuras;
                   OSB para tabiques y forjados; castaño o iroko para elementos exteriores.
@@ -1171,7 +1184,7 @@ export default function GuiaMaderasPage() {
           {/* 6. Warning Box - errores frecuentes */}
           <section className={styles.guideSection}>
             <div className={styles.warningBox}>
-              <h3>⚠️ Errores frecuentes al comprar o trabajar madera</h3>
+              <h3><span aria-hidden="true">⚠️</span> Errores frecuentes al comprar o trabajar madera</h3>
               <ul>
                 <li>
                   <strong>Comprar madera verde o húmeda.</strong> La madera con más del 20% de humedad se deformará al secarse.

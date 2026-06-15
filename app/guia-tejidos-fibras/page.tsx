@@ -631,7 +631,7 @@ export default function GuiaTejidosFibrasPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧵 Guía de Tejidos y Fibras</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧵</span> Guía de Tejidos y Fibras</h1>
           <p className={styles.subtitle}>
             Directorio de {TEJIDOS.length} materiales textiles: naturales, sintéticos y técnicos.
             Propiedades, cuidados y sostenibilidad.
@@ -661,6 +661,7 @@ export default function GuiaTejidosFibrasPage() {
             />
             {busqueda && (
               <button
+                type="button"
                 className={styles.clearBtn}
                 onClick={() => setBusqueda('')}
                 aria-label="Limpiar búsqueda"
@@ -676,6 +677,7 @@ export default function GuiaTejidosFibrasPage() {
           {origenesCuentas.map(({ nombre, count }) => (
             <button
               key={nombre}
+              type="button"
               className={`${styles.filtroBtn} ${origenActivo === nombre ? styles.filtroActivo : ''}`}
               onClick={() => setOrigenActivo(nombre)}
               aria-pressed={origenActivo === nombre}
@@ -699,6 +701,7 @@ export default function GuiaTejidosFibrasPage() {
           {(['Todas', 'Alta', 'Media', 'Baja'] as const).map((s) => (
             <button
               key={s}
+              type="button"
               className={`${styles.sosFiltroBtn} ${sostenibilidadActiva === s ? styles.sosFiltroActivo : ''} ${s !== 'Todas' ? styles[`sos${s}Btn`] : ''}`}
               onClick={() => setSostenibilidadActiva(s)}
               aria-pressed={sostenibilidadActiva === s}
@@ -786,7 +789,7 @@ export default function GuiaTejidosFibrasPage() {
         >
           {/* 1. Tabla comparativa */}
           <section className={styles.guideSection}>
-            <h2>📊 Comparativa de fibras representativas</h2>
+            <h2><span aria-hidden="true">📊</span> Comparativa de fibras representativas</h2>
             <p>
               Comparación de seis fibras clave para entender las diferencias fundamentales entre los distintos tipos de materiales textiles:
             </p>
@@ -858,11 +861,11 @@ export default function GuiaTejidosFibrasPage() {
 
           {/* 2. Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Qué fibra necesitas según tu perfil?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Qué fibra necesitas según tu perfil?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏃</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
                   <h3>Deportista activo</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -874,7 +877,7 @@ export default function GuiaTejidosFibrasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>✈️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">✈️</span>
                   <h3>Viajero frecuente</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -886,7 +889,7 @@ export default function GuiaTejidosFibrasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🌸</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🌸</span>
                   <h3>Persona con piel sensible</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -898,7 +901,7 @@ export default function GuiaTejidosFibrasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>👗</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">👗</span>
                   <h3>Profesional de la moda sostenible</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -913,7 +916,7 @@ export default function GuiaTejidosFibrasPage() {
 
           {/* 3. FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas frecuentes sobre tejidos y fibras</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre tejidos y fibras</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <h4>❓ ¿Qué fibra es mejor para el verano?</h4>
@@ -974,7 +977,7 @@ export default function GuiaTejidosFibrasPage() {
 
           {/* 4. Guía paso a paso */}
           <section className={styles.guideSection}>
-            <h2>📋 Cómo elegir el tejido ideal para cada prenda</h2>
+            <h2><span aria-hidden="true">📋</span> Cómo elegir el tejido ideal para cada prenda</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -1016,30 +1019,30 @@ export default function GuiaTejidosFibrasPage() {
 
           {/* 5. Mejores prácticas */}
           <section className={styles.guideSection}>
-            <h2>✅ Consejos para el cuidado y conservación de tejidos</h2>
+            <h2><span aria-hidden="true">✅</span> Consejos para el cuidado y conservación de tejidos</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌡️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
                 <h4>Lee siempre la etiqueta de cuidado</h4>
                 <p>Los pictogramas internacionales de la etiqueta (tina de agua, triángulo, círculo, cuadrado) son el manual definitivo de la prenda. Una sola colada demasiado caliente puede arruinar una prenda de lana o seda irreversiblemente.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>💨</span>
+                <span className={styles.tipIcon} aria-hidden="true">💨</span>
                 <h4>Seca al aire, no en secadora</h4>
                 <p>La mayoría de fibras naturales (lana, seda, lino, cachemira) no toleran la secadora o pierden calidad con el tiempo. El calor intenso daña las fibras. El secado al aire prolonga la vida útil de las prendas significativamente.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🪲</span>
+                <span className={styles.tipIcon} aria-hidden="true">🪲</span>
                 <h4>Protege las fibras animales de las polillas</h4>
                 <p>Lana, cachemira, angora y mohair son vulnerables a las larvas de polilla que se alimentan de las proteínas de la fibra. Guarda estas prendas limpias en bolsas herméticas o con repelentes naturales (lavanda, cedro) en temporada de guardado.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🧴</span>
+                <span className={styles.tipIcon} aria-hidden="true">🧴</span>
                 <h4>Usa detergente adecuado para cada fibra</h4>
                 <p>La lana y la seda necesitan detergentes de pH neutro o específicos: los detergentes alcalinos dañan sus proteínas. Para las fibras vegetales (algodón, lino) los detergentes normales son válidos. Las fibras técnicas (Gore-Tex) tienen detergentes específicos que preservan sus membranas.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔄</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔄</span>
                 <h4>Renueva el tratamiento DWR del Gore-Tex</h4>
                 <p>Las prendas Gore-Tex y otras membranas impermeables llevan un tratamiento DWR (Durable Water Repellent) que se degrada con el uso y los lavados. Se reactiva planchando suavemente o usando calor de secadora, y puede regenerarse con sprays específicos cuando el agua ya no perla correctamente.</p>
               </div>
@@ -1050,7 +1053,7 @@ export default function GuiaTejidosFibrasPage() {
           <section className={styles.guideSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h3>Errores típicos al lavar o cuidar tejidos</h3>
               </div>
               <ul className={styles.warningList}>

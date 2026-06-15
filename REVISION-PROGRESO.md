@@ -145,10 +145,10 @@
 | [x] | Guía de Aves Comunes | `/guia-aves-comunes/` | cultura, salud |
 | [x] | Guía de Comentario de Texto | `/guia-comentario-texto/` | cultura, estudiantes |
 | [x] | Guía de Estilos de Cerveza | `/guia-estilos-cerveza/` | cultura, juegos |
-| [ ] | Guía de Maderas | `/guia-maderas/` | cultura, tecnicas |
-| [ ] | Guía de Métrica y Estrofas | `/guia-metrica-estrofas/` | cultura, estudiantes |
-| [ ] | Guía de Tejidos y Fibras | `/guia-tejidos-fibras/` | cultura, tecnicas |
-| [ ] | Guía de Tipos de Arroz | `/guia-tipos-arroz/` | cultura, salud |
+| [x] | Guía de Maderas | `/guia-maderas/` | cultura, tecnicas |
+| [x] | Guía de Métrica y Estrofas | `/guia-metrica-estrofas/` | cultura, estudiantes |
+| [x] | Guía de Tejidos y Fibras | `/guia-tejidos-fibras/` | cultura, tecnicas |
+| [x] | Guía de Tipos de Arroz | `/guia-tipos-arroz/` | cultura, salud |
 | [ ] | Guía de Tipos de Pan | `/guia-tipos-pan/` | cultura, salud |
 | [ ] | Guía de Tipos de Pasta | `/guia-tipos-pasta/` | cultura, salud |
 | [ ] | Guía de Varietales de Vino | `/guia-varietales-vino/` | cultura, juegos |
