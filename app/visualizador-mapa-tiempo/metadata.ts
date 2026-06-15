@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Slider de esperanza de vida personalizable',
     'Comparativa por etapas vitales',
     'Gráfico de barras apiladas por actividad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

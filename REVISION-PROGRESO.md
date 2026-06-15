@@ -112,10 +112,10 @@
 | [x] | El Imperio Persa Aqueménida: De Ciro a Alejandro | `/visualizador-historia/imperio-persa/` | cultura |
 | [x] | El Islam Clásico: Del Profeta a la Edad de Oro | `/visualizador-historia/historia-islam-clasico/` | cultura |
 | [x] | El Mapa de las Especias | `/visualizador-mapa-especias/` | cultura |
-| [ ] | El Mapa de los Idiomas del Mundo | `/visualizador-idiomas-mundo/` | cultura, estudiantes |
-| [ ] | El Mapa de tu Tiempo | `/visualizador-mapa-tiempo/` | cultura, productividad, freelance |
-| [ ] | El Microbioma — Billones de Aliados en tu Interior | `/visualizador-microbioma/` | cultura, estudiantes, salud |
-| [ ] | El Movimiento por los Derechos Humanos: Del Siglo de las Luces a la Agenda 2030 | `/visualizador-historia/historia-derechos-humanos/` | cultura |
+| [x] | El Mapa de los Idiomas del Mundo | `/visualizador-idiomas-mundo/` | cultura, estudiantes |
+| [x] | El Mapa de tu Tiempo | `/visualizador-mapa-tiempo/` | cultura, productividad, freelance |
+| [x] | El Microbioma — Billones de Aliados en tu Interior | `/visualizador-microbioma/` | cultura, estudiantes, salud |
+| [x] | El Movimiento por los Derechos Humanos: Del Siglo de las Luces a la Agenda 2030 | `/visualizador-historia/historia-derechos-humanos/` | cultura |
 | [ ] | El Mundo en 100 Personas | `/visualizador-mundo-100-personas/` | cultura |
 | [ ] | El Peso de los Números | `/visualizador-peso-numeros/` | cultura, finanzas |
 | [ ] | El Renacimiento: Del Humanismo a la Revolución Científica | `/visualizador-historia/renacimiento/` | cultura |

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // --- Tipos ---
 
@@ -134,17 +133,11 @@ export default function VisualizadorMicrobiomaPage() {
   const factorData = FACTORES.find((f) => f.id === factorActivo) ?? FACTORES[0];
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🦠 El Microbioma</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🦠</span> El Microbioma</h1>
           <p className={styles.subtitle}>
             Billones de aliados en tu interior — descubre el ecosistema bacteriano que vive en tu cuerpo y cómo influye en tu salud
           </p>
@@ -163,6 +156,7 @@ export default function VisualizadorMicrobiomaPage() {
             {ZONAS.map((zona) => (
               <button
                 key={zona.id}
+                type="button"
                 role="tab"
                 aria-selected={zonaActiva === zona.id}
                 className={`${styles.zonaBtnTab} ${zonaActiva === zona.id ? styles.zonaBtnActive : ''}`}
@@ -271,6 +265,7 @@ export default function VisualizadorMicrobiomaPage() {
             {FACTORES.map((f) => (
               <button
                 key={f.id}
+                type="button"
                 role="tab"
                 aria-selected={factorActivo === f.id}
                 className={`${styles.factorBtn} ${factorActivo === f.id ? styles.factorBtnActive : ''}`}
@@ -412,7 +407,6 @@ export default function VisualizadorMicrobiomaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-microbioma')} />
         <ShareCard appName="visualizador-microbioma" />
         <Footer appName="visualizador-microbioma" />
-      </div>
-    </>
+    </div>
   );
 }

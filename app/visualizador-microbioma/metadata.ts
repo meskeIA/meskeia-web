@@ -45,9 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Explorador de 4 zonas del cuerpo con datos sobre microorganismos',
     'Visualización del eje intestino-cerebro bidireccional',
     'Selector interactivo de 5 factores que alteran el microbioma',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

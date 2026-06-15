@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Top 10 idiomas más hablados: nativos vs segunda lengua',
     'Embudo de lenguas en peligro de extinción',
     'Curiosidades lingüísticas: alfabetos, tonos, clics',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 
