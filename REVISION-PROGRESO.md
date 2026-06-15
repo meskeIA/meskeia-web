@@ -157,10 +157,10 @@
 | [x] | Historia de África: De Berlín a la Potencia Emergente | `/visualizador-historia/historia-africa/` | cultura |
 | [x] | Historia de Alemania: Del Imperio al Motor de Europa | `/visualizador-historia/historia-alemania/` | cultura |
 | [x] | Historia de América Latina: De las Independencias al Siglo XXI | `/visualizador-historia/historia-america-latina/` | cultura |
-| [ ] | Historia de Argentina: De la Revolución de Mayo a la Argentina Contemporánea | `/visualizador-historia/argentina/` | cultura, estudiantes |
-| [ ] | Historia de Australia: De los Aborígenes al Commonwealth del Siglo XXI | `/visualizador-historia/australia/` | cultura, estudiantes |
-| [ ] | Historia de Bizancio: Del Traslado de Roma a la Caída de Constantinopla | `/visualizador-historia/historia-bizancio/` | cultura |
-| [ ] | Historia de Brasil: Del Imperio a la República del Siglo XXI | `/visualizador-historia/brasil-moderno/` | cultura, estudiantes |
+| [x] | Historia de Argentina: De la Revolución de Mayo a la Argentina Contemporánea | `/visualizador-historia/argentina/` | cultura, estudiantes |
+| [x] | Historia de Australia: De los Aborígenes al Commonwealth del Siglo XXI | `/visualizador-historia/australia/` | cultura, estudiantes |
+| [x] | Historia de Bizancio: Del Traslado de Roma a la Caída de Constantinopla | `/visualizador-historia/historia-bizancio/` | cultura |
+| [x] | Historia de Brasil: Del Imperio a la República del Siglo XXI | `/visualizador-historia/brasil-moderno/` | cultura, estudiantes |
 | [ ] | Historia de Canadá: De la Nueva Francia al Estado Multicultural | `/visualizador-historia/canada/` | cultura, estudiantes |
 | [ ] | Historia de Centroamérica: De la Independencia al Corredor de la Migración | `/visualizador-historia/centroamerica/` | cultura, estudiantes |
 | [ ] | Historia de Chile: De la Independencia a la Chile Contemporánea | `/visualizador-historia/chile/` | cultura, estudiantes |
