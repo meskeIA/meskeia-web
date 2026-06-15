@@ -181,10 +181,10 @@
 | [x] | Historia de la Banca: De los Medici al Fintech y las Criptomonedas | `/visualizador-historia/banca/` | cultura, finanzas |
 | [x] | Historia de la Cartografía: De los Primeros Mapas al GPS y los SIG | `/visualizador-historia/cartografia/` | cultura, estudiantes |
 | [x] | Historia de la China Moderna: De la República a la Superpotencia | `/visualizador-historia/historia-china-moderna/` | cultura |
-| [ ] | Historia de la Ciencia Española: De Al-Ándalus al CERN | `/visualizador-historia/historia-ciencia-espanola/` | cultura |
-| [ ] | Historia de la Danza: De los Rituales Egipcios al Breaking Olímpico | `/visualizador-historia/danza/` | cultura |
-| [ ] | Historia de la Economía Mundial: Del Crack del 29 al Siglo XXI | `/visualizador-historia/historia-economia-mundial/` | cultura, finanzas |
-| [ ] | Historia de la Educación: De la Academia de Platón al Aula Digital | `/visualizador-historia/historia-educacion/` | cultura |
+| [x] | Historia de la Ciencia Española: De Al-Ándalus al CERN | `/visualizador-historia/historia-ciencia-espanola/` | cultura |
+| [x] | Historia de la Danza: De los Rituales Egipcios al Breaking Olímpico | `/visualizador-historia/danza/` | cultura |
+| [x] | Historia de la Economía Mundial: Del Crack del 29 al Siglo XXI | `/visualizador-historia/historia-economia-mundial/` | cultura, finanzas |
+| [x] | Historia de la Educación: De la Academia de Platón al Aula Digital | `/visualizador-historia/historia-educacion/` | cultura |
 | [ ] | Historia de la Electricidad: De Faraday a las Redes Inteligentes | `/visualizador-historia/historia-electricidad/` | cultura, tecnicas |
 | [ ] | Historia de la Energía: Del Fuego Prehistórico a la Fusión Nuclear | `/visualizador-historia/energia/` | cultura, tecnicas |
 | [ ] | Historia de la Estadística: Del Censo Babilónico al Big Data e IA | `/visualizador-historia/estadistica/` | cultura, estudiantes |
