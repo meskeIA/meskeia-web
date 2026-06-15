@@ -201,10 +201,10 @@
 | [x] | Historia de la Medicina: Cronología de Hipócrates a la Medicina de Precisión | `/visualizador-historia/medicina/` | cultura |
 | [x] | Historia de la Moda Española: De los Reyes Católicos a Inditex | `/visualizador-historia/moda-espanola/` | cultura, diseno |
 | [x] | Historia de la Moda: Del Renacimiento a la Moda Sostenible | `/visualizador-historia/moda/` | cultura, juegos |
-| [ ] | Historia de la Música Popular: Del Blues al Streaming | `/visualizador-historia/historia-musica-popular/` | cultura, juegos |
-| [ ] | Historia de la Prensa: De Gutenberg al Periodismo Digital e IA | `/visualizador-historia/prensa/` | cultura, tecnicas |
-| [ ] | Historia de la Psicología: De Platón a la IA Terapéutica | `/visualizador-historia/psicologia/` | cultura, salud |
-| [ ] | Historia de la Publicidad: De Gutenberg a la IA Generativa | `/visualizador-historia/publicidad/` | cultura, diseno |
+| [x] | Historia de la Música Popular: Del Blues al Streaming | `/visualizador-historia/historia-musica-popular/` | cultura, juegos |
+| [x] | Historia de la Prensa: De Gutenberg al Periodismo Digital e IA | `/visualizador-historia/prensa/` | cultura, tecnicas |
+| [x] | Historia de la Psicología: De Platón a la IA Terapéutica | `/visualizador-historia/psicologia/` | cultura, salud |
+| [x] | Historia de la Publicidad: De Gutenberg a la IA Generativa | `/visualizador-historia/publicidad/` | cultura, diseno |
 | [ ] | Historia de la Química: De la Alquimia a la Química Computacional | `/visualizador-historia/quimica/` | cultura |
 | [ ] | Historia de la Radio: De Marconi al Podcast con IA | `/visualizador-historia/radio/` | cultura, tecnicas |
 | [ ] | Historia de la República Dominicana: De la Independencia al Caribe del Siglo XXI | `/visualizador-historia/republica-dominicana/` | cultura, estudiantes |
