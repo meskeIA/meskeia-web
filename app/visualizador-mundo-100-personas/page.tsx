@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos: el mundo en 100 personas
@@ -164,13 +163,7 @@ export default function VisualizadorMundo100PersonasPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -273,7 +266,6 @@ export default function VisualizadorMundo100PersonasPage() {
         <RelatedApps apps={getRelatedApps('visualizador-mundo-100-personas')} />
         <ShareCard appName="visualizador-mundo-100-personas" />
         <Footer appName="visualizador-mundo-100-personas" />
-      </div>
-    </>
+    </div>
   );
 }

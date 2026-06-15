@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     '8 categorías: geografía, idiomas, agua, educación, tecnología, riqueza, salud, alimentación',
     'Barras de personas visuales e interactivas',
     'Fuentes: ONU, Banco Mundial, UNESCO, OMS',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Flujo de la linfa paso a paso',
     'Qué ocurre cuando el sistema falla',
     'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

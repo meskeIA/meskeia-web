@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparaciones con objetos y conceptos cotidianos',
     'Visualización de la deuda pública española',
     'Cuánto tardarías en contar cada cifra',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos: escalas numéricas
@@ -151,13 +150,7 @@ export default function VisualizadorPesoNumerosPage() {
   const maxCifra = ESCALAS[ESCALAS.length - 1].cifra;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -185,7 +178,7 @@ export default function VisualizadorPesoNumerosPage() {
         </div>
 
         {/* Cifra principal */}
-        <div className={styles.cifraPrincipal} style={{ borderLeftColor: escala.color }}>
+        <div className={styles.cifraPrincipal} role="status" aria-live="polite" aria-atomic="true" style={{ borderLeftColor: escala.color }}>
           <span className={styles.cifraIcono} aria-hidden="true">{escala.icono}</span>
           <div>
             <h2 className={styles.cifraTitulo} style={{ color: escala.color }}>{escala.etiqueta}</h2>
@@ -227,7 +220,7 @@ export default function VisualizadorPesoNumerosPage() {
             const logPct = (Math.log10(s.cifra) / Math.log10(maxCifra)) * 100;
             return (
               <div key={s.id} className={styles.barraItem}>
-                <span className={styles.barraLabel}>{s.icono} {s.cifra >= 1000000000000 ? '1 billón' : s.cifra >= 1000000000 ? formatNumber(s.cifra / 1000000000, 0) + ' mil M' : s.cifra >= 1000000 ? formatNumber(s.cifra / 1000000, 0) + ' M' : formatNumber(s.cifra, 0)}</span>
+                <span className={styles.barraLabel}><span aria-hidden="true">{s.icono}</span> {s.cifra >= 1000000000000 ? '1 billón' : s.cifra >= 1000000000 ? formatNumber(s.cifra / 1000000000, 0) + ' mil M' : s.cifra >= 1000000 ? formatNumber(s.cifra / 1000000, 0) + ' M' : formatNumber(s.cifra, 0)}</span>
                 <div className={styles.barraFondo}>
                   <div
                     className={styles.barra}
@@ -290,7 +283,6 @@ export default function VisualizadorPesoNumerosPage() {
         <RelatedApps apps={getRelatedApps('visualizador-peso-numeros')} />
         <ShareCard appName="visualizador-peso-numeros" />
         <Footer appName="visualizador-peso-numeros" />
-      </div>
-    </>
+    </div>
   );
 }

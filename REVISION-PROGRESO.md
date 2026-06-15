@@ -116,10 +116,10 @@
 | [x] | El Mapa de tu Tiempo | `/visualizador-mapa-tiempo/` | cultura, productividad, freelance |
 | [x] | El Microbioma — Billones de Aliados en tu Interior | `/visualizador-microbioma/` | cultura, estudiantes, salud |
 | [x] | El Movimiento por los Derechos Humanos: Del Siglo de las Luces a la Agenda 2030 | `/visualizador-historia/historia-derechos-humanos/` | cultura |
-| [ ] | El Mundo en 100 Personas | `/visualizador-mundo-100-personas/` | cultura |
-| [ ] | El Peso de los Números | `/visualizador-peso-numeros/` | cultura, finanzas |
-| [ ] | El Renacimiento: Del Humanismo a la Revolución Científica | `/visualizador-historia/renacimiento/` | cultura |
-| [ ] | El Sistema Linfático — El Sistema Olvidado | `/visualizador-sistema-linfatico/` | cultura, estudiantes, salud |
+| [x] | El Mundo en 100 Personas | `/visualizador-mundo-100-personas/` | cultura |
+| [x] | El Peso de los Números | `/visualizador-peso-numeros/` | cultura, finanzas |
+| [x] | El Renacimiento: Del Humanismo a la Revolución Científica | `/visualizador-historia/renacimiento/` | cultura |
+| [x] | El Sistema Linfático — El Sistema Olvidado | `/visualizador-sistema-linfatico/` | cultura, estudiantes, salud |
 | [ ] | El Viaje de tu Basura | `/visualizador-viaje-basura/` | cultura, salud |
 | [ ] | El Viaje de un Paquete | `/visualizador-viaje-paquete/` | cultura, tecnicas |
 | [ ] | El Viaje de una Ley | `/visualizador-proceso-legislativo/` | cultura |
