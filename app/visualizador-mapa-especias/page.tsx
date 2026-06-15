@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -573,13 +572,7 @@ export default function VisualizadorMapaEspeciasPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -664,7 +657,6 @@ export default function VisualizadorMapaEspeciasPage() {
         <RelatedApps apps={getRelatedApps('visualizador-mapa-especias')} />
         <ShareCard appName="visualizador-mapa-especias" />
         <Footer appName="visualizador-mapa-especias" />
-      </div>
-    </>
+    </div>
   );
 }

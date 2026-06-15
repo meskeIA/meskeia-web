@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparativas de valor histórico: especias vs. oro',
     'Origen y producción de 12 especias populares',
     'Especias por cocina: mediterránea, india, mexicana, asiática',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -108,10 +108,10 @@
 | [x] | Diagnóstico de Brecha IA | `/diagnostico-brecha-ia/` | cultura, productividad |
 | [x] | Economía Circular - De Lineal a Circular | `/visualizador-economia-circular/` | cultura, estudiantes |
 | [x] | El Ciclo de la Desinformación: Cómo se Propaga un Bulo | `/visualizador-desinformacion/` | cultura, diseno |
-| [ ] | El Imperio Austro-Húngaro: La Última Gran Monarquía Multinacional | `/visualizador-historia/historia-austria-hungria/` | cultura |
-| [ ] | El Imperio Persa Aqueménida: De Ciro a Alejandro | `/visualizador-historia/imperio-persa/` | cultura |
-| [ ] | El Islam Clásico: Del Profeta a la Edad de Oro | `/visualizador-historia/historia-islam-clasico/` | cultura |
-| [ ] | El Mapa de las Especias | `/visualizador-mapa-especias/` | cultura |
+| [x] | El Imperio Austro-Húngaro: La Última Gran Monarquía Multinacional | `/visualizador-historia/historia-austria-hungria/` | cultura |
+| [x] | El Imperio Persa Aqueménida: De Ciro a Alejandro | `/visualizador-historia/imperio-persa/` | cultura |
+| [x] | El Islam Clásico: Del Profeta a la Edad de Oro | `/visualizador-historia/historia-islam-clasico/` | cultura |
+| [x] | El Mapa de las Especias | `/visualizador-mapa-especias/` | cultura |
 | [ ] | El Mapa de los Idiomas del Mundo | `/visualizador-idiomas-mundo/` | cultura, estudiantes |
 | [ ] | El Mapa de tu Tiempo | `/visualizador-mapa-tiempo/` | cultura, productividad, freelance |
 | [ ] | El Microbioma — Billones de Aliados en tu Interior | `/visualizador-microbioma/` | cultura, estudiantes, salud |
