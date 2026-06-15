@@ -438,6 +438,8 @@ function TabDetalle() {
         {CORRIENTES.map((cor, i) => (
           <button
             key={cor.id}
+            type="button"
+            aria-pressed={i === indice}
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
             style={i === indice ? { background: cor.color, borderColor: cor.color } : {}}
@@ -535,6 +537,8 @@ function TabComparativa() {
 
       <div className={styles.filtroCategoria}>
         <button
+          type="button"
+          aria-pressed={categoriaFiltro === 'todos'}
           className={`${styles.filtroCatBtn} ${categoriaFiltro === 'todos' ? styles.filtroCatBtnActivo : ''}`}
           onClick={() => setCategoriaFiltro('todos')}
         >
@@ -543,6 +547,8 @@ function TabComparativa() {
         {(Object.keys(ETIQUETAS_CATEGORIA) as Categoria[]).map((cat) => (
           <button
             key={cat}
+            type="button"
+            aria-pressed={categoriaFiltro === cat}
             className={`${styles.filtroCatBtn} ${categoriaFiltro === cat ? styles.filtroCatBtnActivo : ''}`}
             onClick={() => setCategoriaFiltro(cat)}
             style={categoriaFiltro === cat ? { background: COLORES_CATEGORIA[cat], borderColor: COLORES_CATEGORIA[cat] } : {}}
@@ -718,6 +724,7 @@ export default function VisualizadorFilosofia() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               role="tab"
               aria-selected={tabActiva === tab.id}
               className={`${styles.tabBtn} ${tabActiva === tab.id ? styles.tabBtnActivo : ''}`}

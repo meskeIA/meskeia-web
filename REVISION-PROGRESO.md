@@ -189,10 +189,10 @@
 | [x] | Historia de la Energía: Del Fuego Prehistórico a la Fusión Nuclear | `/visualizador-historia/energia/` | cultura, tecnicas |
 | [x] | Historia de la Estadística: Del Censo Babilónico al Big Data e IA | `/visualizador-historia/estadistica/` | cultura, estudiantes |
 | [x] | Historia de la Ética: De Sócrates a la Inteligencia Artificial | `/visualizador-historia/historia-etica/` | cultura |
-| [ ] | Historia de la Exploración: De los Fenicios a las Misiones a Marte | `/visualizador-historia/exploracion/` | cultura |
-| [ ] | Historia de la Filosofía: Corrientes desde los Presocráticos al Posmodernismo | `/visualizador-filosofia/` | cultura |
-| [ ] | Historia de la Física: De los Griegos a la Física de Cuerdas | `/visualizador-historia/fisica/` | cultura |
-| [ ] | Historia de la Fotografía: Del Daguerrotipo a la IA Generativa | `/visualizador-historia/fotografia/` | cultura |
+| [x] | Historia de la Exploración: De los Fenicios a las Misiones a Marte | `/visualizador-historia/exploracion/` | cultura |
+| [x] | Historia de la Filosofía: Corrientes desde los Presocráticos al Posmodernismo | `/visualizador-filosofia/` | cultura |
+| [x] | Historia de la Física: De los Griegos a la Física de Cuerdas | `/visualizador-historia/fisica/` | cultura |
+| [x] | Historia de la Fotografía: Del Daguerrotipo a la IA Generativa | `/visualizador-historia/fotografia/` | cultura |
 | [ ] | Historia de la Gastronomía: Del Fuego Neolítico a la IA Culinaria | `/visualizador-historia/gastronomia/` | cultura |
 | [ ] | Historia de la Higiene y la Salud Pública: De Mohenjo-daro a la OMS | `/visualizador-historia/higiene-salud-publica/` | cultura, estudiantes |
 | [ ] | Historia de la India: Del Imperio Maurya a la Superpotencia Tecnológica | `/visualizador-historia/historia-india/` | cultura |
