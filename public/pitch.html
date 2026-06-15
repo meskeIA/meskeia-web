@@ -268,6 +268,15 @@
       transition: opacity 0.32s ease, transform 0.32s ease;
     }
   </style>
+  <script>
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = window.location.search.match(/print-pdf/gi)
+      ? "/reveal-5.1/dist/print/pdf.css"
+      : "/reveal-5.1/dist/print/paper.css";
+    document.getElementsByTagName("head")[0].appendChild(link);
+  </script>
 </head>
 <body>
 <div class="reveal">
