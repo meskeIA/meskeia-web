@@ -169,10 +169,10 @@
 | [x] | Historia de Cuba: De la Guerra de los Diez Años a la Cuba Contemporánea | `/visualizador-historia/cuba/` | cultura, estudiantes |
 | [x] | Historia de Escandinavia: De los Vikingos al Estado del Bienestar | `/visualizador-historia/escandinavia/` | cultura, estudiantes |
 | [x] | Historia de Internet: Cronología de ARPANET a la IA Generativa | `/visualizador-historia/internet/` | cultura, tecnicas |
-| [ ] | Historia de Italia: Del Risorgimento al Motor de la Cultura Europea | `/visualizador-historia/historia-italia/` | cultura |
-| [ ] | Historia de Japón: De la Corte Imperial a la Restauración Meiji | `/visualizador-historia/japon/` | cultura |
-| [ ] | Historia de la Agricultura: De la Revolución Neolítica a la Agricultura de Precisión | `/visualizador-historia/historia-agricultura/` | cultura |
-| [ ] | Historia de la Antigua Grecia: Del Período Oscuro a Roma | `/visualizador-historia/grecia/` | cultura |
+| [x] | Historia de Italia: Del Risorgimento al Motor de la Cultura Europea | `/visualizador-historia/historia-italia/` | cultura |
+| [x] | Historia de Japón: De la Corte Imperial a la Restauración Meiji | `/visualizador-historia/japon/` | cultura |
+| [x] | Historia de la Agricultura: De la Revolución Neolítica a la Agricultura de Precisión | `/visualizador-historia/historia-agricultura/` | cultura |
+| [x] | Historia de la Antigua Grecia: Del Período Oscuro a Roma | `/visualizador-historia/grecia/` | cultura |
 | [ ] | Historia de la Antigua Roma: De Rómulo a la Caída del Imperio | `/visualizador-historia/roma/` | cultura |
 | [ ] | Historia de la Arquitectura Española: Del Románico al Guggenheim | `/visualizador-historia/arquitectura-espanola/` | cultura, tecnicas |
 | [ ] | Historia de la Arquitectura Moderna: Del Crystal Palace a la IA | `/visualizador-historia/historia-arquitectura-moderna/` | cultura |

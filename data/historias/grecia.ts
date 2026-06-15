@@ -53,17 +53,6 @@ export const grecia: HistoriaData = {
       paises: ['Grecia continental', 'Jonia', 'Egeo'],
     },
     {
-      id: 'colonizacion-arcaica',
-      nombre: 'Gran Colonización',
-      anioInicio: -750,
-      anioFin: -550,
-      color: '#6D4C41',
-      categoria: 'arcaico',
-      descripcion: 'Las poleis griegas se expanden por el Mediterráneo y el Mar Negro fundando más de 500 colonias nuevas. La superpoblación, las tensiones políticas y la búsqueda de recursos motivan este movimiento. Marsella, Siracusa, Nápoleis (Nápoles) y Bizancio son fundadas en este período. La red de colonias extiende la cultura griega desde Hispania hasta el Cáucaso.',
-      obraIconica: 'Fundación de Siracusa (734 a.C.) y Marsella (600 a.C.)',
-      paises: ['Mediterráneo occidental', 'Mar Negro', 'Norte de África'],
-    },
-    {
       id: 'reformas-atenas',
       nombre: 'Reformas en Atenas',
       anioInicio: -594,
@@ -151,17 +140,6 @@ export const grecia: HistoriaData = {
       obraIconica: 'Biblioteca de Alejandría (c. 295 a.C.) — mayor repositorio de conocimiento antiguo',
       paises: ['Egipto', 'Siria', 'Macedonia', 'Asia Menor'],
     },
-    {
-      id: 'conquista-romana',
-      nombre: 'Conquista Romana',
-      anioInicio: -200,
-      anioFin: -146,
-      color: '#B71C1C',
-      categoria: 'conflicto',
-      descripcion: 'Roma interviene progresivamente en los asuntos griegos. Tras derrotar a Macedonia en Pidna (168 a.C.), Roma convierte Macedonia en provincia. La resistencia de la Liga Aquea termina con la destrucción de Corinto (146 a.C.) por el cónsul Lucio Mummio: la ciudad es arrasada, sus habitantes vendidos como esclavos y sus tesoros transportados a Roma. Grecia queda bajo control romano definitivo, aunque su cultura conquista a sus conquistadores.',
-      obraIconica: 'Destrucción de Corinto (146 a.C.) — fin de la Grecia independiente',
-      paises: ['Roma', 'Grecia', 'Macedonia'],
-    },
   ],
 
   eras: [
@@ -184,7 +162,7 @@ export const grecia: HistoriaData = {
       desde: -800,
       hasta: -480,
       icono: '🏛️',
-      hitosDestacados: ['Renacimiento Geométrico', 'Gran Colonización', 'Reformas en Atenas'],
+      hitosDestacados: ['Renacimiento Geométrico', 'Reformas en Atenas'],
       eventos: [
         'Primeros Juegos Olímpicos (776 a.C.)',
         'Adopción del alfabeto fenicio (c. 800 a.C.)',
@@ -245,7 +223,7 @@ export const grecia: HistoriaData = {
       desde: -323,
       hasta: -146,
       icono: '📚',
-      hitosDestacados: ['Período Helenístico', 'Conquista Romana'],
+      hitosDestacados: ['Período Helenístico'],
       eventos: [
         'Fundación de la Biblioteca de Alejandría (c. 295 a.C.)',
         'Euclides escribe los Elementos (c. 300 a.C.)',
