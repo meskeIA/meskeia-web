@@ -161,10 +161,10 @@
 | [x] | Historia de Australia: De los Aborígenes al Commonwealth del Siglo XXI | `/visualizador-historia/australia/` | cultura, estudiantes |
 | [x] | Historia de Bizancio: Del Traslado de Roma a la Caída de Constantinopla | `/visualizador-historia/historia-bizancio/` | cultura |
 | [x] | Historia de Brasil: Del Imperio a la República del Siglo XXI | `/visualizador-historia/brasil-moderno/` | cultura, estudiantes |
-| [ ] | Historia de Canadá: De la Nueva Francia al Estado Multicultural | `/visualizador-historia/canada/` | cultura, estudiantes |
-| [ ] | Historia de Centroamérica: De la Independencia al Corredor de la Migración | `/visualizador-historia/centroamerica/` | cultura, estudiantes |
-| [ ] | Historia de Chile: De la Independencia a la Chile Contemporánea | `/visualizador-historia/chile/` | cultura, estudiantes |
-| [ ] | Historia de Colombia: De la Independencia al Proceso de Paz | `/visualizador-historia/colombia/` | cultura, estudiantes |
+| [x] | Historia de Canadá: De la Nueva Francia al Estado Multicultural | `/visualizador-historia/canada/` | cultura, estudiantes |
+| [x] | Historia de Centroamérica: De la Independencia al Corredor de la Migración | `/visualizador-historia/centroamerica/` | cultura, estudiantes |
+| [x] | Historia de Chile: De la Independencia a la Chile Contemporánea | `/visualizador-historia/chile/` | cultura, estudiantes |
+| [x] | Historia de Colombia: De la Independencia al Proceso de Paz | `/visualizador-historia/colombia/` | cultura, estudiantes |
 | [ ] | Historia de Corea: De los Tres Reinos a la Península Dividida | `/visualizador-historia/corea/` | cultura, estudiantes |
 | [ ] | Historia de Cuba: De la Guerra de los Diez Años a la Cuba Contemporánea | `/visualizador-historia/cuba/` | cultura, estudiantes |
 | [ ] | Historia de Escandinavia: De los Vikingos al Estado del Bienestar | `/visualizador-historia/escandinavia/` | cultura, estudiantes |
