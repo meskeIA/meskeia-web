@@ -40,8 +40,8 @@ export const jsonLd = generateWebAppSchema({
     'Símbolos visuales con texto y voz en español',
     'Categorías: necesidades, emociones, comida, acciones, personas, lugares',
     'Síntesis de voz al pulsar cada símbolo',
-    'Funciona sin conexión a internet',
-    'Gratuito, sin registro, sin instalación',
+    'Favoritos guardados localmente: acceso rápido a los símbolos más usados',
+    'Retroalimentación de voz inmediata al pulsar cada símbolo para refuerzo del aprendizaje',
   ],
 });
 

@@ -154,7 +154,7 @@ export default function TemporizadorVisualPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⏱️ Temporizador Visual</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⏱️</span> Temporizador Visual</h1>
         <p className={styles.subtitle}>
           Elige cuánto tiempo quieres y pulsa Iniciar.
           El círculo te muestra cuánto queda.
@@ -185,6 +185,7 @@ export default function TemporizadorVisualPage() {
         <div className={styles.personalizado}>
           <input
             type="number"
+            inputMode="numeric"
             className={styles.inputPersonalizado}
             value={inputPersonalizado}
             onChange={e => setInputPersonalizado(e.target.value)}
@@ -195,6 +196,7 @@ export default function TemporizadorVisualPage() {
             aria-label="Tiempo personalizado en minutos"
           />
           <button
+            type="button"
             className={styles.btnPersonalizado}
             onClick={aplicarPersonalizado}
             aria-label="Aplicar tiempo personalizado"
@@ -267,6 +269,7 @@ export default function TemporizadorVisualPage() {
         {/* Botones de control */}
         <div className={styles.controles}>
           <button
+            type="button"
             className={`${styles.btnControl} ${styles.btnPrincipal} ${estado === 'terminado' ? styles.btnTerminado : ''}`}
             onClick={iniciarPausar}
             disabled={estado === 'terminado'}
@@ -276,23 +279,25 @@ export default function TemporizadorVisualPage() {
           </button>
 
           <button
+            type="button"
             className={`${styles.btnControl} ${styles.btnReset}`}
             onClick={resetear}
             aria-label="Reiniciar temporizador"
           >
-            🔄 Reiniciar
+            <span aria-hidden="true">🔄</span> Reiniciar
           </button>
         </div>
 
         {/* Toggle sonido */}
         <div className={styles.sonidoToggle}>
           <button
+            type="button"
             className={`${styles.btnSonido} ${sonidoActivo ? styles.sonidoOn : styles.sonidoOff}`}
             onClick={() => setSonidoActivo(prev => !prev)}
             aria-pressed={sonidoActivo}
             aria-label={sonidoActivo ? 'Sonido activado, pulsar para desactivar' : 'Sonido desactivado, pulsar para activar'}
           >
-            {sonidoActivo ? '🔔 Sonido activado' : '🔕 Sonido desactivado'}
+            {sonidoActivo ? <><span aria-hidden="true">🔔</span> Sonido activado</> : <><span aria-hidden="true">🔕</span> Sonido desactivado</>}
           </button>
         </div>
       </section>
@@ -345,7 +350,7 @@ export default function TemporizadorVisualPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🧩</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧩</span>
               <strong>Autismo y TEA</strong>
             </div>
             <p>El tiempo abstracto es difícil de comprender. Un círculo que se vacía y cambia de color es concreto e inmediato.</p>
@@ -354,7 +359,7 @@ export default function TemporizadorVisualPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>⚡</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">⚡</span>
               <strong>TDAH y dificultades de atención</strong>
             </div>
             <p>Ver visualmente cuánto tiempo queda ayuda a mantener el foco y reduce la ansiedad por no saber cuándo termina.</p>
@@ -363,7 +368,7 @@ export default function TemporizadorVisualPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
               <strong>Familias con niños</strong>
             </div>
             <p>Evita discusiones del tipo &quot;¿cuánto falta?&quot;. El niño puede ver por sí mismo el tiempo restante y autorregularse.</p>
@@ -431,22 +436,22 @@ export default function TemporizadorVisualPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🕐</span>
+            <span className={styles.tipIcon} aria-hidden="true">🕐</span>
             <strong>Empieza con tiempos cortos</strong>
             <p>1-5 minutos para que la persona se familiarice antes de aumentar la duración.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔇</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔇</span>
             <strong>Adapta el sonido</strong>
             <p>Desactiva la alarma si resulta molesta. El cambio de color ya avisa visualmente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📱</span>
+            <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <strong>Orienta la pantalla</strong>
             <p>En móvil, usa orientación vertical. En tablet o proyector, horizontal para mayor tamaño.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <strong>Combínalo con rutinas</strong>
             <p>Úsalo junto al Planificador de Rutinas para estructurar toda la jornada con tiempos.</p>
           </div>
@@ -455,7 +460,7 @@ export default function TemporizadorVisualPage() {
         {/* Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al usar el temporizador visual</strong>
           </div>
           <ul className={styles.warningList}>

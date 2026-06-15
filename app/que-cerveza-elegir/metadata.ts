@@ -47,8 +47,8 @@ export const jsonLd = generateWebAppSchema({
     'Mexican Lager y estilos no europeos incluidos',
     'Alternativa "fuera de zona de confort" para explorar',
     'Tips de servicio: temperatura y maridaje',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
+    'Explicación del "por qué" de cada recomendación, no solo el nombre del estilo',
+    'Cobertura de estilos sour y silvestres: Lambic, Gose, Flanders Red',
   ],
 });
 

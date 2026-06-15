@@ -53,16 +53,16 @@
 | [x] | Planificador Visual de Rutinas | `/planificador-rutinas/` | accesibilidad, salud, productividad |
 | [x] | Recordatorio Visual de Medicación | `/recordatorio-medicacion/` | accesibilidad, salud, productividad |
 | [x] | Semáforo Emocional | `/semaforo-emocional/` | accesibilidad, salud, productividad, estudiantes |
-| [ ] | Simulador de Baja Visión | `/simulador-baja-vision/` | accesibilidad, diseno |
+| [x] | Simulador de Baja Visión | `/simulador-baja-vision/` | accesibilidad, diseno |
 | [x] | Simulador de Daltonismo | `/simulador-daltonismo/` | accesibilidad, diseno |
-| [ ] | Tablero de Comunicación AAC | `/tablero-comunicacion/` | accesibilidad, salud, productividad |
-| [ ] | Temporizador Visual | `/temporizador-visual/` | accesibilidad, salud, productividad |
+| [x] | Tablero de Comunicación AAC | `/tablero-comunicacion/` | accesibilidad, salud, productividad |
+| [x] | Temporizador Visual | `/temporizador-visual/` | accesibilidad, salud, productividad |
 
 ## Cultura General (`cultura`) — 262 apps
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | ¿Qué cerveza elegir? | `/que-cerveza-elegir/` | cultura, juegos |
+| [x] | ¿Qué cerveza elegir? | `/que-cerveza-elegir/` | cultura, juegos |
 | [ ] | ¿Qué vino elegir? | `/que-vino-elegir/` | cultura, juegos |
 | [ ] | Análisis Decisión Reversible vs Irreversible | `/analisis-decision-reversible/` | cultura, productividad |
 | [ ] | Anatomía de un Smartphone | `/visualizador-anatomia-smartphone/` | cultura, tecnicas |

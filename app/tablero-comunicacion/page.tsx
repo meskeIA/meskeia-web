@@ -208,7 +208,7 @@ export default function TableroComunicacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💬 Tablero de Comunicación</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💬</span> Tablero de Comunicación</h1>
         <p className={styles.subtitle}>
           Pulsa los símbolos para construir una frase.
           El botón verde la leerá en voz alta.
@@ -254,6 +254,7 @@ export default function TableroComunicacionPage() {
         {/* Acciones de la frase */}
         <div className={styles.fraseAcciones}>
           <button
+            type="button"
             className={styles.btnLeer}
             onClick={leerFrase}
             disabled={frase.length === 0}
@@ -263,6 +264,7 @@ export default function TableroComunicacionPage() {
             🔊 Leer
           </button>
           <button
+            type="button"
             className={styles.btnBorrar}
             onClick={borrarUltimo}
             disabled={frase.length === 0}
@@ -272,6 +274,7 @@ export default function TableroComunicacionPage() {
             ⌫
           </button>
           <button
+            type="button"
             className={styles.btnLimpiar}
             onClick={borrarTodo}
             disabled={frase.length === 0}
@@ -305,6 +308,7 @@ export default function TableroComunicacionPage() {
         {CATEGORIAS.map(cat => (
           <button
             key={cat.id}
+            type="button"
             className={`${styles.categoriaTab} ${categoriaActiva === cat.id ? styles.categoriaActiva : ''}`}
             onClick={() => setCategoriaActiva(cat.id)}
             role="tab"
@@ -356,6 +360,7 @@ export default function TableroComunicacionPage() {
                 className={`${styles.btnEstrella} ${favoritos.includes(simbolo.id) ? styles.btnEstrellaActiva : ''}`}
                 onClick={(e) => toggleFavorito(simbolo.id, e)}
                 aria-label={favoritos.includes(simbolo.id) ? `Quitar ${simbolo.texto} de favoritos` : `Añadir ${simbolo.texto} a favoritos`}
+                aria-pressed={favoritos.includes(simbolo.id)}
               >
                 {favoritos.includes(simbolo.id) ? '⭐' : '☆'}
               </button>
@@ -460,22 +465,22 @@ export default function TableroComunicacionPage() {
           <h2>¿Para quién y cuándo usar este tablero?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧒</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🧒</span>
               <h3>Niño con TEA no verbal</h3>
               <p>Apoyo visual en el hogar para necesidades básicas (agua, baño, hambre) mientras se trabaja con el logopeda en un sistema AAC personalizado. La retroalimentación de voz refuerza la asociación emoji-palabra.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🏥</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🏥</span>
               <h3>Paciente postoperatorio o intubado</h3>
               <p>Comunicación temporal cuando el habla no es posible. El personal sanitario puede mostrar el tablero en un móvil o tablet para que el paciente señale o pulse los símbolos que necesita.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧓</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🧓</span>
               <h3>Persona con afasia progresiva</h3>
               <p>Apoyo para mantener la autonomía comunicativa en etapas en las que el lenguaje oral se deteriora. Las categorías de color facilitan la localización rápida de símbolos con menor esfuerzo cognitivo.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>👩‍🏫</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">👩‍🏫</span>
               <h3>Educador o logopeda en sesión</h3>
               <p>Demostrar el concepto de comunicación con pictogramas en una sesión inicial, antes de invertir en un sistema comercial. Permite evaluar qué categorías son más relevantes para ese usuario específico.</p>
             </div>
@@ -582,27 +587,27 @@ export default function TableroComunicacionPage() {
           <h2>Buenas prácticas para comunicadores AAC</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>⏱️</span>
+              <span className={styles.tipIcono} aria-hidden="true">⏱️</span>
               <p><strong>Dale tiempo para responder.</strong> Las personas con AAC necesitan más tiempo para formular su respuesta. Espera al menos 20-30 segundos antes de repetir la pregunta o cambiar de tema.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔊</span>
+              <span className={styles.tipIcono} aria-hidden="true">🔊</span>
               <p><strong>Nunca hables &quot;por&quot; el usuario.</strong> Aunque sepas lo que quiere decir, deja que el tablero hable por él. La independencia comunicativa es el objetivo, no la eficiencia.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🌍</span>
+              <span className={styles.tipIcono} aria-hidden="true">🌍</span>
               <p><strong>Usa el tablero en todos los entornos.</strong> Casa, cole, consulta médica. La generalización del uso del tablero a diferentes contextos acelera la adquisición comunicativa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📲</span>
+              <span className={styles.tipIcono} aria-hidden="true">📲</span>
               <p><strong>Prueba en diferentes dispositivos.</strong> Un tablet con pantalla grande puede ser más accesible para usuarios con motricidad fina reducida. El tamaño de los botones hace una diferencia importante.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🎯</span>
+              <span className={styles.tipIcono} aria-hidden="true">🎯</span>
               <p><strong>Practica en situaciones reales, no solo en ejercicios.</strong> El tablero debe usarse cuando el usuario realmente quiere comunicar algo, no solo en sesiones de práctica estructuradas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📚</span>
+              <span className={styles.tipIcono} aria-hidden="true">📚</span>
               <p><strong>Informa al equipo de todos los entornos.</strong> Asegúrate de que familia, profesores y sanitarios sepan cómo funciona el tablero y cómo responder cuando el usuario lo use.</p>
             </div>
           </div>
@@ -611,7 +616,7 @@ export default function TableroComunicacionPage() {
         {/* WARNING BOX */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Lo que este tablero no puede hacer (y es importante saber)</h3>
+            <h3><span aria-hidden="true">⚠️</span> Lo que este tablero no puede hacer (y es importante saber)</h3>
             <ul>
               <li><strong>No es un sistema AAC completo:</strong> Un SAAC personalizado incluye vocabulario específico del usuario, acceso adaptado (pulsador, mirada), frases preprogramadas y un plan de intervención. Este tablero es un recurso de apoyo de acceso rápido.</li>
               <li><strong>No sustituye al logopeda:</strong> La implementación de AAC con personas con discapacidad comunicativa requiere evaluación especializada, seguimiento y ajuste continuo. Un logopeda especializado en AAC es imprescindible para un programa efectivo.</li>

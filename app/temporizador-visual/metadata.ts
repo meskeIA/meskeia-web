@@ -42,7 +42,7 @@ export const jsonLd = generateWebAppSchema({
     'Botones grandes accesibles para personas con dificultades motoras',
     'Presets de 1 a 30 minutos',
     'Sonido al finalizar',
-    'Gratuito, sin registro, funciona sin conexión',
+    'Compatible con pantallas grandes y proyectores para uso en aula',
   ],
 });
 

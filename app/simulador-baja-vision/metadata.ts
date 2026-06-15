@@ -39,7 +39,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Simula cómo ven las personas con cataratas, miopía severa, glaucoma, degeneración macular y daltonismo. Herramienta para diseñadores y desarrolladores.",
   url: "https://meskeia.com/simulador-baja-vision/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Simula 9 condiciones: cataratas, miopía severa, glaucoma, degeneración macular y 4 tipos de daltonismo',
+    'Control de intensidad de simulación del 10 % al 100 % para condiciones con gradación',
+    'Filtros SVG de matrices de color clínicamente basados para daltonismo',
+    'Vista de demostración interactiva con UI real para evaluar legibilidad',
+    'Tabla de prevalencia e impacto UX por condición',
+    'Guía de claves WCAG AA/AAA con ratios de contraste mínimos integrada',
+  ],
 });
 
 export const faqJsonLd = {

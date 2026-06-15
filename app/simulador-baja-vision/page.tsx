@@ -246,6 +246,7 @@ export default function SimuladorBajaVision() {
             {CONDICIONES.map((c) => (
               <button
                 key={c.id}
+                type="button"
                 className={`${styles.condicionBtn} ${condicionActiva === c.id ? styles.condicionActiva : ''}`}
                 onClick={() => setCondicionActiva(c.id)}
                 aria-pressed={condicionActiva === c.id}
@@ -283,7 +284,7 @@ export default function SimuladorBajaVision() {
         )}
 
         {/* Info de la condición */}
-        <section className={styles.infoCondicion}>
+        <section className={styles.infoCondicion} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.infoHeader}>
             <span className={styles.infoIcono} aria-hidden="true">{condicion.icono}</span>
             <div>
@@ -305,7 +306,7 @@ export default function SimuladorBajaVision() {
         {/* Vista de demostración */}
         <section className={styles.demoSeccion}>
           <h2 className={styles.sectionTitle}>Vista simulada</h2>
-          <p className={styles.demoSubtitulo}>
+          <p className={styles.demoSubtitulo} role="status" aria-live="polite">
             Así verías esta interfaz de ejemplo con <strong>{condicion.nombre.toLowerCase()}</strong>
             {condicion.tieneIntensidad ? ` (intensidad ${intensidad}%)` : ''}:
           </p>
@@ -334,7 +335,7 @@ export default function SimuladorBajaVision() {
               <div className={styles.demoHero}>
                 <h3>Calculadora de IRPF 2025</h3>
                 <p>Calcula tu retención fiscal en segundos. Datos oficiales AEAT.</p>
-                <button className={styles.demoCta} onClick={(e) => e.preventDefault()}>
+                <button type="button" className={styles.demoCta} onClick={(e) => e.preventDefault()}>
                   Calcular ahora
                 </button>
               </div>
@@ -370,10 +371,10 @@ export default function SimuladorBajaVision() {
               </div>
 
               <div className={styles.demoBadges}>
-                <span className={styles.badgeVerde}>✓ Guardado</span>
-                <span className={styles.badgeRojo}>✗ Error en campo</span>
-                <span className={styles.badgeAmarillo}>⚠ Revisar</span>
-                <span className={styles.badgeAzul}>ℹ Info</span>
+                <span className={styles.badgeVerde}><span aria-hidden="true">✓ </span>Guardado</span>
+                <span className={styles.badgeRojo}><span aria-hidden="true">✗ </span>Error en campo</span>
+                <span className={styles.badgeAmarillo}><span aria-hidden="true">⚠ </span>Revisar</span>
+                <span className={styles.badgeAzul}><span aria-hidden="true">ℹ </span>Info</span>
               </div>
 
               <p className={styles.demoTextoSmall}>
@@ -388,7 +389,7 @@ export default function SimuladorBajaVision() {
 
         {/* Comparativa rápida */}
         <section className={styles.warningBox}>
-          <h3>💡 Claves para diseñar con accesibilidad visual</h3>
+          <h3><span aria-hidden="true">💡</span> Claves para diseñar con accesibilidad visual</h3>
           <ul>
             <li><strong>Contraste mínimo WCAG AA:</strong> 4,5:1 para texto normal, 3:1 para texto grande</li>
             <li><strong>No uses solo el color</strong> para transmitir información (añade iconos o texto)</li>
