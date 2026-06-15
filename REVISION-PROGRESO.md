@@ -165,10 +165,10 @@
 | [x] | Historia de Centroamérica: De la Independencia al Corredor de la Migración | `/visualizador-historia/centroamerica/` | cultura, estudiantes |
 | [x] | Historia de Chile: De la Independencia a la Chile Contemporánea | `/visualizador-historia/chile/` | cultura, estudiantes |
 | [x] | Historia de Colombia: De la Independencia al Proceso de Paz | `/visualizador-historia/colombia/` | cultura, estudiantes |
-| [ ] | Historia de Corea: De los Tres Reinos a la Península Dividida | `/visualizador-historia/corea/` | cultura, estudiantes |
-| [ ] | Historia de Cuba: De la Guerra de los Diez Años a la Cuba Contemporánea | `/visualizador-historia/cuba/` | cultura, estudiantes |
-| [ ] | Historia de Escandinavia: De los Vikingos al Estado del Bienestar | `/visualizador-historia/escandinavia/` | cultura, estudiantes |
-| [ ] | Historia de Internet: Cronología de ARPANET a la IA Generativa | `/visualizador-historia/internet/` | cultura, tecnicas |
+| [x] | Historia de Corea: De los Tres Reinos a la Península Dividida | `/visualizador-historia/corea/` | cultura, estudiantes |
+| [x] | Historia de Cuba: De la Guerra de los Diez Años a la Cuba Contemporánea | `/visualizador-historia/cuba/` | cultura, estudiantes |
+| [x] | Historia de Escandinavia: De los Vikingos al Estado del Bienestar | `/visualizador-historia/escandinavia/` | cultura, estudiantes |
+| [x] | Historia de Internet: Cronología de ARPANET a la IA Generativa | `/visualizador-historia/internet/` | cultura, tecnicas |
 | [ ] | Historia de Italia: Del Risorgimento al Motor de la Cultura Europea | `/visualizador-historia/historia-italia/` | cultura |
 | [ ] | Historia de Japón: De la Corte Imperial a la Restauración Meiji | `/visualizador-historia/japon/` | cultura |
 | [ ] | Historia de la Agricultura: De la Revolución Neolítica a la Agricultura de Precisión | `/visualizador-historia/historia-agricultura/` | cultura |
