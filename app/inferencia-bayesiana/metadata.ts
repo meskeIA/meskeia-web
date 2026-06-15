@@ -37,9 +37,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/inferencia-bayesiana/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Cuatro modos de cálculo: caso simple, múltiples hipótesis, actualización secuencial y diagnóstico clínico',
+    'Actualización secuencial de Bayes: cada observación se convierte en nueva prior automáticamente',
+    'Modo diagnóstico con sensibilidad, especificidad y prevalencia para interpretar pruebas médicas',
+    'Cálculo de likelihood ratio positivo (LR+) y negativo (LR−) en el modo diagnóstico',
+    'Comparación simultánea de hasta 5 hipótesis con suma de probabilidades normalizada automáticamente',
+    'Ejemplos precargados: diagnóstico médico, correo spam, atribución de autoría y decisiones legales',
   ],
 });
 

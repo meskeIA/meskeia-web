@@ -39,7 +39,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Convierte números entre sistemas numéricos: binario, octal, decimal y hexadecimal. Muestra el proceso paso a paso. Incluye operaciones aritméticas y lógicas en binario.",
   url: "https://meskeia.com/calculadora-sistemas-numericos/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso con divisiones sucesivas',
+    'Operaciones lógicas bit a bit: AND, OR, XOR, NOT, desplazamiento izquierda (SHL) y derecha (SHR)',
+    'Selección de ancho de bits: 4, 8, 16 y 32 bits para operaciones en binario',
+    'Tabla de referencia rápida del 0 al 15 en las cuatro bases numéricas',
+    'Formateo del resultado binario en grupos de 4 bits (nibbles) para mayor legibilidad',
+    'Suma y resta aritmética en binario con representación en complemento a 2',
+  ],
 });
 
 export const faqJsonLd = {

@@ -238,7 +238,7 @@ export default function CalculadoraSistemasNumericosPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔢</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔢</span>
         <h1 className={styles.title}>Calculadora de Sistemas Numéricos</h1>
         <p className={styles.subtitle}>
           Convierte entre binario, octal, decimal y hexadecimal con explicación paso a paso
@@ -258,7 +258,9 @@ export default function CalculadoraSistemasNumericosPage() {
               {([2, 8, 10, 16] as Base[]).map(base => (
                 <button
                   key={base}
+                  type="button"
                   onClick={() => setInputBase(base)}
+                  aria-pressed={inputBase === base}
                   className={`${styles.baseBtn} ${inputBase === base ? styles.baseBtnActive : ''}`}
                 >
                   {base === 2 ? 'BIN' : base === 8 ? 'OCT' : base === 10 ? 'DEC' : 'HEX'}
@@ -280,12 +282,13 @@ export default function CalculadoraSistemasNumericosPage() {
           </div>
 
           {result && (
-            <div className={styles.resultsGrid}>
+            <div className={styles.resultsGrid} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.resultCard}>
                 <div className={styles.resultHeader}>
                   <span className={styles.resultLabel}>Binario (Base 2)</span>
                   <button
                     onClick={() => copyToClipboard(result.binary)}
+                    type="button"
                     className={styles.copyBtn}
                     title="Copiar"
                   >
@@ -300,6 +303,7 @@ export default function CalculadoraSistemasNumericosPage() {
                   <span className={styles.resultLabel}>Octal (Base 8)</span>
                   <button
                     onClick={() => copyToClipboard(result.octal)}
+                    type="button"
                     className={styles.copyBtn}
                     title="Copiar"
                   >
@@ -314,6 +318,7 @@ export default function CalculadoraSistemasNumericosPage() {
                   <span className={styles.resultLabel}>Decimal (Base 10)</span>
                   <button
                     onClick={() => copyToClipboard(result.decimal)}
+                    type="button"
                     className={styles.copyBtn}
                     title="Copiar"
                   >
@@ -328,6 +333,7 @@ export default function CalculadoraSistemasNumericosPage() {
                   <span className={styles.resultLabel}>Hexadecimal (Base 16)</span>
                   <button
                     onClick={() => copyToClipboard(result.hex)}
+                    type="button"
                     className={styles.copyBtn}
                     title="Copiar"
                   >
@@ -342,7 +348,9 @@ export default function CalculadoraSistemasNumericosPage() {
           {result && result.steps.length > 0 && (
             <div className={styles.stepsSection}>
               <button
+                type="button"
                 onClick={() => setShowSteps(!showSteps)}
+                aria-pressed={showSteps}
                 className={styles.stepsToggle}
               >
                 {showSteps ? '▼' : '▶'} Ver proceso paso a paso
@@ -368,7 +376,9 @@ export default function CalculadoraSistemasNumericosPage() {
               {([2, 8, 10, 16] as Base[]).map(base => (
                 <button
                   key={base}
+                  type="button"
                   onClick={() => setOpBase(base)}
+                  aria-pressed={opBase === base}
                   className={`${styles.baseBtn} ${opBase === base ? styles.baseBtnActive : ''}`}
                 >
                   {base === 2 ? 'BIN' : base === 8 ? 'OCT' : base === 10 ? 'DEC' : 'HEX'}
@@ -383,7 +393,9 @@ export default function CalculadoraSistemasNumericosPage() {
               {[4, 8, 16, 32].map(bits => (
                 <button
                   key={bits}
+                  type="button"
                   onClick={() => setBitWidth(bits)}
+                  aria-pressed={bitWidth === bits}
                   className={`${styles.baseBtn} ${bitWidth === bits ? styles.baseBtnActive : ''}`}
                 >
                   {bits} bits
@@ -424,7 +436,9 @@ export default function CalculadoraSistemasNumericosPage() {
               {(Object.keys(operationLabels) as Operation[]).map(op => (
                 <button
                   key={op}
+                  type="button"
                   onClick={() => setOperation(op)}
+                  aria-pressed={operation === op}
                   className={`${styles.opBtn} ${operation === op ? styles.opBtnActive : ''}`}
                   title={operationLabels[op].description}
                 >
@@ -435,12 +449,12 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
           </div>
 
-          <button onClick={handleOperation} className={styles.calculateBtn}>
+          <button type="button" onClick={handleOperation} className={styles.calculateBtn}>
             Calcular
           </button>
 
           {opResult && (
-            <div className={styles.opResultCard}>
+            <div className={styles.opResultCard} role="status" aria-live="polite" aria-atomic="true">
               <div className={styles.opResultHeader}>Resultado:</div>
               <div className={styles.opResultValue}>
                 <div className={styles.opResultRow}>
@@ -580,7 +594,7 @@ export default function CalculadoraSistemasNumericosPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔌</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔌</span>
                 <strong>Electrónica y hardware digital</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -590,7 +604,7 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🖥️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🖥️</span>
                 <strong>Colores en diseño web</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -600,7 +614,7 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🐧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🐧</span>
                 <strong>Permisos en Linux/Unix</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -610,7 +624,7 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔐</span>
                 <strong>Criptografía y hashing</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -620,7 +634,7 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧠</span>
                 <strong>Depuración de bajo nivel</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -630,7 +644,7 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📡</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📡</span>
                 <strong>Protocolos de red</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -743,32 +757,32 @@ export default function CalculadoraSistemasNumericosPage() {
           </h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Usa prefijos estándar en código</strong>
               <p><code>0b</code> para binario, <code>0o</code> para octal, <code>0x</code> para hex. <code>int a = 0xFF;</code> es más claro que <code>int a = 255;</code> cuando trabajas con bytes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Domina el truco BIN↔HEX</strong>
               <p>4 bits = 1 dígito hex. Convierte en grupos de 4 de derecha a izquierda. Esencial para leer dumps de memoria y hashes criptográficos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Permisos Linux en octal</strong>
               <p>Memoriza rwx=7, rw-=6, r-x=5, r--=4, ---=0. <code>chmod 755</code> = propietario rwx, grupo r-x, otros r-x. Muy frecuente en administración de sistemas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Piensa en potencias de 2</strong>
               <p>2^8=256, 2^10=1024≈1K, 2^16=65536, 2^32=4G. Memorizar estas potencias acelera el trabajo con sistemas de 8, 16, 32 y 64 bits.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>AND, OR y XOR para bits</strong>
               <p><code>valor &amp; 0x0F</code> extrae los 4 bits menos significativos. <code>valor | 0x80</code> activa el bit 7. <code>valor ^ 0xFF</code> invierte todos los bits.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Calculadora de programador del SO</strong>
               <p>Windows (Calc→Prog), macOS (Calc→Programmer), Linux (speedcrunch). Para conversiones rápidas sin abrir el IDE.</p>
             </div>
@@ -778,7 +792,7 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 6. Warning Box */}
         <div className={styles.warningBox} style={{ marginBottom: 'var(--spacing-xl)' }}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores Comunes al Trabajar con Sistemas Numéricos</strong>
           </div>
           <ul className={styles.warningList}>

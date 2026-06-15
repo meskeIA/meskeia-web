@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparación con Hardy-Weinberg',
     '4 modos preestablecidos (deriva pura, selección direccional, equilibradora, HW)',
     'Histograma de frecuencias finales',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'En español',
   ],
   keywords: ['deriva genética', 'selección natural', 'Hardy-Weinberg', 'biología universidad'],
 });

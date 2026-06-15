@@ -399,7 +399,7 @@
 | [x] | Calculadora de Movimiento | `/calculadora-movimiento/` | estudiantes |
 | [x] | Calculadora de Notas | `/calculadora-notas/` | estudiantes |
 | [ ] | Calculadora de Probabilidad | `/calculadora-probabilidad/` | estudiantes |
-| [ ] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
+| [x] | Calculadora de Sistemas Numéricos | `/calculadora-sistemas-numericos/` | estudiantes, tecnicas |
 | [x] | Calculadora de Trigonometría | `/calculadora-trigonometria/` | estudiantes |
 | [x] | Calculadora Estadística | `/calculadora-estadistica/` | estudiantes |
 | [x] | Calculadora Matemática Avanzada | `/calculadora-matematica/` | estudiantes |
@@ -482,7 +482,7 @@
 | [ ] | Germinación - De la Semilla a la Planta | `/visualizador-germinacion/` | estudiantes, cultura |
 | [x] | Glosario de Física y Química | `/glosario-fisica-quimica/` | estudiantes |
 | [ ] | Glosario de Programación | `/glosario-programacion/` | estudiantes, tecnicas |
-| [ ] | Inferencia Bayesiana | `/inferencia-bayesiana/` | estudiantes |
+| [x] | Inferencia Bayesiana | `/inferencia-bayesiana/` | estudiantes |
 | [ ] | La Célula por Dentro - Animal vs Vegetal | `/visualizador-celula/` | estudiantes, cultura, salud |
 | [ ] | La Escala del Universo | `/visualizador-escala-universo/` | estudiantes, cultura |
 | [ ] | La Fotosíntesis - De la Luz Solar a la Vida | `/visualizador-fotosintesis/` | estudiantes, cultura |
@@ -552,9 +552,9 @@
 | [x] | Simulador de Campo Eléctrico | `/simulador-campo-electrico/` | estudiantes |
 | [ ] | Simulador de Cifrado César | `/simulador-cifrado-cesar/` | estudiantes |
 | [ ] | Simulador de Cinética Química: Ecuación de Arrhenius | `/simulador-cinetica-arrhenius/` | estudiantes |
-| [ ] | Simulador de Colisiones — Elásticas e Inelásticas | `/simulador-colisiones/` | estudiantes, cultura |
+| [x] | Simulador de Colisiones — Elásticas e Inelásticas | `/simulador-colisiones/` | estudiantes, cultura |
 | [x] | Simulador de Conservación de la Energía | `/simulador-conservacion-energia/` | estudiantes |
-| [ ] | Simulador de Deriva Genética y Selección | `/simulador-deriva-genetica/` | estudiantes |
+| [x] | Simulador de Deriva Genética y Selección | `/simulador-deriva-genetica/` | estudiantes |
 | [ ] | Simulador de Derivadas: Pendiente de la Tangente | `/simulador-derivada-pendiente/` | estudiantes |
 | [x] | Simulador de Distribución Normal | `/simulador-distribucion-normal/` | estudiantes |
 | [x] | Simulador de Ecosistema: Cadena Trófica | `/simulador-ecosistema-trofico/` | estudiantes |

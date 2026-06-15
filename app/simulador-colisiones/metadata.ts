@@ -89,6 +89,5 @@ export const jsonLd = generateWebAppSchema({
     'Animación SVG del choque con fases pre-colisión, impacto y post-colisión',
     'Cálculo de momento lineal total y energía cinética antes y después',
     'Ideal para Bachillerato Física y preparación de selectividad',
-    'Gratuito, sin registro, en español',
   ],
 });

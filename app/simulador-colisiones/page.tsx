@@ -141,7 +141,7 @@ export default function SimuladorColisionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💥 Simulador de Colisiones</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💥</span> Simulador de Colisiones</h1>
         <p className={styles.subtitle}>
           Colisiones elásticas e inelásticas en 1D — momento lineal, energía cinética y coeficiente de restitución
         </p>
@@ -224,6 +224,7 @@ export default function SimuladorColisionesPage() {
         {/* ── Botón simular ── */}
         <div className={styles.btnWrapper}>
           <button
+            type="button"
             onClick={lanzarSimulacion}
             disabled={fase === 'pre' || fase === 'impact'}
             className={styles.btnSimular}
@@ -346,7 +347,7 @@ export default function SimuladorColisionesPage() {
 
         {/* ── Resultados ── */}
         {resultado && fase === 'done' && (
-          <div className={styles.resultados}>
+          <div className={styles.resultados} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.resultadosTitulo}>Resultados de la Colisión</h2>
 
             <div className={styles.resGrid}>
@@ -485,7 +486,7 @@ export default function SimuladorColisionesPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎱</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎱</span>
                   <h3>Bolas de billar</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -494,7 +495,7 @@ export default function SimuladorColisionesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🚗</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🚗</span>
                   <h3>Choques de vehículos</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -503,7 +504,7 @@ export default function SimuladorColisionesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚛️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚛️</span>
                   <h3>Física de partículas</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -512,7 +513,7 @@ export default function SimuladorColisionesPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏏</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏏</span>
                   <h3>Bate de béisbol y pelota</h3>
                 </div>
                 <p className={styles.escenarioTip}>
@@ -608,22 +609,22 @@ export default function SimuladorColisionesPage() {
             <h2>Claves para No Cometer Errores</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📐</span>
+                <span className={styles.tipIcon} aria-hidden="true">📐</span>
                 <h4>Ojo con los signos de velocidad</h4>
                 <p>Define un sentido positivo al inicio y mantenlo. Una velocidad negativa es perfectamente válida: significa que el objeto va en sentido contrario.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚖️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
                 <h4>Momento ≠ Energía</h4>
                 <p>El momento es una magnitud vectorial (puede cancelarse). La energía cinética es escalar y siempre positiva. No confundas sus conservaciones.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔢</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔢</span>
                 <h4>Fórmulas generales con e</h4>
                 <p>Para cualquier colisión (elástica o inelástica), si conoces e usa directamente las fórmulas generales. Evitas resolver el sistema cada vez.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <h4>Perfectamente inelástica = más simple</h4>
                 <p>Cuando los objetos se pegan (e=0), el sistema tiene una sola incógnita: v' = (m₁v₁ + m₂v₂)/(m₁+m₂). Aprovéchalo en el examen.</p>
               </div>
@@ -633,7 +634,7 @@ export default function SimuladorColisionesPage() {
           {/* 6. Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Frecuentes en Problemas de Colisiones</h3>
             </div>
             <ul className={styles.warningList}>

@@ -314,6 +314,7 @@ export default function SimuladorDerivaGenetica() {
           <div className={styles.modoSelector}>
             <button
               type="button"
+              aria-pressed={modo === 'deriva'}
               className={`${styles.modoBtn} ${modo === 'deriva' ? styles.modoActive : ''}`}
               onClick={() => aplicarModo('deriva')}
             >
@@ -321,6 +322,7 @@ export default function SimuladorDerivaGenetica() {
             </button>
             <button
               type="button"
+              aria-pressed={modo === 'direccional'}
               className={`${styles.modoBtn} ${modo === 'direccional' ? styles.modoActive : ''}`}
               onClick={() => aplicarModo('direccional')}
             >
@@ -328,6 +330,7 @@ export default function SimuladorDerivaGenetica() {
             </button>
             <button
               type="button"
+              aria-pressed={modo === 'equilibradora'}
               className={`${styles.modoBtn} ${modo === 'equilibradora' ? styles.modoActive : ''}`}
               onClick={() => aplicarModo('equilibradora')}
             >
@@ -335,6 +338,7 @@ export default function SimuladorDerivaGenetica() {
             </button>
             <button
               type="button"
+              aria-pressed={modo === 'hardy-weinberg'}
               className={`${styles.modoBtn} ${
                 modo === 'hardy-weinberg' ? styles.modoActive : ''
               }`}
@@ -565,7 +569,7 @@ export default function SimuladorDerivaGenetica() {
         {/* Resultados */}
         {resultado && (
           <>
-            <section className={styles.resultBlock}>
+            <section className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.resultTitle}>Resultados de la simulación</h3>
               <div className={styles.metricsGrid}>
                 <div className={styles.metricCard}>
@@ -611,10 +615,10 @@ export default function SimuladorDerivaGenetica() {
               <h2 className={styles.panelTitle}>Trayectorias de frecuencia p(A)</h2>
               <div className={styles.legend}>
                 <span className={styles.legendItem}>
-                  <span className={styles.colorDotMedia} /> Media de las {params.K} simulaciones
+                  <span className={styles.colorDotMedia} aria-hidden="true" /> Media de las {params.K} simulaciones
                 </span>
                 <span className={styles.legendItem}>
-                  <span className={styles.colorDotTrayectoria} /> Trayectoria individual
+                  <span className={styles.colorDotTrayectoria} aria-hidden="true" /> Trayectoria individual
                 </span>
               </div>
               <div className={styles.chartContainer}>
@@ -753,10 +757,10 @@ export default function SimuladorDerivaGenetica() {
               </h2>
               <div className={styles.legend}>
                 <span className={styles.legendItem}>
-                  <span className={styles.colorDotPerdido} /> Pérdida (p≈0)
+                  <span className={styles.colorDotPerdido} aria-hidden="true" /> Pérdida (p≈0)
                 </span>
                 <span className={styles.legendItem}>
-                  <span className={styles.colorDotFijado} /> Fijación (p≈1)
+                  <span className={styles.colorDotFijado} aria-hidden="true" /> Fijación (p≈1)
                 </span>
               </div>
               <div className={styles.histograma}>
@@ -1002,7 +1006,7 @@ export default function SimuladorDerivaGenetica() {
           <h3>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
                 <strong>Usa K alto (20-50)</strong>
                 <p>
@@ -1012,7 +1016,7 @@ export default function SimuladorDerivaGenetica() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔬</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔬</span>
               <div>
                 <strong>Compara modos extremos</strong>
                 <p>
@@ -1022,7 +1026,7 @@ export default function SimuladorDerivaGenetica() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏳</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏳</span>
               <div>
                 <strong>Aumenta G si no terminó</strong>
                 <p>
@@ -1032,7 +1036,7 @@ export default function SimuladorDerivaGenetica() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <div>
                 <strong>Equilibradora: prueba w distintos</strong>
                 <p>
@@ -1042,7 +1046,7 @@ export default function SimuladorDerivaGenetica() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧮</span>
               <div>
                 <strong>Tasas de mutación realistas</strong>
                 <p>
@@ -1052,7 +1056,7 @@ export default function SimuladorDerivaGenetica() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <div>
                 <strong>Migración m alta</strong>
                 <p>
@@ -1065,7 +1069,7 @@ export default function SimuladorDerivaGenetica() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <span>Limitaciones del Modelo</span>
             </div>
             <ul className={styles.warningList}>

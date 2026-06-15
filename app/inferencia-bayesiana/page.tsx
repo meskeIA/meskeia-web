@@ -1,8 +1,9 @@
 'use client';
+// @disclaimer: exempt
 
 import { useState, useMemo } from 'react';
 import styles from './InferenciaBayesiana.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -265,7 +266,7 @@ export default function InferenciaBayesianaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🧠</span>
+        <span className={styles.heroIcon} aria-hidden="true">🧠</span>
         <h1 className={styles.title}>Inferencia Bayesiana</h1>
         <p className={styles.subtitle}>
           Teorema de Bayes paso a paso - Actualiza creencias con evidencia
@@ -279,10 +280,12 @@ export default function InferenciaBayesianaPage() {
         {tabs.map(tab => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
+            aria-pressed={activeTab === tab.id}
             className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabActive : ''}`}
           >
-            <span className={styles.tabIcon}>{tab.icon}</span>
+            <span className={styles.tabIcon} aria-hidden="true">{tab.icon}</span>
             <span className={styles.tabLabel}>{tab.name}</span>
           </button>
         ))}
@@ -300,6 +303,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>P(A) - Prior (probabilidad inicial)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={priorA}
                   onChange={e => setPriorA(e.target.value)}
                   className={styles.input}
@@ -312,6 +316,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>P(B|A) - Likelihood (verosimilitud)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={likelihoodBA}
                   onChange={e => setLikelihoodBA(e.target.value)}
                   className={styles.input}
@@ -324,6 +329,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>P(B|¬A) - Falso positivo</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={likelihoodBNotA}
                   onChange={e => setLikelihoodBNotA(e.target.value)}
                   className={styles.input}
@@ -332,12 +338,12 @@ export default function InferenciaBayesianaPage() {
                 <span className={styles.helpText}>Probabilidad de observar B si A es falso</span>
               </div>
 
-              <button onClick={() => loadExample('simple')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('simple')} className={styles.btnSecondary}>
                 Cargar ejemplo (enfermedad rara)
               </button>
             </div>
 
-            <div className={styles.resultsPanel}>
+            <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
               <h2 className={styles.panelTitle}>Resultados</h2>
 
               {simpleResults ? (
@@ -455,6 +461,7 @@ export default function InferenciaBayesianaPage() {
                         <label className={styles.miniLabel}>Prior</label>
                         <input
                           type="text"
+                          inputMode="decimal"
                           value={h.prior}
                           onChange={e => updateHypothesis(i, 'prior', e.target.value)}
                           className={styles.inputSmall}
@@ -465,6 +472,7 @@ export default function InferenciaBayesianaPage() {
                         <label className={styles.miniLabel}>P(E|H)</label>
                         <input
                           type="text"
+                          inputMode="decimal"
                           value={h.likelihood}
                           onChange={e => updateHypothesis(i, 'likelihood', e.target.value)}
                           className={styles.inputSmall}
@@ -473,7 +481,7 @@ export default function InferenciaBayesianaPage() {
                       </div>
                     </div>
                     {hypotheses.length > 2 && (
-                      <button onClick={() => removeHypothesis(i)} className={styles.btnRemove}>
+                      <button type="button" onClick={() => removeHypothesis(i)} className={styles.btnRemove}>
                         ✕
                       </button>
                     )}
@@ -483,7 +491,7 @@ export default function InferenciaBayesianaPage() {
 
               <div className={styles.buttonRow}>
                 {hypotheses.length < 6 && (
-                  <button onClick={addHypothesis} className={styles.btnSecondary}>
+                  <button type="button" onClick={addHypothesis} className={styles.btnSecondary}>
                     + Añadir hipótesis
                   </button>
                 )}
@@ -500,7 +508,7 @@ export default function InferenciaBayesianaPage() {
               </div>
             </div>
 
-            <div className={styles.resultsPanel}>
+            <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
               <h2 className={styles.panelTitle}>Resultados</h2>
 
               {multipleResults ? (
@@ -575,6 +583,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>Prior inicial P(H)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={seqPrior}
                   onChange={e => setSeqPrior(e.target.value)}
                   className={styles.input}
@@ -586,6 +595,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>P(Obs+|H) - Prob. de obs. positiva si H es cierta</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={seqLikelihood}
                   onChange={e => setSeqLikelihood(e.target.value)}
                   className={styles.input}
@@ -597,6 +607,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>P(Obs+|¬H) - Prob. de obs. positiva si H es falsa</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={seqLikelihoodNeg}
                   onChange={e => setSeqLikelihoodNeg(e.target.value)}
                   className={styles.input}
@@ -610,7 +621,9 @@ export default function InferenciaBayesianaPage() {
                   {seqObservations.map((obs, i) => (
                     <button
                       key={i}
+                      type="button"
                       onClick={() => toggleObservation(i)}
+                      aria-pressed={obs}
                       className={`${styles.obsBtn} ${obs ? styles.obsPositive : styles.obsNegative}`}
                     >
                       {i + 1}: {obs ? '✓' : '✗'}
@@ -618,10 +631,10 @@ export default function InferenciaBayesianaPage() {
                   ))}
                 </div>
                 <div className={styles.buttonRow}>
-                  <button onClick={addObservation} className={styles.btnSmall} disabled={seqObservations.length >= 10}>
+                  <button type="button" onClick={addObservation} className={styles.btnSmall} disabled={seqObservations.length >= 10}>
                     + Añadir
                   </button>
-                  <button onClick={removeObservation} className={styles.btnSmall} disabled={seqObservations.length <= 1}>
+                  <button type="button" onClick={removeObservation} className={styles.btnSmall} disabled={seqObservations.length <= 1}>
                     - Quitar
                   </button>
                 </div>
@@ -632,7 +645,7 @@ export default function InferenciaBayesianaPage() {
               </button>
             </div>
 
-            <div className={styles.resultsPanel}>
+            <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
               <h2 className={styles.panelTitle}>Evolución del Posterior</h2>
 
               {sequentialResults ? (
@@ -708,6 +721,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>Prevalencia (%)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={prevalence}
                   onChange={e => setPrevalence(e.target.value)}
                   className={styles.input}
@@ -720,6 +734,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>Sensibilidad (%)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={sensitivity}
                   onChange={e => setSensitivity(e.target.value)}
                   className={styles.input}
@@ -732,6 +747,7 @@ export default function InferenciaBayesianaPage() {
                 <label className={styles.label}>Especificidad (%)</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={specificity}
                   onChange={e => setSpecificity(e.target.value)}
                   className={styles.input}
@@ -745,7 +761,7 @@ export default function InferenciaBayesianaPage() {
               </button>
             </div>
 
-            <div className={styles.resultsPanel}>
+            <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
               <h2 className={styles.panelTitle}>Valores Predictivos</h2>
 
               {diagnosticResults ? (
@@ -850,17 +866,6 @@ export default function InferenciaBayesianaPage() {
         )}
       </main>
 
-      {/* Disclaimer */}
-      
-
-      <DisclaimerCard variant="educational" severity="low" collapsible={true} context="inferencia-bayesiana">
-        <p>Esta calculadora es una <strong>herramienta educativa</strong> para comprender la inferencia bayesiana y el teorema de Bayes:</p>
-        <ul className={styles.disclaimerList}>
-          <li><strong>Verifica resultados en trabajos académicos</strong>: Especialmente en estadística, probabilidad y análisis de datos</li>
-          <li><strong>Consulta con un estadístico</strong>: Para decisiones médicas, financieras o de investigación crítica</li>
-        </ul>
-      </DisclaimerCard>
-
       {/* Educational content */}
       <EducationalSection
         title="¿Quieres entender mejor la inferencia bayesiana?"
@@ -933,28 +938,28 @@ export default function InferenciaBayesianaPage() {
           <h3>Aplicaciones Prácticas</h3>
           <div className={styles.applicationsList}>
             <div className={styles.applicationCard}>
-              <span className={styles.appIcon}>🏥</span>
+              <span className={styles.appIcon} aria-hidden="true">🏥</span>
               <div>
                 <h4>Diagnóstico Médico</h4>
                 <p>Interpretar resultados de tests considerando prevalencia y características del test.</p>
               </div>
             </div>
             <div className={styles.applicationCard}>
-              <span className={styles.appIcon}>📧</span>
+              <span className={styles.appIcon} aria-hidden="true">📧</span>
               <div>
                 <h4>Filtros de Spam</h4>
                 <p>Clasificar emails como spam basándose en palabras clave y patrones históricos.</p>
               </div>
             </div>
             <div className={styles.applicationCard}>
-              <span className={styles.appIcon}>🤖</span>
+              <span className={styles.appIcon} aria-hidden="true">🤖</span>
               <div>
                 <h4>Machine Learning</h4>
                 <p>Redes bayesianas, clasificadores Naive Bayes, inferencia probabilística.</p>
               </div>
             </div>
             <div className={styles.applicationCard}>
-              <span className={styles.appIcon}>⚖️</span>
+              <span className={styles.appIcon} aria-hidden="true">⚖️</span>
               <div>
                 <h4>Sistemas Legales</h4>
                 <p>Evaluar probabilidad de culpabilidad dada la evidencia (aunque controvertido).</p>
@@ -1019,7 +1024,7 @@ export default function InferenciaBayesianaPage() {
             <div className={styles.eduEscenariosGrid}>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
-                  <span className={styles.eduEscenarioIcon}>🏥</span>
+                  <span className={styles.eduEscenarioIcon} aria-hidden="true">🏥</span>
                   <h4>Médico — Diagnóstico Clínico</h4>
                 </div>
                 <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Test COVID con sensibilidad 95% y especificidad 90% en una población con prevalencia 1%. Un paciente da positivo. P(COVID|+) = (0,95 × 0,01) / (0,95×0,01 + 0,10×0,99) = 0,0095 / 0,1085 ≈ <strong>8,8%</strong>. Solo 1 de cada 11 positivos tiene COVID realmente.</p>
@@ -1027,7 +1032,7 @@ export default function InferenciaBayesianaPage() {
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
-                  <span className={styles.eduEscenarioIcon}>🤖</span>
+                  <span className={styles.eduEscenarioIcon} aria-hidden="true">🤖</span>
                   <h4>Científico de Datos — Clasificación y Detección de Fraude</h4>
                 </div>
                 <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Filtro de spam Naive Bayes. P(spam|&quot;dinero&quot;,&quot;gratis&quot;,&quot;urgente&quot;) = P(&quot;dinero&quot;|spam) × P(&quot;gratis&quot;|spam) × P(&quot;urgente&quot;|spam) × P(spam) / P(evidencia). Con P(spam)=0,3 y LRs de 8×, 12× y 5×, el posterior supera 99,9%. En detección de fraude bancario: transacción en país inusual (LR+15) + importe atípico (LR+8) + hora nocturna (LR+3) → posterior 85% de fraude aunque la tasa base sea 0,1%.</p>
@@ -1035,7 +1040,7 @@ export default function InferenciaBayesianaPage() {
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
-                  <span className={styles.eduEscenarioIcon}>📊</span>
+                  <span className={styles.eduEscenarioIcon} aria-hidden="true">📊</span>
                   <h4>Economista — Pronósticos con Incertidumbre</h4>
                 </div>
                 <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Pronóstico de recesión. Prior basado en ciclo económico histórico: P(recesión en 12 meses) = 15%. Aparece dato nuevo: curva de rendimientos invertida (LR = 4,2 históricamente). Posterior = (4,2 × 0,15) / (4,2×0,15 + 1×0,85) = 0,63 / 1,48 ≈ <strong>42,6%</strong>. Nuevo dato: PMI manufacturero cae a 47 (LR = 2,8). Posterior actualizado → <strong>68%</strong>.</p>
@@ -1043,7 +1048,7 @@ export default function InferenciaBayesianaPage() {
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioHeader}>
-                  <span className={styles.eduEscenarioIcon}>🔬</span>
+                  <span className={styles.eduEscenarioIcon} aria-hidden="true">🔬</span>
                   <h4>Investigador Científico — Meta-análisis y Experimentos</h4>
                 </div>
                 <p className={styles.eduEscenarioExample}><strong>Caso real:</strong> Meta-análisis bayesiano de eficacia de un fármaco. Prior de 3 estudios previos: P(eficaz) = 60%. Nuevo ECA con n=500 muestra OR=1,8 (p=0,03). Posterior bayesiano: 84%. Tercer estudio con n=200, OR=1,4 (p=0,12): posterior 79%. Comparar con meta-análisis frecuentista: solo reporta I²=34% y OR combinado=1,65 sin cuantificar la probabilidad de eficacia.</p>
@@ -1161,32 +1166,32 @@ export default function InferenciaBayesianaPage() {
             <h3>✅ Mejores Prácticas en Inferencia Bayesiana</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>📊</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">📊</span>
                 <h4>Siempre reporta el prior</h4>
                 <p>Nunca presentes un posterior sin indicar el prior usado y su fuente. Dos personas con priors distintos obtienen resultados diferentes con los mismos datos.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🔢</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🔢</span>
                 <h4>Usa frecuencias naturales</h4>
                 <p>En vez de &quot;0,001 probabilidad&quot;, di &quot;1 de cada 1.000 personas&quot;. Las frecuencias naturales reducen errores de interpretación hasta en un 70% según estudios de Gigerenzer.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🔄</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🔄</span>
                 <h4>Actualiza secuencialmente</h4>
                 <p>No esperes a tener todos los datos. Cada nueva observación puede (y debe) actualizar el posterior. El aprendizaje bayesiano es continuo, no puntual.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>⚖️</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">⚖️</span>
                 <h4>Calcula el LR antes del prior</h4>
                 <p>El Likelihood Ratio es la &quot;fuerza de la evidencia&quot; independiente del contexto. Calcula LR = P(E|H)/P(E|¬H) primero; luego aplica al prior específico de cada caso.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🎯</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🎯</span>
                 <h4>Analiza la sensibilidad al prior</h4>
                 <p>Si el posterior cambia mucho con pequeños cambios en el prior, necesitas más evidencia. Si es robusto al prior, los datos son suficientemente informativos.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>📝</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">📝</span>
                 <h4>Documenta tus asunciones</h4>
                 <p>La independencia entre observaciones, la estacionariedad del proceso, y el modelo elegido son asunciones que afectan el resultado. Explicítalas siempre.</p>
               </div>
@@ -1196,7 +1201,7 @@ export default function InferenciaBayesianaPage() {
           {/* Warning Box */}
           <div className={styles.eduWarningBox}>
             <div className={styles.eduWarningHeader}>
-              <span className={styles.eduWarningIcon}>⚠️</span>
+              <span className={styles.eduWarningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Conceptuales que Invalidan el Análisis Bayesiano</h3>
             </div>
             <ul className={styles.eduWarningList}>
