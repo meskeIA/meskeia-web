@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Flujo visual del debate parlamentario en el Congreso',
     'Caminos del Senado: aprobar, enmendar o vetar',
     'Cronología real desde propuesta hasta entrada en vigor',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

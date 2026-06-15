@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Tiempos de degradación con escala logarítmica visual',
     'Datos de reciclaje en España vs. media europea',
     'Concepto de economía circular explicado visualmente',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

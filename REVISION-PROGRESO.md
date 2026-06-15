@@ -120,10 +120,10 @@
 | [x] | El Peso de los Números | `/visualizador-peso-numeros/` | cultura, finanzas |
 | [x] | El Renacimiento: Del Humanismo a la Revolución Científica | `/visualizador-historia/renacimiento/` | cultura |
 | [x] | El Sistema Linfático — El Sistema Olvidado | `/visualizador-sistema-linfatico/` | cultura, estudiantes, salud |
-| [ ] | El Viaje de tu Basura | `/visualizador-viaje-basura/` | cultura, salud |
-| [ ] | El Viaje de un Paquete | `/visualizador-viaje-paquete/` | cultura, tecnicas |
-| [ ] | El Viaje de una Ley | `/visualizador-proceso-legislativo/` | cultura |
-| [ ] | Electroquímica: Pilas, Electrólisis y Baterías Li-ion | `/visualizador-electroquimica/` | cultura, estudiantes, tecnicas |
+| [x] | El Viaje de tu Basura | `/visualizador-viaje-basura/` | cultura, salud |
+| [x] | El Viaje de un Paquete | `/visualizador-viaje-paquete/` | cultura, tecnicas |
+| [x] | El Viaje de una Ley | `/visualizador-proceso-legislativo/` | cultura |
+| [x] | Electroquímica: Pilas, Electrólisis y Baterías Li-ion | `/visualizador-electroquimica/` | cultura, estudiantes, tecnicas |
 | [ ] | Epigenética: Metilación, Histonas e Imprinting | `/visualizador-epigenetica/` | cultura, estudiantes, salud |
 | [ ] | Errores de Escritura Creativa | `/errores-escritura-creativa/` | cultura, estudiantes |
 | [ ] | España Contemporánea: De las Guerras Napoleónicas a la Democracia | `/visualizador-historia/espana-contemporanea/` | cultura |

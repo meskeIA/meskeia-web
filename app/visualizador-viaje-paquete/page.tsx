@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -254,11 +253,11 @@ function SeccionTransporte() {
 
             <div className={styles.modoStats}>
               <div className={styles.modoStat}>
-                <span className={styles.modoStatLabel}>💨 CO₂/paquete</span>
+                <span className={styles.modoStatLabel}><span aria-hidden="true">💨</span> CO₂/paquete</span>
                 <span className={styles.modoStatValor}>{formatNumber(m.co2PorPaquete, 0)} g</span>
               </div>
               <div className={styles.modoStat}>
-                <span className={styles.modoStatLabel}>🚀 Velocidad</span>
+                <span className={styles.modoStatLabel}><span aria-hidden="true">🚀</span> Velocidad</span>
                 <span className={styles.modoStatValor}>{m.velocidad}</span>
               </div>
             </div>
@@ -370,14 +369,14 @@ function SeccionEspana() {
         <h3 className={styles.comparativaTitulo}>Devoluciones: online vs tienda</h3>
         <div className={styles.comparativaBarras}>
           <div className={styles.comparativaRow}>
-            <span className={styles.comparativaLabel}>🛒 Online</span>
+            <span className={styles.comparativaLabel}><span aria-hidden="true">🛒</span> Online</span>
             <div className={styles.comparativaBarra}>
               <div className={styles.comparativaRelleno} style={{ width: '100%', backgroundColor: '#EF4444' }} />
             </div>
             <span className={styles.comparativaPct}>25%</span>
           </div>
           <div className={styles.comparativaRow}>
-            <span className={styles.comparativaLabel}>🏪 Tienda</span>
+            <span className={styles.comparativaLabel}><span aria-hidden="true">🏪</span> Tienda</span>
             <div className={styles.comparativaBarra}>
               <div className={styles.comparativaRelleno} style={{ width: '32%', backgroundColor: '#10B981' }} />
             </div>
@@ -417,13 +416,7 @@ export default function VisualizadorViajePaquetePage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -452,7 +445,7 @@ export default function VisualizadorViajePaquetePage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -502,7 +495,6 @@ export default function VisualizadorViajePaquetePage() {
         <RelatedApps apps={getRelatedApps('visualizador-viaje-paquete')} />
         <ShareCard appName="visualizador-viaje-paquete" />
         <Footer appName="visualizador-viaje-paquete" />
-      </div>
-    </>
+  </div>
   );
 }

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -429,13 +428,7 @@ export default function VisualizadorProcesoLegislativoPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -464,7 +457,7 @@ export default function VisualizadorProcesoLegislativoPage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -517,7 +510,6 @@ export default function VisualizadorProcesoLegislativoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-proceso-legislativo')} />
         <ShareCard appName="visualizador-proceso-legislativo" />
         <Footer appName="visualizador-proceso-legislativo" />
-      </div>
-    </>
+  </div>
   );
 }

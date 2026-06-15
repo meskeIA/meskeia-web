@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Transporte: camión, avión, tren y costes CO₂',
     'Última milla: la parte más cara de la logística',
     'España en números: 700M+ paquetes/año, Black Friday, devoluciones',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

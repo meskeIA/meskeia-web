@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -501,13 +500,13 @@ function SeccionEspana() {
           España recicla el 39% de sus residuos urbanos — el objetivo europeo para 2035 es el <strong>65%</strong>.
         </p>
         <div className={styles.circularFlujo}>
-          <span className={styles.circularPaso}>🏭 Fabricar</span>
+          <span className={styles.circularPaso}><span aria-hidden="true">🏭</span> Fabricar</span>
           <span className={styles.circularFlecha} aria-hidden="true">→</span>
-          <span className={styles.circularPaso}>🛒 Usar</span>
+          <span className={styles.circularPaso}><span aria-hidden="true">🛒</span> Usar</span>
           <span className={styles.circularFlecha} aria-hidden="true">→</span>
-          <span className={styles.circularPaso}>♻️ Reciclar</span>
+          <span className={styles.circularPaso}><span aria-hidden="true">♻️</span> Reciclar</span>
           <span className={styles.circularFlecha} aria-hidden="true">→</span>
-          <span className={styles.circularPaso}>🔄 Nueva materia prima</span>
+          <span className={styles.circularPaso}><span aria-hidden="true">🔄</span> Nueva materia prima</span>
         </div>
       </div>
 
@@ -539,13 +538,7 @@ export default function VisualizadorViajeBasuraPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -574,7 +567,7 @@ export default function VisualizadorViajeBasuraPage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -631,7 +624,6 @@ export default function VisualizadorViajeBasuraPage() {
         <RelatedApps apps={getRelatedApps('visualizador-viaje-basura')} />
         <ShareCard appName="visualizador-viaje-basura" />
         <Footer appName="visualizador-viaje-basura" />
-      </div>
-    </>
+  </div>
   );
 }

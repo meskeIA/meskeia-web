@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Electrólisis del agua: burbujas animadas y relación 2:1 H₂/O₂',
     'Mecanismo de batería Li-ion con toggle carga/descarga',
     'Comparativa de tecnologías de baterías',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

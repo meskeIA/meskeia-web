@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -329,7 +328,7 @@ const SeccionSerie = () => {
         </div>
 
         {resultado && selA !== null && selB !== null && (
-          <div className={styles.serieResultado}>
+          <div className={styles.serieResultado} role="status" aria-live="polite" aria-atomic="true">
             <p className={styles.serieResultadoTitulo}>Pila resultante</p>
             <div className={styles.serieResultadoGrid}>
               <div className={`${styles.serieResultadoItem} ${styles.serieResultadoAnodo}`}>
@@ -719,13 +718,7 @@ export default function VisualizadorElectroquimicaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -754,7 +747,7 @@ export default function VisualizadorElectroquimicaPage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>
@@ -829,7 +822,6 @@ export default function VisualizadorElectroquimicaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-electroquimica')} />
         <ShareCard appName="visualizador-electroquimica" />
         <Footer appName="visualizador-electroquimica" />
-      </div>
-    </>
+  </div>
   );
 }
