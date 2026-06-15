@@ -36,7 +36,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Cifrado Vigenère gratuito. Encripta mensajes con palabra clave usando el cifrado polialfabético histórico. Visualización de la tabla Vigenère y explicaciones detalladas.",
   url: "https://meskeia.com/cifrado-vigenere/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Cifrado y descifrado Vigenère con clave personalizable de cualquier longitud',
+    'Visualización de la tabla Vigenère completa (cuadrado de 26×26 alphabetos)',
+    'Marcado visual del proceso: fila de mensaje, columna de clave y celda resultado',
+    'Histograma de frecuencias de letras del texto cifrado para análisis estadístico',
+    'Índice de Coincidencia (IC) calculado para estimar vulnerabilidad del cifrado',
+    'Exportación del texto cifrado como código HTML embebible',
+    'Modo descifrar: recupera el texto original con la misma clave',
+  ],
 });
 
 export const faqJsonLd = {

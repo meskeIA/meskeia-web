@@ -338,7 +338,7 @@ export default function VisualizadorCirculoQuintasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎵 Círculo de Quintas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎵</span> Círculo de Quintas</h1>
         <p className={styles.subtitle}>
           Haz clic en cualquier tonalidad para explorar sus acordes, armadura de clave y relativa menor
         </p>
@@ -469,14 +469,14 @@ export default function VisualizadorCirculoQuintasPage() {
         </div>
 
         {/* Panel de información */}
-        <div className={styles.infoPanel}>
+        <div className={styles.infoPanel} role="status" aria-live="polite" aria-atomic="true">
           {tonActual ? (
             <>
               <div className={styles.infoCabecera}>
                 <h2 className={styles.infoTitulo}>{tonActual.nombre}</h2>
                 <p className={styles.infoSubtitulo}>Relativa menor: <strong>{tonActual.nombreMenor}</strong></p>
                 <p className={styles.armadura}>
-                  🎼 Armadura: <span className={styles.armaduraValor}>{getArmadura(tonActual.alteraciones)}</span>
+                  <span aria-hidden="true">🎼</span> Armadura: <span className={styles.armaduraValor}>{getArmadura(tonActual.alteraciones)}</span>
                 </p>
               </div>
 
@@ -521,6 +521,7 @@ export default function VisualizadorCirculoQuintasPage() {
 
               {/* Progresiones */}
               <button
+                type="button"
                 className={styles.btnProgresiones}
                 onClick={() => setMostrarProgresiones(!mostrarProgresiones)}
                 aria-expanded={mostrarProgresiones}
@@ -709,7 +710,7 @@ export default function VisualizadorCirculoQuintasPage() {
 
           {/* Warning box - errores frecuentes */}
           <div className={styles.warningBox}>
-            <h3 className={styles.warningTitulo}>⚠️ Errores frecuentes al interpretar el círculo</h3>
+            <h3 className={styles.warningTitulo}><span aria-hidden="true">⚠️</span> Errores frecuentes al interpretar el círculo</h3>
             <ul className={styles.warningLista}>
               <li><strong>Confundir "adyacente en el círculo" con "sonido parecido"</strong>: Las tonalidades adyacentes comparten 6 de 7 notas, pero no necesariamente "suenan" parecidas. La proximidad en el círculo indica relación armónica, no timbre.</li>
               <li><strong>Creer que mayor = alegre y menor = triste</strong>: El modo mayor o menor influye en el carácter, pero el tempo, la dinámica y el contexto importan igual o más. Un Adagio en Do mayor puede sonar más melancólico que un Allegro en La menor.</li>

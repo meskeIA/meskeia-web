@@ -196,6 +196,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
         <div className={styles.tabNav} role="tablist" aria-label="Secciones de la cronología">
           {tabs.map(t => (
             <button
+              type="button"
               key={t.id}
               role="tab"
               aria-selected={tab === t.id}
@@ -328,6 +329,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
               <div className={styles.periodoSelector}>
                 {data.hitos.map((h, i) => (
                   <button
+                    type="button"
                     key={h.id}
                     className={`${styles.periodoBtn} ${i === detalleIdx ? styles.periodoBtnActivo : ''}`}
                     onClick={() => setDetalleIdx(i)}
@@ -398,6 +400,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
 
               <div className={styles.navBtns}>
                 <button
+                  type="button"
                   className={styles.btnAnterior}
                   onClick={() => setDetalleIdx(i => Math.max(0, i - 1))}
                   disabled={detalleIdx === 0}
@@ -407,6 +410,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
                 </button>
                 <span className={styles.navCounter}>{detalleIdx + 1} / {data.hitos.length}</span>
                 <button
+                  type="button"
                   className={styles.btnSiguiente}
                   onClick={() => setDetalleIdx(i => Math.min(data.hitos.length - 1, i + 1))}
                   disabled={detalleIdx === data.hitos.length - 1}
@@ -441,6 +445,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
                 </button>
                 {Object.entries(data.categorias).map(([id, label]) => (
                   <button
+                    type="button"
                     key={id}
                     className={`${styles.filtroCatBtn} ${catFiltro === id ? styles.filtroCatBtnActivo : ''}`}
                     onClick={() => setCatFiltro(id)}
@@ -675,7 +680,7 @@ export default function HistoriaInteractivo({ data }: { data: HistoriaData }) {
           </div>
 
           <div className={styles.warningBox}>
-            <strong>⚠️ Errores comunes al entender {data.titulo}</strong>
+            <strong><span aria-hidden="true">⚠️</span> Errores comunes al entender {data.titulo}</strong>
             <ul>
               {data.educativo.errores.map((err, i) => (
                 <li key={i}>

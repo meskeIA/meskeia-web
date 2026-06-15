@@ -46,8 +46,8 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa de órdenes 0, 1 y 2: curvas [A] vs tiempo con ecuaciones integradas',
     'Calculadora de vida media t₁/₂ para cada orden',
     'Cards interactivas: temperatura, concentración, catalizadores, superficie, luz',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
+    'Gráfico interactivo ln(k) vs 1/T con linealización de Arrhenius',
+    'Vida media t₁/₂ calculada automáticamente para cada orden de reacción',
   ],
 });
 

@@ -164,15 +164,17 @@ export default function CifradoVigenerePage() {
             type="button"
             className={`${styles.modeBtn} ${modo === 'cifrar' ? styles.active : ''}`}
             onClick={() => setModo('cifrar')}
+            aria-pressed={modo === 'cifrar'}
           >
-            🔒 Cifrar
+            <span aria-hidden="true">🔒</span> Cifrar
           </button>
           <button
             type="button"
             className={`${styles.modeBtn} ${modo === 'descifrar' ? styles.active : ''}`}
             onClick={() => setModo('descifrar')}
+            aria-pressed={modo === 'descifrar'}
           >
-            🔓 Descifrar
+            <span aria-hidden="true">🔓</span> Descifrar
           </button>
         </div>
 
@@ -248,7 +250,7 @@ export default function CifradoVigenerePage() {
             className={styles.btnPrimary}
             disabled={!texto.trim() || !claveNormalizada}
           >
-            {modo === 'cifrar' ? '🔒 Cifrar mensaje' : '🔓 Descifrar mensaje'}
+            {modo === 'cifrar' ? <><span aria-hidden="true">🔒</span> Cifrar mensaje</> : <><span aria-hidden="true">🔓</span> Descifrar mensaje</>}
           </button>
           <button type="button" onClick={limpiar} className={styles.btnSecondary}>
             Limpiar
@@ -257,11 +259,11 @@ export default function CifradoVigenerePage() {
 
         {/* Resultado */}
         {resultado && (
-          <div className={styles.resultSection}>
+          <div className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
             <label className={styles.label}>Resultado:</label>
             <div className={styles.resultBox}>{resultado}</div>
             <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
-              {copiado ? '✅ Copiado' : '📋 Copiar resultado'}
+              {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar resultado</>}
             </button>
           </div>
         )}
@@ -273,7 +275,7 @@ export default function CifradoVigenerePage() {
               type="button"
               className={styles.htmlToggleBtn}
               onClick={() => setHtmlExpanded(!htmlExpanded)}
-
+              aria-pressed={htmlExpanded}
             >
               <span>{htmlExpanded ? '▲' : '▼'} Exportar como código HTML</span>
               <span className={styles.htmlBadge}>Nuevo</span>
@@ -299,8 +301,9 @@ export default function CifradoVigenerePage() {
             type="button"
             onClick={() => setMostrarTabla(!mostrarTabla)}
             className={styles.btnTabla}
+            aria-pressed={mostrarTabla}
           >
-            {mostrarTabla ? '📊 Ocultar tabla Vigenère' : '📊 Mostrar tabla Vigenère'}
+            {mostrarTabla ? <><span aria-hidden="true">📊</span> Ocultar tabla Vigenère</> : <><span aria-hidden="true">📊</span> Mostrar tabla Vigenère</>}
           </button>
         </div>
 
@@ -349,7 +352,7 @@ export default function CifradoVigenerePage() {
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Vigenère vs César: ¿por qué es más seguro?</h2>
+          <h2><span aria-hidden="true">📊</span> Vigenère vs César: ¿por qué es más seguro?</h2>
           <p className={styles.comparativaSubtitle}>
             Comparativa entre el cifrado César (monoalfabético) y Vigenère (polialfabético)
           </p>
@@ -358,8 +361,8 @@ export default function CifradoVigenerePage() {
               <thead>
                 <tr>
                   <th>Característica</th>
-                  <th>👑 César</th>
-                  <th>🌊 Vigenère</th>
+                  <th><span aria-hidden="true">👑</span> César</th>
+                  <th><span aria-hidden="true">🌊</span> Vigenère</th>
                 </tr>
               </thead>
               <tbody>
@@ -405,10 +408,10 @@ export default function CifradoVigenerePage() {
 
         {/* ========== SECCIÓN 2: HISTORIA ========== */}
         <section className={styles.infoSection}>
-          <h2>🏛️ Historia del Cifrado Vigenère</h2>
+          <h2><span aria-hidden="true">🏛️</span> Historia del Cifrado Vigenère</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>📜 Origen (1553)</h3>
+              <h3><span aria-hidden="true">📜</span> Origen (1553)</h3>
               <p>
                 Descrito por primera vez por <strong>Giovan Battista Bellaso</strong> en su
                 libro <em>La cifra del Sig.</em> en 1553. Fue erróneamente atribuido a
@@ -417,7 +420,7 @@ export default function CifradoVigenerePage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔒 &quot;Le chiffre indéchiffrable&quot;</h3>
+              <h3><span aria-hidden="true">🔒</span> &quot;Le chiffre indéchiffrable&quot;</h3>
               <p>
                 Durante los siglos XVI al XIX fue conocido como el cifrado indescifrable.
                 Fue usado por ejércitos, diplomáticos y espías europeos. La Confederación
@@ -426,7 +429,7 @@ export default function CifradoVigenerePage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔓 Ruptura por Babbage/Kasiski (1846-1863)</h3>
+              <h3><span aria-hidden="true">🔓</span> Ruptura por Babbage/Kasiski (1846-1863)</h3>
               <p>
                 <strong>Charles Babbage</strong> lo rompió hacia 1846, pero no publicó
                 el método. <strong>Friedrich Kasiski</strong> lo redescubrió y publicó
@@ -435,7 +438,7 @@ export default function CifradoVigenerePage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>💡 One-Time Pad (1882)</h3>
+              <h3><span aria-hidden="true">💡</span> One-Time Pad (1882)</h3>
               <p>
                 Frank Miller propuso en 1882 que si la clave es tan larga como el
                 mensaje, aleatoria y de un solo uso, el cifrado es matemáticamente
@@ -448,7 +451,7 @@ export default function CifradoVigenerePage() {
 
         {/* ========== SECCIÓN 3: FAQ ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre Vigenère</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre Vigenère</h2>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary className={styles.faqQuestion}>
@@ -513,7 +516,7 @@ export default function CifradoVigenerePage() {
 
         {/* ========== SECCIÓN 4: EJEMPLO PASO A PASO ========== */}
         <section className={styles.ejemploSection}>
-          <h2>🧮 Cómo funciona: ejemplo paso a paso</h2>
+          <h2><span aria-hidden="true">🧮</span> Cómo funciona: ejemplo paso a paso</h2>
           <div className={styles.ejemploGrid}>
             <div className={styles.ejemploCard}>
               <div className={styles.ejemploStep}>1</div>
@@ -581,31 +584,31 @@ export default function CifradoVigenerePage() {
 
         {/* ========== SECCIÓN 5: CONSEJOS ========== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Consejos para claves seguras</h2>
+          <h2><span aria-hidden="true">💡</span> Consejos para claves seguras</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <div>
                 <strong>Longitud mínima recomendada</strong>
                 <p>Usa claves de al menos 8 caracteres. Cuanto más larga, más repeticiones diferentes del cifrado, y más difícil el análisis de Kasiski.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚫</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Evita palabras del diccionario</strong>
                 <p>Claves como «AMOR», «CLAVE» o «SECRET» son las primeras que prueban los atacantes. Usa frases o combinaciones sin sentido.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔀</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔀</span>
               <div>
                 <strong>Sin patrones reconocibles</strong>
                 <p>Evita claves como «ABCABC» o «AAABBB». Los patrones repetidos facilitan el análisis. Mejor: «XKQZMVP».</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <div>
                 <strong>No reutilices claves</strong>
                 <p>Usar la misma clave para múltiples mensajes facilita el criptoanálisis comparando los textos cifrados. Cada mensaje debería tener su propia clave.</p>
@@ -616,31 +619,31 @@ export default function CifradoVigenerePage() {
 
         {/* ========== SECCIÓN 6: WARNING BOX ========== */}
         <div className={styles.warningBox}>
-          <h2>⚠️ Errores frecuentes con el Cifrado Vigenère</h2>
+          <h2><span aria-hidden="true">⚠️</span> Errores frecuentes con el Cifrado Vigenère</h2>
           <ul className={styles.warningList}>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Usarlo para proteger información real</strong>
                 <p>Vigenère es vulnerable al test de Kasiski y al índice de coincidencia. Con ~200 caracteres de texto cifrado cualquier herramienta online puede romperlo. Para datos reales usa AES-256 con una contraseña robusta.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Confundir clave corta con seguridad suficiente</strong>
                 <p>Una clave de 3 letras (como «SOL») significa que el texto se divide en grupos de 3 y cada grupo es un César independiente. Con frecuencias de texto en español se rompe en minutos.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Creer que es igual al one-time pad</strong>
                 <p>El one-time pad (Vigenère con clave aleatoria tan larga como el mensaje, usada una sola vez) sí es irrompible. Pero si reutilizas la clave o si no es verdaderamente aleatoria, la seguridad desaparece.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>✅</span>
+              <span className={styles.warningIcon} aria-hidden="true">✅</span>
               <div>
                 <strong>Uso correcto: educación y juegos</strong>
                 <p>Vigenère es ideal para aprender los fundamentos de la criptografía polialfabética, diseñar puzzles, escapadas temáticas y comprender la evolución histórica hacia los cifrados modernos.</p>

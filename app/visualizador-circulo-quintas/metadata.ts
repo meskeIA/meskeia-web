@@ -59,7 +59,7 @@ export const jsonLd = generateWebAppSchema({
     'Identificación de tonalidades vecinas: dominante y subdominante',
     'Progresiones populares (I-IV-V, I-V-vi-IV, ii-V-I) para cada tonalidad',
     'Resaltado visual de enharmonías (F#/Gb, B/Cb, C#/Db)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Visualización SVG interactiva de los 12 sectores con resaltado de vecinas y enharmonías',
     'Diseño responsivo optimizado para móvil y escritorio',
   ],
 });

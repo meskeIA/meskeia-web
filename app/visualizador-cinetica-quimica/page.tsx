@@ -498,8 +498,10 @@ export default function VisualizadorCineticaQuimica() {
                 {EJEMPLOS_PERFIL.map((ej, i) => (
                   <button
                     key={i}
+                    type="button"
                     className={`${styles.btnEjemplo} ${ejemploActivo === i ? styles.btnEjemploActivo : ''}`}
                     onClick={() => cargarEjemplo(i)}
+                    aria-pressed={ejemploActivo === i}
                   >
                     {ej.nombre}
                   </button>
@@ -543,6 +545,7 @@ export default function VisualizadorCineticaQuimica() {
             <div className={styles.controlGrupo}>
               <div className={styles.toggleRow}>
                 <button
+                  type="button"
                   className={`${styles.toggleBtn} ${mostrarCat ? styles.toggleBtnActivo : ''}`}
                   onClick={() => setMostrarCat((v) => !v)}
                   aria-label={mostrarCat ? 'Desactivar catalizador' : 'Activar catalizador'}
@@ -630,7 +633,7 @@ export default function VisualizadorCineticaQuimica() {
               />
             </div>
 
-            <div className={styles.arrheniusValorBox}>
+            <div className={styles.arrheniusValorBox} role="status" aria-live="polite" aria-atomic="true">
               <strong>ln(k) relativo</strong>
               <span>{lnK.toFixed(1)}</span>
             </div>

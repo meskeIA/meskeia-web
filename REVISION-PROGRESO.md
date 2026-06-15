@@ -76,10 +76,10 @@
 | [x] | Cifrado Clásico | `/cifrado-clasico/` | cultura |
 | [x] | Cifrado Playfair | `/cifrado-playfair/` | cultura |
 | [x] | Cifrado por Transposición | `/cifrado-transposicion/` | cultura |
-| [ ] | Cifrado Vigenère | `/cifrado-vigenere/` | cultura |
-| [ ] | Cinética Química: Arrhenius, Órdenes y Catalizadores | `/visualizador-cinetica-quimica/` | cultura, estudiantes, tecnicas |
-| [ ] | Círculo de Quintas | `/visualizador-circulo-quintas/` | cultura, estudiantes |
-| [ ] | Civilizaciones Precolombinas: Maya, Azteca e Inca | `/visualizador-historia/civilizaciones-precolombinas/` | cultura |
+| [x] | Cifrado Vigenère | `/cifrado-vigenere/` | cultura |
+| [x] | Cinética Química: Arrhenius, Órdenes y Catalizadores | `/visualizador-cinetica-quimica/` | cultura, estudiantes, tecnicas |
+| [x] | Círculo de Quintas | `/visualizador-circulo-quintas/` | cultura, estudiantes |
+| [x] | Civilizaciones Precolombinas: Maya, Azteca e Inca | `/visualizador-historia/civilizaciones-precolombinas/` | cultura |
 | [ ] | Colores del Cielo — Evolución 24h | `/visualizador-colores-cielo/` | cultura, diseno |
 | [ ] | Cómo Funciona el Clima | `/visualizador-clima/` | cultura, estudiantes |
 | [ ] | Cómo Funciona el GPS | `/visualizador-gps/` | cultura, tecnicas |
