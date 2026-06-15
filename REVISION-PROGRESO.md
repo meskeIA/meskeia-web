@@ -429,7 +429,7 @@
 | [ ] | Curso de Introducción a la Teoría Política | `/curso-teoria-politica/` | estudiantes, cultura |
 | [ ] | Curso de Pensamiento Científico | `/curso-pensamiento-cientifico/` | estudiantes |
 | [x] | Curso de Pensamiento Sistémico | `/curso-pensamiento-sistemico/` | estudiantes, cultura |
-| [ ] | Curso de Redacción Académica | `/curso-redaccion-academica/` | estudiantes |
+| [x] | Curso de Redacción Académica | `/curso-redaccion-academica/` | estudiantes |
 | [ ] | De dónde Viene tu Camiseta | `/visualizador-origen-camiseta/` | estudiantes, cultura |
 | [ ] | Diabetes: Mecanismo Biológico de Insulina y Glucagón | `/visualizador-diabetes-mecanismo/` | estudiantes, cultura, salud |
 | [ ] | Digestión y Nutrientes - De la Comida a la Célula | `/visualizador-digestion-nutrientes/` | estudiantes, cultura, salud |
@@ -579,7 +579,7 @@
 | [x] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
 | [x] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
 | [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
-| [ ] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
+| [x] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
 | [x] | Simulador de Reacciones Químicas | `/simulador-reacciones-quimicas/` | estudiantes, tecnicas |
 | [ ] | Simulador de Recursión y Pila de Llamadas | `/simulador-recursion/` | estudiantes, tecnicas |
 | [x] | Simulador de Reemplazo de Páginas | `/simulador-reemplazo-paginas/` | estudiantes, tecnicas |
@@ -741,7 +741,7 @@
 | [ ] | Asistentes de Código IA 2026: Claude Code vs Copilot vs Gemini | `/comparador-asistentes-codigo/` | tecnicas, productividad |
 | [ ] | Base de Datos Relacional: Tablas, JOIN e Índices | `/visualizador-base-datos-relacional/` | tecnicas, estudiantes |
 | [ ] | Blockchain - Cadena de Bloques y Contratos Inteligentes | `/visualizador-blockchain/` | tecnicas, cultura, estudiantes |
-| [ ] | Buscador de Palabras por Patrón | `/buscador-palabras-patron/` | tecnicas, cultura, juegos, productividad |
+| [x] | Buscador de Palabras por Patrón | `/buscador-palabras-patron/` | tecnicas, cultura, juegos, productividad |
 | [ ] | Calculadora DDT — Temperatura de la Masa (Desired Dough Temperature) | `/calculadora-temperatura-masa/` | tecnicas |
 | [ ] | Calculadora de Ángulo de Campo (FOV) para Vídeo | `/calculadora-fov-video/` | tecnicas, diseno |
 | [x] | Calculadora de Bitrate y Tamaño de Vídeo | `/calculadora-bitrate-video/` | tecnicas, diseno |
@@ -1033,7 +1033,7 @@
 | [ ] | Guía del Aceite de Oliva | `/guia-aceite-oliva/` | salud, cultura |
 | [ ] | Guía del Café | `/guia-cafe/` | salud, cultura |
 | [ ] | Guía del Té | `/guia-te/` | salud, cultura |
-| [ ] | Huesos del Cuerpo Humano | `/huesos-cuerpo-humano/` | salud, cultura |
+| [x] | Huesos del Cuerpo Humano | `/huesos-cuerpo-humano/` | salud, cultura |
 | [ ] | Ibuprofeno: Inhibidor COX con Efecto Antiinflamatorio | `/visualizador-ibuprofeno/` | salud, cultura, estudiantes |
 | [ ] | Índice Glucémico vs. Carga Glucémica: La Paradoja de la Sandía | `/visualizador-indice-glucemico/` | salud, cultura, estudiantes |
 | [ ] | Insulina y Glucosa - Cómo Regula tu Cuerpo el Azúcar | `/visualizador-insulina-glucosa/` | salud, cultura, estudiantes |

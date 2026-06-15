@@ -39,5 +39,12 @@ export const jsonLd = generateWebAppSchema({
   description: "Aprende a escribir textos académicos de calidad. Curso práctico con pautas aplicables a tu TFG, TFM, tesis o artículo. Estructura, citas APA, coherencia, estilo académico y más.",
   url: "https://meskeia.com/curso-redaccion-academica/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    '13 módulos desde fundamentos hasta proyecto final: TFG, TFM, tesis y artículos científicos',
+    'Guía de citas APA 7 y MLA 9 con ejemplos de libros, artículos, webs y entrevistas',
+    'Estructura del párrafo académico: idea principal, desarrollo y conclusión con ejemplos',
+    'Tipos de conectores discursivos por función: causa, contraste, ejemplificación y conclusión',
+    'Seguimiento de progreso por capítulo con indicador visual de completado',
+    'Registro de tiempo estimado por módulo para planificar el estudio',
+  ],
 });

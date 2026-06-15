@@ -38,8 +38,8 @@ export const jsonLd = generateWebAppSchema({
     'Filtro opcional de letras a excluir',
     'Resultados agrupados por longitud y ordenados alfabéticamente',
     'Más de 87.000 lemas del español validados (Lemario de Olea, dominio público)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
+    'Útil para crucigramas, Wordle, Scrabble y retos lingüísticos: busca por longitud exacta y letras conocidas',
+    'Diccionario completo con lemas del español sin distinción regional para hispanohablantes de todo el mundo',
   ],
 });
 

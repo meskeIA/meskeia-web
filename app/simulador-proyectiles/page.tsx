@@ -419,6 +419,7 @@ export default function SimuladorProyectiles() {
                       gravedadPreset === preset ? styles.gravityActive : ''
                     }`}
                     onClick={() => seleccionarPreset(preset)}
+                    aria-pressed={gravedadPreset === preset}
                   >
                     {preset}
                   </button>
@@ -429,6 +430,7 @@ export default function SimuladorProyectiles() {
                     gravedadPreset === 'Custom' ? styles.gravityActive : ''
                   }`}
                   onClick={() => seleccionarPreset('Custom')}
+                  aria-pressed={gravedadPreset === 'Custom'}
                 >
                   Personalizado
                 </button>
@@ -443,6 +445,7 @@ export default function SimuladorProyectiles() {
                 !conResistencia ? styles.modeActive : ''
               }`}
               onClick={() => setConResistencia(false)}
+              aria-pressed={!conResistencia}
             >
               Sin resistencia del aire
             </button>
@@ -452,6 +455,7 @@ export default function SimuladorProyectiles() {
                 conResistencia ? styles.modeActive : ''
               }`}
               onClick={() => setConResistencia(true)}
+              aria-pressed={conResistencia}
             >
               Con resistencia del aire
             </button>
@@ -611,7 +615,7 @@ export default function SimuladorProyectiles() {
 
         {/* Resultados */}
         {lanzamientoActual && (
-          <section className={styles.panel}>
+          <section className={styles.panel} role="status" aria-live="polite" aria-atomic="true">
             <h2 className={styles.panelTitle}>Resultados</h2>
             <div className={styles.resultBlock}>
               <h3 className={styles.resultTitle}>Lanzamiento actual</h3>

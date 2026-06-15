@@ -56,7 +56,7 @@ export default function CursoRedaccionAcademicaPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>📝</span>
+        <span className={styles.heroIcon} aria-hidden="true">📝</span>
         <h1 className={styles.title}>Curso de Redacción Académica</h1>
         <p className={styles.subtitle}>
           Guía práctica para escribir textos académicos de calidad.
@@ -68,7 +68,7 @@ export default function CursoRedaccionAcademicaPage() {
           rel="noopener noreferrer"
           className={styles.videoButton}
         >
-          <span className={styles.videoIcon}>▶️</span>
+          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
           Ver introducción en video
         </a>
       </header>
@@ -78,22 +78,22 @@ export default function CursoRedaccionAcademicaPage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📚</span>
+          <span className={styles.statIcon} aria-hidden="true">📚</span>
           <div className={styles.statValue}>{totalChapters}</div>
           <div className={styles.statLabel}>Capítulos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>⏱️</span>
+          <span className={styles.statIcon} aria-hidden="true">⏱️</span>
           <div className={styles.statValue}>{totalDuration}</div>
           <div className={styles.statLabel}>Minutos</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>✅</span>
+          <span className={styles.statIcon} aria-hidden="true">✅</span>
           <div className={styles.statValue}>{completedCount}/{totalChapters}</div>
           <div className={styles.statLabel}>Completados</div>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statIcon}>📊</span>
+          <span className={styles.statIcon} aria-hidden="true">📊</span>
           <div className={styles.statValue}>{progress}%</div>
           <div className={styles.statLabel}>Progreso</div>
         </div>
@@ -103,32 +103,32 @@ export default function CursoRedaccionAcademicaPage() {
       <section className={styles.overviewSection}>
         <div className={styles.overviewGrid}>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📚</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📚</span>
             <h3>Fundamentos</h3>
             <p>Qué es un texto académico y sus características</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📋</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📋</span>
             <h3>Planificación</h3>
             <p>Organiza tu trabajo antes de escribir</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🚀</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🚀</span>
             <h3>Introducción</h3>
             <p>Cómo empezar tu texto de forma efectiva</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📝</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📝</span>
             <h3>Desarrollo</h3>
             <p>Argumentación y progresión temática</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>🎯</span>
+            <span className={styles.overviewIcon} aria-hidden="true">🎯</span>
             <h3>Conclusiones</h3>
             <p>Cierra tu trabajo de forma memorable</p>
           </div>
           <div className={styles.overviewCard}>
-            <span className={styles.overviewIcon}>📖</span>
+            <span className={styles.overviewIcon} aria-hidden="true">📖</span>
             <h3>Citas</h3>
             <p>APA, MLA y cómo citar correctamente</p>
           </div>
@@ -137,7 +137,7 @@ export default function CursoRedaccionAcademicaPage() {
 
       {/* Modules Section */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📖 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Contenido del Curso</h2>
 
         {modules.map((module) => {
           const completedInModule = module.chapters.filter(ch => isCompleted(ch.id)).length;
@@ -174,7 +174,7 @@ export default function CursoRedaccionAcademicaPage() {
                         <span className={styles.chapterNumber}>{globalChapterIndex}</span>
                         <div className={styles.chapterInfo}>
                           <h4 className={styles.chapterTitle}>{chapter.title}</h4>
-                          <span className={styles.chapterDuration}>⏱️ {chapter.duration} min</span>
+                          <span className={styles.chapterDuration}><span aria-hidden="true">⏱️</span> {chapter.duration} min</span>
                         </div>
                       </div>
                       <div className={styles.chapterTopics}>
@@ -210,15 +210,15 @@ export default function CursoRedaccionAcademicaPage() {
 
       {/* Recursos adicionales */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>🔧 Herramientas Relacionadas</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🔧</span> Herramientas Relacionadas</h2>
         <div className={styles.resourcesGrid}>
           <Link href="/contador-palabras" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>📊</span>
+            <span className={styles.resourceIcon} aria-hidden="true">📊</span>
             <div className={styles.resourceName}>Contador de Palabras</div>
             <div className={styles.resourceDesc}>Controla la extensión de tu texto</div>
           </Link>
           <Link href="/conversor-texto" className={styles.resourceCard}>
-            <span className={styles.resourceIcon}>🔄</span>
+            <span className={styles.resourceIcon} aria-hidden="true">🔄</span>
             <div className={styles.resourceName}>Conversor de Texto</div>
             <div className={styles.resourceDesc}>Mayúsculas, minúsculas y más</div>
           </Link>

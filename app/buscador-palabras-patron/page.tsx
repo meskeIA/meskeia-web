@@ -250,7 +250,7 @@ export default function BuscadorPalabrasPatronPage() {
         </div>
 
         {results.length > 0 && (
-          <div className={styles.resultsSection}>
+          <div className={styles.resultsSection} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.resultsHeader}>
               <h3>Palabras encontradas: {results.length}</h3>
             </div>
@@ -323,7 +323,7 @@ export default function BuscadorPalabrasPatronPage() {
           <h3>🎯 Casos de uso reales</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>🧩</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧩</span>
               <h4>Crucigramas y autodefinidos</h4>
               <p>
                 Estás resolviendo un crucigrama y tienes <code>C_R_E_O</code> con definición “pequeño bote”.
@@ -332,7 +332,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>🎮</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
               <h4>Wordle con pistas verdes</h4>
               <p>
                 Después de un intento en Wordle tienes letras verdes (posición correcta) y amarillas
@@ -342,7 +342,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>📝</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📝</span>
               <h4>Redacción y diseño tipográfico</h4>
               <p>
                 Necesitas una palabra de longitud exacta para un titular, un logotipo o un eslogan que
@@ -351,7 +351,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>📚</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
               <h4>Aprendizaje de vocabulario</h4>
               <p>
                 Para estudiantes de español como segunda lengua o para reforzar ortografía: explorar
@@ -491,7 +491,7 @@ export default function BuscadorPalabrasPatronPage() {
           <h3>💡 Mejores prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Empieza ancho y filtra</h4>
               <p>
                 Es mejor obtener 50 resultados y refinarlos con filtros que empezar con un patrón
@@ -499,7 +499,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔤</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔤</span>
               <h4>No te preocupes por las tildes</h4>
               <p>
                 El sistema compara sin tildes, así que <code>c_s_</code> encuentra también CASÉ.
@@ -508,7 +508,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
               <h4>Memoriza patrones frecuentes</h4>
               <p>
                 Sufijos como <code>__CION</code>, <code>__DAD</code> o <code>__MENTE</code> son
@@ -517,7 +517,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📖</span>
+              <span className={styles.tipIcon} aria-hidden="true">📖</span>
               <h4>Verifica con un diccionario</h4>
               <p>
                 El lemario garantiza que las palabras existen en español, pero no su significado.
@@ -526,7 +526,7 @@ export default function BuscadorPalabrasPatronPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <h4>Atajos rápidos en Wordle</h4>
               <p>
                 Si Wordle te marca posición 1 como N y posición 4 como E, busca <code>N__E_</code>
@@ -539,7 +539,7 @@ export default function BuscadorPalabrasPatronPage() {
         <section>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes al usar el buscador</strong>
             </div>
             <ul className={styles.warningList}>

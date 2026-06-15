@@ -39,7 +39,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Explora los 206 huesos del esqueleto humano: nombre, función, articulaciones y curiosidades. Guía interactiva para estudiantes de medicina, enfermería y anatomía.",
   url: "https://meskeia.com/huesos-cuerpo-humano/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Catálogo de los 206 huesos del esqueleto adulto con nombre en latín',
+    'Filtros por región anatómica: cráneo, columna vertebral, tórax, extremidades superiores e inferiores',
+    'Filtros por tipo de hueso: largo, corto, plano, irregular y sesamoideo',
+    'Articulaciones, función biomecánica y datos curiosos por hueso',
+    'Buscador por nombre, función o articulación entre los 206 huesos',
+    'Contador de resultados dinámico con combinación de filtros',
+  ],
 });
 
 export const faqJsonLd = {

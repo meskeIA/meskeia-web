@@ -98,9 +98,9 @@ export const jsonLd = generateWebAppSchema({
     'Presets de gravedad: Tierra, Luna, Marte, Júpiter',
     'Modo con/sin resistencia del aire',
     'Comparación de hasta 3 lanzamientos simultáneos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'En español',
+    'Visualización de la trayectoria completa con valores numéricos de alcance, altura máxima y tiempo',
+    'Ecuaciones de movimiento parabólico mostradas para cada lanzamiento',
+    'Tabla comparativa de hasta 3 lanzamientos simultáneos con distintos parámetros',
   ],
   keywords: ['proyectiles', 'tiro parabólico', 'cinemática', 'física bachillerato'],
 });

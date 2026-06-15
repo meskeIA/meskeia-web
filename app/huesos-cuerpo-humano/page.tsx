@@ -72,7 +72,7 @@ export default function HuesosCuerpoHumanoPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🦴</span>
+        <span className={styles.heroIcon} aria-hidden="true">🦴</span>
         <h1 className={styles.title}>Huesos del Cuerpo Humano</h1>
         <p className={styles.subtitle}>
           Explora los {totalHuesos} huesos del esqueleto humano adulto
@@ -91,7 +91,7 @@ export default function HuesosCuerpoHumanoPage() {
       {/* Buscador y filtros */}
       <div className={styles.filtersSection}>
         <div className={styles.searchBox}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
             type="text"
             value={busqueda}
@@ -101,6 +101,7 @@ export default function HuesosCuerpoHumanoPage() {
           />
           {busqueda && (
             <button
+              type="button"
               onClick={() => setBusqueda('')}
               className={styles.clearButton}
               aria-label="Limpiar búsqueda"
@@ -115,18 +116,22 @@ export default function HuesosCuerpoHumanoPage() {
             <label className={styles.filterLabel}>Región:</label>
             <div className={styles.filterButtons}>
               <button
+                type="button"
                 className={`${styles.filterButton} ${regionFiltro === 'todas' ? styles.active : ''}`}
                 onClick={() => setRegionFiltro('todas')}
+                aria-pressed={regionFiltro === 'todas'}
               >
                 Todas ({conteosPorRegion.todas})
               </button>
               {REGIONES.map(region => (
                 <button
                   key={region}
+                  type="button"
                   className={`${styles.filterButton} ${regionFiltro === region ? styles.active : ''}`}
                   onClick={() => setRegionFiltro(region)}
+                  aria-pressed={regionFiltro === region}
                 >
-                  {REGION_EMOJI[region]} {region} ({conteosPorRegion[region]})
+                  <span aria-hidden="true">{REGION_EMOJI[region]}</span> {region} ({conteosPorRegion[region]})
                 </button>
               ))}
             </div>
@@ -136,18 +141,22 @@ export default function HuesosCuerpoHumanoPage() {
             <label className={styles.filterLabel}>Tipo de hueso:</label>
             <div className={styles.filterButtons}>
               <button
+                type="button"
                 className={`${styles.filterButton} ${tipoFiltro === 'todos' ? styles.active : ''}`}
                 onClick={() => setTipoFiltro('todos')}
+                aria-pressed={tipoFiltro === 'todos'}
               >
                 Todos
               </button>
               {TIPOS.map(tipo => (
                 <button
                   key={tipo}
+                  type="button"
                   className={`${styles.filterButton} ${tipoFiltro === tipo ? styles.active : ''}`}
                   onClick={() => setTipoFiltro(tipo)}
+                  aria-pressed={tipoFiltro === tipo}
                 >
-                  {TIPO_EMOJI[tipo]} {tipo}
+                  <span aria-hidden="true">{TIPO_EMOJI[tipo]}</span> {tipo}
                 </button>
               ))}
             </div>
@@ -156,7 +165,7 @@ export default function HuesosCuerpoHumanoPage() {
       </div>
 
       {/* Contador de resultados */}
-      <div className={styles.resultsCount}>
+      <div className={styles.resultsCount} role="status" aria-live="polite" aria-atomic="true">
         {huesosFiltrados.length === BONES.length
           ? `Mostrando ${BONES.length} entradas (${totalHuesos} huesos en total)`
           : `${huesosFiltrados.length} entrada${huesosFiltrados.length !== 1 ? 's' : ''} (${totalHuesosFiltrados} huesos)`
@@ -173,7 +182,7 @@ export default function HuesosCuerpoHumanoPage() {
           >
             <div className={styles.cardHeader}>
               <div className={styles.cardHeaderLeft}>
-                <span className={styles.regionEmoji}>{REGION_EMOJI[hueso.region]}</span>
+                <span className={styles.regionEmoji} aria-hidden="true">{REGION_EMOJI[hueso.region]}</span>
                 <div>
                   <h3 className={styles.boneName}>{hueso.nombre}</h3>
                   <span className={styles.latinName}>{hueso.nombreLatin}</span>
@@ -181,7 +190,7 @@ export default function HuesosCuerpoHumanoPage() {
               </div>
               <div className={styles.badges}>
                 <span className={styles.typeBadge} title="Tipo de hueso">
-                  {TIPO_EMOJI[hueso.tipo]} {hueso.tipo}
+                  <span aria-hidden="true">{TIPO_EMOJI[hueso.tipo]}</span> {hueso.tipo}
                 </span>
                 {hueso.cantidad > 1 && (
                   <span className={styles.countBadge} title="Cantidad en el cuerpo">
@@ -207,7 +216,7 @@ export default function HuesosCuerpoHumanoPage() {
             {huesoSeleccionado?.id === hueso.id && (
               <div className={styles.expandedContent}>
                 <div className={styles.detailSection}>
-                  <h4 className={styles.detailTitle}>📋 Información completa</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">📋</span> Información completa</h4>
                   <div className={styles.propertiesGrid}>
                     <div className={styles.propertyItem}>
                       <span className={styles.propertyLabel}>Nombre latino</span>
@@ -231,7 +240,7 @@ export default function HuesosCuerpoHumanoPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h4 className={styles.detailTitle}>🔗 Articulaciones</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">🔗</span> Articulaciones</h4>
                   <div className={styles.articulationsList}>
                     {hueso.articulaciones.map((art, idx) => (
                       <span key={idx} className={styles.articulationTag}>{art}</span>
@@ -240,12 +249,12 @@ export default function HuesosCuerpoHumanoPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h4 className={styles.detailTitle}>⚙️ Función</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">⚙️</span> Función</h4>
                   <p className={styles.functionText}>{hueso.funcion}</p>
                 </div>
 
                 <div className={styles.curiositySection}>
-                  <h4 className={styles.detailTitle}>💡 Curiosidad</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">💡</span> Curiosidad</h4>
                   <p className={styles.curiosityText}>{hueso.curiosidad}</p>
                 </div>
               </div>
@@ -261,9 +270,10 @@ export default function HuesosCuerpoHumanoPage() {
       {/* Sin resultados */}
       {huesosFiltrados.length === 0 && (
         <div className={styles.noResults}>
-          <span className={styles.noResultsIcon}>🔍</span>
+          <span className={styles.noResultsIcon} aria-hidden="true">🔍</span>
           <p>No se encontraron huesos con esos criterios</p>
           <button
+            type="button"
             onClick={() => { setBusqueda(''); setRegionFiltro('todas'); setTipoFiltro('todos'); }}
             className={styles.resetButton}
           >
