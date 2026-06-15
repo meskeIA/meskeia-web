@@ -183,7 +183,7 @@ export default function GeneradorTarjetasPage() {
       <MeskeiaLogo />
 
       <header className={`${styles.hero} noPrint`}>
-        <h1 className={styles.title}>🃏 Generador de Tarjetas de Comunicación</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🃏</span> Generador de Tarjetas de Comunicación</h1>
         <p className={styles.subtitle}>
           Crea e imprime tarjetas pictográficas personalizadas para comunicación aumentativa.
           Elige emojis, colores y texto para cada tarjeta.
@@ -203,6 +203,7 @@ export default function GeneradorTarjetasPage() {
       {/* Selector de vista */}
       <div className={`${styles.vistaTabs} noPrint`} role="tablist" aria-label="Vista de la herramienta">
         <button
+          type="button"
           className={`${styles.vistaTab} ${vista === 'editor' ? styles.vistaTabActiva : ''}`}
           onClick={() => setVista('editor')}
           role="tab"
@@ -211,6 +212,7 @@ export default function GeneradorTarjetasPage() {
           ✏️ Editor
         </button>
         <button
+          type="button"
           className={`${styles.vistaTab} ${vista === 'imprimir' ? styles.vistaTabActiva : ''}`}
           onClick={() => setVista('imprimir')}
           role="tab"
@@ -227,7 +229,7 @@ export default function GeneradorTarjetasPage() {
           <div className={styles.mazosSidebar}>
             <div className={styles.mazosHeader}>
               <h2 className={styles.mazosTitulo}>Mazos</h2>
-              <button className={styles.btnNuevoMazo} onClick={crearMazo} aria-label="Crear nuevo mazo">+</button>
+              <button type="button" className={styles.btnNuevoMazo} onClick={crearMazo} aria-label="Crear nuevo mazo">+</button>
             </div>
             <div className={styles.mazosList}>
               {mazos.map(m => (
@@ -260,19 +262,21 @@ export default function GeneradorTarjetasPage() {
                         autoFocus
                         maxLength={40}
                       />
-                      <button className={styles.btnGuardarNombre} onClick={renombrarMazo}>✓</button>
-                      <button className={styles.btnCancelarNombre} onClick={() => setEditandoMazo(false)}>✕</button>
+                      <button type="button" className={styles.btnGuardarNombre} onClick={renombrarMazo}>✓</button>
+                      <button type="button" className={styles.btnCancelarNombre} onClick={() => setEditandoMazo(false)}>✕</button>
                     </div>
                   ) : (
                     <div className={styles.mazoTituloRow}>
                       <h2 className={styles.mazoNombreH2}>{mazoActual.nombre}</h2>
                       <button
+                        type="button"
                         className={styles.btnEditarNombre}
                         onClick={() => { setNombreMazo(mazoActual.nombre); setEditandoMazo(true); }}
                         aria-label="Renombrar mazo"
                       >✏️</button>
                       {mazos.length > 1 && (
                         <button
+                          type="button"
                           className={styles.btnEliminarMazo}
                           onClick={() => eliminarMazo(mazoActual.id)}
                           aria-label="Eliminar mazo"
@@ -313,6 +317,7 @@ export default function GeneradorTarjetasPage() {
                     {/* Selector de emoji */}
                     <div className={styles.emojiCol}>
                       <button
+                        type="button"
                         className={styles.btnEmojiGrande}
                         onClick={() => setMostrarEmojisPara(mostrarEmojisPara === 'nuevo' ? null : 'nuevo')}
                         aria-label={`Emoji: ${nuevoEmoji}. Pulsa para cambiar`}
@@ -364,6 +369,7 @@ export default function GeneradorTarjetasPage() {
                     </div>
 
                     <button
+                      type="button"
                       className={styles.btnAgregarTarjeta}
                       onClick={agregarTarjeta}
                       disabled={!nuevoTexto.trim()}
@@ -390,6 +396,7 @@ export default function GeneradorTarjetasPage() {
                         <span className={styles.tarjetaEditorEmoji}>{t.emoji}</span>
                         <span className={styles.tarjetaEditorTexto}>{t.texto}</span>
                         <button
+                          type="button"
                           className={styles.btnEliminarT}
                           onClick={() => eliminarTarjeta(t.id)}
                           aria-label={`Eliminar tarjeta ${t.texto}`}
@@ -433,6 +440,7 @@ export default function GeneradorTarjetasPage() {
                 ] as { key: TamanoTarjeta; label: string; sub: string }[]).map(op => (
                   <button
                     key={op.key}
+                    type="button"
                     className={`${styles.tamanoBtn} ${tamano === op.key ? styles.tamanoBtnActivo : ''}`}
                     onClick={() => setTamano(op.key)}
                     aria-pressed={tamano === op.key}
@@ -445,6 +453,7 @@ export default function GeneradorTarjetasPage() {
             </div>
 
             <button
+              type="button"
               className={styles.btnImprimir}
               onClick={imprimir}
               aria-label="Imprimir tarjetas"
@@ -567,22 +576,22 @@ export default function GeneradorTarjetasPage() {
             <h2>¿Para quién es este generador de tarjetas?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <span className={styles.escenarioIcono}>🏥</span>
+                <span aria-hidden="true" className={styles.escenarioIcono}>🏥</span>
                 <h3>Logopeda en sesión</h3>
                 <p>Genera y personaliza mazos para trabajar vocabulario funcional con cada paciente. El código de color por categoría facilita la organización temática del material impreso.</p>
               </div>
               <div className={styles.escenarioCard}>
-                <span className={styles.escenarioIcono}>🏠</span>
+                <span aria-hidden="true" className={styles.escenarioIcono}>🏠</span>
                 <h3>Familia en casa</h3>
                 <p>Crea tarjetas de las cosas importantes en el hogar: comidas preferidas, rutinas, personas. Usar emojis familiares aumenta el reconocimiento y la velocidad de comunicación.</p>
               </div>
               <div className={styles.escenarioCard}>
-                <span className={styles.escenarioIcono}>🎒</span>
+                <span aria-hidden="true" className={styles.escenarioIcono}>🎒</span>
                 <h3>Maestro de apoyo en el aula</h3>
                 <p>Prepara tarjetas de vocabulario del aula, normas de clase o secuencias de actividad. El tamaño grande es idóneo para usuarios con dificultades visuales o motoras en el aula.</p>
               </div>
               <div className={styles.escenarioCard}>
-                <span className={styles.escenarioIcono}>🧑</span>
+                <span aria-hidden="true" className={styles.escenarioIcono}>🧑</span>
                 <h3>Adulto con afasia o ELA</h3>
                 <p>Genera un mazo personalizado con las expresiones que más usa en su vida cotidiana. Las tarjetas grandes y plastificadas son más fáciles de manejar con movilidad reducida.</p>
               </div>
@@ -689,27 +698,27 @@ export default function GeneradorTarjetasPage() {
             <h2>Buenas prácticas para el uso de tarjetas físicas</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🎯</span>
+                <span aria-hidden="true" className={styles.tipIcono}>🎯</span>
                 <p><strong>Prioriza el vocabulario funcional.</strong> &quot;Agua&quot;, &quot;Baño&quot;, &quot;Más&quot; y &quot;No&quot; tienen más impacto en la calidad de vida que un vocabulario temático extenso. Empieza siempre por lo que el usuario necesita comunicar cada día.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📦</span>
+                <span aria-hidden="true" className={styles.tipIcono}>📦</span>
                 <p><strong>Organiza las tarjetas en un sistema predecible.</strong> Separadores por categoría de color, carpetas con velcro o tableros etiquetados. El usuario debe poder localizar cualquier tarjeta en menos de 5 segundos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔄</span>
+                <span aria-hidden="true" className={styles.tipIcono}>🔄</span>
                 <p><strong>Reemplaza las tarjetas dañadas inmediatamente.</strong> Una tarjeta borrosa, rota o con el emoji deformado puede causar confusión. Imprime siempre un set de repuesto para sustituir rápidamente las que se deterioren.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>👁️</span>
+                <span aria-hidden="true" className={styles.tipIcono}>👁️</span>
                 <p><strong>Comprueba que los emojis se reconocen antes de imprimir.</strong> Muestra el mazo en pantalla al usuario y verifica que reconoce el emoji antes de gastar papel y tinta. Algunos emojis pueden ser ambiguos para ciertos usuarios.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🤲</span>
+                <span aria-hidden="true" className={styles.tipIcono}>🤲</span>
                 <p><strong>Usa el modelado para enseñar el uso.</strong> Señala o usa tú las tarjetas durante la comunicación con el usuario. El modelado (ver a otros usar el sistema) acelera el aprendizaje más que la instrucción directa.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📋</span>
+                <span aria-hidden="true" className={styles.tipIcono}>📋</span>
                 <p><strong>Documenta qué tarjetas usa y cuáles ignora.</strong> Esta información es valiosa para el logopeda en la revisión del vocabulario. Un mazo que nadie usa necesita rediseño, no más tarjetas.</p>
               </div>
             </div>
@@ -718,7 +727,7 @@ export default function GeneradorTarjetasPage() {
           {/* WARNING BOX */}
           <section className={styles.guiaSeccion}>
             <div className={styles.warningBox}>
-              <h3>⚠️ Errores frecuentes en la creación de materiales AAC</h3>
+              <h3><span aria-hidden="true">⚠️</span> Errores frecuentes en la creación de materiales AAC</h3>
               <ul>
                 <li><strong>Crear mazos muy grandes desde el inicio:</strong> 50 tarjetas desde el primer día es agotador para el usuario y difícil de gestionar. Empieza con 6-12 y amplía en función del uso real.</li>
                 <li><strong>Usar emojis que el usuario no reconoce:</strong> Algunos emojis son culturalmente específicos o ambiguos. Verifica siempre la comprensión antes de incluirlos. Un emoji que no se entiende es ruido, no comunicación.</li>

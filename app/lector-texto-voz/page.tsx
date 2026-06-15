@@ -166,7 +166,7 @@ export default function LectorTextoVozPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔊 Lector de Texto en Voz Alta</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔊</span> Lector de Texto en Voz Alta</h1>
         <p className={styles.subtitle}>
           Pega cualquier texto y escúchalo en español.
           Las palabras se resaltan conforme se leen.
@@ -260,6 +260,7 @@ export default function LectorTextoVozPage() {
       {/* Pestañas de vista */}
       <div className={styles.pestanas} role="tablist" aria-label="Vista del texto">
         <button
+          type="button"
           className={`${styles.pestana} ${vistaActiva === 'editar' ? styles.pestanaActiva : ''}`}
           onClick={() => setVistaActiva('editar')}
           role="tab"
@@ -269,6 +270,7 @@ export default function LectorTextoVozPage() {
           ✏️ Editar texto
         </button>
         <button
+          type="button"
           className={`${styles.pestana} ${vistaActiva === 'escuchar' ? styles.pestanaActiva : ''}`}
           onClick={() => setVistaActiva('escuchar')}
           role="tab"
@@ -311,6 +313,7 @@ export default function LectorTextoVozPage() {
         >
           <div
             className={styles.textoResaltado}
+            role="status"
             aria-live="polite"
             aria-atomic="false"
           >
@@ -356,6 +359,7 @@ export default function LectorTextoVozPage() {
       <div className={styles.controles} aria-label="Controles de reproducción">
         {estado === 'parado' ? (
           <button
+            type="button"
             className={`${styles.btnControl} ${styles.btnPlay}`}
             onClick={iniciar}
             disabled={!soportado || !texto.trim()}
@@ -366,6 +370,7 @@ export default function LectorTextoVozPage() {
         ) : (
           <>
             <button
+              type="button"
               className={`${styles.btnControl} ${styles.btnPausa}`}
               onClick={pausarReanudar}
               aria-label={estado === 'pausado' ? 'Reanudar lectura' : 'Pausar lectura'}
@@ -373,6 +378,7 @@ export default function LectorTextoVozPage() {
               {estado === 'pausado' ? '▶ Reanudar' : '⏸ Pausar'}
             </button>
             <button
+              type="button"
               className={`${styles.btnControl} ${styles.btnStop}`}
               onClick={detener}
               aria-label="Detener lectura"
@@ -495,22 +501,22 @@ export default function LectorTextoVozPage() {
           <h2>Situaciones donde marca la diferencia</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>📚</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>📚</span>
               <h3>Alumno con dislexia</h3>
               <p>Pegar los apuntes del cole o textos de un examen y escucharlos mientras se sigue el resaltado reduce el esfuerzo cognitivo y mejora la comprensión en sesiones de estudio.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>👴</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>👴</span>
               <h3>Persona mayor con fatiga visual</h3>
               <p>Pegar el texto de un artículo o un correo electrónico y escucharlo con los ojos cerrados, sin necesidad de instalar nada ni pedir ayuda a nadie.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧩</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>🧩</span>
               <h3>Persona con TDAH</h3>
               <p>El resaltado palabra por palabra actúa como ancla visual que impide que la atención se disperse. Especialmente útil para textos largos que habría que releer varias veces.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🏥</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>🏥</span>
               <h3>Paciente con afasia de lectura</h3>
               <p>Escuchar el texto ayuda a compensar la dificultad para decodificar las palabras escritas. El apoyo del logopeda puede indicar qué velocidad y voz funcionan mejor para cada caso.</p>
             </div>
@@ -617,27 +623,27 @@ export default function LectorTextoVozPage() {
           <h2>Buenas prácticas para sacar el máximo partido</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🎧</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🎧</span>
               <p><strong>Usa auriculares si hay ruido ambiente.</strong> La comprensión mejora notablemente al reducir distracciones auditivas externas, especialmente para personas con TDAH o procesamiento auditivo difícil.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📋</span>
+              <span aria-hidden="true" className={styles.tipIcono}>📋</span>
               <p><strong>Divide textos muy largos en secciones.</strong> Si tienes un documento extenso, copia y pega párrafo a párrafo o por secciones temáticas. Facilita la concentración y evita problemas técnicos con textos muy largos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔁</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🔁</span>
               <p><strong>Escucha dos veces los párrafos difíciles.</strong> La primera escucha activa la comprensión general; la segunda permite captar los detalles. Detén y repite la sección que te cueste más.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📱</span>
+              <span aria-hidden="true" className={styles.tipIcono}>📱</span>
               <p><strong>En móvil, mantén la pantalla encendida.</strong> Algunos navegadores móviles suspenden la síntesis de voz si la pantalla se apaga. Ajusta el tiempo de espera de pantalla o mantén el móvil activo durante la lectura.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>👁️</span>
+              <span aria-hidden="true" className={styles.tipIcono}>👁️</span>
               <p><strong>Alterna lectura visual y auditiva.</strong> Seguir el resaltado con la vista mientras se escucha activa simultáneamente los canales visual y auditivo, lo que mejora la retención del contenido.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🏫</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🏫</span>
               <p><strong>En el aula, usa altavoz en lugar de auriculares.</strong> Para lectura grupal o en clase, el lector puede usarse en voz alta para toda la clase, con el texto proyectado y el resaltado visible en la pantalla.</p>
             </div>
           </div>
@@ -646,7 +652,7 @@ export default function LectorTextoVozPage() {
         {/* WARNING BOX */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Limitaciones importantes a tener en cuenta</h3>
+            <h3><span aria-hidden="true">⚠️</span> Limitaciones importantes a tener en cuenta</h3>
             <ul>
               <li><strong>Calidad de voz variable por navegador:</strong> Firefox tiene voces de calidad mucho más baja que Chrome o Edge en español. Si la voz suena robótica o difícil de entender, prueba en otro navegador antes de concluir que la herramienta no funciona.</li>
               <li><strong>El resaltado puede no ser exacto en todos los navegadores:</strong> Safari y Firefox tienen implementaciones menos precisas del evento onboundary. El resaltado puede ir ligeramente desfasado. Esto es una limitación del navegador, no de la herramienta.</li>

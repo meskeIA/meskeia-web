@@ -43,7 +43,7 @@ export const jsonLd = generateWebAppSchema({
     'Respiración coherente para equilibrio del sistema nervioso',
     'Indicaciones para ansiedad, autismo y EPOC',
     'Guía visual con animación sincronizada',
-    'Sin registro ni instalación',
+    'Historial de sesiones guardado localmente para hacer seguimiento del progreso',
   ],
 });
 

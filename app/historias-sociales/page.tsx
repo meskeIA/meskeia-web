@@ -223,7 +223,7 @@ export default function HistoriasSocialesPage() {
         <MeskeiaLogo />
 
         <div className={styles.lectorHeader}>
-          <button onClick={() => setVista('lista')} className={styles.btnVolver} aria-label="Volver a la lista">
+          <button type="button" onClick={() => setVista('lista')} className={styles.btnVolver} aria-label="Volver a la lista">
             ← Volver
           </button>
           <h1 className={styles.lectorTitulo}>
@@ -236,6 +236,7 @@ export default function HistoriasSocialesPage() {
         <div className={styles.lectorProgreso}>
           {historiaActiva.paginas.map((_, i) => (
             <button
+              type="button"
               key={i}
               className={`${styles.lectorDot} ${i === paginaActual ? styles.lectorDotActivo : ''} ${i < paginaActual ? styles.lectorDotVisto : ''}`}
               onClick={() => setPaginaActual(i)}
@@ -262,6 +263,7 @@ export default function HistoriasSocialesPage() {
         {/* Navegación */}
         <div className={styles.lectorNav}>
           <button
+            type="button"
             onClick={() => setPaginaActual(p => p - 1)}
             disabled={esPrimera}
             className={styles.btnNavPag}
@@ -271,6 +273,7 @@ export default function HistoriasSocialesPage() {
           </button>
           {esUltima ? (
             <button
+              type="button"
               onClick={() => setVista('lista')}
               className={styles.btnFinHistoria}
             >
@@ -278,6 +281,7 @@ export default function HistoriasSocialesPage() {
             </button>
           ) : (
             <button
+              type="button"
               onClick={() => setPaginaActual(p => p + 1)}
               className={styles.btnNavPagNext}
               aria-label="Siguiente página"
@@ -301,7 +305,7 @@ export default function HistoriasSocialesPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>✏️ Nueva historia social</h1>
+          <h1 className={styles.title}><span aria-hidden="true">✏️</span> Nueva historia social</h1>
           <p className={styles.subtitle}>Crea una historia visual para preparar una situación</p>
         </header>
 
@@ -447,7 +451,7 @@ export default function HistoriasSocialesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📖 Historias Sociales Visuales</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📖</span> Historias Sociales Visuales</h1>
         <p className={styles.subtitle}>
           Crea y lee historias visuales para preparar situaciones nuevas o difíciles
         </p>
@@ -463,15 +467,16 @@ export default function HistoriasSocialesPage() {
 
       {/* Historias de ejemplo */}
       <section className={styles.seccion}>
-        <h2 className={styles.seccionTitulo}>📚 Ejemplos listos para usar</h2>
+        <h2 className={styles.seccionTitulo}><span aria-hidden="true">📚</span> Ejemplos listos para usar</h2>
         <div className={styles.ejemplosGrid}>
           {HISTORIAS_EJEMPLO.map((ej, idx) => (
             <button
+              type="button"
               key={idx}
               className={styles.ejemploCard}
               onClick={() => abrirEjemplo(idx)}
             >
-              <span className={styles.ejemploIcono}>{ej.icono}</span>
+              <span aria-hidden="true" className={styles.ejemploIcono}>{ej.icono}</span>
               <span className={styles.ejemploTitulo}>{ej.titulo}</span>
               <span className={styles.ejemploPags}>{ej.paginas.length} páginas</span>
             </button>
@@ -482,8 +487,8 @@ export default function HistoriasSocialesPage() {
       {/* Historias creadas */}
       <section className={styles.seccion}>
         <div className={styles.seccionHeader}>
-          <h2 className={styles.seccionTitulo}>🗂️ Mis historias ({historias.length})</h2>
-          <button onClick={() => setVista('crear')} className={styles.btnPrimary}>
+          <h2 className={styles.seccionTitulo}><span aria-hidden="true">🗂️</span> Mis historias ({historias.length})</h2>
+          <button type="button" onClick={() => setVista('crear')} className={styles.btnPrimary}>
             + Crear historia
           </button>
         </div>
@@ -492,7 +497,7 @@ export default function HistoriasSocialesPage() {
           <div className={styles.vacio}>
             <span className={styles.vacioEmoji}>📖</span>
             <p>Aún no has creado ninguna historia</p>
-            <button onClick={() => setVista('crear')} className={styles.btnPrimary}>
+            <button type="button" onClick={() => setVista('crear')} className={styles.btnPrimary}>
               Crear mi primera historia
             </button>
           </div>
@@ -501,12 +506,13 @@ export default function HistoriasSocialesPage() {
         <div className={styles.historiasGrid}>
           {historias.map(hist => (
             <div key={hist.id} className={styles.historiaCard}>
-              <button className={styles.historiaCardBtn} onClick={() => abrirLeer(hist)}>
-                <span className={styles.historiaIcono}>{hist.icono}</span>
+              <button type="button" className={styles.historiaCardBtn} onClick={() => abrirLeer(hist)}>
+                <span aria-hidden="true" className={styles.historiaIcono}>{hist.icono}</span>
                 <span className={styles.historiaTitulo}>{hist.titulo}</span>
                 <span className={styles.historiaPags}>{hist.paginas.length} páginas</span>
               </button>
               <button
+                type="button"
                 className={styles.btnEliminar}
                 onClick={() => eliminar(hist.id)}
                 aria-label={`Eliminar historia ${hist.titulo}`}
@@ -520,7 +526,7 @@ export default function HistoriasSocialesPage() {
 
       {/* Aviso importante */}
       <div className={styles.avisoBox}>
-        <h3>⚠️ Aviso importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso importante</h3>
         <p>Las historias sociales son una herramienta de <strong>apoyo y preparación</strong>, no un tratamiento terapéutico. Para niños con autismo u otras necesidades especiales, combína con la orientación de un <strong>profesional especializado</strong> (logopeda, psicólogo o terapeuta).</p>
       </div>
 
@@ -582,22 +588,22 @@ export default function HistoriasSocialesPage() {
           <h2>¿Quién se beneficia y en qué situaciones?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>🧩</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>🧩</div>
               <h3>Niño con autismo</h3>
               <p>Preparar visitas médicas, cambios de rutina, celebraciones familiares o cualquier situación nueva que genere incertidumbre y ansiedad anticipatoria.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>⚡</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>⚡</div>
               <h3>Adolescente con TDAH</h3>
               <p>Ensayar situaciones sociales complejas como entrevistas, conflictos con compañeros o nuevas responsabilidades escolares que requieran planificación.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>🏫</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>🏫</div>
               <h3>Aula de educación especial</h3>
               <p>El docente crea historias específicas para el grupo antes de excursiones, actos escolares o cambios de horario. Todos saben qué va a pasar.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcono}>👨‍👩‍👧</div>
+              <div aria-hidden="true" className={styles.escenarioIcono}>👨‍👩‍👧</div>
               <h3>Familia en casa</h3>
               <p>Los padres crean historias antes de viajes, mudanzas, nacimiento de un hermano o cualquier evento significativo que altere la rutina familiar.</p>
             </div>
@@ -704,32 +710,32 @@ export default function HistoriasSocialesPage() {
           <h2>Mejores prácticas para familias y educadores</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🎯</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🎯</div>
               <h3>Una situación, una historia</h3>
               <p>No mezcles situaciones distintas en la misma historia. La especificidad es clave para que el cerebro pueda anticipar correctamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🔄</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🔄</div>
               <h3>Revisa las historias periódicamente</h3>
               <p>Los detalles cambian: el médico puede cambiar, la ruta puede ser diferente. Actualiza la historia si algo importante cambia.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🎨</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🎨</div>
               <h3>Elige emojis reconocibles</h3>
               <p>Usa los pictogramas que la persona ya conoce y asocia a cada concepto. La familiaridad del símbolo refuerza la comprensión.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>📱</div>
+              <div aria-hidden="true" className={styles.tipIcono}>📱</div>
               <h3>Acceso fácil en el momento</h3>
               <p>Añade la página al escritorio del móvil. Tener la historia accesible in-situ (mientras esperas en la sala de espera, por ejemplo) puede ser muy útil.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>👏</div>
+              <div aria-hidden="true" className={styles.tipIcono}>👏</div>
               <h3>Termina siempre en positivo</h3>
               <p>La última página debe ser afirmativa: un elogio, un logro esperado o un recordatorio de capacidad. Esto refuerza la confianza y la motivación.</p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcono}>🤝</div>
+              <div aria-hidden="true" className={styles.tipIcono}>🤝</div>
               <h3>Involucra a la persona en la creación</h3>
               <p>Si es posible, crea la historia con la persona, no solo para ella. Elegir el emoji o dictar la frase aumenta el sentido de autoría y la eficacia.</p>
             </div>
@@ -739,7 +745,7 @@ export default function HistoriasSocialesPage() {
         {/* 6. Warning box */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Precauciones importantes</h3>
+            <h3><span aria-hidden="true">⚠️</span> Precauciones importantes</h3>
             <ul>
               <li><strong>No usar como única estrategia</strong>: Las historias sociales son más efectivas combinadas con otras intervenciones (modelado, role-play, apoyo en el momento). No sustituyen la terapia especializada.</li>
               <li><strong>No forzar la lectura</strong>: Si la persona se niega a leer la historia, no la obligues. Intenta otra aproximación (lectura compartida, escuchar mientras juegas) o trabaja con un especialista.</li>

@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
     'Tamaños de tarjeta configurables',
     'Vista previa antes de imprimir',
     'Impresión directa desde el navegador',
-    'Funciona sin conexión, sin registro ni instalación',
+    'Datos almacenados solo en el dispositivo: ninguna tarjeta sale del navegador',
   ],
 });
 

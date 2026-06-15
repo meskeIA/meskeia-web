@@ -45,10 +45,10 @@
 | [x] | Conversor de Código Morse | `/conversor-morse/` | accesibilidad, cultura |
 | [x] | Convertidor de Subtítulos | `/convertidor-subtitulos/` | accesibilidad, diseno, tecnicas |
 | [x] | Ejercicios de Vocalización para Parkinson | `/ejercicios-vocalizacion/` | accesibilidad, salud |
-| [ ] | Generador de Tarjetas de Comunicación | `/generador-tarjetas-comunicacion/` | accesibilidad, salud, productividad |
-| [ ] | Guía de Respiración Consciente | `/guia-respiracion/` | accesibilidad, salud, productividad |
-| [ ] | Historias Sociales Visuales | `/historias-sociales/` | accesibilidad, salud, productividad, estudiantes |
-| [ ] | Lector de Texto en Voz Alta | `/lector-texto-voz/` | accesibilidad, salud, productividad, estudiantes |
+| [x] | Generador de Tarjetas de Comunicación | `/generador-tarjetas-comunicacion/` | accesibilidad, salud, productividad |
+| [x] | Guía de Respiración Consciente | `/guia-respiracion/` | accesibilidad, salud, productividad |
+| [x] | Historias Sociales Visuales | `/historias-sociales/` | accesibilidad, salud, productividad, estudiantes |
+| [x] | Lector de Texto en Voz Alta | `/lector-texto-voz/` | accesibilidad, salud, productividad, estudiantes |
 | [ ] | Lupa Digital con Cámara | `/lupa-digital/` | accesibilidad, tecnicas, salud |
 | [ ] | Planificador Visual de Rutinas | `/planificador-rutinas/` | accesibilidad, salud, productividad |
 | [ ] | Recordatorio Visual de Medicación | `/recordatorio-medicacion/` | accesibilidad, salud, productividad |

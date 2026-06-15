@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
     'Basado en la técnica de Carol Gray para la preparación de situaciones',
     'Para preparar situaciones nuevas o difíciles (visitas médicas, cambios de rutina, conflictos sociales)',
     'Descargable e imprimible en formato PDF',
-    'Funciona sin conexión y sin registro',
+    'Historias guardadas en el navegador con localStorage: sin cuenta ni sincronización en la nube',
   ],
 });
 

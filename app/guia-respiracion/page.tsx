@@ -228,7 +228,7 @@ export default function GuiaRespiracionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🫁 Guía de Respiración Consciente</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🫁</span> Guía de Respiración Consciente</h1>
         <p className={styles.subtitle}>
           Elige una técnica, pulsa Iniciar y deja que el círculo te guíe.
           Respira con calma y a tu ritmo.
@@ -253,6 +253,7 @@ export default function GuiaRespiracionPage() {
         <div className={styles.tecnicaGrid} role="group" aria-label="Técnicas disponibles">
           {TECNICAS.map(t => (
             <button
+              type="button"
               key={t.id}
               className={`${styles.tecnicaCard} ${tecnicaId === t.id ? styles.tecnicaActiva : ''}`}
               onClick={() => cambiarTecnica(t.id)}
@@ -325,6 +326,7 @@ export default function GuiaRespiracionPage() {
         <div className={styles.controles}>
           {!corriendo ? (
             <button
+              type="button"
               className={styles.btnIniciar}
               onClick={iniciar}
               aria-label="Iniciar ejercicio de respiración"
@@ -333,6 +335,7 @@ export default function GuiaRespiracionPage() {
             </button>
           ) : (
             <button
+              type="button"
               className={styles.btnDetener}
               onClick={detener}
               aria-label="Detener ejercicio de respiración"
@@ -342,6 +345,7 @@ export default function GuiaRespiracionPage() {
           )}
 
           <button
+            type="button"
             className={`${styles.btnVoz} ${vozActiva ? styles.vozOn : styles.vozOff}`}
             onClick={() => setVozActiva(prev => !prev)}
             aria-pressed={vozActiva}
@@ -460,22 +464,22 @@ export default function GuiaRespiracionPage() {
           <h2>¿Para quién es esta guía de respiración?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>😰</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>😰</span>
               <h3>Persona con ansiedad situacional</h3>
               <p>Antes de una reunión difícil, un examen o una situación social, 3-5 ciclos de 4-7-8 pueden reducir la respuesta de estrés en menos de 2 minutos.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🫁</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>🫁</span>
               <h3>Paciente en rehabilitación respiratoria</h3>
               <p>La técnica Diafragmática refuerza el trabajo del diafragma, complementando la fisioterapia respiratoria en EPOC o recuperación postoperatoria. Siempre con supervisión médica.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>📚</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>📚</span>
               <h3>Estudiante antes de un examen</h3>
               <p>2-3 minutos de respiración Cuadrada antes de entrar en el aula mejoran la concentración y reducen el estrés previo, sin necesidad de equipo ni espacio especial.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧩</span>
+              <span aria-hidden="true" className={styles.escenarioIcono}>🧩</span>
               <h3>Terapeuta con pacientes autistas</h3>
               <p>El círculo visual predecible y el ritmo constante hacen esta app ideal como herramienta de regulación sensorial. La Diafragmática sin retención es el punto de partida más seguro.</p>
             </div>
@@ -582,27 +586,27 @@ export default function GuiaRespiracionPage() {
           <h2>Buenas prácticas para aprovechar al máximo la app</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📅</span>
+              <span aria-hidden="true" className={styles.tipIcono}>📅</span>
               <p><strong>Practica a la misma hora cada día.</strong> La consistencia horaria refuerza el hábito y el sistema nervioso aprende a anticipar la relajación en ese momento.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>⏰</span>
+              <span aria-hidden="true" className={styles.tipIcono}>⏰</span>
               <p><strong>Actúa al notar los primeros síntomas.</strong> Para la ansiedad, practica 4-7-8 en cuanto notes la tensión, no cuando ya estés desbordado. La efectividad es mayor en las primeras señales.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🧩</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🧩</span>
               <p><strong>Para niños y autismo: sin retenciones al principio.</strong> Empieza siempre con Diafragmática o Coherente. Introduce retenciones solo cuando el niño esté completamente cómodo con el ritmo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🧘</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🧘</span>
               <p><strong>Combina con relajación muscular progresiva.</strong> La respiración consciente + tensión-relajación muscular multiplica los beneficios para la ansiedad y el insomnio.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📝</span>
+              <span aria-hidden="true" className={styles.tipIcono}>📝</span>
               <p><strong>Lleva un registro de qué técnica te funciona mejor.</strong> Anota cuándo practicaste, qué técnica y cómo te sentiste después. Esto ayuda a identificar qué funciona para tu caso específico.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🚗</span>
+              <span aria-hidden="true" className={styles.tipIcono}>🚗</span>
               <p><strong>Nunca practiques al conducir o manejar maquinaria.</strong> Las técnicas con retención pueden causar mareos transitorios. Reserva la práctica para cuando estés sentado o tumbado en un entorno seguro.</p>
             </div>
           </div>
@@ -612,7 +616,7 @@ export default function GuiaRespiracionPage() {
 
       {/* WARNING BOX — siempre visible, fuera de la sección colapsable */}
       <div className={styles.warningBox} role="note" aria-label="Señales de alarma y contraindicaciones">
-        <h3>⚠️ Señales de alarma: cuándo parar y consultar al médico</h3>
+        <h3><span aria-hidden="true">⚠️</span> Señales de alarma: cuándo parar y consultar al médico</h3>
         <ul>
           <li><strong>Hipertensión arterial no controlada:</strong> las técnicas con retención (Cuadrada, 4-7-8) pueden aumentar transitoriamente la presión. Consulta a tu médico antes de practicarlas.</li>
           <li><strong>Mareo intenso, palpitaciones o malestar:</strong> detén el ejercicio inmediatamente si experimentas cualquiera de estos síntomas. Son señales de que la técnica no es adecuada para ti en ese momento.</li>
