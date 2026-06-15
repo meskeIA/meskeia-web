@@ -45,8 +45,8 @@ export const jsonLd = generateWebAppSchema({
     'Control de velocidad: lenta, media y rápida',
     'Navegación manual fase a fase o reproducción automática',
     'Contador de células resultado con ploidy (2n/n)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
+    'Tabla comparativa mitosis vs meiosis: diferencias clave fase a fase',
+    'Identificador de resultado con conteo de células hijas y ploidía (2n/n)',
   ],
   keywords: [
     'mitosis',

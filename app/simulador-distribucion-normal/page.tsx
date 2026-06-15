@@ -454,7 +454,7 @@ export default function SimuladorDistribucionNormalPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Simulador de Distribución Normal</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Simulador de Distribución Normal</h1>
         <p className={styles.subtitle}>
           Mueve la media (μ) y la desviación típica (σ) para ver la curva de Gauss en tiempo real.
           Calcula probabilidades, puntuaciones Z y la regla 68-95-99.7.
@@ -470,7 +470,7 @@ export default function SimuladorDistribucionNormalPage() {
           onClick={() => setMode('probabilidad')}
           aria-pressed={mode === 'probabilidad'}
         >
-          <span className={styles.modeIcon}>📐</span>
+          <span className={styles.modeIcon} aria-hidden="true">📐</span>
           <span className={styles.modeName}>Probabilidad</span>
           <span className={styles.modeDesc}>Calcula P(X&lt;a), P(X&gt;a) o P(a&lt;X&lt;b)</span>
         </button>
@@ -479,7 +479,7 @@ export default function SimuladorDistribucionNormalPage() {
           onClick={() => setMode('regla68')}
           aria-pressed={mode === 'regla68'}
         >
-          <span className={styles.modeIcon}>📏</span>
+          <span className={styles.modeIcon} aria-hidden="true">📏</span>
           <span className={styles.modeName}>Regla 68-95-99.7</span>
           <span className={styles.modeDesc}>Visualiza las zonas ±σ, ±2σ, ±3σ</span>
         </button>
@@ -488,7 +488,7 @@ export default function SimuladorDistribucionNormalPage() {
           onClick={() => setMode('problema')}
           aria-pressed={mode === 'problema'}
         >
-          <span className={styles.modeIcon}>📝</span>
+          <span className={styles.modeIcon} aria-hidden="true">📝</span>
           <span className={styles.modeName}>Problemas tipo</span>
           <span className={styles.modeDesc}>Ejercicios reales resueltos</span>
         </button>
@@ -502,8 +502,10 @@ export default function SimuladorDistribucionNormalPage() {
               {PROBLEMAS_TIPO.map(p => (
                 <button
                   key={p.id}
+                  type="button"
                   className={`${styles.problemaBtn} ${problemaActivo === p.id ? styles.problemaBtnActive : ''}`}
                   onClick={() => cargarProblema(p)}
+                  aria-pressed={problemaActivo === p.id}
                 >
                   {p.nombre}
                 </button>
@@ -555,20 +557,26 @@ export default function SimuladorDistribucionNormalPage() {
           <div className={styles.probControls}>
             <div className={styles.tipoProbButtons}>
               <button
+                type="button"
                 className={`${styles.tipoBtn} ${tipoProb === 'menor' ? styles.tipoBtnActive : ''}`}
                 onClick={() => setTipoProb('menor')}
+                aria-pressed={tipoProb === 'menor'}
               >
                 P(X &lt; a)
               </button>
               <button
+                type="button"
                 className={`${styles.tipoBtn} ${tipoProb === 'mayor' ? styles.tipoBtnActive : ''}`}
                 onClick={() => setTipoProb('mayor')}
+                aria-pressed={tipoProb === 'mayor'}
               >
                 P(X &gt; a)
               </button>
               <button
+                type="button"
                 className={`${styles.tipoBtn} ${tipoProb === 'entre' ? styles.tipoBtnActive : ''}`}
                 onClick={() => setTipoProb('entre')}
+                aria-pressed={tipoProb === 'entre'}
               >
                 P(a &lt; X &lt; b)
               </button>
@@ -628,7 +636,7 @@ export default function SimuladorDistribucionNormalPage() {
         </div>
 
         {/* RESULTADOS */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           {mode === 'regla68' ? (
             <>
               <div className={styles.resultCard}>
@@ -770,22 +778,22 @@ export default function SimuladorDistribucionNormalPage() {
           <h3>4 escenarios típicos donde aparece la normal</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📏</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📏</span>
               <strong>Mediciones biológicas</strong>
               <p>Altura, peso, longitud de extremidades, presión arterial. La acumulación de muchos pequeños factores genéticos y ambientales produce de forma natural una distribución acampanada.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🎯</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🎯</span>
               <strong>Errores de medida</strong>
               <p>En cualquier instrumento real, los errores aleatorios se distribuyen normalmente alrededor del valor verdadero. Es la base de la teoría de errores en física experimental.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
               <strong>Control de calidad</strong>
               <p>Las dimensiones de piezas fabricadas en serie (tornillos, botellas, chips) siguen una normal centrada en el valor diseño. Las desviaciones &gt; 3σ se consideran defectuosas (Six Sigma).</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Test estandarizados</strong>
               <p>Notas de selectividad, EBAU, SAT, GMAT, CI: se diseñan para que sigan una normal con media y σ fijas, lo que permite comparar candidatos de distintas convocatorias.</p>
             </div>
@@ -875,22 +883,22 @@ export default function SimuladorDistribucionNormalPage() {
           <h3>4 buenas prácticas al trabajar con la distribución normal</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Dibuja siempre la curva</strong>
               <p>Antes de hacer cuentas, esboza la campana, marca μ y la zona pedida. Te ahorra errores de signo y de &quot;mayor/menor que&quot;. Este simulador te lo dibuja automáticamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Usa la regla 68-95-99.7 como sanity check</strong>
               <p>Si el resultado dice que P(μ &lt; X &lt; μ+σ) = 0,12, te has equivocado: debe ser ≈ 0,34 (la mitad del 68 %). Es el control de errores más rápido en exámenes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Tipifica siempre antes de buscar en tablas</strong>
               <p>No existen tablas para cada N(μ, σ): la Z es universal. Tipifica primero, luego busca el valor en la tabla N(0,1) y solo al final interpreta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Verifica que los datos parecen normales</strong>
               <p>Antes de aplicar el modelo, comprueba con un histograma o un test (Shapiro-Wilk, Kolmogorov-Smirnov) que tus datos efectivamente se acercan a una normal. No todo lo continuo es normal.</p>
             </div>
@@ -900,7 +908,7 @@ export default function SimuladorDistribucionNormalPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores conceptuales frecuentes con la distribución normal</strong>
           </div>
           <ul className={styles.warningList}>

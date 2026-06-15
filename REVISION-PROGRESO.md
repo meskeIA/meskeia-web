@@ -556,7 +556,7 @@
 | [x] | Simulador de Conservación de la Energía | `/simulador-conservacion-energia/` | estudiantes |
 | [ ] | Simulador de Deriva Genética y Selección | `/simulador-deriva-genetica/` | estudiantes |
 | [ ] | Simulador de Derivadas: Pendiente de la Tangente | `/simulador-derivada-pendiente/` | estudiantes |
-| [ ] | Simulador de Distribución Normal | `/simulador-distribucion-normal/` | estudiantes |
+| [x] | Simulador de Distribución Normal | `/simulador-distribucion-normal/` | estudiantes |
 | [x] | Simulador de Ecosistema: Cadena Trófica | `/simulador-ecosistema-trofico/` | estudiantes |
 | [ ] | Simulador de Elasticidad Precio de la Demanda | `/simulador-elasticidad-precio/` | estudiantes |
 | [x] | Simulador de Equilibrio Químico (Le Chatelier) | `/simulador-equilibrio-quimico/` | estudiantes |
@@ -573,10 +573,10 @@
 | [ ] | Simulador de la Curva de Phillips | `/simulador-curva-phillips/` | estudiantes |
 | [x] | Simulador de Lentes Ópticas: Trazado de Rayos | `/simulador-lentes-opticas/` | estudiantes |
 | [x] | Simulador de Máquina de Turing | `/simulador-maquina-turing/` | estudiantes, tecnicas |
-| [ ] | Simulador de Mitosis y Meiosis | `/simulador-mitosis-meiosis/` | estudiantes |
+| [x] | Simulador de Mitosis y Meiosis | `/simulador-mitosis-meiosis/` | estudiantes |
 | [x] | Simulador de Movimiento Circular | `/simulador-movimiento-circular/` | estudiantes |
 | [x] | Simulador de Oferta y Demanda | `/simulador-oferta-demanda/` | estudiantes |
-| [ ] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
+| [x] | Simulador de Ondas e Interferencia | `/simulador-ondas-interferencia/` | estudiantes |
 | [x] | Simulador de Péndulo Simple y MAS | `/simulador-pendulo/` | estudiantes |
 | [x] | Simulador de Planificación de Procesos en CPU | `/simulador-planificador-procesos/` | estudiantes, tecnicas |
 | [ ] | Simulador de Proyectiles 2D | `/simulador-proyectiles/` | estudiantes |
@@ -588,7 +588,7 @@
 | [ ] | Simulador de Test de Hipótesis | `/simulador-test-hipotesis/` | estudiantes |
 | [x] | Simulador de Titulación Ácido-Base | `/simulador-titulacion/` | estudiantes |
 | [ ] | Simulador de Transformaciones de Funciones | `/simulador-funciones-transformaciones/` | estudiantes |
-| [ ] | Simulador del Ciclo de Carnot | `/simulador-termodinamica-carnot/` | estudiantes |
+| [x] | Simulador del Ciclo de Carnot | `/simulador-termodinamica-carnot/` | estudiantes |
 | [x] | Simulador del Círculo Trigonométrico | `/simulador-trigonometria-circulo-unitario/` | estudiantes |
 | [ ] | Simulador del Handshake TCP | `/simulador-tcp-handshake/` | estudiantes |
 | [ ] | Simulador del Multiplicador del Gasto | `/simulador-multiplicador-gasto/` | estudiantes |

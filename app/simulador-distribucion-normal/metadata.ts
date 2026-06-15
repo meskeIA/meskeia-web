@@ -45,9 +45,9 @@ export const jsonLd = generateWebAppSchema({
     'Tipificación a puntuación Z y comparación con N(0,1)',
     'Visualización de la regla 68-95-99.7 sombreada',
     'Problemas tipo predefinidos (alturas, calificaciones, control de calidad)',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'En español, ideal para EBAU, Bachillerato y universidad',
+    'Comparación simultánea de tu distribución sobre la curva N(0,1) estándar en modo overlay',
+    'Indicador del valor de densidad f(x) en cualquier punto de la campana de Gauss',
+    'Tabla de ángulos notables y porcentajes exactos de las reglas 1σ, 2σ y 3σ',
   ],
   keywords: ['distribución normal', 'Gauss', 'estadística', 'probabilidad', 'puntuación Z', 'EBAU', 'Bachillerato'],
 });

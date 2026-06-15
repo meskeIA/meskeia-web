@@ -685,7 +685,7 @@ export default function SimuladorMitosisMeiosis() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧬 Simulador de Mitosis y Meiosis</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧬</span> Simulador de Mitosis y Meiosis</h1>
         <p className={styles.subtitle}>
           Visualiza las fases de la división celular con cromosomas, huso acromático y crossing-over
         </p>
@@ -700,6 +700,7 @@ export default function SimuladorMitosisMeiosis() {
             className={`${styles.tipoBtn} ${tipoDivision === 'mitosis' ? styles.tipoBtnActive : ''}`}
             onClick={() => handleTipo('mitosis')}
             type="button"
+            aria-pressed={tipoDivision === 'mitosis'}
           >
             Mitosis
           </button>
@@ -707,6 +708,7 @@ export default function SimuladorMitosisMeiosis() {
             className={`${styles.tipoBtn} ${tipoDivision === 'meiosis' ? styles.tipoBtnActive : ''}`}
             onClick={() => handleTipo('meiosis')}
             type="button"
+            aria-pressed={tipoDivision === 'meiosis'}
           >
             Meiosis
           </button>
@@ -742,7 +744,7 @@ export default function SimuladorMitosisMeiosis() {
         </div>
 
         {/* Descripción de la fase actual */}
-        <div className={styles.faseDescripcion} role="region" aria-live="polite">
+        <div className={styles.faseDescripcion} role="region" aria-live="polite" aria-atomic="true">
           <strong>{fase.nombre}</strong>
           <p>{fase.descripcion}</p>
         </div>
@@ -800,7 +802,7 @@ export default function SimuladorMitosisMeiosis() {
         </div>
 
         {/* Badge de resultado */}
-        <div className={styles.resultadoCell} aria-live="polite">
+        <div className={styles.resultadoCell} aria-live="polite" aria-atomic="true">
           <span aria-hidden="true">🔬</span> {resultadoTexto}
         </div>
       </main>

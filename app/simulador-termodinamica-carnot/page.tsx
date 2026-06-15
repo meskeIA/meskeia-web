@@ -399,7 +399,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔥 Simulador del Ciclo de Carnot</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔥</span> Simulador del Ciclo de Carnot</h1>
         <p className={styles.subtitle}>
           El motor térmico ideal: <strong>2 isotermas + 2 adiabáticas</strong>. Visualiza el ciclo en
           un diagrama PV con eficiencia η = 1 − Tf/Tc. La 2.ª ley de la termodinámica al alcance.
@@ -483,11 +483,11 @@ export default function SimuladorTermodinamicaCarnotPage() {
           </div>
 
           <div className={styles.actions}>
-            <button className={styles.actionBtn} onClick={togglePlay}>
+            <button type="button" className={styles.actionBtn} onClick={togglePlay} aria-pressed={running}>
               {running ? '⏸ Pausa' : '▶ Animar ciclo'}
             </button>
-            <button className={`${styles.actionBtn} ${styles.actionBtnSecondary}`} onClick={reset}>
-              🔄 Reiniciar
+            <button type="button" className={`${styles.actionBtn} ${styles.actionBtnSecondary}`} onClick={reset}>
+              <span aria-hidden="true">🔄</span> Reiniciar
             </button>
           </div>
         </div>
@@ -512,7 +512,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
         </div>
 
         {/* RESULTADOS */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardMain}>
             <span className={styles.resultLabel}>Eficiencia η = 1 − Tf/Tc</span>
             <span className={styles.resultValueLarge}>{fmt(ciclo.eta * 100, 2)} %</span>

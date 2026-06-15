@@ -760,6 +760,7 @@ export default function Page() {
                   type="button"
                   className={pausarOnda ? styles.calcBtn : styles.calcBtnSecondary}
                   onClick={() => setPausarOnda((p) => !p)}
+                  aria-pressed={pausarOnda}
                 >
                   {pausarOnda ? 'Reanudar' : 'Pausar'}
                 </button>
@@ -780,7 +781,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className={styles.resultBlock}>
+              <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
                 <h3 className={styles.resultTitle}>Magnitudes derivadas</h3>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Longitud de onda λ = v/f</span>
@@ -827,6 +828,7 @@ export default function Page() {
                   type="button"
                   className={`${styles.presetBtn} ${presetActivo === 'fase' ? styles.presetActive : ''}`}
                   onClick={() => aplicarPreset('fase')}
+                  aria-pressed={presetActivo === 'fase'}
                 >
                   Fuentes en fase, d = λ
                 </button>
@@ -834,6 +836,7 @@ export default function Page() {
                   type="button"
                   className={`${styles.presetBtn} ${presetActivo === 'opuestas' ? styles.presetActive : ''}`}
                   onClick={() => aplicarPreset('opuestas')}
+                  aria-pressed={presetActivo === 'opuestas'}
                 >
                   Fuentes opuestas (Δφ = π)
                 </button>
@@ -841,6 +844,7 @@ export default function Page() {
                   type="button"
                   className={`${styles.presetBtn} ${presetActivo === 'mismo-punto' ? styles.presetActive : ''}`}
                   onClick={() => aplicarPreset('mismo-punto')}
+                  aria-pressed={presetActivo === 'mismo-punto'}
                 >
                   Mismo punto (d = 0)
                 </button>
@@ -922,6 +926,7 @@ export default function Page() {
                   type="button"
                   className={pausarInterf ? styles.calcBtn : styles.calcBtnSecondary}
                   onClick={() => setPausarInterf((p) => !p)}
+                  aria-pressed={pausarInterf}
                 >
                   {pausarInterf ? 'Reanudar' : 'Pausar'}
                 </button>
@@ -951,7 +956,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className={styles.resultBlock}>
+              <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
                 <h3 className={styles.resultTitle}>Magnitudes derivadas</h3>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Longitud de onda λ</span>
@@ -1003,6 +1008,7 @@ export default function Page() {
                       estParams.frontera === item.id ? styles.fronteraActive : ''
                     }`}
                     onClick={() => updateEst({ frontera: item.id })}
+                    aria-pressed={estParams.frontera === item.id}
                   >
                     {item.etiqueta}
                   </button>
@@ -1019,6 +1025,7 @@ export default function Page() {
                     type="button"
                     className={`${styles.modoBtn} ${estParams.n === m ? styles.modoActive : ''}`}
                     onClick={() => updateEst({ n: m })}
+                    aria-pressed={estParams.n === m}
                   >
                     {m}
                   </button>
@@ -1087,6 +1094,7 @@ export default function Page() {
                   type="button"
                   className={pausarEst ? styles.calcBtn : styles.calcBtnSecondary}
                   onClick={() => setPausarEst((p) => !p)}
+                  aria-pressed={pausarEst}
                 >
                   {pausarEst ? 'Reanudar' : 'Pausar'}
                 </button>
@@ -1112,7 +1120,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className={styles.resultBlock}>
+              <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
                 <h3 className={styles.resultTitle}>Modo seleccionado</h3>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Frecuencia fundamental f₁</span>
