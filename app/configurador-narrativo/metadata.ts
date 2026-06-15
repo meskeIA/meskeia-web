@@ -40,7 +40,7 @@ export const jsonLd = generateWebAppSchema({
     'Ejemplos de grandes novelas que usan cada combinación',
     'Tabla de referencia de 10 grandes autores y su elección técnica',
     'Combinaciones inválidas explicadas con el motivo',
-    'Gratuito, sin registro, en español',
+    'Interfaz paso a paso: persona → narrador → tiempo verbal',
   ],
 });
 

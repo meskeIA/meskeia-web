@@ -88,10 +88,10 @@
 | [x] | Cómo Funciona tu Cerebro al Decidir | `/visualizador-sesgos-cognitivos/` | cultura |
 | [x] | Cómo Funciona una Elección | `/visualizador-sistema-electoral/` | cultura |
 | [x] | Cómo Funciona una Pantalla | `/visualizador-pantallas/` | cultura, tecnicas |
-| [ ] | Cómo se Construye un Edificio | `/visualizador-construccion-edificio/` | cultura, tecnicas, inmobiliaria |
-| [ ] | Cómo se Produce la Energía | `/visualizador-produccion-energia/` | cultura, tecnicas |
-| [ ] | Comparador de Voces Narrativas | `/comparador-voces-narrativas/` | cultura, estudiantes |
-| [ ] | Configurador Narrativo | `/configurador-narrativo/` | cultura, estudiantes |
+| [x] | Cómo se Construye un Edificio | `/visualizador-construccion-edificio/` | cultura, tecnicas, inmobiliaria |
+| [x] | Cómo se Produce la Energía | `/visualizador-produccion-energia/` | cultura, tecnicas |
+| [x] | Comparador de Voces Narrativas | `/comparador-voces-narrativas/` | cultura, estudiantes |
+| [x] | Configurador Narrativo | `/configurador-narrativo/` | cultura, estudiantes |
 | [ ] | Constelaciones del Cielo | `/constelaciones-del-cielo/` | cultura |
 | [ ] | Constructor de Personaje | `/constructor-personaje/` | cultura, estudiantes |
 | [ ] | Conversor Binario | `/conversor-binario/` | cultura, estudiantes |
@@ -1098,4 +1098,3 @@
 | [x] | Orientador de Jet Lag | `/orientador-jet-lag/` | viajes, salud |
 | [x] | Planificador de Itinerario | `/planificador-itinerario/` | viajes, productividad |
 | [x] | Presupuesto de Viaje | `/presupuesto-viaje/` | viajes, finanzas |
-

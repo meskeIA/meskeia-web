@@ -490,8 +490,10 @@ export default function ConfiguradorNarrativoPage() {
             {(Object.entries(PERSONA_CONFIG) as [Persona, typeof PERSONA_CONFIG['1a']][]).map(([id, cfg]) => (
               <button
                 key={id}
+                type="button"
                 className={`${styles.personaBtn} ${persona === id ? styles.personaBtnActivo : ''}`}
                 onClick={() => seleccionarPersona(id)}
+                aria-pressed={persona === id}
                 style={persona === id ? { background: cfg.color, borderColor: cfg.color } : { borderColor: cfg.color + '55' }}
               >
                 <span className={styles.personaLabel}>{cfg.label}</span>
@@ -513,8 +515,10 @@ export default function ConfiguradorNarrativoPage() {
               {narradorOpciones.map(op => (
                 <button
                   key={op.id}
+                  type="button"
                   className={`${styles.narradorBtn} ${narrador === op.id ? styles.narradorBtnActivo : ''}`}
                   onClick={() => { setNarrador(op.id); setTiempo(null); }}
+                  aria-pressed={narrador === op.id}
                   style={narrador === op.id ? { borderColor: colorPersona, background: colorPersona + '15' } : {}}
                 >
                   <span className={styles.narradorEmoji} aria-hidden="true">{op.emoji}</span>
@@ -533,7 +537,7 @@ export default function ConfiguradorNarrativoPage() {
               <h2 className={styles.pasoTitulo}>Tipo de narrador</h2>
             </div>
             <div className={styles.infoBox} style={{ borderColor: colorPersona }}>
-              <span className={styles.infoEmoji}>🫵</span>
+              <span className={styles.infoEmoji} aria-hidden="true">🫵</span>
               <p>En la 2ª persona solo existe un tipo de narrador: el <strong>participante</strong>, donde el "tú" convierte al lector en el protagonista. No hay otras opciones válidas.</p>
             </div>
           </div>
@@ -548,8 +552,10 @@ export default function ConfiguradorNarrativoPage() {
             </div>
             <div className={styles.tiempoGrid}>
               <button
+                type="button"
                 className={`${styles.tiempoBtn} ${tiempo === 'pasado' ? styles.tiempoBtnActivo : ''}`}
                 onClick={() => setTiempo('pasado')}
+                aria-pressed={tiempo === 'pasado'}
                 style={tiempo === 'pasado' ? { borderColor: colorPersona, background: colorPersona + '15' } : {}}
               >
                 <span className={styles.tiempoLabel} style={tiempo === 'pasado' ? { color: colorPersona } : {}}>Pasado</span>
@@ -557,8 +563,10 @@ export default function ConfiguradorNarrativoPage() {
                 <span className={styles.tiempoDesc}>La forma más habitual. Distancia temporal que permite perspectiva y reflexión.</span>
               </button>
               <button
+                type="button"
                 className={`${styles.tiempoBtn} ${tiempo === 'presente' ? styles.tiempoBtnActivo : ''}`}
                 onClick={() => setTiempo('presente')}
+                aria-pressed={tiempo === 'presente'}
                 style={tiempo === 'presente' ? { borderColor: colorPersona, background: colorPersona + '15' } : {}}
               >
                 <span className={styles.tiempoLabel} style={tiempo === 'presente' ? { color: colorPersona } : {}}>Presente</span>
@@ -571,7 +579,7 @@ export default function ConfiguradorNarrativoPage() {
 
         {/* ── Resultado ── */}
         {combinacion && (
-          <div className={styles.resultadoBox} style={{ borderColor: colorPersona }}>
+          <div className={styles.resultadoBox} style={{ borderColor: colorPersona }} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.resultadoHeader} style={{ background: colorPersona }}>
               <div className={styles.resultadoTitulo}>
                 <h2 className={styles.resultadoNombre}>{combinacion.nombre}</h2>
@@ -610,7 +618,7 @@ export default function ConfiguradorNarrativoPage() {
 
               <div className={styles.resultadoDual}>
                 <div className={styles.resultadoBloque}>
-                  <h3 className={styles.resultadoBloqueTitle}>✅ Cuándo usarla</h3>
+                  <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">✅</span> Cuándo usarla</h3>
                   <ul className={styles.listaCheck}>
                     {combinacion.cuandoUsar.map((item, i) => (
                       <li key={i} style={{ borderLeftColor: colorPersona }}>{item}</li>
@@ -618,7 +626,7 @@ export default function ConfiguradorNarrativoPage() {
                   </ul>
                 </div>
                 <div className={styles.resultadoBloque}>
-                  <h3 className={styles.resultadoBloqueTitle}>❌ Cuándo evitarla</h3>
+                  <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">❌</span> Cuándo evitarla</h3>
                   <ul className={styles.listaEvitar}>
                     {combinacion.cuandoEvitar.map((item, i) => (
                       <li key={i}>{item}</li>
@@ -740,28 +748,28 @@ export default function ConfiguradorNarrativoPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🔍</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🔍</span>
                   <h4>Escritor de thriller</h4>
                 </div>
                 <p>Las combinaciones más eficaces son 1ª + No fiable + Pasado (giro basado en el engaño del narrador) y 3ª + Limitado + Pasado o Presente (el lector descubre con el protagonista). Evita el omnisciente: destruye el misterio.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🐉</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🐉</span>
                   <h4>Escritor de fantasía épica</h4>
                 </div>
                 <p>El 3ª + Omnisciente + Pasado permite el worldbuilding coral y los arcos múltiples. El 3ª + Limitado + Pasado da intimidad a personajes concretos. Muchas novelas épicas alternan entre ambos según la escena.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>💕</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">💕</span>
                   <h4>Escritor de ficción literaria</h4>
                 </div>
                 <p>El 3ª + Limitado (pasado o presente) es el estándar de la ficción literaria contemporánea. El 1ª + Protagonista + Pasado funciona cuando la voz del narrador es tan específica que se convierte en el tema de la novela.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🧪</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🧪</span>
                   <h4>Escritor experimental</h4>
                 </div>
                 <p>Las combinaciones con presente (3ª + Objetivo + Presente, 1ª + No fiable + Presente, 2ª + Participante + Presente) son las más inusuales y pueden producir efectos únicos si se dominan con precisión.</p>
@@ -837,27 +845,27 @@ export default function ConfiguradorNarrativoPage() {
             <h3>Claves para dominar la voz narrativa</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🎯</span>
+                <span className={styles.tipIcono} aria-hidden="true">🎯</span>
                 <h4>Sé coherente</h4>
                 <p>El mayor error es mezclar combinaciones sin conciencia. Si estás en 3ª limitada, no accedas de pronto a la mente de otro personaje sin justificarlo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔭</span>
+                <span className={styles.tipIcono} aria-hidden="true">🔭</span>
                 <h4>Controla la distancia</h4>
                 <p>Dentro de una misma combinación puedes acercarte o alejarte del personaje. El estilo indirecto libre es la herramienta para acercarse al máximo en 3ª limitada.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📖</span>
+                <span className={styles.tipIcono} aria-hidden="true">📖</span>
                 <h4>Lee en voz alta</h4>
                 <p>Los problemas de voz narrativa se detectan mejor al oído que a la vista. Si algo suena raro o incoherente, probablemente hay un cambio no intencional de persona o modo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>✏️</span>
+                <span className={styles.tipIcono} aria-hidden="true">✏️</span>
                 <h4>Anota las excepciones</h4>
                 <p>Si cambias de combinación en algún pasaje (flashback en pasado dentro de una novela en presente), anótalo como decisión consciente con su justificación.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🧩</span>
+                <span className={styles.tipIcono} aria-hidden="true">🧩</span>
                 <h4>Adapta la combinación al género</h4>
                 <p>El thriller tiene sus convenciones narrativas, la fantasía las suyas. Romperlas puede ser genial, pero primero asegúrate de que lo haces con conciencia, no por error.</p>
               </div>
@@ -866,7 +874,7 @@ export default function ConfiguradorNarrativoPage() {
             {/* Warning box */}
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcono}>⚠️</span>
+                <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 <h4>Errores frecuentes en la voz narrativa</h4>
               </div>
               <ul className={styles.warningList}>

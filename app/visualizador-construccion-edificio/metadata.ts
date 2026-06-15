@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Materiales y cantidades reales de un edificio de 30 viviendas',
     'Desglose de tiempos y licencias: de la idea a las llaves',
     'Coste por m² en España',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Cronología del proceso administrativo: licencias, visados y plazos',
+    'Datos cuantitativos reales de un edificio de 30 viviendas en España',
+    'Glosario de términos técnicos y gremios de la construcción',
   ],
 });
 

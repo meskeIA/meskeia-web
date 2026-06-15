@@ -426,6 +426,7 @@ export default function ComparadorVocesNarrativas() {
                   </div>
                   <div className={styles.autorBotones}>
                     <button
+                      type="button"
                       className={`${styles.btnSlot} ${esA ? styles.btnSlotActivoA : ''}`}
                       style={esA ? { background: autor.color, borderColor: autor.color } : {}}
                       onClick={() => handleSelectA(autor.id)}
@@ -434,6 +435,7 @@ export default function ComparadorVocesNarrativas() {
                       {esA ? '✓ A' : '+ A'}
                     </button>
                     <button
+                      type="button"
                       className={`${styles.btnSlot} ${esB ? styles.btnSlotActivoB : ''}`}
                       style={esB ? { background: autor.color, borderColor: autor.color } : {}}
                       onClick={() => handleSelectB(autor.id)}
@@ -450,7 +452,7 @@ export default function ComparadorVocesNarrativas() {
 
         {/* Panel de comparación */}
         {dataA && dataB && (
-          <section className={styles.comparacion}>
+          <section className={styles.comparacion} role="status" aria-live="polite" aria-atomic="true">
             {/* Cabeceras */}
             <div className={styles.compDual}>
               <div className={styles.compCabecera} style={{ borderTopColor: dataA.color }}>
@@ -584,7 +586,7 @@ export default function ComparadorVocesNarrativas() {
                 <h3 className={styles.compBloqueTitle}>Análisis comparativo</h3>
                 <div className={styles.analisisDual}>
                   <div className={styles.analisisComun}>
-                    <h4 className={styles.analisisTitleGreen}>🤝 Lo que comparten</h4>
+                    <h4 className={styles.analisisTitleGreen}><span aria-hidden="true">🤝</span> Lo que comparten</h4>
                     {analisis.comun.length > 0 ? (
                       <ul className={styles.analisisList}>
                         {analisis.comun.map(item => <li key={item}>{item}</li>)}
@@ -594,7 +596,7 @@ export default function ComparadorVocesNarrativas() {
                     )}
                   </div>
                   <div className={styles.analisisDistinto}>
-                    <h4 className={styles.analisisTitleBlue}>⚡ Lo que los diferencia</h4>
+                    <h4 className={styles.analisisTitleBlue}><span aria-hidden="true">⚡</span> Lo que los diferencia</h4>
                     {analisis.distintos.length > 0 ? (
                       <ul className={styles.analisisList}>
                         {analisis.distintos.map(item => <li key={item}>{item}</li>)}
@@ -652,7 +654,7 @@ export default function ComparadorVocesNarrativas() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🎓</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🎓</span>
                   <h4>Estudiante de Literatura</h4>
                 </div>
                 <p>Prepara un trabajo comparativo sobre el modernismo y necesita argumentar las diferencias de estilo entre Woolf y Proust.</p>
@@ -660,7 +662,7 @@ export default function ComparadorVocesNarrativas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>✍️</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">✍️</span>
                   <h4>Escritor en formación</h4>
                 </div>
                 <p>Busca un referente estilístico para su primera novela: ¿qué voz le resulta más natural, Hemingway o García Márquez?</p>
@@ -668,7 +670,7 @@ export default function ComparadorVocesNarrativas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>📚</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">📚</span>
                   <h4>Lector curioso</h4>
                 </div>
                 <p>Acaba de leer a Kafka y quiere entender por qué le impactó tanto, y qué autores tienen un estilo comparable.</p>
@@ -676,7 +678,7 @@ export default function ComparadorVocesNarrativas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🏫</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🏫</span>
                   <h4>Docente</h4>
                 </div>
                 <p>Diseña una clase de Bachillerato sobre la novela del siglo XX y necesita un recurso visual para mostrar las dimensiones del estilo.</p>
@@ -773,32 +775,32 @@ export default function ComparadorVocesNarrativas() {
             <h3>Consejos para profundizar</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>👂</span>
+                <span className={styles.tipIcono} aria-hidden="true">👂</span>
                 <h4>Lee en voz alta</h4>
                 <p>El ritmo de la frase es la primera marca estilística. Lo que funciona ojo a ojo puede sonar distinto en voz alta.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📖</span>
+                <span className={styles.tipIcono} aria-hidden="true">📖</span>
                 <h4>Empieza por la primera página</h4>
                 <p>La apertura de una novela concentra las decisiones estilísticas más deliberadas del autor. Es el mejor lugar para analizar la voz.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔄</span>
+                <span className={styles.tipIcono} aria-hidden="true">🔄</span>
                 <h4>Ninguna voz es superior</h4>
                 <p>La densidad proustiana y la economía hemingwayana son elecciones distintas ante el mismo desafío. El valor literario no está en la complejidad.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔗</span>
+                <span className={styles.tipIcono} aria-hidden="true">🔗</span>
                 <h4>Las técnicas se transmiten</h4>
                 <p>Woolf aprendió de James; Hemingway de Stein; García Márquez de Faulkner. Rastrear esas influencias es otra forma de entender los estilos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🌍</span>
+                <span className={styles.tipIcono} aria-hidden="true">🌍</span>
                 <h4>Cuenta la traducción</h4>
                 <p>Leer a Proust, Kafka o Dostoievski en español es leerlos a través del filtro del traductor. La voz que percibes es parcialmente la de quien tradujo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>✍️</span>
+                <span className={styles.tipIcono} aria-hidden="true">✍️</span>
                 <h4>Imitar es aprender</h4>
                 <p>Escribir dos párrafos imitando a Hemingway y luego dos imitando a Proust es el ejercicio de estilo más efectivo para entender la diferencia.</p>
               </div>
@@ -807,7 +809,7 @@ export default function ComparadorVocesNarrativas() {
             {/* Warning box */}
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcono}>⚠️</span>
+                <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 <h4>Errores frecuentes al analizar estilos literarios</h4>
               </div>
               <ul className={styles.warningList}>
