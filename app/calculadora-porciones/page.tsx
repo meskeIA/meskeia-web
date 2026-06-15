@@ -182,7 +182,7 @@ export default function CalculadoraPorcionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>✋ Calculadora de Porciones</h1>
+        <h1 className={styles.title}><span aria-hidden="true">✋</span> Calculadora de Porciones</h1>
         <p className={styles.subtitle}>
           Aprende a medir las porciones de alimentos usando tu mano como referencia
         </p>
@@ -204,7 +204,7 @@ export default function CalculadoraPorcionesPage() {
               className={`${styles.methodCard} ${selectedMethod === method.id ? styles.methodSelected : ''}`}
               onClick={() => setSelectedMethod(selectedMethod === method.id ? null : method.id)}
             >
-              <span className={styles.methodIcon}>{method.icon}</span>
+              <span className={styles.methodIcon} aria-hidden="true">{method.icon}</span>
               <h3 className={styles.methodName}>{method.name}</h3>
               <p className={styles.methodDescription}>{method.description}</p>
               <div className={styles.methodEquivalent}>{method.equivalent}</div>
@@ -216,8 +216,8 @@ export default function CalculadoraPorcionesPage() {
 
       {/* Detalle del método seleccionado */}
       {currentMethod && (
-        <div className={styles.methodDetail}>
-          <div className={styles.methodDetailIcon}>{currentMethod.icon}</div>
+        <div className={styles.methodDetail} role="status" aria-live="polite" aria-atomic="true">
+          <div className={styles.methodDetailIcon} aria-hidden="true">{currentMethod.icon}</div>
           <div className={styles.methodDetailContent}>
             <h3>{currentMethod.name}</h3>
             <p>{currentMethod.description}</p>
@@ -235,13 +235,15 @@ export default function CalculadoraPorcionesPage() {
           {FOOD_CATEGORIES.map(category => (
             <button
               key={category.id}
+              type="button"
               className={`${styles.categoryTab} ${selectedCategory === category.id ? styles.categoryTabActive : ''}`}
               onClick={() => setSelectedCategory(category.id)}
+              aria-pressed={selectedCategory === category.id}
               style={{
                 '--category-color': category.color
               } as React.CSSProperties}
             >
-              <span className={styles.categoryIcon}>{category.icon}</span>
+              <span className={styles.categoryIcon} aria-hidden="true">{category.icon}</span>
               <span className={styles.categoryName}>{category.name}</span>
             </button>
           ))}
@@ -249,7 +251,7 @@ export default function CalculadoraPorcionesPage() {
 
         {/* Tabla de alimentos */}
         {currentCategory && (
-          <div className={styles.foodsTable}>
+          <div className={styles.foodsTable} role="status" aria-live="polite" aria-atomic="true">
             <div
               className={styles.tableHeader}
               style={{ backgroundColor: currentCategory.color }}
@@ -265,13 +267,13 @@ export default function CalculadoraPorcionesPage() {
                     <div className={styles.foodMain}>
                       <span className={styles.foodName}>{food.name}</span>
                       <div className={styles.foodPortion}>
-                        <span className={styles.portionIcon}>{method?.icon}</span>
+                        <span className={styles.portionIcon} aria-hidden="true">{method?.icon}</span>
                         <span className={styles.portionText}>{food.portion}</span>
                       </div>
                     </div>
                     <div className={styles.foodDetails}>
                       <span className={styles.foodGrams}>{food.grams}</span>
-                      {food.tip && <span className={styles.foodTip}>💡 {food.tip}</span>}
+                      {food.tip && <span className={styles.foodTip}><span aria-hidden="true">💡</span> {food.tip}</span>}
                     </div>
                   </div>
                 );
@@ -327,22 +329,22 @@ export default function CalculadoraPorcionesPage() {
         <h2 className={styles.sectionTitle}>💡 Consejos Prácticos</h2>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📏</span>
+            <span className={styles.tipIcon} aria-hidden="true">📏</span>
             <h4>Tu mano = Tu porción</h4>
             <p>Las personas más grandes tienen manos más grandes, así que las porciones se ajustan automáticamente a tu tamaño corporal.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <h4>Flexibilidad</h4>
             <p>Estas son guías orientativas. Puedes ajustar según tu actividad física, objetivos y sensación de saciedad.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🥬</span>
+            <span className={styles.tipIcon} aria-hidden="true">🥬</span>
             <h4>Verduras libres</h4>
             <p>Con las verduras no proteicas (lechuga, pepino, tomate...) puedes ser más generoso. ¡Repite sin problema!</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚖️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
             <h4>Sin obsesionarse</h4>
             <p>No necesitas medir todo. Usa este método como referencia visual para desarrollar intuición sobre las porciones.</p>
           </div>
@@ -517,27 +519,27 @@ export default function CalculadoraPorcionesPage() {
         <h3 className={styles.eduTitle}>💡 Hábitos para mejorar la conciencia de porciones</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📸</span>
+            <span className={styles.tipIcon} aria-hidden="true">📸</span>
             <p>Fotografía tu plato antes de comer durante una semana. Te dará conciencia visual de tus porciones habituales.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🍽️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🍽️</span>
             <p>Usa platos más pequeños. El efecto psicológico hace que un plato lleno parezca más abundante que uno grande semivacío.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🫘</span>
+            <span className={styles.tipIcon} aria-hidden="true">🫘</span>
             <p>Las legumbres cuentan como proteína Y carbohidrato a la vez. Son el grupo más versátil de la dieta mediterránea.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🍃</span>
+            <span className={styles.tipIcon} aria-hidden="true">🍃</span>
             <p>Mastica 20–30 veces por bocado. Mejora la digestión y ayuda a que el cerebro registre la saciedad antes de acabar el plato.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>❤️</span>
+            <span className={styles.tipIcon} aria-hidden="true">❤️</span>
             <p>El hambre emocional no se calma con porciones perfectas. Si notas que comes por estrés, trabájalo con un profesional.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <p>Un día fuera de la rutina no arruina nada. La constancia a largo plazo importa más que la perfección diaria.</p>
           </div>
         </div>

@@ -36,7 +36,13 @@ export const jsonLd = generateWebAppSchema({
   description: "Aprende a estimar porciones de alimentos usando tu mano como referencia. Método visual y práctico para controlar las cantidades sin necesidad de báscula.",
   url: "https://meskeia.com/calculadora-porciones/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Cuatro métodos de la mano: palma (proteína), puño (carbohidratos), cupped hand (grasas) y pulgar (aceites)',
+    'Tabla de alimentos por categoría con porción estimada en gramos equivalentes',
+    'Guía visual por grupos de alimentos: proteínas, carbohidratos, verduras y grasas',
+    'Indicador visual del método seleccionado con explicación de aplicación práctica',
+    'Tabla de referencia de porciones comunes en cocina cotidiana',
+  ],
 });
 
 export const faqJsonLd = {

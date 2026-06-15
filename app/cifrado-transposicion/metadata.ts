@@ -36,7 +36,13 @@ export const jsonLd = generateWebAppSchema({
   description: "Cifra textos reordenando letras con métodos de transposición: Columnas con clave, Rail Fence (zigzag) y Escítala espartana. Visualización paso a paso.",
   url: "https://meskeia.com/cifrado-transposicion/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Tres métodos clásicos: transposición por columnas con clave, Rail Fence (zigzag) y Escítala espartana',
+    'Visualización paso a paso de la tabla de cifrado o la valla para entender el proceso',
+    'Modo cifrar y descifrar: encripta texto libre o recupera el texto original',
+    'Exportación del resultado como texto, tabla HTML y bloques de 5 letras estilo telegrama',
+    'Análisis de seguridad histórica y vulnerabilidades de cada método de transposición',
+  ],
 });
 
 export const faqJsonLd = {

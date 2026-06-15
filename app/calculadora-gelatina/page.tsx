@@ -115,7 +115,7 @@ export default function CalculadoraGelatinaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧪 Calculadora de Sustitución de Gelatina</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧪</span> Calculadora de Sustitución de Gelatina</h1>
         <p className={styles.subtitle}>
           Convierte entre gelatina en hoja (bronce, plata, oro, platino),
           en polvo y agar-agar con equivalencias precisas por bloom strength
@@ -133,6 +133,7 @@ export default function CalculadoraGelatinaPage() {
             {OPCIONES_GELATINA.map(opcion => (
               <button
                 key={opcion.tipo}
+                type="button"
                 className={`${styles.tipoBtn} ${tipoOrigen === opcion.tipo ? styles.tipoBtnActivo : ''} ${opcion.esEstandar ? styles.tipoBtnEstandar : ''}`}
                 onClick={() => handleTipoChange(opcion.tipo)}
                 role="radio"
@@ -142,7 +143,7 @@ export default function CalculadoraGelatinaPage() {
                 <span className={styles.tipoBtnNombre}>{opcion.nombre}</span>
                 <span className={styles.tipoBtnBloom}>{opcion.bloom}</span>
                 {opcion.esEstandar && (
-                  <span className={styles.tipoBtnBadge}>★ estándar</span>
+                  <span className={styles.tipoBtnBadge} aria-hidden="true">★ estándar</span>
                 )}
               </button>
             ))}
@@ -155,6 +156,7 @@ export default function CalculadoraGelatinaPage() {
             <span className={styles.unidadLabel}>Unidad:</span>
             <div className={styles.unidadBtns}>
               <button
+                type="button"
                 className={`${styles.unidadBtn} ${unidadEfectiva === 'gramos' ? styles.unidadBtnActivo : ''}`}
                 onClick={() => setUnidad('gramos')}
                 aria-pressed={unidadEfectiva === 'gramos'}
@@ -162,6 +164,7 @@ export default function CalculadoraGelatinaPage() {
                 Gramos
               </button>
               <button
+                type="button"
                 className={`${styles.unidadBtn} ${unidadEfectiva === 'hojas' ? styles.unidadBtnActivo : ''} ${!opcionActual.admiteHojas ? styles.unidadBtnDisabled : ''}`}
                 onClick={() => opcionActual.admiteHojas && setUnidad('hojas')}
                 disabled={!opcionActual.admiteHojas}
@@ -197,6 +200,7 @@ export default function CalculadoraGelatinaPage() {
           </div>
 
           <button
+            type="button"
             onClick={calcular}
             className={styles.btnPrimary}
             aria-label="Calcular equivalencias de gelatina"
@@ -215,7 +219,7 @@ export default function CalculadoraGelatinaPage() {
           )}
 
           {resultado && (
-            <div className={styles.resultadoWrapper}>
+            <div className={styles.resultadoWrapper} role="status" aria-live="polite" aria-atomic="true">
               {/* Resumen origen */}
               <div className={styles.origenCard}>
                 <h3 className={styles.origenTitulo}>Tienes</h3>
@@ -250,7 +254,7 @@ export default function CalculadoraGelatinaPage() {
                     <div className={styles.equipHeader}>
                       <span className={styles.equipNombre}>{equiv.nombre}</span>
                       {equiv.tipo === 'hoja_oro' && (
-                        <span className={styles.equipBadge}>★ más habitual</span>
+                        <span className={styles.equipBadge} aria-hidden="true">★ más habitual</span>
                       )}
                     </div>
                     <div className={styles.equipValores}>

@@ -38,8 +38,8 @@ export const jsonLd = generateWebAppSchema({
     'Advertencia sobre el comportamiento diferente del agar-agar',
     'Destaque de la gelatina hoja de oro (la más habitual en supermercados)',
     'Selector de unidad: gramos o número de hojas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
+    'Tabla de equivalencias de bloom (gelatina hoja) con conversión a gramos exactos',
+    'Guía sobre cuándo usar cada tipo según el postre: bavarois, panna cotta, mousses',
   ],
 });
 

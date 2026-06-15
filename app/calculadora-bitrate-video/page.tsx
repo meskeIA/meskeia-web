@@ -72,7 +72,7 @@ export default function CalculadoraBitrateVideoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>📹 Calculadora de Bitrate y Tamaño de Vídeo</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">📹</span> Calculadora de Bitrate y Tamaño de Vídeo</h1>
         <p className={styles.heroSubtitle}>
           Estima el bitrate y el espacio en disco para cualquier resolución y códec
         </p>
@@ -90,6 +90,7 @@ export default function CalculadoraBitrateVideoPage() {
               {RESOLUCIONES.map((r) => (
                 <button
                   key={r.id}
+                  type="button"
                   className={`${styles.resBtn} ${resolucion === r.id ? styles.resBtnActive : ''}`}
                   onClick={() => setResolucion(r.id)}
                   aria-pressed={resolucion === r.id}
@@ -109,6 +110,7 @@ export default function CalculadoraBitrateVideoPage() {
               {FPS_OPCIONES.map((f) => (
                 <button
                   key={f}
+                  type="button"
                   className={`${styles.fpsBtn} ${fps === f ? styles.fpsBtnActive : ''}`}
                   onClick={() => setFps(f)}
                   aria-pressed={fps === f}
@@ -126,6 +128,7 @@ export default function CalculadoraBitrateVideoPage() {
               {CODECS.map((c) => (
                 <button
                   key={c.id}
+                  type="button"
                   className={`${styles.codecBtn} ${codec === c.id ? styles.codecBtnActive : ''}`}
                   onClick={() => setCodec(c.id)}
                   aria-pressed={codec === c.id}
@@ -158,7 +161,7 @@ export default function CalculadoraBitrateVideoPage() {
         </section>
 
         {/* ── Resultados principales ── */}
-        <section className={styles.resultadosPanel} aria-label="Resultados">
+        <section className={styles.resultadosPanel} role="status" aria-live="polite" aria-atomic="true" aria-label="Resultados">
           <div className={styles.resultadoDestacadoGrid}>
             <div className={styles.resultadoDestacado}>
               <span className={styles.resultadoIcono} aria-hidden="true">📡</span>

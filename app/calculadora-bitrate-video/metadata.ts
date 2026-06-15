@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de tamaño de archivo en GB/MB',
     'Compatible con H.264, H.265, ProRes 422 y RAW',
     'Comparativa simultánea entre los 4 códecs',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Seis resoluciones: 480p, 720p, 1080p, 2K, 4K y 8K con bitrates de referencia',
+    'Seis opciones de fps: 24, 25, 30, 50, 60 y 120 fps',
+    'Cálculo de almacenamiento necesario para proyectos de producción de vídeo',
   ],
 });
 

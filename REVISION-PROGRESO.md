@@ -75,7 +75,7 @@
 | [ ] | Checklist de Segunda Opinión | `/checklist-segunda-opinion/` | cultura, productividad |
 | [ ] | Cifrado Clásico | `/cifrado-clasico/` | cultura |
 | [ ] | Cifrado Playfair | `/cifrado-playfair/` | cultura |
-| [ ] | Cifrado por Transposición | `/cifrado-transposicion/` | cultura |
+| [x] | Cifrado por Transposición | `/cifrado-transposicion/` | cultura |
 | [ ] | Cifrado Vigenère | `/cifrado-vigenere/` | cultura |
 | [ ] | Cinética Química: Arrhenius, Órdenes y Catalizadores | `/visualizador-cinetica-quimica/` | cultura, estudiantes, tecnicas |
 | [ ] | Círculo de Quintas | `/visualizador-circulo-quintas/` | cultura, estudiantes |
@@ -744,7 +744,7 @@
 | [ ] | Buscador de Palabras por Patrón | `/buscador-palabras-patron/` | tecnicas, cultura, juegos, productividad |
 | [ ] | Calculadora DDT — Temperatura de la Masa (Desired Dough Temperature) | `/calculadora-temperatura-masa/` | tecnicas |
 | [ ] | Calculadora de Ángulo de Campo (FOV) para Vídeo | `/calculadora-fov-video/` | tecnicas, diseno |
-| [ ] | Calculadora de Bitrate y Tamaño de Vídeo | `/calculadora-bitrate-video/` | tecnicas, diseno |
+| [x] | Calculadora de Bitrate y Tamaño de Vídeo | `/calculadora-bitrate-video/` | tecnicas, diseno |
 | [ ] | Calculadora de Cámara Lenta (Slow Motion) | `/calculadora-camara-lenta/` | tecnicas, diseno |
 | [ ] | Calculadora de Filtro ND para Vídeo | `/calculadora-filtro-nd-video/` | tecnicas, diseno |
 | [x] | Calculadora de Ganache de Chocolate | `/calculadora-ganache/` | tecnicas, cultura |
@@ -752,7 +752,7 @@
 | [ ] | Calculadora de Puntos del Azúcar | `/calculadora-puntos-azucar/` | tecnicas, cultura |
 | [ ] | Calculadora de Resistencias para LED | `/calculadora-resistencias-led/` | tecnicas, estudiantes |
 | [ ] | Calculadora de Subredes IP | `/calculadora-subredes/` | tecnicas, estudiantes |
-| [ ] | Calculadora de Sustitución de Gelatina | `/calculadora-gelatina/` | tecnicas |
+| [x] | Calculadora de Sustitución de Gelatina | `/calculadora-gelatina/` | tecnicas |
 | [x] | Calculadora de Sustitución de Levadura por Masa Madre | `/calculadora-masa-madre/` | tecnicas, cultura |
 | [ ] | Calculadora Regla de los 180° para Vídeo | `/calculadora-regla-180-video/` | tecnicas, diseno |
 | [ ] | Cifrado AES | `/cifrado-aes/` | tecnicas |
@@ -978,7 +978,7 @@
 | [ ] | Calculadora de Hidratación | `/calculadora-hidratacion/` | salud |
 | [ ] | Calculadora de Macros | `/calculadora-macros/` | salud |
 | [ ] | Calculadora de Pace de Running | `/calculadora-pace-running/` | salud, tecnicas |
-| [ ] | Calculadora de Porciones | `/calculadora-porciones/` | salud |
+| [x] | Calculadora de Porciones | `/calculadora-porciones/` | salud |
 | [ ] | Calculadora de Potencia en Ciclismo (W/kg y VAM) | `/calculadora-potencia-ciclismo/` | salud, tecnicas |
 | [ ] | Calculadora de Sueño | `/calculadora-sueno/` | salud |
 | [ ] | Calculadora de Zonas Cardíacas (Karvonen) | `/calculadora-zonas-cardiacas/` | salud, tecnicas |

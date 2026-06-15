@@ -389,22 +389,25 @@ export default function CifradoTransposicionPage() {
             type="button"
             className={`${styles.metodoBtn} ${metodo === 'columnas' ? styles.active : ''}`}
             onClick={() => setMetodo('columnas')}
+            aria-pressed={metodo === 'columnas'}
           >
-            📊 Columnas
+            <span aria-hidden="true">📊</span> Columnas
           </button>
           <button
             type="button"
             className={`${styles.metodoBtn} ${metodo === 'railfence' ? styles.active : ''}`}
             onClick={() => setMetodo('railfence')}
+            aria-pressed={metodo === 'railfence'}
           >
-            🚃 Rail Fence
+            <span aria-hidden="true">🚃</span> Rail Fence
           </button>
           <button
             type="button"
             className={`${styles.metodoBtn} ${metodo === 'escitala' ? styles.active : ''}`}
             onClick={() => setMetodo('escitala')}
+            aria-pressed={metodo === 'escitala'}
           >
-            📜 Escítala
+            <span aria-hidden="true">📜</span> Escítala
           </button>
         </div>
 
@@ -428,15 +431,17 @@ export default function CifradoTransposicionPage() {
               type="button"
               className={`${styles.modoBtn} ${modo === 'cifrar' ? styles.active : ''}`}
               onClick={() => setModo('cifrar')}
+              aria-pressed={modo === 'cifrar'}
             >
-              🔒 Cifrar
+              <span aria-hidden="true">🔒</span> Cifrar
             </button>
             <button
               type="button"
               className={`${styles.modoBtn} ${modo === 'descifrar' ? styles.active : ''}`}
               onClick={() => setModo('descifrar')}
+              aria-pressed={modo === 'descifrar'}
             >
-              🔓 Descifrar
+              <span aria-hidden="true">🔓</span> Descifrar
             </button>
           </div>
 
@@ -528,7 +533,7 @@ export default function CifradoTransposicionPage() {
 
         {/* Resultado */}
         {resultado && (
-          <section className={styles.resultPanel}>
+          <section className={styles.resultPanel} role="status" aria-live="polite" aria-atomic="true">
             <div className={styles.panelHeader}>
               <h2 className={styles.sectionTitle}>Resultado</h2>
               <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
@@ -548,9 +553,10 @@ export default function CifradoTransposicionPage() {
               type="button"
               className={styles.htmlToggleBtn}
               onClick={() => setHtmlExpanded(!htmlExpanded)}
-
+              aria-pressed={htmlExpanded}
+              aria-expanded={htmlExpanded}
             >
-              <span>{htmlExpanded ? '▲' : '▼'} Exportar como código HTML</span>
+              <span><span aria-hidden="true">{htmlExpanded ? '▲' : '▼'}</span> Exportar como código HTML</span>
               <span className={styles.htmlBadge}>Nuevo</span>
             </button>
 
@@ -791,28 +797,28 @@ export default function CifradoTransposicionPage() {
           <h2>💡 Consejos para usar transposición</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔑</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔑</span>
               <div>
                 <strong>Claves largas y sin repetición</strong>
                 <p>Para el cifrado columnar, usa claves de 7-12 letras sin letras repetidas. Más letras = más columnas = más combinaciones posibles.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔁</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔁</span>
               <div>
                 <strong>Doble transposición</strong>
                 <p>Aplica el cifrado columnar dos veces con claves diferentes. Esto multiplica exponencialmente la seguridad y hace el ataque por fuerza bruta impracticable sin ordenador.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔀</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔀</span>
               <div>
                 <strong>Combinar con sustitución</strong>
                 <p>Aplica primero un cifrado de sustitución (Vigenère) y luego transposición. Esta combinación oculta tanto el orden como las letras, dificultando el análisis de frecuencias.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <div>
                 <strong>Mensajes largos son más seguros</strong>
                 <p>Los ataques estadísticos necesitan suficiente texto para funcionar. Mensajes de menos de 50 letras son más difíciles de romper por análisis, aunque no por fuerza bruta.</p>
@@ -826,28 +832,28 @@ export default function CifradoTransposicionPage() {
           <h2>⚠️ Errores frecuentes con cifrados de transposición</h2>
           <ul className={styles.warningList}>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Creer que la transposición oculta las letras</strong>
                 <p>Un cifrado de transposición solo reordena las letras — no las cambia. Un análisis de frecuencias confirma inmediatamente el idioma original y las letras usadas. Para ocultar también las letras, combina con sustitución.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Usar Rail Fence o Escítala para datos sensibles</strong>
                 <p>Con solo 2-10 rieles posibles (Rail Fence) o unos pocos diámetros (Escítala), un ordenador los rompe en microsegundos. Son métodos puramente educativos, no aptos para proteger información real.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>🚫</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚫</span>
               <div>
                 <strong>Reutilizar la misma clave para múltiples mensajes</strong>
                 <p>Si un atacante captura varios mensajes cifrados con la misma clave columnar, puede usar técnicas de análisis diferencial para deducir la clave. Cambia la clave regularmente.</p>
               </div>
             </li>
             <li className={styles.warningItem}>
-              <span className={styles.warningIcon}>✅</span>
+              <span className={styles.warningIcon} aria-hidden="true">✅</span>
               <div>
                 <strong>Uso correcto: educación y puzzles</strong>
                 <p>Los cifrados de transposición son ideales para enseñar conceptos de criptografía, crear juegos de escape, diseñar acertijos, y entender la evolución histórica hacia los cifrados modernos.</p>
