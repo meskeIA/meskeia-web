@@ -173,10 +173,10 @@
 | [x] | Historia de Japón: De la Corte Imperial a la Restauración Meiji | `/visualizador-historia/japon/` | cultura |
 | [x] | Historia de la Agricultura: De la Revolución Neolítica a la Agricultura de Precisión | `/visualizador-historia/historia-agricultura/` | cultura |
 | [x] | Historia de la Antigua Grecia: Del Período Oscuro a Roma | `/visualizador-historia/grecia/` | cultura |
-| [ ] | Historia de la Antigua Roma: De Rómulo a la Caída del Imperio | `/visualizador-historia/roma/` | cultura |
-| [ ] | Historia de la Arquitectura Española: Del Románico al Guggenheim | `/visualizador-historia/arquitectura-espanola/` | cultura, tecnicas |
-| [ ] | Historia de la Arquitectura Moderna: Del Crystal Palace a la IA | `/visualizador-historia/historia-arquitectura-moderna/` | cultura |
-| [ ] | Historia de la Astronomía: De Stonehenge al Telescopio James Webb | `/visualizador-historia/astronomia/` | cultura |
+| [x] | Historia de la Antigua Roma: De Rómulo a la Caída del Imperio | `/visualizador-historia/roma/` | cultura |
+| [x] | Historia de la Arquitectura Española: Del Románico al Guggenheim | `/visualizador-historia/arquitectura-espanola/` | cultura, tecnicas |
+| [x] | Historia de la Arquitectura Moderna: Del Crystal Palace a la IA | `/visualizador-historia/historia-arquitectura-moderna/` | cultura |
+| [x] | Historia de la Astronomía: De Stonehenge al Telescopio James Webb | `/visualizador-historia/astronomia/` | cultura |
 | [ ] | Historia de la Aviación: De los Hermanos Wright a la Aviación Eléctrica | `/visualizador-historia/aviacion/` | cultura, tecnicas |
 | [ ] | Historia de la Banca: De los Medici al Fintech y las Criptomonedas | `/visualizador-historia/banca/` | cultura, finanzas |
 | [ ] | Historia de la Cartografía: De los Primeros Mapas al GPS y los SIG | `/visualizador-historia/cartografia/` | cultura, estudiantes |
