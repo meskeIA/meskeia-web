@@ -205,10 +205,10 @@
 | [x] | Historia de la Prensa: De Gutenberg al Periodismo Digital e IA | `/visualizador-historia/prensa/` | cultura, tecnicas |
 | [x] | Historia de la Psicología: De Platón a la IA Terapéutica | `/visualizador-historia/psicologia/` | cultura, salud |
 | [x] | Historia de la Publicidad: De Gutenberg a la IA Generativa | `/visualizador-historia/publicidad/` | cultura, diseno |
-| [ ] | Historia de la Química: De la Alquimia a la Química Computacional | `/visualizador-historia/quimica/` | cultura |
-| [ ] | Historia de la Radio: De Marconi al Podcast con IA | `/visualizador-historia/radio/` | cultura, tecnicas |
-| [ ] | Historia de la República Dominicana: De la Independencia al Caribe del Siglo XXI | `/visualizador-historia/republica-dominicana/` | cultura, estudiantes |
-| [ ] | Historia de la Robótica: De Čapek a la IA Encarnada | `/visualizador-historia/robotica/` | cultura, tecnicas |
+| [x] | Historia de la Química: De la Alquimia a la Química Computacional | `/visualizador-historia/quimica/` | cultura |
+| [x] | Historia de la Radio: De Marconi al Podcast con IA | `/visualizador-historia/radio/` | cultura, tecnicas |
+| [x] | Historia de la República Dominicana: De la Independencia al Caribe del Siglo XXI | `/visualizador-historia/republica-dominicana/` | cultura, estudiantes |
+| [x] | Historia de la Robótica: De Čapek a la IA Encarnada | `/visualizador-historia/robotica/` | cultura, tecnicas |
 | [ ] | Historia de la Televisión: De Baird a la TV con IA | `/visualizador-historia/television/` | cultura, tecnicas |
 | [ ] | Historia de la Vejez y la Longevidad: De la Antigüedad a la Ciencia Longevity | `/visualizador-historia/vejez-longevidad/` | cultura, estudiantes |
 | [ ] | Historia de la Vivienda: De las Primeras Construcciones a la Crisis de Asequibilidad | `/visualizador-historia/vivienda/` | cultura, estudiantes |

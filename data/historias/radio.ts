@@ -53,6 +53,17 @@ export const radio: HistoriaData = {
       paises: ['EE.UU.', 'Reino Unido', 'España', 'Alemania', 'Francia'],
     },
     {
+      id: 'radio-publica-guerra-fria',
+      nombre: 'Radio Pública, Propaganda y Guerra Fría',
+      anioInicio: 1945,
+      anioFin: 1989,
+      color: '#228B22',
+      categoria: 'publica',
+      descripcion: 'La BBC World Service emitía en 40 idiomas durante la WWII y continuó durante la Guerra Fría. Radio Free Europe (1949) y Radio Liberty (1953), financiadas por la CIA, transmitían noticias libres al Bloque del Este donde los medios estaban controlados por el partido. La VOA (Voz de América) alcanzó 115 millones de oyentes en su momento álgido. Radio Moscú respondía con propaganda soviética. En España, RNE fue herramienta del franquismo hasta que la Transición la democratizó en los años 80. La radio pública internacional fue el canal de información para millones bajo regímenes totalitarios. La caída del Muro de Berlín (1989) puso fin a esta guerra de las ondas.',
+      obraIconica: 'Radio Free Europe / Radio Liberty (1949-1953) — financiadas por la CIA, transmitían noticias libres al Bloque del Este durante 40 años de Guerra Fría',
+      paises: ['Reino Unido', 'EE.UU.', 'URSS', 'España', 'Europa del Este'],
+    },
+    {
       id: 'rock-radio-am',
       nombre: 'Radio, Rock y Cultura Popular',
       anioInicio: 1948,
@@ -154,7 +165,7 @@ export const radio: HistoriaData = {
       desde: 1955,
       hasta: 1980,
       icono: '🎵',
-      hitosDestacados: ['Radio, Rock y Cultura Popular', 'Transistor, FM y Contracultura'],
+      hitosDestacados: ['Radio Pública, Propaganda y Guerra Fría', 'Radio, Rock y Cultura Popular', 'Transistor, FM y Contracultura'],
       eventos: [
         '1951 — Alan Freed acuña el término "rock and roll" en WJMO Cleveland',
         '1953 — Formato Top 40 de McLendon convierte la radio en el hogar del rock',
@@ -210,6 +221,7 @@ export const radio: HistoriaData = {
   categorias: {
     pioneros: 'Pioneros',
     comercial: 'Comercial',
+    publica: 'Radio Pública',
     musica: 'Música',
     transistor: 'Transistor/FM',
     privada: 'Radio Privada',
@@ -221,6 +233,7 @@ export const radio: HistoriaData = {
   colores: {
     pioneros: '#8B4513',
     comercial: '#C8A000',
+    publica: '#228B22',
     musica: '#FF4500',
     transistor: '#9400D3',
     privada: '#2E86AB',
