@@ -193,10 +193,10 @@
 | [x] | Historia de la Filosofía: Corrientes desde los Presocráticos al Posmodernismo | `/visualizador-filosofia/` | cultura |
 | [x] | Historia de la Física: De los Griegos a la Física de Cuerdas | `/visualizador-historia/fisica/` | cultura |
 | [x] | Historia de la Fotografía: Del Daguerrotipo a la IA Generativa | `/visualizador-historia/fotografia/` | cultura |
-| [ ] | Historia de la Gastronomía: Del Fuego Neolítico a la IA Culinaria | `/visualizador-historia/gastronomia/` | cultura |
-| [ ] | Historia de la Higiene y la Salud Pública: De Mohenjo-daro a la OMS | `/visualizador-historia/higiene-salud-publica/` | cultura, estudiantes |
-| [ ] | Historia de la India: Del Imperio Maurya a la Superpotencia Tecnológica | `/visualizador-historia/historia-india/` | cultura |
-| [ ] | Historia de la Inteligencia Artificial: De Turing a GPT | `/visualizador-historia/historia-inteligencia-artificial/` | cultura, tecnicas |
+| [x] | Historia de la Gastronomía: Del Fuego Neolítico a la IA Culinaria | `/visualizador-historia/gastronomia/` | cultura |
+| [x] | Historia de la Higiene y la Salud Pública: De Mohenjo-daro a la OMS | `/visualizador-historia/higiene-salud-publica/` | cultura, estudiantes |
+| [x] | Historia de la India: Del Imperio Maurya a la Superpotencia Tecnológica | `/visualizador-historia/historia-india/` | cultura |
+| [x] | Historia de la Inteligencia Artificial: De Turing a GPT | `/visualizador-historia/historia-inteligencia-artificial/` | cultura, tecnicas |
 | [ ] | Historia de la Medicina Contemporánea: De Pasteur a las Vacunas mRNA | `/visualizador-historia/historia-medicina-contemporanea/` | cultura, salud |
 | [ ] | Historia de la Medicina: Cronología de Hipócrates a la Medicina de Precisión | `/visualizador-historia/medicina/` | cultura |
 | [ ] | Historia de la Moda Española: De los Reyes Católicos a Inditex | `/visualizador-historia/moda-espanola/` | cultura, diseno |
