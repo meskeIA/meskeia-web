@@ -131,6 +131,7 @@ export default function ConversorNumerosRomanosPage() {
             type="button"
             className={`${styles.modeBtn} ${modo === 'arabigo-romano' ? styles.active : ''}`}
             onClick={() => { setModo('arabigo-romano'); setEntrada(''); setResultado(''); setDesglose([]); setError(''); }}
+            aria-pressed={modo === 'arabigo-romano'}
           >
             Arábigo → Romano
           </button>
@@ -138,6 +139,7 @@ export default function ConversorNumerosRomanosPage() {
             type="button"
             className={`${styles.modeBtn} ${modo === 'romano-arabigo' ? styles.active : ''}`}
             onClick={() => { setModo('romano-arabigo'); setEntrada(''); setResultado(''); setDesglose([]); setError(''); }}
+            aria-pressed={modo === 'romano-arabigo'}
           >
             Romano → Arábigo
           </button>
@@ -170,7 +172,7 @@ export default function ConversorNumerosRomanosPage() {
             </div>
           </div>
 
-          {error && <div className={styles.errorMsg}>{error}</div>}
+          {error && <div className={styles.errorMsg} role="alert">{error}</div>}
 
           <div className={styles.buttonRow}>
             <button type="button" onClick={convertir} className={styles.btnPrimary}>
@@ -222,22 +224,22 @@ export default function ConversorNumerosRomanosPage() {
         <h2>Reglas de los Números Romanos</h2>
         <div className={styles.rulesGrid}>
           <div className={styles.ruleCard}>
-            <h3>📝 Suma</h3>
+            <h3><span aria-hidden="true">📝</span> Suma</h3>
             <p>Si un símbolo va seguido de otro de igual o menor valor, se suman.</p>
             <code>VI = 5 + 1 = 6</code>
           </div>
           <div className={styles.ruleCard}>
-            <h3>➖ Resta</h3>
+            <h3><span aria-hidden="true">➖</span> Resta</h3>
             <p>Si un símbolo de menor valor precede a uno mayor, se resta.</p>
             <code>IV = 5 - 1 = 4</code>
           </div>
           <div className={styles.ruleCard}>
-            <h3>🔢 Repetición</h3>
+            <h3><span aria-hidden="true">🔢</span> Repetición</h3>
             <p>Un símbolo puede repetirse hasta 3 veces consecutivas (I, X, C, M).</p>
             <code>III = 3, XXX = 30</code>
           </div>
           <div className={styles.ruleCard}>
-            <h3>⚠️ Límites</h3>
+            <h3><span aria-hidden="true">⚠️</span> Límites</h3>
             <p>V, L y D nunca se repiten. El máximo representable es 3999 (MMMCMXCIX).</p>
             <code>No: VV, LL, DD</code>
           </div>
@@ -253,10 +255,10 @@ export default function ConversorNumerosRomanosPage() {
 
           {/* SECCIÓN 1: Comparativa de sistemas */}
           <div className={styles.comparativaSection}>
-            <h3>📊 Sistemas de Numeración: Romano vs Árabe vs Otros</h3>
+            <h3><span aria-hidden="true">📊</span> Sistemas de Numeración: Romano vs Árabe vs Otros</h3>
             <div className={styles.comparativaGrid}>
               <div className={styles.comparativaCard}>
-                <h4>🏛️ Romano (I, V, X...)</h4>
+                <h4><span aria-hidden="true">🏛️</span> Romano (I, V, X...)</h4>
                 <ul>
                   <li><strong>Origen:</strong> Roma, ~500 a.C.</li>
                   <li><strong>Base:</strong> Aditivo/sustractivo (no posicional)</li>
@@ -266,7 +268,7 @@ export default function ConversorNumerosRomanosPage() {
                 </ul>
               </div>
               <div className={styles.comparativaCard}>
-                <h4>🔢 Árabe/Hindu (0, 1, 2...)</h4>
+                <h4><span aria-hidden="true">🔢</span> Árabe/Hindu (0, 1, 2...)</h4>
                 <ul>
                   <li><strong>Origen:</strong> India, ~500 d.C. → Europa ~1200</li>
                   <li><strong>Base:</strong> Posicional en base 10</li>
@@ -276,7 +278,7 @@ export default function ConversorNumerosRomanosPage() {
                 </ul>
               </div>
               <div className={styles.comparativaCard}>
-                <h4>🔣 Binario (0, 1)</h4>
+                <h4><span aria-hidden="true">🔣</span> Binario (0, 1)</h4>
                 <ul>
                   <li><strong>Origen:</strong> Leibniz ~1700, usado en computing desde 1940</li>
                   <li><strong>Base:</strong> Posicional en base 2</li>
@@ -290,7 +292,7 @@ export default function ConversorNumerosRomanosPage() {
 
           {/* SECCIÓN 2: Historia */}
           <div className={styles.historiaSection}>
-            <h3>🏛️ Historia de los Números Romanos</h3>
+            <h3><span aria-hidden="true">🏛️</span> Historia de los Números Romanos</h3>
             <div className={styles.historiaTimeline}>
               <div className={styles.timelineItem}>
                 <span className={styles.timelineDate}>~500 a.C.</span>
@@ -332,7 +334,7 @@ export default function ConversorNumerosRomanosPage() {
 
           {/* SECCIÓN 3: FAQ */}
           <div className={styles.faqSection}>
-            <h3>❓ Preguntas Frecuentes sobre Números Romanos</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Números Romanos</h3>
             <div className={styles.faqList}>
               <details className={styles.faqItem}>
                 <summary className={styles.faqQuestion}>¿Por qué el sistema romano solo llega hasta 3.999?</summary>
@@ -359,25 +361,25 @@ export default function ConversorNumerosRomanosPage() {
 
           {/* SECCIÓN 4: Usos modernos */}
           <div className={styles.usosSection}>
-            <h3>🎯 Dónde Se Usan Hoy los Números Romanos</h3>
+            <h3><span aria-hidden="true">🎯</span> Dónde Se Usan Hoy los Números Romanos</h3>
             <div className={styles.usosGrid}>
               <div className={styles.usoCard}>
-                <span className={styles.usoIcon}>🏟️</span>
+                <span className={styles.usoIcon} aria-hidden="true">🏟️</span>
                 <h4>Eventos deportivos</h4>
                 <p>Juegos Olímpicos (París 2024 = MMXXIV), Super Bowl (LVIII), Juegos Europeos. Es tradición desde los primeros Juegos Olímpicos modernos de 1896.</p>
               </div>
               <div className={styles.usoCard}>
-                <span className={styles.usoIcon}>👑</span>
+                <span className={styles.usoIcon} aria-hidden="true">👑</span>
                 <h4>Monarquías y papas</h4>
                 <p>Carlos III, Juan Pablo II, Enrique VIII. Distinguen monarcas del mismo nombre en distintas épocas. Sin esta convención, habría ambigüedad histórica.</p>
               </div>
               <div className={styles.usoCard}>
-                <span className={styles.usoIcon}>🎬</span>
+                <span className={styles.usoIcon} aria-hidden="true">🎬</span>
                 <h4>Fechas en créditos</h4>
                 <p>Hollywood usa números romanos en los créditos finales de películas para indicar el año de producción (© MMXXIV). Tradición que comenzó a principios del cine sonoro.</p>
               </div>
               <div className={styles.usoCard}>
-                <span className={styles.usoIcon}>🕰️</span>
+                <span className={styles.usoIcon} aria-hidden="true">🕰️</span>
                 <h4>Relojes de lujo</h4>
                 <p>Las marcas de alta relojería (Rolex, Patek Philippe, Cartier) usan romanos en sus esferas como símbolo de tradición y artesanía. Los dígitos arábigos son considerados más &quot;modernos&quot; y &quot;deportivos&quot;.</p>
               </div>
@@ -386,25 +388,25 @@ export default function ConversorNumerosRomanosPage() {
 
           {/* SECCIÓN 5: Tips para memorizar */}
           <div className={styles.tipsSection}>
-            <h3>💡 Trucos para Memorizar y Convertir Rápido</h3>
+            <h3><span aria-hidden="true">💡</span> Trucos para Memorizar y Convertir Rápido</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🧠</span>
+                <span className={styles.tipIcon} aria-hidden="true">🧠</span>
                 <h4>Memoriza los 7 símbolos base</h4>
                 <p>I=1, V=5, X=10, L=50, C=100, D=500, M=1000. Mnemotécnico: <strong>I Value Xylophones Like Cows Drink Milk</strong>. Con solo estos 7 puedes convertir cualquier número del 1 al 3999.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <h4>Regla de sustracción rápida</h4>
                 <p>Solo hay 6 formas sustractivas: <strong>IV=4, IX=9, XL=40, XC=90, CD=400, CM=900</strong>. Si ves I antes de V o X, X antes de L o C, C antes de D o M → siempre es resta.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔢</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔢</span>
                 <h4>Reconoce los &quot;bloques&quot; del año actual</h4>
                 <p>2024 = MM (2000) + XXIV (24). Descompón el número en miles, centenas, decenas y unidades. Cada bloque tiene su propio patrón de 1-9 usando I/V/X → X/L/C → C/D/M → M.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📺</span>
+                <span className={styles.tipIcon} aria-hidden="true">📺</span>
                 <h4>Practica con lo que ya ves</h4>
                 <p>Los títulos de películas, capítulos de series, relojes analógicos y monumentos son práctica constante. Cuando veas &quot;Super Bowl LVIII&quot;, tradúcelo mentalmente: L(50)+V(5)+I(1)+I(1)+I(1) = 58.</p>
               </div>
@@ -414,7 +416,7 @@ export default function ConversorNumerosRomanosPage() {
           {/* SECCIÓN 6: Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Limitaciones del Sistema Romano y de este Conversor</h3>
             </div>
             <ul className={styles.warningList}>

@@ -129,14 +129,18 @@ export default function ConversorBinarioPage() {
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>
           <button
+            type="button"
             className={`${styles.modeBtn} ${modo === 'texto-binario' ? styles.active : ''}`}
             onClick={() => { setModo('texto-binario'); setEntrada(''); setResultado(''); setConversiones(null); setError(''); }}
+            aria-pressed={modo === 'texto-binario'}
           >
             Texto → Binario
           </button>
           <button
+            type="button"
             className={`${styles.modeBtn} ${modo === 'binario-texto' ? styles.active : ''}`}
             onClick={() => { setModo('binario-texto'); setEntrada(''); setResultado(''); setConversiones(null); setError(''); }}
+            aria-pressed={modo === 'binario-texto'}
           >
             Binario → Texto
           </button>
@@ -157,34 +161,34 @@ export default function ConversorBinarioPage() {
           />
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Ejemplos:</span>
-            <button onClick={() => cargarEjemplo('Hola')} className={styles.exampleBtn}>Hola</button>
-            <button onClick={() => cargarEjemplo('ABC')} className={styles.exampleBtn}>ABC</button>
-            <button onClick={() => cargarEjemplo('123')} className={styles.exampleBtn}>123</button>
-            <button onClick={() => cargarEjemplo('meskeIA')} className={styles.exampleBtn}>meskeIA</button>
+            <button type="button" onClick={() => cargarEjemplo('Hola')} className={styles.exampleBtn}>Hola</button>
+            <button type="button" onClick={() => cargarEjemplo('ABC')} className={styles.exampleBtn}>ABC</button>
+            <button type="button" onClick={() => cargarEjemplo('123')} className={styles.exampleBtn}>123</button>
+            <button type="button" onClick={() => cargarEjemplo('meskeIA')} className={styles.exampleBtn}>meskeIA</button>
           </div>
         </div>
 
         {error && <div className={styles.errorMsg}>{error}</div>}
 
         <div className={styles.buttonRow}>
-          <button onClick={convertir} className={styles.btnPrimary} disabled={!entrada.trim()}>
+          <button type="button" onClick={convertir} className={styles.btnPrimary} disabled={!entrada.trim()}>
             Convertir
           </button>
-          <button onClick={intercambiar} className={styles.btnSwap} title="Intercambiar">
+          <button type="button" onClick={intercambiar} className={styles.btnSwap} title="Intercambiar">
             ⇄
           </button>
-          <button onClick={limpiar} className={styles.btnSecondary}>
+          <button type="button" onClick={limpiar} className={styles.btnSecondary}>
             Limpiar
           </button>
         </div>
 
         {resultado && (
-          <div className={styles.resultSection}>
+          <div className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
             <label className={styles.label}>
               {modo === 'texto-binario' ? 'Código binario:' : 'Texto:'}
             </label>
             <div className={styles.resultBox}>{resultado}</div>
-            <button onClick={copiarResultado} className={styles.btnCopy}>
+            <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
               📋 Copiar
             </button>
           </div>
@@ -219,7 +223,7 @@ export default function ConversorBinarioPage() {
       >
         {/* Tabla Comparativa */}
         <div className="edu-table-wrapper">
-          <h3 className="edu-section-title">📊 Comparativa de Sistemas de Numeración</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">📊</span> Comparativa de Sistemas de Numeración</h3>
           <div className="edu-table-scroll">
             <table className="edu-table">
               <thead>
@@ -274,25 +278,25 @@ export default function ConversorBinarioPage() {
 
         {/* Casos de Uso */}
         <div className="edu-escenarios-section">
-          <h3 className="edu-section-title">🎯 ¿Cuándo necesitas el código binario?</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">🎯</span> ¿Cuándo necesitas el código binario?</h3>
           <div className="edu-escenarios-grid">
             <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">⚙️</span>
+              <span className="edu-escenario-icon" aria-hidden="true">⚙️</span>
               <h4>Programación de bajo nivel</h4>
               <p>En ensamblador, drivers y firmware trabajas directamente con bits y bytes. Entender binario es esencial para manipular registros de CPU y puertos de E/S.</p>
             </div>
             <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">🌐</span>
+              <span className="edu-escenario-icon" aria-hidden="true">🌐</span>
               <h4>Depuración de redes</h4>
               <p>Las máscaras de subred, direcciones IP y cabeceras de paquetes se entienden mejor en binario. Ejemplo: /24 = 11111111.11111111.11111111.00000000.</p>
             </div>
             <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">🔒</span>
+              <span className="edu-escenario-icon" aria-hidden="true">🔒</span>
               <h4>Criptografía y hashing</h4>
               <p>SHA-256, AES y otros algoritmos operan a nivel de bits con operaciones XOR, AND, OR y rotaciones. El resultado final se expresa habitualmente en hexadecimal.</p>
             </div>
             <div className="edu-escenario-card">
-              <span className="edu-escenario-icon">🔌</span>
+              <span className="edu-escenario-icon" aria-hidden="true">🔌</span>
               <h4>Electrónica digital</h4>
               <p>Puertas lógicas AND, OR, NOT, XOR implementan el binario en hardware. Cada flip-flop almacena un bit. Comprender binario es la base de todo diseño digital.</p>
             </div>
@@ -301,7 +305,7 @@ export default function ConversorBinarioPage() {
 
         {/* FAQ */}
         <div className="edu-faq-section">
-          <h3 className="edu-section-title">❓ Preguntas Frecuentes</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
           <div className="edu-faq-list">
             <details className="edu-faq-item">
               <summary className="edu-faq-question">¿Por qué los ordenadores usan binario y no decimal?</summary>
@@ -356,7 +360,7 @@ export default function ConversorBinarioPage() {
 
         {/* Guía Paso a Paso */}
         <div className="edu-guide-section">
-          <h3 className="edu-section-title">📋 Guía: Convierte decimal a binario manualmente</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">📋</span> Guía: Convierte decimal a binario manualmente</h3>
           <ol className="edu-steps-list">
             <li className="edu-step-item">
               <div className="edu-step-number">1</div>
@@ -405,35 +409,35 @@ export default function ConversorBinarioPage() {
 
         {/* Tips Grid */}
         <div className="edu-tips-section">
-          <h3 className="edu-section-title">💡 Consejos para Dominar el Binario</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">💡</span> Consejos para Dominar el Binario</h3>
           <div className="edu-tips-grid">
             <div className="edu-tip-card">
-              <span className="edu-tip-icon">🧠</span>
+              <span className="edu-tip-icon" aria-hidden="true">🧠</span>
               <h4>Memoriza potencias de 2</h4>
               <p>1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024. Son la base de todo. Con práctica, los reconocerás automáticamente.</p>
             </div>
             <div className="edu-tip-card">
-              <span className="edu-tip-icon">⚡</span>
+              <span className="edu-tip-icon" aria-hidden="true">⚡</span>
               <h4>Hex como atajo</h4>
               <p>Agrupa los bits en grupos de 4 y convierte cada grupo a hex. 1111 0000 = F0. Mucho más rápido que leer 8 bits individuales.</p>
             </div>
             <div className="edu-tip-card">
-              <span className="edu-tip-icon">🏷️</span>
+              <span className="edu-tip-icon" aria-hidden="true">🏷️</span>
               <h4>Prefijos estándar</h4>
               <p>En código: 0b101010 (binario), 0x2A (hex), 0o52 (octal). Muchos lenguajes como Python, JavaScript y C los soportan nativamente.</p>
             </div>
             <div className="edu-tip-card">
-              <span className="edu-tip-icon">📚</span>
+              <span className="edu-tip-icon" aria-hidden="true">📚</span>
               <h4>ASCII de memoria</h4>
               <p>&apos;A&apos;=65, &apos;a&apos;=97 (diferencia de 32=00100000, el bit 5). Los dígitos &apos;0&apos;–&apos;9&apos; van de 48 a 57. Fácil de recordar.</p>
             </div>
             <div className="edu-tip-card">
-              <span className="edu-tip-icon">🔢</span>
+              <span className="edu-tip-icon" aria-hidden="true">🔢</span>
               <h4>Truco para binario rápido</h4>
               <p>Para saber si un número es par o impar en binario, mira solo el último bit: 0=par, 1=impar. Los desplazamientos de bits multiplican y dividen por 2.</p>
             </div>
             <div className="edu-tip-card">
-              <span className="edu-tip-icon">🎯</span>
+              <span className="edu-tip-icon" aria-hidden="true">🎯</span>
               <h4>Máscaras de bits</h4>
               <p>Usa AND para leer bits, OR para activarlos, XOR para invertirlos. Ejemplo: valor & 0b00001111 extrae los 4 bits menos significativos (nibble bajo).</p>
             </div>
@@ -443,7 +447,7 @@ export default function ConversorBinarioPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Limitaciones y Errores Comunes al Usar este Conversor</h3>
           </div>
           <ul className={styles.warningList}>

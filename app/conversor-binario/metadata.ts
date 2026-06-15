@@ -37,9 +37,9 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/conversor-binario/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+      "Conversión bidireccional: texto a binario y binario a texto",
+      "Representaciones en hexadecimal, octal y ASCII simultáneas",
+      "Tabla comparativa de sistemas de numeración (base 2, 8, 10, 16)"
   ],
 });
 

@@ -92,10 +92,10 @@
 | [x] | Cómo se Produce la Energía | `/visualizador-produccion-energia/` | cultura, tecnicas |
 | [x] | Comparador de Voces Narrativas | `/comparador-voces-narrativas/` | cultura, estudiantes |
 | [x] | Configurador Narrativo | `/configurador-narrativo/` | cultura, estudiantes |
-| [ ] | Constelaciones del Cielo | `/constelaciones-del-cielo/` | cultura |
-| [ ] | Constructor de Personaje | `/constructor-personaje/` | cultura, estudiantes |
-| [ ] | Conversor Binario | `/conversor-binario/` | cultura, estudiantes |
-| [ ] | Conversor Números Romanos | `/conversor-numeros-romanos/` | cultura |
+| [x] | Constelaciones del Cielo | `/constelaciones-del-cielo/` | cultura |
+| [x] | Constructor de Personaje | `/constructor-personaje/` | cultura, estudiantes |
+| [x] | Conversor Binario | `/conversor-binario/` | cultura, estudiantes |
+| [x] | Conversor Números Romanos | `/conversor-numeros-romanos/` | cultura |
 | [ ] | Cronobiología: Relojes Circadianos, Cronotipos y Cronofarmacología | `/visualizador-cronobiologia/` | cultura, estudiantes, salud |
 | [ ] | Cuánta Agua Gastas sin Saberlo | `/visualizador-agua-virtual/` | cultura, salud |
 | [ ] | Cuánto Pesa una Decisión | `/visualizador-peso-decisiones/` | cultura, salud, finanzas |

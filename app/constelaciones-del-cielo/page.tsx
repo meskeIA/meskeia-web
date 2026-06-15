@@ -67,7 +67,7 @@ export default function ConstelacionesDelCieloPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🌌</span>
+        <span className={styles.heroIcon} aria-hidden="true">🌌</span>
         <h1 className={styles.title}>Constelaciones del Cielo</h1>
         <p className={styles.subtitle}>
           Explora las 32 constelaciones más famosas del cielo nocturno:
@@ -80,7 +80,7 @@ export default function ConstelacionesDelCieloPage() {
       {/* Buscador y Filtros */}
       <div className={styles.searchSection}>
         <div className={styles.searchBox}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
             type="text"
             placeholder="Buscar por nombre, estrella o abreviatura..."
@@ -132,7 +132,7 @@ export default function ConstelacionesDelCieloPage() {
           </div>
         </div>
 
-        <div className={styles.resultsCount}>
+        <div className={styles.resultsCount} role="status" aria-live="polite">
           Mostrando {filteredConstellations.length} de {CONSTELLATIONS.length} constelaciones
         </div>
       </div>
@@ -147,13 +147,13 @@ export default function ConstelacionesDelCieloPage() {
           >
             <div className={styles.cardHeader}>
               <div className={styles.cardTitle}>
-                <span className={styles.typeEmoji}>{getTypeEmoji(constellation.tipo)}</span>
+                <span className={styles.typeEmoji} aria-hidden="true">{getTypeEmoji(constellation.tipo)}</span>
                 <div>
                   <h2 className={styles.constellationName}>{constellation.nombre}</h2>
                   <p className={styles.latinName}>{constellation.nombreLatin} ({constellation.abreviatura})</p>
                 </div>
               </div>
-              <span className={styles.expandIcon}>
+              <span className={styles.expandIcon} aria-hidden="true">
                 {expandedId === constellation.id ? '−' : '+'}
               </span>
             </div>
@@ -174,7 +174,7 @@ export default function ConstelacionesDelCieloPage() {
             {expandedId === constellation.id && (
               <div className={styles.cardDetails}>
                 <div className={styles.detailSection}>
-                  <h3>⭐ Estrellas Principales</h3>
+                  <h3><span aria-hidden="true">⭐</span> Estrellas Principales</h3>
                   <div className={styles.starsList}>
                     {constellation.estrellasPrincipales.map((star, index) => (
                       <div key={index} className={styles.starItem}>
@@ -188,17 +188,17 @@ export default function ConstelacionesDelCieloPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>📅 Mejor Época</h3>
+                  <h3><span aria-hidden="true">📅</span> Mejor Época</h3>
                   <p>{constellation.mejorMes}</p>
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>📜 Mitología</h3>
+                  <h3><span aria-hidden="true">📜</span> Mitología</h3>
                   <p>{constellation.mitologia}</p>
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>💡 Curiosidad</h3>
+                  <h3><span aria-hidden="true">💡</span> Curiosidad</h3>
                   <p className={styles.curiosity}>{constellation.curiosidad}</p>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function ConstelacionesDelCieloPage() {
       {/* Sin resultados */}
       {filteredConstellations.length === 0 && (
         <div className={styles.noResults}>
-          <span className={styles.noResultsIcon}>🔭</span>
+          <span className={styles.noResultsIcon} aria-hidden="true">🔭</span>
           <p>No se encontraron constelaciones con esos criterios.</p>
           <button
             type="button"
@@ -243,7 +243,7 @@ export default function ConstelacionesDelCieloPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>♈ Constelaciones Zodiacales</h4>
+              <h4><span aria-hidden="true">♈</span> Constelaciones Zodiacales</h4>
               <p>
                 Son las 12 constelaciones por donde pasa la eclíptica, el camino aparente del Sol
                 en el cielo. Cada mes, el Sol parece atravesar una de estas constelaciones, lo que
@@ -252,7 +252,7 @@ export default function ConstelacionesDelCieloPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🌟 Constelaciones Boreales</h4>
+              <h4><span aria-hidden="true">🌟</span> Constelaciones Boreales</h4>
               <p>
                 Visibles principalmente desde el hemisferio norte. Incluyen algunas de las más
                 famosas como la Osa Mayor, Casiopea y Orión. Muchas fueron catalogadas por
@@ -261,7 +261,7 @@ export default function ConstelacionesDelCieloPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>✨ Constelaciones Australes</h4>
+              <h4><span aria-hidden="true">✨</span> Constelaciones Australes</h4>
               <p>
                 Visibles principalmente desde el hemisferio sur. Muchas fueron catalogadas por
                 exploradores europeos en los siglos XV-XVIII, como la Cruz del Sur, que guiaba
@@ -270,7 +270,7 @@ export default function ConstelacionesDelCieloPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📐 Las 88 Constelaciones Oficiales</h4>
+              <h4><span aria-hidden="true">📐</span> Las 88 Constelaciones Oficiales</h4>
               <p>
                 En 1922, la Unión Astronómica Internacional (UAI) estableció oficialmente
                 88 constelaciones que cubren todo el cielo. Cada punto del cielo pertenece
@@ -284,7 +284,7 @@ export default function ConstelacionesDelCieloPage() {
           <h2>Cómo Observar el Cielo Nocturno</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🌑 Busca Cielos Oscuros</h4>
+              <h4><span aria-hidden="true">🌑</span> Busca Cielos Oscuros</h4>
               <p>
                 Aléjate de la contaminación lumínica de las ciudades. Una noche sin luna es
                 ideal para ver las estrellas más débiles y apreciar la Vía Láctea.
@@ -292,7 +292,7 @@ export default function ConstelacionesDelCieloPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>👁️ Adapta tus Ojos</h4>
+              <h4><span aria-hidden="true">👁️</span> Adapta tus Ojos</h4>
               <p>
                 Tus ojos necesitan 20-30 minutos para adaptarse a la oscuridad. Evita mirar
                 pantallas brillantes o luces blancas; usa luz roja si necesitas iluminación.
@@ -300,7 +300,7 @@ export default function ConstelacionesDelCieloPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🧭 Oriéntate con la Polar</h4>
+              <h4><span aria-hidden="true">🧭</span> Oriéntate con la Polar</h4>
               <p>
                 En el hemisferio norte, localiza la Estrella Polar siguiendo las dos estrellas
                 del extremo de la Osa Mayor. Esta estrella indica siempre el norte.
@@ -308,7 +308,7 @@ export default function ConstelacionesDelCieloPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📱 Usa Apps de Astronomía</h4>
+              <h4><span aria-hidden="true">📱</span> Usa Apps de Astronomía</h4>
               <p>
                 Aplicaciones como Stellarium o Star Walk te permiten apuntar al cielo y
                 ver en tiempo real qué constelaciones estás observando.
@@ -334,7 +334,7 @@ export default function ConstelacionesDelCieloPage() {
         </section>
 
         <section>
-          <h3>🏛️ Tradiciones Astronómicas del Mundo</h3>
+          <h3><span aria-hidden="true">🏛️</span> Tradiciones Astronómicas del Mundo</h3>
           <p>Las constelaciones modernas proceden de la astronomía griega, pero otras civilizaciones desarrollaron sus propios sistemas celestes:</p>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
@@ -389,25 +389,25 @@ export default function ConstelacionesDelCieloPage() {
         </section>
 
         <section>
-          <h3>🎯 ¿Para Qué Sirven las Constelaciones Hoy?</h3>
+          <h3><span aria-hidden="true">🎯</span> ¿Para Qué Sirven las Constelaciones Hoy?</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🧭</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🧭</span>
               <h4>Navegación Histórica</h4>
               <p>Durante siglos, marineros y exploradores usaron constelaciones como la Cruz del Sur y la Estrella Polar para determinar su posición en el mar con precisión de grados.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🌾</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🌾</span>
               <h4>Calendario Agrícola</h4>
               <p>En la antigüedad, la aparición de ciertas constelaciones marcaba las estaciones de siembra y cosecha. Las Pléyades en Orión indicaban el inicio de la primavera en Grecia.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🔭</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🔭</span>
               <h4>Astronomía Moderna (IAU)</h4>
               <p>Las 88 constelaciones oficiales dividen el cielo como un sistema de coordenadas. Los astrónomos las usan para indicar la posición de objetos celestes, nebulosas y galaxias.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎓</span>
               <h4>Educación y Divulgación</h4>
               <p>Las constelaciones son la puerta de entrada a la astronomía: son reconocibles a simple vista, tienen historias memorables y permiten aprender mitología griega al mismo tiempo.</p>
             </div>
@@ -415,7 +415,7 @@ export default function ConstelacionesDelCieloPage() {
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Constelaciones</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Constelaciones</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cuál es la diferencia entre una constelación y un asterismo?</summary>
@@ -453,7 +453,7 @@ export default function ConstelacionesDelCieloPage() {
         </section>
 
         <section>
-          <h3>📋 Cómo Localizar Constelaciones: Guía Práctica</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Localizar Constelaciones: Guía Práctica</h3>
           <ol className={styles.eduStepsList}>
             <li className={styles.eduStep}>
               <span className={styles.eduStepNum}>1</span>
@@ -501,35 +501,35 @@ export default function ConstelacionesDelCieloPage() {
         </section>
 
         <section>
-          <h3>💡 Consejos para Observadores de Constelaciones</h3>
+          <h3><span aria-hidden="true">💡</span> Consejos para Observadores de Constelaciones</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🌑</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🌑</span>
               <h4>Luna nueva = mejor noche</h4>
               <p>La Luna llena ilumina el cielo tanto que oculta las estrellas débiles. Planifica tus sesiones de observación en los días cercanos a luna nueva.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🗺️</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🗺️</span>
               <h4>Usa mapas estelares estacionales</h4>
               <p>Descarga o imprime el mapa estelar del mes actual. Girandolo para que el sur esté arriba si observas hacia el sur del hemisferio norte.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📍</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📍</span>
               <h4>Anota tus coordenadas</h4>
               <p>La visibilidad de constelaciones depende de tu latitud. Desde España (40°N) ves bien el hemisferio norte y parte del sur; desde Argentina (35°S) ves la Cruz del Sur perfectamente.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🌬️</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🌬️</span>
               <h4>Condiciones atmosféricas importan</h4>
               <p>El «seeing» (estabilidad del aire) afecta la nitidez. Las noches frías y despejadas tras un frente frío son ideales. La humedad y el calor crean turbulencias que difuminan las estrellas.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📚</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📚</span>
               <h4>Aprende la mitología</h4>
               <p>Asociar cada constelación con su historia mitológica hace que sea imposible olvidarla. Orión el cazador, Perseus rescatando a Andrómeda, Escorpio matando a Orión — son mnemotecnias perfectas.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>👥</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">👥</span>
               <h4>Únete a clubes de astronomía</h4>
               <p>Las sociedades astronómicas locales organizan noches de observación con telescopios profesionales. En España: Agrupación Astronómica de Madrid (AAM), Grup d&apos;Estudis Astronòmics (GEA) en Cataluña.</p>
             </div>
@@ -555,7 +555,7 @@ export default function ConstelacionesDelCieloPage() {
 
         {/* 1. Tabla Comparativa */}
         <section>
-          <h3>🌟 Constelaciones Principales Visibles desde España</h3>
+          <h3><span aria-hidden="true">🌟</span> Constelaciones Principales Visibles desde España</h3>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -640,28 +640,28 @@ export default function ConstelacionesDelCieloPage() {
 
         {/* 2. Casos de Uso */}
         <section>
-          <h3>🎯 ¿Quién Usa esta Herramienta y Para Qué?</h3>
+          <h3><span aria-hidden="true">🎯</span> ¿Quién Usa esta Herramienta y Para Qué?</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>🔭</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🔭</span>
               <div className={styles.escenarioHeader}>Astrónomo aficionado</div>
               <p className={styles.escenarioExample}>Aprendiendo a orientarse en el cielo nocturno por primera vez, identificando las constelaciones circumpolares visibles todo el año desde su localidad.</p>
               <p className={styles.escenarioTip}>Empieza con la Osa Mayor y Casiopea: son circum­polares desde España y visibles cualquier noche despejada.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>👩‍🏫</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👩‍🏫</span>
               <div className={styles.escenarioHeader}>Profesor de ciencias</div>
               <p className={styles.escenarioExample}>Preparando una actividad práctica de astronomía para alumnos de secundaria, con fichas de cada constelación, su mitología y estrellas principales.</p>
               <p className={styles.escenarioTip}>Combina la tabla de magnitudes con la sección mitológica: aprenden astronomía y cultura clásica al mismo tiempo.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>🧭</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧭</span>
               <div className={styles.escenarioHeader}>Senderista o navegante</div>
               <p className={styles.escenarioExample}>Usando las estrellas como referencia de orientación en rutas nocturnas o en travesías marítimas sin GPS disponible.</p>
               <p className={styles.escenarioTip}>La Estrella Polar (Polaris) indica el norte con precisión de menos de 1°. Localízala desde la Osa Mayor en menos de 30 segundos.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcon}>📷</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📷</span>
               <div className={styles.escenarioHeader}>Fotógrafo de astrofotografía</div>
               <p className={styles.escenarioExample}>Buscando composiciones para fotografiar el cielo nocturno: identificar qué constelaciones estarán visibles en su ventana de disparo y qué objetos Messier contienen.</p>
               <p className={styles.escenarioTip}>Orión en invierno y el Escorpión en verano ofrecen las nebulosas más fotogénicas desde España con equipos de entrada.</p>
@@ -671,7 +671,7 @@ export default function ConstelacionesDelCieloPage() {
 
         {/* 3. FAQ */}
         <section>
-          <h3>❓ Preguntas Frecuentes: Observación de Constelaciones</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes: Observación de Constelaciones</h3>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary>¿Cuántas constelaciones hay reconocidas oficialmente?</summary>
@@ -711,7 +711,7 @@ export default function ConstelacionesDelCieloPage() {
 
         {/* 4. Guía Paso a Paso */}
         <section>
-          <h3>📋 Cómo Preparar tu Primera Sesión de Observación</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Preparar tu Primera Sesión de Observación</h3>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <span className={styles.stepNumber}>1</span>
@@ -767,35 +767,35 @@ export default function ConstelacionesDelCieloPage() {
 
         {/* 5. Mejores Prácticas */}
         <section>
-          <h3>💡 Mejores Prácticas para Observar el Cielo Nocturno</h3>
+          <h3><span aria-hidden="true">💡</span> Mejores Prácticas para Observar el Cielo Nocturno</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔴</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔴</span>
               <h4>Luz roja para preservar la visión nocturna</h4>
               <p>La luz roja (longitud de onda larga) no activa los conos ni destruye la rodopsina. Usa una linterna con filtro rojo o cinta roja sobre la frontal. Nunca uses luz blanca ni mires el móvil en brillo normal durante la sesión.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌑</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌑</span>
               <h4>Noches sin luna para mayor visibilidad</h4>
               <p>La Luna llena puede iluminar el cielo tanto como el crepúsculo, ocultando estrellas débiles y la Vía Láctea. Planifica tus sesiones en los 5-7 días alrededor de la luna nueva para maximizar el número de estrellas visibles.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏙️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏙️</span>
               <h4>Alejarse al menos 30 km del núcleo urbano</h4>
               <p>La contaminación lumínica cae de forma exponencial con la distancia. A 30 km de una ciudad media española ya puedes ver la Vía Láctea. A 60-80 km, el cielo se vuelve verdaderamente oscuro con magnitudes límite de 6,5 a simple vista.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛌</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛌</span>
               <h4>Tumbarse en el suelo mirando al cielo</h4>
               <p>Observar de pie con el cuello hacia atrás es incómodo y cansa en minutos. Usa una esterilla, silla reclinable o tumbona para mantener la cabeza hacia arriba. La comodidad alarga la sesión y mejora la concentración en el cielo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔭</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔭</span>
               <h4>Binoculares antes que telescopio para aprender</h4>
               <p>Un telescopio magnifica tanto que solo ves una pequeña porción del cielo, perdiendo el contexto. Los prismáticos 7×50 o 10×50 revelan cúmulos estelares, las Pléyades con detalle y la Vía Láctea resuelta en estrellas, manteniendo el campo visual necesario para aprender.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>❄️</span>
+              <span className={styles.tipIcon} aria-hidden="true">❄️</span>
               <h4>El invierno ofrece el cielo más claro y oscuro</h4>
               <p>Las noches de invierno son más largas, el aire frío y seco produce menos turbulencias atmosféricas («seeing» excelente) y la Vía Láctea no está de frente. Orión, Géminis, Tauro y el Can Mayor son espectaculares de diciembre a febrero. Abrígate bien: el frío nocturno es mayor de lo esperado.</p>
             </div>
@@ -806,7 +806,7 @@ export default function ConstelacionesDelCieloPage() {
         <section>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores que arruinan la observación de constelaciones</strong>
             </div>
             <ul className={styles.warningList}>

@@ -247,12 +247,14 @@ export default function ConstructorPersonajePage() {
       <div className={styles.accionesBar}>
         <div className={styles.accionesBtns}>
           <button
+            type="button"
             className={styles.btnEjemplo}
             onClick={() => { setPersonaje(HAMLET); setTab('superficie'); }}
           >
             <span aria-hidden="true">📖</span> Ver ejemplo (Hamlet)
           </button>
           <button
+            type="button"
             className={styles.btnLimpiar}
             onClick={() => { setPersonaje(VACIO); setTab('superficie'); }}
           >
@@ -278,6 +280,7 @@ export default function ConstructorPersonajePage() {
       <nav className={styles.tabsNav} role="tablist" aria-label="Secciones del constructor">
         {TABS.map((t) => (
           <button
+            type="button"
             key={t.id}
             className={`${styles.tabBtn} ${tab === t.id ? styles.tabBtnActive : ''}`}
             onClick={() => setTab(t.id)}
@@ -469,7 +472,7 @@ export default function ConstructorPersonajePage() {
             {camposRellenos === 0 ? (
               <div className={styles.fichaVacio}>
                 <p>La ficha aparecerá aquí a medida que rellenes los campos.</p>
-                <button className={styles.btnEjemplo} onClick={() => { setPersonaje(HAMLET); setTab('superficie'); }}>
+                <button type="button" className={styles.btnEjemplo} onClick={() => { setPersonaje(HAMLET); setTab('superficie'); }}>
                   <span aria-hidden="true">📖</span> Cargar ejemplo (Hamlet)
                 </button>
               </div>
@@ -478,6 +481,7 @@ export default function ConstructorPersonajePage() {
                 <div className={styles.fichaAcciones}>
                   <h2 className={styles.fichaNombre}>{personaje.nombre || '(Sin nombre)'}</h2>
                   <button
+                    type="button"
                     className={`${styles.copyBtn} ${copiado ? styles.copyBtnOk : ''}`}
                     onClick={copiar}
                   >
