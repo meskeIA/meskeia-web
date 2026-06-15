@@ -209,7 +209,7 @@ function SeccionPresion() {
       )}
 
       <div className={styles.warningBox}>
-        <strong>🔇 El asesino silencioso:</strong> la HTA rara vez da síntomas hasta que el daño ya está hecho.
+        <strong><span aria-hidden="true">🔇</span> El asesino silencioso:</strong> la HTA rara vez da síntomas hasta que el daño ya está hecho.
         La cefalea solo aparece en crisis hipertensivas graves. La única forma de detectarla es medir la presión
         regularmente. <strong>El 46% de los hipertensos en España no saben que lo son.</strong>
       </div>
@@ -594,7 +594,7 @@ function SeccionFactores() {
           onClick={() => setTabActiva('modificables')}
           aria-selected={tabActiva === 'modificables'}
         >
-          ✏️ Modificables
+          <span aria-hidden="true">✏️</span> Modificables
         </button>
         <button
           type="button"
@@ -603,7 +603,7 @@ function SeccionFactores() {
           onClick={() => setTabActiva('no-modificables')}
           aria-selected={tabActiva === 'no-modificables'}
         >
-          🔒 No modificables
+          <span aria-hidden="true">🔒</span> No modificables
         </button>
       </div>
 

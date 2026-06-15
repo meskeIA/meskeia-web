@@ -153,10 +153,10 @@
 | [x] | Guía de Tipos de Pasta | `/guia-tipos-pasta/` | cultura, salud |
 | [x] | Guía de Varietales de Vino | `/guia-varietales-vino/` | cultura, juegos |
 | [x] | Guía de Vinagres del Mundo | `/guia-vinagres-mundo/` | cultura, salud |
-| [ ] | Hipertensión — Qué le Ocurre al Cuerpo con la Presión Alta | `/visualizador-hipertension/` | cultura, estudiantes, salud |
-| [ ] | Historia de África: De Berlín a la Potencia Emergente | `/visualizador-historia/historia-africa/` | cultura |
-| [ ] | Historia de Alemania: Del Imperio al Motor de Europa | `/visualizador-historia/historia-alemania/` | cultura |
-| [ ] | Historia de América Latina: De las Independencias al Siglo XXI | `/visualizador-historia/historia-america-latina/` | cultura |
+| [x] | Hipertensión — Qué le Ocurre al Cuerpo con la Presión Alta | `/visualizador-hipertension/` | cultura, estudiantes, salud |
+| [x] | Historia de África: De Berlín a la Potencia Emergente | `/visualizador-historia/historia-africa/` | cultura |
+| [x] | Historia de Alemania: Del Imperio al Motor de Europa | `/visualizador-historia/historia-alemania/` | cultura |
+| [x] | Historia de América Latina: De las Independencias al Siglo XXI | `/visualizador-historia/historia-america-latina/` | cultura |
 | [ ] | Historia de Argentina: De la Revolución de Mayo a la Argentina Contemporánea | `/visualizador-historia/argentina/` | cultura, estudiantes |
 | [ ] | Historia de Australia: De los Aborígenes al Commonwealth del Siglo XXI | `/visualizador-historia/australia/` | cultura, estudiantes |
 | [ ] | Historia de Bizancio: Del Traslado de Roma a la Caída de Constantinopla | `/visualizador-historia/historia-bizancio/` | cultura |
