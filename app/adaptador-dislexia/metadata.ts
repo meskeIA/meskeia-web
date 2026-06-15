@@ -36,7 +36,16 @@ export const jsonLd = generateWebAppSchema({
   description: "Herramienta gratuita para adaptar textos y facilitar la lectura a personas con dislexia. Ajusta fuente, tamaño, espaciado, interlineado y color de fondo. Tus preferencias se guardan automáticamente.",
   url: "https://meskeia.com/adaptador-dislexia/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Ajuste de fuente tipográfica: Arial, Lexend y monoespaciada para mayor legibilidad',
+    'Control de tamaño de letra de 14 a 36 px con vista previa en tiempo real',
+    'Espaciado entre letras y entre palabras ajustable de forma independiente',
+    'Interlineado configurable de 1,2 a 3,0 para reducir la confusión entre líneas',
+    'Ancho de columna ajustable del 40 al 100% para limitar la longitud de línea',
+    'Cinco opciones de color de fondo: blanco, crema, azul pálido, verde y gris',
+    'Preferencias guardadas automáticamente en localStorage al ajustar cada parámetro',
+    'Procesamiento 100% local: el texto nunca sale del navegador',
+  ],
 });
 
 export const faqJsonLd = {

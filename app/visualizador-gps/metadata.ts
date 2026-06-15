@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Corrección relativista de Einstein: +38 μs/día explicada visualmente',
     'Comparativa GPS vs Galileo vs GLONASS vs BeiDou',
     'Niveles de precisión: estándar, diferencial y RTK',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Pseudorrangos y multicamino: fuentes de error GPS desglosadas visualmente',
+    'Precisión Horizontal de Protección (HPL) y DOP explicados con ejemplos',
+    'Aplicaciones civiles y militares del GPS con contexto histórico',
   ],
 });
 

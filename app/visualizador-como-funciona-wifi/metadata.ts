@@ -42,9 +42,9 @@ export const jsonLd = generateWebAppSchema({
     'Plano interactivo de propagación WiFi en el hogar',
     'Canales WiFi y solapamiento explicados visualmente',
     'Timeline de evolución WiFi hasta WiFi 7',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Consejos para mejorar la cobertura WiFi en el hogar con mapa interactivo',
+    'Seguridad WiFi: WPA2, WPA3 y cifrado AES comparados',
+    'WiFi 6E y WiFi 7: banda de 6 GHz y multi-link operation explicados',
   ],
 });
 

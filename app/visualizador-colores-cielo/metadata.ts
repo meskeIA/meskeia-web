@@ -39,7 +39,7 @@ export const jsonLd = generateWebAppSchema({
     'Indicador visual de elevación solar con ángulo exacto por fase',
     'Consejos de fotografía específicos por cada fase del día',
     'Explicación de la física atmosférica: Rayleigh, Mie, capa de ozono',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Animación continua del cielo durante 24 horas con transiciones suaves de color',
   ],
 });
 

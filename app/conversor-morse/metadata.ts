@@ -36,7 +36,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Conversor de código Morse gratuito. Traduce texto a código Morse y viceversa. Reproduce el sonido del mensaje. Incluye alfabeto Morse completo.",
   url: "https://meskeia.com/conversor-morse/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Conversión bidireccional: texto → Morse y Morse → texto con un clic',
+    'Reproducción de sonido del código Morse a 600 Hz mediante Web Audio API',
+    'Alfabeto Morse Internacional ITU-R M.1677 completo con letras, números y signos',
+    'Intercambio instantáneo de entrada y salida con botón de inversión',
+    'Copia del resultado al portapapeles con un clic',
+    'Tabla de referencia del alfabeto Morse completo integrada en la app',
+  ],
 });
 
 export const faqJsonLd = {

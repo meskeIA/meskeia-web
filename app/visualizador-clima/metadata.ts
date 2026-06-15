@@ -43,9 +43,9 @@ export const jsonLd = generateWebAppSchema({
     'Evolución histórica del CO2 atmosférico (280 → 425 ppm)',
     'Corrientes oceánicas: Gulf Stream, El Niño/La Niña',
     'Slider de calentamiento: consecuencias a +1°C, +2°C y +4°C',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
+    'Simulador del ciclo del agua: evaporación, condensación y precipitación',
+    'Fenómenos extremos: olas de calor, inundaciones y sequías por nivel de calentamiento',
+    'Glosario interactivo de términos climatológicos esenciales',
   ],
 });
 

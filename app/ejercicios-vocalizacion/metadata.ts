@@ -37,9 +37,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/ejercicios-vocalizacion/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
+    'Medidor visual de volumen de voz en tiempo real mediante Web Audio API',
+    'Ejercicios de vocales sostenidas (A, E, I, O, U) con objetivo de intensidad y temporizador',
+    '24 frases para lectura en voz alta con detección automática de voz activa',
+    'Historial de sesiones con fecha, modo, puntuación y duración guardado en localStorage',
+    'Inspirado en los principios del método LSVT LOUD para la rehabilitación vocal en Parkinson',
+    'Audio procesado 100% en el dispositivo, sin envío de datos a servidores externos',
+    'Compatible con móvil, tablet y ordenador a través del micrófono del dispositivo',
   ],
 });
 

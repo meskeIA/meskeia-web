@@ -303,7 +303,7 @@ export default function VisualizadorColoresCielo() {
               />
             )}
             <div className={styles.skyLabel}>
-              <span className={styles.skyIcon}>{fase.icono}</span>
+              <span className={styles.skyIcon} aria-hidden="true">{fase.icono}</span>
               <span className={styles.skyNombre}>{fase.nombre}</span>
               <span className={styles.skyHoras}>{fase.horas}</span>
             </div>
@@ -385,17 +385,17 @@ export default function VisualizadorColoresCielo() {
         <div className={styles.faseInfo}>
           <div className={styles.faseInfoCard}>
             <h2 className={styles.faseInfoTitulo}>
-              {fase.icono} {fase.nombre}
+              <span aria-hidden="true">{fase.icono}</span> {fase.nombre}
             </h2>
             <p className={styles.faseInfoDesc}>{fase.descripcion}</p>
 
             <div className={styles.faseInfoGrid}>
               <div className={styles.faseInfoBloque}>
-                <h3 className={styles.faseInfoSubtitulo}>⚗️ Física atmosférica</h3>
+                <h3 className={styles.faseInfoSubtitulo}><span aria-hidden="true">⚗️</span> Física atmosférica</h3>
                 <p>{fase.fisicaExplicacion}</p>
               </div>
               <div className={styles.faseInfoBloque}>
-                <h3 className={styles.faseInfoSubtitulo}>📷 Consejo fotográfico</h3>
+                <h3 className={styles.faseInfoSubtitulo}><span aria-hidden="true">📷</span> Consejo fotográfico</h3>
                 <p>{fase.consejoFoto}</p>
               </div>
             </div>
@@ -475,19 +475,19 @@ export default function VisualizadorColoresCielo() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>📸 Fotógrafo de paisaje</h4>
+            <h4><span aria-hidden="true">📸</span> Fotógrafo de paisaje</h4>
             <p>Planifica amanecer y atardecer según la orientación del paisaje: usa las golden hours para luz lateral que da volumen. El Cinturón de Venus (horizonte opuesto al atardecer) añade una franja rosada única. Consulta la app <strong>Golden Hour</strong> para calcular los horarios exactos por ubicación.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🎨 Diseñador gráfico</h4>
+            <h4><span aria-hidden="true">🎨</span> Diseñador gráfico</h4>
             <p>Las paletas de cielo tienen armonía natural porque siguen el espectro solar. Los azules nocturnos (#0a0a2e) combinan de forma armónica con los dorados de la golden hour (#f0c040). Copia los HEX de cada fase directamente con un clic para usar en tu diseño.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🏙️ Fotógrafo de arquitectura</h4>
+            <h4><span aria-hidden="true">🏙️</span> Fotógrafo de arquitectura</h4>
             <p>Las horas azules (alba y ocaso) son las ventanas ideales: el cielo uniforme azul-ciano equilibra visualmente la iluminación cálida de edificios iluminados, sin necesidad de HDR. La ventana dura solo 10-15 minutos: prepara encuadre y ajustes con antelación.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>🎬 Cineasta y director de fotografía</h4>
+            <h4><span aria-hidden="true">🎬</span> Cineasta y director de fotografía</h4>
             <p>La golden hour (3000-4500 K) es la temperatura de color favorita del cine clásico, similar al tungsteno. La hora azul crea el ambiente de "final de tarde artificial" que el cine noir usaba con filtros. En exteriores, el cielo es la fuente de luz más grande del mundo.</p>
           </div>
         </div>
@@ -556,32 +556,32 @@ export default function VisualizadorColoresCielo() {
 
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Llega 30 min antes</strong>
             <p>Las transiciones más rápidas (amanecer, golden hour) duran 15-20 min. Llega antes de que empiece, con encuadre y ajustes listos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📱</span>
+            <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <strong>Usa modo manual</strong>
             <p>El medidor automático sobreexpone el cielo oscuro de la hora azul y subexpone el amanecer brillante. Metering puntual en el cielo a 45° del horizonte.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌡️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
             <strong>Balance de blancos fijo</strong>
             <p>Configura el WB en "luz día" (5600 K) y no en automático: el AWB elimina precisamente los tonos cálidos de la golden hour que querías capturar.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🖼️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🖼️</span>
             <strong>Paletas naturales para diseño</strong>
             <p>Los gradientes del cielo son las paletas más armónicas que existen: están basados en el espectro solar físico, no en teoría del color artificial.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌫️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌫️</span>
             <strong>La calima puede ser aliada</strong>
             <p>Una turbidez media (τ ≈ 0,3-0,5) suaviza el gradiente y enriquece los naranjas del atardecer. El cielo perfectamente limpio puede resultar demasiado saturado.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <strong>Repite en distintas estaciones</strong>
             <p>La duración de la golden hour varía el doble entre verano e invierno en latitudes medias. Los colores del amanecer también cambian con la posición del Sol.</p>
           </div>

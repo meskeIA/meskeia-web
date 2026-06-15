@@ -80,10 +80,10 @@
 | [x] | Cinética Química: Arrhenius, Órdenes y Catalizadores | `/visualizador-cinetica-quimica/` | cultura, estudiantes, tecnicas |
 | [x] | Círculo de Quintas | `/visualizador-circulo-quintas/` | cultura, estudiantes |
 | [x] | Civilizaciones Precolombinas: Maya, Azteca e Inca | `/visualizador-historia/civilizaciones-precolombinas/` | cultura |
-| [ ] | Colores del Cielo — Evolución 24h | `/visualizador-colores-cielo/` | cultura, diseno |
-| [ ] | Cómo Funciona el Clima | `/visualizador-clima/` | cultura, estudiantes |
-| [ ] | Cómo Funciona el GPS | `/visualizador-gps/` | cultura, tecnicas |
-| [ ] | Cómo Funciona el WiFi | `/visualizador-como-funciona-wifi/` | cultura, tecnicas |
+| [x] | Colores del Cielo — Evolución 24h | `/visualizador-colores-cielo/` | cultura, diseno |
+| [x] | Cómo Funciona el Clima | `/visualizador-clima/` | cultura, estudiantes |
+| [x] | Cómo Funciona el GPS | `/visualizador-gps/` | cultura, tecnicas |
+| [x] | Cómo Funciona el WiFi | `/visualizador-como-funciona-wifi/` | cultura, tecnicas |
 | [ ] | Cómo Funciona Internet en 60 Segundos | `/visualizador-internet-60-segundos/` | cultura, tecnicas |
 | [ ] | Cómo Funciona tu Cerebro al Decidir | `/visualizador-sesgos-cognitivos/` | cultura |
 | [ ] | Cómo Funciona una Elección | `/visualizador-sistema-electoral/` | cultura |

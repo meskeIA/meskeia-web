@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Preview del resultado antes de descargar',
     'Procesamiento 100% local (el archivo nunca sale del navegador)',
     'Drag & drop o pegar texto directamente',
-    'Gratuito, sin registro ni publicidad',
-    'En español',
   ],
   keywords: ['subtítulos', 'srt', 'vtt', 'webvtt', 'subviewer', 'ssa', 'ass', 'accesibilidad', 'conversor'],
 });
