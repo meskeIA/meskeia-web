@@ -197,10 +197,10 @@
 | [x] | Historia de la Higiene y la Salud Pública: De Mohenjo-daro a la OMS | `/visualizador-historia/higiene-salud-publica/` | cultura, estudiantes |
 | [x] | Historia de la India: Del Imperio Maurya a la Superpotencia Tecnológica | `/visualizador-historia/historia-india/` | cultura |
 | [x] | Historia de la Inteligencia Artificial: De Turing a GPT | `/visualizador-historia/historia-inteligencia-artificial/` | cultura, tecnicas |
-| [ ] | Historia de la Medicina Contemporánea: De Pasteur a las Vacunas mRNA | `/visualizador-historia/historia-medicina-contemporanea/` | cultura, salud |
-| [ ] | Historia de la Medicina: Cronología de Hipócrates a la Medicina de Precisión | `/visualizador-historia/medicina/` | cultura |
-| [ ] | Historia de la Moda Española: De los Reyes Católicos a Inditex | `/visualizador-historia/moda-espanola/` | cultura, diseno |
-| [ ] | Historia de la Moda: Del Renacimiento a la Moda Sostenible | `/visualizador-historia/moda/` | cultura, juegos |
+| [x] | Historia de la Medicina Contemporánea: De Pasteur a las Vacunas mRNA | `/visualizador-historia/historia-medicina-contemporanea/` | cultura, salud |
+| [x] | Historia de la Medicina: Cronología de Hipócrates a la Medicina de Precisión | `/visualizador-historia/medicina/` | cultura |
+| [x] | Historia de la Moda Española: De los Reyes Católicos a Inditex | `/visualizador-historia/moda-espanola/` | cultura, diseno |
+| [x] | Historia de la Moda: Del Renacimiento a la Moda Sostenible | `/visualizador-historia/moda/` | cultura, juegos |
 | [ ] | Historia de la Música Popular: Del Blues al Streaming | `/visualizador-historia/historia-musica-popular/` | cultura, juegos |
 | [ ] | Historia de la Prensa: De Gutenberg al Periodismo Digital e IA | `/visualizador-historia/prensa/` | cultura, tecnicas |
 | [ ] | Historia de la Psicología: De Platón a la IA Terapéutica | `/visualizador-historia/psicologia/` | cultura, salud |

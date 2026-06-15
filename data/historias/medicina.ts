@@ -110,7 +110,7 @@ export const medicina: HistoriaData = {
       paises: ['Reino Unido', 'EE.UU.'],
     },
     {
-      id: 'genomica-proteómica',
+      id: 'genomica-proteomica',
       nombre: 'Genómica y Proteómica',
       anioInicio: 1990,
       anioFin: 2015,
