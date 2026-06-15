@@ -185,10 +185,10 @@
 | [x] | Historia de la Danza: De los Rituales Egipcios al Breaking Olímpico | `/visualizador-historia/danza/` | cultura |
 | [x] | Historia de la Economía Mundial: Del Crack del 29 al Siglo XXI | `/visualizador-historia/historia-economia-mundial/` | cultura, finanzas |
 | [x] | Historia de la Educación: De la Academia de Platón al Aula Digital | `/visualizador-historia/historia-educacion/` | cultura |
-| [ ] | Historia de la Electricidad: De Faraday a las Redes Inteligentes | `/visualizador-historia/historia-electricidad/` | cultura, tecnicas |
-| [ ] | Historia de la Energía: Del Fuego Prehistórico a la Fusión Nuclear | `/visualizador-historia/energia/` | cultura, tecnicas |
-| [ ] | Historia de la Estadística: Del Censo Babilónico al Big Data e IA | `/visualizador-historia/estadistica/` | cultura, estudiantes |
-| [ ] | Historia de la Ética: De Sócrates a la Inteligencia Artificial | `/visualizador-historia/historia-etica/` | cultura |
+| [x] | Historia de la Electricidad: De Faraday a las Redes Inteligentes | `/visualizador-historia/historia-electricidad/` | cultura, tecnicas |
+| [x] | Historia de la Energía: Del Fuego Prehistórico a la Fusión Nuclear | `/visualizador-historia/energia/` | cultura, tecnicas |
+| [x] | Historia de la Estadística: Del Censo Babilónico al Big Data e IA | `/visualizador-historia/estadistica/` | cultura, estudiantes |
+| [x] | Historia de la Ética: De Sócrates a la Inteligencia Artificial | `/visualizador-historia/historia-etica/` | cultura |
 | [ ] | Historia de la Exploración: De los Fenicios a las Misiones a Marte | `/visualizador-historia/exploracion/` | cultura |
 | [ ] | Historia de la Filosofía: Corrientes desde los Presocráticos al Posmodernismo | `/visualizador-filosofia/` | cultura |
 | [ ] | Historia de la Física: De los Griegos a la Física de Cuerdas | `/visualizador-historia/fisica/` | cultura |
