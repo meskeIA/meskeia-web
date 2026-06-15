@@ -300,7 +300,7 @@ export default function EjerciciosVocalizacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎙️ Ejercicios de Vocalización</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎙️</span> Ejercicios de Vocalización</h1>
         <p className={styles.subtitle}>
           Práctica guiada para fortalecer la voz en la enfermedad de Parkinson.
           Mide tu volumen en tiempo real y registra tu progreso.
@@ -341,6 +341,7 @@ export default function EjerciciosVocalizacionPage() {
               </div>
             )}
             <button
+              type="button"
               className={styles.btnActivarMic}
               onClick={activarMicrofono}
               aria-label="Activar micrófono"
@@ -378,6 +379,7 @@ export default function EjerciciosVocalizacionPage() {
             </div>
 
             <button
+              type="button"
               className={styles.btnDesactivarMic}
               onClick={desactivarMicrofono}
               aria-label="Desactivar micrófono"
@@ -393,6 +395,7 @@ export default function EjerciciosVocalizacionPage() {
         <>
           <div className={styles.modosNav} role="tablist" aria-label="Tipo de ejercicio">
             <button
+              type="button"
               className={`${styles.modoBtn} ${modo === 'vocal' ? styles.modoBtnActivo : ''}`}
               onClick={() => { setModo('vocal'); setEjercicioActual(null); setEnEjercicio(false); setEjercicioCompleto(false); }}
               role="tab"
@@ -401,6 +404,7 @@ export default function EjerciciosVocalizacionPage() {
               🗣️ Vocales sostenidas
             </button>
             <button
+              type="button"
               className={`${styles.modoBtn} ${modo === 'frase' ? styles.modoBtnActivo : ''}`}
               onClick={() => { setModo('frase'); setEjercicioActual(null); setEnEjercicio(false); setEjercicioCompleto(false); }}
               role="tab"
@@ -423,6 +427,7 @@ export default function EjerciciosVocalizacionPage() {
                 {VOCALES.map(v => (
                   <button
                     key={v.letra}
+                    type="button"
                     className={`${styles.vocalBtn} ${ejercicioActual && 'letra' in ejercicioActual && (ejercicioActual as EjercicioVocal).letra === v.letra ? styles.vocalBtnActivo : ''}`}
                     onClick={() => {
                       if (!enEjercicio) iniciarEjercicio(v, v.objetivo);
@@ -481,12 +486,13 @@ export default function EjerciciosVocalizacionPage() {
                   </div>
 
                   {enEjercicio && (
-                    <button className={styles.btnDetener} onClick={detenerEjercicio}>
+                    <button type="button" className={styles.btnDetener} onClick={detenerEjercicio}>
                       ⏹ Detener ejercicio
                     </button>
                   )}
                   {ejercicioCompleto && (
                     <button
+                      type="button"
                       className={styles.btnNuevo}
                       onClick={() => { setEjercicioActual(null); setEjercicioCompleto(false); setSegundosVoz(0); }}
                     >
@@ -516,6 +522,7 @@ export default function EjerciciosVocalizacionPage() {
               {/* Navegación entre frases */}
               <div className={styles.fraseNavegacion}>
                 <button
+                  type="button"
                   className={styles.btnNavFrase}
                   onClick={fraseAnterior}
                   disabled={enEjercicio}
@@ -525,6 +532,7 @@ export default function EjerciciosVocalizacionPage() {
                 </button>
                 <span className={styles.fraseCounter}>{indiceFrase + 1} / {FRASES.length}</span>
                 <button
+                  type="button"
                   className={styles.btnNavFrase}
                   onClick={fraseSiguiente}
                   disabled={enEjercicio}
@@ -536,7 +544,7 @@ export default function EjerciciosVocalizacionPage() {
 
               {/* Botón iniciar */}
               {!enEjercicio && !ejercicioCompleto && (
-                <button className={styles.btnIniciarFrase} onClick={iniciarFraseActual}>
+                <button type="button" className={styles.btnIniciarFrase} onClick={iniciarFraseActual}>
                   ▶ Iniciar esta frase
                 </button>
               )}
@@ -559,7 +567,7 @@ export default function EjerciciosVocalizacionPage() {
                       }
                     </div>
                   </div>
-                  <button className={styles.btnDetener} onClick={detenerEjercicio}>
+                  <button type="button" className={styles.btnDetener} onClick={detenerEjercicio}>
                     ⏹ Detener ejercicio
                   </button>
                 </div>
@@ -575,7 +583,7 @@ export default function EjerciciosVocalizacionPage() {
                     <div className={styles.progresoLinealTexto}>{segundosVoz}s / {objetivoSeg}s</div>
                   </div>
                   <div className={styles.exito} role="status">🎉 ¡Frase completada!</div>
-                  <button className={styles.btnNuevo} onClick={fraseSiguiente}>
+                  <button type="button" className={styles.btnNuevo} onClick={fraseSiguiente}>
                     ▶ Siguiente frase
                   </button>
                 </div>
@@ -587,12 +595,13 @@ export default function EjerciciosVocalizacionPage() {
           {historial.length > 0 && (
             <section className={styles.historialSeccion} aria-label="Historial de sesiones">
               <button
+                type="button"
                 className={styles.historialToggle}
                 onClick={() => setMostrarHistorial(p => !p)}
                 aria-expanded={mostrarHistorial}
               >
                 📋 Historial de sesiones ({historial.length})
-                <span className={styles.toggleFlecha}>{mostrarHistorial ? '▲' : '▼'}</span>
+                <span className={styles.toggleFlecha} aria-hidden="true">{mostrarHistorial ? '▲' : '▼'}</span>
               </button>
 
               {mostrarHistorial && (
@@ -607,6 +616,7 @@ export default function EjerciciosVocalizacionPage() {
                     </div>
                   ))}
                   <button
+                    type="button"
                     className={styles.btnLimpiarHistorial}
                     onClick={() => {
                       setHistorial([]);
@@ -726,22 +736,22 @@ export default function EjerciciosVocalizacionPage() {
           <h2>¿Para quién es esta app de ejercicios?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧑‍⚕️</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🧑‍⚕️</span>
               <h3>Persona con Parkinson en fase inicial</h3>
               <p>Mantener el volumen y la proyección vocal desde el inicio del diagnóstico ralentiza el deterioro. La app permite practicar a diario en casa sin depender de citas.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>👪</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">👪</span>
               <h3>Familiar o cuidador</h3>
               <p>Puede guiar al familiar con Parkinson en los ejercicios usando la app como referencia visual. El medidor de volumen objetivo hace la sesión más motivadora y cuantificable.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🏥</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🏥</span>
               <h3>Logopeda en rehabilitación</h3>
               <p>Puede mostrar la app en consulta para demostrar el nivel de volumen objetivo, y recomendarla como práctica entre sesiones. El historial de sesiones facilita el seguimiento.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>👴</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">👴</span>
               <h3>Persona mayor con voz debilitada</h3>
               <p>Aunque no tenga Parkinson, la hipofonía por envejecimiento también mejora con ejercicios de proyección vocal. La app es útil para cualquier persona con voz débil.</p>
             </div>
@@ -848,27 +858,27 @@ export default function EjerciciosVocalizacionPage() {
           <h2>Buenas prácticas para familiares y cuidadores</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📅</span>
+              <span className={styles.tipIcono} aria-hidden="true">📅</span>
               <p><strong>Integra la práctica en la rutina diaria.</strong> Vincular los ejercicios a una actividad fija (después del desayuno, antes de ver la tele) facilita que se conviertan en hábito.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🎯</span>
+              <span className={styles.tipIcono} aria-hidden="true">🎯</span>
               <p><strong>Practica en el &quot;momento ON&quot; de la medicación.</strong> Los ejercicios son más efectivos cuando el efecto de la medicación está en su pico. Coordínalo con el neurólogo si es posible.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>💬</span>
+              <span className={styles.tipIcono} aria-hidden="true">💬</span>
               <p><strong>Recuerda durante las conversaciones.</strong> Cuando el familiar con Parkinson hable en voz baja, recuérdale amablemente: &quot;Habla como cuando practicas.&quot; El refuerzo positivo es más efectivo que la corrección.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔄</span>
+              <span className={styles.tipIcono} aria-hidden="true">🔄</span>
               <p><strong>Comparte el historial con el logopeda.</strong> El registro de sesiones es una herramienta de seguimiento. Muéstraselo en la próxima visita para que el especialista evalúe la adherencia y ajuste el plan.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>😌</span>
+              <span className={styles.tipIcono} aria-hidden="true">😌</span>
               <p><strong>No fuerces si hay fatiga vocal o días malos.</strong> En días de mayor rigidez o temblor, el esfuerzo puede ser contraproducente. Descansar un día no rompe el progreso; forzar sí puede hacerlo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🏆</span>
+              <span className={styles.tipIcono} aria-hidden="true">🏆</span>
               <p><strong>Celebra los logros, por pequeños que sean.</strong> Mantener el volumen 10 segundos hoy es un éxito. El refuerzo positivo, no la comparación con ayer, es el motor del progreso en rehabilitación.</p>
             </div>
           </div>

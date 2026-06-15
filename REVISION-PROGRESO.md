@@ -39,12 +39,12 @@
 
 | Estado | Nombre | URL | Suites |
 |---|---|---|---|
-| [ ] | Adaptador de Lectura para Dislexia | `/adaptador-dislexia/` | accesibilidad, salud, productividad, estudiantes |
+| [x] | Adaptador de Lectura para Dislexia | `/adaptador-dislexia/` | accesibilidad, salud, productividad, estudiantes |
 | [x] | Calculadora de Contraste | `/contraste-colores/` | accesibilidad, diseno |
 | [x] | Conversor Braille | `/conversor-braille/` | accesibilidad, cultura |
-| [ ] | Conversor de Código Morse | `/conversor-morse/` | accesibilidad, cultura |
-| [ ] | Convertidor de Subtítulos | `/convertidor-subtitulos/` | accesibilidad, diseno, tecnicas |
-| [ ] | Ejercicios de Vocalización para Parkinson | `/ejercicios-vocalizacion/` | accesibilidad, salud |
+| [x] | Conversor de Código Morse | `/conversor-morse/` | accesibilidad, cultura |
+| [x] | Convertidor de Subtítulos | `/convertidor-subtitulos/` | accesibilidad, diseno, tecnicas |
+| [x] | Ejercicios de Vocalización para Parkinson | `/ejercicios-vocalizacion/` | accesibilidad, salud |
 | [ ] | Generador de Tarjetas de Comunicación | `/generador-tarjetas-comunicacion/` | accesibilidad, salud, productividad |
 | [ ] | Guía de Respiración Consciente | `/guia-respiracion/` | accesibilidad, salud, productividad |
 | [ ] | Historias Sociales Visuales | `/historias-sociales/` | accesibilidad, salud, productividad, estudiantes |

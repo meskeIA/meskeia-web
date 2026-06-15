@@ -132,7 +132,7 @@ export default function AdaptadorDislexiaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📖 Adaptador de Lectura para Dislexia</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📖</span> Adaptador de Lectura para Dislexia</h1>
         <p className={styles.subtitle}>
           Personaliza cualquier texto para que te resulte más fácil de leer.
           Ajusta la fuente, el tamaño, el espaciado y el color de fondo.
@@ -155,7 +155,7 @@ export default function AdaptadorDislexiaPage() {
       <div className={styles.layout}>
         {/* Panel de controles */}
         <aside className={styles.controlesPanel} aria-label="Ajustes de lectura">
-          <h2 className={styles.panelTitle}>⚙️ Ajustes</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">⚙️</span> Ajustes</h2>
 
           {/* Selector de fuente */}
           <div className={styles.controlGroup}>
@@ -168,6 +168,7 @@ export default function AdaptadorDislexiaPage() {
               ] as const).map(f => (
                 <button
                   key={f.id}
+                  type="button"
                   className={`${styles.fuenteBtn} ${prefs.fuente === f.id ? styles.activo : ''}`}
                   onClick={() => actualizarPref('fuente', f.id)}
                   aria-pressed={prefs.fuente === f.id}
@@ -293,6 +294,7 @@ export default function AdaptadorDislexiaPage() {
               {COLORES_FONDO.map(c => (
                 <button
                   key={c.id}
+                  type="button"
                   className={`${styles.colorBtn} ${prefs.colorFondo === c.color ? styles.activo : ''}`}
                   onClick={() => actualizarPref('colorFondo', c.color)}
                   aria-label={c.nombre}
@@ -309,6 +311,7 @@ export default function AdaptadorDislexiaPage() {
           {/* Botones de acción */}
           <div className={styles.acciones}>
             <button
+              type="button"
               className={styles.btnSecundario}
               onClick={resetear}
               aria-label="Restablecer ajustes por defecto"
@@ -343,8 +346,9 @@ export default function AdaptadorDislexiaPage() {
           {/* Vista previa */}
           <section className={styles.seccionVista} aria-label="Vista previa del texto adaptado">
             <div className={styles.vistaHeader}>
-              <h2 className={styles.seccionTitulo}>👁️ Vista previa</h2>
+              <h2 className={styles.seccionTitulo}><span aria-hidden="true">👁️</span> Vista previa</h2>
               <button
+                type="button"
                 className={styles.btnPrimario}
                 onClick={copiarTexto}
                 aria-label={copiado ? 'Texto copiado al portapapeles' : 'Copiar texto al portapapeles'}
@@ -358,6 +362,8 @@ export default function AdaptadorDislexiaPage() {
                 style={estilosVista}
                 role="region"
                 aria-label="Texto con formato aplicado"
+                aria-live="polite"
+                aria-atomic="true"
               >
                 {texto
                   ? texto.split('\n').map((linea, i) =>
@@ -477,22 +483,22 @@ export default function AdaptadorDislexiaPage() {
           <h2>¿Para quién es este adaptador?</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🧒</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🧒</span>
               <h3>Niño escolar con dislexia</h3>
               <p>Facilita la lectura de apuntes y enunciados de examen. El educador puede pegar el texto y configurarlo juntos, guardando los ajustes para futuras visitas desde el mismo dispositivo.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>🎓</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">🎓</span>
               <h3>Adulto universitario</h3>
               <p>Adapta artículos académicos y apuntes extensos. El fondo crema y la columna estrecha reducen la sobrecarga visual en sesiones de estudio largas.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>💼</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">💼</span>
               <h3>Profesional con fatiga visual</h3>
               <p>Útil para leer correos largos, informes o normativas. Sin necesidad de instalar fuentes en el ordenador corporativo: funciona directamente en el navegador.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <span className={styles.escenarioIcono}>👩‍🏫</span>
+              <span className={styles.escenarioIcono} aria-hidden="true">👩‍🏫</span>
               <h3>Educador o logopeda</h3>
               <p>Prepara materiales de lectura adaptados para cada alumno. Permite demostrar en tiempo real el impacto de los diferentes ajustes tipográficos en una sesión.</p>
             </div>
@@ -599,27 +605,27 @@ export default function AdaptadorDislexiaPage() {
           <h2>Buenas prácticas para educadores y familias</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🎯</span>
+              <span className={styles.tipIcono} aria-hidden="true">🎯</span>
               <p><strong>Configura con el usuario presente.</strong> La configuración óptima varía mucho entre personas. Siempre ajusta con el alumno o familiar delante, no de antemano.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🔄</span>
+              <span className={styles.tipIcono} aria-hidden="true">🔄</span>
               <p><strong>Cambia un parámetro cada vez.</strong> Si cambias fuente, tamaño y espaciado a la vez, no sabrás qué fue lo que ayudó. Modifica de uno en uno.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🗣️</span>
+              <span className={styles.tipIcono} aria-hidden="true">🗣️</span>
               <p><strong>Combina con lectura en voz alta.</strong> El adaptador visual y el lector de pantalla del navegador son complementarios. Usa ambos para reforzar la comprensión.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📸</span>
+              <span className={styles.tipIcono} aria-hidden="true">📸</span>
               <p><strong>Guarda la configuración óptima.</strong> Una vez encontrada, haz una captura de pantalla de los ajustes. Si alguien borra las cookies, tendrás la configuración de referencia.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>📅</span>
+              <span className={styles.tipIcono} aria-hidden="true">📅</span>
               <p><strong>Revisa la configuración periódicamente.</strong> Las necesidades cambian con el tiempo. Una configuración perfecta a los 8 años puede necesitar ajustarse a los 12.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcono}>🤝</span>
+              <span className={styles.tipIcono} aria-hidden="true">🤝</span>
               <p><strong>Comparte el enlace de la app.</strong> Envía la URL al alumno para que pueda usarla en casa con sus mismos ajustes guardados (si usa el mismo navegador y dispositivo).</p>
             </div>
           </div>

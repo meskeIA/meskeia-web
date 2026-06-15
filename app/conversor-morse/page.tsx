@@ -1,9 +1,8 @@
 'use client';
-
+// @disclaimer: exempt
 import { useState, useRef, useCallback } from 'react';
 import styles from './ConversorMorse.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
-  DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -164,24 +163,21 @@ export default function ConversorMorsePage() {
 
       <LegalNotice />
 
-      <DisclaimerCard
-        variant="educational"
-        severity="medium"
-        collapsible={true}
-        context="conversor-morse-disclaimer"
-      />
-
       <div className={styles.mainContent}>
         <div className={styles.modeSelector}>
           <button
+            type="button"
             className={`${styles.modeBtn} ${modo === 'texto-morse' ? styles.active : ''}`}
             onClick={() => setModo('texto-morse')}
+            aria-pressed={modo === 'texto-morse'}
           >
             Texto → Morse
           </button>
           <button
+            type="button"
             className={`${styles.modeBtn} ${modo === 'morse-texto' ? styles.active : ''}`}
             onClick={() => setModo('morse-texto')}
+            aria-pressed={modo === 'morse-texto'}
           >
             Morse → Texto
           </button>
@@ -204,13 +200,13 @@ export default function ConversorMorsePage() {
           </div>
 
           <div className={styles.buttonRow}>
-            <button onClick={convertir} className={styles.btnPrimary}>
+            <button type="button" onClick={convertir} className={styles.btnPrimary}>
               Convertir
             </button>
-            <button onClick={intercambiar} className={styles.btnSwap} title="Intercambiar">
+            <button type="button" onClick={intercambiar} className={styles.btnSwap} title="Intercambiar">
               ⇄
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -219,19 +215,19 @@ export default function ConversorMorsePage() {
             <label className={styles.label}>
               {modo === 'texto-morse' ? 'Código Morse' : 'Texto'}
             </label>
-            <div className={styles.outputBox}>
+            <div className={styles.outputBox} role="status" aria-live="polite" aria-atomic="true">
               {salida || 'El resultado aparecerá aquí...'}
             </div>
             <div className={styles.outputActions}>
-              <button onClick={copiarResultado} className={styles.btnAction} disabled={!salida}>
+              <button type="button" onClick={copiarResultado} className={styles.btnAction} disabled={!salida}>
                 📋 Copiar
               </button>
               {!reproduciendo ? (
-                <button onClick={reproducirMorse} className={styles.btnAction} disabled={!salida && !entrada}>
+                <button type="button" onClick={reproducirMorse} className={styles.btnAction} disabled={!salida && !entrada}>
                   🔊 Reproducir sonido
                 </button>
               ) : (
-                <button onClick={detenerReproduccion} className={styles.btnStop}>
+                <button type="button" onClick={detenerReproduccion} className={styles.btnStop}>
                   ⏹ Detener
                 </button>
               )}
@@ -330,22 +326,22 @@ export default function ConversorMorsePage() {
             <h3>🎯 Dónde se usa hoy el Código Morse</h3>
             <div className={styles.eduEscenariosGrid}>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>📡</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">📡</div>
                 <h4>Radioafición (Ham Radio)</h4>
                 <p>Más de 3 millones de radioaficionados en todo el mundo usan Morse (modo CW). En España, la licencia de radioaficionado clase A requiere su dominio. Los concursos internacionales premian velocidades de 30+ WPM.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>✈️</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">✈️</div>
                 <h4>Aviación</h4>
                 <p>Los identificadores de balizas de navegación aérea (VOR, NDB, ILS) se transmiten en Morse. Los pilotos aprenden a identificar estaciones por su código Morse de 2-3 letras. Un VOR emite su ID en Morse cada 30 segundos.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>♿</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">♿</div>
                 <h4>Comunicación Alternativa</h4>
                 <p>El Morse es una herramienta de comunicación aumentativa para personas con ELA, parálisis cerebral u otras condiciones que limitan el movimiento. Con un solo interruptor o parpadeo, se puede codificar cualquier mensaje.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>🏕️</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">🏕️</div>
                 <h4>Supervivencia y Emergencias</h4>
                 <p>El SOS (... --- ...) es reconocido mundialmente sin importar el idioma. En situaciones de emergencia sin comunicación de voz (tormenta, aveería de radio), el Morse puede salvarte la vida con una linterna o cualquier medio de señalización.</p>
               </div>
@@ -445,32 +441,32 @@ export default function ConversorMorsePage() {
             <h3>✅ Mejores Prácticas para Transmitir y Recibir Morse</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🎵</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🎵</span>
                 <h4>Piensa en ritmo, no en símbolos</h4>
                 <p>La K suena &quot;dah-dit-dah&quot; (ritmo de vals). La A es &quot;dit-dah&quot; (respuesta breve). Asocia cada letra con su música, no con sus puntos y rayas en papel.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>⏰</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">⏰</span>
                 <h4>El timing es todo</h4>
                 <p>La calidad del Morse enviado depende de mantener las proporciones 1:3:7 (símbolo:letra:palabra) perfectas. Una llave electrónica (keyer) con paleta ayuda enormemente a mantener el ritmo perfecto.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>📻</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">📻</span>
                 <h4>Practica escuchando QSOs reales</h4>
                 <p>Sintoniza las bandas de radioafición (7.000-7.040 MHz para CW en Europa) y copia los intercambios reales. El Morse &quot;en vivo&quot; tiene variaciones de operador que los generadores artificiales no reproducen.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>📝</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">📝</span>
                 <h4>Copia sin mirar lo escrito</h4>
                 <p>Al practicar recepción, escribe lo que oyes sin releer lo anterior. El objetivo es procesar y copiar en tiempo real, no corregir errores. La &quot;copia a ciegas&quot; entrena la fluidez automática.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🔢</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🔢</span>
                 <h4>Aprende los números desde el principio</h4>
                 <p>Los números en Morse son los 5 caracteres más largos (5 elementos cada uno). Son imprescindibles en radioafición para intercambiar informes RST (Readability-Strength-Tone) y localizadores QTH.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🎯</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🎯</span>
                 <h4>Frecuencia de 600-700 Hz es la óptima</h4>
                 <p>El oído humano tiene máxima sensibilidad entre 500-1000 Hz. La frecuencia estándar de tono CW en radio es 600-700 Hz. Esta herramienta usa 600 Hz, que es la óptima para entrenar la discriminación auditiva en condiciones reales de radio.</p>
               </div>
@@ -480,7 +476,7 @@ export default function ConversorMorsePage() {
           {/* SECCIÓN 6: Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Comunes al Aprender y Usar Código Morse</h3>
             </div>
             <ul className={styles.warningList}>

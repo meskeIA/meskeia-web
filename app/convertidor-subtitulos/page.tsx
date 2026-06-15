@@ -514,7 +514,7 @@ export default function ConvertidorSubtitulosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎬 Convertidor de Subtítulos</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎬</span> Convertidor de Subtítulos</h1>
         <p className={styles.subtitle}>
           Convierte entre SRT, WebVTT, SUB (SubViewer) y SSA/ASS sin subir el archivo a ningún servidor.
           Detección automática del formato, validación y descarga directa.
@@ -527,7 +527,7 @@ export default function ConvertidorSubtitulosPage() {
         {/* ENTRADA */}
         <section className={styles.column} aria-labelledby="titulo-entrada">
           <div className={styles.columnHeader}>
-            <h2 id="titulo-entrada" className={styles.columnTitle}>📥 Entrada</h2>
+            <h2 id="titulo-entrada" className={styles.columnTitle}><span aria-hidden="true">📥</span> Entrada</h2>
             <div className={styles.fieldGroup}>
               <label htmlFor="formato-origen" className={styles.label}>Formato:</label>
               <select
@@ -580,14 +580,14 @@ export default function ConvertidorSubtitulosPage() {
 
           {inputText.trim() && (
             formatoDetectado ? (
-              <div className={styles.infoBox}>
+              <div className={styles.infoBox} role="status" aria-live="polite">
                 ✓ Formato detectado: <strong>{NOMBRES_FORMATO[formatoDetectado]}</strong>
                 {formatoOrigen !== 'auto' && formatoOrigen !== formatoDetectado && (
                   <> · forzando <strong>{NOMBRES_FORMATO[formatoOrigen]}</strong></>
                 )}
               </div>
             ) : (
-              <div className={styles.warningBoxInline}>
+              <div className={styles.warningBoxInline} role="alert">
                 ⚠ No se ha podido detectar el formato automáticamente. Selecciona uno manualmente arriba.
               </div>
             )
@@ -606,7 +606,7 @@ export default function ConvertidorSubtitulosPage() {
         {/* SALIDA */}
         <section className={styles.column} aria-labelledby="titulo-salida">
           <div className={styles.columnHeader}>
-            <h2 id="titulo-salida" className={styles.columnTitle}>📤 Salida</h2>
+            <h2 id="titulo-salida" className={styles.columnTitle}><span aria-hidden="true">📤</span> Salida</h2>
             <div className={styles.fieldGroup}>
               <label htmlFor="formato-destino" className={styles.label}>Convertir a:</label>
               <select
@@ -652,7 +652,7 @@ export default function ConvertidorSubtitulosPage() {
           />
 
           {resultado.errores.length > 0 && (
-            <div className={styles.errorBox}>
+            <div className={styles.errorBox} role="alert">
               <strong>Errores durante el parseo:</strong>
               <ul>
                 {resultado.errores.slice(0, 5).map((err, i) => <li key={i}>{err}</li>)}
@@ -661,7 +661,7 @@ export default function ConvertidorSubtitulosPage() {
           )}
 
           {problemasValidacion.length > 0 && (
-            <div className={styles.warningBoxInline}>
+            <div className={styles.warningBoxInline} role="status" aria-live="polite">
               <strong>Avisos de validación ({problemasValidacion.length}):</strong>
               <ul>
                 {problemasValidacion.map((p, i) => <li key={i}>{p}</li>)}
