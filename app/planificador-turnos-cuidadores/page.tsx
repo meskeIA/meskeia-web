@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 interface Cuidador {
@@ -147,13 +146,7 @@ export default function PlanificadorTurnosCuidadoresPage() {
     cuidadores.find(c => c.id === id);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -585,7 +578,6 @@ export default function PlanificadorTurnosCuidadoresPage() {
         <RelatedApps apps={getRelatedApps('planificador-turnos-cuidadores')} />
         <ShareCard appName="planificador-turnos-cuidadores" />
         <Footer appName="planificador-turnos-cuidadores" />
-      </div>
-    </>
+    </div>
   );
 }

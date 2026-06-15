@@ -100,8 +100,6 @@ export const jsonLd = generateCalculatorSchema({
     'División de cuenta entre múltiples personas',
     'Porcentaje personalizado configurable',
     'Guarda preferencias en el navegador',
-    'Funciona 100% offline (PWA)',
-    'Sin registros, sin publicidad, totalmente gratis',
     'Formato español (números con coma decimal)',
     'Responsive y optimizado para móviles',
   ],

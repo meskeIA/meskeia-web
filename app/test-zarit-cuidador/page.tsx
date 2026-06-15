@@ -19,7 +19,6 @@ import {
   RECURSOS_CUIDADORES,
   FISCAL_DEPENDENCIA_META,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // Opciones de respuesta Zarit: 1-5
 const OPCIONES_ZARIT = [
@@ -98,13 +97,7 @@ export default function TestZaritCuidadorPage() {
   const barraAncho = ((puntuacionTotal - 22) / (110 - 22)) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -680,7 +673,6 @@ export default function TestZaritCuidadorPage() {
         <RelatedApps apps={getRelatedApps('test-zarit-cuidador')} />
         <ShareCard appName="test-zarit-cuidador" />
         <Footer appName="test-zarit-cuidador" />
-      </div>
-    </>
+    </div>
   );
 }

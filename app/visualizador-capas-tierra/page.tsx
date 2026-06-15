@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -342,13 +341,7 @@ export default function VisualizadorCapasTierraPage() {
   const capaSeleccionada = CAPAS.find(c => c.id === capaActiva);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -712,7 +705,6 @@ export default function VisualizadorCapasTierraPage() {
         <RelatedApps apps={getRelatedApps('visualizador-capas-tierra')} />
         <ShareCard appName="visualizador-capas-tierra" />
         <Footer appName="visualizador-capas-tierra" />
-      </div>
-    </>
+    </div>
   );
 }

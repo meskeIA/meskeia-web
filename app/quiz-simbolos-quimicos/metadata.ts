@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     '3 niveles de dificultad: fácil (10 preguntas), medio (15) y difícil (20)',
     'Feedback inmediato con nombre, símbolo y número atómico',
     'Racha de aciertos y resumen de errores al final',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

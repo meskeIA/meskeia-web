@@ -48,8 +48,6 @@ export const jsonLd = generateWebAppSchema({
     'Cantidades exactas de chocolate y nata en gramos',
     'Temperatura de trabajo recomendada para cada textura',
     'Usos típicos de cada combinación de ganache',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['ganache', 'proporciones chocolate', 'nata ganache', 'repostería', 'trufas chocolate'],

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparación visual modelo de Bohr vs orbitales cuánticos (s, p, d)',
     'Explorador de isótopos e iones con ejemplos reales (C-14, deuterio, NaCl)',
     'Escala atómica: analogías visuales del vacío y línea temporal de descubrimientos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

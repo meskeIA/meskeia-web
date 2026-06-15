@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -716,13 +715,7 @@ export default function SangreComponentesPage() {
   const seccionInfo = SECCIONES.find(s => s.id === seccionActiva)!;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -784,7 +777,6 @@ export default function SangreComponentesPage() {
         <RelatedApps apps={getRelatedApps('visualizador-sangre-componentes')} />
         <ShareCard appName="visualizador-sangre-componentes" />
         <Footer appName="visualizador-sangre-componentes" />
-      </div>
-    </>
+    </div>
   );
 }

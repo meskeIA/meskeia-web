@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparación con la N(μ, σ/√n) teórica superpuesta',
     'Estadísticos empíricos: media, desviación, asimetría y curtosis',
     'Visualiza la velocidad de convergencia según la asimetría original',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y en español, ideal para EBAU, Bachillerato y estadística universitaria',
   ],
   keywords: ['teorema central del límite', 'TCL', 'CLT', 'Monte Carlo', 'estadística', 'distribución muestral', 'EBAU', 'Bachillerato'],
 });

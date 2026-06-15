@@ -38,9 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Calculadora LED: resistencia limitadora por Ley de Ohm',
     'Valor de resistencia estándar E12 más cercano recomendado',
     'Potencia disipada en la resistencia (previene sobrecalentamiento)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

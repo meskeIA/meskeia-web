@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'País con bandera, coste, tiempo e impacto por cada fase',
     'Datos sobre condiciones laborales e impacto ambiental',
     'Enfocado para Geografía y Economía de Bachillerato',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

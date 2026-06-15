@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -691,13 +690,7 @@ export default function VisualizadorElectricidadDomestica() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -779,7 +772,6 @@ export default function VisualizadorElectricidadDomestica() {
         <RelatedApps apps={getRelatedApps('visualizador-electricidad-domestica')} />
         <ShareCard appName="visualizador-electricidad-domestica" />
         <Footer appName="visualizador-electricidad-domestica" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Constructor de árbol filogenético con primates y cetáceos como ejemplos',
     'Evidencia molecular de la evolución: pseudogenes, ERVs, secuencias Alu',
     'Concepto MRCA (Most Recent Common Ancestor) visual e interactivo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Disponible en español',
   ],
 });
 

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos de la nómina ficticia
@@ -196,13 +195,7 @@ export default function VisualizadorAnatomiaNominaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -383,7 +376,6 @@ export default function VisualizadorAnatomiaNominaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-anatomia-nomina')} />
         <ShareCard appName="visualizador-anatomia-nomina" />
         <Footer appName="visualizador-anatomia-nomina" />
-      </div>
-    </>
+    </div>
   );
 }

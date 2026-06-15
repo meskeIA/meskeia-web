@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Estimación de atrasos retroactivos (SMI 2026 vs SMI 2025)',
     'Comparativa SMI vs salario medio en las 52 provincias',
     'Datos oficiales: BOE RD 126/2026 + AEAT 2023',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

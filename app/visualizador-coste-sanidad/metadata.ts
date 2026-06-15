@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Desglose sanidad pública vs privada',
     'Coste real de operaciones comunes',
     'Cómo se financia la sanidad española',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

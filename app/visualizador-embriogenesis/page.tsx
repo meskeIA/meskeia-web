@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tipos
@@ -524,10 +523,6 @@ export default function VisualizadorEmbriogenesis() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

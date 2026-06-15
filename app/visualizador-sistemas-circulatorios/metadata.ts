@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa de corazones de 2, 3 y 4 cámaras con flujo de sangre',
     'Sangre fría vs sangre caliente: relación con el sistema circulatorio',
     'Datos fascinantes: ballena azul, colibrí, pulpo, jirafa y más',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

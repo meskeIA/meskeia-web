@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     '4 episodios históricos de referencia con coordenadas reales',
     'Zonas sombreadas de estanflación y equilibrio ideal',
     'Toggle corto plazo / largo plazo',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['curva de Phillips', 'inflación', 'desempleo', 'NAIRU', 'estanflación', 'macroeconomía', 'Bachillerato'],
 });

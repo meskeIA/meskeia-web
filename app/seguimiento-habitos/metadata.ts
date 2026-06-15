@@ -37,9 +37,6 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/seguimiento-habitos/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
   ],
 });
 

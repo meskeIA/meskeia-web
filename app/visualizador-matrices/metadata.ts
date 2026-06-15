@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Transformaciones 2D visualizadas en plano cartesiano',
     'Rotación, escala, reflexión y cizalladura animadas',
     'Aplicaciones reales: IA, videojuegos, PageRank, GPS',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

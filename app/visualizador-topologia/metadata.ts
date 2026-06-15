@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Nudos topológicos: trivial, trébol y figura-8',
     'Tabla comparativa con característica de Euler χ = V − E + F',
     'Equivalencia taza-donut explicada paso a paso',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
   category: 'EducationalApplication',
 });

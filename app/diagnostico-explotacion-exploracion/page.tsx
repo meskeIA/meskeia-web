@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -238,13 +237,7 @@ export default function DiagnosticoExplotacionExploracionPage() {
   const posY = 100 - ((puntuacionExploracion - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -502,7 +495,6 @@ export default function DiagnosticoExplotacionExploracionPage() {
         <RelatedApps apps={getRelatedApps('diagnostico-explotacion-exploracion')} />
         <ShareCard appName="diagnostico-explotacion-exploracion" />
         <Footer appName="diagnostico-explotacion-exploracion" />
-      </div>
-    </>
+    </div>
   );
 }

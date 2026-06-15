@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos: cadena de producción de una camiseta de 15€
@@ -117,13 +116,7 @@ export default function VisualizadorOrigenCamisetaPage() {
   const etapa = etapaActiva > 0 ? ETAPAS.find(e => e.id === etapaActiva) : null;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -345,7 +338,6 @@ export default function VisualizadorOrigenCamisetaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-origen-camiseta')} />
         <ShareCard appName="visualizador-origen-camiseta" />
         <Footer appName="visualizador-origen-camiseta" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -14,7 +14,6 @@ import {
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ───
 
@@ -248,13 +247,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -703,7 +696,6 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
         <RelatedApps apps={getRelatedApps('simulador-subvenciones-rehabilitacion')} />
         <ShareCard appName="simulador-subvenciones-rehabilitacion" />
         <Footer appName="simulador-subvenciones-rehabilitacion" />
-      </div>
-    </>
+    </div>
   );
 }

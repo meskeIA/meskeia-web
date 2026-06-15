@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -382,13 +381,7 @@ export default function VisualizadorEstacionesAno() {
   const maxHoras = 24;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -731,7 +724,6 @@ export default function VisualizadorEstacionesAno() {
         <RelatedApps apps={getRelatedApps('visualizador-estaciones-ano')} />
         <ShareCard appName="visualizador-estaciones-ano" />
         <Footer appName="visualizador-estaciones-ano" />
-      </div>
-    </>
+    </div>
   );
 }

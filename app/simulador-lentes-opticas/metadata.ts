@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Sliders interactivos de distancia focal, distancia objeto y altura',
     'Cálculo automático de aumento y clasificación de la imagen',
     'Aplicación de la ecuación de Gauss (1/s + 1/s\' = 1/f)',
-    'Funciona 100% en el navegador, gratuito y en español',
     'Ideal para EBAU, Bachillerato y óptica universitaria',
   ],
   keywords: ['lentes ópticas', 'trazado de rayos', 'óptica', 'imagen real', 'imagen virtual', 'EBAU', 'Bachillerato', 'física'],

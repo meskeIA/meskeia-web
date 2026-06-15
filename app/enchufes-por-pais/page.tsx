@@ -5,7 +5,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
   DisclaimerCard,
 } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
-import { jsonLd } from './metadata';
 import styles from './EnchufesPais.module.css';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -125,10 +124,6 @@ export default function EnchufesPais() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <AnalyticsTracker appName="enchufes-por-pais" />
       <MeskeiaLogo />
 

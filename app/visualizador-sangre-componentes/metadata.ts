@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de compatibilidad donante-receptor ABO/Rh',
     'Cascada de coagulación paso a paso',
     'Valores normales de un análisis de sangre',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

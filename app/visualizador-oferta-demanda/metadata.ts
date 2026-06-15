@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Precio y cantidad de equilibrio antes y después del shock',
     'Explicación intuitiva de cada mecanismo económico',
     'Sin gráficos externos — visualización CSS pura',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
   keywords: [
     'oferta demanda', 'curvas oferta demanda', 'precio equilibrio',

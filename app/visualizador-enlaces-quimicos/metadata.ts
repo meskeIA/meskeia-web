@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Escala de electronegatividad interactiva para predecir el tipo de enlace',
     'Tabla comparativa de propiedades: fusión, conductividad, dureza',
     'Ejemplos cotidianos: sal, agua, hierro, diamante, hielo, CO₂',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

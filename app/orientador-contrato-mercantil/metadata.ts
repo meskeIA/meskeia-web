@@ -49,9 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Cláusulas esenciales para cada tipo de contrato',
     'Tabla comparativa de los 7 tipos de contrato mercantil',
     'Errores frecuentes a evitar en contratos mercantiles',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

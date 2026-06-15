@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Estructuras visuales simplificadas con animación de ensamblaje',
     'Composición del cuerpo humano en biomoléculas',
     'Datos fascinantes sobre ADN, proteínas y más',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

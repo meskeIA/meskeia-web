@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Panel descriptivo con el efecto de cada parámetro en lenguaje natural',
     'Detección automática de modo oscuro/claro',
     'Escala Retina/HiDPI para pantallas de alta resolución',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
   keywords: ['funciones', 'transformaciones', 'traslación', 'amplitud', 'frecuencia', 'Bachillerato', 'álgebra', 'gráficas'],
 });

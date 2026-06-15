@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Ventaja fiscal del plan de pensiones (IRPF 2026)',
     'Proyección de capital por 3 escenarios de rentabilidad',
     'Pensión complementaria estimada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

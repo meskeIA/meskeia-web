@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Modo secante: ver cómo Q→P transforma secante en tangente (concepto de límite)',
     'Display de pendiente, ángulo y valor numérico',
     'Detección automática de máximos, mínimos y puntos de inflexión',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad, ideal para EBAU y Bachillerato',
   ],
   keywords: ['derivada', 'tangente', 'cálculo diferencial', 'EBAU', 'matemáticas', 'Bachillerato'],
 });

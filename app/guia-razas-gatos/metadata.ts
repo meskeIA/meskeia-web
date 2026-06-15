@@ -48,9 +48,6 @@ export const jsonLd = generateWebAppSchema({
     'Filtros por tipo de pelo, energía, tamaño y temperamento',
     'Compatibilidad con niños, perros y vida en interior',
     'Buscador por nombre de raza',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

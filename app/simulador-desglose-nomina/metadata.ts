@@ -53,8 +53,6 @@ export const jsonLd = generateWebAppSchema({
     'Soporte 12, 14 o 15 pagas',
     'Datos basados en LPGE 2025 y Orden PJC/51/2025',
     'Solo orientativo — no sustituye al asesor fiscal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['nómina', 'bruto neto', 'IRPF', 'cotizaciones', 'fiscal España'],

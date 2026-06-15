@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Simulación interactiva de ventaja mecánica para palanca y plano inclinado',
     'Ejemplos cotidianos: tijeras, grúa, rampa, volante, hacha, sacacorchos',
     'Historia: Arquímedes, pirámides de Egipto, Leonardo da Vinci',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

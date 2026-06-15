@@ -91,8 +91,6 @@ export const jsonLd = generateWebAppSchema({
     'Conteo automático de sílabas',
     'Análisis métrico para poesía',
     'Identificación de diptongos, hiatos y triptongos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['contador sílabas', 'separar sílabas', 'silabeador', 'métrica poesía', 'ortografía'],

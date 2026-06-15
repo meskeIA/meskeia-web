@@ -14,7 +14,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 type NivelComplejidad = 'basico' | 'medio' | 'alto' | 'especialista';
 type NivelUrgencia = 'no' | 'algo' | 'muy';
@@ -123,13 +122,7 @@ export default function CalculadoraPrecioPorProyectoPage() {
   }, [horasTrabajo, horasGestion, horasRevisiones, tarifaHora, complejidad, gastosDirectos, margenImprevistos, urgencia]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -584,7 +577,6 @@ export default function CalculadoraPrecioPorProyectoPage() {
         <RelatedApps apps={getRelatedApps('calculadora-precio-por-proyecto')} />
         <ShareCard appName="calculadora-precio-por-proyecto" />
         <Footer appName="calculadora-precio-por-proyecto" />
-      </div>
-    </>
+    </div>
   );
 }

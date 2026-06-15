@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaCortesCarne.module.css';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -395,10 +394,6 @@ export default function GuiaCortesCarne() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

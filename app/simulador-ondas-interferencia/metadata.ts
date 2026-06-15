@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Ondas estacionarias en cuerda y tubo abierto/cerrado',
     'Hasta 5 modos armónicos visualizables',
     'Patrones predefinidos: doble rendija, fuentes opuestas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['ondas', 'interferencia', 'estacionarias', 'física bachillerato'],

@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Mensaje educativo claro con números reales',
     'Datos basados en LPGE 2025 y Ley 35/2006',
     'Solo orientativo — verifica con la AEAT',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['mito IRPF', 'tramos IRPF', 'tipo marginal', 'fiscal España'],

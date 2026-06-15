@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Métricas: R², MSE, accuracy, precision, recall',
     'Curva de pérdida durante el entrenamiento',
     '4 datasets predefinidos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['regresión', 'machine learning', 'descenso gradiente', 'IA universidad'],

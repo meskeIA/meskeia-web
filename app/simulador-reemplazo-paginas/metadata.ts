@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Gráfica de fallos acumulados',
     '4 ejemplos clásicos (Belady, localidad alta/baja, Tanenbaum)',
     'Detección automática de anomalía de Belady',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['reemplazo páginas', 'memoria virtual', 'sistemas operativos', 'informática universidad'],

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // TIPOS Y DATOS
@@ -628,13 +627,7 @@ export default function GuiaTejidosFibrasPage() {
   }, []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1084,7 +1077,6 @@ export default function GuiaTejidosFibrasPage() {
         <RelatedApps apps={getRelatedApps('guia-tejidos-fibras')} />
         <ShareCard appName="guia-tejidos-fibras" />
         <Footer appName="guia-tejidos-fibras" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Radio atómico con círculos proporcionales',
     'Energía de ionización con gráfico de barras',
     'Aplicaciones prácticas: baterías, materiales, electrónica',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

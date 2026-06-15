@@ -88,8 +88,6 @@ export const jsonLd = generateWebAppSchema({
     'Conteo en vivo de comparaciones, intercambios y pasos',
     'Modo comparativa: 4 algoritmos en paralelo',
     'Indicación de complejidad temporal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['ordenación', 'sorting', 'algoritmos', 'informática universidad'],

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── DATOS TÉCNICOS ─── */
 
@@ -140,13 +139,7 @@ export default function SimuladorPlacasSolaresPage() {
   const barPct = (val: number) => Math.max(2, (val / maxBar) * 100);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -609,7 +602,6 @@ export default function SimuladorPlacasSolaresPage() {
         <RelatedApps apps={getRelatedApps('simulador-placas-solares')} />
         <ShareCard appName="simulador-placas-solares" />
         <Footer appName="simulador-placas-solares" />
-      </div>
-    </>
+    </div>
   );
 }

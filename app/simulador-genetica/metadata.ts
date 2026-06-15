@@ -92,8 +92,6 @@ export const jsonLd = generateWebAppSchema({
     'Herencia ligada al sexo y autosómica',
     'Árboles genealógicos (pedigrees)',
     'Simulación de frecuencias alélicas en poblaciones',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['genética', 'Mendel', 'cuadro de Punnett', 'herencia', 'bachillerato', 'biología'],

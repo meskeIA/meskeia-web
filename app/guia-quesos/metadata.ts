@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Maridaje con vinos y acompañamientos específicos',
     'Denominaciones de origen (D.O./IGP)',
     'Curiosidades históricas y culturales',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
   ],
 });
 

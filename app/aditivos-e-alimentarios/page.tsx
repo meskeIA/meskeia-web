@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // DATOS
@@ -183,13 +182,7 @@ export default function AdditivosEAlimentariosPage() {
   }, []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -571,7 +564,6 @@ export default function AdditivosEAlimentariosPage() {
         <RelatedApps apps={getRelatedApps('aditivos-e-alimentarios')} />
         <ShareCard appName="aditivos-e-alimentarios" />
         <Footer appName="aditivos-e-alimentarios" />
-      </div>
-    </>
+    </div>
   );
 }

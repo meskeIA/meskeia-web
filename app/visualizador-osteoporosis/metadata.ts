@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Factores de riesgo modificables y no modificables',
     'Curva de densidad ósea femenina vs masculina',
     'Umbrales de osteopenia y osteoporosis explicados',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Ejemplos predefinidos: XOR, votación por mayoría, paridad y BCD inválido',
     'Proceso de simplificación paso a paso con agrupaciones explicadas',
     'Equivalencias con puertas NAND, NOR y XOR',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

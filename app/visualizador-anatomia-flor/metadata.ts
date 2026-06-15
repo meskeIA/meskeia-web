@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Proceso de polinización paso a paso: entomófila, anemófila, ornitófila e hidrófila',
     'Transformación del ovario en fruto: carnosos, secos y dispersión de semillas',
     'Datos fascinantes: 400.000 especies, Rafflesia, orquídeas y más',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

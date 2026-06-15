@@ -19,7 +19,6 @@ import {
   FISCAL_MATERNIDAD_META,
   DEDUCCION_MATERNIDAD_IRPF_2025,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -137,10 +136,6 @@ export default function EstimacionDeduccionMaternidadPage() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -415,13 +414,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
   const relatedApps = useMemo(() => getRelatedApps('visualizador-fases-luna-eclipses'), []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -730,7 +723,6 @@ export default function VisualizadorFasesLunaEclipsesPage() {
         <RelatedApps apps={relatedApps} />
         <ShareCard appName="visualizador-fases-luna-eclipses" />
         <Footer appName="visualizador-fases-luna-eclipses" />
-      </div>
-    </>
+    </div>
   );
 }

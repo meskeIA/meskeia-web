@@ -58,9 +58,6 @@ export const jsonLd = generateWebAppSchema({
     'Planificación de CPU: FIFO, Round Robin con quantum, Prioridad y SJF con Gantt animado',
     'Memoria virtual: tabla de páginas, page faults y comparativa Belady vs LRU vs FIFO',
     'Sistema de ficheros: árbol Unix, inodos, journaling y comparativa FAT32/NTFS/ext4/APFS',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

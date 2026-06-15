@@ -45,8 +45,6 @@ const webAppSchema = generateWebAppSchema({
     'Conversión entre 6+ escalas de calificación de Latam',
     'Calculadora de "qué nota necesitas para aprobar"',
     'Tabla de equivalencias entre sistemas educativos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['calculadora notas', 'media ponderada', 'ECTS', 'EvAU', 'GPA', 'conversor notas', 'estudiantes'],

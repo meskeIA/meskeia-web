@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     '3 tipos de bordes con diagramas animados',
     'Escala Richter visualizada con energía equivalente',
     'Timeline de Pangea a la tectónica moderna',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

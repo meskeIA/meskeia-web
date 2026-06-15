@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     '6 tipos funcionales de proteínas con ejemplos reales',
     'Enfermedades por mal plegamiento: Alzheimer, Parkinson, priones, fibrosis quística',
     'Chaperonas moleculares y proteínas de shock térmico',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Disponible en español',
   ],
 });
 

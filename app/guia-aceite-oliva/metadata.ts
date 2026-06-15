@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Denominaciones de Origen Protegidas por variedad',
     'Guía de cata paso a paso',
     'Comparativa AOVE vs virgen vs aceite de oliva vs orujo',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

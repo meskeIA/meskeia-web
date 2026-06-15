@@ -29,7 +29,6 @@ import {
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -187,13 +186,7 @@ export default function EstimadorSMIPage() {
   const ratioNacional = (SMI_2026.anual / SALARIO_MEDIO_NACIONAL_2023) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -605,7 +598,6 @@ export default function EstimadorSMIPage() {
         <RelatedApps apps={getRelatedApps('estimador-smi')} />
         <ShareCard appName="estimador-smi" />
         <Footer appName="estimador-smi" />
-      </div>
-    </>
+    </div>
   );
 }

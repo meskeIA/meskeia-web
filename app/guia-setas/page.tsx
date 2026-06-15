@@ -12,7 +12,6 @@ import {
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // TIPOS
@@ -651,13 +650,7 @@ export default function GuiaSetasPage() {
   }, [comestibilidad, habitat, busqueda]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1105,7 +1098,6 @@ export default function GuiaSetasPage() {
         <RelatedApps apps={getRelatedApps('guia-setas')} />
         <ShareCard appName="guia-setas" />
         <Footer appName="guia-setas" />
-      </div>
-    </>
+    </div>
   );
 }

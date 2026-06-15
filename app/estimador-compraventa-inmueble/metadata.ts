@@ -49,8 +49,6 @@ const webAppSchema = generateWebAppSchema({
     'Plusvalía municipal (IIVTNU)',
     'Comisiones de inmobiliaria configurables',
     'Cuatro tipos de inmueble: vivienda, local, nave, terreno',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
   keywords: ['compraventa inmueble', 'ITP', 'IVA', 'plusvalía municipal', 'gastos vivienda España', 'inmobiliaria'],
 });

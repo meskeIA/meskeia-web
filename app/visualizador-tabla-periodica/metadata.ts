@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Mapa de 30+ elementos en un smartphone: batería, chip, pantalla, contactos',
     'Exploración habitación por habitación de elementos en el hogar',
     'Ranking de escasez: qué elementos podrían agotarse primero',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

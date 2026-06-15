@@ -50,9 +50,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa con y sin batería de almacenamiento',
     'Compensación de excedentes vertidos a red',
     'Reducción de CO2 estimada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

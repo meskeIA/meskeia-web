@@ -42,7 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Hora exacta en el reloj de 24 horas para cada hito',
     'Año real + explicación + dato sorprendente para cada evento',
     'Perspectiva temporal de la brevedad de la civilización moderna',
-    'Funciona 100% en el navegador, sin registro ni instalación',
     'Gratuito, en español, ideal para Bachillerato e Historia',
   ],
   category: 'EducationalApplication',

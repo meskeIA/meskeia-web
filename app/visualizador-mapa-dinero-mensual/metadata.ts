@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Bloques clickables con explicación y dato INE',
     'Barra de reparto proporcional visual',
     'Gráfico doughnut de composición',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

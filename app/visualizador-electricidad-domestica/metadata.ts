@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Animación simplificada de corriente normal vs fuga a tierra',
     'Colores de cables según normativa (marrón, azul, verde-amarillo)',
     'Datos de consumo y potencia en España',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

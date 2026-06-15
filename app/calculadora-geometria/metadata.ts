@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Visualización interactiva de cada figura',
     'Fórmulas explicadas paso a paso',
     'Soporte para polígonos regulares e irregulares',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['geometría', 'área', 'perímetro', 'volumen', 'figuras geométricas', 'estudiantes'],

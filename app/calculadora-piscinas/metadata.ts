@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Dosis de corrector de pH (elevador y reductor)',
     'Dosis de alguicida preventivo y de choque',
     'Dosis de sal para piscinas con electrólisis salina',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

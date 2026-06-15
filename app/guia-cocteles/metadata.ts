@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Copa o vaso recomendado',
     'Historia y curiosidades de cada cóctel',
     '7 opciones sin alcohol / mocktails',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

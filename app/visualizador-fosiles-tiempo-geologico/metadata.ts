@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Analogia visual: si la Tierra fuera un dia de 24 horas',
     'Las 5 grandes extinciones masivas con barras de impacto',
     'Metodos de datacion: carbono-14, potasio-argon, estratigrafia, fosiles guia',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

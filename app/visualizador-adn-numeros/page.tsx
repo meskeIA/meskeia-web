@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -168,13 +167,7 @@ export default function VisualizadorAdnNumerosPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -368,7 +361,6 @@ export default function VisualizadorAdnNumerosPage() {
         <RelatedApps apps={getRelatedApps('visualizador-adn-numeros')} />
         <ShareCard appName="visualizador-adn-numeros" />
         <Footer appName="visualizador-adn-numeros" />
-      </div>
-    </>
+    </div>
   );
 }

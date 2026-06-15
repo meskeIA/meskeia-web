@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 type TabType = 'azulejos' | 'pintura' | 'tarima' | 'mortero';
 
@@ -201,13 +200,7 @@ export default function CalculadoraMaterialesPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -672,7 +665,6 @@ export default function CalculadoraMaterialesPage() {
         <RelatedApps apps={getRelatedApps('calculadora-materiales-construccion')} />
         <ShareCard appName="calculadora-materiales-construccion" />
         <Footer appName="calculadora-materiales-construccion" />
-      </div>
-    </>
+    </div>
   );
 }

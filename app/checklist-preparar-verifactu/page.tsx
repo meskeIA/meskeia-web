@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -199,13 +198,7 @@ export default function ChecklistPrepararVerifactuPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -431,7 +424,6 @@ export default function ChecklistPrepararVerifactuPage() {
         <RelatedApps apps={getRelatedApps('checklist-preparar-verifactu')} />
         <ShareCard appName="checklist-preparar-verifactu" />
         <Footer appName="checklist-preparar-verifactu" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // TIPOS Y DATOS
@@ -793,13 +792,7 @@ export default function GuiaEspeciasPage() {
   }, []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1241,7 +1234,6 @@ export default function GuiaEspeciasPage() {
         <RelatedApps apps={getRelatedApps('guia-especias')} />
         <ShareCard appName="guia-especias" />
         <Footer appName="guia-especias" />
-      </div>
-    </>
+    </div>
   );
 }

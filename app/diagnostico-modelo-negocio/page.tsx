@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -235,13 +234,7 @@ export default function DiagnosticoModeloNegocioPage() {
   const posY = 100 - ((puntuacionSostenibilidad - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -384,7 +377,6 @@ export default function DiagnosticoModeloNegocioPage() {
         <RelatedApps apps={getRelatedApps('diagnostico-modelo-negocio')} />
         <ShareCard appName="diagnostico-modelo-negocio" />
         <Footer appName="diagnostico-modelo-negocio" />
-      </div>
-    </>
+    </div>
   );
 }

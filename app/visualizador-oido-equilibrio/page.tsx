@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -666,13 +665,7 @@ export default function OidoEquilibrioPage() {
   // ─── Render principal ───
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -749,7 +742,6 @@ export default function OidoEquilibrioPage() {
         <RelatedApps apps={getRelatedApps('visualizador-oido-equilibrio')} />
         <ShareCard appName="visualizador-oido-equilibrio" />
         <Footer appName="visualizador-oido-equilibrio" />
-      </div>
-    </>
+    </div>
   );
 }

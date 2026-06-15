@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Cada concepto clickable con explicación detallada',
     'Desglose visual: energía, potencia, impuestos',
     'Gráfico doughnut de composición de la factura',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

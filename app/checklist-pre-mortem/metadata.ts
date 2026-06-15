@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Basado en el análisis pre-mortem de Gary Klein',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para mejorar la anticipación de fallos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

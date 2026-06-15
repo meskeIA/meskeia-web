@@ -49,8 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Ampliaciones por parto multiple, discapacidad y hospitalizacion',
     'Timeline visual con fechas clave si se indica la fecha de parto',
     'Diferencia entre semanas obligatorias y voluntarias',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

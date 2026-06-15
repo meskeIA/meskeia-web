@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Kit de arranque con preguntas clave antes de escribir la primera línea',
     'Errores frecuentes del escritor principiante específicos por género',
     'Hoja de ruta personalizada con tus respuestas del kit de arranque',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

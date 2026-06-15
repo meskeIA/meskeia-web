@@ -32,7 +32,6 @@ export const jsonLd = generateWebAppSchema({
     'Ciclo de vida del hongo: micelio, esporas y germinación',
     'Importancia ecológica: descomponedores, micorrizas y antibióticos',
     'Gratuito, sin registro, 100% en el navegador',
-    'Disponible en español',
   ],
 });
 

@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -200,13 +199,7 @@ export default function SelectorActividadesMovilidadPage() {
     : actividades.filter(a => a.categoria === filtroCategoria);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -417,7 +410,6 @@ export default function SelectorActividadesMovilidadPage() {
         <RelatedApps apps={getRelatedApps('selector-actividades-movilidad')} />
         <ShareCard appName="selector-actividades-movilidad" />
         <Footer appName="selector-actividades-movilidad" />
-      </div>
-    </>
+    </div>
   );
 }

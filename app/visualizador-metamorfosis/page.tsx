@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -619,13 +618,7 @@ export default function MetamorfosisPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -714,7 +707,6 @@ export default function MetamorfosisPage() {
         <RelatedApps apps={getRelatedApps('visualizador-metamorfosis')} />
         <ShareCard appName="visualizador-metamorfosis" />
         <Footer appName="visualizador-metamorfosis" />
-      </div>
-    </>
+    </div>
   );
 }

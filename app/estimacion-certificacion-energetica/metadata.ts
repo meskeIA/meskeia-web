@@ -48,8 +48,6 @@ export const jsonLd = generateWebAppSchema({
     'Consumo estimado en kWh/m2/ano y emisiones CO2',
     'Sugerencias de mejora personalizadas',
     'Barra comparativa visual de todas las letras',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

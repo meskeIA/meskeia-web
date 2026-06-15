@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Segunda ley: F=ma con sliders de masa y fuerza',
     'Tercera ley: acción-reacción con ejemplos animados',
     'Datos curiosos y timeline Newton-Einstein',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

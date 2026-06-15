@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -239,13 +238,7 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
   const posY = 100 - ((puntuacionHabilidad - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -498,7 +491,6 @@ export default function DiagnosticoEstancamientoProfesionalPage() {
         <RelatedApps apps={getRelatedApps('diagnostico-estancamiento-profesional')} />
         <ShareCard appName="diagnostico-estancamiento-profesional" />
         <Footer appName="diagnostico-estancamiento-profesional" />
-      </div>
-    </>
+    </div>
   );
 }

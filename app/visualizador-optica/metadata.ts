@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Refracción con ley de Snell y múltiples medios',
     'Lentes convergentes y divergentes con rayos SVG',
     'Prisma y espectro electromagnético',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

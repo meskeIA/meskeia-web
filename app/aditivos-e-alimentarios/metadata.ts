@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     '90 aditivos E con información oficial EFSA',
     'Origen de cada aditivo: natural, sintético o semisintético',
     'Ejemplos de alimentos donde aparece cada aditivo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

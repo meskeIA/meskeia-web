@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de deducciones IRPF por mejora energética',
     'Comparativa entre programas 3, 4 y 5 de rehabilitación',
     'IVA reducido del 10% en obras de rehabilitación',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

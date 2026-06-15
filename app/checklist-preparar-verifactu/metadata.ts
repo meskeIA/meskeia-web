@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Checklist de 14 puntos organizados en 4 secciones',
     'Progreso guardado automáticamente en el navegador',
     'Información detallada sobre cada requisito VeriFactu',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

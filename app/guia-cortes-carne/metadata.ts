@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Temperatura interna ideal y tiempo de cocción orientativo',
     'Consejos prácticos de cocina para cada corte',
     'Curiosidades históricas y culturales',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
   ],
 });
 

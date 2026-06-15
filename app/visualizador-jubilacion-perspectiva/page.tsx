@@ -14,7 +14,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import { FISCAL_PENSIONES_META, COTIZACION_MINIMA } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
 
@@ -138,13 +137,7 @@ export default function VisualizadorJubilacionPerspectivaPage() {
   const anosParaCompleto = Math.ceil(COTIZACION_MINIMA.anosParaCien);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -311,7 +304,6 @@ export default function VisualizadorJubilacionPerspectivaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-jubilacion-perspectiva')} />
         <ShareCard appName="visualizador-jubilacion-perspectiva" />
         <Footer appName="visualizador-jubilacion-perspectiva" />
-      </div>
-    </>
+    </div>
   );
 }

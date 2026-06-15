@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     '4 datasets predefinidos (gaussianas, solape, alargado, tamaños distintos)',
     'Método del codo (Elbow Method)',
     'Métricas: inertia, tamaños, convergencia, trayectoria centroides',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['k-means', 'clustering', 'machine learning', 'IA universidad'],

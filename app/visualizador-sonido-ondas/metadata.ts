@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Escala de decibelios con niveles de seguridad auditiva',
     'Timbre y armónicos: por qué cada instrumento suena diferente',
     'Efecto Doppler y resonancia explicados visualmente',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

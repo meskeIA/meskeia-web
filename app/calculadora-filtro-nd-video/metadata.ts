@@ -38,9 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Obturador resultante con cada filtro',
     'Filtro recomendado destacado automáticamente',
     'Basado en la regla de los 180° para motion blur natural',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

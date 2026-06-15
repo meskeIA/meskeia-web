@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Visualización de v, h, E_c, E_p y E_total en cualquier instante',
     'Comparación con la energía total inicial (línea de referencia)',
     'Botones de play/pausa/reset y velocidad de simulación',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['conservación de la energía', 'energía mecánica', 'cinética', 'potencial', 'fricción', 'EBAU', 'Bachillerato', 'física'],
 });

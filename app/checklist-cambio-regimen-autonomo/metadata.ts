@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Progreso guardado en sessionStorage',
     'Tabla comparativa de regímenes fiscales',
     'Gratuito y sin registro',
-    'Disponible en español',
   ],
 });
 

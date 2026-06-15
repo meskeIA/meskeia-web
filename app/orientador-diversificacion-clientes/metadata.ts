@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Gráfico donut de distribución de clientes',
     'Escenarios comparativos (actual, ideal, sin cliente principal)',
     'Estrategias personalizadas de diversificación',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

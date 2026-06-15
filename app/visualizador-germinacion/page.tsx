@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -295,13 +294,7 @@ export default function GerminacionPage() {
   const germinaOK = aguaActiva && tempOptima;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -733,7 +726,6 @@ export default function GerminacionPage() {
         <RelatedApps apps={getRelatedApps('visualizador-germinacion')} />
         <ShareCard appName="visualizador-germinacion" />
         <Footer appName="visualizador-germinacion" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Isomería estructural, geométrica (cis/trans) y óptica ilustrada',
     'Visualizaciones SVG de moléculas simplificadas',
     'Ejemplos cotidianos: jabón, aspirina, nylon, vinagre',
-    'Funciona 100% en el navegador, sin registro ni instalación',
     'Gratuito y disponible en español',
   ],
 });

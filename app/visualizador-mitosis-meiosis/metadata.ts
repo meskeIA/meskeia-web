@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Meiosis I y II con crossing-over visualizado',
     'Comparativa visual mitosis vs meiosis',
     'Datos: 3,8 millones de mitosis por segundo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

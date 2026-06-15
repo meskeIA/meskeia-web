@@ -45,9 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Calcula cuánto necesitas facturar de más para compensar',
     'Sugiere ahorro mensual preventivo para cubrir vacaciones',
     'Tabla de estacionalidad por tipo de freelance',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

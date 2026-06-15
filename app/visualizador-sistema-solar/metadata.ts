@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparación a escala: si el Sol fuera un balón, ¿dónde estaría cada planeta?',
     'Tiempos de viaje de la luz y la Voyager 1 por el sistema solar',
     'Curiosidades sorprendentes: Venus gira al revés, Saturno flotaría en agua',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -235,13 +234,7 @@ export default function TestSindromeImpostorPage() {
   const posY = 100 - ((puntuacionReconocimiento - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -490,7 +483,6 @@ export default function TestSindromeImpostorPage() {
         <RelatedApps apps={getRelatedApps('test-sindrome-impostor')} />
         <ShareCard appName="test-sindrome-impostor" />
         <Footer appName="test-sindrome-impostor" />
-      </div>
-    </>
+    </div>
   );
 }

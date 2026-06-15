@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Desglose de cada partida presupuestaria con explicación',
     'Calculadora: cuánto aportas tú a cada partida según tu IRPF',
     'Datos de los PGE 2025',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

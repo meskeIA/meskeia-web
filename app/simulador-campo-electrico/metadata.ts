@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Mapa de intensidad |E| con escala de color',
     '4 configuraciones predefinidas (dipolo, cuadrupolo, etc.)',
     'Carga de prueba con cálculo de F, U, E, V',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['campo eléctrico', 'electrostática', 'Coulomb', 'física bachillerato'],

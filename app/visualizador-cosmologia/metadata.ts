@@ -55,9 +55,6 @@ export const jsonLd = generateWebAppSchema({
     'Geometría del universo: plana, abierta y cerrada con visualización SVG',
     'Cards de destinos cósmicos: Big Freeze, Big Rip, Big Crunch, Big Bounce',
     'Sección educativa: ΛCDM, materia oscura, energía oscura, tensión de Hubble, CMB',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

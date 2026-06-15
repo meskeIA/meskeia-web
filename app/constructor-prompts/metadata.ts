@@ -40,7 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Formatos de salida configurables: lista, tabla, email, código, respuesta concisa',
     'Control de tono, longitud y restricciones del prompt generado',
     'Resultado listo para copiar con un clic',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

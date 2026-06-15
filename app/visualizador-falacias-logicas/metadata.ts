@@ -57,9 +57,6 @@ export const jsonLd = generateWebAppSchema({
     '12 falacias explicadas con ejemplos reales',
     'Detector interactivo: adivina la falacia antes de ver la respuesta',
     'Constructor de argumentos sólidos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

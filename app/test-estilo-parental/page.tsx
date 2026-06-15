@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { ESTILOS_PARENTALES } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -114,13 +113,7 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
   const dotY = Math.min(100, Math.max(0, 100 - (afecto / 40) * 100)); // invertido: Y alto = arriba
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -609,7 +602,6 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
         <RelatedApps apps={getRelatedApps('test-estilo-parental')} />
         <ShareCard appName="test-estilo-parental" />
         <Footer appName="test-estilo-parental" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -40,8 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de geometría electrónica vs geometría molecular',
     'Ángulos de enlace ideales',
     'Ejemplos famosos para cada geometría (H2O, NH3, CH4, PCl5, SF6, XeF4...)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['VSEPR', 'geometría molecular', 'pares libres', 'química bachillerato'],

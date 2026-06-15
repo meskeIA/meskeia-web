@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -186,13 +185,7 @@ export default function VisualizadorViajeImpuestosPage() {
   }, []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -356,7 +349,6 @@ export default function VisualizadorViajeImpuestosPage() {
         <RelatedApps apps={getRelatedApps('visualizador-viaje-impuestos')} />
         <ShareCard appName="visualizador-viaje-impuestos" />
         <Footer appName="visualizador-viaje-impuestos" />
-      </div>
-    </>
+    </div>
   );
 }

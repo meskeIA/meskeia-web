@@ -89,8 +89,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de percentil de talla según edad y sexo',
     'Basado en tablas de crecimiento OMS',
     'Interpretación del resultado con rango de normalidad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['percentil', 'crecimiento infantil', 'peso bebé', 'talla niño', 'tablas OMS', 'pediatría'],

@@ -49,9 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Explicación de cuándo NO se aplica retención (clientes particulares)',
     'Guía de declaración: modelo 111 trimestral y 190 anual',
     'Errores frecuentes y cómo evitarlos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

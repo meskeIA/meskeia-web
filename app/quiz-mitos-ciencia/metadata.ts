@@ -38,8 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Puntuación final con nivel: Científico, Investigador, Curioso, Aprendiz',
     'Desglose de aciertos por categoría al finalizar',
     'Explicaciones rigurosas basadas en estudios y consenso científico',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

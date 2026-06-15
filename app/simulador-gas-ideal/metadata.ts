@@ -52,8 +52,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagramas PV interactivos con curvas reales',
     'Ciclos de Carnot, Otto, Diesel y Stirling',
     'Cálculo de eficiencia, trabajo y calor intercambiado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['gas ideal', 'termodinámica', 'PV=nRT', 'Carnot', 'física bachillerato'],

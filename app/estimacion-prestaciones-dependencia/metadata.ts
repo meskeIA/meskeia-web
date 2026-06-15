@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Catálogo de servicios SAAD disponibles',
     'Cuantías máximas 2025 orientativas',
     'Información sobre copago y capacidad económica',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

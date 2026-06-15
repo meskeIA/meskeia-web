@@ -37,8 +37,6 @@ export const jsonLd = generateWebAppSchema({
     'Soporte para fórmula con preferment (poolish, levain)',
     'Resultado en °C y °F',
     'Indicador visual de temperatura fría, tibia o caliente',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

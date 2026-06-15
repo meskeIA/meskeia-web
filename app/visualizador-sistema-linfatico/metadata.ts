@@ -43,7 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Selector de 6 órganos linfáticos (primarios y secundarios)',
     'Flujo de la linfa paso a paso',
     'Qué ocurre cuando el sistema falla',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Selector de 4 células protagonistas (mastocitos, neutrófilos, macrófagos, linfocitos T)',
     '6 factores amplificadores de la inflamación crónica',
     'Línea temporal del proceso inflamatorio agudo (0h → resolución)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

@@ -12,7 +12,6 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaAvesComunes.module.css';
-import { jsonLd } from './metadata';
 
 type OrdenAve =
   | 'Paseriformes'
@@ -823,13 +822,7 @@ export default function GuiaAvesComunesPage() {
   }, [busqueda, habitatSelec, presenciaSelec, ordenSelec]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1327,7 +1320,6 @@ export default function GuiaAvesComunesPage() {
         <RelatedApps apps={getRelatedApps('guia-aves-comunes')} />
         <ShareCard appName="guia-aves-comunes" />
         <Footer appName="guia-aves-comunes" />
-      </div>
-    </>
+    </div>
   );
 }

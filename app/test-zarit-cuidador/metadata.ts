@@ -40,8 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Escala Zarit completa de 22 ítems validada en español',
     'Puntuación con 3 niveles de sobrecarga',
     'Recursos de ayuda y teléfonos de atención',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

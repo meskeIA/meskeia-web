@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Etapas del sistema digestivo
@@ -154,13 +153,7 @@ export default function VisualizadorViajeComidaPage() {
   const etapa = ETAPAS.find(e => e.id === etapaActiva)!;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -375,7 +368,6 @@ export default function VisualizadorViajeComidaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-viaje-comida')} />
         <ShareCard appName="visualizador-viaje-comida" />
         <Footer appName="visualizador-viaje-comida" />
-      </div>
-    </>
+    </div>
   );
 }

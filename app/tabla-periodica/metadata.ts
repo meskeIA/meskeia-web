@@ -93,8 +93,6 @@ export const jsonLd = generateWebAppSchema({
     'Información detallada de cada elemento al hacer clic',
     'Calculadora de masa molar integrada',
     'Búsqueda por nombre, símbolo o número atómico',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['tabla periódica', 'elementos químicos', 'química', 'masa molar', 'estudiantes', 'bachillerato'],

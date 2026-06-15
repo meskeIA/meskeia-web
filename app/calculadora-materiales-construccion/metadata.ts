@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Estimador de tarima y parquet con cortes incluidos',
     'Cálculo de sacos de mortero o adhesivo cerámico',
     'Estimación de coste total por material',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

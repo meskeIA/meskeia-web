@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Barras CSS animadas comparando "Cambia siempre" vs "No cambia"',
     'Contador de racha de victorias y derrotas en la sesión',
     'Bloque educativo completo sobre probabilidad condicional',
-    'Funciona 100% en el navegador, sin servidor ni datos personales',
-    'Gratuito y sin publicidad',
     'Ideal para secundaria, preparatoria, Bachillerato y divulgación',
   ],
   keywords: [

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Regla del 10%: flujo de energía entre niveles tróficos',
     'Ciclos biogeoquímicos del carbono y nitrógeno con diagramas circulares',
     'Datos fascinantes sobre ecología y naturaleza',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

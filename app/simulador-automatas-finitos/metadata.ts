@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Modo batch: validar múltiples cadenas a la vez',
     '4 ejemplos clásicos predefinidos',
     'Estados iniciales y finales configurables',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['autómatas finitos', 'DFA NFA', 'lenguajes formales', 'teoría computación'],

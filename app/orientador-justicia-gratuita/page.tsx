@@ -8,7 +8,6 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Datos IPREM 2026 ────────────────────────────────────────────────────────
 
@@ -132,10 +131,7 @@ export default function OrientadorJusticiaGratuitaPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -379,7 +375,6 @@ export default function OrientadorJusticiaGratuitaPage() {
         <RelatedApps apps={getRelatedApps('orientador-justicia-gratuita')} />
         <ShareCard appName="orientador-justicia-gratuita" />
         <Footer appName="orientador-justicia-gratuita" />
-      </div>
-    </>
+    </div>
   );
 }

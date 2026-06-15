@@ -45,9 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Especies confusas y avisos de seguridad por seta',
     'Temporadas de recolección y distribución geográfica',
     'Curiosidades y usos culinarios',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Feedback negativo interactivo (tiroides, glucosa)',
     'Eje HPA del estrés explicado visualmente',
     'Slider de glucosa con respuesta insulina/glucagón',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

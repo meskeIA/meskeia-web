@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Determinante como área del paralelogramo visualizada',
     'Eigenvalores y eigenvectores para matrices simétricas 2×2',
     'Cálculo exacto de eigenvalores mediante fórmula analítica',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
   category: 'EducationalApplication',
 });

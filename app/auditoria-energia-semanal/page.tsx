@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -235,13 +234,7 @@ export default function AuditoriaEnergiaSemanalPage() {
   const posY = 100 - ((puntuacionRecarga - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -483,7 +476,6 @@ export default function AuditoriaEnergiaSemanalPage() {
         <RelatedApps apps={getRelatedApps('auditoria-energia-semanal')} />
         <ShareCard appName="auditoria-energia-semanal" />
         <Footer appName="auditoria-energia-semanal" />
-      </div>
-    </>
+    </div>
   );
 }

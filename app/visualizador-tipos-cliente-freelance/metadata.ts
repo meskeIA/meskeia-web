@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Detección de falso autónomo con base legal (Estatuto de los Trabajadores)',
     'Tabla comparativa de estabilidad, independencia y riesgo legal',
     'Espectro visual de independencia profesional',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

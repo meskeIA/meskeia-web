@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     '4 niveles: básico (ESO), intermedio (Bachillerato), avanzado (Selectividad) y todas',
     'Feedback educativo con definición y ejemplo correctos tras cada respuesta',
     'Historial de errores con revisión al final del quiz',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

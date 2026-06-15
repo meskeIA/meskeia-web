@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Múltiples combinaciones por sorteo',
     'Historial de combinaciones generadas',
     'Estadísticas básicas de los números generados',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
   keywords: ['lotería', 'números aleatorios', 'Primitiva', 'Euromillones', 'Bonoloto'],
 });

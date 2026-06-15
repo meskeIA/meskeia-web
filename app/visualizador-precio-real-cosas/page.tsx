@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos: objetos y servicios cotidianos
@@ -97,13 +96,7 @@ export default function VisualizadorPrecioRealCosasPage() {
   const maxHoras = Math.max(...objetosFiltrados.map(o => o.precio / sueldoHora));
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -258,7 +251,6 @@ export default function VisualizadorPrecioRealCosasPage() {
         <RelatedApps apps={getRelatedApps('visualizador-precio-real-cosas')} />
         <ShareCard appName="visualizador-precio-real-cosas" />
         <Footer appName="visualizador-precio-real-cosas" />
-      </div>
-    </>
+    </div>
   );
 }

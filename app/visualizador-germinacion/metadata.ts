@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Proceso de germinación animado paso a paso',
     'Factores de germinación con controles interactivos',
     'Datos fascinantes sobre semillas y plantas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

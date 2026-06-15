@@ -47,8 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Potencia y coste energético: P = V×I, consumo en kWh y coste estimado según tarifa',
     'Hasta 6 resistencias en serie o paralelo',
     'Diagramas ASCII de circuito para cada configuración',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

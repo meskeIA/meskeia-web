@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa caldera de gas vs bomba de calor',
     'Plazo de amortización (payback) en años',
     'Estimación de reducción de CO₂',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -45,9 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Fuentes antropogénicas desglosadas por sector',
     'Huella de carbono media en España (~6 t CO₂/año)',
     'Feedback loops y soluciones (renovables, captura de carbono, reforestación)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

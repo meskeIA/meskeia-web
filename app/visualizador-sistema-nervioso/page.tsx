@@ -905,7 +905,7 @@ export default function VisualizadorSistemaNerviosoPage() {
       {/* Cabecera sección */}
       <div className={styles.seccionHeader}>
         <h2 className={styles.seccionTitulo}>
-          {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+          <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
           {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
         </h2>
         <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>

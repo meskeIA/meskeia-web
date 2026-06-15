@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Desplazadores de oferta: costes, tecnología y número de productores',
     'Modos de precio controlado: precio máximo (techo) y precio mínimo (suelo)',
     'Indicador de escasez o excedente bajo control de precios',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
   keywords: [
     'oferta y demanda',

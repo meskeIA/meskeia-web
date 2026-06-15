@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Explicación de la sensibilización central',
     'Teoría de la puerta de Melzack & Wall',
     'Fibras A-delta y fibras C explicadas visualmente',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

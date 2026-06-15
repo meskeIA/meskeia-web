@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Alfabeto Braille español completo (ñ, vocales acentuadas)',
     'Visualización con celdas Braille Unicode',
     'Soporte para números y signos de puntuación',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['Braille', 'accesibilidad', 'discapacidad visual', 'conversor texto Braille'],

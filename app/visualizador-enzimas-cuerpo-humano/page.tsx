@@ -12,7 +12,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -623,13 +622,7 @@ export default function EnzimasCuerpoHumanoPage() {
   const seccionActual = SECCIONES.find(s => s.id === seccion);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -698,7 +691,6 @@ export default function EnzimasCuerpoHumanoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-enzimas-cuerpo-humano')} />
         <ShareCard appName="visualizador-enzimas-cuerpo-humano" />
         <Footer appName="visualizador-enzimas-cuerpo-humano" />
-      </div>
-    </>
+    </div>
   );
 }

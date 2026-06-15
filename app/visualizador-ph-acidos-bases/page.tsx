@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -243,13 +242,7 @@ export default function VisualizadorPhAcidosBases() {
   const tipoPh = obtenerTipoPh(phSlider);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -732,7 +725,6 @@ export default function VisualizadorPhAcidosBases() {
         <RelatedApps apps={getRelatedApps('visualizador-ph-acidos-bases')} />
         <ShareCard appName="visualizador-ph-acidos-bases" />
         <Footer appName="visualizador-ph-acidos-bases" />
-      </div>
-    </>
+    </div>
   );
 }

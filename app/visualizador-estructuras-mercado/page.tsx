@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ==========================================
 // TIPOS
@@ -128,13 +127,7 @@ export default function VisualizadorEstructurasMercadoPage() {
   ];
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -650,8 +643,7 @@ export default function VisualizadorEstructurasMercadoPage() {
         <ShareCard appName="visualizador-estructuras-mercado" />
 
         <Footer appName="visualizador-estructuras-mercado" />
-      </div>
-    </>
+    </div>
   );
 }
 

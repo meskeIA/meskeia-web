@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Cuartiles, deciles y percentiles',
     'Gráfico de distribución de datos',
     'Detección de valores atípicos (outliers)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['estadística', 'media mediana moda', 'desviación estándar', 'análisis datos', 'estudiantes'],

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -601,9 +600,7 @@ export default function VisualizadorMatricesPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>Matrices: El Lenguaje Secreto de las Transformaciones</h1>
@@ -628,7 +625,7 @@ export default function VisualizadorMatricesPage() {
 
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSub}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -649,7 +646,6 @@ export default function VisualizadorMatricesPage() {
         <RelatedApps apps={getRelatedApps('visualizador-matrices')} />
         <ShareCard appName="visualizador-matrices" />
         <Footer appName="visualizador-matrices" />
-      </div>
-    </>
+    </div>
   );
 }

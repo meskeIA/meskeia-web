@@ -40,8 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Progresiones predefinidas populares (I-V-vi-IV, ii-V-I, etc.)',
     'Copia el resultado con un clic',
     'Selector de tono original y destino con las 12 notas de la escala cromática',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

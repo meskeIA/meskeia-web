@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Temperatura de servicio y maridaje para cada varietal',
     'Curiosidades históricas y enológicas de cada uva',
     'Denominaciones de Origen destacadas por varietal',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

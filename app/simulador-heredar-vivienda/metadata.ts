@@ -53,8 +53,6 @@ export const jsonLd = generateWebAppSchema({
     '4 casos preconfigurados con CCAA distintas',
     'Datos basados en Ley 29/1987 ISD y RDL 26/2021 plusvalía',
     'Solo orientativo — consulta con notario y asesor fiscal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['ISD', 'plusvalía municipal', 'IRPF herencia', 'heredar vivienda España'],

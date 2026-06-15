@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Del trueque a las criptomonedas en 4 eras',
     'Comparativa de uso de efectivo por país (slider)',
     'Datos de ejemplo educativos, sin entrada del usuario',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

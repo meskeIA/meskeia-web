@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Explicación de enzimas digestivas y su función',
     'Datos sorprendentes sobre el sistema digestivo',
     'Navegación paso a paso interactiva',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

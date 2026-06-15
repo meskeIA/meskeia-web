@@ -9,7 +9,6 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Datos del juego ──────────────────────────────────────────────────────────
 
@@ -170,10 +169,7 @@ export default function JuegoPresupuestoMensualPage() {
   const nota = saldoFinal >= 200 ? 'A' : saldoFinal >= 100 ? 'B' : saldoFinal >= 0 ? 'C' : 'D';
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -322,7 +318,6 @@ export default function JuegoPresupuestoMensualPage() {
         <RelatedApps apps={getRelatedApps('juego-presupuesto-mensual')} />
         <ShareCard appName="juego-presupuesto-mensual" />
         <Footer appName="juego-presupuesto-mensual" />
-      </div>
-    </>
+    </div>
   );
 }

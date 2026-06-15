@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Mix eléctrico español: distribución actual y evolución en 20 años',
     'Comparativa de coste y emisiones CO2 por kWh para cada fuente',
     'Futuro energético: almacenamiento, fusión nuclear, objetivos 2030',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

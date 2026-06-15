@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -701,13 +700,7 @@ export default function MusculosMovimientoPage() {
 
   // ─── Render principal ───
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -770,7 +763,6 @@ export default function MusculosMovimientoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-musculos-movimiento')} />
         <ShareCard appName="visualizador-musculos-movimiento" />
         <Footer appName="visualizador-musculos-movimiento" />
-      </div>
-    </>
+    </div>
   );
 }

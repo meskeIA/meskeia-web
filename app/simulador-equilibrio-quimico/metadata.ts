@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo del cociente Q y comparación con Kc',
     'Gráfico de concentraciones vs tiempo',
     'Predicción visual del desplazamiento',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['equilibrio químico', 'Le Chatelier', 'Kc', 'química bachillerato'],

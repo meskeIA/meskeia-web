@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -555,13 +554,7 @@ export default function VisualizadorInflamacionPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -704,7 +697,6 @@ export default function VisualizadorInflamacionPage() {
         <RelatedApps apps={getRelatedApps('visualizador-inflamacion')} />
         <ShareCard appName="visualizador-inflamacion" />
         <Footer appName="visualizador-inflamacion" />
-      </div>
-    </>
+    </div>
   );
 }

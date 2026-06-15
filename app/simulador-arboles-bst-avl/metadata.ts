@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Factor de balance visible en cada nodo (AVL)',
     '4 recorridos: inorden, preorden, postorden, niveles',
     '4 ejemplos clásicos (inserción ordenada, rotación simple/doble, balanceado)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['BST', 'AVL', 'árboles binarios', 'estructuras de datos'],

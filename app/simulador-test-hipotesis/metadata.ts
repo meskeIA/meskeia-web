@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo automático de estadístico z, p-valor y decisión',
     'Cálculo de potencia (1 − β) bajo diferentes escenarios',
     'Comprensión visual del trade-off α ↔ β',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['test de hipótesis', 'p-valor', 'alfa', 'beta', 'potencia', 'EBAU', 'Bachillerato', 'estadística'],
 });

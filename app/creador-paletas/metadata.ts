@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Selector de color base (HEX, RGB, HSL)',
     'Exportar como CSS, SCSS o JSON',
     'Visualización de cada color con código hex',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['paleta colores', 'color harmony', 'diseño', 'CSS', 'esquema cromático'],

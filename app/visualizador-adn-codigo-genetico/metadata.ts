@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Proceso de transcripción ADN → ARN paso a paso',
     'Tabla completa de 64 codones con 20 aminoácidos',
     'Mutaciones, epigenética y CRISPR explicados visualmente',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

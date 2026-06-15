@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Mecanismos de ascenso del agua: transpiración, capilaridad, presión radicular',
     'Estomas interactivos con toggle día/noche',
     'Datos fascinantes sobre el transporte vegetal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -203,13 +202,7 @@ export default function ChecklistTramitesDependenciaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -720,7 +713,6 @@ export default function ChecklistTramitesDependenciaPage() {
         <RelatedApps apps={getRelatedApps('checklist-tramites-dependencia')} />
         <ShareCard appName="checklist-tramites-dependencia" />
         <Footer appName="checklist-tramites-dependencia" />
-      </div>
-    </>
+    </div>
   );
 }

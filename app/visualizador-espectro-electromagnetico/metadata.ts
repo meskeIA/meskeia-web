@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Escala de energía y peligro: radiación ionizante vs no ionizante',
     'Relación c = λ × f y E = h × f explicada visualmente',
     'Curiosidades: Maxwell, Hertz, fondo cósmico de microondas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa conos vs bastones con datos cuantitativos',
     'Defectos visuales con diagramas SVG simplificados',
     'Datos y curiosidades sobre la visión humana',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

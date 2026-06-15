@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── WHO-5 Well-Being Index ───────────────────────────────────────────────────
 // Fuente: Psychiatric Research Unit, WHO Collaborating Centre, Hillerød (Dinamarca)
@@ -122,10 +121,7 @@ export default function TestBienestarWho5Page() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -316,7 +312,6 @@ export default function TestBienestarWho5Page() {
         <RelatedApps apps={getRelatedApps('test-bienestar-who5')} />
         <ShareCard appName="test-bienestar-who5" />
         <Footer appName="test-bienestar-who5" />
-      </div>
-    </>
+    </div>
   );
 }

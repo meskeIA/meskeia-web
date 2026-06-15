@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagnóstico visual con perfil personalizado',
     'Basado en el modelo académico de James G. March (1991)',
     'Acciones concretas según tu resultado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

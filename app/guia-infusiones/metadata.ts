@@ -45,7 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Instrucciones de preparación (temperatura, tiempo, cantidad)',
     'Contraindicaciones conocidas por planta',
     'Con qué otras infusiones combina',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

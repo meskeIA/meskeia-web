@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Ondas sismicas P y S: como sabemos lo que hay dentro',
     'Campo magnetico y efecto dinamo',
     'Comparativa Tierra vs Marte',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

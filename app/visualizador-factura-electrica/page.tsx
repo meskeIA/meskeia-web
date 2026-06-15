@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -196,13 +195,7 @@ export default function VisualizadorFacturaElectricaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -324,7 +317,6 @@ export default function VisualizadorFacturaElectricaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-factura-electrica')} />
         <ShareCard appName="visualizador-factura-electrica" />
         <Footer appName="visualizador-factura-electrica" />
-      </div>
-    </>
+    </div>
   );
 }

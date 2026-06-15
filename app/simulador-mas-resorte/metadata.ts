@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Control de amortiguamiento viscoso (0 → sobreamortiguado)',
     'Cálculo instantáneo de ω₀, T, f, x, v, a y energías',
     'Botón pausar/reanudar y reiniciar',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['masa-resorte', 'MAS', 'movimiento armónico simple', 'física bachillerato', 'amortiguamiento', 'período'],

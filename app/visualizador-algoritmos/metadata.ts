@@ -48,8 +48,6 @@ export const jsonLd = generateWebAppSchema({
     'Control de velocidad de la animación',
     'Comparación de complejidad temporal de cada algoritmo',
     'Conjuntos de datos personalizables',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['algoritmos', 'ordenación', 'sorting', 'estructuras de datos', 'informática', 'universidad', 'FP'],

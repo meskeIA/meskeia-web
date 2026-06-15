@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Proceso paso a paso de vibración a señal nerviosa',
     'Sistema vestibular: canales semicirculares y otolitos',
     'Datos sobre pérdida auditiva, tinnitus e implante coclear',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

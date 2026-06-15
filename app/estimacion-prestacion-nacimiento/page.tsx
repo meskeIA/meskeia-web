@@ -21,7 +21,6 @@ import {
   PERMISO_NACIMIENTO_2025,
   AMPLIACIONES_PERMISO,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ===== TIPOS =====
 type RangoEdad = 'menor21' | '21a25' | 'mayor26';
@@ -175,10 +174,6 @@ export default function EstimacionPrestacionNacimiento() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       {/* Hero */}

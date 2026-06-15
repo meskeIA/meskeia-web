@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Fragmentos literarios ilustrativos atribuidos',
     'Características definitorias de cada estilo',
     'Cobertura desde el s.XVII hasta la literatura contemporánea',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

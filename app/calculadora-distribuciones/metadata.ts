@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
       "Muestra media, varianza, desviación estándar, moda y mediana de cada distribución",
       "Tabla de cuantiles comunes (5%, 10%, 25%, 50%, 75%, 90%, 95%, 99%)",
       "Soporte para distribuciones continuas y discretas",
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
   ],
 });
 

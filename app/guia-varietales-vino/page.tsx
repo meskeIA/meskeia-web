@@ -12,7 +12,6 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaVarietalesVino.module.css';
-import { jsonLd } from './metadata';
 
 // ── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -641,13 +640,7 @@ export default function GuiaVarietalesVinoPage() {
   }, [tipo, busqueda]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1137,7 +1130,6 @@ export default function GuiaVarietalesVinoPage() {
         <ShareCard appName="guia-varietales-vino" />
 
         <Footer appName="guia-varietales-vino" />
-      </div>
-    </>
+    </div>
   );
 }

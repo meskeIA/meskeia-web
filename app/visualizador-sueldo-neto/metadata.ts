@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Desglose IRPF por tramos con datos 2025',
     'Cotizaciones SS: contingencias comunes, desempleo, formación, MEI',
     'Slider interactivo de sueldo bruto',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Distingue tres resultados claros: descarte por CCAA, descarte por límite, posible beneficio',
     'Datos basados en Ley 19/1991 actualizados a 2025',
     'Solo orientativo — siempre deriva al asesor fiscal',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
   ],
   keywords: ['Patrimonio España', 'límite conjunto IRPF', 'Art. 31 Ley 19/1991', 'reducción cuota Patrimonio', 'fiscal España'],
 });

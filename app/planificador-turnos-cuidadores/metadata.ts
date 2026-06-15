@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Reparto de horas entre cuidadores',
     'Alertas de desbalance en la carga',
     'Turnos de mañana, tarde y noche',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Eclipses solares y lunares con conos de sombra visuales',
     'Mareas: por qué hay 2 al día, mareas vivas y muertas',
     'Datos fascinantes sobre la Luna y su relación con la Tierra',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

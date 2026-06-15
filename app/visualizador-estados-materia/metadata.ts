@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     '6 transiciones con ejemplos cotidianos',
     'Diagrama de fases del agua interactivo',
     'Slider de temperatura con cambio de estado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

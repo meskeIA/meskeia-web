@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -755,13 +754,7 @@ export default function VisualizadorDineroYTiempoPage() {
   }, [seccionActiva]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -860,7 +853,6 @@ export default function VisualizadorDineroYTiempoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-dinero-y-tiempo')} />
         <ShareCard appName="visualizador-dinero-y-tiempo" />
         <Footer appName="visualizador-dinero-y-tiempo" />
-      </div>
-    </>
+    </div>
   );
 }

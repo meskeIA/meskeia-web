@@ -10,7 +10,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tipos
@@ -526,13 +525,7 @@ export default function VisualizadorCicloEconomicoPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* ── Hero ── */}
@@ -1101,7 +1094,6 @@ export default function VisualizadorCicloEconomicoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-ciclo-economico')} />
         <ShareCard appName="visualizador-ciclo-economico" />
         <Footer appName="visualizador-ciclo-economico" />
-      </div>
-    </>
+    </div>
   );
 }

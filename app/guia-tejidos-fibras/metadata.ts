@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Propiedades destacadas de cada material',
     'Instrucciones de lavado con temperatura máxima',
     'Curiosidades y datos técnicos de cada fibra',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

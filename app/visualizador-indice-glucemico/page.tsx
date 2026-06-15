@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ───────────────────────────────────────────
 type TabId = 'conceptos' | 'alimentos' | 'fibra' | 'curva';
@@ -195,10 +194,6 @@ export default function IndiceGlucemicoPage() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

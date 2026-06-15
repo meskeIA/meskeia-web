@@ -44,7 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Circuitos mixtos con sintaxis serie(...)/paralelo(...) anidable',
     'Circuitos RC y RL: constante de tiempo τ, respuesta transitoria y frecuencia de corte',
     'Calculadora de consumo energético: potencia, horas de uso, kWh y coste en €',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

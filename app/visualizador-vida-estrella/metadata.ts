@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Camino de muerte bifurcado según masa: enana blanca vs agujero negro',
     'Tabla periódica coloreada por origen estelar (Big Bang, estrellas, supernovas)',
     'Diagrama Hertzsprung-Russell simplificado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

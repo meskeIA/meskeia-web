@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -236,13 +235,7 @@ export default function MapaDependenciaClientesPage() {
   const posY = 100 - ((puntuacionDiversificacion - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -480,7 +473,6 @@ export default function MapaDependenciaClientesPage() {
         <RelatedApps apps={getRelatedApps('mapa-dependencia-clientes')} />
         <ShareCard appName="mapa-dependencia-clientes" />
         <Footer appName="mapa-dependencia-clientes" />
-      </div>
-    </>
+    </div>
   );
 }

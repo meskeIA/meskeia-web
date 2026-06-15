@@ -47,8 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Búsqueda por nombre, notas de sabor y maridaje',
     'IBU, ABV y temperatura de servicio para cada estilo',
     'Marcas destacadas y curiosidades históricas',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
   ],
 });
 

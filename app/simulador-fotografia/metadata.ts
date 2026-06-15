@@ -40,8 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Indicador visual de exposición en stops (-3 a +3)',
     'Renderizado sintético en SVG: bokeh real, ruido y motion blur direccional',
     'Bloque educativo con guía paso a paso, casos de uso y errores frecuentes',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
   ],
 });
 

@@ -50,7 +50,6 @@ export const jsonLd = generateWebAppSchema({
     'Notas de sabor y maridajes recomendados en cada ficha',
     'Curiosidad y dato cultural por cada vinagre',
     'Patrón meskeIA v2.0: tabla comparativa, casos de uso, FAQ y errores comunes',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

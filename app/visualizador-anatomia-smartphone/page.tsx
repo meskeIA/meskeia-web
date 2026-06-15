@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -441,13 +440,7 @@ export default function VisualizadorAnatomiaSmartphonePage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -536,7 +529,6 @@ export default function VisualizadorAnatomiaSmartphonePage() {
         <RelatedApps apps={getRelatedApps('visualizador-anatomia-smartphone')} />
         <ShareCard appName="visualizador-anatomia-smartphone" />
         <Footer appName="visualizador-anatomia-smartphone" />
-      </div>
-    </>
+    </div>
   );
 }

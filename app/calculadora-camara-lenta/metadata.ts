@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Niveles de slow motion: suave, marcado, intenso y ultra',
     'Selectores rápidos de fps comunes (60, 90, 120, 240, 480, 960)',
     'Guía educativa completa: interpolación vs slow motion real, casos de uso',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
   ],
 });
 

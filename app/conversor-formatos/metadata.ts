@@ -37,9 +37,6 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/conversor-formatos/',
   category: 'UtilityApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
   ],
 });
 

@@ -9,7 +9,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Objetivos predefinidos ───────────────────────────────────────────────────
 
@@ -73,10 +72,7 @@ export default function EstimadorTiempoAhorroPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -240,7 +236,6 @@ export default function EstimadorTiempoAhorroPage() {
         <RelatedApps apps={getRelatedApps('estimador-tiempo-ahorro')} />
         <ShareCard appName="estimador-tiempo-ahorro" />
         <Footer appName="estimador-tiempo-ahorro" />
-      </div>
-    </>
+    </div>
   );
 }

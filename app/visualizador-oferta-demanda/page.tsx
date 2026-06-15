@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y datos
@@ -361,9 +360,7 @@ export default function VisualizadorOfertaDemandaPage() {
   const escenario = ESCENARIOS.find(e => e.id === escenarioActivo)!;
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -569,7 +566,6 @@ export default function VisualizadorOfertaDemandaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-oferta-demanda')} />
         <ShareCard appName="visualizador-oferta-demanda" />
         <Footer appName="visualizador-oferta-demanda" />
-      </div>
-    </>
+    </div>
   );
 }

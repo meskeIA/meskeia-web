@@ -90,8 +90,6 @@ export const jsonLd = generateWebAppSchema({
     '10 preguntas validadas para evaluar tolerancia al riesgo',
     'Resultado: perfil conservador, moderado o agresivo',
     'Recomendaciones orientativas según el perfil obtenido',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['perfil inversor', 'tolerancia riesgo', 'test inversión', 'finanzas personales'],

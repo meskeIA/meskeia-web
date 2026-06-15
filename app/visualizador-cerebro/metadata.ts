@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagrama de formación de recuerdos: codificación, almacenamiento y recuperación',
     'Casos reales de neuroplasticidad: taxistas de Londres, músicos, recuperación tras ictus',
     'Ilusiones cognitivas interactivas con demos CSS',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

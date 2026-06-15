@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Fase luminosa con flujo de energía animado',
     'Ciclo de Calvin con diagrama circular interactivo',
     'Datos de escala: árboles, oxígeno, fitoplancton',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

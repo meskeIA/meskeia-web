@@ -40,8 +40,6 @@ const webAppSchema = generateWebAppSchema({
     'Curva de pH en tiempo real',
     '4 indicadores con su rango de viraje',
     'Cálculo automático del punto de equivalencia',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['titulación', 'valoración', 'pH', 'química secundaria'],

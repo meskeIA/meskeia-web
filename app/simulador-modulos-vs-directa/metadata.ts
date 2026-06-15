@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Aviso sobre actividades elegibles a módulos',
     'Datos basados en LPGE 2025 y Orden HFP de módulos 2024',
     'Solo orientativo — no sustituye al asesor fiscal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['módulos', 'estimación directa', 'autónomo', 'régimen fiscal'],

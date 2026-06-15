@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Formacion de lluvia, nieve, granizo y niebla explicada paso a paso',
     'Rayos, huracanes, tornados y DANA con datos reales',
     'Datos y curiosidades meteorologicas fascinantes',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Cuatro formas de onda: senoidal, cuadrada, triangular, sierra',
     'Control fino de frecuencia y volumen',
     'Útil para tests de audio y calibración',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
   keywords: ['generador tonos', 'frecuencias audio', 'test audio', 'calibración altavoces', 'tinnitus'],
 });

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y datos
@@ -425,13 +424,7 @@ export default function VisualizadorCicloVidaFreelancePage() {
   const [faseActiva, setFaseActiva] = useState<string | null>(null);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -515,7 +508,6 @@ export default function VisualizadorCicloVidaFreelancePage() {
         <RelatedApps apps={getRelatedApps('visualizador-ciclo-vida-freelance')} />
         <ShareCard appName="visualizador-ciclo-vida-freelance" />
         <Footer appName="visualizador-ciclo-vida-freelance" />
-      </div>
-    </>
+    </div>
   );
 }

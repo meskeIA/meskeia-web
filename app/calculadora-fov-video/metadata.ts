@@ -39,7 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Focal equivalente en Full Frame para cada sensor',
     'Clasificación del tipo de plano (gran angular, normal, teleobjetivo...)',
     'Acceso rápido a focales comunes (14, 24, 35, 50, 85 mm...)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

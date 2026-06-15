@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import styles from './EstrategicacionSocial.module.css';
 
 // ─────────────────────────────────────────────
@@ -470,10 +469,6 @@ export default function VisualizadorEstrategicacionSocial() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

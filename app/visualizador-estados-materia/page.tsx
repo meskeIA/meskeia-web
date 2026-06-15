@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -641,13 +640,7 @@ export default function VisualizadorEstadosMateria() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -724,7 +717,6 @@ export default function VisualizadorEstadosMateria() {
         <RelatedApps apps={getRelatedApps('visualizador-estados-materia')} />
         <ShareCard appName="visualizador-estados-materia" />
         <Footer appName="visualizador-estados-materia" />
-      </div>
-    </>
+    </div>
   );
 }

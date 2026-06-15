@@ -10,7 +10,6 @@ import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -697,13 +696,7 @@ export default function VisualizadorCortisolPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -741,7 +734,7 @@ export default function VisualizadorCortisolPage() {
         {/* Cabecera de sección */}
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.sectionSubtitle}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -802,7 +795,6 @@ export default function VisualizadorCortisolPage() {
         <RelatedApps apps={getRelatedApps('visualizador-cortisol')} />
         <ShareCard appName="visualizador-cortisol" />
         <Footer appName="visualizador-cortisol" />
-      </div>
-    </>
+    </div>
   );
 }

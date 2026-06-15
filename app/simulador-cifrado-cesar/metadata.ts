@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Ataque automático por análisis de frecuencias',
     '5 textos predefinidos',
     'ROT-13 como caso especial',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

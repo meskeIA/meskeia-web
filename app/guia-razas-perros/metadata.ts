@@ -46,8 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Peso, altura, tipo de pelo y esperanza de vida',
     'Nivel de mantenimiento y temperamento por raza',
     'Guía paso a paso para elegir la raza ideal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

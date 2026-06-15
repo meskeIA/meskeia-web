@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -381,13 +380,7 @@ export default function CartografiaProyeccionesPage() {
   const seccionActual = SECCIONES.find(s => s.id === seccion);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -761,7 +754,6 @@ export default function CartografiaProyeccionesPage() {
         <RelatedApps apps={getRelatedApps('visualizador-cartografia-proyecciones')} />
         <ShareCard appName="visualizador-cartografia-proyecciones" />
         <Footer appName="visualizador-cartografia-proyecciones" />
-      </div>
-    </>
+    </div>
   );
 }

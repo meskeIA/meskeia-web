@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     '4 casos preconfigurados (joven, mileurista, alto, mal rescate)',
     'Datos basados en Ley 35/2006 y LPGE 2025',
     'Solo orientativo — consulta con asesor fiscal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['plan de pensiones', 'IRPF', 'rescate', 'fiscal España'],

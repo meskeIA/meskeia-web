@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -278,13 +277,7 @@ export default function AnatomiaFlorPage() {
   const datoActivoInfo = DATOS.find((d) => d.id === datoActivo);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -568,7 +561,6 @@ export default function AnatomiaFlorPage() {
         <RelatedApps apps={getRelatedApps('visualizador-anatomia-flor')} />
         <ShareCard appName="visualizador-anatomia-flor" />
         <Footer appName="visualizador-anatomia-flor" />
-      </div>
-    </>
+    </div>
   );
 }

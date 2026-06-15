@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Documentación necesaria detallada',
     '6 fases del proceso de valoración',
     'Plazos orientativos por fase',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

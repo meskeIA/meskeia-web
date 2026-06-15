@@ -10,7 +10,6 @@ import {
   EducationalSection,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import styles from './CicloNitrogeno.module.css';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -709,10 +708,6 @@ export default function VisualizadorCicloNitrogenoPage() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

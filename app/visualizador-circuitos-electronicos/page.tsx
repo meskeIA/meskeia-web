@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -364,9 +363,7 @@ export default function VisualizadorCircuitosElectronicos() {
   const PUERTAS: PuertaLogica[] = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1106,8 +1103,7 @@ export default function VisualizadorCircuitosElectronicos() {
         <RelatedApps apps={getRelatedApps('visualizador-circuitos-electronicos')} />
         <ShareCard appName="visualizador-circuitos-electronicos" />
         <Footer appName="visualizador-circuitos-electronicos" />
-      </div>
-    </>
+    </div>
   );
 }
 

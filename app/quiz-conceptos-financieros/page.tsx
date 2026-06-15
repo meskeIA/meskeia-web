@@ -8,7 +8,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Preguntas ────────────────────────────────────────────────────────────────
 
@@ -81,10 +80,7 @@ export default function QuizConceptosFinancierosPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -226,7 +222,6 @@ export default function QuizConceptosFinancierosPage() {
         <RelatedApps apps={getRelatedApps('quiz-conceptos-financieros')} />
         <ShareCard appName="quiz-conceptos-financieros" />
         <Footer appName="quiz-conceptos-financieros" />
-      </div>
-    </>
+    </div>
   );
 }

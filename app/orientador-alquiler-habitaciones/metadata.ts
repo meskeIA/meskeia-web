@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Información sobre +300 municipios declarados zona tensionada',
     'Normativa actualizada: Ley 12/2023 + Prop. Ley habitaciones + RDL 8/2026',
     'Régimen sancionador estatal y autonómico (Cataluña)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

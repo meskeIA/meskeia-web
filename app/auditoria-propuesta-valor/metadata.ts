@@ -36,7 +36,7 @@ export const jsonLd = generateWebAppSchema({
   name: 'Auditoría de Propuesta de Valor',
   description: 'Herramienta interactiva de reflexión para evaluar si tu propuesta de valor encaja con las necesidades reales de tu cliente. Basado en el Value Proposition Canvas de Osterwalder.',
   url: 'https://meskeia.com/auditoria-propuesta-valor/',
-  features: ['Test de 10 preguntas sobre encaje y comunicación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en el Value Proposition Canvas', 'Acciones concretas según tu resultado', 'Funciona 100% en el navegador, sin registro ni instalación', 'Gratuito y sin publicidad', 'Disponible en español'],
+  features: ['Test de 10 preguntas sobre encaje y comunicación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en el Value Proposition Canvas', 'Acciones concretas según tu resultado'],
 });
 
 export const faqJsonLd = {

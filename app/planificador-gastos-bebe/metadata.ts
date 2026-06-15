@@ -49,9 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Selector global y ajuste individual por categoría',
     'Resumen con total anual, mensual y distribución visual',
     'Datos orientativos para España 2025',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

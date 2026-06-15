@@ -13,7 +13,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ============================================================================
@@ -393,13 +392,7 @@ export default function TestSaludNegocioFreelance() {
   const dimensiones: Dimension[] = ['finanzas', 'clientes', 'eficiencia', 'equilibrio', 'crecimiento'];
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -646,7 +639,6 @@ export default function TestSaludNegocioFreelance() {
         <RelatedApps apps={getRelatedApps('test-salud-negocio-freelance')} />
         <ShareCard appName="test-salud-negocio-freelance" />
         <Footer appName="test-salud-negocio-freelance" />
-      </div>
-    </>
+    </div>
   );
 }

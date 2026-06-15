@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Indicador de ángulo de visión y equivalente Full Frame para cada combinación',
     'Visualiza la "compresión de perspectiva" del teleobjetivo y la apertura del gran angular',
     'Tabla comparativa completa de focales, ángulos y usos típicos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
   ],
 });
 

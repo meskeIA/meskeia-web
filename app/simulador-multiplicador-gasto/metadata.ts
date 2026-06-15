@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla detallada de las primeras rondas con impulso acumulado',
     'Comparativa visual de tres escenarios (economía cerrada, con impuestos, abierta)',
     '4 parámetros ajustables con sliders en tiempo real',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['multiplicador keynesiano', 'gasto público', 'PMC', 'macroeconomía', 'política fiscal'],

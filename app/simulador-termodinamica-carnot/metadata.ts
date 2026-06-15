@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de calor absorbido (Qc), calor cedido (Qf) y trabajo (W)',
     'Comparación con motores reales (gasolina, diesel, central térmica)',
     'Visualización del área del ciclo (= trabajo neto)',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['ciclo de Carnot', 'eficiencia térmica', '2.ª ley termodinámica', 'EBAU', 'Bachillerato', 'física'],
 });

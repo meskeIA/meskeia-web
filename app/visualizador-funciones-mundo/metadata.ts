@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Gráficos Chart.js interactivos con sliders',
     'Comparativa visual de las 4 funciones superpuestas',
     'Explicación intuitiva sin fórmulas complejas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

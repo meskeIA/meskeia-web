@@ -57,8 +57,6 @@ export const jsonLd = generateWebAppSchema({
     'Conservación y duración orientativa',
     'Usos culinarios y combinaciones',
     'Beneficios para la salud y curiosidades',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
   ],
 });
 

@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Explicación educativa tras cada respuesta',
     'Selección aleatoria de 15 preguntas por partida',
     'Puntuación y evaluación final con feedback',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

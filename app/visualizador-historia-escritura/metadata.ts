@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Grandes sistemas de escritura: cuneiforme, jeroglíficos, caracteres chinos, alfabeto',
     'La revolución del papel: papiro, pergamino, imprenta, era digital',
     'El futuro de escribir: emojis, IA, voz — ¿volvemos a los pictogramas?',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

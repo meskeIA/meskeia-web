@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -406,13 +405,7 @@ export default function VisualizadorOpticaPage() {
   const medioActual = useMemo(() => MEDIOS.find(m => m.id === medioId)!, [medioId]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -780,7 +773,6 @@ export default function VisualizadorOpticaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-optica')} />
         <ShareCard appName="visualizador-optica" />
         <Footer appName="visualizador-optica" />
-      </div>
-    </>
+    </div>
   );
 }

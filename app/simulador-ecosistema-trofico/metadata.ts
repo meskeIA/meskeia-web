@@ -49,8 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Barras animadas de población antes y después del evento',
     'Explicación dinámica de la cascada trófica generada',
     'Bloque educativo completo sobre cadenas tróficas y regla del 10%',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
 });
 

@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Proyeccion mes a mes con barras visuales',
     'Desglose porcentual de gastos con donut CSS',
     'Objetivos de ahorro a 3 y 6 meses',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

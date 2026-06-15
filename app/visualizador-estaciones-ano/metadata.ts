@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Slider de latitud: horas de luz desde el ecuador hasta los polos en cada estación',
     'Fechas exactas de solsticios y equinoccios con explicación de cada fenómeno',
     'Mitos desmontados: perihelio en enero, afelio en julio, estaciones en otros planetas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

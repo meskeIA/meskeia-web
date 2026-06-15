@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -152,13 +151,7 @@ export default function VisualizadorEnvejecimientoCuerpoPage() {
   }, []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -304,7 +297,6 @@ export default function VisualizadorEnvejecimientoCuerpoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-envejecimiento-cuerpo')} />
         <ShareCard appName="visualizador-envejecimiento-cuerpo" />
         <Footer appName="visualizador-envejecimiento-cuerpo" />
-      </div>
-    </>
+    </div>
   );
 }

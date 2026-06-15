@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Basado en el Modelo Situacional de Hersey-Blanchard',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para mejorar tu delegación',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

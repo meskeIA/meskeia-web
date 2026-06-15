@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Datos sorprendentes para cada fuerza',
     'Sección educativa con física profunda y aplicaciones prácticas',
     'Ideal para preparar Bachillerato y selectividad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -436,13 +435,7 @@ export default function VisualizadorOjoHumanoVisionPage() {
   }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -729,7 +722,6 @@ export default function VisualizadorOjoHumanoVisionPage() {
         <RelatedApps apps={getRelatedApps('visualizador-ojo-humano-vision')} />
         <ShareCard appName="visualizador-ojo-humano-vision" />
         <Footer appName="visualizador-ojo-humano-vision" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // --- Tipos ---
 
@@ -745,13 +744,7 @@ export default function GuiaMaderasPage() {
   const hayFiltrosActivos = busqueda !== '' || filtroTipo !== '' || filtroDificultad !== '' || filtroSostenibilidad !== '';
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1208,7 +1201,6 @@ export default function GuiaMaderasPage() {
         <RelatedApps apps={getRelatedApps('guia-maderas')} />
         <ShareCard appName="guia-maderas" />
         <Footer appName="guia-maderas" />
-      </div>
-    </>
+    </div>
   );
 }

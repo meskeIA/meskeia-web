@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Tipos de inflación: deflación, moderada, hiperinflación',
     'Mecanismo de transmisión de la política monetaria del BCE',
     'Slider interactivo de tipos de interés',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

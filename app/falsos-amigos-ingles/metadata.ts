@@ -38,8 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Pestaña Práctica: modo flashcard con 3 opciones y puntuación final',
     'Cada par incluye significado real, error frecuente y ejemplo de uso',
     'Niveles básico, medio y avanzado para aprendizaje progresivo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

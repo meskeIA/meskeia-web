@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos e interfaces
@@ -423,13 +422,7 @@ export default function VisualizadorHistoriaRelojPage() {
   const idxActual = HITOS.findIndex(h => h.id === hitoActivo);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -620,7 +613,6 @@ export default function VisualizadorHistoriaRelojPage() {
         <RelatedApps apps={getRelatedApps('visualizador-historia-reloj')} />
         <ShareCard appName="visualizador-historia-reloj" />
         <Footer appName="visualizador-historia-reloj" />
-      </div>
-    </>
+    </div>
   );
 }

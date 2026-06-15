@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // TIPOS
@@ -674,13 +673,7 @@ export default function GuiaInsectosJardinPage() {
   }, []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -1105,7 +1098,6 @@ export default function GuiaInsectosJardinPage() {
         <RelatedApps apps={getRelatedApps('guia-insectos-jardin')} />
         <ShareCard appName="guia-insectos-jardin" />
         <Footer appName="guia-insectos-jardin" />
-      </div>
-    </>
+    </div>
   );
 }

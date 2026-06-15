@@ -38,7 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Recomendaciones por perfil: principiante, web developer, JVM backend, open source',
     'Precios actualizados con enlaces a páginas oficiales de cada herramienta',
     'Nota sobre combinaciones IDE + asistente externo (Claude Code, Copilot, etc.)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

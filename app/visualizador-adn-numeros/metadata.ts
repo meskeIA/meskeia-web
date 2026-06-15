@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Barra de similitud genética comparada con 6 organismos',
     'Escala visual del ADN: desde la célula hasta el Sistema Solar',
     'Contenido educativo orientado a Bachillerato y Selectividad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
   category: 'EducationalApplication',
 });

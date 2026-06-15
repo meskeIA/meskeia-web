@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 interface Pregunta { id: number; texto: string; dimension: 'encaje' | 'comunicacion'; }
 interface Perfil { nombre: string; emoji: string; descripcion: string; fortalezas: string[]; riesgos: string[]; acciones: string[]; }
@@ -119,9 +118,7 @@ export default function AuditoriaPropuestaValorPage() {
   const posY = 100 - ((puntuacionComunicacion - 5) / 20) * 100;
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>💎 Auditoría de Propuesta de Valor</h1>
@@ -221,7 +218,6 @@ export default function AuditoriaPropuestaValorPage() {
         <RelatedApps apps={getRelatedApps('auditoria-propuesta-valor')} />
         <ShareCard appName="auditoria-propuesta-valor" />
         <Footer appName="auditoria-propuesta-valor" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Checklist de documentación según importe de devolución',
     'Información sobre Modelo H-100 y procedimiento de devolución',
     'Casos especiales: fallecimiento 31/dic, varios herederos, renuncia',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

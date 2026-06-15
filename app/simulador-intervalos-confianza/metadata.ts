@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Tamaños muestrales de 5 a 500',
     'Visualización clara: IC que contienen μ vs IC que NO lo contienen',
     'Cálculo automático de error estándar y margen de error',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['intervalo de confianza', 'IC', 't de Student', 'z', 'inferencia estadística', 'EBAU', 'Bachillerato'],
 });

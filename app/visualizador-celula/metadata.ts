@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Célula vegetal con diferencias resaltadas',
     'Comparativa visual animal vs vegetal',
     'Datos fascinantes: billones de células, ADN de 2 metros',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

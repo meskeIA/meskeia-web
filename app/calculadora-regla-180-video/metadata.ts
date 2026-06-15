@@ -43,7 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Explicación del motion blur natural y por qué funciona',
     'Compatible con 24/25/30/50/60/120 fps y más',
     'Selector rápido de fps comunes y entrada manual',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

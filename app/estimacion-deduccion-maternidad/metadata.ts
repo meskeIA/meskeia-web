@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Simulacion de cobro anticipado mensual (Modelo 140)',
     'Verificacion de requisitos de elegibilidad',
     'Datos actualizados IRPF 2025',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
   ],
 });
 

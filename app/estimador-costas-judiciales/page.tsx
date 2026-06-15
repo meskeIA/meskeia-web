@@ -8,7 +8,6 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -168,10 +167,7 @@ export default function EstimadorCostasJudicialesPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -381,7 +377,6 @@ export default function EstimadorCostasJudicialesPage() {
         <RelatedApps apps={getRelatedApps('estimador-costas-judiciales')} />
         <ShareCard appName="estimador-costas-judiciales" />
         <Footer appName="estimador-costas-judiciales" />
-      </div>
-    </>
+    </div>
   );
 }

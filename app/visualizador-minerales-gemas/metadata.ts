@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Gemas preciosas: diamante, rubí, zafiro, esmeralda y más',
     'Formación: ígnea, sedimentaria y metamórfica con timeline',
     'Usos industriales vs joyería con datos curiosos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de los 4 casos de signo de ΔH y ΔS',
     'Simulador de equilibrio Kₑq con visualización de concentraciones',
     'Principio de Le Chatelier para síntesis de amoniaco Haber-Bosch',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

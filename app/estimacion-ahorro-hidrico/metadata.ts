@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de ahorro en litros y euros por acción',
     'Ajuste por número de personas y precio del agua local',
     'Equivalencias visuales (bañeras, piscinas)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

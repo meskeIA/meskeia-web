@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     '15+ objetos y servicios cotidianos',
     'Slider de sueldo neto para personalizar',
     'Visualización en barras de horas de vida laboral',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

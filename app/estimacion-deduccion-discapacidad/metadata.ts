@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Gastos de asistencia adicionales',
     'Estimación del ahorro fiscal según tipo marginal',
     'Datos actualizados IRPF 2025',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

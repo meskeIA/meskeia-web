@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Corte vertical: 5 zonas de profundidad con fauna, temperatura y presión',
     'Contaminación por plástico: degradación, islas de basura, países contaminantes',
     'Regulador del clima: absorción de CO2, calor, nivel del mar y coral',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

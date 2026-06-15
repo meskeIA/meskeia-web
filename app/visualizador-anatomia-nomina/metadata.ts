@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Nómina ficticia interactiva con datos de ejemplo',
     'Explicación de cada concepto al hacer clic',
     'Secciones: devengos, deducciones, bases de cotización, líquido',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

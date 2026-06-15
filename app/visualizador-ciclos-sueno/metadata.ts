@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Hipnograma CSS interactivo de 8 horas con ciclos de 90 minutos',
     'Horas de sueño necesarias por grupo de edad (recién nacido a anciano)',
     '6 enemigos del sueño con medidor de impacto y consejos científicos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

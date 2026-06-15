@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Evalúa automatización de lo rutinario y protección de lo creativo',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para automatizar mejor',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

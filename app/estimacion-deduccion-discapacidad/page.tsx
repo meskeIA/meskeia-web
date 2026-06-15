@@ -19,7 +19,6 @@ import {
   FISCAL_DEPENDENCIA_META,
   TRAMOS_IRPF_2025,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -82,10 +81,6 @@ export default function EstimacionDeduccionDiscapacidadPage() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

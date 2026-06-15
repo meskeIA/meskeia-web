@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Mundo micro: 37,2 billones de células, 86.000 millones de neuronas, longitud total del ADN',
     'Récords y curiosidades: velocidad nerviosa, ácido estomacal, regeneración hepática',
     'Datos de ejemplo con comparaciones cotidianas para dimensionar las cifras',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

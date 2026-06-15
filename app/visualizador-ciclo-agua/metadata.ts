@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Distribucion del agua en la Tierra con escalas proporcionales',
     'Tiempos de residencia del agua en cada reservorio',
     'Datos fascinantes sobre el agua y cambio climatico',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

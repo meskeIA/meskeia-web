@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Secciones
@@ -337,9 +336,7 @@ export default function VisualizadorProbabilidadPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>Cómo Funciona la Probabilidad</h1>
@@ -382,7 +379,6 @@ export default function VisualizadorProbabilidadPage() {
         <RelatedApps apps={getRelatedApps('visualizador-probabilidad')} />
         <ShareCard appName="visualizador-probabilidad" />
         <Footer appName="visualizador-probabilidad" />
-      </div>
-    </>
+    </div>
   );
 }

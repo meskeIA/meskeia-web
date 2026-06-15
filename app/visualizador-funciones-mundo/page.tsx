@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -152,9 +151,7 @@ export default function VisualizadorFuncionesMundoPage() {
     funcionActiva === 'logaritmica' ? 'Factor de escala' : 'Coeficiente (a)';
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>Funciones que Gobiernan el Mundo</h1>
@@ -255,7 +252,6 @@ export default function VisualizadorFuncionesMundoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-funciones-mundo')} />
         <ShareCard appName="visualizador-funciones-mundo" />
         <Footer appName="visualizador-funciones-mundo" />
-      </div>
-    </>
+    </div>
   );
 }

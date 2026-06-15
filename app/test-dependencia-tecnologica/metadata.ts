@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Evalúa autonomía real y adaptabilidad tecnológica',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para reducir dependencia sin perder productividad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

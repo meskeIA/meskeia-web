@@ -10,7 +10,6 @@ import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import { PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026, FISCAL_PENSIONES_META } from '@/data/fiscal';
 import type { PensionMinimaEntry } from '@/data/fiscal/pensiones';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -119,13 +118,7 @@ export default function EstimadorComplementoMinimosPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -438,7 +431,6 @@ export default function EstimadorComplementoMinimosPage() {
         <RelatedApps apps={getRelatedApps('estimador-complemento-minimos')} />
         <ShareCard appName="estimador-complemento-minimos" />
         <Footer appName="estimador-complemento-minimos" />
-      </div>
-    </>
+    </div>
   );
 }

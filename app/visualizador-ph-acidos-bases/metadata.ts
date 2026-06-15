@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Ácidos y bases: fuertes vs débiles con ejemplos',
     'Neutralización y aplicaciones prácticas',
     'Curiosidades: lluvia ácida, pH del estómago, escala logarítmica',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

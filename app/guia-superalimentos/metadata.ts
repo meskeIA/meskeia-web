@@ -47,8 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Contraindicaciones e interacciones conocidas',
     'Combinaciones sinérgicas con otros alimentos',
     'Curiosidades históricas y científicas',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
   ],
 });
 

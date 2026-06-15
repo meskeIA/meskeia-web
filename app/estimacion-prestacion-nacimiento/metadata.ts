@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Ampliaciones por parto multiple y hospitalizacion neonatal',
     'Requisitos de cotizacion minima por edad',
     'Comparativa contributiva vs no contributiva',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
   ],
 });
 

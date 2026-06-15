@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de conductividad térmica con barras proporcionales',
     'Convección en la naturaleza: brisa marina, corrientes oceánicas, meteorología',
     'Datos fascinantes sobre termodinámica cotidiana',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

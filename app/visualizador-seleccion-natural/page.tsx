@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -489,13 +488,7 @@ export default function SeleccionNaturalPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -564,7 +557,6 @@ export default function SeleccionNaturalPage() {
         <RelatedApps apps={getRelatedApps('visualizador-seleccion-natural')} />
         <ShareCard appName="visualizador-seleccion-natural" />
         <Footer appName="visualizador-seleccion-natural" />
-      </div>
-    </>
+    </div>
   );
 }

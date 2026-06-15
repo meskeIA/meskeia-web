@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Grid de enzimas digestivas, metabólicas y hepáticas con datos detallados',
     'Sliders interactivos de temperatura, pH y concentración de sustrato',
     'Cofactores, coenzimas y enfermedades enzimáticas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

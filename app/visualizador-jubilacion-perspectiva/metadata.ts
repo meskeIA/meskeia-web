@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo del porcentaje de pensión según años cotizados',
     'Slider de edad de inicio de cotización',
     'Gráfico de evolución del porcentaje de pensión por años',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

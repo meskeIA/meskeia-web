@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Las 3 fases: glucólisis, Krebs y cadena de electrones',
     'Diagrama interactivo de la mitocondria con partes clickables',
     'Comparativa visual con la fotosíntesis',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

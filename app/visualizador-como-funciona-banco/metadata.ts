@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Ciclo depósito → préstamo → nuevo depósito explicado',
     'Papel del BCE y los tipos de interés',
     'Qué pasa cuando todos quieren su dinero a la vez',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

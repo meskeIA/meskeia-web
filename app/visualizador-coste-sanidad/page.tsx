@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -435,13 +434,7 @@ export default function VisualizadorCosteSanidadPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -473,7 +466,7 @@ export default function VisualizadorCosteSanidadPage() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -526,7 +519,6 @@ export default function VisualizadorCosteSanidadPage() {
         <RelatedApps apps={getRelatedApps('visualizador-coste-sanidad')} />
         <ShareCard appName="visualizador-coste-sanidad" />
         <Footer appName="visualizador-coste-sanidad" />
-      </div>
-    </>
+    </div>
   );
 }

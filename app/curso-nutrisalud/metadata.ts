@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Glosario técnico de términos nutricionales y recursos adicionales',
     'Sistema de progreso persistente con consentimiento informado y disclaimers médicos',
     'TextToSpeech en cada capítulo para seguir el contenido sin leer',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

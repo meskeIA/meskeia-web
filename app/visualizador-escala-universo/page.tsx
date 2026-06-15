@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos de los 12 niveles de escala
@@ -230,13 +229,7 @@ export default function VisualizadorEscalaUniversoPage() {
   }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -458,7 +451,6 @@ export default function VisualizadorEscalaUniversoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-escala-universo')} />
         <ShareCard appName="visualizador-escala-universo" />
         <Footer appName="visualizador-escala-universo" />
-      </div>
-    </>
+    </div>
   );
 }

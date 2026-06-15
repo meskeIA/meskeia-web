@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -236,13 +235,7 @@ export default function TestDependenciaTecnologicaPage() {
   const posY = 100 - ((puntuacionAutonomia - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -496,7 +489,6 @@ export default function TestDependenciaTecnologicaPage() {
         <RelatedApps apps={getRelatedApps('test-dependencia-tecnologica')} />
         <ShareCard appName="test-dependencia-tecnologica" />
         <Footer appName="test-dependencia-tecnologica" />
-      </div>
-    </>
+    </div>
   );
 }

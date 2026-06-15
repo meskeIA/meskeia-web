@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Vía nigroestriada y pérdida de dopamina en Parkinson',
     'α-sinucleína y cuerpos de Lewy (SVG)',
     'Circuito de ganglios basales: vía directa vs indirecta',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

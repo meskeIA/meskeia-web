@@ -10,7 +10,6 @@ import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // Tipos de contrato mercantil
 interface TipoContrato {
@@ -350,13 +349,7 @@ export default function OrientadorContratoMercantilPage() {
   const progreso = Math.round(((preguntaActual) / PREGUNTAS.length) * 100);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -684,7 +677,6 @@ export default function OrientadorContratoMercantilPage() {
         <ShareCard appName="orientador-contrato-mercantil" />
 
         <Footer appName="orientador-contrato-mercantil" />
-      </div>
-    </>
+    </div>
   );
 }

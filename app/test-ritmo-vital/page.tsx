@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -234,13 +233,7 @@ export default function TestRitmoVitalPage() {
   const posY = 100 - ((puntuacionPresencia - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -473,7 +466,6 @@ export default function TestRitmoVitalPage() {
         <RelatedApps apps={getRelatedApps('test-ritmo-vital')} />
         <ShareCard appName="test-ritmo-vital" />
         <Footer appName="test-ritmo-vital" />
-      </div>
-    </>
+    </div>
   );
 }

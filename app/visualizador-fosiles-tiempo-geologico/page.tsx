@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -419,13 +418,7 @@ export default function VisualizadorFosilesGeologicoPage() {
   const metodoSeleccionado = METODOS_DATACION.find(m => m.id === metodoActivo);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -874,7 +867,6 @@ export default function VisualizadorFosilesGeologicoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-fosiles-tiempo-geologico')} />
         <ShareCard appName="visualizador-fosiles-tiempo-geologico" />
         <Footer appName="visualizador-fosiles-tiempo-geologico" />
-      </div>
-    </>
+    </div>
   );
 }

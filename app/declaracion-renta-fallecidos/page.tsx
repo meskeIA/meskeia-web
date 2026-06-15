@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -177,13 +176,7 @@ export default function DeclaracionRentaFallecidosPage() {
   const viaAcceso = determinarViaAcceso();
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero Section */}
@@ -601,7 +594,6 @@ export default function DeclaracionRentaFallecidosPage() {
         <RelatedApps apps={getRelatedApps('declaracion-renta-fallecidos')} />
         <ShareCard appName="declaracion-renta-fallecidos" />
         <Footer appName="declaracion-renta-fallecidos" />
-      </div>
-    </>
+    </div>
   );
 }

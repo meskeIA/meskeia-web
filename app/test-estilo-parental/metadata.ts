@@ -45,9 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Basado en el modelo científico de Baumrind (1966) + Maccoby & Martin (1983)',
     'Visualización en cuadrante bidimensional (control vs afecto)',
     'Descripción detallada del estilo con recomendaciones constructivas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

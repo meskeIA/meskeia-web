@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Escenarios predefinidos: Mendel clásico, portador, puro × recesivo',
     'Botón de caso aleatorio para explorar combinaciones',
     'Interpretación en texto natural de los resultados',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: [

@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Mapa de Karnaugh SVG de 2 y 3 variables con clic en celdas',
     'Agrupación automática de 1s y expresión SOP simplificada',
     'Formas Normales Conjuntiva (FNC) y Disyuntiva (FND) para 3 variables',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
   category: 'EducationalApplication',
 });

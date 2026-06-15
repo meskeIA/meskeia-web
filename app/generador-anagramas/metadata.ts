@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Diccionario español integrado',
     'Filtros por longitud de palabra',
     'Útil para juegos de palabras (Wordle, Scrabble, Apalabrados)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['anagramas', 'palabras', 'Wordle', 'Scrabble', 'crucigramas', 'juegos palabras'],

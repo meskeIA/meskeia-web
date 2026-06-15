@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Basado en la Matriz Eisenhower y el Cuadrante 2 de Covey',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para mejorar tu gestión del tiempo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Metamorfosis incompleta: saltamontes y libélula',
     'Metamorfosis anfibio: de renacuajo a rana',
     'Datos fascinantes sobre transformación animal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

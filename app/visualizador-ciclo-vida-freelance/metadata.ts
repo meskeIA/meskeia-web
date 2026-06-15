@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Cuellos de botella y tips para cada fase',
     'Calculo del coste real por hora contando tiempo no facturable',
     'Estadisticas de morosidad en Espana (plazo medio 82 dias)',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
   ],
 });
 

@@ -9,7 +9,6 @@ import {
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -68,10 +67,7 @@ export default function SimuladorPagaAhorroPage() {
   };
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -342,7 +338,6 @@ export default function SimuladorPagaAhorroPage() {
         <RelatedApps apps={getRelatedApps('simulador-paga-ahorro')} />
         <ShareCard appName="simulador-paga-ahorro" />
         <Footer appName="simulador-paga-ahorro" />
-      </div>
-    </>
+    </div>
   );
 }

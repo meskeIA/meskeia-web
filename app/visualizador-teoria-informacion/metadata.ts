@@ -55,9 +55,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparativa de formatos: WAV vs MP3, BMP vs PNG vs JPEG',
     'Slider de calidad JPEG con estimación de tamaño',
     'Visualizaciones SVG proporcionales al tamaño de archivo',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

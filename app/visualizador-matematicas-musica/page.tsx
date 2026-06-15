@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Web Audio API — generador de sonido
@@ -750,13 +749,7 @@ export default function VisualizadorMatematicasMusicaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -842,7 +835,6 @@ export default function VisualizadorMatematicasMusicaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-matematicas-musica')} />
         <ShareCard appName="visualizador-matematicas-musica" />
         <Footer appName="visualizador-matematicas-musica" />
-      </div>
-    </>
+    </div>
   );
 }

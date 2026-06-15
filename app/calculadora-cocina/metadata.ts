@@ -48,8 +48,6 @@ const webAppSchema = generateWebAppSchema({
     'Tabla de tiempos de cocción por alimento y método',
     'Buscador de sustitutos de ingredientes',
     'Conversor de temperaturas de horno (°C, °F, gas)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['calculadora cocina', 'conversor unidades', 'escalador recetas', 'tiempos cocción', 'sustitutos ingredientes'],

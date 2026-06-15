@@ -48,8 +48,6 @@ export const jsonLd = generateWebAppSchema({
     'Advertencias para factores extremos (mayor de 4× o menor de 1/4×)',
     'Nota automática sobre tiempo y temperatura del horno',
     'Redondeo práctico de cantidades (g, ml, cucharadas, etc.)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['escalador recetas', 'ajustar porciones', 'multiplicar receta', 'levadura no lineal', 'cocina'],

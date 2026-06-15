@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 interface Pregunta { id: number; texto: string; dimension: 'asuncion' | 'validacion'; }
 interface Perfil { nombre: string; emoji: string; descripcion: string; fortalezas: string[]; riesgos: string[]; acciones: string[]; }
@@ -124,9 +123,7 @@ export default function TestValidacionIdeaPage() {
   const posY = 100 - ((puntuacionValidacion - 5) / 20) * 100;
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>🧪 Test de Validación de Idea</h1>
@@ -231,7 +228,6 @@ export default function TestValidacionIdeaPage() {
         <RelatedApps apps={getRelatedApps('test-validacion-idea')} />
         <ShareCard appName="test-validacion-idea" />
         <Footer appName="test-validacion-idea" />
-      </div>
-    </>
+    </div>
   );
 }

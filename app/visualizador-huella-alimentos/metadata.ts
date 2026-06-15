@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     '3 métricas: CO2, agua y uso de suelo',
     'Barras proporcionales con ordenación interactiva',
     'Datos de Our World in Data / Poore & Nemecek 2018',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

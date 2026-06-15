@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Indicador visual de WB correcto para cada escena',
     'Mensajes contextuales: demasiado cálido, demasiado frío, balance correcto',
     'Guía completa con presets de cámara (Tungsteno, Fluorescente, Sol, Nublado, Sombra)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
   ],
 });
 

@@ -18,7 +18,6 @@ import {
   PERMISO_NACIMIENTO_2025,
   AMPLIACIONES_PERMISO,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -174,10 +173,6 @@ export default function EstimacionBajaMaternalPage() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

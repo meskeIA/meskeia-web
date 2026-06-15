@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Orientación sobre jubilación parcial con contrato de relevo',
     'Tabla progresiva de edad de jubilación 2024-2027',
     'Comparativa fórmula clásica vs ampliada (sistema dual)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

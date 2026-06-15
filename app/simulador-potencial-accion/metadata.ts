@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Estímulo sostenido: produce trenes de PA con frecuencia variable',
     'Detección de periodos refractarios absoluto y relativo',
     'Estadísticos: latencia, frecuencia, altura del pico',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['potencial de acción', 'neurona', 'despolarización', 'todo o nada', 'EBAU', 'Bachillerato', 'biología'],
 });

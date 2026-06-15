@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Visualización clara de falsos positivos vs verdaderos positivos',
     'Probabilidades pre-test vs post-test',
     'Aplicación de la fórmula de Bayes paso a paso',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['teorema de Bayes', 'probabilidad condicional', 'tests médicos', 'EBAU', 'Bachillerato'],
 });

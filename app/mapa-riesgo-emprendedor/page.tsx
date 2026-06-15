@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 interface Pregunta { id: number; texto: string; dimension: 'exposicion' | 'preparacion'; }
 interface Perfil { nombre: string; emoji: string; descripcion: string; fortalezas: string[]; riesgos: string[]; acciones: string[]; }
@@ -120,9 +119,7 @@ export default function MapaRiesgoEmprendedorPage() {
   const posY = 100 - ((puntuacionPreparacion - 5) / 20) * 100;
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>🎲 Mapa de Riesgo del Emprendedor</h1>
@@ -225,7 +222,6 @@ export default function MapaRiesgoEmprendedorPage() {
         <RelatedApps apps={getRelatedApps('mapa-riesgo-emprendedor')} />
         <ShareCard appName="mapa-riesgo-emprendedor" />
         <Footer appName="mapa-riesgo-emprendedor" />
-      </div>
-    </>
+    </div>
   );
 }

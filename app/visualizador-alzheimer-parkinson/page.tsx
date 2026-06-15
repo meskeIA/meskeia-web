@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -734,13 +733,7 @@ export default function VisualizadorAlzheimerParkinsonPage() {
   const [enfermedadActiva, setEnfermedadActiva] = useState<Enfermedad>('alzheimer');
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -811,7 +804,6 @@ export default function VisualizadorAlzheimerParkinsonPage() {
         <RelatedApps apps={getRelatedApps('visualizador-alzheimer-parkinson')} />
         <ShareCard appName="visualizador-alzheimer-parkinson" />
         <Footer appName="visualizador-alzheimer-parkinson" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Búsqueda por nombre, país o región',
     'Acompañamientos y usos recomendados',
     'Curiosidades históricas y culturales',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
   category: 'EducationalApplication',
 });

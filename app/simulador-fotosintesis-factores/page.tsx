@@ -13,7 +13,6 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorFotosintesisFactores.module.css';
-import { jsonLd } from './metadata';
 
 // ============================================================================
 // MODELO MATEMÁTICO
@@ -269,13 +268,7 @@ export default function SimuladorFotosintesisFactoresPage() {
   ];
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -639,7 +632,6 @@ export default function SimuladorFotosintesisFactoresPage() {
         <RelatedApps apps={getRelatedApps('simulador-fotosintesis-factores')} />
         <ShareCard appName="simulador-fotosintesis-factores" />
         <Footer appName="simulador-fotosintesis-factores" />
-      </div>
-    </>
+    </div>
   );
 }

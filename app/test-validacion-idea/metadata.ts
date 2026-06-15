@@ -36,7 +36,7 @@ export const jsonLd = generateWebAppSchema({
   name: 'Test de Validación de Idea',
   description: 'Herramienta interactiva de reflexión para evaluar si tu idea de negocio resuelve un problema real. Basado en Lean Startup de Eric Ries.',
   url: 'https://meskeia.com/test-validacion-idea/',
-  features: ['Test de 10 preguntas sobre asunciones y validación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en Lean Startup (Eric Ries)', 'Acciones concretas según tu resultado', 'Funciona 100% en el navegador, sin registro ni instalación', 'Gratuito y sin publicidad', 'Disponible en español'],
+  features: ['Test de 10 preguntas sobre asunciones y validación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en Lean Startup (Eric Ries)', 'Acciones concretas según tu resultado'],
 });
 
 export const faqJsonLd = {

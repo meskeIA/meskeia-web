@@ -43,7 +43,6 @@ const webAppSchema = generateWebAppSchema({
     'Fórmulas relevantes mostradas junto a los resultados en cada modo',
     'Ejemplos cargables con un clic para ilustrar cada tipo de movimiento',
     'Bloque educativo con tabla de comparativa, errores frecuentes y laboratorio de medición de g',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

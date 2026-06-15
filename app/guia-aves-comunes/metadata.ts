@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Estado de conservación IUCN por especie',
     'Descripción del canto y curiosidades de cada ave',
     'Guía de iniciación al birdwatching paso a paso',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

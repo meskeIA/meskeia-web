@@ -21,7 +21,6 @@ import {
   LIMITES_PLAN_PENSIONES_2025,
   tipoMarginalDesdeRendimientosBrutos,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // TIPOS
@@ -210,13 +209,7 @@ export default function PlanificadorAhorroJubilacionPage() {
   }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -710,7 +703,6 @@ export default function PlanificadorAhorroJubilacionPage() {
         <RelatedApps apps={getRelatedApps('planificador-ahorro-jubilacion')} />
         <ShareCard appName="planificador-ahorro-jubilacion" />
         <Footer appName="planificador-ahorro-jubilacion" />
-      </div>
-    </>
+    </div>
   );
 }

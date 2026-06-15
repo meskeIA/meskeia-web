@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Guía de métodos de procesado',
     'Guía de niveles de tueste',
     'Indicadores visuales de acidez y cuerpo',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

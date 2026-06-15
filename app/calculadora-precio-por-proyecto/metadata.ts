@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Multiplicadores de complejidad y urgencia',
     'Margen de imprevistos configurable',
     'Métricas útiles: tarifa efectiva, duración estimada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

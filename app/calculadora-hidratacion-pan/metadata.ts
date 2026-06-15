@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Descripción de la textura y manejo de cada nivel',
     'Ejemplos de panes típicos por nivel de hidratación',
     'Visualización con color por nivel de hidratación',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ───────────────────────────────────────────
 type TabId = 'ruta' | 'organos' | 'aldh2' | 'cerebro';
@@ -190,10 +189,6 @@ export default function MetabolismoAlcoholPage() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

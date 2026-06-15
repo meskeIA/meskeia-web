@@ -55,9 +55,6 @@ export const jsonLd = generateWebAppSchema({
     'Epiciclos animados con Canvas 2D (requestAnimationFrame)',
     'Aplicaciones reales: MP3, JPEG/DCT, ECG, sismología',
     'Visualización interactiva en Canvas 2D',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

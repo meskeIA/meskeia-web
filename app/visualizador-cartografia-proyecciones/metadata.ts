@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Groenlandia vs África en cada proyección',
     'Indicadores de Tissot',
     'Coordenadas y husos horarios',
-    'Funciona 100% en el navegador',
-    'Gratuito y en español',
   ],
 });
 

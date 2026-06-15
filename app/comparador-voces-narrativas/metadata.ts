@@ -38,8 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Fragmentos representativos con análisis de cada técnica',
     'Lista de técnicas narrativas clave por autor',
     'Análisis automático de similitudes y contrastes',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

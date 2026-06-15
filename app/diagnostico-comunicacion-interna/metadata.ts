@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Evalúa velocidad y profundidad de la comunicación',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para mejorar la comunicación interna',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

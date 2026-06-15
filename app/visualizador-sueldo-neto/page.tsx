@@ -14,7 +14,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 import {
   FISCAL_IRPF_META,
   TRAMOS_IRPF_2025,
@@ -214,13 +213,7 @@ export default function VisualizadorSueldoNetoPage() {
   const coloresTramos = ['#27ae60', '#48A9A6', '#2E86AB', '#e67e22', '#e74c3c', '#8e44ad'];
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -453,7 +446,6 @@ export default function VisualizadorSueldoNetoPage() {
         <RelatedApps apps={getRelatedApps('visualizador-sueldo-neto')} />
         <ShareCard appName="visualizador-sueldo-neto" />
         <Footer appName="visualizador-sueldo-neto" />
-      </div>
-    </>
+    </div>
   );
 }

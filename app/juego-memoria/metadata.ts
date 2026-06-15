@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Cronómetro y contador de movimientos',
     'Estadísticas guardadas localmente',
     'Diferentes temas visuales (emojis, animales, frutas)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['juego memoria', 'parejas', 'concentración', 'brain training', 'juego online'],

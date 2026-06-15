@@ -54,9 +54,6 @@ export const jsonLd = generateWebAppSchema({
     'Animación de producción de O₂ proporcional a la tasa de fotosíntesis',
     'Visualización de barras de progreso por factor con resaltado del limitante',
     'Bloque educativo completo con tabla comparativa, FAQ y guía de experimentos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

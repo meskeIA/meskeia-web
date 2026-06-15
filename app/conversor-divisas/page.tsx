@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
-import { jsonLd } from './metadata';
 import styles from './ConversionDivisas.module.css';
 import { getRelatedApps } from '@/data/app-relations';
 
@@ -90,10 +89,6 @@ export default function ConversionDivisas() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <AnalyticsTracker appName="conversor-divisas" />
       <MeskeiaLogo />
 

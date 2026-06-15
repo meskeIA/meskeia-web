@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Permite añadir y eliminar ingredientes dinámicamente',
     'Calcula el número de porciones según el peso por porción',
     'Estado inicial con receta básica: harina, agua, sal y levadura',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

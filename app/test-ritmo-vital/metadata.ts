@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagnóstico visual con mapa 2D y perfil personalizado',
     'Basado en el concepto kletskassa y cronobiología',
     'Acciones concretas según tu resultado',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

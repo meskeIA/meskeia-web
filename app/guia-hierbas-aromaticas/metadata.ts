@@ -50,7 +50,6 @@ export const jsonLd = generateWebAppSchema({
     'Maridaje ideal y cocinas típicas por hierba',
     'Cuándo añadir cada hierba durante la cocción',
     'Guía de cultivo: sol, riego y dificultad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

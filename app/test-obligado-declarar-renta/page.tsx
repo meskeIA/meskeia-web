@@ -15,7 +15,6 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { OBLIGACION_DECLARAR_2025, FISCAL_IRPF_META } from '@/data/fiscal';
 import { formatCurrency } from '@/lib';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────
 // TIPOS Y DATOS
@@ -325,13 +324,7 @@ export default function TestObligadoDeclararRentaPage() {
   const respuestaActual = preguntaActual ? respuestas[preguntaActual.id] : undefined;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -624,7 +617,6 @@ export default function TestObligadoDeclararRentaPage() {
         <RelatedApps apps={getRelatedApps('test-obligado-declarar-renta')} />
         <ShareCard appName="test-obligado-declarar-renta" />
         <Footer appName="test-obligado-declarar-renta" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de tipo marginal y tipo medio efectivo',
     'Datos basados en Ley 35/2006 y LPGE 2025',
     'Solo orientativo — verifica con la AEAT',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['IRPF', 'tramos IRPF', 'tipo marginal', 'AEAT', 'fiscal España'],

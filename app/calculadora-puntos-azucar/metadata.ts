@@ -39,8 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Prueba del vaso de agua fría para cada fase',
     'Tabla de referencia completa con las 9 fases del azúcar',
     'Navegación de contexto: fase anterior y siguiente',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

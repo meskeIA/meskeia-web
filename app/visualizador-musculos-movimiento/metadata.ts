@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Sarcómero y modelo de filamentos deslizantes',
     'Articulaciones y sistema de palancas',
     'Datos y curiosidades musculares',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

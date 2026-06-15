@@ -38,8 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de splits con tiempo acumulado por kilómetro',
     'Proyecciones para 5K, 10K, media maratón y maratón',
     'Entrada de tiempo en horas, minutos y segundos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito, sin publicidad y disponible en español',
   ],
 });
 

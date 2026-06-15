@@ -38,7 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de combinaciones IDE + asistente (VS Code, Cursor, Windsurf, JetBrains)',
     'Nota explicativa sobre la confusión con los distintos significados de "Codex"',
     'Indicadores de privacidad y cumplimiento RGPD por herramienta',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

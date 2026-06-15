@@ -45,7 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Indicador visual de intensidad por especia',
     'Con qué especias combina cada una',
     'Guía de conservación (tiempo y método)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

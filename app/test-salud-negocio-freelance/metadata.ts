@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Radar chart interactivo con resultados visuales',
     'Recomendaciones personalizadas con enlaces a herramientas',
     'Puerta de entrada a la suite freelance completa de meskeIA',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -12,7 +12,6 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaRazasPerros.module.css';
-import { jsonLd } from './metadata';
 
 type GrupoFCI =
   | 'Pastoreo'
@@ -974,13 +973,7 @@ export default function GuiaRazasPerrosPage() {
   }, [busqueda, tamanoSelec, energiaSelec, soloApartamento, soloNinos]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1516,7 +1509,6 @@ export default function GuiaRazasPerrosPage() {
         <RelatedApps apps={getRelatedApps('guia-razas-perros')} />
         <ShareCard appName="guia-razas-perros" />
         <Footer appName="guia-razas-perros" />
-      </div>
-    </>
+    </div>
   );
 }

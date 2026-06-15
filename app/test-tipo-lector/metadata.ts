@@ -38,8 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Géneros literarios asociados a cada perfil',
     'Autores emblema y lecturas recomendadas por arquetipo',
     'Resultado compartible con descripción personalizada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

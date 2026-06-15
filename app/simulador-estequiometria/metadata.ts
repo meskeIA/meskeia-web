@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Gramos sobrantes del reactivo en exceso',
     'Ecuación balanceada con reactivo limitante resaltado en rojo',
     'Soporte para catalizadores (fermentación alcohólica)',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['estequiometría', 'reactivo limitante', 'moles', 'masa molar', 'rendimiento', 'EBAU', 'Bachillerato', 'química'],
 });

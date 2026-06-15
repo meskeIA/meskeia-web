@@ -42,8 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Consulta SQL generada automáticamente',
     'Tabla resultado con NULL resaltados',
     '4 ejemplos clásicos (empleados, pedidos, productos, estudiantes)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['SQL JOIN', 'bases de datos', 'INNER LEFT RIGHT', 'informática universidad'],

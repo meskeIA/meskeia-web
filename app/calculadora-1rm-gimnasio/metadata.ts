@@ -38,9 +38,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla completa de cargas por porcentaje (60%–100%)',
     'Cálculo para cualquier ejercicio de fuerza',
     'Comparativa de ambas fórmulas con media ponderada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Umbrales IRPF 2025 actualizados (22.000 € / 15.876 €)',
     'Contempla desempleo, IMV, varios pagadores y deducciones',
     'Resultado inmediato con explicación detallada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

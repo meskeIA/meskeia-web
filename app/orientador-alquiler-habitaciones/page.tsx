@@ -14,7 +14,6 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────
 // DATOS: MUNICIPIOS ZONA TENSIONADA
@@ -69,13 +68,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
   }, [rentaPisoStr, numHabitaciones, esZonaTensionada, calculado]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -376,7 +369,6 @@ export default function OrientadorAlquilerHabitacionesPage() {
         <RelatedApps apps={getRelatedApps('orientador-alquiler-habitaciones')} />
         <ShareCard appName="orientador-alquiler-habitaciones" />
         <Footer appName="orientador-alquiler-habitaciones" />
-      </div>
-    </>
+    </div>
   );
 }

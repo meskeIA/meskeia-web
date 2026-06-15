@@ -44,8 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Desglose visual: IVA, RETA, IRPF, gastos profesionales y personales',
     'Bloques expandibles con explicaciones detalladas',
     'Resumen "de cada 100 € facturados, te quedan X €"',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

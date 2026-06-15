@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -181,10 +180,7 @@ export default function OrientadorTipoOposicionPage() {
   const resultados = testTerminado ? filtrarOposiciones(respuestas) : [];
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -341,7 +337,6 @@ export default function OrientadorTipoOposicionPage() {
         <RelatedApps apps={getRelatedApps('orientador-tipo-oposicion')} />
         <ShareCard appName="orientador-tipo-oposicion" />
         <Footer appName="orientador-tipo-oposicion" />
-      </div>
-    </>
+    </div>
   );
 }

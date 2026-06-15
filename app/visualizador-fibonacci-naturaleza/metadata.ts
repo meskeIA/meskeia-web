@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Espiral dorada dibujada con CSS a partir de cuadrados de Fibonacci',
     'Fibonacci en plantas: girasoles, piñas, piñones, pétalos',
     'Proporción áurea en arte, arquitectura y diseño',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

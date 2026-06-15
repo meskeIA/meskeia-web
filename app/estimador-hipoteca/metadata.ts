@@ -97,8 +97,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de amortización mensual y anual completa',
     'Comparador de los tres tipos de hipoteca con los mismos datos',
     'Cálculo del ratio cuota/ingresos y alerta de sobreendeudamiento',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
 });

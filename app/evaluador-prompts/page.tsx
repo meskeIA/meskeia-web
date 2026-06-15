@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -238,13 +237,7 @@ export default function EvaluadorPromptsPage() {
   const posY = 100 - ((puntuacionEntrada - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -501,7 +494,6 @@ export default function EvaluadorPromptsPage() {
         <RelatedApps apps={getRelatedApps('evaluador-prompts')} />
         <ShareCard appName="evaluador-prompts" />
         <Footer appName="evaluador-prompts" />
-      </div>
-    </>
+    </div>
   );
 }

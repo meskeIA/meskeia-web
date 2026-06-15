@@ -40,8 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Gráfico temporal x(t), y(t) y diagrama de fases',
     '4 presets: linces y liebres, sobrepesca, equilibrio, caos',
     'Detección automática de picos, colapsos y extinciones',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['Lotka-Volterra', 'ecología', 'dinámica poblaciones', 'biología'],

@@ -36,9 +36,6 @@ export const jsonLd = generateWebAppSchema({
     'Ajuste automático de harina y agua por hidratación de la masa madre',
     'Compatible con cualquier hidratación de masa madre (50–150%)',
     'Tiempo de fermentación orientativo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

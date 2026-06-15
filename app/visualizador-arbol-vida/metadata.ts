@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla visual de características evolutivas por grupo',
     'Gráfico de número de especies con datos reales',
     'Timeline de 540 millones de años de evolución animal',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

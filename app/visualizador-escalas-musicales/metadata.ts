@@ -39,7 +39,6 @@ export const jsonLd = generateWebAppSchema({
     'Acordes tríada diatónicos construidos sobre cada escala',
     'Descripción del carácter sonoro de cada escala',
     'Selector de las 12 notas cromáticas como raíz',
-    'Funciona 100% en el navegador, sin registro ni instalación',
     'Gratuito y disponible en español',
   ],
 });

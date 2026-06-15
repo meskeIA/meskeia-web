@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Datos de las fuerzas físicas cotidianas
@@ -157,13 +156,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -355,7 +348,6 @@ export default function VisualizadorFuerzasInvisiblesPage() {
         <RelatedApps apps={getRelatedApps('visualizador-fuerzas-invisibles')} />
         <ShareCard appName="visualizador-fuerzas-invisibles" />
         <Footer appName="visualizador-fuerzas-invisibles" />
-      </div>
-    </>
+    </div>
   );
 }

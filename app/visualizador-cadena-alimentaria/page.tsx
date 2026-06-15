@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -560,13 +559,7 @@ export default function VisualizadorCadenaAlimentariaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -647,7 +640,6 @@ export default function VisualizadorCadenaAlimentariaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-cadena-alimentaria')} />
         <ShareCard appName="visualizador-cadena-alimentaria" />
         <Footer appName="visualizador-cadena-alimentaria" />
-      </div>
-    </>
+    </div>
   );
 }

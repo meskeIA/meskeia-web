@@ -45,8 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Circuitos predefinidos: Half Adder, Full Adder, Multiplexor',
     'Evaluador de expresiones booleanas',
     'Visualización paso a paso de la propagación de señales',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['compuertas lógicas', 'puertas lógicas', 'electrónica digital', 'álgebra booleana', 'tablas verdad', 'universidad', 'FP'],

@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Ciclo de las rocas con diagrama SVG animado',
     'Rocas en la vida cotidiana con usos reales',
     'Escala de Mohs simplificada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

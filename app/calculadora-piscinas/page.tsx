@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 type FormaType = 'rectangular' | 'circular' | 'ovalada';
 
@@ -97,13 +96,7 @@ export default function CalculadoraPiscinasPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -562,7 +555,6 @@ export default function CalculadoraPiscinasPage() {
         <RelatedApps apps={getRelatedApps('calculadora-piscinas')} />
         <ShareCard appName="calculadora-piscinas" />
         <Footer appName="calculadora-piscinas" />
-      </div>
-    </>
+    </div>
   );
 }

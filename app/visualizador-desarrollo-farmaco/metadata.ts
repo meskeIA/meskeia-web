@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Aprobación regulatoria EMA/FDA y fabricación a escala',
     'Vigilancia post-comercialización (Fase IV) y genéricos',
     'Negociación de precios en el SNS español',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

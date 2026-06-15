@@ -11,7 +11,6 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import RegionBadge from '@/components/RegionBadge';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -246,13 +245,7 @@ export default function ChecklistCambioRegimenPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -656,7 +649,6 @@ export default function ChecklistCambioRegimenPage() {
         <RelatedApps apps={getRelatedApps('checklist-cambio-regimen-autonomo')} />
         <ShareCard appName="checklist-cambio-regimen-autonomo" />
         <Footer appName="checklist-cambio-regimen-autonomo" />
-      </div>
-    </>
+    </div>
   );
 }

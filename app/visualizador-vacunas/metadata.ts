@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Comparación de 5 tipos de vacunas',
     'Simulador visual de inmunidad de rebaño',
     'Timeline histórica de la vacunación',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

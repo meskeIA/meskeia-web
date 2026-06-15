@@ -45,9 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Acción recomendada para cada insecto (qué hacer como jardinero)',
     'Curiosidad entomológica por especie',
     'Enfoque en control biológico y jardinería ecológica',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -40,9 +40,6 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-gasto-energetico/',
   category: 'EducationalApplication',
   features: [
-      "Funciona 100% en el navegador, sin registro ni instalación",
-      "Gratuito y sin publicidad",
-      "En español"
   ],
 });
 

@@ -33,7 +33,6 @@ import {
   JUBILACION_PARCIAL_META,
   getCoeficienteAnticipada,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // TIPOS
@@ -400,13 +399,7 @@ export default function SimuladorJubilacionPublicaPage() {
   const req = REQUISITOS_JUBILACION_PARCIAL;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -1035,7 +1028,6 @@ export default function SimuladorJubilacionPublicaPage() {
         <RelatedApps apps={getRelatedApps('simulador-jubilacion-publica')} />
         <ShareCard appName="simulador-jubilacion-publica" />
         <Footer appName="simulador-jubilacion-publica" />
-      </div>
-    </>
+    </div>
   );
 }

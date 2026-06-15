@@ -41,8 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de v, a_c, F_c, T y frecuencia en tiempo real',
     'Soporte dark mode completo',
     'Escala Retina/HiDPI para pantallas de alta resolución',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['movimiento circular', 'MCU', 'MCNU', 'aceleración centrípeta', 'física bachillerato'],

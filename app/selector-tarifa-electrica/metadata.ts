@@ -49,8 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Recomendacion personalizada entre PVPC y mercado libre',
     'Estimacion de coste anual para cada opcion',
     'Explicacion de franjas horarias 2.0TD (punta, llano, valle)',
-    'Funciona 100% en el navegador, sin registro ni instalacion',
-    'Gratuito y sin publicidad',
     'Disponible en espanol',
   ],
 });

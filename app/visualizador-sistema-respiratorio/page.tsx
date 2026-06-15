@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -858,13 +857,7 @@ export default function VisualizadorSistemaRespiratorio() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -893,7 +886,7 @@ export default function VisualizadorSistemaRespiratorio() {
         {/* Cabecera sección */}
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>
-            {SECCIONES.find(s => s.id === seccionActiva)?.icono}{' '}
+            <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
           </h2>
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
@@ -945,7 +938,6 @@ export default function VisualizadorSistemaRespiratorio() {
         <RelatedApps apps={getRelatedApps('visualizador-sistema-respiratorio')} />
         <ShareCard appName="visualizador-sistema-respiratorio" />
         <Footer appName="visualizador-sistema-respiratorio" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -226,13 +225,7 @@ export default function OrientadorDiversificacionClientesPage() {
   }, [hhi]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -588,7 +581,6 @@ export default function OrientadorDiversificacionClientesPage() {
         <RelatedApps apps={getRelatedApps('orientador-diversificacion-clientes')} />
         <ShareCard appName="orientador-diversificacion-clientes" />
         <Footer appName="orientador-diversificacion-clientes" />
-      </div>
-    </>
+    </div>
   );
 }

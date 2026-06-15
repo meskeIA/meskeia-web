@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'Espiral de Ulam con patrones diagonales de primos',
     'Explicación visual de criptografía RSA',
     'Primos gemelos, de Mersenne y récords mundiales',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

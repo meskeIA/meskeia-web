@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Gráfico animado de interés compuesto vs simple vs sin interés',
     'Simulación visual de la erosión del poder adquisitivo por inflación',
     'Comparativa visual: amortizar hipoteca vs invertir',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

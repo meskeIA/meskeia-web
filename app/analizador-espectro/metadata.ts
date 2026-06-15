@@ -44,7 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Control de sensibilidad ajustable y marcadores de picos con decay automático',
     'Tabla de referencia de frecuencias de notas musicales (A4=440 Hz)',
     'Bloque educativo sobre FFT, EQ, respuesta frecuencial y usos profesionales',
-    'Funciona 100% en el navegador con el micrófono del dispositivo, sin instalación',
   ],
 });
 

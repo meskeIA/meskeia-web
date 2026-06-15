@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -239,13 +238,7 @@ export default function ChecklistPreMortemPage() {
   const posY = 100 - ((puntuacionAnticipacion - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -509,7 +502,6 @@ export default function ChecklistPreMortemPage() {
         <RelatedApps apps={getRelatedApps('checklist-pre-mortem')} />
         <ShareCard appName="checklist-pre-mortem" />
         <Footer appName="checklist-pre-mortem" />
-      </div>
-    </>
+    </div>
   );
 }

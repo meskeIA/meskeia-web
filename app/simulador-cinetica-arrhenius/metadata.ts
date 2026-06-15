@@ -47,7 +47,6 @@ export const jsonLd = generateWebAppSchema({
     'Recta de Arrhenius (ln k vs 1/T) — pendiente −Ea/R',
     '5 reacciones predefinidas con valores de Ea reales',
     'Tiempo de vida media para reacciones de primer orden',
-    'Funciona 100% en el navegador, gratuito y en español',
   ],
   keywords: ['cinética química', 'Arrhenius', 'energía activación', 'Maxwell-Boltzmann', 'EBAU', 'Bachillerato', 'química'],
 });

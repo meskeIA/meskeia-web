@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
-import { jsonLd } from './metadata';
 
 // ===== CONSTANTES =====
 
@@ -206,13 +205,7 @@ export default function EstimacionCertificacionEnergeticaPage() {
   const indiceLetra = resultado ? ESCALA_ENERGETICA.findIndex((e) => e.letra === resultado.letra) : -1;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -744,7 +737,6 @@ export default function EstimacionCertificacionEnergeticaPage() {
         <RelatedApps apps={getRelatedApps('estimacion-certificacion-energetica')} />
         <ShareCard appName="estimacion-certificacion-energetica" />
         <Footer appName="estimacion-certificacion-energetica" />
-      </div>
-    </>
+    </div>
   );
 }

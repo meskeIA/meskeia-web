@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Ejemplos clásicos: polilla del abedul, pinzones de Galápagos, resistencia a antibióticos',
     'Comparativa visual Darwin vs Lamarck con el ejemplo de la jirafa',
     'Datos fascinantes sobre evolución y selección natural',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

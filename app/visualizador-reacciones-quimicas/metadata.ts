@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Balanceo interactivo de ecuaciones químicas',
     'Conteo atómico visual en tiempo real',
     'Reacciones cotidianas: cocina, motor, batería',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

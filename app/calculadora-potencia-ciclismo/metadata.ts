@@ -37,9 +37,6 @@ export const jsonLd = generateWebAppSchema({
     'Zonas de potencia Z1-Z6 basadas en tu FTP',
     'Cálculo de VAM (Velocidad Ascensional Media) para subidas cronometradas',
     'Tabla de zonas con rangos de vatios y porcentajes del FTP',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

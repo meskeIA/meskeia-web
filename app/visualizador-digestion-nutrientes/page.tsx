@@ -12,7 +12,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 type Seccion = 'macronutrientes' | 'digestion' | 'micronutrientes' | 'datos';
 
@@ -278,13 +277,7 @@ export default function VisualizadorDigestionNutrientesPage() {
   const maxKcal = Math.max(...MACRONUTRIENTES.map(m => m.kcalPorGramo));
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -626,7 +619,6 @@ export default function VisualizadorDigestionNutrientesPage() {
         <RelatedApps apps={getRelatedApps('visualizador-digestion-nutrientes')} />
         <ShareCard appName="visualizador-digestion-nutrientes" />
         <Footer appName="visualizador-digestion-nutrientes" />
-      </div>
-    </>
+    </div>
   );
 }

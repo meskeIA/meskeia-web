@@ -44,9 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Órganos diana clickables: corazón, cerebro, riñón, ojos y arterias grandes',
     'Factores modificables y no modificables que elevan la presión',
     'Warningbox: el asesino silencioso y estadísticas de diagnóstico en España',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

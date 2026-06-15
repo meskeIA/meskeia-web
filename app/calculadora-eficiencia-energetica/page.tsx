@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 type TabType = 'aislamiento' | 'ventanas' | 'calefaccion';
 
@@ -175,13 +174,7 @@ export default function EficienciaEnergeticaPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -627,7 +620,6 @@ export default function EficienciaEnergeticaPage() {
         <RelatedApps apps={getRelatedApps('calculadora-eficiencia-energetica')} />
         <ShareCard appName="calculadora-eficiencia-energetica" />
         <Footer appName="calculadora-eficiencia-energetica" />
-      </div>
-    </>
+    </div>
   );
 }

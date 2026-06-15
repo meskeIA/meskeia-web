@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -95,13 +94,7 @@ export default function TomaDecisionesPage() {
   ];
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -738,7 +731,6 @@ export default function TomaDecisionesPage() {
         <ShareCard appName="visualizador-toma-decisiones" />
 
         <Footer appName="visualizador-toma-decisiones" />
-      </div>
-    </>
+    </div>
   );
 }

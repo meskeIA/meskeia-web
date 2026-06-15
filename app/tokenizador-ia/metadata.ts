@@ -40,7 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Indicador visual de ventana de contexto utilizada por modelo',
     'Ratio de tokens entrada/salida configurable para estimaciones reales',
     'Ejemplos preconfigurados: tweet, email, párrafo, fragmento de código',
-    'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
 

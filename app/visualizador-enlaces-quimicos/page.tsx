@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -497,13 +496,7 @@ export default function VisualizadorEnlacesQuimicosPage() {
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -573,7 +566,6 @@ export default function VisualizadorEnlacesQuimicosPage() {
         <RelatedApps apps={getRelatedApps('visualizador-enlaces-quimicos')} />
         <ShareCard appName="visualizador-enlaces-quimicos" />
         <Footer appName="visualizador-enlaces-quimicos" />
-      </div>
-    </>
+    </div>
   );
 }

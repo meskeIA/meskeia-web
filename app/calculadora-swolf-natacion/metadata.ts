@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Velocidad media en min/100m',
     'Consejos de mejora técnica personalizados según el nivel',
     'Compatible con piscinas de 25m y 50m',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

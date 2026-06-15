@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Recorrido interactivo por la nefrona',
     'Los 3 procesos: filtración, reabsorción, secreción',
     'Regulación hormonal SRAA y ADH',
-    'Funciona 100% en el navegador, sin registro',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Animación visual de Torres de Hanoi',
     'Trazado paso a paso de llamadas y retornos',
     'Métricas: llamadas totales, profundidad máxima, eficiencia',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['recursión', 'pila llamadas', 'Fibonacci', 'programación'],

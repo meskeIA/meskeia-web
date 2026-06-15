@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -662,13 +661,7 @@ export default function TermodinamicaQuimicaPage() {
   ], []);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -726,7 +719,6 @@ export default function TermodinamicaQuimicaPage() {
         <RelatedApps apps={getRelatedApps('visualizador-termodinamica-quimica')} />
         <ShareCard appName="visualizador-termodinamica-quimica" />
         <Footer appName="visualizador-termodinamica-quimica" />
-      </div>
-    </>
+    </div>
   );
 }

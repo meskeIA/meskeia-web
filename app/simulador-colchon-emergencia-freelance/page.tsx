@@ -8,7 +8,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // --- Tipos ---
 
@@ -173,10 +172,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
   }, [resultados]);
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -576,7 +572,6 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
         <RelatedApps apps={getRelatedApps('simulador-colchon-emergencia-freelance')} />
         <ShareCard appName="simulador-colchon-emergencia-freelance" />
         <Footer appName="simulador-colchon-emergencia-freelance" />
-      </div>
-    </>
+    </div>
   );
 }

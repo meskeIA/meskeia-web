@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de perímetro y área por iteración',
     'Fractales en la naturaleza: helechos, brócoli, costas, pulmones',
     'Conjunto de Mandelbrot y dimensión fractal de Hausdorff explicados',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

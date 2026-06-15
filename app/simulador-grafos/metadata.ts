@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     '4 presets: grid 5x5, árbol binario, grafo denso, laberinto',
     'Animación paso a paso con velocidad ajustable',
     'Camino encontrado destacado y métricas de complejidad',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['grafos', 'BFS DFS Dijkstra', 'algoritmia', 'informática universidad'],

@@ -43,8 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagrama de fase (trayectoria orbital conejos vs lobos)',
     'Ley de enfriamiento de Newton con solución exacta',
     'Circuito RC: constante de tiempo τ = RC visualizada',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y en español',
   ],
   category: 'EducationalApplication',
 });

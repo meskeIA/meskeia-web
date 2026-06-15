@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagrama de la unión P-N con slider de voltaje de polarización',
     'Infografía del proceso de fabricación: de la arena al chip en 7 pasos',
     'Gráfico de la Ley de Moore en escala logarítmica con datos históricos',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

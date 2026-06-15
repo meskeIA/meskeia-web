@@ -49,9 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Fechas de presentación de modelos fiscales (303, 130, 390, 190)',
     'Alertas de meses críticos: agosto y diciembre',
     'Reparto equitativo de objetivos con un clic',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

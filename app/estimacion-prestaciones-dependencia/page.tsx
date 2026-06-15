@@ -21,7 +21,6 @@ import {
   SERVICIOS_SAAD,
   COPAGO_DEPENDENCIA_2025,
 } from '@/data/fiscal';
-import { jsonLd } from './metadata';
 
 // ===== TIPOS =====
 interface GradoSeleccionado {
@@ -76,10 +75,6 @@ export default function EstimacionPrestacionesDependencia() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       {/* Hero */}

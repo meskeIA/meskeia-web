@@ -42,9 +42,6 @@ export const jsonLd = generateWebAppSchema({
     'Intercambio gaseoso O₂/CO₂ en alvéolos con diagrama SVG',
     'Espirometría visual con volúmenes pulmonares',
     'Enfermedades respiratorias: asma, EPOC, neumotórax',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

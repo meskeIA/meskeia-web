@@ -52,8 +52,6 @@ export const jsonLd = generateWebAppSchema({
     'Timeline de reformas del sistema (1995-2027)',
     'Proyecciones de gasto AIREF hasta 2050',
     'Evolución del Fondo de Reserva (hucha de las pensiones)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
   ],
 });
 

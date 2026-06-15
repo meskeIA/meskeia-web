@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -107,10 +106,7 @@ export default function PlanificadorEstudioOposicionesPage() {
   const semanasRepaso = plan.length - semanasEstudio;
 
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -310,7 +306,6 @@ export default function PlanificadorEstudioOposicionesPage() {
         <RelatedApps apps={getRelatedApps('planificador-estudio-oposiciones')} />
         <ShareCard appName="planificador-estudio-oposiciones" />
         <Footer appName="planificador-estudio-oposiciones" />
-      </div>
-    </>
+    </div>
   );
 }

@@ -45,7 +45,6 @@ export const jsonLd = generateWebAppSchema({
     'Tipos de cáncer por origen celular (sin estadísticas)',
     'Enfoque exclusivo en biología molecular, sin síntomas ni estadios',
     'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

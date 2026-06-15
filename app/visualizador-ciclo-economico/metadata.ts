@@ -60,9 +60,6 @@ export const jsonLd = generateWebAppSchema({
     'Curva de rendimientos normal, plana e invertida con animación',
     'Simulador interactivo para estimar la fase económica actual',
     'Ejemplos históricos de España y economías globales',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

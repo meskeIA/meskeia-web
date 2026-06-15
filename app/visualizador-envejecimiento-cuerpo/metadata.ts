@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     '7 indicadores fisiológicos con barras animadas',
     'Explicación de cada cambio y consejos preventivos',
     'Gráfico de evolución de capacidades a lo largo de la vida',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

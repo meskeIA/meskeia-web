@@ -46,7 +46,6 @@ export const jsonLd = generateWebAppSchema({
     'Indicador visual de nivel de cafeína',
     'Nombres originales en su idioma de procedencia',
     'Curiosidades históricas y culturales',
-    'Funciona 100% en el navegador, sin registro',
   ],
 });
 

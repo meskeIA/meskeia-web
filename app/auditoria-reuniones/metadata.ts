@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Diagnóstico visual con mapa bidimensional',
     'Perfil personalizado con fortalezas y riesgos',
     'Acciones concretas para mejorar tus reuniones',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

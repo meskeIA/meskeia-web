@@ -14,7 +14,6 @@ import {
 import { GASTOS_PRIMER_ANO_BEBE } from '@/data/fiscal';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 type NivelGasto = 'min' | 'med' | 'alto';
 
@@ -79,13 +78,7 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
   const totalConfortable = GASTOS_PRIMER_ANO_BEBE.reduce((s, c) => s + c.gastoAlto, 0);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero */}
@@ -431,7 +424,6 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
         <RelatedApps apps={getRelatedApps('planificador-gastos-bebe')} />
         <ShareCard appName="planificador-gastos-bebe" />
         <Footer appName="planificador-gastos-bebe" />
-      </div>
-    </>
+    </div>
   );
 }

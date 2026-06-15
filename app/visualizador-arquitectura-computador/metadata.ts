@@ -43,7 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Jerarquía de memoria: de registros a HDD con velocidad, tamaño y latencia reales',
     'Ideal para 1º de carrera de informática y Bachillerato tecnológico',
     'Gratuito, sin registro, 100% en el navegador',
-    'Disponible en español',
   ],
 });
 

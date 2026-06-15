@@ -37,7 +37,6 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de ejemplos interactiva: añadir, eliminar y modificar ejemplos',
     'Clasificador de nuevos ejemplos con trayectoria visual por el árbol',
     'Indicador de impureza Gini por nodo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
     'Explica visualmente cómo aprende una máquina a clasificar datos',
   ],
 });

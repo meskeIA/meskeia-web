@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 /* ─── Tipos ─── */
 
@@ -239,13 +238,7 @@ export default function MapaDecisionesUrgentesImportantesPage() {
   const posY = 100 - ((puntuacionVision - 5) / 20) * 100;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -516,7 +509,6 @@ export default function MapaDecisionesUrgentesImportantesPage() {
         <RelatedApps apps={getRelatedApps('mapa-decisiones-urgentes-importantes')} />
         <ShareCard appName="mapa-decisiones-urgentes-importantes" />
         <Footer appName="mapa-decisiones-urgentes-importantes" />
-      </div>
-    </>
+    </div>
   );
 }

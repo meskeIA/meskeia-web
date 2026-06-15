@@ -43,9 +43,6 @@ export const jsonLd = generateWebAppSchema({
     'Requisitos, plazos y bases máximas deducibles',
     'Estimación del ahorro fiscal por modalidad',
     'Normativa actualizada: DA 50.ª LIRPF + RDL 2/2026',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

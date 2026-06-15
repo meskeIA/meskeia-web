@@ -40,8 +40,6 @@ export const jsonLd = generateWebAppSchema({
     'Cálculo de tiempos de espera, respuesta y turnaround',
     'Métricas globales: throughput, utilización CPU, inanición',
     '4 ejemplos clásicos preconfigurados (convoy effect, inanición, etc.)',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
     'En español',
   ],
   keywords: ['planificación procesos', 'CPU scheduling', 'sistemas operativos', 'informática universidad'],

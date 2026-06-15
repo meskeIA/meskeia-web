@@ -6,7 +6,6 @@ import styles from './SimuladorEstequiometria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
 
 // ============================================
 // TIPOS
@@ -277,13 +276,7 @@ export default function SimuladorEstequiometriaPage() {
   const esLimitanteB = resultado !== null && resultado.limitante === reaccion.reactivos[1].nombre;
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         <MeskeiaLogo />
 
         <header className={styles.hero}>
@@ -908,7 +901,6 @@ export default function SimuladorEstequiometriaPage() {
         <RelatedApps apps={getRelatedApps('simulador-estequiometria')} />
         <ShareCard appName="simulador-estequiometria" />
         <Footer appName="simulador-estequiometria" />
-      </div>
-    </>
+    </div>
   );
 }

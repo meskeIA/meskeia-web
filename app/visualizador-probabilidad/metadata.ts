@@ -41,9 +41,6 @@ export const jsonLd = generateWebAppSchema({
     'La falacia del jugador explicada visualmente',
     'Paradoja del cumpleaños interactiva',
     'Probabilidad en dados con distribución visual',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

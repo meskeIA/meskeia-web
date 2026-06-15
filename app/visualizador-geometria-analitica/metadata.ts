@@ -44,7 +44,6 @@ export const jsonLd = generateWebAppSchema({
     'Focos, vértices y puntos notables con coordenadas',
     'Asíntotas de la hipérbola en líneas punteadas',
     'Tab de coordenadas polares: rosa de pétalos, espiral y cardioide',
-    'Funciona 100% en el navegador, sin registro ni instalación',
     'Gratuito y disponible en español',
   ],
 });

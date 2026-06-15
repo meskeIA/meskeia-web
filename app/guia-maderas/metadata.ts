@@ -49,9 +49,6 @@ export const jsonLd = generateWebAppSchema({
     'Buscador por nombre de especie',
     'Escala visual de dureza Janka',
     'Información de sostenibilidad y origen',
-    'Funciona 100% en el navegador, sin registro ni instalación',
-    'Gratuito y sin publicidad',
-    'Disponible en español',
   ],
 });
 

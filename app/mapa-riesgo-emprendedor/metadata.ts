@@ -36,7 +36,7 @@ export const jsonLd = generateWebAppSchema({
   name: 'Mapa de Riesgo del Emprendedor',
   description: 'Herramienta interactiva de reflexión para evaluar si estás gestionando bien los riesgos de emprender. Análisis de exposición y preparación ante el fracaso.',
   url: 'https://meskeia.com/mapa-riesgo-emprendedor/',
-  features: ['Test de 10 preguntas sobre exposición y preparación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en análisis de riesgos personales', 'Acciones concretas según tu resultado', 'Funciona 100% en el navegador, sin registro ni instalación', 'Gratuito y sin publicidad', 'Disponible en español'],
+  features: ['Test de 10 preguntas sobre exposición y preparación', 'Diagnóstico visual con mapa 2D y perfil personalizado', 'Basado en análisis de riesgos personales', 'Acciones concretas según tu resultado'],
 });
 
 export const faqJsonLd = {
