@@ -266,6 +266,7 @@ export default function VisualizadorGeopoliticaRecursos() {
           {RECURSOS.map((r) => (
             <button
               key={r.id}
+              type="button"
               role="tab"
               aria-selected={recursoActivo === r.id}
               aria-controls={`panel-${r.id}`}
@@ -361,13 +362,13 @@ export default function VisualizadorGeopoliticaRecursos() {
               <div className={styles.gridColProveedor}>{fila.proveedor}</div>
               <div>
                 {fila.riesgo === 'rojo' && (
-                  <span className={styles.semaforoRojo}>🔴 {fila.riesgoLabel}</span>
+                  <span className={styles.semaforoRojo}><span aria-hidden="true">🔴</span> {fila.riesgoLabel}</span>
                 )}
                 {fila.riesgo === 'naranja' && (
-                  <span className={styles.semaforoNaranja}>🟠 {fila.riesgoLabel}</span>
+                  <span className={styles.semaforoNaranja}><span aria-hidden="true">🟠</span> {fila.riesgoLabel}</span>
                 )}
                 {fila.riesgo === 'verde' && (
-                  <span className={styles.semaforoVerde}>🟢 {fila.riesgoLabel}</span>
+                  <span className={styles.semaforoVerde}><span aria-hidden="true">🟢</span> {fila.riesgoLabel}</span>
                 )}
               </div>
             </div>
@@ -386,6 +387,7 @@ export default function VisualizadorGeopoliticaRecursos() {
           {CONFLICTOS.map((conflicto) => (
             <div key={conflicto.id} className={styles.conflictoCard}>
               <button
+                type="button"
                 className={styles.conflictoHeader}
                 onClick={() => toggleConflicto(conflicto.id)}
                 aria-expanded={conflictoAbierto === conflicto.id}

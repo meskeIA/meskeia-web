@@ -402,6 +402,7 @@ export default function GeneradorPoemas() {
               {FORMAS.map(forma => (
                 <button
                   key={forma.id}
+                  type="button"
                   className={styles.formaCard}
                   onClick={() => seleccionarForma(forma)}
                   aria-label={`Escribir un ${forma.nombre}`}
@@ -431,7 +432,7 @@ export default function GeneradorPoemas() {
         {pantalla === 'editor' && formaActual && (
           <section className={styles.editor}>
             <div className={styles.editorCabecera}>
-              <button className={styles.volverBtn} onClick={volver} aria-label="Volver a la selección de formas">
+              <button type="button" className={styles.volverBtn} onClick={volver} aria-label="Volver a la selección de formas">
                 ← Volver
               </button>
               <div className={styles.editorTitulo}>
@@ -494,6 +495,7 @@ export default function GeneradorPoemas() {
 
                 <div className={styles.accionesBar}>
                   <button
+                    type="button"
                     className={`${styles.copiarBtn} ${copiado ? styles.copiarBtnOk : ''}`}
                     onClick={copiarPoema}
                     aria-label="Copiar poema al portapapeles"
@@ -501,6 +503,7 @@ export default function GeneradorPoemas() {
                     {copiado ? '✓ ¡Copiado!' : '📋 Copiar poema'}
                   </button>
                   <button
+                    type="button"
                     className={styles.limpiarBtn}
                     onClick={limpiar}
                     aria-label="Limpiar todos los versos"
@@ -508,6 +511,7 @@ export default function GeneradorPoemas() {
                     Limpiar
                   </button>
                   <button
+                    type="button"
                     className={`${styles.ejemploBtn} ${mostrarEjemplo ? styles.ejemploBtnActivo : ''}`}
                     onClick={() => setMostrarEjemplo(v => !v)}
                     aria-expanded={mostrarEjemplo}
@@ -622,19 +626,19 @@ export default function GeneradorPoemas() {
           <h3>¿Quién puede usar esta herramienta?</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <strong>📚 Estudiante de Literatura</strong>
+              <strong><span aria-hidden="true">📚</span> Estudiante de Literatura</strong>
               <p>Practica las estructuras métricas que aparecen en el comentario de texto de tu examen de acceso a la universidad. Empieza por la redondilla y avanza al soneto.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <strong>✍️ Escritor principiante</strong>
+              <strong><span aria-hidden="true">✍️</span> Escritor principiante</strong>
               <p>Aprende la musicalidad del verso español escribiendo primero un haiku: solo 17 sílabas y sin rima. En 10 minutos ya tienes tu primer poema métrico.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <strong>🎓 Docente de Lengua</strong>
+              <strong><span aria-hidden="true">🎓</span> Docente de Lengua</strong>
               <p>Crea ejemplos ilustrativos para trabajar formas clásicas en clase. Muestra en tiempo real cómo funciona la sinalefa o el efecto del acento final.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <strong>🌟 Aficionado a la poesía</strong>
+              <strong><span aria-hidden="true">🌟</span> Aficionado a la poesía</strong>
               <p>Si escribes en verso libre, experimenta con la métrica clásica. La disciplina del soneto o la lira puede aportar musicalidad que no encontrarás de otro modo.</p>
             </div>
           </div>
@@ -720,27 +724,27 @@ export default function GeneradorPoemas() {
           <h3>Consejos para mejorar rápido</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <p><strong>Empieza con el haiku</strong> — 17 sílabas en total y sin rima. Es la forma más corta y permite entender el cómputo silábico sin la presión de buscar palabras rimadas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <p><strong>Planifica las rimas antes de escribir</strong> — Una lista de 3-4 palabras por grupo de rima evita el bloqueo a mitad del poema y da más opciones de vocabulario.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👂</span>
+              <span className={styles.tipIcon} aria-hidden="true">👂</span>
               <p><strong>Lee siempre en voz alta</strong> — El ritmo se percibe con el oído, no con la vista. Un verso que «cuenta bien» pero suena raro necesita ajuste de acentuación o de orden de palabras.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <p><strong>Acepta la variación ±1 sílaba</strong> — Los grandes poetas emplean licencias métricas. El contador muestra la desviación; el criterio artístico es tuyo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📚</span>
+              <span className={styles.tipIcon} aria-hidden="true">📚</span>
               <p><strong>Estudia los ejemplos clásicos</strong> — La lira de Garcilaso y el soneto de Lope no son solo referencias: son modelos de cómo resolver los problemas rítmicos más habituales.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌱</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌱</span>
               <p><strong>Progresa gradualmente</strong> — El camino natural es: haiku → redondilla → romance → serventesio → lira → soneto. Cada forma añade una dificultad nueva sobre la anterior.</p>
             </div>
           </div>
@@ -748,7 +752,7 @@ export default function GeneradorPoemas() {
           {/* 6. WARNING BOX */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Limitaciones del contador y normas a tener en cuenta</strong>
             </div>
             <ul className={styles.warningList}>

@@ -223,6 +223,7 @@ export default function GeneradorIncipitPage() {
             {FILTROS_GENERO.map((f) => (
               <button
                 key={f.id}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroGenero === f.id ? styles.filtroBtnActive : ''}`}
                 onClick={() => setFiltroGenero(f.id)}
                 aria-pressed={filtroGenero === f.id}
@@ -238,6 +239,7 @@ export default function GeneradorIncipitPage() {
             {FILTROS_TONO.map((f) => (
               <button
                 key={f.id}
+                type="button"
                 className={`${styles.filtroBtn} ${filtroTono === f.id ? styles.filtroBtnActive : ''}`}
                 onClick={() => setFiltroTono(f.id)}
                 aria-pressed={filtroTono === f.id}
@@ -248,7 +250,7 @@ export default function GeneradorIncipitPage() {
           </div>
         </div>
         <div className={styles.generarRow}>
-          <button className={styles.generarBtn} onClick={generar} aria-label="Generar nuevos íncipit">
+          <button type="button" className={styles.generarBtn} onClick={generar} aria-label="Generar nuevos íncipit">
             🎲 Generar
           </button>
           <span className={styles.contadorInfo}>
@@ -287,6 +289,7 @@ export default function GeneradorIncipitPage() {
                 )}
 
                 <button
+                  type="button"
                   className={`${styles.copyBtn} ${copiado === inc.id ? styles.copyBtnOk : ''}`}
                   onClick={() => copiar(inc.texto, inc.id)}
                   aria-label="Copiar al portapapeles"
@@ -305,6 +308,7 @@ export default function GeneradorIncipitPage() {
 
       <div className={styles.verTodosSection}>
         <button
+          type="button"
           className={styles.verTodosBtn}
           onClick={() => setVerTodos(!verTodos)}
           aria-expanded={verTodos}
@@ -324,7 +328,7 @@ export default function GeneradorIncipitPage() {
                   >
                     {genConf.label}
                   </span>
-                  <span className={styles.todosTono}>{TONO_CONFIG[inc.tono]}</span>
+                  <span className={styles.todosTono} aria-hidden="true">{TONO_CONFIG[inc.tono]}</span>
                   <span className={styles.todosTexto}>
                     {inc.texto}
                     {inc.real && (
@@ -332,6 +336,7 @@ export default function GeneradorIncipitPage() {
                     )}
                   </span>
                   <button
+                    type="button"
                     className={styles.todosBtn}
                     onClick={() => copiar(inc.texto, inc.id)}
                     aria-label="Copiar"

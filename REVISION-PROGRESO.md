@@ -136,11 +136,11 @@
 | [x] | Falacias Lógicas - Guía Visual de Errores de Razonamiento | `/visualizador-falacias-logicas/` | cultura, estudiantes |
 | [x] | Falsos Amigos Español-Inglés: Catálogo y Práctica | `/falsos-amigos-ingles/` | cultura, estudiantes |
 | [x] | Flujos Migratorios Globales: Mapa 2024 | `/visualizador-migracion-global/` | cultura |
-| [ ] | Francia Contemporánea: De la Tercera República a Macron | `/visualizador-historia/historia-francia-contemporanea/` | cultura |
+| [x] | Francia Contemporánea: De la Tercera República a Macron | `/visualizador-historia/historia-francia-contemporanea/` | cultura |
 | [x] | Generador de Anagramas | `/generador-anagramas/` | cultura, juegos |
-| [ ] | Generador de Íncipit | `/generador-incipit/` | cultura, estudiantes |
-| [ ] | Generador de Poemas por Forma | `/generador-poemas/` | cultura, estudiantes |
-| [ ] | Geopolítica de los Recursos - Petróleo, Litio y Tierras Raras | `/visualizador-geopolitica-recursos/` | cultura, estudiantes |
+| [x] | Generador de Íncipit | `/generador-incipit/` | cultura, estudiantes |
+| [x] | Generador de Poemas por Forma | `/generador-poemas/` | cultura, estudiantes |
+| [x] | Geopolítica de los Recursos - Petróleo, Litio y Tierras Raras | `/visualizador-geopolitica-recursos/` | cultura, estudiantes |
 | [ ] | Grandes Géneros de la Novela | `/visualizador-generos-novela/` | cultura |
 | [ ] | Guía de Aves Comunes | `/guia-aves-comunes/` | cultura, salud |
 | [ ] | Guía de Comentario de Texto | `/guia-comentario-texto/` | cultura, estudiantes |
